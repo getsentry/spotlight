@@ -8,6 +8,9 @@ dependencies:
   autoprefixer:
     specifier: ^10.4.15
     version: 10.4.15(postcss@8.4.28)
+  dayjs:
+    specifier: ^1.11.9
+    version: 1.11.9
   postcss:
     specifier: ^8.4.28
     version: 8.4.28
@@ -20,6 +23,9 @@ dependencies:
   tailwindcss:
     specifier: ^3.3.3
     version: 3.3.3
+  usehooks-ts:
+    specifier: ^2.9.1
+    version: 2.9.1(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
   '@tailwindcss/forms':
@@ -978,6 +984,10 @@ packages:
   /csstype@3.1.2:
     resolution: {integrity: sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==}
     dev: true
+
+  /dayjs@1.11.9:
+    resolution: {integrity: sha512-QvzAURSbQ0pKdIye2txOzNaHmxtUBXerpY0FJsFXUMKbIZeFm5ht1LS/jFsrncjnmtv8HsG0W2g6c0zUjZWmpA==}
+    dev: false
 
   /debug@4.3.4:
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
@@ -1958,6 +1968,17 @@ packages:
     dependencies:
       punycode: 2.3.0
     dev: true
+
+  /usehooks-ts@2.9.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-2FAuSIGHlY+apM9FVlj8/oNhd+1y+Uwv5QNkMQz1oSfdHk4PXo1qoCw9I5M7j0vpH8CSWFJwXbVPeYDjLCx9PA==}
+    engines: {node: '>=16.15.0', npm: '>=8'}
+    peerDependencies:
+      react: ^16.8.0  || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0  || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
 
   /util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}

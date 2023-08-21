@@ -23,7 +23,7 @@ function Frame({ frame }: { frame: EventFrame }) {
             at line{" "}
             <span className="text-indigo-100">
               {frame.lineno}
-              {frame.colno !== undefined && `:{frame.colno}`}
+              {frame.colno !== undefined && `:${frame.colno}`}
             </span>
           </>
         )}
@@ -83,6 +83,35 @@ function Frame({ frame }: { frame: EventFrame }) {
   );
 }
 
+export function getErrorEventTitle({ event }: { event: SentryErrorEvent }) {
+  const values =
+    "values" in event.exception
+      ? event.exception.values
+      : [event.exception.value];
+
+  return (
+    <>
+      <strong className="font-bold">{values[0].type}:</strong> {values[0].value}
+    </>
+  );
+}
+
+export function ErrorSummary({ event }: { event: SentryErrorEvent }) {
+  const values =
+    "values" in event.exception
+      ? event.exception.values
+      : [event.exception.value];
+
+  return (
+    <div className="font-mono space-y-4">
+      <h3 className="flex flex-col">
+        <strong className="text-xl">{values[0].type}</strong>
+        <span className="">{values[0].value}</span>
+      </h3>
+    </div>
+  );
+}
+
 export default function Error({ event }: { event: SentryErrorEvent }) {
   const values =
     "values" in event.exception
@@ -90,9 +119,8 @@ export default function Error({ event }: { event: SentryErrorEvent }) {
       : [event.exception.value];
   return (
     <>
-      <ol className="space-y-8">
+      <ol className="space-y-4">
         {values.map((value, valueIdx) => {
-          console.log(value);
           return (
             <li key={valueIdx} className="font-mono space-y-4">
               <h3 className="flex flex-col">

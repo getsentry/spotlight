@@ -19,7 +19,6 @@ export const SentryContextProvider: React.FC<{ children: ReactNode }> = ({
     eventSource,
     ["message"],
     (evt) => {
-      console.log("here");
       addEvents(JSON.parse(evt.data));
     },
     [addEvents]

@@ -32,8 +32,27 @@ export type EventException =
       value: EventExceptionValue;
     };
 
+export type Breadcrumbs = {
+  values: {
+    message: string;
+    category: string;
+    timestamp: string;
+    type: string | "default";
+  }[];
+};
+
+export type Context = {
+  [key: string]: string | number;
+};
+
 type CommonEventAttrs = {
   event_id: string;
+  timestamp: string;
+  breadcrumbs?: Breadcrumbs;
+  transaction?: string;
+  contexts?: {
+    [key: string]: Context;
+  };
 };
 
 export type SentryErrorEvent = CommonEventAttrs & {
@@ -41,7 +60,7 @@ export type SentryErrorEvent = CommonEventAttrs & {
 };
 
 export type SentryTransactionEvent = CommonEventAttrs & {
-  type: "transactiokn";
+  type: "transaction";
 };
 
 export type SentryEvent = SentryErrorEvent | SentryTransactionEvent;
