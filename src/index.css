@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.reset {
+}
+
+.sentry-trigger {
+  @apply reset fixed border border-indigo-950 bg-indigo-900 text-white inline-block right-2 bottom-2 text-sm px-3 py-2 rounded;
+
+  z-index: 2147483647;
+  cursor: pointer;
+  /* transform: rotate(-90deg) translateY(16px); */
+}
+
+.sentry-debugger {
+  @apply reset fixed inset-0 h-screen w-screen bg-indigo-900 text-white overflow-auto;
+
+  z-index: 2147483647;
+}
