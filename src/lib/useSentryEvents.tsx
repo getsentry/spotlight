@@ -9,12 +9,15 @@ function eventReducer(state: SentryEvent[], message: SentryEvent) {
   return [message, ...state];
 }
 
+const DEFAULT_RELAY = "http://localhost:8969/stream";
+
 export const SentryContextProvider: React.FC<{
+  relay?: string;
   initialValue?: SentryEvent[];
   children: ReactNode;
-}> = ({ initialValue = [], children }) => {
+}> = ({ initialValue = [], relay = DEFAULT_RELAY, children }) => {
   const [events, addEvents] = useReducer(eventReducer, initialValue);
-  const [eventSource] = useEventSource("http://localhost:8969/stream");
+  const [eventSource] = useEventSource(relay || DEFAULT_RELAY);
 
   useEventSourceListener(
     eventSource,

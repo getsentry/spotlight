@@ -1,4 +1,3 @@
-import classNames from "../lib/classNames";
 import { useSentryEvents } from "../lib/useSentryEvents";
 
 export default function Trigger({
