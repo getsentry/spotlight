@@ -1,13 +1,19 @@
+import { useState } from "react";
 import { SentryEvent } from "../types";
 import Error, { getErrorEventTitle } from "./Events/Error";
+import Tabs from "./Tabs";
+import EventContexts from "./EventContexts";
+import Transaction, { getTransactionEventTitle } from "./Events/Transaction";
 
 function renderEvent(event: SentryEvent) {
   if ("exception" in event) return <Error event={event} />;
+  if (event.type === "transaction") return <Transaction event={event} />;
   return null;
 }
 
 function renderEventTitle(event: SentryEvent) {
   if ("exception" in event) return getErrorEventTitle({ event });
+  if (event.type === "transaction") return getTransactionEventTitle({ event });
   return "Unknown Event";
 }
 
@@ -18,9 +24,24 @@ export default function EventDetails({
   event: SentryEvent;
   clearActiveEvent: () => void;
 }) {
+  const [activeTab, setActiveTab] = useState("details");
+
+  const tabs = [
+    {
+      name: "Details",
+      active: activeTab === "details",
+      onSelect: () => setActiveTab("details"),
+    },
+    {
+      name: "Context",
+      active: activeTab === "contexts",
+      onSelect: () => setActiveTab("contexts"),
+    },
+  ];
+
   return (
     <>
-      <div className="px-6 py-2 flex gap-x-2 font-mono">
+      <div className="px-6 py-4 flex gap-x-2 bg-indigo-950">
         <button
           className="hover:underline text-indigo-400"
           onClick={() => clearActiveEvent()}
@@ -28,10 +49,12 @@ export default function EventDetails({
           Events
         </button>
         <div className="text-indigo-600">/</div>
-        <h1 className="max-w-md truncate">{renderEventTitle(event)}</h1>
+        <h1 className="max-w-full truncate">{renderEventTitle(event)}</h1>
       </div>
-      <div className="divide-indigo-500 bg-indigo-950 px-6 py-4">
-        {renderEvent(event)}
+      <Tabs tabs={tabs} />
+      <div className="divide-indigo-500 flex-1 bg-indigo-950 px-6 py-4">
+        {activeTab === "details" && renderEvent(event)}
+        {activeTab === "contexts" && <EventContexts event={event} />}
       </div>
     </>
   );

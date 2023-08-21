@@ -41,26 +41,65 @@ export type Breadcrumbs = {
   }[];
 };
 
-export type Context = {
-  [key: string]: string | number;
-};
-
 type CommonEventAttrs = {
   event_id: string;
   timestamp: string;
   breadcrumbs?: Breadcrumbs;
   transaction?: string;
-  contexts?: {
-    [key: string]: Context;
-  };
+  environment?: string;
+  platform?: string;
+  server_name?: string;
+  release?: string;
+  type?: "transaction" | string;
+  start_timestamp?: string;
+  contexts?: Contexts;
+  tags?: Tags;
+};
+
+export type Contexts = {
+  [key: string]: Context;
+};
+
+export type Context = {
+  [key: string]: string | number;
+};
+
+export type TraceContext = {
+  trace_id: string;
+  span_id: string;
+  parent_span_id?: string | null;
+  op: string;
+  description?: string | null;
+  status: "ok" | string;
+};
+
+export type Tags = {
+  [key: string]: string;
 };
 
 export type SentryErrorEvent = CommonEventAttrs & {
   exception: EventException;
 };
 
+export type Span = {
+  trace_id: string;
+  span_id: string;
+  parent_span_id: string;
+  op: string;
+  description?: string | null;
+  start_timestamp: string;
+  tags: Tags;
+  timestamp: string;
+  status: "ok" | string;
+};
+
 export type SentryTransactionEvent = CommonEventAttrs & {
   type: "transaction";
+  spans: Span[];
+  start_timestamp: string;
+  contexts: Contexts & {
+    trace: TraceContext;
+  };
 };
 
 export type SentryEvent = SentryErrorEvent | SentryTransactionEvent;

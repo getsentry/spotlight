@@ -2,8 +2,14 @@ import { useState } from "react";
 import classNames from "../../lib/classNames";
 import { EventFrame, SentryErrorEvent } from "../../types";
 
-function Frame({ frame }: { frame: EventFrame }) {
-  const [isOpen, setOpen] = useState(false);
+function Frame({
+  frame,
+  defaultExpand = false,
+}: {
+  frame: EventFrame;
+  defaultExpand: boolean;
+}) {
+  const [isOpen, setOpen] = useState(defaultExpand);
 
   const hasSource = !!frame.context_line;
   return (
@@ -33,7 +39,7 @@ function Frame({ frame }: { frame: EventFrame }) {
           {frame.pre_context &&
             frame.pre_context.map((line, lineNo) => {
               return (
-                <div className="flex items-center ">
+                <div className="flex items-center" key={lineNo}>
                   {frame.lineno !== undefined && (
                     <div className="text-right w-16 text-indigo-300">
                       {frame.lineno - frame.pre_context!.length + lineNo}
@@ -65,7 +71,7 @@ function Frame({ frame }: { frame: EventFrame }) {
           {frame.post_context &&
             frame.post_context.map((line, lineNo) => {
               return (
-                <div className="flex items-center">
+                <div className="flex items-center" key={lineNo}>
                   {frame.lineno !== undefined && (
                     <div className="text-right w-16 text-indigo-300">
                       {frame.lineno + 1 + lineNo}
@@ -123,13 +129,19 @@ export default function Error({ event }: { event: SentryErrorEvent }) {
         {values.map((value, valueIdx) => {
           return (
             <li key={valueIdx} className="font-mono space-y-4">
-              <h3 className="flex flex-col">
+              <h3 className="flex flex-col bg-indigo-950">
                 <strong className="text-xl">{value.type}</strong>
                 <span className="">{value.value}</span>
               </h3>
               <ul className="border border-indigo-900">
                 {value.stacktrace?.frames.map((frame, frameIdx) => {
-                  return <Frame key={frameIdx} frame={frame} />;
+                  return (
+                    <Frame
+                      key={frameIdx}
+                      frame={frame}
+                      defaultExpand={valueIdx === 0 && frameIdx === 0}
+                    />
+                  );
                 })}
               </ul>
             </li>

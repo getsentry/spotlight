@@ -1,3 +1,4 @@
+import classNames from "../lib/classNames";
 import { useSentryEvents } from "../lib/useSentryEvents";
 
 export default function Trigger({
@@ -8,6 +9,8 @@ export default function Trigger({
   setOpen: (value: boolean) => void;
 }) {
   const events = useSentryEvents();
+
+  const errorCount = events.filter((e) => "exception" in e).length;
 
   return (
     <div
@@ -20,7 +23,9 @@ export default function Trigger({
       Sentry
       <span
         className={
-          "bg-indigo-100 text-indigo-600 ml-3 hidden rounded py-0.5 px-1.5 text-xs font-medium md:inline-block"
+          errorCount === 0
+            ? "bg-indigo-300 text-indigo-600"
+            : "bg-red-500 text-white"
         }
       >
         {events.length}

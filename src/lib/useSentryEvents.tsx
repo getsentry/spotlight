@@ -9,10 +9,11 @@ function eventReducer(state: SentryEvent[], message: SentryEvent) {
   return [message, ...state];
 }
 
-export const SentryContextProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  const [events, addEvents] = useReducer(eventReducer, []);
+export const SentryContextProvider: React.FC<{
+  initialValue?: SentryEvent[];
+  children: ReactNode;
+}> = ({ initialValue = [], children }) => {
+  const [events, addEvents] = useReducer(eventReducer, initialValue);
   const [eventSource] = useEventSource("http://localhost:8969/stream");
 
   useEventSourceListener(

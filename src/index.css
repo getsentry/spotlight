@@ -6,15 +6,20 @@
 }
 
 .sentry-trigger {
-  @apply reset fixed border border-indigo-950 bg-indigo-900 text-white inline-block right-2 bottom-2 text-sm px-3 py-2 rounded;
+  @apply reset fixed border font-medium right-2 bottom-2 px-3 py-2 rounded inline-flex gap-x-2 items-center justify-center;
+  @apply border-indigo-950 bg-indigo-900 text-white;
 
   z-index: 2147483647;
   cursor: pointer;
   /* transform: rotate(-90deg) translateY(16px); */
 }
 
+.sentry-trigger span {
+  @apply rounded py-0.5 px-1.5 text-xs font-medium;
+}
+
 .sentry-debugger {
-  @apply reset fixed inset-0 h-screen w-screen bg-indigo-900 text-white overflow-auto;
+  @apply reset fixed inset-0 h-screen w-screen bg-indigo-900 text-white overflow-auto flex flex-col;
 
   z-index: 2147483647;
 }
