@@ -2,6 +2,7 @@ import { SentryEvent } from "~/types";
 import { ErrorSummary } from "./Events/Error";
 import { TransactionSummary } from "./Events/Transaction";
 import TimeSince from "./TimeSince";
+import PlatformIcon from "./PlatformIcon";
 
 function renderEvent(event: SentryEvent) {
   if ("exception" in event) return <ErrorSummary event={event} />;
@@ -43,6 +44,7 @@ export default function EventList({
               key={e.event_id}
               onClick={() => setActiveEvent(e)}
             >
+              <PlatformIcon platform={e.platform} className="text-indigo-300" />
               <div className="font-mono text-indigo-300 flex flex-col w-48 truncate">
                 <span>{(e.event_id || "").substring(0, 8)}</span>
                 <TimeSince date={e.timestamp} />

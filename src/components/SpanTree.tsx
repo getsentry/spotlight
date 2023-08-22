@@ -1,6 +1,7 @@
 import classNames from "~/lib/classNames";
 import { SpanWithChildren } from "~/lib/traces";
 import { TraceContext } from "~/types";
+import PlatformIcon from "./PlatformIcon";
 
 export default function SpanTree({
   traceContext,
@@ -38,11 +39,23 @@ export default function SpanTree({
                 onClick={() => setActiveSpan(span)}
               >
                 <div
-                  className="flex gap-x-1 py-1 w-6/12"
+                  className={classNames(
+                    "flex items-center gap-x-1 py-1 w-6/12",
+                    span.event
+                      ? span.status === "ok"
+                        ? "text-green-400"
+                        : "text-red-400"
+                      : span.status && span.status !== "ok"
+                      ? "text-red-400"
+                      : ""
+                  )}
                   style={{
                     paddingLeft: depth * 12,
                   }}
                 >
+                  {span.event && (
+                    <PlatformIcon size={16} platform={span.event.platform} />
+                  )}
                   <span className="font-bold">{span.op}</span>
                   <span className="text-indigo-400">&ndash;</span>
                   <span className="max-w-sm block truncate">

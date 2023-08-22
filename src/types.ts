@@ -93,6 +93,7 @@ export type Span = {
   tags?: Tags | null;
   timestamp: string;
   status: "ok" | string;
+  event?: SentryEvent | null;
 };
 
 export type SentryTransactionEvent = CommonEventAttrs & {
@@ -107,11 +108,12 @@ export type SentryTransactionEvent = CommonEventAttrs & {
 export type SentryEvent = SentryErrorEvent | SentryTransactionEvent;
 
 export type Trace = TraceContext & {
-  transactions: number;
+  transactions: SentryTransactionEvent[];
   errors: number;
   start_timestamp: number;
   timestamp: number;
   status: string;
-  rootTransactionName?: string;
+  rootTransaction: SentryTransactionEvent | null;
+  rootTransactionName: string;
   spans: Span[];
 };

@@ -1,7 +1,8 @@
 import { getDuration } from "~/lib/duration";
 import classNames from "~/lib/classNames";
-import { SentryEvent, Trace } from "~/types";
+import { SentryEvent, SentryTransactionEvent, Span, Trace } from "~/types";
 import TimeSince from "./TimeSince";
+import PlatformIcon from "./PlatformIcon";
 
 export default function TraceList({
   events,
@@ -10,6 +11,7 @@ export default function TraceList({
   events: SentryEvent[];
   setActiveTrace: (trace: Trace) => void;
 }) {
+  // XXX: could move this into a TraceCache
   const traceMap = new Map<string, Trace>();
   [...events].reverse().forEach((e) => {
     if (!e.contexts?.trace) return;
@@ -21,13 +23,14 @@ export default function TraceList({
     const endTs = e.timestamp ? new Date(e.timestamp).getTime() : 0;
     const trace = traceMap.get(traceId) || {
       ...traceCtx,
-      spans: [],
-      transactions: 0,
+      spans: [] as Span[],
+      transactions: [] as SentryTransactionEvent[],
       errors: 0,
       timestamp: endTs,
       start_timestamp: startTs,
       status: traceCtx.status,
-      rootTransactionName: e.transaction,
+      rootTransactionName: e.transaction || "(unknown transaction)",
+      rootTransaction: null,
     };
     if (e.type === "transaction") {
       trace.spans.push({
@@ -35,11 +38,17 @@ export default function TraceList({
         start_timestamp: e.start_timestamp,
         timestamp: e.timestamp,
         description: traceCtx.description || e.transaction,
+        event: e,
       });
       e.spans.forEach((s) => trace.spans.push(s));
-      trace.transactions += 1;
-      if (!trace.rootTransactionName) trace.rootTransactionName = e.transaction;
+      trace.transactions.push(e);
     } else {
+      // TODO: inject event reference in span tree?
+      const refSpan = trace.spans.find(
+        (s) =>
+          traceCtx.trace_id === s.trace_id && traceCtx.span_id === s.span_id
+      );
+      if (refSpan) refSpan.event = e;
       trace.errors += 1;
     }
     trace.start_timestamp = Math.min(startTs, trace.start_timestamp);
@@ -51,6 +60,18 @@ export default function TraceList({
   const traceList = Array.from(traceMap.values()).sort(
     (a, b) => b.start_timestamp - a.start_timestamp
   );
+
+  traceList.forEach((t) => {
+    const roots = t.transactions.filter(
+      (e) => !e.contexts.trace.parent_span_id
+    );
+    if (roots.length === 1) {
+      t.rootTransaction = roots[0];
+      t.rootTransactionName = roots[0].transaction || "(unknown transaction)";
+    } else if (roots.length > 1)
+      t.rootTransactionName = "(multiple root transactions)";
+    else t.rootTransactionName = "(missing root transaction)";
+  });
   return (
     <>
       <div className="divide-y divide-indigo-500 bg-indigo-950">
@@ -65,6 +86,8 @@ export default function TraceList({
                   setActiveTrace(trace);
                 }}
               >
+                <PlatformIcon platform={trace.rootTransaction?.platform} />
+
                 <div className="w-16 font-mono">
                   {getDuration(trace.start_timestamp, trace.timestamp)}
                 </div>
@@ -89,7 +112,7 @@ export default function TraceList({
                     <div>&mdash;</div>
                     <div>
                       {trace.spans.length.toLocaleString()} spans,{" "}
-                      {trace.transactions.toLocaleString()} txns
+                      {trace.transactions.length.toLocaleString()} txns
                     </div>
                   </div>
                 </div>

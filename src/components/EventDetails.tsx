@@ -5,6 +5,7 @@ import Tabs from "./Tabs";
 import EventContexts from "./EventContexts";
 import Transaction, { TransactionTitle } from "./Events/Transaction";
 import useKeyPress from "~/lib/useKeyPress";
+import PlatformIcon from "./PlatformIcon";
 
 function renderEvent(event: SentryEvent) {
   if ("exception" in event) return <Error event={event} />;
@@ -44,23 +45,20 @@ export default function EventDetails({
     },
   ];
 
+  const trace = event.contexts?.trace;
   return (
     <>
-      <div className="px-6 py-4 flex gap-x-2 bg-indigo-950">
-        <div className="flex flex-1 gap-x-2">
-          <button
-            className="hover:underline text-indigo-400"
-            onClick={(e) => {
-              e.stopPropagation();
-              clearActiveEvent();
-            }}
-          >
-            Events
-          </button>
-          <div className="text-indigo-600">/</div>
-          <h1 className="max-w-full truncate">{renderEventTitle(event)}</h1>
-        </div>
-        <div className="font-mono">{event.event_id.substring(0, 8)}</div>
+      <div className="px-6 py-4 flex gap-x-1 bg-indigo-950  items-center">
+        <PlatformIcon platform={event.platform} />
+        <h1 className="text-2xl max-w-full truncate flex-1">
+          {renderEventTitle(event)}
+        </h1>
+        {!!trace && (
+          <div className="font-mono text-indigo-300">
+            <div>T: {trace.trace_id}</div>
+            <div>S: {trace.span_id}</div>
+          </div>
+        )}
       </div>
       <Tabs tabs={tabs} />
       <div className="divide-indigo-500 flex-1 bg-indigo-950 px-6 py-4">
