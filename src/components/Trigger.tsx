@@ -1,3 +1,4 @@
+import { useSentryTraces } from "~/lib/useSentryTraces";
 import { useSentryEvents } from "../lib/useSentryEvents";
 
 export default function Trigger({
@@ -8,8 +9,10 @@ export default function Trigger({
   setOpen: (value: boolean) => void;
 }) {
   const events = useSentryEvents();
+  const traces = useSentryTraces();
 
   const errorCount = events.filter((e) => "exception" in e).length;
+  const traceCount = traces.length;
 
   return (
     <div
@@ -27,7 +30,7 @@ export default function Trigger({
             : "bg-red-500 text-white"
         }
       >
-        {events.length}
+        {errorCount + traceCount}
       </span>
     </div>
   );
