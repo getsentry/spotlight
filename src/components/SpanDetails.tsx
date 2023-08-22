@@ -109,20 +109,22 @@ export default function SpanDetails({
           <h2 className="font-bold uppercase mb-2">Tags</h2>
           {span.tags && Object.keys(span.tags).length ? (
             <table className="w-full">
-              {Object.entries(span.tags).map(([key, value]) => {
-                return (
-                  <tr key={key}>
-                    <th className="w-1/12 text-left text-indigo-300 font-normal font-mono pr-4">
-                      <div className="truncate w-full">{key}</div>
-                    </th>
-                    <td>
-                      <pre className="whitespace-nowrap font-mono">
-                        {JSON.stringify(value, undefined, 2)}
-                      </pre>
-                    </td>
-                  </tr>
-                );
-              })}
+              <tbody>
+                {Object.entries(span.tags).map(([key, value]) => {
+                  return (
+                    <tr key={key}>
+                      <th className="w-1/12 text-left text-indigo-300 font-normal font-mono pr-4 py-0.5">
+                        <div className="truncate w-full">{key}</div>
+                      </th>
+                      <td className="py-0.5">
+                        <pre className="whitespace-nowrap font-mono">
+                          {JSON.stringify(value, undefined, 2)}
+                        </pre>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
             </table>
           ) : (
             <div className="text-indigo-300">
@@ -133,23 +135,26 @@ export default function SpanDetails({
         <div>
           <h2 className="font-bold uppercase mb-2">Context</h2>
           <table className="w-full">
-            {[
-              ["trace", span.trace_id],
-              ["span", span.span_id],
-              ["parent", span.parent_span_id],
-              ["op", span.op],
-            ].map(([key, value]) => {
-              return (
-                <tr key={key}>
-                  <th className="w-1/12 text-left text-indigo-300 font-normal font-mono pr-4">
-                    <div className="truncate w-full">{key}</div>
-                  </th>
-                  <td>
-                    <pre className="whitespace-nowrap font-mono">{value}</pre>
-                  </td>
-                </tr>
-              );
-            })}
+            <tbody>
+              {[
+                ["status", span.status || ""],
+                ["trace", span.trace_id],
+                ["span", span.span_id],
+                ["parent", span.parent_span_id],
+                ["op", span.op],
+              ].map(([key, value]) => {
+                return (
+                  <tr key={key}>
+                    <th className="w-1/12 text-left text-indigo-300 font-normal font-mono pr-4 py-0.5">
+                      <div className="truncate w-full">{key}</div>
+                    </th>
+                    <td className="py-0.5">
+                      <pre className="whitespace-nowrap font-mono">{value}</pre>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
           </table>
         </div>
 

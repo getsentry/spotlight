@@ -78,7 +78,7 @@ export default function Overview() {
     <>
       <Tabs tabs={tabs} />
       {activeTab === "traces" ? (
-        <TraceList events={events} setActiveTrace={setActiveTrace} />
+        <TraceList setActiveTrace={setActiveTrace} />
       ) : (
         <EventList
           events={events}

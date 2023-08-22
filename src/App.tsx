@@ -1,17 +1,17 @@
 import { useState } from "react";
 import Trigger from "./components/Trigger";
 import Debugger from "./components/Debugger";
-import { SentryContextProvider } from "./lib/sentryContextProvider";
+import { SentryEventsContextProvider } from "./lib/sentryEventsContext";
 
 export default function App({ fullScreen = false }: { fullScreen?: boolean }) {
   const [isOpen, setOpen] = useState(fullScreen);
 
   return (
     <>
-      <SentryContextProvider>
+      <SentryEventsContextProvider>
         <Trigger isOpen={isOpen} setOpen={setOpen} />
         <Debugger isOpen={isOpen} setOpen={setOpen} />
-      </SentryContextProvider>
+      </SentryEventsContextProvider>
     </>
   );
 }

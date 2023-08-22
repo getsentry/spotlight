@@ -21,20 +21,22 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
           <div key={ctxKey}>
             <h2 className="font-bold uppercase">{ctxKey}</h2>
             <table className="w-full">
-              {Object.entries(ctxValues).map(([key, value]) => {
-                return (
-                  <tr key={key}>
-                    <th className="w-1/12 text-left text-indigo-300 font-normal font-mono pr-4">
-                      <div className="truncate w-full">{key}</div>
-                    </th>
-                    <td>
-                      <pre className="whitespace-nowrap font-mono">
-                        {JSON.stringify(value, undefined, 2)}
-                      </pre>
-                    </td>
-                  </tr>
-                );
-              })}
+              <tbody>
+                {Object.entries(ctxValues).map(([key, value]) => {
+                  return (
+                    <tr key={key}>
+                      <th className="w-1/12 text-left text-indigo-300 font-normal font-mono pr-4 py-0.5">
+                        <div className="truncate w-full">{key}</div>
+                      </th>
+                      <td className="py-0.5">
+                        <pre className="whitespace-nowrap font-mono">
+                          {JSON.stringify(value, undefined, 2)}
+                        </pre>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
             </table>
           </div>
         );

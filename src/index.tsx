@@ -6,7 +6,7 @@ import fontStyles from "@fontsource/raleway/index.css?inline";
 import App from "./App.tsx";
 import { SentryEvent } from "./types.ts";
 import globalStyles from "./index.css?inline";
-import eventCache from "./lib/eventCache.ts";
+import dataCache from "./lib/dataCache.ts";
 
 const DEFAULT_RELAY = "http://localhost:8969/stream";
 
@@ -55,13 +55,13 @@ export function init({
 }
 
 export function pushEvent(event: SentryEvent) {
-  eventCache.push(event);
+  dataCache.pushEvent(event);
 }
 
 function connectToRelay(relay: string = DEFAULT_RELAY) {
   console.log("[Spotlight] Connecting to relay");
   const source = new EventSource(relay || DEFAULT_RELAY);
   source.onmessage = (event) => {
-    eventCache.push(JSON.parse(event.data));
+    dataCache.pushEvent(JSON.parse(event.data));
   };
 }
