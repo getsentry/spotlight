@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .sentry-trigger {
-  @apply fixed border font-medium right-2 bottom-2 px-3 py-2 rounded inline-flex gap-x-2 items-center justify-center opacity-80;
+  @apply fixed border font-medium right-2 bottom-2 px-3 py-2 rounded inline-flex gap-x-2 items-center justify-center opacity-80 hover:opacity-100;
   @apply border-indigo-950 bg-indigo-900 text-white uppercase font-light tracking-widest font-raleway text-sm;
 
   z-index: 2147483647;
@@ -12,7 +12,7 @@
 }
 
 .sentry-trigger span {
-  @apply rounded py-0.5 px-1.5 text-xs font-medium;
+  @apply rounded py-0.5 px-1.5 text-xs font-medium font-sans;
 }
 
 .sentry-debugger {
