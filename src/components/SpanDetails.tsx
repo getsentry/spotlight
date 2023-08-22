@@ -44,7 +44,7 @@ export default function SpanDetails({
   const spanDuration = new Date(span.timestamp).getTime() - spanStartTimestamp;
 
   return (
-    <div className="fixed h-full right-0 top-0 bottom-0 left-1/4 bg-indigo-900 border-l border-l-indigo-400 z-[2147483647] py-4 px-6 overflow-auto">
+    <div className="fixed h-full right-0 top-0 bottom-0 left-1/4 bg-indigo-900 border-l border-l-indigo-400 py-4 px-6 overflow-auto">
       <div className="flex border-b border-b-indigo-400 pb-4 mb-4">
         <div className="flex-1">
           <h2 className="text-xl text-indigo-300">Span Details</h2>

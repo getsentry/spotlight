@@ -3,7 +3,9 @@ import { Trace } from "../types";
 import useKeyPress from "~/lib/useKeyPress";
 import SpanDetails from "./SpanDetails";
 import SpanTree from "./SpanTree";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { getDuration } from "~/lib/duration";
+import DateTime from "./DateTime";
 
 export default function TraceDetails({
   trace,
@@ -16,29 +18,41 @@ export default function TraceDetails({
     clearActiveTrace();
   });
 
+  const [activeSpan, setActiveSpan] = useState<SpanWithChildren | null>(null);
+
+  const ref = useRef(null);
+
   const groupedSpans = groupSpans(trace.spans);
   const startTimestamp = trace.start_timestamp;
   const totalDuration = trace.timestamp - startTimestamp;
 
-  const [activeSpan, setActiveSpan] = useState<SpanWithChildren | null>(null);
-
   return (
-    <>
-      <div className="px-6 py-4 flex gap-x-2 bg-indigo-950">
-        <div className="flex flex-1 gap-x-2">
-          <button
-            className="hover:underline text-indigo-400"
-            onClick={(e) => {
-              e.stopPropagation();
-              clearActiveTrace();
-            }}
-          >
-            Traces
-          </button>
-          <div className="text-indigo-600">/</div>
-          <h1 className="max-w-full truncate">{trace.rootTransactionName}</h1>
+    <div ref={ref}>
+      <div className="px-6 py-4 flex gap-x-2 bg-indigo-950  items-center">
+        <h1 className="text-2xl max-w-full truncate flex-1">
+          {trace.rootTransactionName}
+        </h1>
+        <div className="font-mono text-indigo-300">
+          <div>T: {trace.trace_id}</div>
+          <div>S: {trace.span_id}</div>
         </div>
-        <div className="font-mono">{trace.trace_id}</div>
+      </div>
+      <div className="px-6 py-4">
+        <div className="flex flex-1 items-center text-indigo-300 gap-x-1">
+          <div className="text-indigo-200">
+            <DateTime date={trace.start_timestamp} />
+          </div>
+          <span>&mdash;</span>
+          <span>
+            <strong className="font-bold text-indigo-200">
+              {getDuration(trace.start_timestamp, trace.timestamp)}
+            </strong>{" "}
+            recorded in{" "}
+            <strong className="font-bold text-indigo-200">
+              {trace.spans.length} spans
+            </strong>
+          </span>
+        </div>
       </div>
       <div className="divide-indigo-500 flex-1 bg-indigo-950 px-6 py-4">
         <SpanTree
@@ -62,6 +76,6 @@ export default function TraceDetails({
           />
         ) : null}
       </div>
-    </>
+    </div>
   );
 }

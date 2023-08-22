@@ -28,7 +28,11 @@ export default function Overview() {
       name: "Errors",
       count: events.filter((e) => "exception" in e).length,
       active: activeTab === "errors",
-      onSelect: () => setActiveTab("errors"),
+      onSelect: () => {
+        setActiveEvent(null);
+        setActiveTrace(null);
+        setActiveTab("errors");
+      },
     },
     {
       name: "Traces",
@@ -38,31 +42,35 @@ export default function Overview() {
         )
       ).length,
       active: activeTab === "traces",
-      onSelect: () => setActiveTab("traces"),
-    },
-    {
-      name: "Transactions",
-      count: events.filter((e) => e.type === "transaction").length,
-      active: activeTab === "transactions",
-      onSelect: () => setActiveTab("transactions"),
+      onSelect: () => {
+        setActiveEvent(null);
+        setActiveTrace(null);
+        setActiveTab("traces");
+      },
     },
   ];
 
   if (activeEvent) {
     return (
-      <EventDetails
-        event={activeEvent}
-        clearActiveEvent={() => setActiveEvent(null)}
-      />
+      <>
+        <Tabs tabs={tabs} />
+        <EventDetails
+          event={activeEvent}
+          clearActiveEvent={() => setActiveEvent(null)}
+        />
+      </>
     );
   }
 
   if (activeTrace) {
     return (
-      <TraceDetails
-        trace={activeTrace}
-        clearActiveTrace={() => setActiveTrace(null)}
-      />
+      <>
+        <Tabs tabs={tabs} />
+        <TraceDetails
+          trace={activeTrace}
+          clearActiveTrace={() => setActiveTrace(null)}
+        />
+      </>
     );
   }
 
