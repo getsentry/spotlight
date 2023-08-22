@@ -2,6 +2,7 @@ import classNames from "~/lib/classNames";
 import { SpanWithChildren } from "~/lib/traces";
 import { TraceContext } from "~/types";
 import PlatformIcon from "./PlatformIcon";
+import { getSpanDurationClassName } from "~/lib/duration";
 
 export default function SpanTree({
   traceContext,
@@ -77,7 +78,14 @@ export default function SpanTree({
                       }%)`,
                     }}
                   >
-                    <span className="whitespace-nowrap">{spanDuration} ms</span>
+                    <span
+                      className={classNames(
+                        "whitespace-nowrap",
+                        getSpanDurationClassName(spanDuration)
+                      )}
+                    >
+                      {spanDuration} ms
+                    </span>
                   </div>
                 </div>
               </div>

@@ -1,4 +1,4 @@
-import { getDuration } from "~/lib/duration";
+import { getDuration, getDurationClassName } from "~/lib/duration";
 import classNames from "~/lib/classNames";
 import { Trace } from "~/types";
 import TimeSince from "./TimeSince";
@@ -17,6 +17,10 @@ export default function TraceList({
       <div className="divide-y divide-indigo-500 bg-indigo-950">
         {traceList.length !== 0 ? (
           traceList.map((trace) => {
+            const duration = getDuration(
+              trace.start_timestamp,
+              trace.timestamp
+            );
             return (
               <div
                 className="px-6 py-4 flex gap-x-4 items-center cursor-pointer hover:bg-indigo-800"
@@ -28,8 +32,9 @@ export default function TraceList({
               >
                 <PlatformIcon platform={trace.rootTransaction?.platform} />
 
-                <div className="w-16 font-mono">
-                  {getDuration(trace.start_timestamp, trace.timestamp)}
+                <div className="font-mono text-indigo-300 flex flex-col w-48 truncate">
+                  <div>{trace.trace_id.substring(0, 8)}</div>
+                  <TimeSince date={trace.start_timestamp} />
                 </div>
                 <div className="font-mono flex flex-1 flex-col truncate">
                   <div>{trace.rootTransactionName}</div>
@@ -44,7 +49,7 @@ export default function TraceList({
                       {trace.status}
                     </div>
                     <div>&mdash;</div>
-                    <TimeSince date={trace.start_timestamp} />
+                    <div>{duration} ms</div>
                     <div>&mdash;</div>
                     <div>
                       {trace.spans.length.toLocaleString()} spans,{" "}

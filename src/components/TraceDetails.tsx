@@ -47,7 +47,7 @@ export default function TraceDetails({
           <span>&mdash;</span>
           <span>
             <strong className="font-bold text-indigo-200">
-              {getDuration(trace.start_timestamp, trace.timestamp)}
+              {getDuration(trace.start_timestamp, trace.timestamp)} ms
             </strong>{" "}
             recorded in{" "}
             <strong className="font-bold text-indigo-200">
