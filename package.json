@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "watch:build": "vite build --watch",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -30,6 +31,7 @@
     "vite-plugin-dts": "^3.5.2"
   },
   "devDependencies": {
+    "@sentry/types": "^7.64.0",
     "@tailwindcss/forms": "^0.5.4",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",

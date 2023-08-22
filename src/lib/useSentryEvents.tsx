@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
-import React, { useContext, useReducer } from "react";
-import { useEventSource, useEventSourceListener } from "./useEventSource";
+import React, { useContext, useEffect, useReducer } from "react";
 import { SentryEvent } from "../types";
+import eventCache from "./eventCache";
 
 const SentryEventsContext = React.createContext<SentryEvent[]>([]);
 
@@ -9,24 +9,19 @@ function eventReducer(state: SentryEvent[], message: SentryEvent) {
   return [message, ...state];
 }
 
-const DEFAULT_RELAY = "http://localhost:8969/stream";
-
 export const SentryContextProvider: React.FC<{
-  relay?: string;
-  initialValue?: SentryEvent[];
   children: ReactNode;
-}> = ({ initialValue = [], relay = DEFAULT_RELAY, children }) => {
-  const [events, addEvents] = useReducer(eventReducer, initialValue);
-  const [eventSource] = useEventSource(relay || DEFAULT_RELAY);
+}> = ({ children }) => {
+  const [events, addEvents] = useReducer(eventReducer, eventCache.values());
 
-  useEventSourceListener(
-    eventSource,
-    ["message"],
-    (evt) => {
-      addEvents(JSON.parse(evt.data));
-    },
-    [addEvents]
-  );
+  useEffect(() => {
+    const unsubscribe = eventCache.subscribe((e) => {
+      addEvents(e);
+    });
+    return () => {
+      unsubscribe();
+    };
+  });
 
   return (
     <SentryEventsContext.Provider value={events}>

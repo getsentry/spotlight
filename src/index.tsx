@@ -4,19 +4,23 @@ import App from "./App.tsx";
 import { SentryEvent } from "./types.ts";
 
 import globalStyles from "./index.css?inline";
+import eventCache from "./lib/eventCache.ts";
+
+import SpotlightIntegration from "./integration.ts";
+export { SpotlightIntegration };
+
+const DEFAULT_RELAY = "http://localhost:8969/stream";
 
 export function init({
   relay,
-  initialEvents = [],
 }: {
   relay?: string;
-  initialEvents?: SentryEvent[];
 } = {}) {
+  if (typeof document === "undefined") return;
+
+  connectToRelay(relay);
+
   const docRoot = document.createElement("div");
-  docRoot.style.position = "absolute";
-  docRoot.style.top = "0";
-  docRoot.style.left = "0";
-  docRoot.style.right = "0";
 
   const shadow = docRoot.attachShadow({ mode: "open" });
   const appRoot = document.createElement("div");
@@ -32,7 +36,7 @@ export function init({
 
   ReactDOM.createRoot(appRoot).render(
     <React.StrictMode>
-      <App initialEvents={initialEvents} relay={relay} />
+      <App />
     </React.StrictMode>
   );
 
@@ -41,4 +45,16 @@ export function init({
 
     document.body.append(docRoot);
   });
+}
+
+export function pushEvent(event: SentryEvent) {
+  eventCache.push(event);
+}
+
+function connectToRelay(relay: string = DEFAULT_RELAY) {
+  console.log("[Spotlight] Connecting to relay");
+  const source = new EventSource(relay || DEFAULT_RELAY);
+  source.onmessage = (event) => {
+    eventCache.push(JSON.parse(event.data));
+  };
 }

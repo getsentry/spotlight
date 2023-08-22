@@ -66,7 +66,7 @@ export default function EventList({
                 onClick={() => setActiveEvent(e)}
               >
                 <div className="font-mono text-indigo-300 flex flex-col w-48 truncate">
-                  <span>{e.event_id.substring(0, 8)}</span>
+                  <span>{(e.event_id || "").substring(0, 8)}</span>
                   <TimeSince date={e.timestamp} />
                 </div>
                 <div className="flex-1">{renderEvent(e)}</div>

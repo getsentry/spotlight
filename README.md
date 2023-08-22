@@ -19,3 +19,5 @@ For multi sidecar what we could do is:
 - Sub services funnel payloads back to the root sidecar, which then transfers them to the JS widget
 
 2. Per-trace clustering. You've effectively got a stream open, but if the stream changes, that is, you SPA to another location (and the core trace ID changes) it should hide all old events. This is probably a way to navigate to a "list of traces captuerd", and it just defaults by showing the current one.
+
+3. Some kind of pinning. There's a little bit of a confusing flow that would happen if you had multiple windows open, creating multiple requests. Or if you're on a shared env and multiple people are making requests. May be solvable via the trace clustering solution.

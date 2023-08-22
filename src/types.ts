@@ -42,6 +42,7 @@ export type Breadcrumbs = {
 };
 
 type CommonEventAttrs = {
+  // not always present, but we are forcing it in EventCache
   event_id: string;
   timestamp: string;
   breadcrumbs?: Breadcrumbs;

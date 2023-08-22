@@ -42,14 +42,20 @@ export default function EventDetails({
   return (
     <>
       <div className="px-6 py-4 flex gap-x-2 bg-indigo-950">
-        <button
-          className="hover:underline text-indigo-400"
-          onClick={() => clearActiveEvent()}
-        >
-          Events
-        </button>
-        <div className="text-indigo-600">/</div>
-        <h1 className="max-w-full truncate">{renderEventTitle(event)}</h1>
+        <div className="flex flex-1">
+          <button
+            className="hover:underline text-indigo-400"
+            onClick={(e) => {
+              e.stopPropagation();
+              clearActiveEvent();
+            }}
+          >
+            Events
+          </button>
+          <div className="text-indigo-600">/</div>
+          <h1 className="max-w-full truncate">{renderEventTitle(event)}</h1>
+        </div>
+        <div>{event.event_id.substring(0, 8)}</div>
       </div>
       <Tabs tabs={tabs} />
       <div className="divide-indigo-500 flex-1 bg-indigo-950 px-6 py-4">

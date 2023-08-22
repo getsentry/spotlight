@@ -31,6 +31,9 @@ dependencies:
     version: 3.5.2(typescript@5.0.2)(vite@4.4.5)
 
 devDependencies:
+  '@sentry/types':
+    specifier: ^7.64.0
+    version: 7.64.0
   '@tailwindcss/forms':
     specifier: ^0.5.4
     version: 0.5.4(tailwindcss@3.3.3)
@@ -661,6 +664,11 @@ packages:
       colors: 1.2.5
       string-argv: 0.3.2
     dev: false
+
+  /@sentry/types@7.64.0:
+    resolution: {integrity: sha512-LqjQprWXjUFRmzIlUjyA+KL+38elgIYmAeoDrdyNVh8MK5IC1W2Lh1Q87b4yOiZeMiIhIVNBd7Ecoh2rodGrGA==}
+    engines: {node: '>=8'}
+    dev: true
 
   /@tailwindcss/forms@0.5.4(tailwindcss@3.3.3):
     resolution: {integrity: sha512-YAm12D3R7/9Mh4jFbYSMnsd6jG++8KxogWgqs7hbdo/86aWjjlIEvL7+QYdVELmAI0InXTpZqFIg5e7aDVWI2Q==}

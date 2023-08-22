@@ -28,7 +28,9 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
                       <div className="truncate w-full">{key}</div>
                     </th>
                     <td>
-                      <pre className="whitespace-nowrap font-mono">{value}</pre>
+                      <pre className="whitespace-nowrap font-mono">
+                        {JSON.stringify(value, undefined, 2)}
+                      </pre>
                     </td>
                   </tr>
                 );

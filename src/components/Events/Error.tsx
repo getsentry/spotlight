@@ -2,6 +2,10 @@ import { useState } from "react";
 import classNames from "../../lib/classNames";
 import { EventFrame, SentryErrorEvent } from "../../types";
 
+function formatFilename(filename: string) {
+  return filename.replace("/node_modules/", "@npm:").split("@npm:").pop();
+}
+
 function Frame({
   frame,
   defaultExpand = false,
@@ -21,8 +25,10 @@ function Frame({
       onClick={() => setOpen(!isOpen)}
     >
       <div className="text-indigo-400 border-b border-indigo-950 px-2 py-1">
-        <span className="text-indigo-100">{frame.filename}</span> in{" "}
-        <span className="text-indigo-100">{frame.function}</span>
+        <span className="text-indigo-100">
+          {formatFilename(frame.filename)}
+        </span>{" "}
+        in <span className="text-indigo-100">{frame.function}</span>
         {frame.lineno !== undefined && (
           <>
             {" "}
@@ -123,6 +129,7 @@ export default function Error({ event }: { event: SentryErrorEvent }) {
     "values" in event.exception
       ? event.exception.values
       : [event.exception.value];
+
   return (
     <>
       <ol className="space-y-4">

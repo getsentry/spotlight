@@ -23,6 +23,7 @@ export default function Tabs({ tabs }: Props) {
           className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
           defaultValue={tabs.find((tab) => tab.active)?.name}
           onChange={(e) => {
+            e.stopPropagation();
             const activeTab = tabs[parseInt(e.target.value, 10)];
             activeTab.onSelect && activeTab.onSelect();
           }}
@@ -43,7 +44,10 @@ export default function Tabs({ tabs }: Props) {
                   : "border-transparent text-indigo-400 hover:border-indigo-400 hover:text-indigo-100",
                 "flex whitespace-nowrap border-b-2 py-3 px-2 -mx-2 text-sm font-medium"
               )}
-              onClick={() => tab.onSelect && tab.onSelect()}
+              onClick={(e) => {
+                e.stopPropagation();
+                tab.onSelect && tab.onSelect();
+              }}
               aria-current={tab.active ? "page" : undefined}
             >
               {tab.name}
