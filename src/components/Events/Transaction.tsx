@@ -4,8 +4,8 @@ import classNames from "../../lib/classNames";
 import { SentryTransactionEvent, Span } from "../../types";
 import { sum } from "~/lib/math";
 import { groupSpans } from "~/lib/traces";
-import SpanDetails from "./Transaction/SpanDetails";
-import SpanTree from "./Transaction/SpanTree";
+import SpanDetails from "../SpanDetails";
+import SpanTree from "../SpanTree";
 
 export function TransactionTitle({ event }: { event: SentryTransactionEvent }) {
   return (
@@ -24,7 +24,7 @@ export function TransactionSummary({
   return (
     <div className="font-mono space-y-1">
       <h3 className="font-medium">{event.transaction || "Unknown"}</h3>
-      <div className="text-sm text-indigo-300 flex gap-x-1">
+      <div className="text-sm text-indigo-300 flex gap-x-2">
         <div
           className={classNames(
             ctx.status === "ok" ? "text-green-400" : "text-red-400"
@@ -32,7 +32,6 @@ export function TransactionSummary({
         >
           {ctx.status}
         </div>
-        <span className="text-indigo-400">&mdash;</span>
         <span>
           {sum(
             event.spans,
@@ -42,7 +41,7 @@ export function TransactionSummary({
           )}
           {" ms"}
         </span>
-        <span className="text-indigo-400">&mdash;</span>
+        <span>&mdash;</span>
         <span>{ctx.trace_id}</span>
         <span>({event.spans.length} spans)</span>
       </div>
@@ -77,7 +76,6 @@ export default function Transaction({
         totalDuration={totalDuration}
         setActiveSpan={setActiveSpan}
         activeSpan={activeSpan}
-        root
       />
 
       {activeSpan ? (

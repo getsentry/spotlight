@@ -51,14 +51,9 @@ type CommonEventAttrs = {
   platform?: string;
   server_name?: string;
   release?: string;
-  type?: "transaction" | string;
   start_timestamp?: string;
   contexts?: Contexts;
   tags?: Tags;
-};
-
-export type Contexts = {
-  [key: string]: Context;
 };
 
 export type Context = {
@@ -74,22 +69,28 @@ export type TraceContext = {
   status: "ok" | string;
 };
 
+export type Contexts = {
+  trace?: TraceContext;
+  [key: string]: Context;
+};
+
 export type Tags = {
   [key: string]: string;
 };
 
 export type SentryErrorEvent = CommonEventAttrs & {
+  type?: "error" | "default";
   exception: EventException;
 };
 
 export type Span = {
   trace_id: string;
   span_id: string;
-  parent_span_id: string;
+  parent_span_id?: string | null;
   op: string;
   description?: string | null;
   start_timestamp: string;
-  tags: Tags;
+  tags?: Tags | null;
   timestamp: string;
   status: "ok" | string;
 };
@@ -104,3 +105,13 @@ export type SentryTransactionEvent = CommonEventAttrs & {
 };
 
 export type SentryEvent = SentryErrorEvent | SentryTransactionEvent;
+
+export type Trace = TraceContext & {
+  transactions: number;
+  errors: number;
+  start_timestamp: number;
+  timestamp: number;
+  status: string;
+  rootTransactionName?: string;
+  spans: Span[];
+};

@@ -1,8 +1,5 @@
-import { useState } from "react";
-import EventList from "./EventList";
-import EventDetails from "./EventDetails";
-import { SentryEvent } from "../types";
 import useKeyPress from "~/lib/useKeyPress";
+import Overview from "./Overview";
 
 export default function Debugger({
   isOpen,
@@ -11,10 +8,7 @@ export default function Debugger({
   isOpen: boolean;
   setOpen: (value: boolean) => void;
 }) {
-  const [activeEvent, setActiveEvent] = useState<null | SentryEvent>(null);
-
   useKeyPress("Escape", () => {
-    setActiveEvent(null);
     setOpen(false);
   });
 
@@ -43,21 +37,14 @@ export default function Debugger({
         <button
           className="cursor-pointer px-3 py-1 -my-1 text-2xl -mr-3 rounded bg-indigo-950 hover:bg-black font-mono"
           onClick={() => {
-            setActiveEvent(null);
             setOpen(false);
           }}
         >
           {"✕"}
         </button>
       </div>
-      {activeEvent ? (
-        <EventDetails
-          event={activeEvent}
-          clearActiveEvent={() => setActiveEvent(null)}
-        />
-      ) : (
-        <EventList setActiveEvent={setActiveEvent} />
-      )}
+
+      <Overview />
     </div>
   );
 }

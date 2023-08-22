@@ -8,7 +8,7 @@ dayjs.extend(DayJsRelativeTime);
 export default function TimeSince({
   date,
   ...props
-}: { date: string | Date } & React.ComponentProps<"time">) {
+}: { date: string | number | Date } & React.ComponentProps<"time">) {
   const [value, setValue] = useState(date ? dayjs(date).fromNow() : null);
 
   useTimeout(() => {
@@ -20,7 +20,7 @@ export default function TimeSince({
 
   return (
     <time
-      dateTime={date instanceof Date ? date.toISOString() : date}
+      dateTime={date instanceof Date ? date.toISOString() : `${date}`}
       {...props}
     >
       {value}

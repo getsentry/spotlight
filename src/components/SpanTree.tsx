@@ -1,6 +1,6 @@
 import classNames from "~/lib/classNames";
 import { SpanWithChildren } from "~/lib/traces";
-import { Span, TraceContext } from "~/types";
+import { TraceContext } from "~/types";
 
 export default function SpanTree({
   traceContext,
@@ -16,8 +16,8 @@ export default function SpanTree({
   startTimestamp: number;
   totalDuration: number;
   depth?: number;
-  activeSpan: Span | null;
-  setActiveSpan: (span: Span) => void;
+  activeSpan: SpanWithChildren | null;
+  setActiveSpan: (span: SpanWithChildren) => void;
 }) {
   if (!tree.length) return null;
 

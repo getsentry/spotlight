@@ -1,3 +1,3 @@
 import { init } from "./index.tsx";
 
-init();
+init({ fullScreen: true });

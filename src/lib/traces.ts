@@ -11,7 +11,7 @@ export function groupSpans(spans: Span[]) {
   const idLookup: { [spanId: string]: SpanWithChildren } = {};
 
   spans.forEach((span) => {
-    const parent = idLookup[span.parent_span_id];
+    const parent = idLookup[span.parent_span_id || ""];
     const newItem = {
       ...span,
       children: [],

@@ -3,8 +3,8 @@ import Trigger from "./components/Trigger";
 import Debugger from "./components/Debugger";
 import { SentryContextProvider } from "./lib/sentryContextProvider";
 
-export default function App() {
-  const [isOpen, setOpen] = useState(false);
+export default function App({ fullScreen = false }: { fullScreen?: boolean }) {
+  const [isOpen, setOpen] = useState(fullScreen);
 
   return (
     <>

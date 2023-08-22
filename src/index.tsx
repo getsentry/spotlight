@@ -17,8 +17,10 @@ function createStyleSheet(styles: string) {
 }
 
 export function init({
+  fullScreen = false,
   relay,
 }: {
+  fullScreen?: boolean;
   relay?: string;
 } = {}) {
   if (typeof document === "undefined") return;
@@ -41,7 +43,7 @@ export function init({
 
   ReactDOM.createRoot(appRoot).render(
     <React.StrictMode>
-      <App />
+      <App fullScreen={fullScreen} />
     </React.StrictMode>
   );
 

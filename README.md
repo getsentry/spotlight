@@ -22,7 +22,6 @@ For multi sidecar what we could do is:
 
 3. Some kind of pinning. There's a little bit of a confusing flow that would happen if you had multiple windows open, creating multiple requests. Or if you're on a shared env and multiple people are making requests. May be solvable via the trace clustering solution.
 
-
 Another issue we've hit is the fact that we need various exposure to hooks:
 
 1. Python was somewhat easy to hook in _capture_event
@@ -30,6 +29,14 @@ Another issue we've hit is the fact that we need various exposure to hooks:
 2. JavaScript is a nightmare, and requiers overrides in a number of spots. Somewhat easy in Node (extend _captureEvent or w/e). Browser is awful. Can't inject via integrations as integrations don't do a damn thing, and the only other way would be beforeSend (which probalby doesnt trigger).
 
 3. Some events are not fully materialized event in captureEvent. For example, Node seems to be missing some things like timestamps and event_ids in transactions.
+
+4. JS SDK seems to not pass baggage if DSN is not set.
+
+5. JS SDK - why does captureCheckIn not call captureEvent? Its duplicating an enabled check. More malformed data.
+
+6. Sentry's frontend is generating multiple trace IDs for what should be one trace (e.g. on the issues list load)
+
+7. The parent span (e.g. the root span or root transaction span) is not present in the span tree.
 
 Generally speaking we need:
 
