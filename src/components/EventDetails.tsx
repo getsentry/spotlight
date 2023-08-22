@@ -42,7 +42,7 @@ export default function EventDetails({
   return (
     <>
       <div className="px-6 py-4 flex gap-x-2 bg-indigo-950">
-        <div className="flex flex-1">
+        <div className="flex flex-1 gap-x-2">
           <button
             className="hover:underline text-indigo-400"
             onClick={(e) => {

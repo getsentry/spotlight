@@ -19,7 +19,7 @@ export default function Trigger({
       }}
       onClick={() => setOpen(!isOpen)}
     >
-      Sentry
+      Spotlight
       <span
         className={
           errorCount === 0

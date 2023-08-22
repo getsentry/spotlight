@@ -1,15 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+
+import fontStyles from "@fontsource/raleway/index.css?inline";
+
 import App from "./App.tsx";
 import { SentryEvent } from "./types.ts";
-
 import globalStyles from "./index.css?inline";
 import eventCache from "./lib/eventCache.ts";
 
-import SpotlightIntegration from "./integration.ts";
-export { SpotlightIntegration };
-
 const DEFAULT_RELAY = "http://localhost:8969/stream";
+
+function createStyleSheet(styles: string) {
+  const sheet = new CSSStyleSheet();
+  sheet.replaceSync(styles);
+  return sheet;
+}
 
 export function init({
   relay,
@@ -30,9 +35,10 @@ export function init({
   appRoot.style.right = "0";
   shadow.appendChild(appRoot);
 
-  const stylesheet = new CSSStyleSheet();
-  stylesheet.replaceSync(globalStyles);
-  shadow.adoptedStyleSheets = [stylesheet];
+  shadow.adoptedStyleSheets = [
+    createStyleSheet(fontStyles),
+    createStyleSheet(globalStyles),
+  ];
 
   ReactDOM.createRoot(appRoot).render(
     <React.StrictMode>

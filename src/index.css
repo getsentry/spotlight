@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 .sentry-trigger {
-  @apply fixed border font-medium right-2 bottom-2 px-3 py-2 rounded inline-flex gap-x-2 items-center justify-center;
-  @apply border-indigo-950 bg-indigo-900 text-white;
+  @apply fixed border font-medium right-2 bottom-2 px-3 py-2 rounded inline-flex gap-x-2 items-center justify-center opacity-80;
+  @apply border-indigo-950 bg-indigo-900 text-white uppercase font-light tracking-widest font-raleway text-sm;
 
   z-index: 2147483647;
   cursor: pointer;
@@ -16,7 +16,7 @@
 }
 
 .sentry-debugger {
-  @apply fixed inset-0 h-screen w-screen bg-indigo-900 text-white overflow-auto flex flex-col;
+  @apply fixed inset-0 h-screen w-screen bg-indigo-900 text-white overflow-auto flex flex-col font-sans;
 
   z-index: 2147483647;
 }

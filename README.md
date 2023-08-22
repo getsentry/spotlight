@@ -21,3 +21,17 @@ For multi sidecar what we could do is:
 2. Per-trace clustering. You've effectively got a stream open, but if the stream changes, that is, you SPA to another location (and the core trace ID changes) it should hide all old events. This is probably a way to navigate to a "list of traces captuerd", and it just defaults by showing the current one.
 
 3. Some kind of pinning. There's a little bit of a confusing flow that would happen if you had multiple windows open, creating multiple requests. Or if you're on a shared env and multiple people are making requests. May be solvable via the trace clustering solution.
+
+
+Another issue we've hit is the fact that we need various exposure to hooks:
+
+1. Python was somewhat easy to hook in _capture_event
+
+2. JavaScript is a nightmare, and requiers overrides in a number of spots. Somewhat easy in Node (extend _captureEvent or w/e). Browser is awful. Can't inject via integrations as integrations don't do a damn thing, and the only other way would be beforeSend (which probalby doesnt trigger).
+
+3. Some events are not fully materialized event in captureEvent. For example, Node seems to be missing some things like timestamps and event_ids in transactions.
+
+Generally speaking we need:
+
+- Better hooks, they're all half baked and incomplete
+- A "event was fully processed" hook should exist in all SDKs.
