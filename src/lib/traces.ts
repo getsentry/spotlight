@@ -1,28 +1,23 @@
 import { Span } from "~/types";
 
-export type SpanWithChildren = Span & {
-  children: SpanWithChildren[];
-};
-
+// mutates spans in place and adds children, as well as returns the top level tree
 export function groupSpans(spans: Span[]) {
   // ordered
-  const results: SpanWithChildren[] = [];
+  const tree: Span[] = [];
   // hash with pointers
-  const idLookup: { [spanId: string]: SpanWithChildren } = {};
+  const idLookup: { [spanId: string]: Span } = {};
 
   spans.forEach((span) => {
     const parent = idLookup[span.parent_span_id || ""];
-    const newItem = {
-      ...span,
-      children: [],
-    };
+    span.children = [];
     if (parent) {
-      parent.children.push(newItem);
+      if (!parent.children) parent.children = [];
+      parent.children.push(span);
     } else {
-      results.push(newItem);
+      tree.push(span);
     }
-    idLookup[span.span_id] = newItem;
+    idLookup[span.span_id] = span;
   });
 
-  return results;
+  return tree;
 }

@@ -1,34 +1,29 @@
-import { SpanWithChildren, groupSpans } from "~/lib/traces";
 import { Trace } from "../types";
 import useKeyPress from "~/lib/useKeyPress";
 import SpanDetails from "./SpanDetails";
 import SpanTree from "./SpanTree";
-import { useRef, useState } from "react";
 import { getDuration } from "~/lib/duration";
 import DateTime from "./DateTime";
 import PlatformIcon from "./PlatformIcon";
+import { useNavigation } from "~/lib/useNavigation";
+import dataCache from "~/lib/dataCache";
 
-export default function TraceDetails({
-  trace,
-  clearActiveTrace,
-}: {
-  trace: Trace;
-  clearActiveTrace: () => void;
-}) {
+export default function TraceDetails({ trace }: { trace: Trace }) {
   useKeyPress("Escape", () => {
-    clearActiveTrace();
+    setTraceId(null);
   });
 
-  const [activeSpan, setActiveSpan] = useState<SpanWithChildren | null>(null);
+  const { spanId, setTraceId } = useNavigation();
 
-  const ref = useRef(null);
+  const span = spanId
+    ? dataCache.getSpanById(trace.trace_id, spanId)
+    : undefined;
 
-  const groupedSpans = groupSpans(trace.spans);
   const startTimestamp = trace.start_timestamp;
   const totalDuration = trace.timestamp - startTimestamp;
 
   return (
-    <div ref={ref}>
+    <>
       <div className="px-6 py-4 flex gap-x-2 bg-indigo-950  items-center">
         <PlatformIcon platform={trace.rootTransaction?.platform} />
         <h1 className="text-2xl max-w-full truncate flex-1">
@@ -59,25 +54,20 @@ export default function TraceDetails({
       <div className="divide-indigo-500 flex-1 bg-indigo-950 px-6 py-4">
         <SpanTree
           traceContext={trace}
-          tree={groupedSpans}
+          tree={trace.spanTree}
           startTimestamp={startTimestamp}
           totalDuration={totalDuration}
-          setActiveSpan={setActiveSpan}
-          activeSpan={activeSpan}
         />
 
-        {activeSpan ? (
+        {span ? (
           <SpanDetails
             traceContext={trace}
             startTimestamp={startTimestamp}
             totalDuration={totalDuration}
-            span={activeSpan}
-            onClose={() => setActiveSpan(null)}
-            setActiveSpan={setActiveSpan}
-            activeSpan={activeSpan}
+            span={span}
           />
         ) : null}
       </div>
-    </div>
+    </>
   );
 }

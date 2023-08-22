@@ -3,9 +3,11 @@ import useKeyPress from "~/lib/useKeyPress";
 
 import { format as formatSQL } from "sql-formatter";
 import { getDuration } from "~/lib/duration";
-import { SpanWithChildren } from "~/lib/traces";
 import SpanTree from "./SpanTree";
-import { TraceContext } from "~/types";
+import { SentryErrorEvent, Span, TraceContext } from "~/types";
+import { ErrorTitle } from "./Events/Error";
+import dataCache from "~/lib/dataCache";
+import { useNavigation } from "~/lib/useNavigation";
 
 function formatSpanDescription(desc: string) {
   if (desc.match(/^(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|ALTER) /i)) {
@@ -24,24 +26,24 @@ export default function SpanDetails({
   span,
   startTimestamp,
   totalDuration,
-  onClose,
-  activeSpan,
-  setActiveSpan,
 }: {
   traceContext: TraceContext;
-  span: SpanWithChildren;
+  span: Span;
   startTimestamp: number;
   totalDuration: number;
-  onClose: () => void;
-  activeSpan: SpanWithChildren | null;
-  setActiveSpan: (span: SpanWithChildren) => void;
 }) {
+  const { setEventId, setSpanId } = useNavigation();
+
   useKeyPress("Escape", () => {
-    onClose();
+    setSpanId(null);
   });
 
   const spanStartTimestamp = new Date(span.start_timestamp).getTime();
   const spanDuration = new Date(span.timestamp).getTime() - spanStartTimestamp;
+
+  const errors = dataCache
+    .getEventsByTrace(span.trace_id)
+    .filter((e) => e.type !== "transaction");
 
   return (
     <div className="fixed h-full right-0 top-0 bottom-0 left-1/4 bg-indigo-900 border-l border-l-indigo-400 py-4 px-6 overflow-auto">
@@ -55,7 +57,7 @@ export default function SpanDetails({
         </div>
         <button
           className="cursor-pointer px-3 py-1 -my-1 text-2xl -mr-3 rounded bg-indigo-900 hover:bg-black font-mono"
-          onClick={() => onClose()}
+          onClick={() => setSpanId(null)}
         >
           {"✕"}
         </button>
@@ -91,6 +93,24 @@ export default function SpanDetails({
             </div>
           </div>
         </div>
+
+        {!!errors.length && (
+          <div>
+            <h2 className="font-bold uppercase mb-2">Related Errors</h2>
+            {errors.map((event) => (
+              <button
+                key={event.event_id}
+                className="cursor-pointer underline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEventId(event.event_id);
+                }}
+              >
+                <ErrorTitle event={event as SentryErrorEvent} />
+              </button>
+            ))}
+          </div>
+        )}
 
         <div>
           <h2 className="font-bold uppercase mb-2">Description</h2>
@@ -163,11 +183,9 @@ export default function SpanDetails({
           <div className="bg-indigo-950 border-indigo-900 border -mx-3">
             <SpanTree
               traceContext={traceContext}
-              tree={span.children}
+              tree={span.children || []}
               startTimestamp={startTimestamp}
               totalDuration={totalDuration}
-              setActiveSpan={setActiveSpan}
-              activeSpan={activeSpan}
             />
           </div>
         </div>

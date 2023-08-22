@@ -71,6 +71,7 @@ export type TraceContext = {
 
 export type Contexts = {
   trace?: TraceContext;
+} & {
   [key: string]: Context;
 };
 
@@ -93,7 +94,8 @@ export type Span = {
   tags?: Tags | null;
   timestamp: string;
   status: "ok" | string;
-  event?: SentryEvent | null;
+  transaction?: SentryTransactionEvent;
+  children?: Span[];
 };
 
 export type SentryTransactionEvent = CommonEventAttrs & {
@@ -116,4 +118,5 @@ export type Trace = TraceContext & {
   rootTransaction: SentryTransactionEvent | null;
   rootTransactionName: string;
   spans: Span[];
+  spanTree: Span[];
 };

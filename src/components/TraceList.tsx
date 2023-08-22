@@ -1,16 +1,13 @@
-import { getDuration, getDurationClassName } from "~/lib/duration";
+import { getDuration } from "~/lib/duration";
 import classNames from "~/lib/classNames";
-import { Trace } from "~/types";
 import TimeSince from "./TimeSince";
 import PlatformIcon from "./PlatformIcon";
 import { useSentryTraces } from "~/lib/useSentryTraces";
+import { useNavigation } from "~/lib/useNavigation";
 
-export default function TraceList({
-  setActiveTrace,
-}: {
-  setActiveTrace: (trace: Trace) => void;
-}) {
+export default function TraceList() {
   const traceList = useSentryTraces();
+  const { setTraceId } = useNavigation();
 
   return (
     <>
@@ -27,7 +24,7 @@ export default function TraceList({
                 key={trace.trace_id}
                 onClick={(e) => {
                   e.stopPropagation();
-                  setActiveTrace(trace);
+                  setTraceId(trace.trace_id);
                 }}
               >
                 <PlatformIcon platform={trace.rootTransaction?.platform} />

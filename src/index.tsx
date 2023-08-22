@@ -62,6 +62,6 @@ function connectToRelay(relay: string = DEFAULT_RELAY) {
   console.log("[Spotlight] Connecting to relay");
   const source = new EventSource(relay || DEFAULT_RELAY);
   source.onmessage = (event) => {
-    dataCache.pushEvent(JSON.parse(event.data));
+    pushEvent(JSON.parse(event.data));
   };
 }

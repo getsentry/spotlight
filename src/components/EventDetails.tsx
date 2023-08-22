@@ -3,33 +3,27 @@ import { SentryEvent } from "../types";
 import Error, { ErrorTitle } from "./Events/Error";
 import Tabs from "./Tabs";
 import EventContexts from "./EventContexts";
-import Transaction, { TransactionTitle } from "./Events/Transaction";
 import useKeyPress from "~/lib/useKeyPress";
 import PlatformIcon from "./PlatformIcon";
+import { useNavigation } from "~/lib/useNavigation";
 
 function renderEvent(event: SentryEvent) {
   if ("exception" in event) return <Error event={event} />;
-  if (event.type === "transaction") return <Transaction event={event} />;
   return null;
 }
 
 function renderEventTitle(event: SentryEvent) {
   if ("exception" in event) return <ErrorTitle event={event} />;
-  if (event.type === "transaction") return <TransactionTitle event={event} />;
   return "Unknown Event";
 }
 
-export default function EventDetails({
-  event,
-  clearActiveEvent,
-}: {
-  event: SentryEvent;
-  clearActiveEvent: () => void;
-}) {
+export default function EventDetails({ event }: { event: SentryEvent }) {
+  const { setEventId, setTraceId, setSpanId } = useNavigation();
+
   const [activeTab, setActiveTab] = useState("details");
 
   useKeyPress("Escape", () => {
-    clearActiveEvent();
+    setEventId(null);
   });
 
   const tabs = [
@@ -45,7 +39,7 @@ export default function EventDetails({
     },
   ];
 
-  const trace = event.contexts?.trace;
+  const traceCtx = event.contexts?.trace;
   return (
     <>
       <div className="px-6 py-4 flex gap-x-2 bg-indigo-950 items-center">
@@ -53,10 +47,32 @@ export default function EventDetails({
         <h1 className="text-2xl max-w-full truncate flex-1">
           {renderEventTitle(event)}
         </h1>
-        {!!trace && (
+        {!!traceCtx && (
           <div className="font-mono text-indigo-300">
-            <div>T: {trace.trace_id}</div>
-            <div>S: {trace.span_id}</div>
+            <div>
+              T:{" "}
+              <button
+                className="cursor-pointer underline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setTraceId(traceCtx.trace_id);
+                }}
+              >
+                {traceCtx.trace_id}
+              </button>
+            </div>
+            <div>
+              S:{" "}
+              <button
+                className="cursor-pointer underline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSpanId(traceCtx.trace_id, traceCtx.span_id);
+                }}
+              >
+                {traceCtx.span_id}
+              </button>
+            </div>
           </div>
         )}
       </div>

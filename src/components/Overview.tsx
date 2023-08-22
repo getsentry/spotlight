@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useSentryEvents } from "../lib/useSentryEvents";
-import { SentryEvent, Trace } from "../types";
 import Tabs from "./Tabs";
 import TraceList from "./TraceList";
 import EventList from "./EventList";
 import useKeyPress from "~/lib/useKeyPress";
 import EventDetails from "./EventDetails";
 import TraceDetails from "./TraceDetails";
+import dataCache from "~/lib/dataCache";
+import { useNavigation } from "~/lib/useNavigation";
 
 const DEFAULT_TAB = "errors";
 
@@ -15,22 +16,23 @@ export default function Overview() {
 
   const events = useSentryEvents();
 
-  const [activeTrace, setActiveTrace] = useState<null | Trace>(null);
-  const [activeEvent, setActiveEvent] = useState<null | SentryEvent>(null);
+  const { traceId, setTraceId, eventId, setEventId, setSpanId } =
+    useNavigation();
 
   useKeyPress("Escape", () => {
-    setActiveEvent(null);
-    setActiveTrace(null);
+    setEventId(null);
+    setTraceId(null);
+    setSpanId(null);
   });
 
   const tabs = [
     {
       name: "Errors",
       count: events.filter((e) => "exception" in e).length,
-      active: activeTab === "errors",
+      active: activeTab === "errors" && (!traceId || !!eventId),
       onSelect: () => {
-        setActiveEvent(null);
-        setActiveTrace(null);
+        setEventId(null);
+        setTraceId(null);
         setActiveTab("errors");
       },
     },
@@ -41,51 +43,43 @@ export default function Overview() {
           events.map((e) => e.contexts?.trace?.trace_id).filter((e) => !!e)
         )
       ).length,
-      active: activeTab === "traces",
+      active: activeTab === "traces" && (!eventId || !!traceId),
       onSelect: () => {
-        setActiveEvent(null);
-        setActiveTrace(null);
+        setEventId(null);
+        setTraceId(null);
         setActiveTab("traces");
       },
     },
   ];
 
-  if (activeEvent) {
-    return (
-      <>
-        <Tabs tabs={tabs} />
-        <EventDetails
-          event={activeEvent}
-          clearActiveEvent={() => setActiveEvent(null)}
-        />
-      </>
-    );
+  if (eventId) {
+    const activeEvent = dataCache.getEventById(eventId);
+    if (activeEvent) {
+      return (
+        <>
+          <Tabs tabs={tabs} />
+          <EventDetails event={activeEvent} />
+        </>
+      );
+    }
   }
 
-  if (activeTrace) {
-    return (
-      <>
-        <Tabs tabs={tabs} />
-        <TraceDetails
-          trace={activeTrace}
-          clearActiveTrace={() => setActiveTrace(null)}
-        />
-      </>
-    );
+  if (traceId) {
+    const activeTrace = dataCache.getTraceById(traceId);
+    if (activeTrace) {
+      return (
+        <>
+          <Tabs tabs={tabs} />
+          <TraceDetails trace={activeTrace} />
+        </>
+      );
+    }
   }
 
   return (
     <>
       <Tabs tabs={tabs} />
-      {activeTab === "traces" ? (
-        <TraceList setActiveTrace={setActiveTrace} />
-      ) : (
-        <EventList
-          events={events}
-          filter={activeTab}
-          setActiveEvent={setActiveEvent}
-        />
-      )}
+      {activeTab === "traces" ? <TraceList /> : <EventList events={events} />}
     </>
   );
 }

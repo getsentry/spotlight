@@ -1,8 +1,8 @@
 import classNames from "~/lib/classNames";
-import { SpanWithChildren } from "~/lib/traces";
-import { TraceContext } from "~/types";
+import { Span, TraceContext } from "~/types";
 import PlatformIcon from "./PlatformIcon";
 import { getSpanDurationClassName } from "~/lib/duration";
+import { useNavigation } from "~/lib/useNavigation";
 
 export default function SpanTree({
   traceContext,
@@ -10,17 +10,15 @@ export default function SpanTree({
   startTimestamp,
   totalDuration,
   depth = 1,
-  activeSpan,
-  setActiveSpan,
 }: {
   traceContext: TraceContext;
-  tree: SpanWithChildren[];
+  tree: Span[];
   startTimestamp: number;
   totalDuration: number;
   depth?: number;
-  activeSpan: SpanWithChildren | null;
-  setActiveSpan: (span: SpanWithChildren) => void;
 }) {
+  const { spanId, setSpanId } = useNavigation();
+
   if (!tree.length) return null;
 
   return (
@@ -35,14 +33,14 @@ export default function SpanTree({
               <div
                 className={classNames(
                   "text-sm flex relative hover:bg-indigo-800 cursor-pointer",
-                  activeSpan?.span_id === span.span_id ? "bg-indigo-800" : ""
+                  spanId === span.span_id ? "bg-indigo-800" : ""
                 )}
-                onClick={() => setActiveSpan(span)}
+                onClick={() => setSpanId(span.trace_id, span.span_id)}
               >
                 <div
                   className={classNames(
                     "flex items-center gap-x-1 py-1 w-6/12",
-                    span.event
+                    span.transaction
                       ? span.status === "ok"
                         ? "text-green-400"
                         : "text-red-400"
@@ -54,8 +52,11 @@ export default function SpanTree({
                     paddingLeft: depth * 12,
                   }}
                 >
-                  {span.event && (
-                    <PlatformIcon size={16} platform={span.event.platform} />
+                  {span.transaction && (
+                    <PlatformIcon
+                      size={16}
+                      platform={span.transaction.platform}
+                    />
                   )}
                   <span className="font-bold">{span.op}</span>
                   <span className="text-indigo-400">&ndash;</span>
@@ -91,12 +92,10 @@ export default function SpanTree({
               </div>
               <SpanTree
                 traceContext={traceContext}
-                tree={span.children}
+                tree={span.children || []}
                 startTimestamp={startTimestamp}
                 totalDuration={totalDuration}
                 depth={depth + 1}
-                activeSpan={activeSpan}
-                setActiveSpan={setActiveSpan}
               />
             </li>
           </ul>

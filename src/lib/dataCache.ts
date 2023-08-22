@@ -1,4 +1,5 @@
-import { SentryEvent, Trace } from "~/types";
+import { SentryEvent, SentryTransactionEvent, Span, Trace } from "~/types";
+import { groupSpans } from "./traces";
 
 function generate_uuidv4() {
   let dt = new Date().getTime();
@@ -37,7 +38,6 @@ class DataCache {
     }
   ) {
     if (!event.event_id) event.event_id = generate_uuidv4();
-    this.events.push(event);
 
     const traceCtx = event.contexts?.trace;
     if (traceCtx) {
@@ -59,22 +59,19 @@ class DataCache {
       };
 
       if (event.type === "transaction") {
-        trace.spans.push({
-          ...traceCtx,
-          start_timestamp: event.start_timestamp,
-          timestamp: event.timestamp,
-          description: traceCtx.description || event.transaction,
-          event,
-        });
-        event.spans.forEach((s) => trace.spans.push(s));
+        [
+          {
+            ...traceCtx,
+            start_timestamp: event.start_timestamp,
+            timestamp: event.timestamp,
+            description: traceCtx.description || event.transaction,
+            transaction: event,
+          },
+          ...event.spans,
+        ].forEach((s) => trace.spans.push(s));
+        trace.spanTree = groupSpans(trace.spans);
         trace.transactions.push(event);
       } else {
-        // TODO: inject event reference in span tree?
-        const refSpan = trace.spans.find(
-          (s) =>
-            traceCtx.trace_id === s.trace_id && traceCtx.span_id === s.span_id
-        );
-        if (refSpan) refSpan.event = event;
         trace.errors += 1;
       }
       trace.start_timestamp = Math.min(startTs, trace.start_timestamp);
@@ -93,11 +90,12 @@ class DataCache {
       else trace.rootTransactionName = "(missing root transaction)";
 
       if (!existingTrace) {
-        this.traces.push(trace);
+        this.traces.unshift(trace);
         this.tracesById[trace.trace_id] = trace;
       }
     }
 
+    this.events.push(event);
     this.subscribers.forEach((s) => s(event));
   }
 
@@ -107,6 +105,28 @@ class DataCache {
 
   getTraces() {
     return [...this.traces];
+  }
+
+  getEventById(id: string) {
+    return this.events.find((e) => e.event_id === id);
+  }
+
+  getTraceById(id: string) {
+    return this.tracesById[id];
+  }
+
+  getEventsByTrace(traceId: string, spanId?: string | null) {
+    return this.events.filter(
+      (e) =>
+        e.contexts?.trace?.trace_id === traceId &&
+        (!spanId || e.contexts?.trace?.span_id === spanId)
+    );
+  }
+
+  getSpanById(traceId: string, spanId: string) {
+    const trace = this.tracesById[traceId];
+    if (!trace) return undefined;
+    return trace.spans.find((s) => s.span_id === spanId);
   }
 
   subscribe(cb: SubscriptionCallback) {
