@@ -42,3 +42,9 @@ Generally speaking we need:
 
 - Better hooks, they're all half baked and incomplete
 - A "event was fully processed" hook should exist in all SDKs.
+
+Sidecar concerns:
+
+- There's a race condition for when yuou connect to the sidecar, which means it needs to keep a buffer of events. That said, its possible to connect and get either 1) no events, 2) too old of events. We need to solve this one.
+
+- Python implementation is hypothetically superior right now, but its got some issues w/ deadlocking the uwsgi process.
