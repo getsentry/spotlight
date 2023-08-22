@@ -38,7 +38,7 @@ export default function SpanDetails({
     <div className="fixed h-full right-0 top-0 bottom-0 left-1/4 bg-indigo-900 border-l border-l-indigo-400 z-[2147483647] py-4 px-6 overflow-auto">
       <div className="flex border-b border-b-indigo-400 pb-4 mb-4">
         <div className="flex-1">
-          <h2 className="text-xl text-indigo-200">Span Details</h2>
+          <h2 className="text-xl text-indigo-300">Span Details</h2>
           <h3 className="font-mono">
             {span.op} <span className="text-indigo-500">&mdash;</span>{" "}
             {span.span_id}
@@ -54,7 +54,7 @@ export default function SpanDetails({
 
       <div className="space-y-4">
         <div className="flex flex-col space-y-4">
-          <div className="flex flex-1 items-center text-indigo-200">
+          <div className="flex flex-1 items-center text-indigo-300">
             <DateTime date={span.start_timestamp} />
             <span className="text-indigo-400 flex-1 text-center">⟶</span>
             <DateTime date={span.timestamp} />
@@ -81,7 +81,7 @@ export default function SpanDetails({
 
         <h2 className="font-bold uppercase">Description</h2>
         {span.description ? (
-          <pre className="whitespace-pre-wrap font-mono text-indigo-200">
+          <pre className="whitespace-pre-wrap font-mono text-indigo-300">
             {formatSpanDescription(span.description)}
           </pre>
         ) : (
@@ -109,8 +109,29 @@ export default function SpanDetails({
             })}
           </table>
         ) : (
-          <div className="text-indigo-200">No tags recorded for this span.</div>
+          <div className="text-indigo-300">No tags recorded for this span.</div>
         )}
+
+        <h2 className="font-bold uppercase">Context</h2>
+        <table className="w-full">
+          {[
+            ["trace", span.trace_id],
+            ["span", span.span_id],
+            ["parent", span.parent_span_id],
+            ["op", span.op],
+          ].map(([key, value]) => {
+            return (
+              <tr key={key}>
+                <th className="w-1/12 text-left text-indigo-300 font-normal font-mono pr-4">
+                  <div className="truncate w-full">{key}</div>
+                </th>
+                <td>
+                  <pre className="whitespace-nowrap font-mono">{value}</pre>
+                </td>
+              </tr>
+            );
+          })}
+        </table>
       </div>
     </div>
   );
