@@ -48,7 +48,7 @@ export default function EventDetails({
   const trace = event.contexts?.trace;
   return (
     <>
-      <div className="px-6 py-4 flex gap-x-1 bg-indigo-950  items-center">
+      <div className="px-6 py-4 flex gap-x-2 bg-indigo-950 items-center">
         <PlatformIcon platform={event.platform} />
         <h1 className="text-2xl max-w-full truncate flex-1">
           {renderEventTitle(event)}
