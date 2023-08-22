@@ -2,7 +2,7 @@ import { useState } from "react";
 import EventList from "./EventList";
 import EventDetails from "./EventDetails";
 import { SentryEvent } from "../types";
-import useKeyPress from "@/lib/useKeyPress";
+import useKeyPress from "~/lib/useKeyPress";
 
 export default function Debugger({
   isOpen,
@@ -14,6 +14,7 @@ export default function Debugger({
   const [activeEvent, setActiveEvent] = useState<null | SentryEvent>(null);
 
   useKeyPress("Escape", () => {
+    setActiveEvent(null);
     setOpen(false);
   });
 
@@ -41,7 +42,10 @@ export default function Debugger({
         </h1>
         <button
           className="cursor-pointer px-3 py-1 -my-1 text-2xl -mr-3 rounded bg-indigo-950 hover:bg-black font-mono"
-          onClick={() => setOpen(false)}
+          onClick={() => {
+            setActiveEvent(null);
+            setOpen(false);
+          }}
         >
           {"✕"}
         </button>

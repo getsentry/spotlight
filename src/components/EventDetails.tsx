@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { SentryEvent } from "../types";
-import Error, { getErrorEventTitle } from "./Events/Error";
+import Error, { ErrorTitle } from "./Events/Error";
 import Tabs from "./Tabs";
 import EventContexts from "./EventContexts";
-import Transaction, { getTransactionEventTitle } from "./Events/Transaction";
-import useKeyPress from "@/lib/useKeyPress";
+import Transaction, { TransactionTitle } from "./Events/Transaction";
+import useKeyPress from "~/lib/useKeyPress";
 
 function renderEvent(event: SentryEvent) {
   if ("exception" in event) return <Error event={event} />;
@@ -13,8 +13,8 @@ function renderEvent(event: SentryEvent) {
 }
 
 function renderEventTitle(event: SentryEvent) {
-  if ("exception" in event) return getErrorEventTitle({ event });
-  if (event.type === "transaction") return getTransactionEventTitle({ event });
+  if ("exception" in event) return <ErrorTitle event={event} />;
+  if (event.type === "transaction") return <TransactionTitle event={event} />;
   return "Unknown Event";
 }
 
@@ -60,7 +60,7 @@ export default function EventDetails({
           <div className="text-indigo-600">/</div>
           <h1 className="max-w-full truncate">{renderEventTitle(event)}</h1>
         </div>
-        <div>{event.event_id.substring(0, 8)}</div>
+        <div className="font-mono">{event.event_id.substring(0, 8)}</div>
       </div>
       <Tabs tabs={tabs} />
       <div className="divide-indigo-500 flex-1 bg-indigo-950 px-6 py-4">

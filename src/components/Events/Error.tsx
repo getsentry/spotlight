@@ -95,7 +95,7 @@ function Frame({
   );
 }
 
-export function getErrorEventTitle({ event }: { event: SentryErrorEvent }) {
+export function ErrorTitle({ event }: { event: SentryErrorEvent }) {
   const values =
     "values" in event.exception
       ? event.exception.values

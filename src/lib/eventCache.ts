@@ -1,4 +1,4 @@
-import { SentryEvent } from "@/types";
+import { SentryEvent } from "~/types";
 
 function generate_uuidv4() {
   let dt = new Date().getTime();

@@ -25,8 +25,8 @@ export function init({
 
   connectToRelay(relay);
 
+  // build shadow dom container to contain styles
   const docRoot = document.createElement("div");
-
   const shadow = docRoot.attachShadow({ mode: "open" });
   const appRoot = document.createElement("div");
   appRoot.style.position = "absolute";
@@ -34,7 +34,6 @@ export function init({
   appRoot.style.left = "0";
   appRoot.style.right = "0";
   shadow.appendChild(appRoot);
-
   shadow.adoptedStyleSheets = [
     createStyleSheet(fontStyles),
     createStyleSheet(globalStyles),

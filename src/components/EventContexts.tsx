@@ -24,7 +24,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
               {Object.entries(ctxValues).map(([key, value]) => {
                 return (
                   <tr key={key}>
-                    <th className="w-1/12 text-left text-indigo-300 font-normal font-mono">
+                    <th className="w-1/12 text-left text-indigo-300 font-normal font-mono pr-4">
                       <div className="truncate w-full">{key}</div>
                     </th>
                     <td>
