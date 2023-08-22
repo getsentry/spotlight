@@ -2,6 +2,7 @@ import { useState } from "react";
 import EventList from "./EventList";
 import EventDetails from "./EventDetails";
 import { SentryEvent } from "../types";
+import useKeyPress from "@/lib/useKeyPress";
 
 export default function Debugger({
   isOpen,
@@ -11,6 +12,10 @@ export default function Debugger({
   setOpen: (value: boolean) => void;
 }) {
   const [activeEvent, setActiveEvent] = useState<null | SentryEvent>(null);
+
+  useKeyPress("Escape", () => {
+    setOpen(false);
+  });
 
   return (
     <div

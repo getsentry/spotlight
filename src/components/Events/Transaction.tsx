@@ -104,11 +104,8 @@ function SpanTree({
         const spanDuration =
           new Date(span.timestamp).getTime() - spanStartTimestamp;
         return (
-          <ul className={root ? "tree" : ""}>
-            <li
-              key={span.span_id}
-              className={spanIdx === lastSpanIdx ? "last" : ""}
-            >
+          <ul className={root ? "tree" : ""} key={span.span_id}>
+            <li className={spanIdx === lastSpanIdx ? "last" : ""}>
               <div className="text-sm flex relative">
                 <div
                   className="flex gap-x-1 py-1 w-6/12"

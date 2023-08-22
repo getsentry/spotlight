@@ -4,6 +4,7 @@ import Error, { getErrorEventTitle } from "./Events/Error";
 import Tabs from "./Tabs";
 import EventContexts from "./EventContexts";
 import Transaction, { getTransactionEventTitle } from "./Events/Transaction";
+import useKeyPress from "@/lib/useKeyPress";
 
 function renderEvent(event: SentryEvent) {
   if ("exception" in event) return <Error event={event} />;
@@ -25,6 +26,10 @@ export default function EventDetails({
   clearActiveEvent: () => void;
 }) {
   const [activeTab, setActiveTab] = useState("details");
+
+  useKeyPress("Escape", () => {
+    clearActiveEvent();
+  });
 
   const tabs = [
     {
