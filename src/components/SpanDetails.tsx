@@ -35,7 +35,7 @@ export default function SpanDetails({
   const { setEventId, setSpanId } = useNavigation();
 
   useKeyPress("Escape", () => {
-    setSpanId(null);
+    setSpanId(span.trace_id, null);
   });
 
   const spanDuration = getDuration(span.start_timestamp, span.timestamp);
