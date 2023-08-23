@@ -20,7 +20,7 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
     );
   }
   return (
-    <div className="space-y-2 divide-y divide-indigo-800">
+    <div className="space-y-2 divide-y divide-indigo-800 -mx-2">
       {event.breadcrumbs.values.map((crumb, crumbIdx) => {
         return (
           <div key={crumbIdx} className="flex items-center  p-2">
