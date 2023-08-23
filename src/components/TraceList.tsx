@@ -43,7 +43,7 @@ export default function TraceList() {
                           : "text-red-400"
                       )}
                     >
-                      {trace.status}
+                      {trace.status || "unknown"}
                     </div>
                     <div>&mdash;</div>
                     <div>{duration} ms</div>
