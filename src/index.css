@@ -88,8 +88,12 @@ ul.tree li:last-child:before {
   @apply border-l border-indigo-400;
 }
 
-.waterfall {
-  @apply absolute left-[35%] right-0 h-8 bg-indigo-950 border-l border-l-indigo-800 py-1;
+.tree .node {
+  @apply w-[65%] flex items-center gap-x-1 py-1 overflow-auto;
+}
+
+.tree .waterfall {
+  @apply absolute left-[65%] right-0 h-7 bg-indigo-950 border-l border-l-indigo-800 py-1;
 }
 
 .table-values {

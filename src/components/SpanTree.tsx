@@ -41,7 +41,7 @@ export default function SpanTree({
             >
               <div
                 className={classNames(
-                  "flex items-center gap-x-1 py-1 w-6/12 node",
+                  "node",
                   span.transaction
                     ? span.status === "ok"
                       ? "text-green-400"
