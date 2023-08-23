@@ -38,8 +38,7 @@ export default function SpanDetails({
     setSpanId(null);
   });
 
-  const spanStartTimestamp = new Date(span.start_timestamp).getTime();
-  const spanDuration = new Date(span.timestamp).getTime() - spanStartTimestamp;
+  const spanDuration = getDuration(span.start_timestamp, span.timestamp);
 
   const errors = dataCache
     .getEventsByTrace(span.trace_id)
@@ -79,8 +78,7 @@ export default function SpanDetails({
                   className="bg-indigo-600 absolute w-full p-0.5 -m-0.5 top-0 bottom-0 flex items-center justify-center"
                   style={{
                     left: `min(${
-                      ((new Date(span.start_timestamp).getTime() -
-                        startTimestamp) /
+                      ((span.start_timestamp - startTimestamp) /
                         totalDuration) *
                       100
                     }%, 100% - 1px)`,

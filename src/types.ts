@@ -44,14 +44,14 @@ export type Breadcrumbs = {
 type CommonEventAttrs = {
   // not always present, but we are forcing it in EventCache
   event_id: string;
-  timestamp: string | number;
+  timestamp: number;
   breadcrumbs?: Breadcrumbs;
   transaction?: string;
   environment?: string;
   platform?: string;
   server_name?: string;
   release?: string;
-  start_timestamp?: string | number;
+  start_timestamp?: number;
   contexts?: Contexts;
   tags?: Tags;
 };
@@ -90,9 +90,9 @@ export type Span = {
   parent_span_id?: string | null;
   op: string;
   description?: string | null;
-  start_timestamp: string | number;
+  start_timestamp: number;
   tags?: Tags | null;
-  timestamp: string | number;
+  timestamp: number;
   status: "ok" | string;
   transaction?: SentryTransactionEvent;
   children?: Span[];

@@ -1,7 +1,7 @@
 import classNames from "~/lib/classNames";
 import { Span, TraceContext } from "~/types";
 import PlatformIcon from "./PlatformIcon";
-import { getSpanDurationClassName } from "~/lib/duration";
+import { getDuration, getSpanDurationClassName } from "~/lib/duration";
 import { useNavigation } from "~/lib/useNavigation";
 
 export default function SpanTree({
@@ -24,9 +24,7 @@ export default function SpanTree({
   return (
     <>
       {tree.map((span) => {
-        const spanStartTimestamp = new Date(span.start_timestamp).getTime();
-        const spanDuration =
-          new Date(span.timestamp).getTime() - spanStartTimestamp;
+        const spanDuration = getDuration(span.start_timestamp, span.timestamp);
         return (
           <ul key={span.span_id}>
             <li>
@@ -69,8 +67,7 @@ export default function SpanTree({
                     className="bg-indigo-900 absolute w-full p-0.5 -m-0.5"
                     style={{
                       left: `min(${
-                        ((new Date(span.start_timestamp).getTime() -
-                          startTimestamp) /
+                        ((span.start_timestamp - startTimestamp) /
                           totalDuration) *
                         100
                       }%, 100% - 1px)`,

@@ -46,21 +46,20 @@ class DataCache {
 
     event.timestamp = toTimestamp(event.timestamp);
     if (event.start_timestamp)
-      event.start_timestamp = toTimestamp(event.timestamp);
+      event.start_timestamp = toTimestamp(event.start_timestamp);
 
     const traceCtx = event.contexts?.trace;
     if (traceCtx) {
       const existingTrace = this.tracesById[traceCtx.trace_id];
       const startTs = event.start_timestamp
-        ? toTimestamp(event.start_timestamp)
+        ? event.start_timestamp
         : new Date().getTime();
-      const endTs = toTimestamp(event.timestamp);
       const trace = existingTrace ?? {
         ...traceCtx,
         spans: [] as Span[],
         transactions: [] as SentryTransactionEvent[],
         errors: 0,
-        timestamp: endTs,
+        timestamp: event.timestamp,
         start_timestamp: startTs,
         status: traceCtx.status,
         rootTransactionName: event.transaction || "(unknown transaction)",
@@ -71,8 +70,8 @@ class DataCache {
         [
           {
             ...traceCtx,
-            start_timestamp: toTimestamp(event.start_timestamp),
-            timestamp: toTimestamp(event.timestamp),
+            start_timestamp: event.start_timestamp,
+            timestamp: event.timestamp,
             description: traceCtx.description || event.transaction,
             transaction: event,
           },
@@ -84,7 +83,7 @@ class DataCache {
         trace.errors += 1;
       }
       trace.start_timestamp = Math.min(startTs, trace.start_timestamp);
-      trace.timestamp = Math.max(endTs, trace.timestamp);
+      trace.timestamp = Math.max(event.timestamp, trace.timestamp);
       if (traceCtx.status !== "ok") trace.status = traceCtx.status;
 
       const roots = trace.transactions.filter(
