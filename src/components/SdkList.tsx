@@ -17,7 +17,7 @@ export default function SdkList() {
           sdkList.map((sdk) => {
             return (
               <div
-                className="px-6 py-4 flex gap-x-4 items-center cursor-pointer"
+                className="px-6 py-4 flex gap-x-4 items-center"
                 key={`${sdk.name}-${sdk.version}`}
               >
                 <PlatformIcon platform={sdkToPlatform(sdk.name)} />

@@ -38,6 +38,8 @@ Another issue we've hit is the fact that we need various exposure to hooks:
 
 7. The parent span (e.g. the root span or root transaction span) is not present in the span tree.
 
+8. Sampling would need to happen outside of the payload creation, so we can still get debug information locally and only apply sampling decisions to if we send data upstream or not.
+
 Generally speaking we need:
 
 - Better hooks, they're all half baked and incomplete

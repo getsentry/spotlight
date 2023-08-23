@@ -74,13 +74,18 @@ function connectToRelay(relay: string = DEFAULT_RELAY) {
   const source = new EventSource(relay || DEFAULT_RELAY);
 
   source.addEventListener("envelope", (event) => {
-    console.log("[Spotlight] Received new envelope");
-    const [header, ...entries] = event.data.split("\n");
+    const [rawHeader, ...rawEntries] = event.data.split("\n");
+    const header = JSON.parse(rawHeader);
+    console.log(
+      `[Spotlight] Received new envelope from SDK ${header.sdk.name}`
+    );
+
     const items: EnvelopeItem[] = [];
-    for (let i = 0; i < entries.length; i += 2) {
-      items.push([JSON.parse(entries[i]), JSON.parse(entries[i + 1])]);
+    for (let i = 0; i < rawEntries.length; i += 2) {
+      items.push([JSON.parse(rawEntries[i]), JSON.parse(rawEntries[i + 1])]);
     }
-    dataCache.pushEnvelope([JSON.parse(header), items]);
+
+    dataCache.pushEnvelope([header, items]);
   });
 
   source.addEventListener("event", (event) => {

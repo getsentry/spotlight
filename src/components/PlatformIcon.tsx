@@ -23,7 +23,6 @@ export default function PlatformIcon({
     case "node":
       return <NodeIcon width={size} height={size} {...props} />;
     default:
-      console.log(`[spotlight] Missing platform: ${platform}`);
       return <DefaultIcon width={size} height={size} {...props} />;
   }
 }
