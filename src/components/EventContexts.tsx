@@ -1,9 +1,14 @@
 import { SentryEvent } from "../types";
 
-const EXAMPLE_CONTEXT = `Sentry.setContext("myContextName", {usefulThing: "useful things value"});`;
+const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
+  name: "Mighty Fighter",
+  age: 19,
+  attack_type: "melee",
+});`;
 
 export default function EventContexts({ event }: { event: SentryEvent }) {
-  if (!event.contexts || !Object.keys(event.contexts).length) {
+  const contexts = { extra: event.extra, ...event.contexts };
+  if (!contexts || !Object.values(contexts).find((v) => !!v)) {
     return (
       <div className="px-6 space-y-4">
         <div className="text-indigo-300">
@@ -16,7 +21,8 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
   }
   return (
     <div className="space-y-6">
-      {Object.entries(event.contexts).map(([ctxKey, ctxValues]) => {
+      {Object.entries(contexts).map(([ctxKey, ctxValues]) => {
+        if (!ctxValues) return null;
         return (
           <div key={ctxKey}>
             <h2 className="font-bold uppercase">{ctxKey}</h2>

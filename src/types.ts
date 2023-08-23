@@ -56,6 +56,7 @@ type CommonEventAttrs = {
   start_timestamp?: number;
   contexts?: Contexts;
   tags?: Tags;
+  extra?: { [key: string]: string | number };
 };
 
 export type Context = {

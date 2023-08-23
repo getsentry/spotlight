@@ -6,6 +6,7 @@ import EventContexts from "./EventContexts";
 import useKeyPress from "~/lib/useKeyPress";
 import PlatformIcon from "./PlatformIcon";
 import { useNavigation } from "~/lib/useNavigation";
+import EventBreadcrumbs from "./EventBreadcrumbs";
 
 function renderEvent(event: SentryEvent) {
   if ("exception" in event) return <Error event={event} />;
@@ -31,6 +32,11 @@ export default function EventDetails({ event }: { event: SentryEvent }) {
       name: "Details",
       active: activeTab === "details",
       onSelect: () => setActiveTab("details"),
+    },
+    {
+      name: "Breadcrumbs",
+      active: activeTab === "breadcrumbs",
+      onSelect: () => setActiveTab("breadcrumbs"),
     },
     {
       name: "Context",
@@ -79,6 +85,7 @@ export default function EventDetails({ event }: { event: SentryEvent }) {
       <Tabs tabs={tabs} />
       <div className="divide-indigo-500 flex-1 bg-indigo-950 px-6 py-4">
         {activeTab === "details" && renderEvent(event)}
+        {activeTab === "breadcrumbs" && <EventBreadcrumbs event={event} />}
         {activeTab === "contexts" && <EventContexts event={event} />}
       </div>
     </>
