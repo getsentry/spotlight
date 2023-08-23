@@ -11,6 +11,11 @@ function generate_uuidv4() {
   });
 }
 
+function toTimestamp(date: string | number) {
+  if (typeof date === "string") return new Date(date).getTime();
+  return date * 1000;
+}
+
 type SubscriptionCallback = (event: SentryEvent) => void;
 
 class DataCache {
@@ -39,13 +44,17 @@ class DataCache {
   ) {
     if (!event.event_id) event.event_id = generate_uuidv4();
 
+    event.timestamp = toTimestamp(event.timestamp);
+    if (event.start_timestamp)
+      event.start_timestamp = toTimestamp(event.timestamp);
+
     const traceCtx = event.contexts?.trace;
     if (traceCtx) {
       const existingTrace = this.tracesById[traceCtx.trace_id];
       const startTs = event.start_timestamp
-        ? new Date(event.start_timestamp).getTime()
+        ? toTimestamp(event.start_timestamp)
         : new Date().getTime();
-      const endTs = new Date(event.timestamp).getTime();
+      const endTs = toTimestamp(event.timestamp);
       const trace = existingTrace ?? {
         ...traceCtx,
         spans: [] as Span[],
@@ -62,8 +71,8 @@ class DataCache {
         [
           {
             ...traceCtx,
-            start_timestamp: event.start_timestamp,
-            timestamp: event.timestamp,
+            start_timestamp: toTimestamp(event.start_timestamp),
+            timestamp: toTimestamp(event.timestamp),
             description: traceCtx.description || event.transaction,
             transaction: event,
           },

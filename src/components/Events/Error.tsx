@@ -3,7 +3,11 @@ import classNames from "../../lib/classNames";
 import { EventFrame, SentryErrorEvent } from "../../types";
 
 function formatFilename(filename: string) {
-  return filename.replace("/node_modules/", "@npm:").split("@npm:").pop();
+  if (filename.indexOf("/node_modules/") === -1) return filename;
+  return `npm:${filename
+    .replace(/\/node_modules\//gi, "npm:")
+    .split("npm:")
+    .pop()}`;
 }
 
 function Frame({
@@ -57,23 +61,25 @@ function Frame({
                 </div>
               );
             })}
-          <div
-            className={classNames(
-              frame.pre_context || frame.post_context
-                ? "bg-indigo-600"
-                : "bg-indigo-900",
-              "flex items-center"
-            )}
-          >
-            {frame.lineno !== undefined && (
-              <div className="text-right w-16 text-indigo-300">
-                {frame.lineno}
-              </div>
-            )}
-            <pre className="whitespace-pre-wrap flex-1  text-indigo-100 px-2 py-1">
-              {frame.context_line}
-            </pre>
-          </div>
+          {!!frame.context_line && (
+            <div
+              className={classNames(
+                frame.pre_context || frame.post_context
+                  ? "bg-indigo-600"
+                  : "bg-indigo-900",
+                "flex items-center"
+              )}
+            >
+              {frame.lineno !== undefined && (
+                <div className="text-right w-16 text-indigo-300">
+                  {frame.lineno}
+                </div>
+              )}
+              <pre className="whitespace-pre-wrap flex-1  text-indigo-100 px-2 py-1">
+                {frame.context_line}
+              </pre>
+            </div>
+          )}
           {frame.post_context &&
             frame.post_context.map((line, lineNo) => {
               return (
