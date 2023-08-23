@@ -93,7 +93,7 @@ export default function SpanDetails({
         </div>
 
         {!!errors.length && (
-          <div>
+          <div className="flex flex-col items-start">
             <h2 className="font-bold uppercase mb-2">Related Errors</h2>
             {errors.map((event) => (
               <button
