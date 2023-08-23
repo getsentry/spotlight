@@ -40,6 +40,8 @@ Another issue we've hit is the fact that we need various exposure to hooks:
 
 8. Sampling would need to happen outside of the payload creation, so we can still get debug information locally and only apply sampling decisions to if we send data upstream or not.
 
+9. Attachments are probably not parsed correclty out of the Envelope. Docs are quite complex to read.
+
 Generally speaking we need:
 
 - Better hooks, they're all half baked and incomplete
@@ -50,3 +52,45 @@ Sidecar concerns:
 - There's a race condition for when yuou connect to the sidecar, which means it needs to keep a buffer of events. That said, its possible to connect and get either 1) no events, 2) too old of events. We need to solve this one.
 
 - Python implementation is hypothetically superior right now, but its got some issues w/ deadlocking the uwsgi process.
+
+
+## Setup POC
+
+Pull down `sentry-python` (most up to date sidecar implementation)
+
+```shell
+git clone git@github.com:getsentry/sentry-python.git ~/src/sentry-python
+cd ~/src/sentry-python
+git checkout feat/hackweek-2023-spotlight
+```
+
+If you **are using the Python SDK** simply symlink the SDK into your project:
+
+```shell
+cd ~/src/myproject
+pip install -e ~/src/sentry-python
+```
+
+If you **not using the Python SDK** in your app, run the sidecar manually:
+
+```shell
+cd ~/src/sentry-python
+python sentry_sdk/spotlight.py &
+```
+
+If you **are using the JavaScript SDK** in your app, setup the repo similarly within your project:
+
+```shell
+git clone git@github.com:getsentry/sentry-python.git ~/src/sentry-python
+cd ~/src/sentry-python
+git checkout feat/hackweek-2023-spotlight
+```
+
+Note: `sentry-python` has the most functional sidecar implementation currently. Both SDKs automatically attempt to keep a sidecar running, so its a race to whomever claims the port.
+
+Lastly, add Spotlight to your app:
+
+```ts
+import * as Spotlight from "sentry-spotlight";
+Spotlight.init();
+```

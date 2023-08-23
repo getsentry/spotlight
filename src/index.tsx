@@ -8,7 +8,7 @@ import { SentryEvent } from "./types.ts";
 import globalStyles from "./index.css?inline";
 import dataCache from "./lib/dataCache.ts";
 
-import type { Envelope, EnvelopeItem } from "@sentry/types";
+import type { Envelope } from "@sentry/types";
 
 const DEFAULT_RELAY = "http://localhost:8969/stream";
 
@@ -75,17 +75,19 @@ function connectToRelay(relay: string = DEFAULT_RELAY) {
 
   source.addEventListener("envelope", (event) => {
     const [rawHeader, ...rawEntries] = event.data.split("\n");
-    const header = JSON.parse(rawHeader);
+    const header = JSON.parse(rawHeader) as Envelope[0];
     console.log(
-      `[Spotlight] Received new envelope from SDK ${header.sdk.name}`
+      `[Spotlight] Received new envelope from SDK ${
+        header.sdk?.name || "(unknown)"
+      }`
     );
 
-    const items: EnvelopeItem[] = [];
+    const items: Envelope[1][] = [];
     for (let i = 0; i < rawEntries.length; i += 2) {
       items.push([JSON.parse(rawEntries[i]), JSON.parse(rawEntries[i + 1])]);
     }
 
-    dataCache.pushEnvelope([header, items]);
+    dataCache.pushEnvelope([header, items] as Envelope);
   });
 
   source.addEventListener("event", (event) => {
