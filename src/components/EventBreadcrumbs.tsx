@@ -27,6 +27,9 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
             <div className="w-32 text-indigo-300">
               <Time date={crumb.timestamp} />
             </div>
+            <div className="w-32 text-indigo-300 truncate">
+              {crumb.category}
+            </div>
             <div className="flex-1 font-mono">{crumb.message}</div>
           </div>
         );
