@@ -19,7 +19,7 @@ export default function SpanTree({
 }) {
   const { spanId, setSpanId } = useNavigation();
 
-  if (!tree.length) return null;
+  if (!tree || !tree.length) return null;
 
   return (
     <>

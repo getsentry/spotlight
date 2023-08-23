@@ -75,7 +75,11 @@ class DataCache {
             description: traceCtx.description || event.transaction,
             transaction: event,
           },
-          ...event.spans,
+          ...event.spans.map((s) => ({
+            ...s,
+            timestamp: toTimestamp(s.timestamp),
+            start_timestamp: toTimestamp(s.start_timestamp),
+          })),
         ].forEach((s) => trace.spans.push(s));
         trace.spanTree = groupSpans(trace.spans);
         trace.transactions.push(event);
