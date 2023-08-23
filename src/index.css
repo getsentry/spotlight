@@ -91,3 +91,23 @@ ul.tree li:last-child:before {
 .waterfall {
   @apply absolute left-[35%] right-0 h-8 bg-indigo-950 border-l border-l-indigo-800 py-1;
 }
+
+.table-values {
+  @apply border-collapse text-sm bg-indigo-900;
+}
+
+.table-values tbody th {
+  @apply font-mono px-2 py-1 text-right font-normal text-indigo-300 w-1/12 border-y border-indigo-950;
+}
+
+.table-values tbody td {
+  @apply px-2 py-1 border-y border-indigo-950;
+}
+
+/* 
+<th className="w-/12 text-left text-indigo-300 font-normal font-mono pr-4 py-0.5">
+<div className="truncate w-full">{key}</div>
+</th>
+<td className="py-0.5">
+<pre className="whitespace-nowrap font-mono">{value}</pre>
+</td> */

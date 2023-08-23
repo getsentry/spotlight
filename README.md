@@ -24,7 +24,7 @@ For multi sidecar what we could do is:
 
 Another issue we've hit is the fact that we need various exposure to hooks:
 
-1. Python was somewhat easy to hook in _capture_event
+1. ~Python was somewhat easy to hook in _capture_event~. We're now hooking the envelope endpoints. Python still easy.
 
 2. JavaScript is a nightmare, and requiers overrides in a number of spots. Somewhat easy in Node (extend _captureEvent or w/e). Browser is awful. Can't inject via integrations as integrations don't do a damn thing, and the only other way would be beforeSend (which probalby doesnt trigger).
 
@@ -41,6 +41,8 @@ Another issue we've hit is the fact that we need various exposure to hooks:
 8. Sampling would need to happen outside of the payload creation, so we can still get debug information locally and only apply sampling decisions to if we send data upstream or not.
 
 9. Attachments are probably not parsed correclty out of the Envelope. Docs are quite complex to read.
+
+10. When you navigate to a new page in Remix its creating a transaction coupled to the prior trace (the origin load), and upon navigation creates a new trace. I'm not sure I'd expect this behavior.
 
 Generally speaking we need:
 

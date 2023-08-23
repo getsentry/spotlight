@@ -1,3 +1,7 @@
+export type FrameVars = {
+  [key: string]: string;
+};
+
 export type EventFrame = {
   filename: string;
   abs_path?: string;
@@ -8,9 +12,7 @@ export type EventFrame = {
   pre_context?: string[];
   post_context?: string[];
   context_line?: string;
-  vars?: {
-    [key: string]: string;
-  };
+  vars?: FrameVars;
   in_app?: boolean;
 };
 
