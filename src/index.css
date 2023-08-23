@@ -20,3 +20,74 @@
 
   z-index: 2147483647;
 }
+/* .sentry-debugger .tree li {
+  position: relative;
+}
+.sentry-debugger .tree li > div > div {
+  position: relative;
+}
+
+.sentry-debugger .tree li .node::before {
+  @apply border-b-2 border-indigo-400 border-l-2;
+
+  display: block;
+  left: -10px;
+  width: 10px;
+  content: "";
+  margin-top: -13px;
+  height: 15px;
+}
+
+.sentry-debugger .tree li:first-child .node::before {
+}
+
+.sentry-debugger .tree li:last-child .node::before {
+} */
+
+ul.tree {
+  position: relative;
+}
+ul.tree ul.tree {
+  position: static;
+}
+
+ul.tree,
+ul.tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ul.tree ul {
+  margin-left: 8px;
+}
+ul.tree li {
+  @apply border-l border-indigo-400;
+}
+
+ul.tree li:last-child {
+  @apply border-0 ml-[0.5px];
+}
+
+ul.tree > li:first-child:before {
+  display: none;
+}
+
+ul.tree > li:before,
+ul.tree ul.tree > li:before {
+  @apply border-b border-indigo-400;
+  position: absolute;
+  margin-top: -2px;
+  height: 1em;
+  width: 12px;
+  content: "";
+  display: inline-block;
+  margin-left: -16px;
+}
+
+ul.tree li:last-child:before {
+  @apply border-l border-indigo-400;
+}
+
+.waterfall {
+  @apply absolute left-[35%] right-0 h-8 bg-indigo-950 border-l border-l-indigo-800 py-1;
+}

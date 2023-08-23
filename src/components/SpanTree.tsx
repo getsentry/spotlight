@@ -22,82 +22,80 @@ export default function SpanTree({
   if (!tree || !tree.length) return null;
 
   return (
-    <>
+    <ul className="tree">
       {tree.map((span) => {
         const spanDuration = getDuration(span.start_timestamp, span.timestamp);
         return (
-          <ul key={span.span_id}>
-            <li>
+          <li
+            key={span.span_id}
+            style={{
+              paddingLeft: 16,
+            }}
+          >
+            <div
+              className={classNames(
+                "text-sm flex hover:bg-indigo-800 cursor-pointer",
+                spanId === span.span_id ? "bg-indigo-800" : ""
+              )}
+              onClick={() => setSpanId(span.trace_id, span.span_id)}
+            >
               <div
                 className={classNames(
-                  "text-sm flex relative hover:bg-indigo-800 cursor-pointer",
-                  spanId === span.span_id ? "bg-indigo-800" : ""
+                  "flex items-center gap-x-1 py-1 w-6/12 node",
+                  span.transaction
+                    ? span.status === "ok"
+                      ? "text-green-400"
+                      : "text-red-400"
+                    : span.status && span.status !== "ok"
+                    ? "text-red-400"
+                    : ""
                 )}
-                onClick={() => setSpanId(span.trace_id, span.span_id)}
               >
+                {span.transaction && (
+                  <PlatformIcon
+                    size={16}
+                    platform={span.transaction.platform}
+                  />
+                )}
+                <span className="font-bold">{span.op}</span>
+                <span className="text-indigo-400">&ndash;</span>
+                <span className="max-w-sm block truncate">
+                  {span.description || span.span_id}
+                </span>
+              </div>
+              <div className="waterfall">
                 <div
-                  className={classNames(
-                    "flex items-center gap-x-1 py-1 w-6/12",
-                    span.transaction
-                      ? span.status === "ok"
-                        ? "text-green-400"
-                        : "text-red-400"
-                      : span.status && span.status !== "ok"
-                      ? "text-red-400"
-                      : ""
-                  )}
+                  className="bg-indigo-900 absolute w-full p-0.5 -m-0.5"
                   style={{
-                    paddingLeft: depth * 12,
+                    left: `min(${
+                      ((span.start_timestamp - startTimestamp) /
+                        totalDuration) *
+                      100
+                    }%, 100% - 1px)`,
+                    width: `max(1px, ${(spanDuration / totalDuration) * 100}%)`,
                   }}
                 >
-                  {span.transaction && (
-                    <PlatformIcon
-                      size={16}
-                      platform={span.transaction.platform}
-                    />
-                  )}
-                  <span className="font-bold">{span.op}</span>
-                  <span className="text-indigo-400">&ndash;</span>
-                  <span className="max-w-sm block truncate">
-                    {span.description || span.span_id}
+                  <span
+                    className={classNames(
+                      "whitespace-nowrap",
+                      getSpanDurationClassName(spanDuration)
+                    )}
+                  >
+                    {spanDuration} ms
                   </span>
                 </div>
-                <div className="flex-1 relative border-l border-l-indigo-800 py-1">
-                  <div
-                    className="bg-indigo-900 absolute w-full p-0.5 -m-0.5"
-                    style={{
-                      left: `min(${
-                        ((span.start_timestamp - startTimestamp) /
-                          totalDuration) *
-                        100
-                      }%, 100% - 1px)`,
-                      width: `max(1px, ${
-                        (spanDuration / totalDuration) * 100
-                      }%)`,
-                    }}
-                  >
-                    <span
-                      className={classNames(
-                        "whitespace-nowrap",
-                        getSpanDurationClassName(spanDuration)
-                      )}
-                    >
-                      {spanDuration} ms
-                    </span>
-                  </div>
-                </div>
               </div>
-              <SpanTree
-                traceContext={traceContext}
-                tree={span.children || []}
-                startTimestamp={startTimestamp}
-                totalDuration={totalDuration}
-                depth={depth + 1}
-              />
-            </li>
-          </ul>
+            </div>
+            <SpanTree
+              traceContext={traceContext}
+              tree={span.children || []}
+              startTimestamp={startTimestamp}
+              totalDuration={totalDuration}
+              depth={depth + 1}
+            />
+          </li>
         );
       })}
-    </>
+    </ul>
   );
 }

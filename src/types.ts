@@ -120,3 +120,9 @@ export type Trace = TraceContext & {
   spans: Span[];
   spanTree: Span[];
 };
+
+export type Sdk = {
+  name: string;
+  version: string;
+  lastSeen: number;
+};

@@ -8,6 +8,7 @@ import EventDetails from "./EventDetails";
 import TraceDetails from "./TraceDetails";
 import dataCache from "~/lib/dataCache";
 import { useNavigation } from "~/lib/useNavigation";
+import SdkList from "./SdkList";
 
 const DEFAULT_TAB = "errors";
 
@@ -50,6 +51,15 @@ export default function Overview() {
         setActiveTab("traces");
       },
     },
+    {
+      name: "SDKs",
+      active: activeTab === "sdks" && !eventId && !traceId,
+      onSelect: () => {
+        setEventId(null);
+        setTraceId(null);
+        setActiveTab("sdks");
+      },
+    },
   ];
 
   if (eventId) {
@@ -79,7 +89,13 @@ export default function Overview() {
   return (
     <>
       <Tabs tabs={tabs} />
-      {activeTab === "traces" ? <TraceList /> : <EventList events={events} />}
+      {activeTab === "traces" ? (
+        <TraceList />
+      ) : activeTab == "errors" ? (
+        <EventList events={events} />
+      ) : (
+        <SdkList />
+      )}
     </>
   );
 }

@@ -1,5 +1,6 @@
-import { SentryEvent, SentryTransactionEvent, Span, Trace } from "~/types";
+import { Sdk, SentryEvent, SentryTransactionEvent, Span, Trace } from "~/types";
 import { groupSpans } from "./traces";
+import { Envelope } from "@sentry/types";
 
 function generate_uuidv4() {
   let dt = new Date().getTime();
@@ -20,8 +21,9 @@ type SubscriptionCallback = (event: SentryEvent) => void;
 
 class DataCache {
   protected events: SentryEvent[];
-  private traces: Trace[];
-  private tracesById: { [id: string]: Trace };
+  protected sdks: Sdk[];
+  protected traces: Trace[];
+  protected tracesById: { [id: string]: Trace };
   protected subscribers: Map<string, SubscriptionCallback>;
 
   constructor(
@@ -30,11 +32,35 @@ class DataCache {
     })[] = []
   ) {
     this.events = [];
+    this.sdks = [];
     this.traces = [];
     this.tracesById = {};
     this.subscribers = new Map<string, SubscriptionCallback>();
 
     initial.forEach((e) => this.pushEvent(e));
+  }
+
+  pushEnvelope(envelope: Envelope) {
+    const [header, items] = envelope;
+    if (header.sdk && header.sdk.name && header.sdk.version) {
+      const existingSdk = this.sdks.find(
+        (s) => s.name === header.sdk!.name && s.version === header.sdk!.version
+      );
+      if (!existingSdk) {
+        this.sdks.push({
+          name: header.sdk.name,
+          version: header.sdk.version,
+          lastSeen: new Date(header.sent_at as string).getTime(),
+        });
+      } else {
+        existingSdk.lastSeen = new Date(header.sent_at as string).getTime();
+      }
+    }
+    items.forEach(([itemHeader, itemData]) => {
+      if (itemHeader.type === "event" || itemHeader.type === "transaction") {
+        this.pushEvent(itemData as SentryEvent);
+      }
+    });
   }
 
   pushEvent(
@@ -117,6 +143,10 @@ class DataCache {
 
   getTraces() {
     return [...this.traces];
+  }
+
+  getSdks() {
+    return [...this.sdks];
   }
 
   getEventById(id: string) {

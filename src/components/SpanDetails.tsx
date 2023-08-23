@@ -12,7 +12,6 @@ import { useNavigation } from "~/lib/useNavigation";
 function formatSpanDescription(desc: string) {
   if (desc.match(/^(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|ALTER) /i)) {
     try {
-      console.log(desc.replace(/([\s,(])(%[a-z])([\s,)])/gim, "$1?$3"));
       return formatSQL(desc.replace(/([\s,(])(%[a-z])([\s,)])/gim, "$1?$3"));
     } catch (err) {
       console.error(err);
@@ -56,7 +55,7 @@ export default function SpanDetails({
         </div>
         <button
           className="cursor-pointer px-3 py-1 -my-1 text-2xl -mr-3 rounded bg-indigo-900 hover:bg-black font-mono"
-          onClick={() => setSpanId(null)}
+          onClick={() => setSpanId(span.trace_id, null)}
         >
           {"✕"}
         </button>
