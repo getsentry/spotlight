@@ -20,9 +20,11 @@ function createStyleSheet(styles: string) {
 
 export function init({
   fullScreen = false,
+  defaultEventId,
   relay,
 }: {
   fullScreen?: boolean;
+  defaultEventId?: string;
   relay?: string;
 } = {}) {
   if (typeof document === "undefined") return;
@@ -50,7 +52,7 @@ export function init({
 
   ReactDOM.createRoot(appRoot).render(
     <React.StrictMode>
-      <App fullScreen={fullScreen} />
+      <App fullScreen={fullScreen} defaultEventId={defaultEventId} />
     </React.StrictMode>
   );
 

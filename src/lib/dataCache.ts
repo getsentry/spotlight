@@ -93,22 +93,32 @@ class DataCache {
       };
 
       if (event.type === "transaction") {
-        [
-          {
-            ...traceCtx,
-            start_timestamp: event.start_timestamp,
-            timestamp: event.timestamp,
-            description: traceCtx.description || event.transaction,
-            transaction: event,
-          },
-          ...event.spans.map((s) => ({
-            ...s,
-            timestamp: toTimestamp(s.timestamp),
-            start_timestamp: toTimestamp(s.start_timestamp),
-          })),
-        ].forEach((s) => trace.spans.push(s));
-        trace.spanTree = groupSpans(trace.spans);
         trace.transactions.push(event);
+        trace.transactions.sort(
+          (a, b) => a.start_timestamp - b.start_timestamp
+        );
+
+        // recompute tree as we might have txn out of order
+        // XXX: we're trusting timestamps, wihch are not trustworthy
+        const allSpans: Span[] = [];
+        trace.transactions.forEach((txn) => {
+          allSpans.push(
+            {
+              ...txn.contexts.trace,
+              start_timestamp: txn.start_timestamp,
+              timestamp: txn.timestamp,
+              description: traceCtx.description || txn.transaction,
+              transaction: txn,
+            },
+            ...txn.spans.map((s) => ({
+              ...s,
+              timestamp: toTimestamp(s.timestamp),
+              start_timestamp: toTimestamp(s.start_timestamp),
+            }))
+          );
+        });
+        trace.spans = allSpans;
+        trace.spanTree = groupSpans(allSpans);
       } else {
         trace.errors += 1;
       }

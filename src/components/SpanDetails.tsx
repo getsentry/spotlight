@@ -157,11 +157,26 @@ export default function SpanDetails({
                 ["status", span.status || ""],
                 ["trace", span.trace_id],
                 ["span", span.span_id],
-                ["parent", span.parent_span_id],
+                [
+                  "parent",
+                  span.parent_span_id ? (
+                    <button
+                      className="underline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSpanId(span.trace_id, span.parent_span_id);
+                      }}
+                    >
+                      {span.parent_span_id}
+                    </button>
+                  ) : (
+                    ""
+                  ),
+                ],
                 ["op", span.op],
               ].map(([key, value]) => {
                 return (
-                  <tr key={key}>
+                  <tr key={key as string}>
                     <th className="w-1/12 text-left text-indigo-300 font-normal font-mono pr-4 py-0.5">
                       <div className="truncate w-full">{key}</div>
                     </th>

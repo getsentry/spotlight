@@ -1,16 +1,28 @@
 import useKeyPress from "~/lib/useKeyPress";
 import Overview from "./Overview";
+import { useNavigation } from "~/lib/useNavigation";
+import { useEffect } from "react";
 
 export default function Debugger({
   isOpen,
   setOpen,
+  defaultEventId,
 }: {
   isOpen: boolean;
   setOpen: (value: boolean) => void;
+  defaultEventId?: string;
 }) {
   useKeyPress("Escape", () => {
     setOpen(false);
   });
+
+  // TODO: this needs to defer til events are received, and listen for those events
+  const { setEventId } = useNavigation();
+  useEffect(() => {
+    if (defaultEventId) {
+      setEventId(defaultEventId);
+    }
+  }, [defaultEventId, setEventId]);
 
   return (
     <div

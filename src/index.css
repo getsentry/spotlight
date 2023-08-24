@@ -77,11 +77,11 @@ ul.tree ul.tree > li:before {
   @apply border-b border-indigo-400;
   position: absolute;
   margin-top: -2px;
-  height: 1em;
+  height: 10px;
   width: 12px;
   content: "";
   display: inline-block;
-  margin-left: -16px;
+  margin-left: -17px;
 }
 
 ul.tree li:last-child:before {
