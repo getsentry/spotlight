@@ -74,7 +74,7 @@ export default function SpanDetails({
             <div className="flex-1">
               <div className="relative border border-indigo-600 py-1 h-8">
                 <div
-                  className="bg-indigo-600 absolute w-full p-0.5 -m-0.5 top-0 bottom-0 flex items-center justify-center"
+                  className="bg-indigo-600 absolute w-full p-0.5 -m-0.5 top-0 bottom-0 flex items-center"
                   style={{
                     left: `min(${
                       ((span.start_timestamp - startTimestamp) /
