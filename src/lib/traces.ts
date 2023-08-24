@@ -8,7 +8,7 @@ export function groupSpans(spans: Span[]) {
   const idLookup = new Map<string, Span>();
 
   const sortedSpans = [...spans] // need to sort root(s) first
-    .sort((a, b) => (a.parent_span_id ? 1 : 0));
+    .sort((a) => (a.parent_span_id ? 1 : 0));
 
   sortedSpans.forEach((span) => {
     let parent = idLookup.get(span.parent_span_id || "");

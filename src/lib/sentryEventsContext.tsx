@@ -15,7 +15,7 @@ export const SentryEventsContextProvider: React.FC<{
   const [events, addEvents] = useReducer(eventReducer, dataCache.getEvents());
 
   useEffect(() => {
-    const unsubscribe = dataCache.subscribe("event", (e) => {
+    const unsubscribe = dataCache.subscribe("event", (e: SentryEvent) => {
       addEvents(e);
     });
     return () => {

@@ -17,8 +17,6 @@ function toTimestamp(date: string | number) {
   return date * 1000;
 }
 
-type SubscriptionType = "event" | "trace" | "online";
-
 type OnlineSubscription = ["online", (status: boolean) => void];
 type EventSubscription = ["event", (event: SentryEvent) => void];
 type TraceSubscription = ["trace", (trace: Trace) => void];
