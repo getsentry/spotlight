@@ -42,11 +42,15 @@ export default function TraceDetails({ trace }: { trace: Trace }) {
           <span>&mdash;</span>
           <span>
             <strong className="font-bold text-indigo-200">
-              {getDuration(trace.start_timestamp, trace.timestamp)} ms
+              {getDuration(
+                trace.start_timestamp,
+                trace.timestamp
+              ).toLocaleString()}{" "}
+              ms
             </strong>{" "}
             recorded in{" "}
             <strong className="font-bold text-indigo-200">
-              {trace.spans.length} spans
+              {trace.spans.length.toLocaleString()} spans
             </strong>
           </span>
         </div>

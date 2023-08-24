@@ -81,7 +81,7 @@ export default function SpanTree({
                       getSpanDurationClassName(spanDuration)
                     )}
                   >
-                    {spanDuration} ms
+                    {spanDuration.toLocaleString()} ms
                   </span>
                 </div>
               </div>
