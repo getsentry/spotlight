@@ -3,6 +3,7 @@ import Trigger from "./components/Trigger";
 import Debugger from "./components/Debugger";
 import { SentryEventsContextProvider } from "./lib/sentryEventsContext";
 import { NavigationProvider } from "./lib/navigationContext";
+import { OnlineContextProvider } from "./lib/onlineContext";
 
 export default function App({
   fullScreen = false,
@@ -16,14 +17,16 @@ export default function App({
   return (
     <>
       <SentryEventsContextProvider>
-        <NavigationProvider>
-          <Trigger isOpen={isOpen} setOpen={setOpen} />
-          <Debugger
-            isOpen={isOpen}
-            setOpen={setOpen}
-            defaultEventId={defaultEventId}
-          />
-        </NavigationProvider>
+        <OnlineContextProvider>
+          <NavigationProvider>
+            <Trigger isOpen={isOpen} setOpen={setOpen} />
+            <Debugger
+              isOpen={isOpen}
+              setOpen={setOpen}
+              defaultEventId={defaultEventId}
+            />
+          </NavigationProvider>
+        </OnlineContextProvider>
       </SentryEventsContextProvider>
     </>
   );

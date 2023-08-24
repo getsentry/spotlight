@@ -17,27 +17,37 @@ function toTimestamp(date: string | number) {
   return date * 1000;
 }
 
-type SubscriptionCallback = (event: SentryEvent) => void;
+type SubscriptionType = "event" | "trace" | "online";
+
+type OnlineSubscription = ["online", (status: boolean) => void];
+type EventSubscription = ["event", (event: SentryEvent) => void];
+type TraceSubscription = ["trace", (trace: Trace) => void];
+
+type Subscription = OnlineSubscription | EventSubscription | TraceSubscription;
 
 class DataCache {
-  protected events: SentryEvent[];
-  protected sdks: Sdk[];
-  protected traces: Trace[];
-  protected tracesById: { [id: string]: Trace };
-  protected subscribers: Map<string, SubscriptionCallback>;
+  protected events: SentryEvent[] = [];
+  protected sdks: Sdk[] = [];
+  protected traces: Trace[] = [];
+  protected tracesById: { [id: string]: Trace } = {};
+  protected subscribers: Map<string, Subscription> = new Map();
+  protected online = false;
 
   constructor(
     initial: (SentryEvent & {
       event_id?: string;
     })[] = []
   ) {
-    this.events = [];
-    this.sdks = [];
-    this.traces = [];
-    this.tracesById = {};
-    this.subscribers = new Map<string, SubscriptionCallback>();
-
     initial.forEach((e) => this.pushEvent(e));
+  }
+
+  setOnline(status: boolean) {
+    this.online = status;
+    this.subscribers.forEach(([type, cb]) => type === "online" && cb(status));
+  }
+
+  isOnline(): boolean {
+    return this.online;
   }
 
   pushEnvelope(envelope: Envelope) {
@@ -73,6 +83,8 @@ class DataCache {
     event.timestamp = toTimestamp(event.timestamp);
     if (event.start_timestamp)
       event.start_timestamp = toTimestamp(event.start_timestamp);
+
+    this.events.push(event);
 
     const traceCtx = event.contexts?.trace;
     if (traceCtx) {
@@ -141,10 +153,9 @@ class DataCache {
         this.traces.unshift(trace);
         this.tracesById[trace.trace_id] = trace;
       }
+      this.subscribers.forEach(([type, cb]) => type === "trace" && cb(trace));
     }
-
-    this.events.push(event);
-    this.subscribers.forEach((s) => s(event));
+    this.subscribers.forEach(([type, cb]) => type === "event" && cb(event));
   }
 
   getEvents() {
@@ -181,9 +192,9 @@ class DataCache {
     return trace.spans.find((s) => s.span_id === spanId);
   }
 
-  subscribe(cb: SubscriptionCallback) {
+  subscribe(...args: Subscription) {
     const id = generate_uuidv4();
-    this.subscribers.set(id, cb);
+    this.subscribers.set(id, args);
 
     return () => {
       this.subscribers.delete(id);

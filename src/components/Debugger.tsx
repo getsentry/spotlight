@@ -2,6 +2,8 @@ import useKeyPress from "~/lib/useKeyPress";
 import Overview from "./Overview";
 import { useNavigation } from "~/lib/useNavigation";
 import { useEffect } from "react";
+import { useOnlineStatus } from "~/lib/useOnlineStatus";
+import classNames from "~/lib/classNames";
 
 export default function Debugger({
   isOpen,
@@ -24,6 +26,8 @@ export default function Debugger({
     }
   }, [defaultEventId, setEventId]);
 
+  const isOnline = useOnlineStatus();
+
   return (
     <div
       className="sentry-debugger"
@@ -31,12 +35,12 @@ export default function Debugger({
         display: isOpen ? undefined : "none",
       }}
     >
-      <div className="flex text-3xl items-center text-indigo-200 bg-indigo-950 px-6 py-4 gap-x-2">
-        <h1 className="flex-1 space-x-1 font-raleway opacity-80">
-          <span className="uppercase font-light tracking-widest">
+      <div className="flex items-center text-indigo-200 bg-indigo-950 px-6 py-4 gap-x-2">
+        <h1 className="flex-1 flex items-end gap-x-1 font-raleway opacity-80">
+          <div className="uppercase font-light tracking-widest text-3xl">
             Spotlight
-          </span>
-          <span className="text-sm text-indigo-300">
+          </div>
+          <div className="flex gap-x-1 text-sm items-center text-indigo-300">
             by{" "}
             <a
               href="https://sentry.io"
@@ -44,7 +48,21 @@ export default function Debugger({
             >
               Sentry
             </a>
-          </span>
+            <div
+              className={classNames(
+                "pl-2 ml-2 flex items-center gap-x-2 text-xs",
+                isOnline ? "" : "text-red-400"
+              )}
+            >
+              <div
+                className={classNames(
+                  " rounded-full w-2 h-2 block",
+                  isOnline ? "bg-green-400" : "bg-red-400 animate-pulse"
+                )}
+              />
+              {isOnline ? "Connected to Relay" : "Not connected to Relay"}
+            </div>
+          </div>
         </h1>
         <button
           className="cursor-pointer px-3 py-1 -my-1 text-2xl -mr-3 rounded bg-indigo-950 hover:bg-black font-mono"

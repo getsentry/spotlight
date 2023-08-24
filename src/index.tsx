@@ -98,7 +98,13 @@ function connectToRelay(relay: string = DEFAULT_RELAY) {
     dataCache.pushEvent(data);
   });
 
-  source.onerror = (err) => {
+  source.addEventListener("open", () => {
+    dataCache.setOnline(true);
+  });
+
+  source.addEventListener("error", (err) => {
+    dataCache.setOnline(false);
+
     console.error("EventSource failed:", err);
-  };
+  });
 }
