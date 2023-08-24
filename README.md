@@ -1,3 +1,113 @@
+# Spotlight
+
+Spotlight is Sentry for Development. Inspired by an old project that I worked on (Django Debug Toolbar), Spotlight brings a rich debug overlay into development environments, and it does it by leveraging the existing power of Sentry's SDKs.
+
+At a high level, Spotlight consists of three projects:
+
+1. An JavaScript overlay that renders inside of your application. The overlay is a simple npm package, and can seamlessly run in any web application (or even independently!).
+
+2. A proxy server which which enables push-based communication to the overlay. This is achieved via a simple HTTP relay, allowing SDKs to push events to it (even without a DSN being configured!), and allow the overlay to receive events using an event stream.
+
+3. A variety of SDK changes, enabling the SDK to fully manifest events and envelopes even when the DSN is not set. This means SDKs generate a full production-grade payload of their data all the time, and when spotlight is enabled (e.g. in dev) those get fired off. 
+
+To adopt relay, a customer would only need to load the Spotlight overlay in their application:
+
+```shell
+npm add sentry-spotlight
+```
+
+```typescript
+import * as Spotlight from "sentry-spotlight";
+Spotlight.init();
+```
+
+That's it! A relay will automatically launch from one of the SDKs, and all available SDKs will communicate with it. No configuration is required at the SDK level.
+
+The overlay itself behaves a little differently from Sentry. That's intentional both because this is for local development, but also because we don't believe our production implementation of certain components is our final implementation.
+
+Ruight now the overlay consists of three components:
+
+- Errors - very similar to Sentry
+- Traces - all transactions get clustered into a trace view, othewrise similar to Sentry
+- SDKs - simple data on which SDKs have streamed events up
+
+We do not render Replays, Profiling data, or Attachments currently. Profiles and Attachments feel useful, Replays less so unless you're running a remote/headless UI.
+
+## Zero to One
+
+To make this production grade there's a number of changes we'd want to make.
+
+First and foremost is how the relay works. Currently there is a sidecar implemented in both sentry-javascript and sentry-python. Whoever gets the port first wins. The implementations are independent (desirable for compatibility), but are also not equal.
+
+The next issue we see on the relay is that its always-on. Its a little odd behaviorally that a web server is launching when, for example, you are simply running a CLI command. This could be resolved by making the relay lazy, but if the relay is lazy it _must_ buffer data. Per the first problem, the relays do not implement this uniformly at the moment.
+
+Third is how the SDKs communicate with the Relay. Its just assumed its always available on `:8969`. That obviously wouldn't be true, and the main concern is making sure its only pushed to, and only running when we're in a development environment (how do we detect that?).
+
+On the same front of SDK communication, we'd want to pass the relay information (the port, if its active) downstream via baggage. Its ok for SDKs to attempt to auto discover it, but it'd be a lot more reliable if our trace baggage contained the relay connection information.
+
+For the overlay there's also a number of improvements that we'd like to make:
+
+- Cluster similar events together, primarily visually. You might hit 40 "resource not found" errors, and while you may want to look at that, it makes navigating the UI quite difficult.
+
+- SDKs could contain more information, such as the process they're running under, the number of events received, and meta configuration (release, environment, etc). They could also guide you on how to send data to Sentry (e.g. set the DSN).
+
+- More debug information would be useful locally. Take a look at Django's error page - it contains information around the HTTP request headers, environment configuration, and other settings. We could enable those kinds of debug experiences from the SDK and lock them to only working with Spotlight. Some of this should be available within the trace, and could just need better exposure.
+
+- Framework native integration. The overlay already supports the concept of "fullscreen by default", which means we could hook some frameworks error pages and simply load Spotlight in place of their existing (or non-existant) error page.
+
+## Technical Notes
+
+There's some interesting choices I made, and I learned along the way.
+
+### CSS Scoping
+
+Because this is an embedded overlay we needed to scope styles to only our code, and at the same time we needed to make sure the parent document didn't impact us. To do this we're using a [shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM). This allows us to fully render all of our components, our styles (which is just [Tailwind](https://tailwindcss.com/)!), inside of what might as well be considered an iframe.
+
+### Relay Sidecar
+
+The relay has a bunch of challenges to make it work:
+
+- It should be invisible to the user, thus it launches from the SDKs themselves. This also means it could attempt to launch multiple processes.
+
+- It needs to be seamless, meaning we can't install a sidecar that requires a Python runtime if we're using Node.
+
+- It needs to cleanly start up and shutdown - this proved annoying in Python (and doesnt cleanly shut down).
+
+- It needs to both buffer events to deal w/ the async nature of when the overlay loads, but also expire events so future loads arent filled with previous requests. This could be made a lot better with some kind of session ID (or if traces were more encapsulated) so you could auto hide prior sessions.
+
+In the end the Python version ended up with a variation of a circular buffer for keeping events around, using a time-based expiration to ensure only recent events were pushed out.
+
+### Data Quality
+
+If anything, this project has showcased the importance of data quality. While our error data is generally good, there's a number of areas for improvement, some of which are extermely critical.
+
+#### JavaScript
+
+- We inject browser related instrumentation as faux spans, except those spans are not accurate. e.g. the "browser.request" span will show up _after_ the server has received and hydrated the request. Traces need to _look_ correct, and this not only doesnt _look_ correct, but it isn't. 
+
+- What is and isnt a trace is extremely confusing once you start rendering full traces. When does a trace end? More importantly than that, when does it start? For example, when I click a link on the page, the trace is still going, but once the browser receives the navigation it creates a new trace.
+
+- There are a lot of cases where we fail to achieve a parent (root) transaction, meaning we're left with a bunch of siblings that have to be clustered together. This shouldn't happen, and happens even in Remix where we have end-to-end instrumentation available to us.
+
+- Various data is missing. I patched the SDK a bunch to materialize as much of the payload as I could, but for example the `status` attribute is sometimes not persent on transactions.
+
+- Within errors, filenames are illegible. We do not strip prefixes in any situation so we're left with long absolute paths for application-relative code. This problem is even worse with node packages (and subpackages). Example of app-local code:
+
+```shell 
+# what Sentry shows as filename
+/home/dcramer/src/peated/apps/api/src/routes/triggerSentry.tsx
+
+# This would be better
+src/peated/apps/api/src/routes/triggerSentry.tsx
+
+# This would be best, and accurate
+~/src/routes/triggerSentry.tsx
+```
+
+## Notes from Development
+
+(this is a loose collection of scribbles I made while building the POC)
+
 Data needs pushed from an SDK into the Debugger. To do this we have a few constraints:
 
 1. The Widget _must_ be pull-based, as theres no way for it to accept push data natively. We're using _Server Sent Events_ for this.
