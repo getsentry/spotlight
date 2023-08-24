@@ -10,7 +10,7 @@ At a high level, Spotlight consists of three projects:
 
 3. A variety of SDK changes, enabling the SDK to fully manifest events and envelopes even when the DSN is not set. This means SDKs generate a full production-grade payload of their data all the time, and when spotlight is enabled (e.g. in dev) those get fired off. 
 
-To adopt relay, a customer would only need to load the Spotlight overlay in their application:
+To adopt Spotlight, a customer would only need to load the dependency in their application:
 
 ```shell
 npm add sentry-spotlight
@@ -21,7 +21,7 @@ import * as Spotlight from "sentry-spotlight";
 Spotlight.init();
 ```
 
-That's it! A relay will automatically launch from one of the SDKs, and all available SDKs will communicate with it. No configuration is required at the SDK level.
+That's it! A data relay will automatically launch from one of the SDKs, and all available SDKs will communicate with it. No configuration is required at the SDK level.
 
 The overlay itself behaves a little differently from Sentry. That's intentional both because this is for local development, but also because we don't believe our production implementation of certain components is our final implementation.
 
