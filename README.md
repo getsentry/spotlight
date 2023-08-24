@@ -106,6 +106,8 @@ src/peated/apps/api/src/routes/triggerSentry.tsx
 
 - When you stitch together a full trace you see a lot of gaps. One of the biggest is "what service is this". We do not have names of services, process names, or any other kind of identifying information exposed.
 
+- Orphan spans exist from setTimeout calls (no parent, but valid trace)
+
 ## Notes from Development
 
 (this is a loose collection of scribbles I made while building the POC)
