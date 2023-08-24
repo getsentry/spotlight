@@ -118,7 +118,7 @@ class DataCache {
           );
         });
         trace.spans = allSpans;
-        trace.spanTree = groupSpans(allSpans);
+        trace.spanTree = groupSpans(trace.spans);
       } else {
         trace.errors += 1;
       }

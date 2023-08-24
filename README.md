@@ -75,7 +75,7 @@ The relay has a bunch of challenges to make it work:
 
 - It needs to both buffer events to deal w/ the async nature of when the overlay loads, but also expire events so future loads arent filled with previous requests. This could be made a lot better with some kind of session ID (or if traces were more encapsulated) so you could auto hide prior sessions.
 
-In the end the Python version ended up with a variation of a circular buffer for keeping events around, using a time-based expiration to ensure only recent events were pushed out.
+In the end I ended up with a variation of a circular buffer for keeping events around, using a time-based expiration to ensure only recent events were pushed out.
 
 ### Data Quality
 
@@ -120,7 +120,7 @@ Theres a race condition for when its running and when the UI connects. That coul
 
 The widget is an embeddable React application. It's currently using Tailwind which wouldn't work in prod without using an IFRAME (which would mean the sidecar has to render the iframe _in addition_ to the framework loading the trigger JS). Both the debugger and the trigger could be embedded from the same sidecar, which means the sidecar could be implemented per-language with a simple JS shim that also gets bundled (either via CDN or packaged locally, maybe both?).
 
-## TODO
+### TODO
 
 1. Multi service POC. Both for multiple python services as well as a JS intercept.
 
@@ -168,7 +168,7 @@ Sidecar concerns:
 - Python implementation is hypothetically superior right now, but its got some issues w/ deadlocking the uwsgi process.
 
 
-## Setup POC
+### Setup POC
 
 Pull down `sentry-python` (most up to date sidecar implementation)
 
