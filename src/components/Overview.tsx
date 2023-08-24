@@ -9,6 +9,7 @@ import TraceDetails from "./TraceDetails";
 import dataCache from "~/lib/dataCache";
 import { useNavigation } from "~/lib/useNavigation";
 import SdkList from "./SdkList";
+import { useSentryTraces } from "~/lib/useSentryTraces";
 
 const DEFAULT_TAB = "errors";
 
@@ -16,6 +17,7 @@ export default function Overview() {
   const [activeTab, setActiveTab] = useState(DEFAULT_TAB);
 
   const events = useSentryEvents();
+  const traces = useSentryTraces();
 
   const { traceId, setTraceId, eventId, setEventId, setSpanId } =
     useNavigation();
@@ -39,11 +41,7 @@ export default function Overview() {
     },
     {
       name: "Traces",
-      count: Array.from(
-        new Set(
-          events.map((e) => e.contexts?.trace?.trace_id).filter((e) => !!e)
-        )
-      ).length,
+      count: traces.length,
       active: activeTab === "traces" && (!eventId || !!traceId),
       onSelect: () => {
         setEventId(null);

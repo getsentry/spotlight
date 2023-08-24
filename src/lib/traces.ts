@@ -7,20 +7,39 @@ export function groupSpans(spans: Span[]) {
   // hash with pointers
   const idLookup = new Map<string, Span>();
 
-  [...spans]
-    // need to sort root(s) first
-    .sort((a, b) => (a.parent_span_id ? 1 : -1))
-    .forEach((span) => {
-      const parent = idLookup.get(span.parent_span_id || "");
-      span.children = [];
-      if (parent) {
-        if (!parent.children) parent.children = [];
-        parent.children.push(span);
-      } else {
-        tree.push(span);
+  const sortedSpans = [...spans] // need to sort root(s) first
+    .sort((a, b) => (a.parent_span_id ? 1 : -1));
+
+  sortedSpans.forEach((span) => {
+    let parent = idLookup.get(span.parent_span_id || "");
+    span.children = [];
+    if (parent) {
+      if (!parent.children) parent.children = [];
+      parent.children.push(span);
+    } else if (span.parent_span_id) {
+      const parentParent = sortedSpans.find((s) => !s.parent_span_id);
+      if (!parentParent) {
+        console.log("Cant create a faux parent");
+        return;
       }
-      idLookup.set(span.span_id, span);
-    });
+      parent = {
+        trace_id: span.trace_id,
+        span_id: span.parent_span_id,
+        parent_span_id: parentParent.span_id,
+        op: "orphan",
+        description: "missing parent span",
+        children: [span],
+        start_timestamp: span.start_timestamp,
+        timestamp: span.timestamp,
+        status: "unknown",
+      };
+      if (!parentParent.children) parentParent.children = [];
+      parentParent.children.push(parent);
+    } else {
+      tree.push(span);
+    }
+    idLookup.set(span.span_id, span);
+  });
 
   return tree;
 }
