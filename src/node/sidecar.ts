@@ -1,4 +1,4 @@
-import { Server, createServer } from 'http';
+import { Server, createServer } from "http";
 
 const defaultResponse = `<!doctype html>
 <html>
@@ -20,11 +20,11 @@ EvtSource.onmessage = function (event) {
 
 function generate_uuidv4() {
   let dt = new Date().getTime();
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     let rnd = Math.random() * 16;
     rnd = (dt + rnd) % 16 | 0;
     dt = Math.floor(dt / 16);
-    return (c === 'x' ? rnd : (rnd & 0x3) | 0x8).toString(16);
+    return (c === "x" ? rnd : (rnd & 0x3) | 0x8).toString(16);
   });
 }
 
@@ -75,11 +75,11 @@ class MessageBuffer<T> {
     const cb = this._readers.get(readerId);
     if (!cb) return;
 
-    let atReadPos = typeof readPos === 'undefined' ? this._head : readPos;
+    let atReadPos = typeof readPos === "undefined" ? this._head : readPos;
     let item;
     while (true) {
       item = this._items[atReadPos % this._size];
-      if (typeof item === 'undefined') {
+      if (typeof item === "undefined") {
         break;
       }
       cb(item[1]);
@@ -89,8 +89,8 @@ class MessageBuffer<T> {
   }
 }
 
-const ENVELOPE = 'envelope';
-const EVENT = 'event';
+const ENVELOPE = "envelope";
+const EVENT = "event";
 
 type Payload = [string, string];
 
@@ -98,34 +98,34 @@ let serverInstance: Server;
 
 function getCorsHeader(): { [name: string]: string } {
   return {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Headers': '*',
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Headers": "*",
   };
 }
 
 function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
   const server = createServer((req, res) => {
     console.log(`[spotlight] Received request ${req.method} ${req.url}`);
-    if (req.headers.accept && req.headers.accept == 'text/event-stream') {
-      if (req.url == '/stream') {
+    if (req.headers.accept && req.headers.accept == "text/event-stream") {
+      if (req.url == "/stream") {
         res.writeHead(200, {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
           ...getCorsHeader(),
-          Connection: 'keep-alive',
+          Connection: "keep-alive",
         });
         res.flushHeaders();
 
         const sub = buffer.subscribe(([payloadType, data]) => {
           res.write(`event:${payloadType}\n`);
-          data.split('\n').forEach(line => {
+          data.split("\n").forEach((line) => {
             res.write(`data:${line}\n`);
           });
-          res.write('\n');
+          res.write("\n");
         });
 
-        req.on('close', () => {
+        req.on("close", () => {
           buffer.unsubscribe(sub);
         });
       } else {
@@ -133,32 +133,35 @@ function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
         res.end();
       }
     } else {
-      if (req.url == '/stream') {
-        if (req.method === 'OPTIONS') {
+      if (req.url == "/stream") {
+        if (req.method === "OPTIONS") {
           res.writeHead(204, {
-            'Cache-Control': 'no-cache',
+            "Cache-Control": "no-cache",
             ...getCorsHeader(),
           });
           res.end();
-        } else if (req.method === 'POST') {
-          let body: string = '';
-          req.on('readable', () => {
+        } else if (req.method === "POST") {
+          let body: string = "";
+          req.on("readable", () => {
             const chunk = req.read();
             if (chunk !== null) body += chunk;
           });
-          req.on('end', () => {
-            const payloadType = req.headers['content-type'] === 'application/x-sentry-envelope' ? ENVELOPE : EVENT;
+          req.on("end", () => {
+            const payloadType =
+              req.headers["content-type"] === "application/x-sentry-envelope"
+                ? ENVELOPE
+                : EVENT;
             buffer.put([payloadType, body]);
             res.writeHead(204, {
-              'Cache-Control': 'no-cache',
+              "Cache-Control": "no-cache",
               ...getCorsHeader(),
-              Connection: 'keep-alive',
+              Connection: "keep-alive",
             });
             res.end();
           });
         } else {
           res.writeHead(200, {
-            'Content-Type': 'text/html',
+            "Content-Type": "text/html",
           });
           res.write(defaultResponse);
           res.end();
@@ -169,8 +172,9 @@ function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
       }
     }
   });
-  server.on('error', e => {
-    if ('code' in e && e.code === 'EADDRINUSE') {
+  
+  server.on("error", (e) => {
+    if ("code" in e && e.code === "EADDRINUSE") {
       // console.error('[Spotlight] Address in use, retrying...');
       setTimeout(() => {
         server.close();
@@ -195,11 +199,11 @@ export function setupSidecar(): void {
 
 function shutdown() {
   if (serverInstance) {
-    console.log('[Spotlight] Shutting down server');
+    console.log("[Spotlight] Shutting down server");
     serverInstance.close();
   }
 }
 
-process.on('SIGTERM', () => {
+process.on("SIGTERM", () => {
   shutdown();
 });
