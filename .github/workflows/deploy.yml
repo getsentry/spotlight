@@ -25,7 +25,7 @@ jobs:
         with:
           path: ./website
           # node-version: 18 # The specific version of Node that should be used to build your site. Defaults to 18. (optional)
-          package-manager: yarn
+          package-manager: yarn@1
 
   deploy:
     needs: build
