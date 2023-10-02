@@ -25,7 +25,7 @@ jobs:
         with:
           path: ./website
           # node-version: 18 # The specific version of Node that should be used to build your site. Defaults to 18. (optional)
-          # package-manager: pnpm@latest # The Node package manager that should be used to install dependencies and build your site. Automatically detected based on your lockfile. (optional)
+          package-manager: yarn
 
   deploy:
     needs: build
