@@ -17,10 +17,13 @@ export default defineConfig({
         {
           label: "Start here",
           items: [
-            // Each item here is one entry in the navigation menu.
             {
               label: "What is Spotlight?",
               link: "/what-is-spotlight/",
+            },
+            {
+              label: "Architecture",
+              link: "/architecture/",
             },
           ],
         },
@@ -41,12 +44,17 @@ export default defineConfig({
         {
           label: "Guides",
           items: [
-            // Each item here is one entry in the navigation menu.
             {
-              label: "Write a plugin",
-              link: "/guides/plugin/",
+              label: "Write an integration",
+              link: "/guides/integration/",
             },
           ],
+        },
+        {
+          label: "Integrations",
+          autogenerate: {
+            directory: "integrations",
+          },
         },
         {
           label: "Reference",
@@ -58,7 +66,6 @@ export default defineConfig({
       customCss: ["./src/tailwind.css"],
     }),
     tailwind({
-      // Disable the default base styles:
       applyBaseStyles: false,
     }),
   ],

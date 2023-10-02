@@ -9,13 +9,13 @@ description: All the configuration options for setting up Spotlight
 import * as Spotlight from '@sentry/spotlight';
 
 Spotlight.init({
-    plugins: ['sentry']
+    integrations: [sentry()]
 });
 ```
 
 
-### `plugins`
+### `integrations`
 
-*type:* `string[]`
+*type:* `<SpotlightIntegration>[]`
 
-Defines which plugins should be loaded for Spotlight.
+Defines which integrations should be loaded for Spotlight.
