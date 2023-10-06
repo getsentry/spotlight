@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && yarn build:sidecar",
-    "build:sidecar": "tsc --module nodenext --moduleResolution nodenext --esModuleInterop false --target esnext src/node/sidecar.ts --outDir dist/",
+    "build:sidecar": "tsc --module nodenext --moduleResolution nodenext --esModuleInterop false --target esnext src/node/sidecar.ts --outDir node/",
     "build:watch": "vite build --watch",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -21,8 +21,8 @@
       "require": "./dist/sentry-spotlight.umd.cjs"
     },
     "./sidecar": {
-      "import": "./dist/sidecar.js",
-      "require": "./dist/sidecar.cjs"
+      "import": "./node/sidecar.js",
+      "require": "./node/sidecar.cjs"
     }
   },
   "dependencies": {

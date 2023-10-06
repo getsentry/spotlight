@@ -1,6 +1,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
-
+import spotlight from "./spotlight";
+import sentry from "./sentry";
 import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
@@ -68,5 +69,7 @@ export default defineConfig({
     tailwind({
       applyBaseStyles: false,
     }),
+    sentry(),
+    spotlight()
   ],
 });
