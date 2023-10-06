@@ -28,7 +28,7 @@ const createPlugin = (options?: {}): AstroIntegration => {
                 console.log('@sentry/spotlight astro:config:setup ------------');
                 console.log(options.config.integrations[0].hooks['astro:config:setup']);
                 if (options.command === 'dev') {
-                    options.injectScript('page', `import * as Spotlight from '@sentry/spotlight'; Spotlight.init();`);
+                    options.injectScript('page', `import * as Spotlight from '@sentry/spotlight'; Spotlight.init({integrations: [Spotlight.sentry()]});`);
                 }
                 
                 // console.log(options);
