@@ -1,4 +1,5 @@
 import type { Envelope } from "@sentry/types";
+import { serializeEnvelope } from "@sentry/utils";
 
 import type { Integration } from "../integration";
 
@@ -34,22 +35,4 @@ function hookIntoSentry() {
       });
     }
   );
-}
-
-function serializeEnvelope(envelope: Envelope): string {
-  const [envHeaders, items] = envelope;
-
-  // Initially we construct our envelope as a string and only convert to binary chunks if we encounter binary data
-  const parts: string[] = [];
-  parts.push(JSON.stringify(envHeaders));
-
-  for (const item of items) {
-    const [itemHeaders, payload] = item;
-
-    parts.push(`\n${JSON.stringify(itemHeaders)}\n`);
-
-    parts.push(JSON.stringify(payload));
-  }
-
-  return parts.join("");
 }

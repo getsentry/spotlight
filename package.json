@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@fontsource/raleway": "^5.0.8",
+    "@sentry/utils": "^7.73.0",
     "autoprefixer": "^10.4.15",
     "dayjs": "^1.11.9",
     "platformicons": "^5.6.2",
