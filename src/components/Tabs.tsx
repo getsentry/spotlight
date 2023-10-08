@@ -6,6 +6,7 @@ export type Props = {
     active?: boolean;
     count?: number;
     onSelect?: () => void;
+    component?: React.ReactNode;
   }[];
 };
 
@@ -32,6 +33,7 @@ export default function Tabs({ tabs }: Props) {
           ))}
         </select>
       </div>
+      {/* TODO: check for tabs.component and render this instead */}
       <div className="hidden sm:block">
         <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map((tab) => (

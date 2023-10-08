@@ -3,6 +3,11 @@ export interface Integration {
   hooks: {
     "spotlight:integration:init"?: () => void | Promise<void>;
   };
+  tabs?: {
+    name: string;
+    count?: number;
+    component?: () => JSX.Element;
+  }[];
 }
 
 export type IntegrationParameter = Array<
@@ -13,14 +18,17 @@ export type IntegrationParameter = Array<
   | null
 >;
 
-export function initIntegrations(integrations?: IntegrationParameter) {
+export async function initIntegrations(
+  integrations?: IntegrationParameter
+): Promise<Integration[]> {
   if (!integrations) {
-    return;
+    return [];
   }
+  const initializedIntegrations: Integration[] = [];
   // iterate over integrations and call their hooks
   for (const integration of integrations) {
     if (Array.isArray(integration)) {
-      initIntegrations(integration);
+      initializedIntegrations.push(...(await initIntegrations(integration)));
     } else if (integration) {
       const hooks = integration.hooks;
       if (hooks) {
@@ -29,6 +37,9 @@ export function initIntegrations(integrations?: IntegrationParameter) {
           setupHook();
         }
       }
+      initializedIntegrations.push(integration);
     }
   }
+
+  return initializedIntegrations;
 }

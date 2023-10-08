@@ -13,6 +13,7 @@ import dataCache from "./lib/dataCache.ts";
 import type { Envelope } from "@sentry/types";
 
 export { default as sentry } from "./integrations/sentry";
+export { default as console } from "./integrations/console";
 
 const DEFAULT_RELAY = "http://localhost:8969/stream";
 
@@ -22,7 +23,7 @@ function createStyleSheet(styles: string) {
   return sheet;
 }
 
-export function init({
+export async function init({
   integrations,
   fullScreen = false,
   defaultEventId,
@@ -35,7 +36,7 @@ export function init({
 } = {}) {
   if (typeof document === "undefined") return;
 
-  initIntegrations(integrations);
+  const initializedIntegrations = await initIntegrations(integrations);
   connectToRelay(relay);
 
   // build shadow dom container to contain styles
@@ -59,7 +60,7 @@ export function init({
 
   ReactDOM.createRoot(appRoot).render(
     <React.StrictMode>
-      <App fullScreen={fullScreen} defaultEventId={defaultEventId} />
+      <App integrations={initializedIntegrations} fullScreen={fullScreen} defaultEventId={defaultEventId} />
     </React.StrictMode>
   );
 

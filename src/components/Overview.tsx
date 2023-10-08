@@ -19,7 +19,7 @@ export default function Overview() {
   const events = useSentryEvents();
   const traces = useSentryTraces();
 
-  const { traceId, setTraceId, eventId, setEventId, setSpanId } =
+  const { integrations, traceId, setTraceId, eventId, setEventId, setSpanId } =
     useNavigation();
 
   useKeyPress("Escape", () => {
@@ -59,7 +59,25 @@ export default function Overview() {
       },
     },
   ];
-
+  
+  integrations.forEach((integration) => {
+    if (integration.tabs) {
+      integration.tabs.forEach((tab) => {
+        tabs.push(
+          {
+            name: tab.name,
+            active: activeTab === tab.name,
+            onSelect: () => {
+              setEventId(null);
+              setTraceId(null);
+              setActiveTab(tab.name);
+            },
+          }
+        );
+      });
+    }
+  });
+  
   if (eventId) {
     const activeEvent = dataCache.getEventById(eventId);
     if (activeEvent) {

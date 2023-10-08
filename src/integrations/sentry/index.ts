@@ -6,7 +6,6 @@ import type { Integration } from "../integration";
 export default function sentryIntegration() {
   return {
     name: "sentry",
-    version: "1.0.0",
     hooks: {
       "spotlight:integration:init": () => {
         console.log("sentry integration init");
