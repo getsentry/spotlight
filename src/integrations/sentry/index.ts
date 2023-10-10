@@ -3,9 +3,12 @@ import { serializeEnvelope } from "@sentry/utils";
 
 import type { Integration } from "../integration";
 
+const HEADER = "application/x-sentry-envelope";
+
 export default function sentryIntegration() {
   return {
     name: "sentry",
+    forwardedContentType: [HEADER],
     hooks: {
       "spotlight:integration:init": () => {
         console.log("sentry integration init");
@@ -26,7 +29,7 @@ function hookIntoSentry() {
         method: "POST",
         body: serializeEnvelope(envelope),
         headers: {
-          "Content-Type": "application/x-sentry-envelope",
+          "Content-Type": HEADER,
         },
         mode: "cors",
       }).catch((err) => {

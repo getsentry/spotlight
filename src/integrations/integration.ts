@@ -3,10 +3,10 @@ export interface Integration {
   hooks: {
     "spotlight:integration:init"?: () => void | Promise<void>;
   };
+  forwardedContentType?: string[];
   tabs?: {
     name: string;
     count?: number;
-    component?: () => JSX.Element;
   }[];
 }
 

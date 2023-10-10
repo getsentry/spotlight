@@ -6,6 +6,7 @@ export default function consoleIntegration() {
     hooks: {
       "spotlight:integration:init": () => {},
     },
+    forwardedContentType: ["application/x-spotlight-console"],
     tabs: [
       {
         name: "Console",
