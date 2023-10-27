@@ -31,7 +31,8 @@ export default function Overview({
     setSpanId(null);
   });
 
-  const tabs: IntegrationTab[] = [
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tabs: IntegrationTab<any>[] = [
     {
       name: "Errors",
       count: events.filter((e) => "exception" in e).length,
