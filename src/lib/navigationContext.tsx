@@ -1,7 +1,10 @@
+import type { Integration } from "~/integrations/integration";
 import type { ReactNode } from "react";
 import React, { useState } from "react";
 
 export const NavigationContext = React.createContext<{
+  integrations: Integration[];
+  setIntegrations: (integrations: Integration[]) => void;
   eventId: string | null;
   setEventId: (id: string | null) => void;
   traceId: string | null;
@@ -9,9 +12,11 @@ export const NavigationContext = React.createContext<{
   spanId: string | null;
   setSpanId: (traceId: string | null, spanId?: string | null) => void;
 }>({
+  integrations: [],
   eventId: null,
   traceId: null,
   spanId: null,
+  setIntegrations: function () {},
   setEventId: function () {},
   setTraceId: function () {},
   setSpanId: function () {},
@@ -19,7 +24,9 @@ export const NavigationContext = React.createContext<{
 
 export const NavigationProvider: React.FC<{
   children: ReactNode;
-}> = ({ children }) => {
+  initializedIntegrations: Integration[];
+}> = ({ children, initializedIntegrations }) => {
+  const [integrations, setIntegrations] = useState<Integration[]>(initializedIntegrations);
   const [eventId, setEventId] = useState<null | string>(null);
   const [traceId, setTraceId] = useState<null | string>(null);
   const [spanId, setSpanId] = useState<null | string>(null);
@@ -27,6 +34,13 @@ export const NavigationProvider: React.FC<{
   return (
     <NavigationContext.Provider
       value={{
+        integrations,
+        setIntegrations: (integrations: Integration[]) => {
+          setIntegrations(integrations);
+          setEventId(null);
+          setTraceId(null);
+          setSpanId(null);
+        },
         eventId,
         setEventId: (...args) => {
           setEventId(...args);

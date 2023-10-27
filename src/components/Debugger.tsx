@@ -9,10 +9,12 @@ export default function Debugger({
   isOpen,
   setOpen,
   defaultEventId,
+  integrationData,
 }: {
   isOpen: boolean;
   setOpen: (value: boolean) => void;
   defaultEventId?: string;
+  integrationData: Record<string, Array<unknown>>;
 }) {
   useKeyPress("Escape", () => {
     setOpen(false);
@@ -74,7 +76,7 @@ export default function Debugger({
         </button>
       </div>
 
-      <Overview />
+      <Overview integrationData={integrationData}/>
     </div>
   );
 }

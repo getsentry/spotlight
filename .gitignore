@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+node
 dist-ssr
 *.local
 
@@ -22,3 +23,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+.yalc
+yalc.lock

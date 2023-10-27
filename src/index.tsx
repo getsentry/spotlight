@@ -5,12 +5,16 @@ import fontStyles from "@fontsource/raleway/index.css?inline";
 
 import App from "./App.tsx";
 import { SentryEvent } from "./types.ts";
+import type { Integration } from "./integrations/integration";
+import { initIntegrations } from "./integrations/integration";
 import globalStyles from "./index.css?inline";
 import dataCache from "./lib/dataCache.ts";
 
 import type { Envelope } from "@sentry/types";
 
-const DEFAULT_RELAY = "http://localhost:8969/stream";
+export { default as sentry } from "./integrations/sentry";
+export { default as console } from "./integrations/console";
+
 
 function createStyleSheet(styles: string) {
   const sheet = new CSSStyleSheet();
@@ -18,19 +22,21 @@ function createStyleSheet(styles: string) {
   return sheet;
 }
 
-export function init({
+export async function init({
+  integrations,
   fullScreen = false,
   defaultEventId,
-  relay,
 }: {
+  integrations?: Integration[],
   fullScreen?: boolean;
   defaultEventId?: string;
   relay?: string;
 } = {}) {
   if (typeof document === "undefined") return;
 
-  hookIntoSentry();
-  connectToRelay(relay);
+  const initializedIntegrations = await initIntegrations(integrations);
+
+  // connectToRelay(relay, contentTypeToIntegrations);
 
   // build shadow dom container to contain styles
   const docRoot = document.createElement("div");
@@ -52,9 +58,9 @@ export function init({
   }
 
   ReactDOM.createRoot(appRoot).render(
-    <React.StrictMode>
-      <App fullScreen={fullScreen} defaultEventId={defaultEventId} />
-    </React.StrictMode>
+    // <React.StrictMode>
+      <App integrations={initializedIntegrations} fullScreen={fullScreen} defaultEventId={defaultEventId} />
+    // </React.StrictMode>
   );
 
   window.addEventListener("load", () => {
@@ -72,48 +78,18 @@ export function pushEnvelope(envelope: Envelope) {
   dataCache.pushEnvelope(envelope);
 }
 
-function hookIntoSentry() {
-  // A very hacky way to hook into Sentry's SDK
-  // but we love hacks
-  (window as any).__SENTRY__.hub._stack[0].client.setupIntegrations(true);
-  (window as any).__SENTRY__.hub._stack[0].client.on("beforeEnvelope", (envelope: any) => {
-    fetch('http://localhost:8969/stream', {
-      method: 'POST',
-      body: serializeEnvelope(envelope),
-      headers: {
-        'Content-Type': 'application/x-sentry-envelope',
-      },
-      mode: 'cors',
-    })
-      .catch(err => {
-        console.error(err);
-      });
-  });
-}
 
-function serializeEnvelope(envelope: Envelope): string {
-  const [envHeaders, items] = envelope;
-
-  // Initially we construct our envelope as a string and only convert to binary chunks if we encounter binary data
-  const parts: string[] = [];
-  parts.push(JSON.stringify(envHeaders));
-
-  for (const item of items) {
-    const [itemHeaders, payload] = item;
-
-    parts.push(`\n${JSON.stringify(itemHeaders)}\n`);
-
-    parts.push(JSON.stringify(payload));
-  }
-
-  return parts.join("");
-}
-
-function connectToRelay(relay: string = DEFAULT_RELAY) {
+export function connectToRelay(
+  relayUrl: string, 
+  contentTypeToIntegrations: Map<string, Integration<unknown>[]>, 
+  setIntegrationData: React.Dispatch<React.SetStateAction<Record<string, Array<unknown>>>>
+): () => void
+ {
   console.log("[Spotlight] Connecting to relay");
-  const source = new EventSource(relay || DEFAULT_RELAY);
+  const source = new EventSource(relayUrl);
 
-  source.addEventListener("envelope", (event) => {
+  source.addEventListener("application/x-sentry-envelope", (event) => {
+    console.log("[spotlight] Received new envelope");
     const [rawHeader, ...rawEntries] = event.data.split("\n");
     const header = JSON.parse(rawHeader) as Envelope[0];
     console.log(
@@ -127,8 +103,47 @@ function connectToRelay(relay: string = DEFAULT_RELAY) {
       items.push([JSON.parse(rawEntries[i]), JSON.parse(rawEntries[i + 1])]);
     }
 
-    dataCache.pushEnvelope([header, items] as Envelope);
+    const envelope = [header, items] as Envelope;
+    console.log('[Spotlight]', envelope);
+
+    dataCache.pushEnvelope(envelope);
   });
+
+  const contentTypeListeners: [contentType: string, listener: (event: MessageEvent) => void][] = [];
+
+  for (const [contentType, integrations] of contentTypeToIntegrations.entries()) {
+
+    // TODO: remove this, for now this isolates the sentry stuff from the new integrations API 
+    if (contentType === "application/x-sentry-envelope") {
+      continue;
+    }
+
+    const listener = (event: MessageEvent): void => {
+      console.log(`[spotlight] Received new ${contentType} event`);
+      integrations.forEach((integration) => {
+        if (integration.processEvent) {
+          const processedEvent = integration.processEvent({
+            contentType,
+            data: event.data
+          });
+          if (processedEvent) {
+            setIntegrationData(prev => {
+              return {
+                ...prev,
+                [contentType]: [...(prev[contentType] || []), processedEvent]
+              };
+            });
+          }
+        }
+      });
+    };
+
+    // `contentType` could for example be "application/x-sentry-envelope"
+    contentTypeListeners.push([contentType, listener]);
+    source.addEventListener(contentType, listener);
+
+    console.log('[spotlight] added listener for', contentType, 'sum', contentTypeListeners.length)
+   }
 
   source.addEventListener("event", (event) => {
     console.log("[Spotlight] Received new event");
@@ -137,6 +152,7 @@ function connectToRelay(relay: string = DEFAULT_RELAY) {
   });
 
   source.addEventListener("open", () => {
+    console.log("[Spotlight] open");
     dataCache.setOnline(true);
   });
 
@@ -145,4 +161,12 @@ function connectToRelay(relay: string = DEFAULT_RELAY) {
 
     console.error("EventSource failed:", err);
   });
+
+  return () => {
+    console.log(`[spotlight] removing ${contentTypeListeners.length} listeners`)
+    contentTypeListeners.forEach(typeAndListener => {
+      source.removeEventListener(typeAndListener[0], typeAndListener[1])
+      console.log('[spotlight] removed listner for type', typeAndListener[0])
+    });
+  }
 }

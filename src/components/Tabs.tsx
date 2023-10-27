@@ -6,6 +6,7 @@ export type Props = {
     active?: boolean;
     count?: number;
     onSelect?: () => void;
+    component?: React.ReactNode;
   }[];
 };
 

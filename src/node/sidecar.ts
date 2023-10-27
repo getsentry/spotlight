@@ -88,10 +88,6 @@ class MessageBuffer<T> {
     setTimeout(() => this.stream(readerId, atReadPos), 500);
   }
 }
-
-const ENVELOPE = "envelope";
-const EVENT = "event";
-
 type Payload = [string, string];
 
 let serverInstance: Server;
@@ -147,11 +143,7 @@ function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
             if (chunk !== null) body += chunk;
           });
           req.on("end", () => {
-            const payloadType =
-              req.headers["content-type"] === "application/x-sentry-envelope"
-                ? ENVELOPE
-                : EVENT;
-            buffer.put([payloadType, body]);
+            buffer.put([`${req.headers["content-type"]}`, body]);
             res.writeHead(204, {
               "Cache-Control": "no-cache",
               ...getCorsHeader(),
@@ -172,7 +164,7 @@ function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
       }
     }
   });
-  
+
   server.on("error", (e) => {
     if ("code" in e && e.code === "EADDRINUSE") {
       // console.error('[Spotlight] Address in use, retrying...');

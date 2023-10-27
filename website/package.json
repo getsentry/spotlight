@@ -13,10 +13,14 @@
     "@astrojs/starlight": "^0.10.3",
     "@astrojs/starlight-tailwind": "^2.0.0",
     "@astrojs/tailwind": "^5.0.0",
+    "@sentry/astro": "^7.75.0",
     "@tailwindcss/typography": "^0.5.10",
     "astro": "^3.0.6",
     "sharp": "^0.32.5",
     "tailwindcss": "^3.0.24"
+  },
+  "devDependencies": {
+    "@sentry/spotlight": "file:.yalc/@sentry/spotlight"
   },
   "volta": {
     "node": "18.18.0",
