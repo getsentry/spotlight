@@ -9,10 +9,12 @@
     "build:sidecar": "tsc --module nodenext --moduleResolution nodenext --esModuleInterop false --target esnext src/node/sidecar.ts --outDir node/",
     "build:watch": "vite build --watch",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "yalc:publish": "yalc publish --push --sig --private"
   },
   "files": [
-    "dist"
+    "dist",
+    "node"
   ],
   "main": "./dist/sentry-spotlight.js",
   "exports": {

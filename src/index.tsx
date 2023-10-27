@@ -5,7 +5,7 @@ import fontStyles from "@fontsource/raleway/index.css?inline";
 
 import App from "./App.tsx";
 import { SentryEvent } from "./types.ts";
-import type { IntegrationParameter } from "./integrations/integration";
+import type { Integration } from "./integrations/integration";
 import { initIntegrations } from "./integrations/integration";
 import globalStyles from "./index.css?inline";
 import dataCache from "./lib/dataCache.ts";
@@ -15,7 +15,6 @@ import type { Envelope } from "@sentry/types";
 export { default as sentry } from "./integrations/sentry";
 export { default as console } from "./integrations/console";
 
-const DEFAULT_RELAY = "http://localhost:8969/stream";
 
 function createStyleSheet(styles: string) {
   const sheet = new CSSStyleSheet();
@@ -27,9 +26,8 @@ export async function init({
   integrations,
   fullScreen = false,
   defaultEventId,
-  relay,
 }: {
-  integrations?: IntegrationParameter,
+  integrations?: Integration[],
   fullScreen?: boolean;
   defaultEventId?: string;
   relay?: string;
@@ -37,7 +35,8 @@ export async function init({
   if (typeof document === "undefined") return;
 
   const initializedIntegrations = await initIntegrations(integrations);
-  connectToRelay(relay);
+
+  // connectToRelay(relay, contentTypeToIntegrations);
 
   // build shadow dom container to contain styles
   const docRoot = document.createElement("div");
@@ -59,9 +58,9 @@ export async function init({
   }
 
   ReactDOM.createRoot(appRoot).render(
-    <React.StrictMode>
+    // <React.StrictMode>
       <App integrations={initializedIntegrations} fullScreen={fullScreen} defaultEventId={defaultEventId} />
-    </React.StrictMode>
+    // </React.StrictMode>
   );
 
   window.addEventListener("load", () => {
@@ -80,11 +79,17 @@ export function pushEnvelope(envelope: Envelope) {
 }
 
 
-function connectToRelay(relay: string = DEFAULT_RELAY) {
+export function connectToRelay(
+  relayUrl: string, 
+  contentTypeToIntegrations: Map<string, Integration<unknown>[]>, 
+  setIntegrationData: React.Dispatch<React.SetStateAction<Record<string, Array<unknown>>>>
+): () => void
+ {
   console.log("[Spotlight] Connecting to relay");
-  const source = new EventSource(relay || DEFAULT_RELAY);
+  const source = new EventSource(relayUrl);
 
-  source.addEventListener("envelope", (event) => {
+  source.addEventListener("application/x-sentry-envelope", (event) => {
+    console.log("[spotlight] Received new envelope");
     const [rawHeader, ...rawEntries] = event.data.split("\n");
     const header = JSON.parse(rawHeader) as Envelope[0];
     console.log(
@@ -98,8 +103,47 @@ function connectToRelay(relay: string = DEFAULT_RELAY) {
       items.push([JSON.parse(rawEntries[i]), JSON.parse(rawEntries[i + 1])]);
     }
 
-    dataCache.pushEnvelope([header, items] as Envelope);
+    const envelope = [header, items] as Envelope;
+    console.log('[Spotlight]', envelope);
+
+    dataCache.pushEnvelope(envelope);
   });
+
+  const contentTypeListeners: [contentType: string, listener: (event: MessageEvent) => void][] = [];
+
+  for (const [contentType, integrations] of contentTypeToIntegrations.entries()) {
+
+    // TODO: remove this, for now this isolates the sentry stuff from the new integrations API 
+    if (contentType === "application/x-sentry-envelope") {
+      continue;
+    }
+
+    const listener = (event: MessageEvent): void => {
+      console.log(`[spotlight] Received new ${contentType} event`);
+      integrations.forEach((integration) => {
+        if (integration.processEvent) {
+          const processedEvent = integration.processEvent({
+            contentType,
+            data: event.data
+          });
+          if (processedEvent) {
+            setIntegrationData(prev => {
+              return {
+                ...prev,
+                [contentType]: [...(prev[contentType] || []), processedEvent]
+              };
+            });
+          }
+        }
+      });
+    };
+
+    // `contentType` could for example be "application/x-sentry-envelope"
+    contentTypeListeners.push([contentType, listener]);
+    source.addEventListener(contentType, listener);
+
+    console.log('[spotlight] added listener for', contentType, 'sum', contentTypeListeners.length)
+   }
 
   source.addEventListener("event", (event) => {
     console.log("[Spotlight] Received new event");
@@ -108,6 +152,7 @@ function connectToRelay(relay: string = DEFAULT_RELAY) {
   });
 
   source.addEventListener("open", () => {
+    console.log("[Spotlight] open");
     dataCache.setOnline(true);
   });
 
@@ -116,4 +161,12 @@ function connectToRelay(relay: string = DEFAULT_RELAY) {
 
     console.error("EventSource failed:", err);
   });
+
+  return () => {
+    console.log(`[spotlight] removing ${contentTypeListeners.length} listeners`)
+    contentTypeListeners.forEach(typeAndListener => {
+      source.removeEventListener(typeAndListener[0], typeAndListener[1])
+      console.log('[spotlight] removed listner for type', typeAndListener[0])
+    });
+  }
 }

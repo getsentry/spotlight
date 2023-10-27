@@ -9,13 +9,11 @@ export default function sentryIntegration() {
   return {
     name: "sentry",
     forwardedContentType: [HEADER],
-    hooks: {
-      "spotlight:integration:init": () => {
-        console.log("sentry integration init");
-        hookIntoSentry();
-      },
+    setup: () => {
+      console.log("sentry integration init 2");
+      hookIntoSentry();
     },
-  } as Integration;
+  } satisfies Integration;
 }
 
 function hookIntoSentry() {

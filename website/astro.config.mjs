@@ -1,14 +1,26 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import spotlight from "./spotlight";
-import sentry from "./sentry";
 import tailwind from "@astrojs/tailwind";
+
+import sentry from "@sentry/astro";
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://getsentry.github.io',
-  base: '/spotlight',
+  site: "https://getsentry.github.io",
+  base: "/spotlight",
+  vite: {
+    server: {
+      watch: {
+        ignored: ["!**/node_modules/@sentry/spotlight/**"],
+      },
+    },
+    optimizeDeps: {
+      exclude: ["@sentry/spotlight"],
+    },
+  },
   integrations: [
+    sentry({ debug: true }),
     starlight({
       title: "Spotlight",
       social: {
@@ -28,7 +40,6 @@ export default defineConfig({
             },
           ],
         },
-
         {
           label: "Setup",
           items: [
@@ -69,7 +80,6 @@ export default defineConfig({
     tailwind({
       applyBaseStyles: false,
     }),
-    sentry(),
-    spotlight()
+    spotlight(),
   ],
 });

@@ -10,10 +10,13 @@ import dataCache from "~/lib/dataCache";
 import { useNavigation } from "~/lib/useNavigation";
 import SdkList from "./SdkList";
 import { useSentryTraces } from "~/lib/useSentryTraces";
+import { IntegrationTab } from "~/integrations/integration";
 
 const DEFAULT_TAB = "errors";
 
-export default function Overview() {
+export default function Overview({
+  integrationData,
+}: {integrationData: Record<string, Array<unknown>>}) {
   const [activeTab, setActiveTab] = useState(DEFAULT_TAB);
 
   const events = useSentryEvents();
@@ -28,7 +31,7 @@ export default function Overview() {
     setSpanId(null);
   });
 
-  const tabs = [
+  const tabs: IntegrationTab[] = [
     {
       name: "Errors",
       count: events.filter((e) => "exception" in e).length,
@@ -65,7 +68,7 @@ export default function Overview() {
       integration.tabs.forEach((tab) => {
         tabs.push(
           {
-            name: tab.name,
+            ...tab,
             active: activeTab === tab.name,
             onSelect: () => {
               setEventId(null);
@@ -102,16 +105,18 @@ export default function Overview() {
     }
   }
 
+  const TabContent = tabs.find((tab) => tab.name === activeTab)?.content || (() => (<p>This tab doesn't seem to display anything (yet).</p>));
+
   return (
     <>
       <Tabs tabs={tabs} />
       {activeTab === "traces" ? (
         <TraceList />
-      ) : activeTab == "errors" ? (
+      ) : activeTab === "errors" ? (
         <EventList events={events} />
-      ) : (
+      ) : activeTab === "sdks" ? (
         <SdkList />
-      )}
+      ): <TabContent integrationData={integrationData}/>}
     </>
   );
 }
