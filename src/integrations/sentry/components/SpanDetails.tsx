@@ -4,7 +4,7 @@ import { format as formatSQL } from 'sql-formatter';
 import SpanTree from './SpanTree';
 import { SentryErrorEvent, Span, TraceContext } from '~/types';
 import { ErrorTitle } from './Events/Error';
-import dataCache from '~/lib/dataCache';
+import dataCache from '../data/sentryDataCache';
 import { useNavigation } from '~/lib/useNavigation';
 import DateTime from './DateTime';
 import { getDuration } from '../utils/duration';

@@ -3,7 +3,7 @@ import { serializeEnvelope } from '@sentry/utils';
 
 import type { Integration } from '../integration';
 
-import dataCache from '../../lib/dataCache';
+import sentryDataCache from './data/sentryDataCache';
 import EventList from './components/EventList';
 import TraceList from './components/TraceList';
 import SdkList from './components/SdkList';
@@ -31,7 +31,7 @@ export default function sentryIntegration() {
       }
 
       const envelope = [header, items] as Envelope;
-      dataCache.pushEnvelope(envelope);
+      sentryDataCache.pushEnvelope(envelope);
 
       return envelope;
     },

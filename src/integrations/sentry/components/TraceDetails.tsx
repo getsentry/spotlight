@@ -4,7 +4,7 @@ import SpanTree from './SpanTree';
 import DateTime from './DateTime';
 import PlatformIcon from './PlatformIcon';
 import { useNavigation } from '~/lib/useNavigation';
-import dataCache from '~/lib/dataCache';
+import dataCache from '../data/sentryDataCache';
 import { Trace } from '~/types';
 import { getDuration } from '../utils/duration';
 

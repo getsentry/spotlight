@@ -1,16 +1,7 @@
 import { Sdk, SentryEvent, SentryTransactionEvent, Span, Trace } from '~/types';
-import { groupSpans } from './traces';
 import { Envelope } from '@sentry/types';
-
-function generate_uuidv4() {
-  let dt = new Date().getTime();
-  return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    let rnd = Math.random() * 16; //random number in range 0 to 16
-    rnd = (dt + rnd) % 16 | 0;
-    dt = Math.floor(dt / 16);
-    return (c === 'x' ? rnd : (rnd & 0x3) | 0x8).toString(16);
-  });
-}
+import { groupSpans } from '../utils/traces';
+import { generate_uuidv4 } from '~/lib/uuid';
 
 function toTimestamp(date: string | number) {
   if (typeof date === 'string') return new Date(date).getTime();
@@ -23,13 +14,13 @@ type TraceSubscription = ['trace', (trace: Trace) => void];
 
 type Subscription = OnlineSubscription | EventSubscription | TraceSubscription;
 
-class DataCache {
+class SentryDataCache {
   protected events: SentryEvent[] = [];
   protected sdks: Sdk[] = [];
   protected traces: Trace[] = [];
   protected tracesById: { [id: string]: Trace } = {};
+
   protected subscribers: Map<string, Subscription> = new Map();
-  protected online = false;
 
   constructor(
     initial: (SentryEvent & {
@@ -37,15 +28,6 @@ class DataCache {
     })[] = [],
   ) {
     initial.forEach(e => this.pushEvent(e));
-  }
-
-  setOnline(status: boolean) {
-    this.online = status;
-    this.subscribers.forEach(([type, cb]) => type === 'online' && cb(status));
-  }
-
-  isOnline(): boolean {
-    return this.online;
   }
 
   pushEnvelope(envelope: Envelope) {
@@ -187,4 +169,4 @@ class DataCache {
   }
 }
 
-export default new DataCache();
+export default new SentryDataCache();

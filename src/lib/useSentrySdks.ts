@@ -1,8 +1,8 @@
 import { useContext } from 'react';
-import dataCache from './dataCache';
+import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
 import { SentryEventsContext } from './sentryEventsContext';
 
 export const useSentrySdks = () => {
   useContext(SentryEventsContext);
-  return dataCache.getSdks();
+  return sentryDataCache.getSdks();
 };

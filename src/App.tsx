@@ -3,9 +3,8 @@ import Trigger from './components/Trigger';
 import Debugger from './components/Debugger';
 import { SentryEventsContextProvider } from './lib/sentryEventsContext';
 import { NavigationProvider } from './lib/navigationContext';
-import { OnlineContextProvider } from './lib/onlineContext';
 import type { Integration } from './integrations/integration';
-import { connectToSidecar } from '.';
+import { connectToSidecar } from './sidecar';
 
 const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
 
@@ -25,6 +24,7 @@ export default function App({
   console.log('[Spotlight] App rerender');
 
   const [integrationData, setIntegrationData] = useState<Record<string, Array<unknown>>>({});
+  const [isOnline, setOnline] = useState(false);
 
   useEffect(() => {
     // Map that holds the information which kind of content type should be dispatched to which integration(s)
@@ -39,7 +39,12 @@ export default function App({
         }),
     );
 
-    const cleanupListeners = connectToSidecar(DEFAULT_SIDECAR, contentTypeToIntegrations, setIntegrationData);
+    const cleanupListeners = connectToSidecar(
+      DEFAULT_SIDECAR,
+      contentTypeToIntegrations,
+      setIntegrationData,
+      setOnline,
+    );
 
     return () => {
       console.log('[Spotlight] useeffect cleanup');
@@ -58,17 +63,16 @@ export default function App({
   return (
     <>
       <SentryEventsContextProvider>
-        <OnlineContextProvider>
-          <NavigationProvider initializedIntegrations={integrations}>
-            {showTriggerButton && <Trigger isOpen={isOpen} setOpen={setOpen} />}
-            <Debugger
-              isOpen={isOpen}
-              setOpen={setOpen}
-              defaultEventId={defaultEventId}
-              integrationData={integrationData}
-            />
-          </NavigationProvider>
-        </OnlineContextProvider>
+        <NavigationProvider initializedIntegrations={integrations}>
+          {showTriggerButton && <Trigger isOpen={isOpen} setOpen={setOpen} />}
+          <Debugger
+            isOpen={isOpen}
+            setOpen={setOpen}
+            isOnline={isOnline}
+            defaultEventId={defaultEventId}
+            integrationData={integrationData}
+          />
+        </NavigationProvider>
       </SentryEventsContextProvider>
     </>
   );

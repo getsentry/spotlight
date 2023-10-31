@@ -2,7 +2,6 @@ import useKeyPress from '~/lib/useKeyPress';
 import Overview from './Overview';
 import { useNavigation } from '~/lib/useNavigation';
 import { useEffect } from 'react';
-import { useOnlineStatus } from '~/lib/useOnlineStatus';
 import classNames from '~/lib/classNames';
 
 export default function Debugger({
@@ -10,11 +9,13 @@ export default function Debugger({
   setOpen,
   defaultEventId,
   integrationData,
+  isOnline,
 }: {
   isOpen: boolean;
   setOpen: (value: boolean) => void;
   defaultEventId?: string;
   integrationData: Record<string, Array<unknown>>;
+  isOnline: boolean;
 }) {
   useKeyPress('Escape', () => {
     setOpen(false);
@@ -27,8 +28,6 @@ export default function Debugger({
       setEventId(defaultEventId);
     }
   }, [defaultEventId, setEventId]);
-
-  const isOnline = useOnlineStatus();
 
   return (
     <div

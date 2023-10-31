@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import fontStyles from '@fontsource/raleway/index.css?inline';
@@ -7,9 +6,6 @@ import App from './App.tsx';
 import type { Integration } from './integrations/integration';
 import { initIntegrations } from './integrations/integration';
 import globalStyles from './index.css?inline';
-
-// TODO: get rid of this here
-import dataCache from './lib/dataCache.ts';
 
 export { default as sentry } from './integrations/sentry';
 export { default as console } from './integrations/console';
@@ -82,69 +78,4 @@ export async function init({
 
     document.body.append(docRoot);
   });
-}
-
-export function connectToSidecar(
-  sidecarUrl: string,
-  contentTypeToIntegrations: Map<string, Integration<unknown>[]>,
-  setIntegrationData: React.Dispatch<React.SetStateAction<Record<string, Array<unknown>>>>,
-): () => void {
-  console.log('[Spotlight] Connecting to sidecar at', sidecarUrl);
-  const source = new EventSource(sidecarUrl);
-
-  const contentTypeListeners: [contentType: string, listener: (event: MessageEvent) => void][] = [];
-
-  for (const [contentType, integrations] of contentTypeToIntegrations.entries()) {
-    const listener = (event: MessageEvent): void => {
-      console.log(`[spotlight] Received new ${contentType} event`);
-      integrations.forEach(integration => {
-        if (integration.processEvent) {
-          const processedEvent = integration.processEvent({
-            contentType,
-            data: event.data,
-          });
-          if (processedEvent) {
-            setIntegrationData(prev => {
-              return {
-                ...prev,
-                [contentType]: [...(prev[contentType] || []), processedEvent],
-              };
-            });
-          }
-        }
-      });
-    };
-
-    // `contentType` could for example be "application/x-sentry-envelope"
-    contentTypeListeners.push([contentType, listener]);
-    source.addEventListener(contentType, listener);
-
-    console.log('[spotlight] added listener for', contentType, 'sum', contentTypeListeners.length);
-  }
-
-  source.addEventListener('event', event => {
-    console.log('[Spotlight] Received new event');
-    const data = JSON.parse(event.data);
-    dataCache.pushEvent(data);
-  });
-
-  source.addEventListener('open', () => {
-    console.log('[Spotlight] open');
-    // TODO: remove from datacache and useEffect instead
-    dataCache.setOnline(true);
-  });
-
-  source.addEventListener('error', err => {
-    dataCache.setOnline(false);
-    // TODO: remove from datacache and useEffect instead
-    console.error('EventSource failed:', err);
-  });
-
-  return () => {
-    console.log(`[spotlight] removing ${contentTypeListeners.length} listeners`);
-    contentTypeListeners.forEach(typeAndListener => {
-      source.removeEventListener(typeAndListener[0], typeAndListener[1]);
-      console.log('[spotlight] removed listner for type', typeAndListener[0]);
-    });
-  };
 }
