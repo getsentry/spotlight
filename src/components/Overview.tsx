@@ -31,7 +31,8 @@ export default function Overview({ integrationData }: { integrationData: Record<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const tabs: IntegrationTab<any>[] = [
     {
-      name: 'Errors',
+      id: 'errors',
+      title: 'Errors',
       count: events.filter(e => 'exception' in e).length,
       active: activeTab === 'errors' && (!traceId || !!eventId),
       onSelect: () => {
@@ -41,7 +42,8 @@ export default function Overview({ integrationData }: { integrationData: Record<
       },
     },
     {
-      name: 'Traces',
+      id: 'traces',
+      title: 'Traces',
       count: traces.length,
       active: activeTab === 'traces' && (!eventId || !!traceId),
       onSelect: () => {
@@ -51,7 +53,8 @@ export default function Overview({ integrationData }: { integrationData: Record<
       },
     },
     {
-      name: 'SDKs',
+      id: 'sdks',
+      title: 'SDKs',
       active: activeTab === 'sdks' && !eventId && !traceId,
       onSelect: () => {
         setEventId(null);
@@ -66,11 +69,11 @@ export default function Overview({ integrationData }: { integrationData: Record<
       integration.tabs.forEach(tab => {
         tabs.push({
           ...tab,
-          active: activeTab === tab.name,
+          active: activeTab === tab.id,
           onSelect: () => {
             setEventId(null);
             setTraceId(null);
-            setActiveTab(tab.name);
+            setActiveTab(tab.id);
           },
         });
       });
@@ -102,8 +105,7 @@ export default function Overview({ integrationData }: { integrationData: Record<
   }
 
   const TabContent =
-    tabs.find(tab => tab.name === activeTab)?.content ||
-    (() => <p>This tab doesn't seem to display anything (yet).</p>);
+    tabs.find(tab => tab.id === activeTab)?.content || (() => <p>This tab doesn't seem to display anything (yet).</p>);
 
   return (
     <>

@@ -35,10 +35,14 @@ export type Integration<T = any> = {
 
 export type IntegrationTab<T> = {
   /**
-   * Name of the tab. This needs to be a unique name.
-   * TODO: Add a second property tabTitle so that we can distinguish between
+   * Id of the tab. This needs to be a unique name.
    */
-  name: string;
+  id: string;
+
+  /**
+   * Title of the tab. This is what will be displayed in the UI.
+   */
+  title: string;
 
   /**
    * The number of events that should be displayed next to the tab's title.

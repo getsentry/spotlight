@@ -1,13 +1,8 @@
+import { IntegrationTab } from '~/integrations/integration';
 import classNames from '../lib/classNames';
 
 export type Props = {
-  tabs: {
-    name: string;
-    active?: boolean;
-    count?: number;
-    onSelect?: () => void;
-    component?: React.ReactNode;
-  }[];
+  tabs: IntegrationTab<unknown>[];
 };
 
 export default function Tabs({ tabs }: Props) {
@@ -22,14 +17,16 @@ export default function Tabs({ tabs }: Props) {
           id="tabs"
           name="tabs"
           className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-          defaultValue={tabs.find(tab => tab.active)?.name}
+          defaultValue={tabs.find(tab => tab.active)?.title}
           onChange={e => {
             const activeTab = tabs[parseInt(e.target.value, 10)];
             activeTab.onSelect && activeTab.onSelect();
           }}
         >
           {tabs.map((tab, tabIdx) => (
-            <option key={tabIdx}>{tab.name}</option>
+            <option key={tabIdx} value={tab.id}>
+              {tab.title}
+            </option>
           ))}
         </select>
       </div>
@@ -37,7 +34,7 @@ export default function Tabs({ tabs }: Props) {
         <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map(tab => (
             <button
-              key={tab.name}
+              key={tab.id}
               className={classNames(
                 tab.active
                   ? 'border-indigo-200 text-indigo-100'
@@ -47,7 +44,7 @@ export default function Tabs({ tabs }: Props) {
               onClick={() => tab.onSelect && tab.onSelect()}
               aria-current={tab.active ? 'page' : undefined}
             >
-              {tab.name}
+              {tab.title}
               {tab.count !== undefined ? (
                 <span
                   className={classNames(

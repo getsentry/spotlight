@@ -29,17 +29,20 @@ export default function EventDetails({ event }: { event: SentryEvent }) {
 
   const tabs = [
     {
-      name: 'Details',
+      id: 'details',
+      title: 'Details',
       active: activeTab === 'details',
       onSelect: () => setActiveTab('details'),
     },
     {
-      name: 'Breadcrumbs',
+      id: 'breadcrumbs',
+      title: 'Breadcrumbs',
       active: activeTab === 'breadcrumbs',
       onSelect: () => setActiveTab('breadcrumbs'),
     },
     {
-      name: 'Context',
+      id: 'contexts',
+      title: 'Context',
       active: activeTab === 'contexts',
       onSelect: () => setActiveTab('contexts'),
     },

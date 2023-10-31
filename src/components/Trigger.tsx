@@ -10,7 +10,6 @@ export default function Trigger({ isOpen, setOpen }: { isOpen: boolean; setOpen:
 
   return (
     <div
-      id="sentry-spotlight-trigger"
       className="sentry-trigger"
       style={{
         display: isOpen ? 'none' : undefined,

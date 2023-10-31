@@ -13,7 +13,8 @@ export default function consoleIntegration() {
     forwardedContentType: [HEADER],
     tabs: [
       {
-        name: 'Console',
+        id: 'console',
+        title: 'Browser Console Logs',
         content: ConsoleTab,
       },
     ],
