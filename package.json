@@ -9,7 +9,7 @@
     "build:sidecar": "tsc --module nodenext --moduleResolution nodenext --esModuleInterop false --target esnext src/node/sidecar.ts --outDir node/",
     "build:watch": "vite build --watch",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "fix:prettier": "prettier --write \"{src,test,scripts,website}/**/**.ts*\"",
+    "fix:prettier": "prettier --write \"{src,test,website}/**/**.ts*\"",
     "preview": "vite preview",
     "yalc:publish": "yalc publish --push --sig --private"
   },
