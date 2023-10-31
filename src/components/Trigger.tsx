@@ -16,6 +16,7 @@ export default function Trigger({
 
   return (
     <div
+      id="sentry-spotlight-trigger"
       className="sentry-trigger"
       style={{
         display: isOpen ? "none" : undefined,

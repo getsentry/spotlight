@@ -1,6 +1,6 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
-import spotlight from "./spotlight";
+import spotlight from "./src/spotlight";
 import tailwind from "@astrojs/tailwind";
 
 import sentry from "@sentry/astro";
@@ -18,6 +18,9 @@ export default defineConfig({
     optimizeDeps: {
       exclude: ["@sentry/spotlight"],
     },
+  },
+  experimental: {
+    devOverlay: true,
   },
   integrations: [
     sentry({ debug: true }),

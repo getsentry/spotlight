@@ -9,12 +9,17 @@ import { connectToRelay } from ".";
 
 const DEFAULT_RELAY = "http://localhost:8969/stream";
 
+
 export default function App({
+  eventTarget,
   fullScreen = false,
+  showTriggerButton = true,
   defaultEventId,
   integrations = [],
 }: {
+  eventTarget: EventTarget;
   fullScreen?: boolean;
+  showTriggerButton?: boolean;
   defaultEventId?: string;
   integrations?: Integration[];
 }) {
@@ -44,6 +49,10 @@ export default function App({
 
   const [isOpen, setOpen] = useState(fullScreen);
 
+  eventTarget.addEventListener('toggle', () => {
+    setOpen(!isOpen);
+  })
+
   console.log('[Spotlight] Integrations', integrationData);
 
   return (
@@ -51,7 +60,9 @@ export default function App({
       <SentryEventsContextProvider>
         <OnlineContextProvider>
           <NavigationProvider initializedIntegrations={integrations}>
-            <Trigger isOpen={isOpen} setOpen={setOpen} />
+            {showTriggerButton && (
+              <Trigger isOpen={isOpen} setOpen={setOpen} />
+            )}
             <Debugger
               isOpen={isOpen}
               setOpen={setOpen}

@@ -22,15 +22,23 @@ function createStyleSheet(styles: string) {
   return sheet;
 }
 
+const spotlightEventTarget: EventTarget = new EventTarget();
+
+export async function toggleSpotlight() {
+  spotlightEventTarget.dispatchEvent(new Event("toggle"));
+}
+
 export async function init({
-  integrations,
   fullScreen = false,
+  showTriggerButton = true,
+  integrations,
   defaultEventId,
 }: {
   integrations?: Integration[],
   fullScreen?: boolean;
   defaultEventId?: string;
   relay?: string;
+  showTriggerButton?: boolean;
 } = {}) {
   if (typeof document === "undefined") return;
 
@@ -40,6 +48,7 @@ export async function init({
 
   // build shadow dom container to contain styles
   const docRoot = document.createElement("div");
+  docRoot.id = "sentry-spotlight-root";
   const shadow = docRoot.attachShadow({ mode: "open" });
   const appRoot = document.createElement("div");
   appRoot.style.position = "absolute";
@@ -59,7 +68,7 @@ export async function init({
 
   ReactDOM.createRoot(appRoot).render(
     // <React.StrictMode>
-      <App integrations={initializedIntegrations} fullScreen={fullScreen} defaultEventId={defaultEventId} />
+      <App integrations={initializedIntegrations} fullScreen={fullScreen} defaultEventId={defaultEventId} eventTarget={spotlightEventTarget} showTriggerButton={showTriggerButton}/>
     // </React.StrictMode>
   );
 
