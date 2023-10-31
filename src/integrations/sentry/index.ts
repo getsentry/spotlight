@@ -4,9 +4,9 @@ import { serializeEnvelope } from '@sentry/utils';
 import type { Integration } from '../integration';
 
 import sentryDataCache from './data/sentryDataCache';
-import EventList from './components/EventList';
-import TraceList from './components/TraceList';
-import SdkList from './components/SdkList';
+import ErrorsTab from './tabs/ErrorsTab';
+import TracesTab from './tabs/TracesTab';
+import SdksTab from './tabs/SdksTab';
 
 const HEADER = 'application/x-sentry-envelope';
 
@@ -39,17 +39,17 @@ export default function sentryIntegration() {
       {
         id: 'errors',
         title: 'Errors',
-        content: EventList,
+        content: ErrorsTab,
       },
       {
         id: 'traces',
         title: 'Traces',
-        content: TraceList,
+        content: TracesTab,
       },
       {
         id: 'sdks',
         title: 'SDKs',
-        content: SdkList,
+        content: SdksTab,
       },
     ],
   } satisfies Integration<Envelope>;
