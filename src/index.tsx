@@ -24,6 +24,9 @@ function createStyleSheet(styles: string) {
 
 const spotlightEventTarget: EventTarget = new EventTarget();
 
+/**
+ * Open or close the Spotlight UI
+ */
 export async function toggleSpotlight() {
   spotlightEventTarget.dispatchEvent(new Event("toggle"));
 }
