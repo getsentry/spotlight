@@ -52,7 +52,7 @@ export default function Debugger({
                   isOnline ? 'bg-green-400' : 'bg-red-400 animate-pulse',
                 )}
               />
-              {isOnline ? 'Connected to Relay' : 'Not connected to Relay'}
+              {isOnline ? 'Connected to Sidecar' : 'Not connected to Sidecar'}
             </div>
           </div>
         </h1>

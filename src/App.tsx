@@ -5,9 +5,9 @@ import { SentryEventsContextProvider } from './lib/sentryEventsContext';
 import { NavigationProvider } from './lib/navigationContext';
 import { OnlineContextProvider } from './lib/onlineContext';
 import type { Integration } from './integrations/integration';
-import { connectToRelay } from '.';
+import { connectToSidecar } from '.';
 
-const DEFAULT_RELAY = 'http://localhost:8969/stream';
+const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
 
 export default function App({
   eventTarget,
@@ -39,7 +39,7 @@ export default function App({
         }),
     );
 
-    const cleanupListeners = connectToRelay(DEFAULT_RELAY, contentTypeToIntegrations, setIntegrationData);
+    const cleanupListeners = connectToSidecar(DEFAULT_SIDECAR, contentTypeToIntegrations, setIntegrationData);
 
     return () => {
       console.log('[Spotlight] useeffect cleanup');

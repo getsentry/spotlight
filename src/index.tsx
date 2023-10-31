@@ -39,14 +39,12 @@ export async function init({
   integrations?: Integration[];
   fullScreen?: boolean;
   defaultEventId?: string;
-  relay?: string;
+  sidecarUrl?: string;
   showTriggerButton?: boolean;
 } = {}) {
   if (typeof document === 'undefined') return;
 
   const initializedIntegrations = await initIntegrations(integrations);
-
-  // connectToRelay(relay, contentTypeToIntegrations);
 
   // build shadow dom container to contain styles
   const docRoot = document.createElement('div');
@@ -95,13 +93,13 @@ export function pushEnvelope(envelope: Envelope) {
   dataCache.pushEnvelope(envelope);
 }
 
-export function connectToRelay(
-  relayUrl: string,
+export function connectToSidecar(
+  sidecarUrl: string,
   contentTypeToIntegrations: Map<string, Integration<unknown>[]>,
   setIntegrationData: React.Dispatch<React.SetStateAction<Record<string, Array<unknown>>>>,
 ): () => void {
-  console.log('[Spotlight] Connecting to relay');
-  const source = new EventSource(relayUrl);
+  console.log('[Spotlight] Connecting to sidecar at', sidecarUrl);
+  const source = new EventSource(sidecarUrl);
 
   source.addEventListener('application/x-sentry-envelope', event => {
     console.log('[spotlight] Received new envelope');
