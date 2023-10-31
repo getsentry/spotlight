@@ -1,11 +1,8 @@
-import { SentryErrorEvent } from "../../types";
-import Frame from "./Error/Frame";
+import { SentryErrorEvent } from '../../types';
+import Frame from './Error/Frame';
 
 export function ErrorTitle({ event }: { event: SentryErrorEvent }) {
-  const values =
-    "values" in event.exception
-      ? event.exception.values
-      : [event.exception.value];
+  const values = 'values' in event.exception ? event.exception.values : [event.exception.value];
 
   return (
     <>
@@ -15,10 +12,7 @@ export function ErrorTitle({ event }: { event: SentryErrorEvent }) {
 }
 
 export function ErrorSummary({ event }: { event: SentryErrorEvent }) {
-  const values =
-    "values" in event.exception
-      ? event.exception.values
-      : [event.exception.value];
+  const values = 'values' in event.exception ? event.exception.values : [event.exception.value];
 
   return (
     <div className="font-mono space-y-4">
@@ -31,10 +25,7 @@ export function ErrorSummary({ event }: { event: SentryErrorEvent }) {
 }
 
 export default function Error({ event }: { event: SentryErrorEvent }) {
-  const values =
-    "values" in event.exception
-      ? event.exception.values
-      : [event.exception.value];
+  const values = 'values' in event.exception ? event.exception.values : [event.exception.value];
 
   return (
     <>
@@ -48,13 +39,7 @@ export default function Error({ event }: { event: SentryErrorEvent }) {
               </h3>
               <ul className="border border-indigo-600">
                 {value.stacktrace?.frames.map((frame, frameIdx) => {
-                  return (
-                    <Frame
-                      key={frameIdx}
-                      frame={frame}
-                      defaultExpand={valueIdx === 0 && frameIdx === 0}
-                    />
-                  );
+                  return <Frame key={frameIdx} frame={frame} defaultExpand={valueIdx === 0 && frameIdx === 0} />;
                 })}
               </ul>
             </li>

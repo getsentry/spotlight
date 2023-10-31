@@ -1,8 +1,8 @@
-import classNames from "~/lib/classNames";
-import { Span, TraceContext } from "~/types";
-import PlatformIcon from "./PlatformIcon";
-import { getDuration, getSpanDurationClassName } from "~/lib/duration";
-import { useNavigation } from "~/lib/useNavigation";
+import classNames from '~/lib/classNames';
+import { Span, TraceContext } from '~/types';
+import PlatformIcon from './PlatformIcon';
+import { getDuration, getSpanDurationClassName } from '~/lib/duration';
+import { useNavigation } from '~/lib/useNavigation';
 
 export default function SpanTree({
   traceContext,
@@ -23,7 +23,7 @@ export default function SpanTree({
 
   return (
     <ul className="tree">
-      {tree.map((span) => {
+      {tree.map(span => {
         const spanDuration = getDuration(span.start_timestamp, span.timestamp);
         return (
           <li
@@ -34,53 +34,37 @@ export default function SpanTree({
           >
             <div
               className={classNames(
-                "text-sm flex hover:bg-indigo-800 cursor-pointer",
-                spanId === span.span_id ? "bg-indigo-800" : ""
+                'text-sm flex hover:bg-indigo-800 cursor-pointer',
+                spanId === span.span_id ? 'bg-indigo-800' : '',
               )}
               onClick={() => setSpanId(span.trace_id, span.span_id)}
             >
               <div
                 className={classNames(
-                  "node",
+                  'node',
                   span.transaction
-                    ? span.status === "ok"
-                      ? "text-green-400"
-                      : "text-red-400"
-                    : span.status && span.status !== "ok"
-                    ? "text-red-400"
-                    : ""
+                    ? span.status === 'ok'
+                      ? 'text-green-400'
+                      : 'text-red-400'
+                    : span.status && span.status !== 'ok'
+                    ? 'text-red-400'
+                    : '',
                 )}
               >
-                {span.transaction && (
-                  <PlatformIcon
-                    size={16}
-                    platform={span.transaction.platform}
-                  />
-                )}
+                {span.transaction && <PlatformIcon size={16} platform={span.transaction.platform} />}
                 <span className="font-bold">{span.op}</span>
                 <span className="text-indigo-400">&ndash;</span>
-                <span className="max-w-sm block truncate">
-                  {span.description || span.span_id}
-                </span>
+                <span className="max-w-sm block truncate">{span.description || span.span_id}</span>
               </div>
               <div className="waterfall">
                 <div
                   className="bg-indigo-900 absolute w-full p-0.5 -m-0.5"
                   style={{
-                    left: `min(${
-                      ((span.start_timestamp - startTimestamp) /
-                        totalDuration) *
-                      100
-                    }%, 100% - 1px)`,
+                    left: `min(${((span.start_timestamp - startTimestamp) / totalDuration) * 100}%, 100% - 1px)`,
                     width: `max(1px, ${(spanDuration / totalDuration) * 100}%)`,
                   }}
                 >
-                  <span
-                    className={classNames(
-                      "whitespace-nowrap",
-                      getSpanDurationClassName(spanDuration)
-                    )}
-                  >
+                  <span className={classNames('whitespace-nowrap', getSpanDurationClassName(spanDuration))}>
                     {spanDuration.toLocaleString()} ms
                   </span>
                 </div>

@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import React, { useEffect, useReducer } from "react";
-import { SentryEvent } from "../types";
-import dataCache from "./dataCache";
+import type { ReactNode } from 'react';
+import React, { useEffect, useReducer } from 'react';
+import { SentryEvent } from '../types';
+import dataCache from './dataCache';
 
 export const SentryEventsContext = React.createContext<SentryEvent[]>([]);
 
@@ -15,7 +15,7 @@ export const SentryEventsContextProvider: React.FC<{
   const [events, addEvents] = useReducer(eventReducer, dataCache.getEvents());
 
   useEffect(() => {
-    const unsubscribe = dataCache.subscribe("event", (e: SentryEvent) => {
+    const unsubscribe = dataCache.subscribe('event', (e: SentryEvent) => {
       addEvents(e);
     });
     return () => {
@@ -23,9 +23,5 @@ export const SentryEventsContextProvider: React.FC<{
     };
   });
 
-  return (
-    <SentryEventsContext.Provider value={events}>
-      {children}
-    </SentryEventsContext.Provider>
-  );
+  return <SentryEventsContext.Provider value={events}>{children}</SentryEventsContext.Provider>;
 };

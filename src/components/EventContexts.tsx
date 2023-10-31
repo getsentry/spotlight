@@ -1,4 +1,4 @@
-import { SentryEvent } from "../types";
+import { SentryEvent } from '../types';
 
 const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
   name: "Mighty Fighter",
@@ -8,12 +8,11 @@ const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
 
 export default function EventContexts({ event }: { event: SentryEvent }) {
   const contexts = { extra: event.extra, ...event.contexts };
-  if (!contexts || !Object.values(contexts).find((v) => !!v)) {
+  if (!contexts || !Object.values(contexts).find(v => !!v)) {
     return (
       <div className="px-6 space-y-4">
         <div className="text-indigo-300">
-          No context available for this event. Try adding some to make debugging
-          easier.
+          No context available for this event. Try adding some to make debugging easier.
         </div>
         <pre className="whitespace-pre-wrap ">{EXAMPLE_CONTEXT}</pre>
       </div>
@@ -35,9 +34,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
                         <div className="truncate w-full">{key}</div>
                       </th>
                       <td className="py-0.5">
-                        <pre className="whitespace-nowrap font-mono">
-                          {JSON.stringify(value, undefined, 2)}
-                        </pre>
+                        <pre className="whitespace-nowrap font-mono">{JSON.stringify(value, undefined, 2)}</pre>
                       </td>
                     </tr>
                   );

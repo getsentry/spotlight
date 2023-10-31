@@ -1,9 +1,9 @@
-import { getDuration } from "~/lib/duration";
-import classNames from "~/lib/classNames";
-import TimeSince from "./TimeSince";
-import PlatformIcon from "./PlatformIcon";
-import { useSentryTraces } from "~/lib/useSentryTraces";
-import { useNavigation } from "~/lib/useNavigation";
+import { getDuration } from '~/lib/duration';
+import classNames from '~/lib/classNames';
+import TimeSince from './TimeSince';
+import PlatformIcon from './PlatformIcon';
+import { useSentryTraces } from '~/lib/useSentryTraces';
+import { useNavigation } from '~/lib/useNavigation';
 
 export default function TraceList() {
   const traceList = useSentryTraces();
@@ -13,16 +13,13 @@ export default function TraceList() {
     <>
       <div className="divide-y divide-indigo-500 bg-indigo-950">
         {traceList.length !== 0 ? (
-          traceList.map((trace) => {
-            const duration = getDuration(
-              trace.start_timestamp,
-              trace.timestamp
-            );
+          traceList.map(trace => {
+            const duration = getDuration(trace.start_timestamp, trace.timestamp);
             return (
               <div
                 className="px-6 py-4 flex gap-x-4 items-center cursor-pointer hover:bg-indigo-800"
                 key={trace.trace_id}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setTraceId(trace.trace_id);
                 }}
@@ -36,21 +33,14 @@ export default function TraceList() {
                 <div className="font-mono flex flex-1 flex-col truncate">
                   <div>{trace.rootTransactionName}</div>
                   <div className="text-indigo-300 flex space-x-2 text-sm">
-                    <div
-                      className={classNames(
-                        trace.status === "ok"
-                          ? "text-green-400"
-                          : "text-red-400"
-                      )}
-                    >
-                      {trace.status || "unknown"}
+                    <div className={classNames(trace.status === 'ok' ? 'text-green-400' : 'text-red-400')}>
+                      {trace.status || 'unknown'}
                     </div>
                     <div>&mdash;</div>
                     <div>{duration} ms</div>
                     <div>&mdash;</div>
                     <div>
-                      {trace.spans.length.toLocaleString()} spans,{" "}
-                      {trace.transactions.length.toLocaleString()} txns
+                      {trace.spans.length.toLocaleString()} spans, {trace.transactions.length.toLocaleString()} txns
                     </div>
                   </div>
                 </div>
@@ -58,9 +48,7 @@ export default function TraceList() {
             );
           })
         ) : (
-          <div className="p-6 text-indigo-300">
-            Looks like there's no traces recorded matching this query. 🤔
-          </div>
+          <div className="p-6 text-indigo-300">Looks like there's no traces recorded matching this query. 🤔</div>
         )}
       </div>
     </>

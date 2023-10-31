@@ -1,9 +1,9 @@
-import useKeyPress from "~/lib/useKeyPress";
-import Overview from "./Overview";
-import { useNavigation } from "~/lib/useNavigation";
-import { useEffect } from "react";
-import { useOnlineStatus } from "~/lib/useOnlineStatus";
-import classNames from "~/lib/classNames";
+import useKeyPress from '~/lib/useKeyPress';
+import Overview from './Overview';
+import { useNavigation } from '~/lib/useNavigation';
+import { useEffect } from 'react';
+import { useOnlineStatus } from '~/lib/useOnlineStatus';
+import classNames from '~/lib/classNames';
 
 export default function Debugger({
   isOpen,
@@ -16,7 +16,7 @@ export default function Debugger({
   defaultEventId?: string;
   integrationData: Record<string, Array<unknown>>;
 }) {
-  useKeyPress("Escape", () => {
+  useKeyPress('Escape', () => {
     setOpen(false);
   });
 
@@ -34,35 +34,25 @@ export default function Debugger({
     <div
       className="sentry-debugger"
       style={{
-        display: isOpen ? undefined : "none",
+        display: isOpen ? undefined : 'none',
       }}
     >
       <div className="flex items-center text-indigo-200 bg-indigo-950 px-6 py-4 gap-x-2">
         <h1 className="flex-1 flex items-end gap-x-1 font-raleway opacity-80">
-          <div className="uppercase font-light tracking-widest text-3xl">
-            Spotlight
-          </div>
+          <div className="uppercase font-light tracking-widest text-3xl">Spotlight</div>
           <div className="flex gap-x-1 text-sm items-center text-indigo-300">
-            by{" "}
-            <a
-              href="https://sentry.io"
-              className="hover:underline font-semibold"
-            >
+            by{' '}
+            <a href="https://sentry.io" className="hover:underline font-semibold">
               Sentry
             </a>
-            <div
-              className={classNames(
-                "pl-2 ml-2 flex items-center gap-x-2 text-xs",
-                isOnline ? "" : "text-red-400"
-              )}
-            >
+            <div className={classNames('pl-2 ml-2 flex items-center gap-x-2 text-xs', isOnline ? '' : 'text-red-400')}>
               <div
                 className={classNames(
-                  " rounded-full w-2 h-2 block",
-                  isOnline ? "bg-green-400" : "bg-red-400 animate-pulse"
+                  ' rounded-full w-2 h-2 block',
+                  isOnline ? 'bg-green-400' : 'bg-red-400 animate-pulse',
                 )}
               />
-              {isOnline ? "Connected to Relay" : "Not connected to Relay"}
+              {isOnline ? 'Connected to Relay' : 'Not connected to Relay'}
             </div>
           </div>
         </h1>
@@ -72,11 +62,11 @@ export default function Debugger({
             setOpen(false);
           }}
         >
-          {"✕"}
+          {'✕'}
         </button>
       </div>
 
-      <Overview integrationData={integrationData}/>
+      <Overview integrationData={integrationData} />
     </div>
   );
 }

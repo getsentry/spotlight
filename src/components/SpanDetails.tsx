@@ -1,18 +1,18 @@
-import DateTime from "~/components/DateTime";
-import useKeyPress from "~/lib/useKeyPress";
+import DateTime from '~/components/DateTime';
+import useKeyPress from '~/lib/useKeyPress';
 
-import { format as formatSQL } from "sql-formatter";
-import { getDuration } from "~/lib/duration";
-import SpanTree from "./SpanTree";
-import { SentryErrorEvent, Span, TraceContext } from "~/types";
-import { ErrorTitle } from "./Events/Error";
-import dataCache from "~/lib/dataCache";
-import { useNavigation } from "~/lib/useNavigation";
+import { format as formatSQL } from 'sql-formatter';
+import { getDuration } from '~/lib/duration';
+import SpanTree from './SpanTree';
+import { SentryErrorEvent, Span, TraceContext } from '~/types';
+import { ErrorTitle } from './Events/Error';
+import dataCache from '~/lib/dataCache';
+import { useNavigation } from '~/lib/useNavigation';
 
 function formatSpanDescription(desc: string) {
   if (desc.match(/^(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|ALTER) /i)) {
     try {
-      return formatSQL(desc.replace(/([\s,(])(%[a-z])([\s,)])/gim, "$1?$3"));
+      return formatSQL(desc.replace(/([\s,(])(%[a-z])([\s,)])/gim, '$1?$3'));
     } catch (err) {
       console.error(err);
     }
@@ -33,15 +33,13 @@ export default function SpanDetails({
 }) {
   const { setEventId, setSpanId } = useNavigation();
 
-  useKeyPress("Escape", () => {
+  useKeyPress('Escape', () => {
     setSpanId(span.trace_id, null);
   });
 
   const spanDuration = getDuration(span.start_timestamp, span.timestamp);
 
-  const errors = dataCache
-    .getEventsByTrace(span.trace_id)
-    .filter((e) => e.type !== "transaction");
+  const errors = dataCache.getEventsByTrace(span.trace_id).filter(e => e.type !== 'transaction');
 
   return (
     <div className="fixed h-full right-0 top-0 bottom-0 left-1/4 bg-indigo-900 border-l border-l-indigo-400 py-4 px-6 overflow-auto">
@@ -49,15 +47,14 @@ export default function SpanDetails({
         <div className="flex-1">
           <h2 className="text-xl text-indigo-300">Span Details</h2>
           <h3 className="font-mono">
-            {span.op} <span className="text-indigo-500">&mdash;</span>{" "}
-            {span.span_id}
+            {span.op} <span className="text-indigo-500">&mdash;</span> {span.span_id}
           </h3>
         </div>
         <button
           className="cursor-pointer px-3 py-1 -my-1 text-2xl -mr-3 rounded bg-indigo-900 hover:bg-black font-mono"
           onClick={() => setSpanId(span.trace_id, null)}
         >
-          {"✕"}
+          {'✕'}
         </button>
       </div>
 
@@ -67,20 +64,14 @@ export default function SpanDetails({
             <div className="flex flex-1 items-center text-indigo-300 gap-x-1">
               <DateTime date={span.start_timestamp} />
               <span>&mdash;</span>
-              <span>
-                {getDuration(startTimestamp, span.start_timestamp)} into trace
-              </span>
+              <span>{getDuration(startTimestamp, span.start_timestamp)} into trace</span>
             </div>
             <div className="flex-1">
               <div className="relative border border-indigo-600 py-1 h-8">
                 <div
                   className="bg-indigo-600 absolute w-full p-0.5 -m-0.5 top-0 bottom-0 flex items-center"
                   style={{
-                    left: `min(${
-                      ((span.start_timestamp - startTimestamp) /
-                        totalDuration) *
-                      100
-                    }%, 100% - 1px)`,
+                    left: `min(${((span.start_timestamp - startTimestamp) / totalDuration) * 100}%, 100% - 1px)`,
                     width: `max(1px, ${(spanDuration / totalDuration) * 100}%)`,
                   }}
                 >
@@ -94,11 +85,11 @@ export default function SpanDetails({
         {!!errors.length && (
           <div className="flex flex-col items-start">
             <h2 className="font-bold uppercase mb-2">Related Errors</h2>
-            {errors.map((event) => (
+            {errors.map(event => (
               <button
                 key={event.event_id}
                 className="cursor-pointer underline"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setEventId(event.event_id);
                 }}
@@ -116,9 +107,7 @@ export default function SpanDetails({
               {formatSpanDescription(span.description)}
             </pre>
           ) : (
-            <div className="text-indigo-300">
-              No description recorded for this span.
-            </div>
+            <div className="text-indigo-300">No description recorded for this span.</div>
           )}
         </div>
 
@@ -134,9 +123,7 @@ export default function SpanDetails({
                         <div className="truncate w-full">{key}</div>
                       </th>
                       <td className="py-0.5">
-                        <pre className="whitespace-nowrap font-mono">
-                          {JSON.stringify(value, undefined, 2)}
-                        </pre>
+                        <pre className="whitespace-nowrap font-mono">{JSON.stringify(value, undefined, 2)}</pre>
                       </td>
                     </tr>
                   );
@@ -144,9 +131,7 @@ export default function SpanDetails({
               </tbody>
             </table>
           ) : (
-            <div className="text-indigo-300">
-              No tags recorded for this span.
-            </div>
+            <div className="text-indigo-300">No tags recorded for this span.</div>
           )}
         </div>
         <div>
@@ -154,15 +139,15 @@ export default function SpanDetails({
           <table className="w-full">
             <tbody>
               {[
-                ["status", span.status || ""],
-                ["trace", span.trace_id],
-                ["span", span.span_id],
+                ['status', span.status || ''],
+                ['trace', span.trace_id],
+                ['span', span.span_id],
                 [
-                  "parent",
+                  'parent',
                   span.parent_span_id ? (
                     <button
                       className="underline"
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         setSpanId(span.trace_id, span.parent_span_id);
                       }}
@@ -170,10 +155,10 @@ export default function SpanDetails({
                       {span.parent_span_id}
                     </button>
                   ) : (
-                    ""
+                    ''
                   ),
                 ],
-                ["op", span.op],
+                ['op', span.op],
               ].map(([key, value]) => {
                 return (
                   <tr key={key as string}>

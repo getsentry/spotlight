@@ -1,23 +1,21 @@
-import { Trace } from "../types";
-import useKeyPress from "~/lib/useKeyPress";
-import SpanDetails from "./SpanDetails";
-import SpanTree from "./SpanTree";
-import { getDuration } from "~/lib/duration";
-import DateTime from "./DateTime";
-import PlatformIcon from "./PlatformIcon";
-import { useNavigation } from "~/lib/useNavigation";
-import dataCache from "~/lib/dataCache";
+import { Trace } from '../types';
+import useKeyPress from '~/lib/useKeyPress';
+import SpanDetails from './SpanDetails';
+import SpanTree from './SpanTree';
+import { getDuration } from '~/lib/duration';
+import DateTime from './DateTime';
+import PlatformIcon from './PlatformIcon';
+import { useNavigation } from '~/lib/useNavigation';
+import dataCache from '~/lib/dataCache';
 
 export default function TraceDetails({ trace }: { trace: Trace }) {
-  useKeyPress("Escape", () => {
+  useKeyPress('Escape', () => {
     setTraceId(null);
   });
 
   const { spanId, setTraceId } = useNavigation();
 
-  const span = spanId
-    ? dataCache.getSpanById(trace.trace_id, spanId)
-    : undefined;
+  const span = spanId ? dataCache.getSpanById(trace.trace_id, spanId) : undefined;
 
   const startTimestamp = trace.start_timestamp;
   const totalDuration = trace.timestamp - startTimestamp;
@@ -26,9 +24,7 @@ export default function TraceDetails({ trace }: { trace: Trace }) {
     <>
       <div className="px-6 py-4 flex gap-x-2 bg-indigo-950  items-center">
         <PlatformIcon platform={trace.rootTransaction?.platform} />
-        <h1 className="text-2xl max-w-full truncate flex-1">
-          {trace.rootTransactionName}
-        </h1>
+        <h1 className="text-2xl max-w-full truncate flex-1">{trace.rootTransactionName}</h1>
         <div className="font-mono text-indigo-300">
           <div>T: {trace.trace_id}</div>
           <div>S: {trace.span_id}</div>
@@ -42,16 +38,10 @@ export default function TraceDetails({ trace }: { trace: Trace }) {
           <span>&mdash;</span>
           <span>
             <strong className="font-bold text-indigo-200">
-              {getDuration(
-                trace.start_timestamp,
-                trace.timestamp
-              ).toLocaleString()}{" "}
-              ms
-            </strong>{" "}
-            recorded in{" "}
-            <strong className="font-bold text-indigo-200">
-              {trace.spans.length.toLocaleString()} spans
-            </strong>
+              {getDuration(trace.start_timestamp, trace.timestamp).toLocaleString()} ms
+            </strong>{' '}
+            recorded in{' '}
+            <strong className="font-bold text-indigo-200">{trace.spans.length.toLocaleString()} spans</strong>
           </span>
         </div>
       </div>
@@ -64,12 +54,7 @@ export default function TraceDetails({ trace }: { trace: Trace }) {
         />
 
         {span ? (
-          <SpanDetails
-            traceContext={trace}
-            startTimestamp={startTimestamp}
-            totalDuration={totalDuration}
-            span={span}
-          />
+          <SpanDetails traceContext={trace} startTimestamp={startTimestamp} totalDuration={totalDuration} span={span} />
         ) : null}
       </div>
     </>

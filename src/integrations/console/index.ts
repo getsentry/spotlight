@@ -1,26 +1,26 @@
-import type { Integration } from "../integration";
-import ConsoleTab from "./console-tab";
-import { ConsoleMessage, Levels } from "./types";
+import type { Integration } from '../integration';
+import ConsoleTab from './console-tab';
+import { ConsoleMessage, Levels } from './types';
 
-const HEADER = "application/x-spotlight-console";
+const HEADER = 'application/x-spotlight-console';
 const PORT = 8969;
 
 export default function consoleIntegration() {
   const pageloadId = window.crypto.randomUUID();
 
   return {
-    name: "console",
+    name: 'console',
     forwardedContentType: [HEADER],
     tabs: [
       {
-        name: "Console",
+        name: 'Console',
         content: ConsoleTab,
       },
     ],
 
     setup: () => {
-      instrumentConsole("log", pageloadId);
-      instrumentConsole("warn", pageloadId);
+      instrumentConsole('log', pageloadId);
+      instrumentConsole('warn', pageloadId);
     },
 
     processEvent({ data, contentType }) {
@@ -41,39 +41,39 @@ function instrumentConsole(level: Levels, pageloadId: string) {
   window.console[level] = (...args: unknown[]) => {
     const serializedArgs = argsToString(args);
     // Super dumb way to avoid endless loops (we're gonna regret that)
-    if (serializedArgs.find((a) => a.toLowerCase().includes("spotlight"))) {
+    if (serializedArgs.find(a => a.toLowerCase().includes('spotlight'))) {
       return originalConsoleLog(...args);
     }
 
     void fetch(`http://localhost:${PORT}/stream`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({
         type: level,
         args: serializedArgs,
-        msg: serializedArgs.join(" "),
+        msg: serializedArgs.join(' '),
         sessionId: pageloadId,
       } satisfies ConsoleMessage),
       headers: {
-        "Content-Type": HEADER,
+        'Content-Type': HEADER,
       },
-      mode: "cors",
+      mode: 'cors',
     });
 
-    console.log("[Spotlight] Sent Console Event");
+    console.log('[Spotlight] Sent Console Event');
 
     return originalConsoleLog(...args);
   };
 }
 
 function argsToString(args: unknown[]): string[] {
-  return args.map((arg) => {
+  return args.map(arg => {
     if (arg === null) {
-      return "null";
+      return 'null';
     }
     if (arg === undefined) {
-      return "undefined";
+      return 'undefined';
     }
-    if (typeof arg === "string") {
+    if (typeof arg === 'string') {
       return arg;
     }
     return safeToString(arg);
@@ -84,6 +84,6 @@ function safeToString(arg: { toString: () => string }): string {
   try {
     return JSON.stringify(arg);
   } catch {
-    return "[serialization error]";
+    return '[serialization error]';
   }
 }

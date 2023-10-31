@@ -39,7 +39,7 @@ export type Breadcrumbs = {
     message: string;
     category: string;
     timestamp: string;
-    type: string | "default";
+    type: string | 'default';
   }[];
 };
 
@@ -69,7 +69,7 @@ export type TraceContext = {
   parent_span_id?: string | null;
   op: string;
   description?: string | null;
-  status: "ok" | string;
+  status: 'ok' | string;
 };
 
 export type Contexts = {
@@ -83,7 +83,7 @@ export type Tags = {
 };
 
 export type SentryErrorEvent = CommonEventAttrs & {
-  type?: "error" | "default";
+  type?: 'error' | 'default';
   exception: EventException;
 };
 
@@ -96,13 +96,13 @@ export type Span = {
   start_timestamp: number;
   tags?: Tags | null;
   timestamp: number;
-  status: "ok" | string;
+  status: 'ok' | string;
   transaction?: SentryTransactionEvent;
   children?: Span[];
 };
 
 export type SentryTransactionEvent = CommonEventAttrs & {
-  type: "transaction";
+  type: 'transaction';
   spans: Span[];
   start_timestamp: string;
   contexts: Contexts & {

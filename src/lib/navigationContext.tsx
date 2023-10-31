@@ -1,6 +1,6 @@
-import type { Integration } from "~/integrations/integration";
-import type { ReactNode } from "react";
-import React, { useState } from "react";
+import type { Integration } from '~/integrations/integration';
+import type { ReactNode } from 'react';
+import React, { useState } from 'react';
 
 export const NavigationContext = React.createContext<{
   integrations: Integration[];

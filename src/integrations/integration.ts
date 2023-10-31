@@ -75,9 +75,7 @@ type RawEvent = {
 
 // export type IntegrationParameter = Array<Integration<unknown>>;
 
-export async function initIntegrations(
-  integrations?: Integration[]
-): Promise<Integration[]> {
+export async function initIntegrations(integrations?: Integration[]): Promise<Integration[]> {
   if (!integrations) {
     return [];
   }

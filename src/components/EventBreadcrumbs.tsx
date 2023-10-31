@@ -1,5 +1,5 @@
-import { SentryEvent } from "../types";
-import Time from "./Time";
+import { SentryEvent } from '../types';
+import Time from './Time';
 
 const EXAMPLE_BREADCRUMB = `Sentry.addBreadcrumb({
   category: "auth",
@@ -12,8 +12,7 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
     return (
       <div className="px-6 space-y-4">
         <div className="text-indigo-300">
-          No breadcrumbs available for this event. Try adding some to make
-          debugging easier.
+          No breadcrumbs available for this event. Try adding some to make debugging easier.
         </div>
         <pre className="whitespace-pre-wrap ">{EXAMPLE_BREADCRUMB}</pre>
       </div>
@@ -27,9 +26,7 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
             <div className="w-32 text-indigo-300">
               <Time date={crumb.timestamp} />
             </div>
-            <div className="w-32 text-indigo-300 truncate">
-              {crumb.category}
-            </div>
+            <div className="w-32 text-indigo-300 truncate">{crumb.category}</div>
             <div className="flex-1 font-mono">{crumb.message}</div>
           </div>
         );
