@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { SentryEvent } from '../types';
 import Error, { ErrorTitle } from './Events/Error';
-import Tabs from './Tabs';
 import EventContexts from './EventContexts';
 import useKeyPress from '~/lib/useKeyPress';
 import PlatformIcon from './PlatformIcon';
 import { useNavigation } from '~/lib/useNavigation';
 import EventBreadcrumbs from './EventBreadcrumbs';
+import { SentryEvent } from '~/types';
+import Tabs from '~/components/Tabs';
 
 function renderEvent(event: SentryEvent) {
   if ('exception' in event) return <Error event={event} />;

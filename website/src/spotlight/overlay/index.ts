@@ -7,7 +7,7 @@ export default {
   id: 'spotlight-plugin',
   name: 'Sentry Spotlight',
   icon: sentrylogo,
-  init(canvas, eventTarget) {
+  init(_canvas, eventTarget) {
     eventTarget.dispatchEvent(
       new CustomEvent('plugin-notification', {
         detail: {

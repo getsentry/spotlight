@@ -61,7 +61,7 @@ console.log('[Spotlight]', globalThis.__SENTRY__);
   }
 );
 
-setTimeout(() => {
-  Sentry.captureMessage('does this now show up in spotlight?');
-}, 2000);
+// setTimeout(() => {
+  Sentry.captureException(new Error('does this now show up in spotlight?'));
+// }, 2000);
 `;

@@ -1,9 +1,9 @@
-import { getDuration } from '~/lib/duration';
 import classNames from '~/lib/classNames';
 import TimeSince from './TimeSince';
 import PlatformIcon from './PlatformIcon';
 import { useSentryTraces } from '~/lib/useSentryTraces';
 import { useNavigation } from '~/lib/useNavigation';
+import { getDuration } from '../utils/duration';
 
 export default function TraceList() {
   const traceList = useSentryTraces();

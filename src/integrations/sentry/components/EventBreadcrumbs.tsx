@@ -1,4 +1,4 @@
-import { SentryEvent } from '../types';
+import { SentryEvent } from '~/types';
 import Time from './Time';
 
 const EXAMPLE_BREADCRUMB = `Sentry.addBreadcrumb({

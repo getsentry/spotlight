@@ -3,14 +3,16 @@ import { ErrorSummary } from './Events/Error';
 import TimeSince from './TimeSince';
 import PlatformIcon from './PlatformIcon';
 import { useNavigation } from '~/lib/useNavigation';
+import { useSentryEvents } from '~/lib/useSentryEvents';
 
 function renderEvent(event: SentryEvent) {
   if ('exception' in event) return <ErrorSummary event={event} />;
   return null;
 }
 
-export default function EventList({ events }: { events: SentryEvent[] }) {
+export default function EventList() {
   const { setEventId } = useNavigation();
+  const events = useSentryEvents();
 
   const matchingEvents = events.filter(e => e.type !== 'transaction');
 

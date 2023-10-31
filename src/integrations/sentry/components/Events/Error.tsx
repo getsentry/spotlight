@@ -1,4 +1,4 @@
-import { SentryErrorEvent } from '../../types';
+import { SentryErrorEvent } from '~/types';
 import Frame from './Error/Frame';
 
 export function ErrorTitle({ event }: { event: SentryErrorEvent }) {

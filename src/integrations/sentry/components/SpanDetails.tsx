@@ -1,13 +1,13 @@
-import DateTime from '~/components/DateTime';
 import useKeyPress from '~/lib/useKeyPress';
 
 import { format as formatSQL } from 'sql-formatter';
-import { getDuration } from '~/lib/duration';
 import SpanTree from './SpanTree';
 import { SentryErrorEvent, Span, TraceContext } from '~/types';
 import { ErrorTitle } from './Events/Error';
 import dataCache from '~/lib/dataCache';
 import { useNavigation } from '~/lib/useNavigation';
+import DateTime from './DateTime';
+import { getDuration } from '../utils/duration';
 
 function formatSpanDescription(desc: string) {
   if (desc.match(/^(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|ALTER) /i)) {

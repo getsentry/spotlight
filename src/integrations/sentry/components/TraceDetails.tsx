@@ -1,12 +1,12 @@
-import { Trace } from '../types';
 import useKeyPress from '~/lib/useKeyPress';
 import SpanDetails from './SpanDetails';
 import SpanTree from './SpanTree';
-import { getDuration } from '~/lib/duration';
 import DateTime from './DateTime';
 import PlatformIcon from './PlatformIcon';
 import { useNavigation } from '~/lib/useNavigation';
 import dataCache from '~/lib/dataCache';
+import { Trace } from '~/types';
+import { getDuration } from '../utils/duration';
 
 export default function TraceDetails({ trace }: { trace: Trace }) {
   useKeyPress('Escape', () => {

@@ -1,8 +1,8 @@
 import classNames from '~/lib/classNames';
 import { Span, TraceContext } from '~/types';
 import PlatformIcon from './PlatformIcon';
-import { getDuration, getSpanDurationClassName } from '~/lib/duration';
 import { useNavigation } from '~/lib/useNavigation';
+import { getDuration, getSpanDurationClassName } from '../utils/duration';
 
 export default function SpanTree({
   traceContext,
