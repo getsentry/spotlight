@@ -1,0 +1,53 @@
+{
+  "name": "@sentry/spotlight",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:watch": "vite build --watch",
+    "preview": "vite preview",
+    "yalc:publish": "yalc publish --push --sig --private"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/sentry-spotlight.js",
+  "exports": {
+    ".": {
+      "import": "./dist/sentry-spotlight.js",
+      "require": "./dist/sentry-spotlight.umd.cjs"
+    }
+  },
+  "dependencies": {
+    "@fontsource/raleway": "^5.0.8",
+    "@sentry/utils": "^7.73.0",
+    "autoprefixer": "^10.4.15",
+    "dayjs": "^1.11.9",
+    "platformicons": "^5.6.2",
+    "postcss": "^8.4.28",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sql-formatter": "^12.2.4",
+    "tailwindcss": "^3.3.3",
+    "usehooks-ts": "^2.9.1"
+  },
+  "devDependencies": {
+    "@sentry/spotlight-tsconfig": "workspace:*",
+    "@sentry/types": "^7.64.0",
+    "@tailwindcss/forms": "^0.5.4",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^4.0.3",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "vite-plugin-dts": "^3.5.2",
+    "vite-plugin-svgr": "^3.2.0"
+  }
+}

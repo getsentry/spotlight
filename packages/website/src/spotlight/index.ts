@@ -1,5 +1,5 @@
 import type { AstroIntegration } from 'astro';
-import { setupSidecar } from '@sentry/spotlight/sidecar';
+import { setupSidecar } from '@sentry/spotlight-sidecar';
 import { SPOTLIGHT_CLIENT_INIT, SPOTLIGHT_SERVER_SNIPPET } from './snippets';
 
 import path from 'path';

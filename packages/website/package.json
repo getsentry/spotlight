@@ -1,5 +1,5 @@
 {
-  "name": "spotlight-website",
+  "name": "@sentry/spotlight-website",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -20,10 +20,7 @@
     "tailwindcss": "^3.0.24"
   },
   "devDependencies": {
-    "@sentry/spotlight": "file:.yalc/@sentry/spotlight"
-  },
-  "volta": {
-    "node": "18.18.0",
-    "yarn": "1.22.19"
+    "@sentry/spotlight": "workspace:*",
+    "@sentry/spotlight-sidecar": "workspace:*"
   }
 }

@@ -1,0 +1,15 @@
+{
+  "extends": "@sentry/spotlight-tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"]
+    },
+    "moduleResolution": "nodenext",
+    "esModuleInterop": false,
+    "target": "esnext",
+    "module": "nodenext",
+    "outDir": "dist"
+  },
+  "include": ["src"],
+}
