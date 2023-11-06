@@ -1,0 +1,33 @@
+{
+  "name": "@sentry/spotlight-sidecar",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "exit 1",
+    "clean": "rimraf dist"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "dist/main.js",
+  "module": "dist/main.js",
+  "types": "dist/main.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/main.js",
+      "types": "./dist/main.d.ts"
+    }
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@sentry/spotlight-tsconfig": "workspace:*",
+    "@types/node": "^18",
+    "typescript": "^5.0.2"
+  },
+  "volta": {
+    "node": "18.18.0",
+    "pnpm": "8.6.12"
+  }
+}

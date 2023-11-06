@@ -4,62 +4,45 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build && yarn build:sidecar",
-    "build:sidecar": "tsc --module nodenext --moduleResolution nodenext --esModuleInterop false --target esnext src/node/sidecar.ts --outDir node/",
-    "build:watch": "vite build --watch",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "fix:prettier": "prettier --write \"{src,test,website}/**/**.ts*\"",
-    "preview": "vite preview",
+    "dev": "pnpm -r run dev",
+    "build": "pnpm -r run build",
+    "preview": "pnpm -r run preview",
+    "lint": "eslint . --cache --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preinstall": "npx only-allow pnpm",
+    "postinstall": "simple-git-hooks",
+    "format": "prettier --write --cache .",
     "yalc:publish": "yalc publish --push --sig --private"
   },
-  "files": [
-    "dist",
-    "node"
-  ],
-  "main": "./dist/sentry-spotlight.js",
-  "exports": {
-    ".": {
-      "import": "./dist/sentry-spotlight.js",
-      "require": "./dist/sentry-spotlight.umd.cjs"
-    },
-    "./sidecar": {
-      "import": "./node/sidecar.js",
-      "require": "./node/sidecar.cjs"
-    }
-  },
-  "dependencies": {
-    "@fontsource/raleway": "^5.0.8",
-    "@sentry/utils": "^7.73.0",
-    "autoprefixer": "^10.4.15",
-    "dayjs": "^1.11.9",
-    "platformicons": "^5.6.2",
-    "postcss": "^8.4.28",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "sql-formatter": "^12.2.4",
-    "tailwindcss": "^3.3.3",
-    "usehooks-ts": "^2.9.1",
-    "vite-plugin-dts": "^3.5.2",
-    "vite-plugin-svgr": "^3.2.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@sentry/types": "^7.64.0",
-    "@tailwindcss/forms": "^0.5.4",
-    "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.3",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "lint-staged": "^15.0.2",
+    "simple-git-hooks": "^2.9.0",
     "prettier": "^3.0.3",
+    "prettier-plugin-organize-imports": "^3.2.3",
+    "prettier-plugin-tailwindcss": "^0.5.6",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "rimraf": "^5.0.5"
   },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm exec lint-staged --concurrent false"
+  },
+  "lint-staged": {
+    "*": [
+      "prettier --write --cache --ignore-unknown"
+    ],
+    "{apps,packages}/**/*.{ts,tsx}": [
+      "eslint --cache --fix"
+    ]
+  },
+  "packageManager": "pnpm@8.6.0",
   "volta": {
     "node": "18.18.0",
-    "yarn": "1.22.19"
+    "pnpm": "8.6.0"
   }
 }
