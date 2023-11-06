@@ -1,9 +1,9 @@
-import { SentryEvent } from '~/types';
-import { ErrorSummary } from './Events/Error';
-import TimeSince from './TimeSince';
-import PlatformIcon from './PlatformIcon';
 import { useNavigation } from '~/lib/useNavigation';
-import { useSentryEvents } from '~/lib/useSentryEvents';
+import { SentryEvent } from '~/types';
+import { useSentryEvents } from './../data/useSentryEvents';
+import { ErrorSummary } from './Events/Error';
+import PlatformIcon from './PlatformIcon';
+import TimeSince from './TimeSince';
 
 function renderEvent(event: SentryEvent) {
   if ('exception' in event) return <ErrorSummary event={event} />;
@@ -22,12 +22,12 @@ export default function EventList() {
         matchingEvents.map(e => {
           return (
             <div
-              className="px-6 py-4 flex gap-x-4 items-center cursor-pointer hover:bg-indigo-800"
+              className="flex cursor-pointer items-center gap-x-4 px-6 py-4 hover:bg-indigo-800"
               key={e.event_id}
               onClick={() => setEventId(e.event_id)}
             >
               <PlatformIcon platform={e.platform} className="text-indigo-300" />
-              <div className="font-mono text-indigo-300 flex flex-col w-48 truncate">
+              <div className="flex w-48 flex-col truncate font-mono text-indigo-300">
                 <span>{(e.event_id || '').substring(0, 8)}</span>
                 <TimeSince date={e.timestamp} />
               </div>

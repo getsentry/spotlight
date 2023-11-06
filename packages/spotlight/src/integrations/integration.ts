@@ -29,6 +29,7 @@ export type Integration<T = any> = {
    * Hook called whenever spotlight forwards a new raw event to this integration.
    * Use this hook to process and convert the raw request payload (string) to a
    * data structure that your integration works with in the UI.
+   * The returned object will be passed to your tabs.
    */
   processEvent?: (event: RawEvent) => T | Promise<T>;
 };

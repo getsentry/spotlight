@@ -1,9 +1,11 @@
 import { useNavigation } from '~/lib/useNavigation';
 import EventList from '../components/EventList';
 
-import dataCache from '../data/sentryDataCache';
-import EventDetails from '../components/EventDetails';
 import useKeyPress from '~/lib/useKeyPress';
+import EventDetails from '../components/EventDetails';
+import { SentryEventsContextProvider } from '../data/sentryEventsContext';
+
+import dataCache from '../data/sentryDataCache';
 
 export default function ErrorsTab() {
   const { eventId, setEventId } = useNavigation();
@@ -12,12 +14,11 @@ export default function ErrorsTab() {
     setEventId(null);
   });
 
-  if (eventId) {
-    const activeEvent = dataCache.getEventById(eventId);
-    if (activeEvent) {
-      return <EventDetails event={activeEvent} />;
-    }
-  }
+  const activeEvent = eventId ? dataCache.getEventById(eventId) : undefined;
 
-  return <EventList />;
+  return (
+    <SentryEventsContextProvider>
+      {activeEvent ? <EventDetails event={activeEvent} /> : <EventList />}
+    </SentryEventsContextProvider>
+  );
 }

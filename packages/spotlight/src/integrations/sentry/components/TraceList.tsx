@@ -1,9 +1,9 @@
 import classNames from '~/lib/classNames';
-import TimeSince from './TimeSince';
-import PlatformIcon from './PlatformIcon';
-import { useSentryTraces } from '~/lib/useSentryTraces';
 import { useNavigation } from '~/lib/useNavigation';
+import { useSentryTraces } from '../data/useSentryTraces';
 import { getDuration } from '../utils/duration';
+import PlatformIcon from './PlatformIcon';
+import TimeSince from './TimeSince';
 
 export default function TraceList() {
   const traceList = useSentryTraces();
@@ -17,7 +17,7 @@ export default function TraceList() {
             const duration = getDuration(trace.start_timestamp, trace.timestamp);
             return (
               <div
-                className="px-6 py-4 flex gap-x-4 items-center cursor-pointer hover:bg-indigo-800"
+                className="flex cursor-pointer items-center gap-x-4 px-6 py-4 hover:bg-indigo-800"
                 key={trace.trace_id}
                 onClick={e => {
                   e.stopPropagation();
@@ -26,13 +26,13 @@ export default function TraceList() {
               >
                 <PlatformIcon platform={trace.rootTransaction?.platform} />
 
-                <div className="font-mono text-indigo-300 flex flex-col w-48 truncate">
+                <div className="flex w-48 flex-col truncate font-mono text-indigo-300">
                   <div>{trace.trace_id.substring(0, 8)}</div>
                   <TimeSince date={trace.start_timestamp} />
                 </div>
-                <div className="font-mono flex flex-1 flex-col truncate">
+                <div className="flex flex-1 flex-col truncate font-mono">
                   <div>{trace.rootTransactionName}</div>
-                  <div className="text-indigo-300 flex space-x-2 text-sm">
+                  <div className="flex space-x-2 text-sm text-indigo-300">
                     <div className={classNames(trace.status === 'ok' ? 'text-green-400' : 'text-red-400')}>
                       {trace.status || 'unknown'}
                     </div>

@@ -1,13 +1,10 @@
-import { useSentryTraces } from '~/lib/useSentryTraces';
-import { useSentryEvents } from '../lib/useSentryEvents';
-
 export default function Trigger({ isOpen, setOpen }: { isOpen: boolean; setOpen: (value: boolean) => void }) {
   // TODO: replace w/ generic counter
-  const events = useSentryEvents();
-  const traces = useSentryTraces();
+  // const events = []; useSentryEvents();
+  // const traces = []; useSentryTraces();
 
-  const errorCount = events.filter(e => 'exception' in e).length;
-  const traceCount = traces.length;
+  const errorCount = 0; // events.filter(e => 'exception' in e).length;
+  const traceCount = 0; //traces.length;
 
   return (
     <div

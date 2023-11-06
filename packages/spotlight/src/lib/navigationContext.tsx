@@ -1,6 +1,6 @@
-import type { Integration } from '~/integrations/integration';
 import type { ReactNode } from 'react';
 import React, { useState } from 'react';
+import type { Integration } from '~/integrations/integration';
 
 // TODO: What do we do with this? It can't stay global as long as there's Sentry stuff in it
 export const NavigationContext = React.createContext<{

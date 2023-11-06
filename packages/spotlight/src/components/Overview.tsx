@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Tabs from './Tabs';
 import { useNavigation } from '~/lib/useNavigation';
+import Tabs from './Tabs';
 
 const DEFAULT_TAB = 'errors';
 

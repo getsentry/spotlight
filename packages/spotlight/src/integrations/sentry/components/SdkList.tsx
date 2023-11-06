@@ -1,6 +1,6 @@
-import TimeSince from './TimeSince';
+import { useSentrySdks } from '../data/useSentrySdks';
 import PlatformIcon from './PlatformIcon';
-import { useSentrySdks } from '~/lib/useSentrySdks';
+import TimeSince from './TimeSince';
 
 function sdkToPlatform(name: string) {
   if (name.indexOf('sentry.javascript') === 0) return 'javascript';
@@ -16,10 +16,10 @@ export default function SdkList() {
         {sdkList.length !== 0 ? (
           sdkList.map(sdk => {
             return (
-              <div className="px-6 py-4 flex gap-x-4 items-center" key={`${sdk.name}-${sdk.version}`}>
+              <div className="flex items-center gap-x-4 px-6 py-4" key={`${sdk.name}-${sdk.version}`}>
                 <PlatformIcon platform={sdkToPlatform(sdk.name)} />
 
-                <div className="font-mono text-indigo-300 flex flex-col truncate">
+                <div className="flex flex-col truncate font-mono text-indigo-300">
                   <div>{sdk.name}</div>
                   <div>{sdk.version}</div>
                   <TimeSince date={sdk.lastSeen} />
