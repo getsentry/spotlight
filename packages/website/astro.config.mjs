@@ -1,15 +1,21 @@
 import starlight from '@astrojs/starlight';
 import tailwind from '@astrojs/tailwind';
-import { defineConfig } from 'astro/config';
-import spotlight from './src/spotlight';
-
 import sentry from '@sentry/astro';
+import { defineConfig } from 'astro/config';
+import Inspect from 'vite-plugin-inspect';
+import spotlight from './src/spotlight';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://getsentry.github.io',
   base: '/spotlight',
   vite: {
+    plugins: [
+      Inspect({
+        dev: true,
+        build: true,
+      }),
+    ],
     server: {
       watch: {
         ignored: ['!**/node_modules/@sentry/spotlight/**'],
@@ -17,6 +23,9 @@ export default defineConfig({
     },
     optimizeDeps: {
       exclude: ['@sentry/spotlight'],
+    },
+    build: {
+      sourcemap: true,
     },
   },
   experimental: {

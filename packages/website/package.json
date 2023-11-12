@@ -22,7 +22,8 @@
     "@sentry/spotlight": "workspace:*",
     "@sentry/spotlight-sidecar": "workspace:*",
     "@tailwindcss/typography": "^0.5.10",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.2",
+    "vite-plugin-inspect": "^0.7.42"
   },
   "volta": {
     "node": "18.18.0",

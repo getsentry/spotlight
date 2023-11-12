@@ -20,16 +20,16 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 ## Next steps
 
 <CardGrid stagger>
-	<Card title="Easy to customize" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="TODO" icon="add-document">
-		TODO
-	</Card>
-	<Card title="TODO" icon="setting">
-		TODO
-	</Card>
-	<Card title="TODO" icon="open-book">
-		TODO
-	</Card>
+  <Card title="Easy to customize" icon="pencil">
+    Edit `src/content/docs/index.mdx` to see this page change.
+  </Card>
+  <Card title="TODO" icon="add-document">
+    TODO
+  </Card>
+  <Card title="TODO" icon="setting">
+    <button onClick="throw new Error('Houston, we have a problem!')">Throw Error</button>
+  </Card>
+  <Card title="TODO" icon="open-book">
+    TODO
+  </Card>
 </CardGrid>
