@@ -28,3 +28,4 @@ dist-ssr
 
 .yalc
 yalc.lock
+.vite-inspect

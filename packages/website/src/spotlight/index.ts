@@ -1,11 +1,11 @@
-import { setupSidecar } from '@sentry/spotlight-sidecar';
+import { setupSidecar } from '@spotlightjs/sidecar';
 import type { AstroIntegration } from 'astro';
 import { SPOTLIGHT_CLIENT_INIT, SPOTLIGHT_SERVER_SNIPPET } from './snippets';
 
 import path from 'path';
 import url from 'url';
 
-const PKG_NAME = '@sentry/spotlight';
+const PKG_NAME = '@spotlightjs/core';
 
 const createPlugin = (): AstroIntegration => {
   return {
@@ -13,7 +13,7 @@ const createPlugin = (): AstroIntegration => {
 
     hooks: {
       'astro:config:setup': async ({ command, injectScript, addDevOverlayPlugin, logger }) => {
-        logger.info('[@sentry/spotlight] Setting up Spotlight');
+        logger.info('[@spotlightjs/core] Setting up Spotlight');
         if (command === 'dev') {
           injectScript('page', SPOTLIGHT_CLIENT_INIT);
           injectScript('page-ssr', SPOTLIGHT_SERVER_SNIPPET);

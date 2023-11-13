@@ -1,7 +1,7 @@
 import type { DevOverlayPlugin } from 'astro';
 import sentrylogo from './sentry-logo.svg?raw';
 
-import * as Spotlight from '@sentry/spotlight';
+import * as Spotlight from '@spotlightjs/core';
 
 export default {
   id: 'spotlight-plugin',

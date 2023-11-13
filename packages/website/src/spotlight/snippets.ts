@@ -1,5 +1,5 @@
 export const SPOTLIGHT_CLIENT_INIT = `
-import * as Spotlight from '@sentry/spotlight'; 
+import * as Spotlight from '@spotlightjs/core'; 
 
 Spotlight.init({
   integrations: [

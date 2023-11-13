@@ -18,11 +18,11 @@ export default defineConfig({
     ],
     server: {
       watch: {
-        ignored: ['!**/node_modules/@sentry/spotlight/**'],
+        ignored: ['!**/node_modules/@spotlightjs/core/**'],
       },
     },
     optimizeDeps: {
-      exclude: ['@sentry/spotlight'],
+      exclude: ['@spotlightjs/core'],
     },
     build: {
       sourcemap: true,
