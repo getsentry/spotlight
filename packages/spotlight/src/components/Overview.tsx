@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { useNavigation } from '~/lib/useNavigation';
 import Tabs from './Tabs';
 
@@ -26,13 +27,28 @@ export default function Overview({ integrationData }: { integrationData: Record<
     })
     .flat();
 
-  const TabContent =
-    tabs.find(tab => tab.id === activeTab)?.content || (() => <p>This tab doesn't seem to display anything (yet).</p>);
+  const initalTab = tabs.length ? `/${tabs[0].id}` : '/no-tabs';
 
   return (
     <>
-      <Tabs tabs={tabs} />
-      <TabContent integrationData={integrationData} />
+      <MemoryRouter initialEntries={[initalTab]}>
+        <Tabs tabs={tabs} />
+        <Routes>
+          <Route path="/not-found" element={<p>not fount</p>} key={'not-found'}></Route>
+          {tabs.map(tab => {
+            const TabContent =
+              (tab.content && tab.content) || (() => <p>This tab doesn't seem to display anything (yet).</p>);
+
+            return (
+              <Route
+                path={`/${tab.id}/*`}
+                key={tab.id}
+                element={<TabContent integrationData={integrationData} key={tab.id} />}
+              ></Route>
+            );
+          })}
+        </Routes>
+      </MemoryRouter>
     </>
   );
 }

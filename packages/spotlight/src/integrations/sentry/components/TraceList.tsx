@@ -1,5 +1,5 @@
+import { Link } from 'react-router-dom';
 import classNames from '~/lib/classNames';
-import { useNavigation } from '~/lib/useNavigation';
 import { useSentryTraces } from '../data/useSentryTraces';
 import { getDuration } from '../utils/duration';
 import PlatformIcon from './PlatformIcon';
@@ -7,7 +7,6 @@ import TimeSince from './TimeSince';
 
 export default function TraceList() {
   const traceList = useSentryTraces();
-  const { setTraceId } = useNavigation();
 
   return (
     <>
@@ -16,13 +15,10 @@ export default function TraceList() {
           traceList.map(trace => {
             const duration = getDuration(trace.start_timestamp, trace.timestamp);
             return (
-              <div
+              <Link
                 className="flex cursor-pointer items-center gap-x-4 px-6 py-4 hover:bg-indigo-800"
                 key={trace.trace_id}
-                onClick={e => {
-                  e.stopPropagation();
-                  setTraceId(trace.trace_id);
-                }}
+                to={trace.trace_id}
               >
                 <PlatformIcon platform={trace.rootTransaction?.platform} />
 
@@ -44,7 +40,7 @@ export default function TraceList() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })
         ) : (

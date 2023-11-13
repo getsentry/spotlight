@@ -10,7 +10,7 @@ Spotlight.init({
 });
 
 setTimeout(() => {
-  console.log("this message should show up in the Spotlight Console tab eventually")
+  console.log("this message should show up in the Console tab eventually")
 }, 3000);
 
 setTimeout(() => {

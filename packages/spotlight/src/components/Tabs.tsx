@@ -1,11 +1,23 @@
+import { Link, useNavigate } from 'react-router-dom';
 import { IntegrationTab } from '~/integrations/integration';
 import classNames from '../lib/classNames';
 
 export type Props = {
+  /**
+   * Array of tabs to display.
+   */
   tabs: IntegrationTab<unknown>[];
+
+  /**
+   * Whether the tabs are nested inside another tab.
+   * If `nested` is `true`, links will be set relative to the parent
+   * tab route instead of absolute to the root.
+   */
+  nested?: boolean;
 };
 
-export default function Tabs({ tabs }: Props) {
+export default function Tabs({ tabs, nested }: Props) {
+  const navigate = useNavigate();
   return (
     <div>
       <div className="sm:hidden">
@@ -19,8 +31,11 @@ export default function Tabs({ tabs }: Props) {
           className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
           defaultValue={tabs.find(tab => tab.active)?.title}
           onChange={e => {
-            const activeTab = tabs[parseInt(e.target.value, 10)];
-            activeTab.onSelect && activeTab.onSelect();
+            const activeTab = tabs.find(tab => tab.id === e.target.value);
+            if (activeTab && activeTab.onSelect) {
+              activeTab.onSelect();
+            }
+            navigate(`${nested ? '' : '/'}${activeTab?.id || 'not-found'}`);
           }}
         >
           {tabs.map((tab, tabIdx) => (
@@ -33,13 +48,14 @@ export default function Tabs({ tabs }: Props) {
       <div className="hidden sm:block">
         <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
           {tabs.map(tab => (
-            <button
+            <Link
+              to={`${nested ? '' : '/'}${tab.id}`}
               key={tab.id}
               className={classNames(
                 tab.active
                   ? 'border-indigo-200 text-indigo-100'
                   : 'border-transparent text-indigo-400 hover:border-indigo-400 hover:text-indigo-100',
-                'flex whitespace-nowrap border-b-2 py-3 px-2 -mx-2 text-sm font-medium',
+                '-mx-2 flex whitespace-nowrap border-b-2 px-2 py-3 text-sm font-medium',
               )}
               onClick={() => tab.onSelect && tab.onSelect()}
               aria-current={tab.active ? 'page' : undefined}
@@ -49,13 +65,13 @@ export default function Tabs({ tabs }: Props) {
                 <span
                   className={classNames(
                     tab.active ? 'bg-indigo-100 text-indigo-600' : 'bg-indigo-700 text-indigo-200',
-                    'ml-3 hidden rounded py-0.5 px-2.5 text-xs font-medium md:inline-block',
+                    'ml-3 hidden rounded px-2.5 py-0.5 text-xs font-medium md:inline-block',
                   )}
                 >
                   {tab.count}
                 </span>
               ) : null}
-            </button>
+            </Link>
           ))}
         </nav>
       </div>

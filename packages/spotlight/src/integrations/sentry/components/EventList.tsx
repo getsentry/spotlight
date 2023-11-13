@@ -1,4 +1,4 @@
-import { useNavigation } from '~/lib/useNavigation';
+import { Link } from 'react-router-dom';
 import { SentryEvent } from '~/types';
 import { useSentryEvents } from './../data/useSentryEvents';
 import { ErrorSummary } from './Events/Error';
@@ -11,7 +11,6 @@ function renderEvent(event: SentryEvent) {
 }
 
 export default function EventList() {
-  const { setEventId } = useNavigation();
   const events = useSentryEvents();
 
   const matchingEvents = events.filter(e => e.type !== 'transaction');
@@ -21,10 +20,10 @@ export default function EventList() {
       {matchingEvents.length !== 0 ? (
         matchingEvents.map(e => {
           return (
-            <div
+            <Link
               className="flex cursor-pointer items-center gap-x-4 px-6 py-4 hover:bg-indigo-800"
               key={e.event_id}
-              onClick={() => setEventId(e.event_id)}
+              to={e.event_id}
             >
               <PlatformIcon platform={e.platform} className="text-indigo-300" />
               <div className="flex w-48 flex-col truncate font-mono text-indigo-300">
@@ -32,7 +31,7 @@ export default function EventList() {
                 <TimeSince date={e.timestamp} />
               </div>
               <div className="flex-1">{renderEvent(e)}</div>
-            </div>
+            </Link>
           );
         })
       ) : (

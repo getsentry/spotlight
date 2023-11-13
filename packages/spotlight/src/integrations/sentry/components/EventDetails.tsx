@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import Error, { ErrorTitle } from './Events/Error';
-import EventContexts from './EventContexts';
-import useKeyPress from '~/lib/useKeyPress';
-import PlatformIcon from './PlatformIcon';
-import { useNavigation } from '~/lib/useNavigation';
-import EventBreadcrumbs from './EventBreadcrumbs';
-import { SentryEvent } from '~/types';
+import { Link, Outlet, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import Tabs from '~/components/Tabs';
+import useKeyPress from '~/lib/useKeyPress';
+import { SentryEvent } from '~/types';
+import sentryDataCache from '../data/sentryDataCache';
+import EventBreadcrumbs from './EventBreadcrumbs';
+import EventContexts from './EventContexts';
+import Error, { ErrorTitle } from './Events/Error';
+import PlatformIcon from './PlatformIcon';
 
 function renderEvent(event: SentryEvent) {
   if ('exception' in event) return <Error event={event} />;
@@ -18,14 +19,28 @@ function renderEventTitle(event: SentryEvent) {
   return 'Unknown Event';
 }
 
-export default function EventDetails({ event }: { event: SentryEvent }) {
-  const { setEventId, setTraceId, setSpanId } = useNavigation();
-
+export default function EventDetails() {
+  const { eventId } = useParams();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('details');
 
-  useKeyPress('Escape', () => {
-    setEventId(null);
-  });
+  useKeyPress(
+    'Escape',
+    () => {
+      navigate('..');
+    },
+    true,
+  );
+
+  if (!eventId) {
+    return <p>Unknown event id</p>;
+  }
+
+  const event = sentryDataCache.getEventById(eventId);
+
+  if (!event) {
+    return <p>Event not found</p>;
+  }
 
   const tabs = [
     {
@@ -51,22 +66,16 @@ export default function EventDetails({ event }: { event: SentryEvent }) {
   const traceCtx = event.contexts?.trace;
   return (
     <>
-      <div className="px-6 py-4 flex gap-x-2 bg-indigo-950 items-center">
+      <div className="flex items-center gap-x-2 bg-indigo-950 px-6 py-4">
         <PlatformIcon platform={event.platform} />
-        <h1 className="text-2xl max-w-full truncate flex-1">{renderEventTitle(event)}</h1>
+        <h1 className="max-w-full flex-1 truncate text-2xl">{renderEventTitle(event)}</h1>
         {!!traceCtx && (
           <div className="font-mono text-indigo-300">
             <div>
               T:{' '}
-              <button
-                className="cursor-pointer underline"
-                onClick={e => {
-                  e.stopPropagation();
-                  setTraceId(traceCtx.trace_id);
-                }}
-              >
+              <Link className="cursor-pointer underline" to={`/traces/${traceCtx.trace_id}`}>
                 {traceCtx.trace_id}
-              </button>
+              </Link>
             </div>
             <div>
               S:{' '}
@@ -74,7 +83,8 @@ export default function EventDetails({ event }: { event: SentryEvent }) {
                 className="cursor-pointer underline"
                 onClick={e => {
                   e.stopPropagation();
-                  setSpanId(traceCtx.trace_id, traceCtx.span_id);
+                  // setSpanId(traceCtx.trace_id, traceCtx.span_id);
+                  console.log('TODO, route to trace');
                 }}
               >
                 {traceCtx.span_id}
@@ -83,11 +93,15 @@ export default function EventDetails({ event }: { event: SentryEvent }) {
           </div>
         )}
       </div>
-      <Tabs tabs={tabs} />
-      <div className="divide-indigo-500 flex-1 bg-indigo-950 px-6 py-4">
-        {activeTab === 'details' && renderEvent(event)}
-        {activeTab === 'breadcrumbs' && <EventBreadcrumbs event={event} />}
-        {activeTab === 'contexts' && <EventContexts event={event} />}
+      <Tabs tabs={tabs} nested={true} />
+      <div className="flex-1 divide-indigo-500 bg-indigo-950 px-6 py-4">
+        <Routes>
+          <Route path="breadcrumbs" element={<EventBreadcrumbs event={event} />} />
+          <Route path="contexts" element={<EventContexts event={event} />} />
+          {/* Default tab */}
+          <Route path="*" element={renderEvent(event)} />
+        </Routes>
+        <Outlet />
       </div>
     </>
   );

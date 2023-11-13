@@ -21,7 +21,6 @@ const createPlugin = (): AstroIntegration => {
 
         const importPath = path.dirname(url.fileURLToPath(import.meta.url));
         const pluginPath = path.join(importPath, 'overlay/index.ts');
-        console.log({ pluginPath });
         addDevOverlayPlugin(pluginPath);
       },
       'astro:server:start': async () => {
