@@ -10,10 +10,7 @@ overlay into development environments, and it does it by leveraging the existing
 This repo is power by `pnpm`
 
 1. `pnpm install`
-2. `cd packages/website`
-3. `pnpm install & pnpm build`
-
-Step 2 & 3 are only necessary because a bug in `pnpm install`
+2. `pnpm build`
 
 ### Run Local Dev build
 
@@ -44,11 +41,11 @@ At a high level, Spotlight consists of two components:
 To adopt Spotlight, a customer would only need to load the dependency in their application:
 
 ```shell
-npm add sentry-spotlight
+npm add @spotlightjs/core
 ```
 
 ```typescript
-import * as Spotlight from 'sentry-spotlight';
+import * as Spotlight from '@spotlightjs/core';
 Spotlight.init();
 ```
 
@@ -59,10 +56,10 @@ The overlay itself behaves a little differently from Sentry. That's intentional 
 development, but also because we don't believe our production implementation of certain components is our final
 implementation.
 
-Ruight now the overlay consists of three components:
+Right now the overlay consists of three components:
 
 - Errors - very similar to Sentry
-- Traces - all transactions get clustered into a trace view, othewrise similar to Sentry
+- Traces - all transactions get clustered into a trace view, otherwise similar to Sentry
 - SDKs - simple data on which SDKs have streamed events up
 
 We do not render Replays, Profiling data, or Attachments currently. Profiles and Attachments feel useful, Replays less

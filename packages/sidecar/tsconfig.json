@@ -1,5 +1,5 @@
 {
-  "extends": "@sentry/spotlight-tsconfig/tsconfig.json",
+  "extends": "@spotlightjs/tsconfig/tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {

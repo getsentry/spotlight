@@ -1,7 +1,6 @@
 {
-  "name": "@sentry/spotlight-sidecar",
-  "private": true,
-  "version": "0.0.1",
+  "name": "@spotlightjs/sidecar",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -22,7 +21,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@sentry/spotlight-tsconfig": "workspace:*",
+    "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "^18",
     "typescript": "^5.0.2"
   },

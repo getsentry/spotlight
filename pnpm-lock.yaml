@@ -49,7 +49,7 @@ importers:
 
   packages/sidecar:
     devDependencies:
-      '@sentry/spotlight-tsconfig':
+      '@spotlightjs/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@types/node':
@@ -95,12 +95,12 @@ importers:
         specifier: ^2.9.1
         version: 2.9.1(react-dom@18.2.0)(react@18.2.0)
     devDependencies:
-      '@sentry/spotlight-tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
       '@sentry/types':
         specifier: ^7.77.0
         version: 7.77.0
+      '@spotlightjs/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@tailwindcss/forms':
         specifier: ^0.5.4
         version: 0.5.4(tailwindcss@3.3.3)
@@ -167,10 +167,10 @@ importers:
         specifier: ^3.0.24
         version: 3.3.3
     devDependencies:
-      '@sentry/spotlight':
+      '@spotlightjs/core':
         specifier: workspace:*
         version: link:../spotlight
-      '@sentry/spotlight-sidecar':
+      '@spotlightjs/sidecar':
         specifier: workspace:*
         version: link:../sidecar
       '@tailwindcss/typography':

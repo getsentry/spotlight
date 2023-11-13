@@ -1,7 +1,8 @@
 {
-  "name": "@sentry/spotlight-website",
+  "name": "@spotlightjs/spotlight-website",
   "type": "module",
-  "version": "0.0.1",
+  "private": true,
+  "version": "0.0.0",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -19,8 +20,8 @@
     "tailwindcss": "^3.0.24"
   },
   "devDependencies": {
-    "@sentry/spotlight": "workspace:*",
-    "@sentry/spotlight-sidecar": "workspace:*",
+    "@spotlightjs/core": "workspace:*",
+    "@spotlightjs/sidecar": "workspace:*",
     "@tailwindcss/typography": "^0.5.10",
     "typescript": "^5.0.2",
     "vite-plugin-inspect": "^0.7.42"
