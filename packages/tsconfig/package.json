@@ -1,14 +1,13 @@
 {
-    "name": "@sentry/spotlight-tsconfig",
-    "private": true,
-    "version": "0.0.0",
-    "type": "module",
-    "scripts": {},
-    "files": [
-      "tsconfig.json",
-      "tsconfig.node.json"
-    ],
-    "dependencies": {},
-    "devDependencies": {}
-  }
-  
+  "name": "@spotlightjs/tsconfig",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {},
+  "files": [
+    "tsconfig.json",
+    "tsconfig.node.json"
+  ],
+  "dependencies": {},
+  "devDependencies": {}
+}
