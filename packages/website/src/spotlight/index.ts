@@ -7,7 +7,7 @@ import url from 'url';
 
 const PKG_NAME = '@spotlightjs/core';
 
-const createPlugin = (): AstroIntegration => {
+const createSpotlightIntegration = (): AstroIntegration => {
   return {
     name: PKG_NAME,
 
@@ -23,6 +23,7 @@ const createPlugin = (): AstroIntegration => {
         const pluginPath = path.join(importPath, 'overlay/index.ts');
         addDevOverlayPlugin(pluginPath);
       },
+
       'astro:server:start': async () => {
         console.log('astro:server:start ------------');
         setupSidecar();
@@ -31,4 +32,4 @@ const createPlugin = (): AstroIntegration => {
   };
 };
 
-export default createPlugin;
+export default createSpotlightIntegration;
