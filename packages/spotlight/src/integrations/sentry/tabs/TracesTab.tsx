@@ -7,8 +7,9 @@ export default function ErrorsTab() {
   return (
     <SentryEventsContextProvider>
       <Routes>
-        <Route path="/" element={<TraceList />} />
+        <Route path="/:traceId/:spanId" element={<TraceDetails />} />
         <Route path="/:traceId" element={<TraceDetails />} />
+        <Route path="/" element={<TraceList />} />
       </Routes>
     </SentryEventsContextProvider>
   );
