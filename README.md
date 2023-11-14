@@ -7,25 +7,7 @@ overlay into development environments, and it does it by leveraging the existing
 
 ## Contributing / Running the repo
 
-This repo is power by `pnpm`
-
-1. `pnpm install`
-2. `pnpm build`
-
-### Run Local Dev build
-
-If you want to locally open two terminals
-
-One is for building & watching Spotlight locally.
-
-1. `cd packages/spotlight`
-2. `pnpm dev`
-
-The other is to run the website locally:
-
-1. `cd packages/website`
-2. `pnpm dev`
-3. `open http://localhost:4321/spotlight`
+See [CONTIBUTING.md](./CONTRIBUTING.md) for how to contribute and develop Spotlight.
 
 ## More on Architecture
 
