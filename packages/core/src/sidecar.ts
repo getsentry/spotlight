@@ -1,5 +1,5 @@
-import { Integration } from './integrations/integration';
 import React from 'react';
+import { Integration } from './integrations/integration';
 
 export function connectToSidecar(
   sidecarUrl: string,

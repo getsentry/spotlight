@@ -1,8 +1,8 @@
-import useKeyPress from '~/lib/useKeyPress';
-import Overview from './Overview';
-import { useNavigation } from '~/lib/useNavigation';
 import { useEffect } from 'react';
 import classNames from '~/lib/classNames';
+import useKeyPress from '~/lib/useKeyPress';
+import { useNavigation } from '~/lib/useNavigation';
+import Overview from './Overview';
 
 export default function Debugger({
   isOpen,
@@ -36,19 +36,19 @@ export default function Debugger({
         display: isOpen ? undefined : 'none',
       }}
     >
-      <div className="flex items-center text-indigo-200 bg-indigo-950 px-6 py-4 gap-x-2">
-        <h1 className="flex-1 flex items-end gap-x-1 font-raleway opacity-80">
-          <div className="uppercase font-light tracking-widest text-3xl">Spotlight</div>
-          <div className="flex gap-x-1 text-sm items-center text-indigo-300">
+      <div className="flex items-center gap-x-2 bg-indigo-950 px-6 py-4 text-indigo-200">
+        <h1 className="font-raleway flex flex-1 items-end gap-x-1 opacity-80">
+          <div className="text-3xl font-light uppercase tracking-widest">Spotlight</div>
+          <div className="flex items-center gap-x-1 text-sm text-indigo-300">
             by{' '}
-            <a href="https://sentry.io" className="hover:underline font-semibold">
+            <a href="https://sentry.io" className="font-semibold hover:underline">
               Sentry
             </a>
-            <div className={classNames('pl-2 ml-2 flex items-center gap-x-2 text-xs', isOnline ? '' : 'text-red-400')}>
+            <div className={classNames('ml-2 flex items-center gap-x-2 pl-2 text-xs', isOnline ? '' : 'text-red-400')}>
               <div
                 className={classNames(
-                  ' rounded-full w-2 h-2 block',
-                  isOnline ? 'bg-green-400' : 'bg-red-400 animate-pulse',
+                  ' block h-2 w-2 rounded-full',
+                  isOnline ? 'bg-green-400' : 'animate-pulse bg-red-400',
                 )}
               />
               {isOnline ? 'Connected to Sidecar' : 'Not connected to Sidecar'}
@@ -56,7 +56,7 @@ export default function Debugger({
           </div>
         </h1>
         <button
-          className="cursor-pointer px-3 py-1 -my-1 text-2xl -mr-3 rounded bg-indigo-950 hover:bg-black font-mono"
+          className="-my-1 -mr-3 cursor-pointer rounded bg-indigo-950 px-3 py-1 font-mono text-2xl hover:bg-black"
           onClick={() => {
             setOpen(false);
           }}

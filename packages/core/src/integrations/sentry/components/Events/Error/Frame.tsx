@@ -12,13 +12,13 @@ function formatFilename(filename: string) {
 
 function ContextLocals({ vars }: { vars: FrameVars }) {
   return (
-    <table className="w-full table-values">
+    <table className="table-values w-full">
       <tbody>
         {Object.entries(vars).map(([key, value]) => {
           return (
             <tr key={key}>
               <th>
-                <div className="truncate w-full">{key}</div>
+                <div className="w-full truncate">{key}</div>
               </th>
               <td>
                 <pre className="whitespace-nowrap font-mono">{value}</pre>
@@ -39,11 +39,11 @@ export default function Frame({ frame, defaultExpand = false }: { frame: EventFr
     <li
       className={classNames(
         hasSource ? 'cursor-pointer hover:bg-indigo-800' : '',
-        'bg-indigo-900 border-b border-indigo-900 last:border-b-0',
+        'border-b border-indigo-900 bg-indigo-900 last:border-b-0',
       )}
       onClick={() => setOpen(!isOpen)}
     >
-      <div className="text-indigo-400 border-b border-indigo-950 px-2 py-1">
+      <div className="border-b border-indigo-950 px-2 py-1 text-indigo-400">
         <span className="text-indigo-100">{formatFilename(frame.filename)}</span> in{' '}
         <span className="text-indigo-100">{frame.function}</span>
         {frame.lineno !== undefined && (
@@ -64,11 +64,11 @@ export default function Frame({ frame, defaultExpand = false }: { frame: EventFr
               return (
                 <div className="flex items-center" key={lineNo}>
                   {frame.lineno !== undefined && (
-                    <div className="text-right w-16 text-indigo-300">
+                    <div className="w-16 text-right text-indigo-300">
                       {frame.lineno - frame.pre_context!.length + lineNo}
                     </div>
                   )}
-                  <pre className="whitespace-pre-wrap flex-1  text-indigo-100 px-2 py-1">{line}</pre>
+                  <pre className="flex-1 whitespace-pre-wrap  px-2 py-1 text-indigo-100">{line}</pre>
                 </div>
               );
             })}
@@ -79,8 +79,8 @@ export default function Frame({ frame, defaultExpand = false }: { frame: EventFr
                 'flex items-center',
               )}
             >
-              {frame.lineno !== undefined && <div className="text-right w-16 text-indigo-300">{frame.lineno}</div>}
-              <pre className="whitespace-pre-wrap text-indigo-100 px-2 py-1">{frame.context_line}</pre>
+              {frame.lineno !== undefined && <div className="w-16 text-right text-indigo-300">{frame.lineno}</div>}
+              <pre className="whitespace-pre-wrap px-2 py-1 text-indigo-100">{frame.context_line}</pre>
             </div>
           )}
           {frame.post_context &&
@@ -88,9 +88,9 @@ export default function Frame({ frame, defaultExpand = false }: { frame: EventFr
               return (
                 <div className="flex items-center" key={lineNo}>
                   {frame.lineno !== undefined && (
-                    <div className="text-right w-16 text-indigo-300">{frame.lineno + 1 + lineNo}</div>
+                    <div className="w-16 text-right text-indigo-300">{frame.lineno + 1 + lineNo}</div>
                   )}
-                  <pre className="whitespace-pre-wrap flex-1  text-indigo-100 px-2 py-1">{line}</pre>
+                  <pre className="flex-1 whitespace-pre-wrap  px-2 py-1 text-indigo-100">{line}</pre>
                 </div>
               );
             })}

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { SentryEvent } from '~/types';
-import { useSentryEvents } from './../data/useSentryEvents';
+import { useSentryEvents } from '../data/useSentryEvents';
 import { ErrorSummary } from './Events/Error';
 import PlatformIcon from './PlatformIcon';
 import TimeSince from './TimeSince';
