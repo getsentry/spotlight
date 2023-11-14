@@ -1,16 +1,16 @@
-import { useEffect } from 'react';
+import { Integration } from '~/integrations/integration';
 import classNames from '~/lib/classNames';
 import useKeyPress from '~/lib/useKeyPress';
-import { useNavigation } from '~/lib/useNavigation';
 import Overview from './Overview';
 
 export default function Debugger({
+  integrations,
   isOpen,
   setOpen,
-  defaultEventId,
   integrationData,
   isOnline,
 }: {
+  integrations: Integration[];
   isOpen: boolean;
   setOpen: (value: boolean) => void;
   defaultEventId?: string;
@@ -20,15 +20,6 @@ export default function Debugger({
   useKeyPress('Escape', () => {
     setOpen(false);
   });
-
-  // TODO: this needs to defer til events are received, and listen for those events
-  const { setEventId } = useNavigation();
-  useEffect(() => {
-    if (defaultEventId) {
-      setEventId(defaultEventId);
-    }
-  }, [defaultEventId, setEventId]);
-
   return (
     <div
       className="sentry-debugger"
@@ -65,7 +56,7 @@ export default function Debugger({
         </button>
       </div>
 
-      <Overview integrationData={integrationData} />
+      <Overview integrations={integrations} integrationData={integrationData} />
     </div>
   );
 }

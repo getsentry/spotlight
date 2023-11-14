@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import Debugger from './components/Debugger';
 import Trigger from './components/Trigger';
 import type { Integration } from './integrations/integration';
-import { NavigationProvider } from './lib/navigationContext';
 import { connectToSidecar } from './sidecar';
 
 const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
@@ -61,16 +60,15 @@ export default function App({
 
   return (
     <>
-      <NavigationProvider initializedIntegrations={integrations}>
-        {showTriggerButton && <Trigger isOpen={isOpen} setOpen={setOpen} />}
-        <Debugger
-          isOpen={isOpen}
-          setOpen={setOpen}
-          isOnline={isOnline}
-          defaultEventId={defaultEventId}
-          integrationData={integrationData}
-        />
-      </NavigationProvider>
+      {showTriggerButton && <Trigger isOpen={isOpen} setOpen={setOpen} />}
+      <Debugger
+        isOpen={isOpen}
+        setOpen={setOpen}
+        isOnline={isOnline}
+        defaultEventId={defaultEventId}
+        integrations={integrations}
+        integrationData={integrationData}
+      />
     </>
   );
 }
