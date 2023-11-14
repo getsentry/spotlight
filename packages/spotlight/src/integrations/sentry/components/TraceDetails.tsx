@@ -1,6 +1,4 @@
 import { useParams } from 'react-router-dom';
-import useKeyPress from '~/lib/useKeyPress';
-import { useNavigation } from '~/lib/useNavigation';
 import dataCache from '../data/sentryDataCache';
 import { getDuration } from '../utils/duration';
 import DateTime from './DateTime';
@@ -9,11 +7,7 @@ import SpanDetails from './SpanDetails';
 import SpanTree from './SpanTree';
 
 export default function TraceDetails() {
-  useKeyPress('Escape', () => {
-    setTraceId(null);
-  });
-  const { traceId } = useParams();
-  const { spanId, setTraceId } = useNavigation();
+  const { traceId, spanId } = useParams();
 
   if (!traceId) {
     return <p>Unknown trace id</p>;
