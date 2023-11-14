@@ -28,7 +28,7 @@ jobs:
         uses: changesets/action@v1
         with:
           version: pnpm run changeset:consume
-          commit: Update package versions
-          title: Update package versions
+          commit: 'meta(changelog): Update package versions'
+          title: 'meta(changelog): Update package versions'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
