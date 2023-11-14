@@ -19,13 +19,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout your repository using git
-        uses: actions/checkout@v3
-      - name: Install, build, and upload your site
-        uses: withastro/action@v1
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          path: ./packages/website
-          # node-version: 18 # The specific version of Node that should be used to build your site. Defaults to 18. (optional)
-          package-manager: pnpm
+          node-version-file: 'package.json'
+
+      - name: Setup pnpm & install dependencies
+        uses: pnpm/action-setup@v2
+        with:
+          run_install: true
+
+      - name: Build
+        run: pnpm build
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './packages/website/dist/'
 
   deploy:
     needs: build
