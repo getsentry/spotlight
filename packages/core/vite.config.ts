@@ -1,8 +1,8 @@
-import { resolve } from "path";
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import dts from "vite-plugin-dts";
-import svgr from "vite-plugin-svgr";
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
+import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
+import svgr from 'vite-plugin-svgr';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -15,16 +15,16 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "~": resolve(__dirname, "src"),
+      '~': resolve(__dirname, 'src'),
     },
   },
   build: {
     lib: {
       // Could also be a dictionary or array of multiple entry points
-      entry: resolve(__dirname, "src/index.tsx"),
-      name: "sentry-spotlight",
+      entry: resolve(__dirname, 'src/index.tsx'),
+      name: 'sentry-spotlight',
       // the proper extensions will be added
-      fileName: "sentry-spotlight",
+      fileName: 'sentry-spotlight',
     },
     // rollupOptions: {
     //   // make sure to externalize deps that shouldn't be bundled

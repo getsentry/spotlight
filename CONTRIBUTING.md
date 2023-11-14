@@ -11,7 +11,7 @@ If you want to locally open two terminals
 
 One is for building & watching Spotlight locally.
 
-1. `cd packages/spotlight`
+1. `cd packages/core`
 2. `pnpm dev`
 
 The other is to run the website locally:

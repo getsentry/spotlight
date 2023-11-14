@@ -5,8 +5,8 @@ import type { Integration } from '../integration';
 
 import sentryDataCache from './data/sentryDataCache';
 import ErrorsTab from './tabs/ErrorsTab';
-import TracesTab from './tabs/TracesTab';
 import SdksTab from './tabs/SdksTab';
+import TracesTab from './tabs/TracesTab';
 
 const HEADER = 'application/x-sentry-envelope';
 

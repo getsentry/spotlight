@@ -1,7 +1,7 @@
-import { ReactComponent as PythonIcon } from 'platformicons/svg/python.svg';
+import { ReactComponent as DefaultIcon } from 'platformicons/svg/default.svg';
 import { ReactComponent as JavaScriptIcon } from 'platformicons/svg/javascript.svg';
 import { ReactComponent as NodeIcon } from 'platformicons/svg/nodejs.svg';
-import { ReactComponent as DefaultIcon } from 'platformicons/svg/default.svg';
+import { ReactComponent as PythonIcon } from 'platformicons/svg/python.svg';
 
 import { ComponentPropsWithoutRef } from 'react';
 

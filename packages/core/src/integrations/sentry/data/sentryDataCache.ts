@@ -1,7 +1,7 @@
-import { Sdk, SentryEvent, SentryTransactionEvent, Span, Trace } from '~/types';
 import { Envelope } from '@sentry/types';
-import { groupSpans } from '../utils/traces';
 import { generate_uuidv4 } from '~/lib/uuid';
+import { Sdk, SentryEvent, SentryTransactionEvent, Span, Trace } from '~/types';
+import { groupSpans } from '../utils/traces';
 
 function toTimestamp(date: string | number) {
   if (typeof date === 'string') return new Date(date).getTime();

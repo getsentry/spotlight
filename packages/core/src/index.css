@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 .sentry-trigger {
-  @apply fixed border font-medium right-2 bottom-2 px-3 py-2 rounded inline-flex gap-x-2 items-center justify-center opacity-80 hover:opacity-100;
-  @apply border-indigo-950 bg-indigo-900 text-white uppercase font-light tracking-widest font-raleway text-sm;
+  @apply fixed bottom-2 right-2 inline-flex items-center justify-center gap-x-2 rounded border px-3 py-2 font-medium opacity-80 hover:opacity-100;
+  @apply font-raleway border-indigo-950 bg-indigo-900 text-sm font-light uppercase tracking-widest text-white;
 
   z-index: 2147483647;
   cursor: pointer;
@@ -12,11 +12,11 @@
 }
 
 .sentry-trigger span {
-  @apply rounded py-0.5 px-1.5 text-xs font-medium font-sans;
+  @apply rounded px-1.5 py-0.5 font-sans text-xs font-medium;
 }
 
 .sentry-debugger {
-  @apply fixed inset-0 h-screen w-screen bg-indigo-900 text-white overflow-auto flex flex-col font-sans;
+  @apply fixed inset-0 flex h-screen w-screen flex-col overflow-auto bg-indigo-900 font-sans text-white;
 
   z-index: 2147483647;
 }
@@ -79,7 +79,7 @@ ul.tree ul.tree > li:before {
   margin-top: -2px;
   height: 15px;
   width: 12px;
-  content: "";
+  content: '';
   display: inline-block;
   margin-left: -16px;
 }
@@ -89,23 +89,23 @@ ul.tree li:last-child:before {
 }
 
 .tree .node {
-  @apply w-[65%] flex items-center gap-x-1 py-1 overflow-auto;
+  @apply flex w-[65%] items-center gap-x-1 overflow-auto py-1;
 }
 
 .tree .waterfall {
-  @apply absolute left-[65%] right-0 h-7 bg-indigo-950 border-l border-l-indigo-800 py-1;
+  @apply absolute left-[65%] right-0 h-7 border-l border-l-indigo-800 bg-indigo-950 py-1;
 }
 
 .table-values {
-  @apply border-collapse text-sm bg-indigo-900;
+  @apply border-collapse bg-indigo-900 text-sm;
 }
 
 .table-values tbody th {
-  @apply font-mono px-2 py-1 text-right font-normal text-indigo-300 w-1/12 border-y border-indigo-950;
+  @apply w-1/12 border-y border-indigo-950 px-2 py-1 text-right font-mono font-normal text-indigo-300;
 }
 
 .table-values tbody td {
-  @apply px-2 py-1 border-y border-indigo-950;
+  @apply border-y border-indigo-950 px-2 py-1;
 }
 
 /* 

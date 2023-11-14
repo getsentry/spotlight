@@ -10,7 +10,7 @@ const EXAMPLE_BREADCRUMB = `Sentry.addBreadcrumb({
 export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
   if (!event.breadcrumbs || !event.breadcrumbs.values.length) {
     return (
-      <div className="px-6 space-y-4">
+      <div className="space-y-4 px-6">
         <div className="text-indigo-300">
           No breadcrumbs available for this event. Try adding some to make debugging easier.
         </div>
@@ -19,14 +19,14 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
     );
   }
   return (
-    <div className="space-y-2 divide-y divide-indigo-800 -mx-2">
+    <div className="-mx-2 space-y-2 divide-y divide-indigo-800">
       {event.breadcrumbs.values.map((crumb, crumbIdx) => {
         return (
           <div key={crumbIdx} className="flex items-center  p-2">
             <div className="w-32 text-indigo-300">
               <Time date={crumb.timestamp} />
             </div>
-            <div className="w-32 text-indigo-300 truncate">{crumb.category}</div>
+            <div className="w-32 truncate text-indigo-300">{crumb.category}</div>
             <div className="flex-1 font-mono">{crumb.message}</div>
           </div>
         );

@@ -3,12 +3,12 @@ import ReactDOM from 'react-dom/client';
 import fontStyles from '@fontsource/raleway/index.css?inline';
 
 import App from './App.tsx';
-import type { Integration } from './integrations/integration';
-import { initIntegrations } from './integrations/integration';
 import globalStyles from './index.css?inline';
+import type { Integration } from './integrations/integration.ts';
+import { initIntegrations } from './integrations/integration.ts';
 
-export { default as sentry } from './integrations/sentry';
-export { default as console } from './integrations/console';
+export { default as console } from './integrations/console/index.ts';
+export { default as sentry } from './integrations/sentry/index.ts';
 
 function createStyleSheet(styles: string) {
   const sheet = new CSSStyleSheet();
