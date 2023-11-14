@@ -34,12 +34,10 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Install, build, and upload your site
-        uses: withastro/action@v1
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          path: ./packages/website
-          # node-version: 18 # The specific version of Node that should be used to build your site. Defaults to 18. (optional)
-          package-manager: pnpm
+          path: './packages/website/dist/'
 
   deploy:
     needs: build
