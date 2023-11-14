@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 0.0.3
+
+### Patch Changes
+
+- ref(core): Remove useNavigation and NavigationContext ([#36](https://github.com/getsentry/spotlight/pull/36))
+
 ## 0.0.2
 
 ### Patch Changes
