@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { useSpotlight } from '~/lib/useSpotlight';
+import { Integration } from '~/integrations/integration';
 import Tabs from './Tabs';
 
 const DEFAULT_TAB = 'errors';
 
-export default function Overview({ integrationData }: { integrationData: Record<string, Array<unknown>> }) {
+export default function Overview({
+  integrations,
+  integrationData,
+}: {
+  integrations: Integration[];
+  integrationData: Record<string, Array<unknown>>;
+}) {
   const [activeTab, setActiveTab] = useState(DEFAULT_TAB);
-
-  const { integrations } = useSpotlight();
 
   const tabs = integrations
     .map(integration => {
