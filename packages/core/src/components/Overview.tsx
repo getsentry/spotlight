@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { useNavigation } from '~/lib/useNavigation';
+import { useSpotlight } from '~/lib/useSpotlight';
 import Tabs from './Tabs';
 
 const DEFAULT_TAB = 'errors';
@@ -8,7 +8,7 @@ const DEFAULT_TAB = 'errors';
 export default function Overview({ integrationData }: { integrationData: Record<string, Array<unknown>> }) {
   const [activeTab, setActiveTab] = useState(DEFAULT_TAB);
 
-  const { integrations } = useNavigation();
+  const { integrations } = useSpotlight();
 
   const tabs = integrations
     .map(integration => {
@@ -17,8 +17,6 @@ export default function Overview({ integrationData }: { integrationData: Record<
           ...tab,
           active: activeTab === tab.id,
           onSelect: () => {
-            // setEventId(null);
-            // setTraceId(null);
             setActiveTab(tab.id);
           },
         }));

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Debugger from './components/Debugger';
 import Trigger from './components/Trigger';
 import type { Integration } from './integrations/integration';
-import { NavigationProvider } from './lib/navigationContext';
+import { SpotlightProvider } from './lib/spotlightContext';
 import { connectToSidecar } from './sidecar';
 
 const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
@@ -61,7 +61,7 @@ export default function App({
 
   return (
     <>
-      <NavigationProvider initializedIntegrations={integrations}>
+      <SpotlightProvider initializedIntegrations={integrations}>
         {showTriggerButton && <Trigger isOpen={isOpen} setOpen={setOpen} />}
         <Debugger
           isOpen={isOpen}
@@ -70,7 +70,7 @@ export default function App({
           defaultEventId={defaultEventId}
           integrationData={integrationData}
         />
-      </NavigationProvider>
+      </SpotlightProvider>
     </>
   );
 }

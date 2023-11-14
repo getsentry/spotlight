@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Link, Outlet, Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import { Link, Outlet, Route, Routes, useParams } from 'react-router-dom';
 import Tabs from '~/components/Tabs';
-import useKeyPress from '~/lib/useKeyPress';
 import { SentryEvent } from '~/types';
 import sentryDataCache from '../data/sentryDataCache';
 import EventBreadcrumbs from './EventBreadcrumbs';
@@ -21,16 +20,7 @@ function renderEventTitle(event: SentryEvent) {
 
 export default function EventDetails() {
   const { eventId } = useParams();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('details');
-
-  useKeyPress(
-    'Escape',
-    () => {
-      navigate('..');
-    },
-    true,
-  );
 
   if (!eventId) {
     return <p>Unknown event id</p>;
@@ -79,16 +69,9 @@ export default function EventDetails() {
             </div>
             <div>
               S:{' '}
-              <button
-                className="cursor-pointer underline"
-                onClick={e => {
-                  e.stopPropagation();
-                  // setSpanId(traceCtx.trace_id, traceCtx.span_id);
-                  console.log('TODO, route to trace');
-                }}
-              >
+              <Link className="cursor-pointer underline" to={`/traces/${traceCtx.trace_id}/${traceCtx.span_id}`}>
                 {traceCtx.span_id}
-              </button>
+              </Link>
             </div>
           </div>
         )}
