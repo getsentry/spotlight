@@ -26,8 +26,10 @@ jobs:
         with:
           node-version-file: 'package.json'
 
-      - name: Install Dependencies
-        run: pnpm install
+      - name: Setup pnpm & install dependencies
+        uses: pnpm/action-setup@v2
+        with:
+          run_install: true
 
       - name: Build
         run: pnpm build
