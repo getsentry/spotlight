@@ -23,6 +23,11 @@ export default function Debugger({
   return (
     <div
       className="fullscreen-blur"
+      onClick={e => {
+        if (e.target === e.currentTarget) {
+          setOpen(false);
+        }
+      }}
       style={{
         display: isOpen ? undefined : 'none',
       }}
