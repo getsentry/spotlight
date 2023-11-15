@@ -9,5 +9,8 @@
     "tsconfig.node.json"
   ],
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "volta": {
+    "extends": "../../package.json"
+  }
 }

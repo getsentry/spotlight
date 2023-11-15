@@ -1,5 +1,6 @@
 {
   "name": "@spotlightjs/sidecar",
+  "description": "A small proxy server to capture and forward data from backend services to Spotlight.",
   "version": "0.0.2",
   "type": "module",
   "scripts": {
@@ -26,7 +27,6 @@
     "typescript": "^5.0.2"
   },
   "volta": {
-    "node": "18.18.0",
-    "pnpm": "8.6.12"
+    "extends": "../../package.json"
   }
 }
