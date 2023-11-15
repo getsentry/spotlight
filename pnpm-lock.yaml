@@ -56,10 +56,10 @@ importers:
   packages/astro:
     dependencies:
       '@spotlightjs/core':
-        specifier: 0.0.4
+        specifier: 0.0.5
         version: link:../core
       '@spotlightjs/sidecar':
-        specifier: 0.0.3
+        specifier: 0.0.4
         version: link:../sidecar
       astro:
         specifier: ^3.4.0
@@ -193,7 +193,7 @@ importers:
         version: 3.3.3
     devDependencies:
       '@spotlightjs/astro':
-        specifier: 0.0.1
+        specifier: 0.0.2
         version: link:../astro
       '@tailwindcss/typography':
         specifier: ^0.5.10

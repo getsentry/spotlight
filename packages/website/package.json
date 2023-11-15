@@ -20,7 +20,7 @@
     "tailwindcss": "^3.0.24"
   },
   "devDependencies": {
-    "@spotlightjs/astro": "0.0.2",
+    "@spotlightjs/astro": "workspace:*",
     "@tailwindcss/typography": "^0.5.10",
     "typescript": "^5.0.2",
     "vite-plugin-inspect": "^0.7.42"

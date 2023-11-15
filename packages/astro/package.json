@@ -20,8 +20,8 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@spotlightjs/core": "0.0.5",
-    "@spotlightjs/sidecar": "0.0.4",
+    "@spotlightjs/core": "workspace:*",
+    "@spotlightjs/sidecar": "workspace:*",
     "astro": "^3.4.0"
   },
   "devDependencies": {
