@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 0.0.5
+
+### Patch Changes
+
+- unstale yarn lock
+  ([`2c3d9d1`](https://github.com/getsentry/spotlight/commit/2c3d9d1d3c9bbc36f59ed611601b0ae196c40d8b))
+
 ## 0.0.4
 
 ### Patch Changes

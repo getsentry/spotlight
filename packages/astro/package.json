@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/astro",
   "description": "Add spotlight to your Astro toolbar, for better debugging.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "keywors": [
     "astro",
@@ -20,8 +20,8 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@spotlightjs/core": "0.0.4",
-    "@spotlightjs/sidecar": "0.0.3",
+    "@spotlightjs/core": "0.0.5",
+    "@spotlightjs/sidecar": "0.0.4",
     "astro": "^3.4.0"
   },
   "devDependencies": {
