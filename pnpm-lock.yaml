@@ -56,8 +56,8 @@ importers:
   packages/astro:
     dependencies:
       '@spotlightjs/core':
-        specifier: 0.0.2
-        version: 0.0.2
+        specifier: 0.0.3
+        version: link:../core
       '@spotlightjs/sidecar':
         specifier: 0.0.2
         version: link:../sidecar
@@ -1779,26 +1779,6 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
-    dev: false
-
-  /@spotlightjs/core@0.0.2:
-    resolution:
-      { integrity: sha512-nrZyHJc5w3NdXNJFUld+GYU1jpfgkmyAN0ChN9Yixv+JQscpzu8mTQfaD5WB0t2jD6iXHtstEVLzPYEwXw9kwA== }
-    dependencies:
-      '@fontsource/raleway': 5.0.8
-      '@sentry/utils': 7.80.0
-      autoprefixer: 10.4.16(postcss@8.4.31)
-      dayjs: 1.11.9
-      platformicons: 5.6.2(react@18.2.0)
-      postcss: 8.4.31
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      react-router-dom: 6.18.0(react-dom@18.2.0)(react@18.2.0)
-      sql-formatter: 12.2.4
-      tailwindcss: 3.3.3
-      usehooks-ts: 2.9.1(react-dom@18.2.0)(react@18.2.0)
-    transitivePeerDependencies:
-      - ts-node
     dev: false
 
   /@svgr/babel-plugin-add-jsx-attribute@7.0.0(@babel/core@7.23.2):

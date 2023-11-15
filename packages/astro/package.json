@@ -21,7 +21,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@spotlightjs/core": "0.0.2",
+    "@spotlightjs/core": "0.0.3",
     "@spotlightjs/sidecar": "0.0.2",
     "astro": "^3.4.0"
   },
