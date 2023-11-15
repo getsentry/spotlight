@@ -1,6 +1,6 @@
 import type { Integration } from '../integration';
 import ConsoleTab from './console-tab';
-import { ConsoleMessage, Levels } from './types';
+import { ConsoleMessage, Level } from './types';
 
 const HEADER = 'application/x-spotlight-console';
 const PORT = 8969;
@@ -22,21 +22,18 @@ export default function consoleIntegration() {
     setup: () => {
       instrumentConsole('log', pageloadId);
       instrumentConsole('warn', pageloadId);
+      instrumentConsole('error', pageloadId);
     },
 
-    processEvent({ data, contentType }) {
+    processEvent({ data }) {
       const msgJson = JSON.parse(data) as ConsoleMessage;
-      // if (msgJson.sessionId !== pageloadId) {
-      //   return undefined;
-      // }
 
-      console.log(`[Spotlight] event ${msgJson} (type ${contentType})`);
       return msgJson;
     },
   } satisfies Integration;
 }
 
-function instrumentConsole(level: Levels, pageloadId: string) {
+function instrumentConsole(level: Level, pageloadId: string) {
   const originalConsoleLog = window.console[level];
 
   window.console[level] = (...args: unknown[]) => {
@@ -59,8 +56,6 @@ function instrumentConsole(level: Levels, pageloadId: string) {
       },
       mode: 'cors',
     });
-
-    console.log('[Spotlight] Sent Console Event');
 
     return originalConsoleLog(...args);
   };
