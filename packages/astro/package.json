@@ -7,7 +7,6 @@
     "astro",
     "withastro",
     "astro-component",
-    "analytics"
   ],
   "scripts": {
     "dev": "astro dev",
