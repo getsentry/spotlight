@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 0.0.6
+
+### Patch Changes
+
+- Fix version bumps in package.jsons
+  ([`bded33c`](https://github.com/getsentry/spotlight/commit/bded33cfd262aa7c86e35fefd9cd46f9f922d891))
+
 ## 0.0.5
 
 ### Patch Changes
