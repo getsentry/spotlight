@@ -1,5 +1,17 @@
 # @spotlightjs/astro
 
+## 0.0.3
+
+### Patch Changes
+
+- Fix version bumps in package.jsons
+  ([`bded33c`](https://github.com/getsentry/spotlight/commit/bded33cfd262aa7c86e35fefd9cd46f9f922d891))
+
+- Updated dependencies
+  [[`bded33c`](https://github.com/getsentry/spotlight/commit/bded33cfd262aa7c86e35fefd9cd46f9f922d891)]:
+  - @spotlightjs/core@0.0.6
+  - @spotlightjs/sidecar@0.0.5
+
 ## 0.0.2
 
 ### Patch Changes
