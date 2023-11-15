@@ -6,7 +6,7 @@
   "keywors": [
     "astro",
     "withastro",
-    "astro-component",
+    "astro-component"
   ],
   "scripts": {
     "dev": "astro dev",
