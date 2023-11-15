@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 0.0.3
+
+### Patch Changes
+
+- Add description to package.json ([#40](https://github.com/getsentry/spotlight/pull/40))
+
 ## 0.0.2
 
 ### Patch Changes
