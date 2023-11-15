@@ -1,5 +1,17 @@
 # @spotlightjs/core
 
+## 0.0.4
+
+### Patch Changes
+
+- ref(integrations): Adjust input and return types of `processEvent`
+  ([#42](https://github.com/getsentry/spotlight/pull/42))
+
+- Add description to package.json ([#40](https://github.com/getsentry/spotlight/pull/40))
+
+- Removed `integrationData` prop in favour of `processedEvents` in tab component
+  ([#42](https://github.com/getsentry/spotlight/pull/42))
+
 ## 0.0.3
 
 ### Patch Changes
