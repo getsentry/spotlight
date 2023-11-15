@@ -17,7 +17,7 @@ export default function Overview({
   const tabs = integrations
     .map(integration => {
       if (integration.tabs) {
-        return integration.tabs.map(tab => ({
+        return integration.tabs({ integrationData }).map(tab => ({
           ...tab,
           active: activeTab === tab.id,
           onSelect: () => {

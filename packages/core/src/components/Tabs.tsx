@@ -40,7 +40,7 @@ export default function Tabs({ tabs, nested }: Props) {
         >
           {tabs.map((tab, tabIdx) => (
             <option key={tabIdx} value={tab.id}>
-              {tab.title}
+              {tab.title} {tab.notificationCount}
             </option>
           ))}
         </select>
@@ -61,14 +61,14 @@ export default function Tabs({ tabs, nested }: Props) {
               aria-current={tab.active ? 'page' : undefined}
             >
               {tab.title}
-              {tab.count !== undefined ? (
+              {tab.notificationCount !== undefined ? (
                 <span
                   className={classNames(
                     tab.active ? 'bg-indigo-100 text-indigo-600' : 'bg-indigo-700 text-indigo-200',
                     'ml-3 hidden rounded px-2.5 py-0.5 text-xs font-medium md:inline-block',
                   )}
                 >
-                  {tab.count}
+                  {tab.notificationCount}
                 </span>
               ) : null}
             </Link>

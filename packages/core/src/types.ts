@@ -129,3 +129,8 @@ export type Sdk = {
   version: string;
   lastSeen: number;
 };
+
+export type TriggerButtonCount = {
+  general: number;
+  severe: number;
+};
