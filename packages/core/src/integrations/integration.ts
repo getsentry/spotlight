@@ -15,6 +15,9 @@ export type Integration<T = any> = {
 
   /**
    * A function returning an array of tabs to be displayed in the UI.
+   *
+   * @param context contains the processed events for the tabs. Use this information to
+   * e.g. update the notification count badge of the tab.
    */
   tabs?: TabsCreationFunction<T>;
 
@@ -27,11 +30,15 @@ export type Integration<T = any> = {
 
   /**
    * Hook called whenever spotlight forwards a new raw event to this integration.
+   *
    * Use this hook to process and convert the raw request payload (string) to a
    * data structure that your integration works with in the UI.
-   * The returned object will be passed to your tabs.
+   *
+   * If you want to disregard the sent event, simply return `undefined`.
+   *
+   * The returned object will be passed to your tabs function.
    */
-  processEvent?: (eventContext: RawEventContext) => T | Promise<T>;
+  processEvent?: (eventContext: RawEventContext) => ProcessedEventContainer<T> | undefined;
 };
 
 export type IntegrationTab<T> = {
@@ -55,7 +62,7 @@ export type IntegrationTab<T> = {
    * JSX content of the tab. Go crazy, this is all yours!
    */
   content?: React.ComponentType<{
-    integrationData: IntegrationData<T>;
+    processedEvents: T[];
   }>;
 
   onSelect?: () => void;
@@ -64,10 +71,28 @@ export type IntegrationTab<T> = {
   active?: boolean;
 };
 
-type IntegrationData<T> = Record<string, T[]>;
+type ProcessedEventContainer<T> = {
+  /**
+   * The processed event data to be passed to your tabs.
+   */
+  event: T;
+
+  /**
+   * A level indicating the impact or severity of the processed event. Set this to
+   * 'severe' if the event is critical and users should be aware of it (e.g. a thrown error).
+   *
+   * If this is set to 'severe', a red notification count badge will be displayed
+   * next to the spotlight trigger button in the UI.
+   *
+   * @default value is 'default'
+   */
+  severity?: 'default' | 'severe';
+};
+
+export type IntegrationData<T> = Record<string, ProcessedEventContainer<T>[]>;
 
 type TabsContext<T> = {
-  integrationData: IntegrationData<T>;
+  processedEvents: T[];
 };
 
 type TabsCreationFunction<T> = (context: TabsContext<T>) => IntegrationTab<T>[];
@@ -86,14 +111,6 @@ type RawEventContext = {
    * Return the processed object or undefined if the event should be ignored.
    */
   data: string;
-
-  /**
-   * Calling this function will tell spotlight that the processed event is a severe
-   * event that should be highlighted in the general UI.
-   *
-   * For instance, this will have an effect on the Spotlight trigger button's counter appearance.
-   */
-  markEventSevere: () => void;
 };
 
 // export type IntegrationParameter = Array<Integration<unknown>>;

@@ -1,4 +1,4 @@
-import { Integration } from '~/integrations/integration';
+import { Integration, IntegrationData } from '~/integrations/integration';
 import classNames from '~/lib/classNames';
 import useKeyPress from '~/lib/useKeyPress';
 import Overview from './Overview';
@@ -14,7 +14,7 @@ export default function Debugger({
   isOpen: boolean;
   setOpen: (value: boolean) => void;
   defaultEventId?: string;
-  integrationData: Record<string, Array<unknown>>;
+  integrationData: IntegrationData<unknown>;
   isOnline: boolean;
 }) {
   useKeyPress('Escape', () => {

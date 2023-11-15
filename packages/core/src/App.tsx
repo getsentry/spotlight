@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Debugger from './components/Debugger';
 import Trigger from './components/Trigger';
-import type { Integration } from './integrations/integration';
+import type { Integration, IntegrationData } from './integrations/integration';
 import { connectToSidecar } from './sidecar';
 import { TriggerButtonCount } from './types';
 
@@ -22,7 +22,7 @@ export default function App({
 }) {
   console.log('[Spotlight] App rerender');
 
-  const [integrationData, setIntegrationData] = useState<Record<string, Array<unknown>>>({});
+  const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});
   const [isOnline, setOnline] = useState(false);
   const [triggerButtonCount, setTriggerButtonCount] = useState<TriggerButtonCount>({ general: 0, severe: 0 });
 
@@ -51,7 +51,7 @@ export default function App({
       console.log('[Spotlight] useeffect cleanup');
       cleanupListeners();
     };
-  }, []);
+  }, [integrations]);
 
   const [isOpen, setOpen] = useState(fullScreen);
 
