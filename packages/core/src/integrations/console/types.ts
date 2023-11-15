@@ -1,8 +1,8 @@
 export type ConsoleMessage = {
-  type: Levels;
+  type: Level;
   args: string[];
   msg: string;
   sessionId: string;
 };
 
-export type Levels = 'log' | 'warn';
+export type Level = 'log' | 'warn' | 'error';

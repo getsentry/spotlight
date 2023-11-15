@@ -40,13 +40,6 @@ export function connectToSidecar(
     console.log('[spotlight] added listener for', contentType, 'sum', contentTypeListeners.length);
   }
 
-  // TODO: Do we need this? I don't think so...
-  //   source.addEventListener('event', event => {
-  //     console.log('[Spotlight] Received new event');
-  //     const data = JSON.parse(event.data);
-  //     dataCache.pushEvent(data);
-  //   });
-
   source.addEventListener('open', () => {
     setOnline(true);
     console.log('[Spotlight] open');
