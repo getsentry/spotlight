@@ -6,7 +6,7 @@ Spotlight.init({
     Spotlight.sentry(), 
     Spotlight.console()
   ],
-  showTriggerButton: true,
+  showTriggerButton: false,
 });
 
 setTimeout(() => {
