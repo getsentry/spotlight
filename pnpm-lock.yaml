@@ -53,6 +53,22 @@ importers:
         specifier: ^5.0.2
         version: 5.2.2
 
+  packages/astro:
+    dependencies:
+      '@spotlightjs/core':
+        specifier: 0.0.3
+        version: link:../core
+      '@spotlightjs/sidecar':
+        specifier: 0.0.2
+        version: link:../sidecar
+      astro:
+        specifier: ^3.4.0
+        version: 3.4.0(typescript@5.0.4)
+    devDependencies:
+      typescript:
+        specifier: ^5.0.2
+        version: 5.0.4
+
   packages/core:
     dependencies:
       '@fontsource/raleway':
@@ -176,12 +192,9 @@ importers:
         specifier: ^3.0.24
         version: 3.3.3
     devDependencies:
-      '@spotlightjs/core':
-        specifier: workspace:*
-        version: link:../core
-      '@spotlightjs/sidecar':
-        specifier: workspace:*
-        version: link:../sidecar
+      '@spotlightjs/astro':
+        specifier: 0.0.0
+        version: link:../astro
       '@tailwindcss/typography':
         specifier: ^0.5.10
         version: 0.5.10(tailwindcss@3.3.3)
@@ -234,7 +247,7 @@ packages:
       astro: ^3.3.0
     dependencies:
       '@astrojs/prism': 3.0.0
-      astro: 3.4.0(typescript@5.2.2)
+      astro: 3.4.0(typescript@5.0.4)
       github-slugger: 2.0.0
       import-meta-resolve: 3.1.1
       mdast-util-definitions: 6.0.0
@@ -2683,6 +2696,83 @@ packages:
     resolution:
       { integrity: sha512-ISvCdHdlTDlH5IpxQJIex7BWBywFWgjJSVdwst+/iQCoEYnyOaQ95+X1JGshuBjGp6nxKUy1jMgE3zPqN7fQdg== }
     hasBin: true
+    dev: false
+
+  /astro@3.4.0(typescript@5.0.4):
+    resolution:
+      { integrity: sha512-nTOFxrPOnmACl8noTPkRJkaEOMx4wZy4QCLB2aDL3Lm+AiEaVcgH7YQ4GpCl72zSNXp/A7hGdUgcXbC4XYHOCQ== }
+    engines: { node: '>=18.14.1', npm: '>=6.14.0' }
+    hasBin: true
+    dependencies:
+      '@astrojs/compiler': 2.2.2
+      '@astrojs/internal-helpers': 0.2.1
+      '@astrojs/markdown-remark': 3.3.0(astro@3.4.0)
+      '@astrojs/telemetry': 3.0.4
+      '@babel/core': 7.23.2
+      '@babel/generator': 7.23.0
+      '@babel/parser': 7.23.0
+      '@babel/plugin-transform-react-jsx': 7.22.15(@babel/core@7.23.2)
+      '@babel/traverse': 7.23.2
+      '@babel/types': 7.23.0
+      '@types/babel__core': 7.20.3
+      acorn: 8.11.2
+      boxen: 7.1.1
+      chokidar: 3.5.3
+      ci-info: 3.9.0
+      clsx: 2.0.0
+      common-ancestor-path: 1.0.1
+      cookie: 0.5.0
+      debug: 4.3.4
+      deterministic-object-hash: 1.3.1
+      devalue: 4.3.2
+      diff: 5.1.0
+      es-module-lexer: 1.3.1
+      esbuild: 0.19.5
+      estree-walker: 3.0.3
+      execa: 8.0.1
+      fast-glob: 3.3.1
+      github-slugger: 2.0.0
+      gray-matter: 4.0.3
+      html-escaper: 3.0.3
+      http-cache-semantics: 4.1.1
+      js-yaml: 4.1.0
+      kleur: 4.1.5
+      magic-string: 0.30.5
+      mime: 3.0.0
+      ora: 7.0.1
+      p-limit: 4.0.0
+      p-queue: 7.4.1
+      path-to-regexp: 6.2.1
+      preferred-pm: 3.1.2
+      probe-image-size: 7.2.3
+      prompts: 2.4.2
+      rehype: 12.0.1
+      resolve: 1.22.8
+      semver: 7.5.4
+      server-destroy: 1.0.1
+      shikiji: 0.6.12
+      string-width: 6.1.0
+      strip-ansi: 7.1.0
+      tsconfck: 3.0.0(typescript@5.0.4)
+      unist-util-visit: 4.1.2
+      vfile: 5.3.7
+      vite: 4.5.0
+      vitefu: 0.2.5(vite@4.5.0)
+      which-pm: 2.1.1
+      yargs-parser: 21.1.1
+      zod: 3.21.1
+    optionalDependencies:
+      sharp: 0.32.5
+    transitivePeerDependencies:
+      - '@types/node'
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+      - typescript
     dev: false
 
   /astro@3.4.0(typescript@5.2.2):
@@ -8220,6 +8310,20 @@ packages:
     resolution:
       { integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA== }
 
+  /tsconfck@3.0.0(typescript@5.0.4):
+    resolution:
+      { integrity: sha512-w3wnsIrJNi7avf4Zb0VjOoodoO0woEqGgZGQm+LHH9przdUI+XDKsWAXwxHA1DaRTjeuZNcregSzr7RaA8zG9A== }
+    engines: { node: ^18 || >=20 }
+    hasBin: true
+    peerDependencies:
+      typescript: ^5.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      typescript: 5.0.4
+    dev: false
+
   /tsconfck@3.0.0(typescript@5.2.2):
     resolution:
       { integrity: sha512-w3wnsIrJNi7avf4Zb0VjOoodoO0woEqGgZGQm+LHH9przdUI+XDKsWAXwxHA1DaRTjeuZNcregSzr7RaA8zG9A== }
@@ -8347,7 +8451,6 @@ packages:
       { integrity: sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw== }
     engines: { node: '>=12.20' }
     hasBin: true
-    dev: true
 
   /typescript@5.2.2:
     resolution:

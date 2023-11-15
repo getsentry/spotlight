@@ -1,9 +1,9 @@
 import starlight from '@astrojs/starlight';
 import tailwind from '@astrojs/tailwind';
 import sentry from '@sentry/astro';
+import spotlight from '@spotlightjs/astro';
 import { defineConfig } from 'astro/config';
 import Inspect from 'vite-plugin-inspect';
-import spotlight from './src/spotlight';
 
 // https://astro.build/config
 export default defineConfig({
@@ -16,14 +16,6 @@ export default defineConfig({
         build: true,
       }),
     ],
-    server: {
-      watch: {
-        ignored: ['!**/node_modules/@spotlightjs/core/**'],
-      },
-    },
-    optimizeDeps: {
-      exclude: ['@spotlightjs/core'],
-    },
     build: {
       sourcemap: true,
     },
