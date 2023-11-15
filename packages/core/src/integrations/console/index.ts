@@ -11,10 +11,11 @@ export default function consoleIntegration() {
   return {
     name: 'console',
     forwardedContentType: [HEADER],
-    tabs: [
+    tabs: ({ integrationData }) => [
       {
         id: 'console',
         title: 'Browser Console Logs',
+        notificationCount: integrationData[HEADER]?.length,
         content: ConsoleTab,
       },
     ],

@@ -27,10 +27,10 @@ class SentryDataCache {
       event_id?: string;
     })[] = [],
   ) {
-    initial.forEach(e => this.pushEvent(e));
+    initial.forEach(e => this.pushEvent(e, () => {}));
   }
 
-  pushEnvelope(envelope: Envelope) {
+  pushEnvelope(envelope: Envelope, markSevere: () => void) {
     const [header, items] = envelope;
     if (header.sdk && header.sdk.name && header.sdk.version) {
       const existingSdk = this.sdks.find(s => s.name === header.sdk!.name && s.version === header.sdk!.version);
@@ -46,7 +46,7 @@ class SentryDataCache {
     }
     items.forEach(([itemHeader, itemData]) => {
       if (itemHeader.type === 'event' || itemHeader.type === 'transaction') {
-        this.pushEvent(itemData as SentryEvent);
+        this.pushEvent(itemData as SentryEvent, markSevere);
       }
     });
   }
@@ -55,6 +55,7 @@ class SentryDataCache {
     event: SentryEvent & {
       event_id?: string;
     },
+    markSevere: () => void,
   ) {
     if (!event.event_id) event.event_id = generate_uuidv4();
 
@@ -124,6 +125,7 @@ class SentryDataCache {
       }
       this.subscribers.forEach(([type, cb]) => type === 'trace' && cb(trace));
     }
+    markSevere();
     this.subscribers.forEach(([type, cb]) => type === 'event' && cb(event));
   }
 

@@ -14,9 +14,9 @@ export type Integration<T = any> = {
   forwardedContentType?: string[];
 
   /**
-   * Array of tabs to be displayed in the Spotlight UI
+   * A function returning an array of tabs to be displayed in the UI.
    */
-  tabs?: IntegrationTab<T>[];
+  tabs?: TabsCreationFunction<T>;
 
   /**
    * Setup hook called when Spotlight is initialized.
@@ -31,7 +31,7 @@ export type Integration<T = any> = {
    * data structure that your integration works with in the UI.
    * The returned object will be passed to your tabs.
    */
-  processEvent?: (event: RawEvent) => T | Promise<T>;
+  processEvent?: (eventContext: RawEventContext) => T | Promise<T>;
 };
 
 export type IntegrationTab<T> = {
@@ -46,23 +46,33 @@ export type IntegrationTab<T> = {
   title: string;
 
   /**
-   * The number of events that should be displayed next to the tab's title.
+   * If this property is set, a count badge will be displayed
+   * next to the tab title with the specified value.
    */
-  count?: number;
+  notificationCount?: number;
 
   /**
    * JSX content of the tab. Go crazy, this is all yours!
    */
   content?: React.ComponentType<{
-    integrationData: Record<string, T[]>;
+    integrationData: IntegrationData<T>;
   }>;
 
-  // TODO: I don't think these should be user-facing, right?
   onSelect?: () => void;
+
+  // TODO: I don't think this should be user-facing
   active?: boolean;
 };
 
-type RawEvent = {
+type IntegrationData<T> = Record<string, T[]>;
+
+type TabsContext<T> = {
+  integrationData: IntegrationData<T>;
+};
+
+type TabsCreationFunction<T> = (context: TabsContext<T>) => IntegrationTab<T>[];
+
+type RawEventContext = {
   /**
    * The content-type header of the event
    */
@@ -76,6 +86,14 @@ type RawEvent = {
    * Return the processed object or undefined if the event should be ignored.
    */
   data: string;
+
+  /**
+   * Calling this function will tell spotlight that the processed event is a severe
+   * event that should be highlighted in the general UI.
+   *
+   * For instance, this will have an effect on the Spotlight trigger button's counter appearance.
+   */
+  markEventSevere: () => void;
 };
 
 // export type IntegrationParameter = Array<Integration<unknown>>;

@@ -3,6 +3,7 @@ import Debugger from './components/Debugger';
 import Trigger from './components/Trigger';
 import type { Integration } from './integrations/integration';
 import { connectToSidecar } from './sidecar';
+import { TriggerButtonCount } from './types';
 
 const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
 
@@ -23,6 +24,7 @@ export default function App({
 
   const [integrationData, setIntegrationData] = useState<Record<string, Array<unknown>>>({});
   const [isOnline, setOnline] = useState(false);
+  const [triggerButtonCount, setTriggerButtonCount] = useState<TriggerButtonCount>({ general: 0, severe: 0 });
 
   useEffect(() => {
     // Map that holds the information which kind of content type should be dispatched to which integration(s)
@@ -42,6 +44,7 @@ export default function App({
       contentTypeToIntegrations,
       setIntegrationData,
       setOnline,
+      setTriggerButtonCount,
     );
 
     return () => {
@@ -60,7 +63,7 @@ export default function App({
 
   return (
     <>
-      {showTriggerButton && <Trigger isOpen={isOpen} setOpen={setOpen} />}
+      {showTriggerButton && <Trigger isOpen={isOpen} setOpen={setOpen} count={triggerButtonCount} />}
       <Debugger
         isOpen={isOpen}
         setOpen={setOpen}

@@ -1,11 +1,13 @@
 import React from 'react';
 import { Integration } from './integrations/integration';
+import { TriggerButtonCount } from './types';
 
 export function connectToSidecar(
   sidecarUrl: string,
   contentTypeToIntegrations: Map<string, Integration<unknown>[]>,
   setIntegrationData: React.Dispatch<React.SetStateAction<Record<string, Array<unknown>>>>,
   setOnline: React.Dispatch<React.SetStateAction<boolean>>,
+  setTriggerButtonCount: React.Dispatch<React.SetStateAction<TriggerButtonCount>>,
 ): () => void {
   console.log('[Spotlight] Connecting to sidecar at', sidecarUrl);
   const source = new EventSource(sidecarUrl);
@@ -17,15 +19,27 @@ export function connectToSidecar(
       console.log(`[spotlight] Received new ${contentType} event`);
       integrations.forEach(integration => {
         if (integration.processEvent) {
+          // TODO: This will not stay but I'll refactor it later with a better processEvent API.
+          let isSevere = false;
+          const markEventSevere = (severe: boolean = true) => {
+            isSevere = severe;
+          };
           const processedEvent = integration.processEvent({
             contentType,
             data: event.data,
+            markEventSevere,
           });
           if (processedEvent) {
             setIntegrationData(prev => {
               return {
                 ...prev,
                 [contentType]: [...(prev[contentType] || []), processedEvent],
+              };
+            });
+            setTriggerButtonCount(prev => {
+              return {
+                ...prev,
+                [isSevere ? 'severe' : 'general']: prev[isSevere ? 'severe' : 'general'] + 1,
               };
             });
           }

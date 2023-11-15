@@ -19,7 +19,7 @@ export default function sentryIntegration() {
       hookIntoSentry();
     },
 
-    processEvent({ data }) {
+    processEvent({ data, markEventSevere }) {
       console.log('[spotlight] Received new envelope');
       const [rawHeader, ...rawEntries] = data.split('\n');
       const header = JSON.parse(rawHeader) as Envelope[0];
@@ -31,19 +31,22 @@ export default function sentryIntegration() {
       }
 
       const envelope = [header, items] as Envelope;
-      sentryDataCache.pushEnvelope(envelope);
+      sentryDataCache.pushEnvelope(envelope, markEventSevere);
 
       return envelope;
     },
-    tabs: [
+
+    tabs: ({ integrationData }) => [
       {
         id: 'errors',
         title: 'Errors',
+        notificationCount: integrationData['application/x-sentry-envelope']?.length,
         content: ErrorsTab,
       },
       {
         id: 'traces',
         title: 'Traces',
+        notificationCount: integrationData['application/x-sentry-envelope']?.length + 1,
         content: TracesTab,
       },
       {
