@@ -11,11 +11,11 @@ export default function consoleIntegration() {
   return {
     name: 'console',
     forwardedContentType: [HEADER],
-    tabs: ({ integrationData }) => [
+    tabs: ({ processedEvents }) => [
       {
         id: 'console',
         title: 'Browser Console Logs',
-        notificationCount: integrationData[HEADER]?.length,
+        notificationCount: processedEvents.length,
         content: ConsoleTab,
       },
     ],
@@ -29,7 +29,9 @@ export default function consoleIntegration() {
     processEvent({ data }) {
       const msgJson = JSON.parse(data) as ConsoleMessage;
 
-      return msgJson;
+      return {
+        event: msgJson,
+      };
     },
   } satisfies Integration;
 }

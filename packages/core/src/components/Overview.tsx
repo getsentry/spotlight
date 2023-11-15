@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { Integration } from '~/integrations/integration';
+import { Integration, IntegrationData } from '~/integrations/integration';
 import Tabs from './Tabs';
 
 const DEFAULT_TAB = 'errors';
@@ -10,19 +10,21 @@ export default function Overview({
   integrationData,
 }: {
   integrations: Integration[];
-  integrationData: Record<string, Array<unknown>>;
+  integrationData: IntegrationData<unknown>;
 }) {
   const [activeTab, setActiveTab] = useState(DEFAULT_TAB);
 
   const tabs = integrations
     .map(integration => {
       if (integration.tabs) {
-        return integration.tabs({ integrationData }).map(tab => ({
+        const processedEvents = integrationData[integration.name]?.map(container => container.event) || [];
+        return integration.tabs({ processedEvents }).map(tab => ({
           ...tab,
           active: activeTab === tab.id,
           onSelect: () => {
             setActiveTab(tab.id);
           },
+          processedEvents: processedEvents,
         }));
       }
       return [];
@@ -45,7 +47,7 @@ export default function Overview({
               <Route
                 path={`/${tab.id}/*`}
                 key={tab.id}
-                element={<TabContent integrationData={integrationData} key={tab.id} />}
+                element={<TabContent processedEvents={tab.processedEvents} key={tab.id} />}
               ></Route>
             );
           })}

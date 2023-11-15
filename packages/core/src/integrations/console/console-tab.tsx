@@ -1,11 +1,10 @@
 import { ConsoleMessage } from './types';
 
 type Props = {
-  consoleMessages?: ConsoleMessage[];
-  integrationData: Record<string, Array<ConsoleMessage>>;
+  processedEvents?: ConsoleMessage[];
 };
-export default function ConsoleTab({ integrationData }: Props) {
-  const messages = (integrationData['application/x-spotlight-console'] || []) as ConsoleMessage[];
+export default function ConsoleTab({ processedEvents }: Props) {
+  const messages = (processedEvents || []) as ConsoleMessage[];
 
   return (
     <div className="divide-y divide-indigo-500 bg-indigo-950 p-4">
