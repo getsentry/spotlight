@@ -1,13 +1,18 @@
 {
   "name": "@spotlightjs/astro",
-  "description": "Add spotlight to your Astro toolbar, for better debugging.",
   "version": "0.0.4",
-  "type": "module",
+  "description": "Add spotlight to your Astro toolbar, for better debugging.",
+  "author": "Sentry",
+  "repository": "git@github.com:getsentry/spotlight.git",
+  "homepage": "https://github.com/getsentry/spotlight/blob/main/packages/astro/README.md",
   "keywors": [
     "astro",
     "withastro",
-    "astro-component"
+    "astro-component",
+    "astro-integration",
+    "devtools"
   ],
+  "license": "MIT",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -15,6 +20,7 @@
     "preview": "astro preview",
     "astro": "astro"
   },
+  "type": "module",
   "main": "./src/index.tx",
   "exports": {
     ".": "./src/index.ts"

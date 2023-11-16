@@ -25,6 +25,8 @@ export default defineConfig({
   },
   integrations: [
     sentry({ debug: true }),
+    spotlight(),
+
     starlight({
       title: 'Spotlight',
       social: {
@@ -84,6 +86,5 @@ export default defineConfig({
     tailwind({
       applyBaseStyles: false,
     }),
-    spotlight(),
   ],
 });
