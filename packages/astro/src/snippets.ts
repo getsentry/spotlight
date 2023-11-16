@@ -8,18 +8,6 @@ init({
   ],
   showTriggerButton: false,
 });
-
-setTimeout(() => {
-  console.log("this message should show up in the Console tab eventually")
-}, 3000);
-
-setTimeout(() => {
-  console.log("this one, too ;)")
-}, 6000);
-
-setTimeout(() => {
-  console.warn("this warning, too ;)")
-}, 6000);
 `;
 
 export const SPOTLIGHT_SERVER_SNIPPET = `
@@ -61,7 +49,4 @@ console.log('[Spotlight]', globalThis.__SENTRY__);
   }
 );
 
-// setTimeout(() => {
-  Sentry.captureException(new Error('does this now show up in spotlight?'));
-// }, 2000);
 `;

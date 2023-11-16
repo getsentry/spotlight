@@ -19,10 +19,24 @@ function createStyleSheet(styles: string) {
 const spotlightEventTarget: EventTarget = new EventTarget();
 
 /**
- * Open or close the Spotlight UI
+ * Open the Spotlight debugger Window
  */
-export async function toggleSpotlight() {
-  spotlightEventTarget.dispatchEvent(new Event('toggle'));
+export async function openSpotlight() {
+  spotlightEventTarget.dispatchEvent(new CustomEvent('open'));
+}
+
+/**
+ * Close the Spotlight debugger Window
+ */
+export async function closeSpotlight() {
+  spotlightEventTarget.dispatchEvent(new CustomEvent('close'));
+}
+
+/**
+ * Invokes the passed in callback when the Spotlight debugger Window is closed
+ */
+export async function onClose(cb: () => void) {
+  spotlightEventTarget.addEventListener('closed', cb);
 }
 
 export async function init({
