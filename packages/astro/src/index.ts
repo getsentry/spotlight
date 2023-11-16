@@ -32,3 +32,5 @@ const createPlugin = (): AstroIntegration => {
 };
 
 export default createPlugin;
+
+export * from '@spotlightjs/core';
