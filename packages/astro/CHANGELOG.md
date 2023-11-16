@@ -1,5 +1,17 @@
 # @spotlightjs/astro
 
+## 0.0.4
+
+### Patch Changes
+
+- fix(astro): Correctly reset toolbar button state ([#49](https://github.com/getsentry/spotlight/pull/49))
+
+- Re-export core exports from astro package ([#47](https://github.com/getsentry/spotlight/pull/47))
+
+- Updated dependencies
+  [[`8c485ba`](https://github.com/getsentry/spotlight/commit/8c485ba0e9fad2f91e853f571b10e9956494b2e5)]:
+  - @spotlightjs/core@0.0.7
+
 ## 0.0.3
 
 ### Patch Changes
