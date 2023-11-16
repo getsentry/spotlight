@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 0.0.7
+
+### Patch Changes
+
+- fix(astro): Correctly reset toolbar button state ([#49](https://github.com/getsentry/spotlight/pull/49))
+
 ## 0.0.6
 
 ### Patch Changes
