@@ -6,9 +6,8 @@
   @apply fixed bottom-2 right-2 inline-flex items-center justify-center gap-x-2 rounded border px-3 py-2 font-medium opacity-80 hover:opacity-100;
   @apply font-raleway border-indigo-950 bg-indigo-900 text-sm font-light uppercase tracking-widest text-white;
 
-  z-index: 2147483647;
+  z-index: 999999;
   cursor: pointer;
-  /* transform: rotate(-90deg) translateY(16px); */
 }
 
 .sentry-trigger span {
@@ -17,8 +16,9 @@
 
 .fullscreen-blur {
   @apply fixed flex h-screen w-screen flex-col overflow-auto bg-black bg-opacity-50 backdrop-blur-sm backdrop-filter;
-  z-index: 2147483647;
+  z-index: 999998;
   padding: 2.5vh;
+  padding-bottom: 22vh;
 }
 
 .sentry-debugger {
