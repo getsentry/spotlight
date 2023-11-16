@@ -1,5 +1,12 @@
 # @spotlightjs/astro
 
+## 0.0.5
+
+### Patch Changes
+
+- fix(astro): Add package.json entries for `astro add` compatiblity
+  ([`d78de7d`](https://github.com/getsentry/spotlight/commit/d78de7dae5d384d31710e6f8f774a2f202e24905))
+
 ## 0.0.4
 
 ### Patch Changes
