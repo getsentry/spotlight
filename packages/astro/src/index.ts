@@ -1,4 +1,3 @@
-import { setupSidecar } from '@spotlightjs/sidecar';
 import type { AstroIntegration } from 'astro';
 import { SPOTLIGHT_CLIENT_INIT, SPOTLIGHT_SERVER_SNIPPET } from './snippets';
 
@@ -24,7 +23,9 @@ const createPlugin = (): AstroIntegration => {
         addDevOverlayPlugin(pluginPath);
       },
       'astro:server:start': async () => {
-        console.log('astro:server:start ------------');
+        // Importing this dynamically because for some reason, the top level import
+        // caused a dev server error because sidecar code was bundled into the server
+        const { setupSidecar } = await import('@spotlightjs/sidecar');
         setupSidecar();
       },
     },
