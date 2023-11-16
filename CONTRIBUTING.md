@@ -7,18 +7,12 @@
 
 ### Run Local Dev build
 
-If you want to locally open two terminals
+If you want to run this locally for development, you have to open two terminals and run the following commands:
 
-One is for building & watching Spotlight locally.
+1. Terminal 1: `pnpm dev:core`
+2. Terminal 2: `pnpm dev:website`
 
-1. `cd packages/core`
-2. `pnpm dev`
-
-The other is to run the website locally:
-
-1. `cd packages/website`
-2. `pnpm dev`
-3. `open http://localhost:4321/spotlight`
+Then you can find the website under http://localhost:4321/spotlight.
 
 ## Changesets
 

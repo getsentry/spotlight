@@ -2,8 +2,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm -r --parallel dev",
-    "build": "pnpm -r --parallel build",
+    "dev:core": "pnpm --filter core dev",
+    "dev:website": "pnpm --filter spotlight-website dev",
+    "build": "pnpm -r run build",
     "preview": "pnpm -r run preview",
     "lint": "eslint . --cache --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preinstall": "npx only-allow pnpm",
