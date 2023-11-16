@@ -25,6 +25,7 @@ export default function App({
   const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});
   const [isOnline, setOnline] = useState(false);
   const [triggerButtonCount, setTriggerButtonCount] = useState<TriggerButtonCount>({ general: 0, severe: 0 });
+  const [isOpen, setOpen] = useState(fullScreen);
 
   useEffect(() => {
     // Map that holds the information which kind of content type should be dispatched to which integration(s)
@@ -53,11 +54,19 @@ export default function App({
     };
   }, [integrations]);
 
-  const [isOpen, setOpen] = useState(fullScreen);
-
-  eventTarget.addEventListener('toggle', () => {
-    setOpen(!isOpen);
+  eventTarget.addEventListener('open', () => {
+    setOpen(true);
   });
+
+  eventTarget.addEventListener('close', () => {
+    setOpen(false);
+  });
+
+  useEffect(() => {
+    if (!isOpen) {
+      eventTarget.dispatchEvent(new CustomEvent('closed'));
+    }
+  }, [isOpen, eventTarget]);
 
   console.log('[Spotlight] Integrations', integrationData);
 

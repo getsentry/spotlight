@@ -23,8 +23,20 @@ export default {
       }),
     );
 
-    eventTarget.addEventListener('plugin-toggle', () => {
-      Spotlight.toggleSpotlight();
+    eventTarget.addEventListener('plugin-toggled', e => {
+      // e.detail.state exists, see https://docs.astro.build/en/reference/dev-overlay-plugin-reference/#plugin-toggled
+      const shouldOpen = (e as CustomEvent).detail.state;
+      shouldOpen ? Spotlight.openSpotlight() : Spotlight.closeSpotlight();
+    });
+
+    Spotlight.onClose(() => {
+      eventTarget.dispatchEvent(
+        new CustomEvent('toggle-plugin', {
+          detail: {
+            state: false,
+          },
+        }),
+      );
     });
   },
 } satisfies DevOverlayPlugin;
