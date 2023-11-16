@@ -1,10 +1,10 @@
 export const SPOTLIGHT_CLIENT_INIT = `
-import * as Spotlight from '@spotlightjs/astro'; 
+import { init, sentry, console } from '@spotlightjs/astro'; 
 
-Spotlight.init({
+init({
   integrations: [
-    Spotlight.sentry(), 
-    Spotlight.console()
+    sentry(), 
+    console()
   ],
   showTriggerButton: false,
 });
