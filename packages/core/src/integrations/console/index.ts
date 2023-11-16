@@ -46,19 +46,23 @@ function instrumentConsole(level: Level, pageloadId: string) {
       return originalConsoleLog(...args);
     }
 
-    void fetch(`http://localhost:${PORT}/stream`, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: level,
-        args: serializedArgs,
-        msg: serializedArgs.join(' '),
-        sessionId: pageloadId,
-      } satisfies ConsoleMessage),
-      headers: {
-        'Content-Type': HEADER,
-      },
-      mode: 'cors',
-    });
+    try {
+      void fetch(`http://localhost:${PORT}/stream`, {
+        method: 'POST',
+        body: JSON.stringify({
+          type: level,
+          args: serializedArgs,
+          msg: serializedArgs.join(' '),
+          sessionId: pageloadId,
+        } satisfies ConsoleMessage),
+        headers: {
+          'Content-Type': HEADER,
+        },
+        mode: 'cors',
+      }).catch(() => {});
+    } catch {
+      // ignore failed fetch requests
+    }
 
     return originalConsoleLog(...args);
   };
