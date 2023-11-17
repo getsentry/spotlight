@@ -1,0 +1,28 @@
+{
+  "name": "@spotlightjs/spotlight-astro-playground",
+  "description": "Playground for testing Spotlight in an Astro SSR app with islands",
+  "type": "module",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.3.1",
+    "@astrojs/node": "^6.0.4",
+    "@astrojs/react": "^3.0.5",
+    "@astrojs/svelte": "^4.0.4",
+    "@sentry/astro": "^7.80.1",
+    "@spotlightjs/astro": "workspace:*",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "astro": "^3.5.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "svelte": "^5.0.0-next.1",
+    "typescript": "^5.2.2"
+  }
+}
