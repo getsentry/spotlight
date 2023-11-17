@@ -1,4 +1,4 @@
-import { SentryEvent } from '~/types';
+import { SentryEvent } from '../types';
 
 const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
   name: "Mighty Fighter",
