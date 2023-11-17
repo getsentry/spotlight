@@ -50,12 +50,12 @@ export default defineConfig({
           label: 'Setup',
           items: [
             {
-              label: 'for your custom project',
-              link: '/setup/',
-            },
-            {
               label: 'for Astro',
               link: '/setup/astro/',
+            },
+            {
+              label: 'for your project',
+              link: '/setup/',
             },
           ],
         },
