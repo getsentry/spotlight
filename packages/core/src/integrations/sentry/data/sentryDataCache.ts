@@ -1,6 +1,6 @@
 import { Envelope } from '@sentry/types';
 import { generate_uuidv4 } from '~/lib/uuid';
-import { Sdk, SentryEvent, SentryTransactionEvent, Span, Trace } from '~/types';
+import { Sdk, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
 import { groupSpans } from '../utils/traces';
 
 function toTimestamp(date: string | number) {

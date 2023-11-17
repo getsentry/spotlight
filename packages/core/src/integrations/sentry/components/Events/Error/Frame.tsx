@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import classNames from '~/lib/classNames';
-import { EventFrame, FrameVars } from '~/types';
+import { EventFrame, FrameVars } from '../../../types';
 
 function formatFilename(filename: string) {
   if (filename.indexOf('/node_modules/') === -1) return filename;

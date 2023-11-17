@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import React, { useEffect, useReducer } from 'react';
 import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
-import { SentryEvent } from '~/types';
+import { SentryEvent } from '../types';
 
 export const SentryEventsContext = React.createContext<SentryEvent[]>([]);
 

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
-import { SentryErrorEvent, Span, TraceContext } from '~/types';
 import dataCache from '../data/sentryDataCache';
+import { SentryErrorEvent, Span, TraceContext } from '../types';
 import { getDuration } from '../utils/duration';
 import DateTime from './DateTime';
 import { ErrorTitle } from './Events/Error';

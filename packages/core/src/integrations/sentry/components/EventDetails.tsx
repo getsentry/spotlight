@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, Outlet, Route, Routes, useParams } from 'react-router-dom';
 import Tabs from '~/components/Tabs';
-import { SentryEvent } from '~/types';
 import sentryDataCache from '../data/sentryDataCache';
+import { SentryEvent } from '../types';
 import EventBreadcrumbs from './EventBreadcrumbs';
 import EventContexts from './EventContexts';
 import Error, { ErrorTitle } from './Events/Error';

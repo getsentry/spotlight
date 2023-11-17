@@ -1,4 +1,4 @@
-import { Span } from '~/types';
+import { Span } from '../types';
 
 // mutates spans in place and adds children, as well as returns the top level tree
 export function groupSpans(spans: Span[]) {

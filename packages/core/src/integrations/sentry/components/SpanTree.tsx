@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import classNames from '~/lib/classNames';
-import { Span, TraceContext } from '~/types';
+import { Span, TraceContext } from '../types';
 import { getDuration, getSpanDurationClassName } from '../utils/duration';
 import PlatformIcon from './PlatformIcon';
 
