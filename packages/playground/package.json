@@ -3,6 +3,7 @@
   "description": "Playground for testing Spotlight in an Astro SSR app with islands",
   "type": "module",
   "version": "0.0.0",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",

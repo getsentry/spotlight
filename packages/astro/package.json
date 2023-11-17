@@ -1,7 +1,8 @@
 {
   "name": "@spotlightjs/astro",
-  "version": "0.0.5",
   "description": "Add spotlight to your Astro toolbar, for better debugging.",
+  "version": "0.0.5",
+  "license": "Apache-2.0",
   "author": "Sentry",
   "repository": "git@github.com:getsentry/spotlight.git",
   "homepage": "https://github.com/getsentry/spotlight/blob/main/packages/astro/README.md",
@@ -12,7 +13,6 @@
     "astro-integration",
     "devtools"
   ],
-  "license": "MIT",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
