@@ -1,0 +1,10 @@
+---
+import {GET} from '../api/hello.ts'
+
+let response = await GET(Astro)
+const data = await response.json()
+---
+
+<h1>SSR error page</h1>
+
+{data.greeting}
