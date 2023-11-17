@@ -1,11 +1,15 @@
 import starlightPlugin from '@astrojs/starlight-tailwind';
 import typographyPlugin from '@tailwindcss/typography';
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   theme: {
     extend: {
+      fontFamily: {
+        raleway: ['Raleway', ...defaultTheme.fontFamily.sans],
+      },
       animation: {
         fadeIn: '0.5s fadeIn forwards',
         fadeOut: '0.5s fadeOut forwards',

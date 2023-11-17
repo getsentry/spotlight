@@ -18,11 +18,10 @@
   @apply fixed flex h-screen w-screen flex-col overflow-auto bg-black bg-opacity-50 backdrop-blur-sm backdrop-filter;
   z-index: 999998;
   padding: 2.5vh;
-  padding-bottom: 22vh;
 }
 
 .sentry-debugger {
-  @apply flex flex-col overflow-auto rounded-lg bg-indigo-900 font-sans text-white shadow-xl;
+  @apply flex h-full flex-col overflow-auto rounded-lg bg-indigo-900 font-sans text-white shadow-xl;
 }
 
 /* .sentry-debugger .tree li {
