@@ -1,8 +1,8 @@
-import { SentryErrorEvent } from '../../types';
+import { EventException, EventExceptionValue, SentryErrorEvent } from '../../types';
 import Frame from './Error/Frame';
 
 export function ErrorTitle({ event }: { event: SentryErrorEvent }) {
-  const values = 'values' in event.exception ? event.exception.values : [event.exception.value];
+  const values = arraifyValues(event.exception);
 
   return (
     <>
@@ -12,7 +12,7 @@ export function ErrorTitle({ event }: { event: SentryErrorEvent }) {
 }
 
 export function ErrorSummary({ event }: { event: SentryErrorEvent }) {
-  const values = 'values' in event.exception ? event.exception.values : [event.exception.value];
+  const values = arraifyValues(event.exception);
 
   return (
     <div className="space-y-4 font-mono">
@@ -25,7 +25,7 @@ export function ErrorSummary({ event }: { event: SentryErrorEvent }) {
 }
 
 export default function Error({ event }: { event: SentryErrorEvent }) {
-  const values = 'values' in event.exception ? event.exception.values : [event.exception.value];
+  const values = arraifyValues(event.exception);
 
   return (
     <>
@@ -48,4 +48,11 @@ export default function Error({ event }: { event: SentryErrorEvent }) {
       </ol>
     </>
   );
+}
+
+function arraifyValues(exception: EventException): EventExceptionValue[] {
+  if (exception.value) {
+    return [exception.value];
+  }
+  return exception.values;
 }

@@ -29,8 +29,10 @@ export type EventExceptionValue = {
 export type EventException =
   | {
       values: EventExceptionValue[];
+      value: undefined;
     }
   | {
+      values: undefined;
       value: EventExceptionValue;
     };
 
