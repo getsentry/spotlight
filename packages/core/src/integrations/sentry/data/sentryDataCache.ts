@@ -1,6 +1,6 @@
 import { Envelope } from '@sentry/types';
 import { generate_uuidv4 } from '~/lib/uuid';
-import { Sdk, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
+import { Sdk, SentryErrorEvent, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
 import { groupSpans } from '../utils/traces';
 
 function toTimestamp(date: string | number) {
@@ -56,7 +56,15 @@ class SentryDataCache {
       event_id?: string;
     },
   ) {
-    if (!event.event_id) event.event_id = generate_uuidv4();
+    if (!event.event_id) {
+      event.event_id = generate_uuidv4();
+    }
+
+    console.log('DDDD', event);
+    if (isErrorEvent(event)) {
+      console.log('AAAA');
+      reverseStackTraces(event);
+    }
 
     event.timestamp = toTimestamp(event.timestamp);
     if (event.start_timestamp) event.start_timestamp = toTimestamp(event.start_timestamp);
@@ -170,3 +178,20 @@ class SentryDataCache {
 }
 
 export default new SentryDataCache();
+
+function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
+  return !event.type;
+}
+
+function reverseStackTraces(errorEvent: SentryErrorEvent): void {
+  if (!errorEvent.exception || !errorEvent.exception.values) {
+    console.log('CCC', errorEvent);
+    return;
+  }
+  errorEvent.exception.values.forEach(value => {
+    if (value.stacktrace) {
+      value.stacktrace.frames.reverse();
+    }
+  });
+  console.log('BBB', errorEvent.exception.values);
+}
