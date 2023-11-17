@@ -60,9 +60,7 @@ class SentryDataCache {
       event.event_id = generate_uuidv4();
     }
 
-    console.log('DDDD', event);
     if (isErrorEvent(event)) {
-      console.log('AAAA');
       reverseStackTraces(event);
     }
 
@@ -185,7 +183,6 @@ function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
 
 function reverseStackTraces(errorEvent: SentryErrorEvent): void {
   if (!errorEvent.exception || !errorEvent.exception.values) {
-    console.log('CCC', errorEvent);
     return;
   }
   errorEvent.exception.values.forEach(value => {
@@ -193,5 +190,4 @@ function reverseStackTraces(errorEvent: SentryErrorEvent): void {
       value.stacktrace.frames.reverse();
     }
   });
-  console.log('BBB', errorEvent.exception.values);
 }
