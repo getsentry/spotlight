@@ -5,6 +5,8 @@ import spotlight from '@spotlightjs/astro';
 import { defineConfig } from 'astro/config';
 import Inspect from 'vite-plugin-inspect';
 
+import vercel from '@astrojs/vercel/serverless';
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://getsentry.github.io',
@@ -24,9 +26,10 @@ export default defineConfig({
     devOverlay: true,
   },
   integrations: [
-    sentry({ debug: true }),
+    sentry({
+      debug: true,
+    }),
     spotlight(),
-
     starlight({
       title: 'Spotlight',
       social: {
@@ -87,4 +90,6 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
   ],
+  output: 'server',
+  adapter: vercel(),
 });

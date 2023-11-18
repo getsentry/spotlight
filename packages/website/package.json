@@ -15,6 +15,7 @@
     "@astrojs/starlight": "^0.11.2",
     "@astrojs/starlight-tailwind": "^2.0.0",
     "@astrojs/tailwind": "^5.0.2",
+    "@astrojs/vercel": "^5.2.0",
     "@fontsource/raleway": "^5.0.8",
     "@sentry/astro": "^7.80.0",
     "astro": "^3.5.4",
