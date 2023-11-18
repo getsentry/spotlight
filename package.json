@@ -2,10 +2,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:core": "pnpm --filter core dev",
+    "dev:core": "pnpm --filter core sidecar dev",
     "dev:website": "pnpm --filter spotlight-website dev",
     "dev:playground": "pnpm --filter spotlight-astro-playground dev",
-    "build": "pnpm -r run build",
+    "build": "pnpm --filter=!spotlight-astro-playground -r run build",
     "preview": "pnpm -r run preview",
     "lint": "eslint . --cache --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preinstall": "npx only-allow pnpm",
