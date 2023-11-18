@@ -9,8 +9,8 @@ import vercelStatic from '@astrojs/vercel/static';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://getsentry.github.io',
-  base: '/spotlight',
+  site: 'https://spotlightjs.com',
+  // base: '/spotlight',
   vite: {
     plugins: [
       Inspect({
