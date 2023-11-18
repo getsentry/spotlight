@@ -5,7 +5,7 @@ import spotlight from '@spotlightjs/astro';
 import { defineConfig } from 'astro/config';
 import Inspect from 'vite-plugin-inspect';
 
-import vercel from '@astrojs/vercel/serverless';
+import vercelStatic from '@astrojs/vercel/static';
 
 // https://astro.build/config
 export default defineConfig({
@@ -90,6 +90,6 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
   ],
-  output: 'server',
-  adapter: vercel(),
+  output: 'static',
+  adapter: vercelStatic(),
 });
