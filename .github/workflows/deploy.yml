@@ -34,10 +34,10 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: './packages/website/dist/'
+      # - name: Upload Pages Artifact
+      #   uses: actions/upload-pages-artifact@v1
+      #   with:
+      #     path: './packages/website/.vercel/'
 
   # deploy:
   #   needs: build
