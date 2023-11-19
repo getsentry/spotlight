@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:core": "pnpm --filter core sidecar dev",
+    "dev:core": "pnpm --filter core dev",
     "dev:website": "pnpm --filter spotlight-website dev",
     "dev:playground": "pnpm --filter spotlight-astro-playground dev",
     "build": "pnpm --filter=!spotlight-astro-playground -r run build",

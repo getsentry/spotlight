@@ -13,9 +13,12 @@ hero:
       variant: primary
     - text: Read the Spotlight docs
       link: /reference/configuration/
+
+
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+import ReactIsland from './error'
 
 ## Next steps
 
@@ -27,9 +30,10 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     TODO
   </Card>
   <Card title="TODO" icon="setting">
-    <button onClick="throw new Error('Houston, we have a problem!')">Throw Error</button>
+    <button onClick="throwError()">Throw Error</button>
   </Card>
   <Card title="TODO" icon="open-book">
-    TODO
+    <ReactIsland client:load />
   </Card>
 </CardGrid>
+

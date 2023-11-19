@@ -9,6 +9,7 @@ import { initIntegrations } from './integrations/integration.ts';
 
 export { default as console } from './integrations/console/index.ts';
 export { default as sentry } from './integrations/sentry/index.ts';
+export { default as viteInspect } from './integrations/vite-inspect/index.ts';
 
 function createStyleSheet(styles: string) {
   const sheet = new CSSStyleSheet();

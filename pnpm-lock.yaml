@@ -212,6 +212,9 @@ importers:
 
   packages/website:
     dependencies:
+      '@astrojs/react':
+        specifier: ^3.0.5
+        version: 3.0.5(@types/react-dom@18.2.15)(@types/react@18.2.37)(react-dom@18.2.0)(react@18.2.0)(vite@4.5.0)
       '@astrojs/starlight':
         specifier: ^0.11.2
         version: 0.11.2(astro@3.5.4)
@@ -229,10 +232,22 @@ importers:
         version: 5.0.8
       '@sentry/astro':
         specifier: ^7.80.0
-        version: 7.80.0(astro@3.5.4)
+        version: link:../../../sentry-javascript/packages/astro
+      '@types/react':
+        specifier: ^18.0.21
+        version: 18.2.37
+      '@types/react-dom':
+        specifier: ^18.0.6
+        version: 18.2.15
       astro:
         specifier: ^3.5.4
         version: 3.5.4(typescript@5.2.2)
+      react:
+        specifier: ^18.0.0
+        version: 18.2.0
+      react-dom:
+        specifier: ^18.0.0
+        version: 18.2.0(react@18.2.0)
       sharp:
         specifier: ^0.32.6
         version: 0.32.6
@@ -1950,25 +1965,6 @@ packages:
       '@sentry/utils': 7.80.1
     dev: false
 
-  /@sentry/astro@7.80.0(astro@3.5.4):
-    resolution:
-      { integrity: sha512-Ogtvdhw1+fpRWIqLgsAwhIxl7ODVwUXGlZUQnO5PD/ruxlrzY5ieCOdqO6t6X/iI/c0UtBS7PXqQfzNftviiIg== }
-    engines: { node: '>=18.14.1' }
-    peerDependencies:
-      astro: 3.x
-    dependencies:
-      '@sentry/browser': 7.80.0
-      '@sentry/core': 7.80.0
-      '@sentry/node': 7.80.0
-      '@sentry/types': 7.80.0
-      '@sentry/utils': 7.80.0
-      '@sentry/vite-plugin': 2.9.0
-      astro: 3.5.4(typescript@5.2.2)
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-    dev: false
-
   /@sentry/astro@7.80.1(astro@3.5.5):
     resolution:
       { integrity: sha512-aKV8V5b8H5EY5JtCT0uZyy8D/Ne2RqNUqzQZbJb/HT8PuRvMUmWH1RJAb6jCUtH0GObgFZLoSP79xglA9IiZGA== }
@@ -1986,18 +1982,6 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
-    dev: false
-
-  /@sentry/browser@7.80.0:
-    resolution:
-      { integrity: sha512-Ngwjc+yyf/aH5q7iQM1LeDNlhM1Ilt4ZLUogTghZR/guwNWmCtk3OHcjOLz7fxBBj9wGFUc2pHPyeYM6bQhrEw== }
-    engines: { node: '>=8' }
-    dependencies:
-      '@sentry-internal/tracing': 7.80.0
-      '@sentry/core': 7.80.0
-      '@sentry/replay': 7.80.0
-      '@sentry/types': 7.80.0
-      '@sentry/utils': 7.80.0
     dev: false
 
   /@sentry/browser@7.80.1:
@@ -2091,17 +2075,6 @@ packages:
       https-proxy-agent: 5.0.1
     transitivePeerDependencies:
       - supports-color
-    dev: false
-
-  /@sentry/replay@7.80.0:
-    resolution:
-      { integrity: sha512-wWnpuJq3OaDLp1LutE4oxWXnau04fvwuzBjuaFvOXOV+pB/kn+pDPuVOC5+FH/RMRZ5ftwX5+dF6fojfcLVGCg== }
-    engines: { node: '>=12' }
-    dependencies:
-      '@sentry-internal/tracing': 7.80.0
-      '@sentry/core': 7.80.0
-      '@sentry/types': 7.80.0
-      '@sentry/utils': 7.80.0
     dev: false
 
   /@sentry/replay@7.80.1:
@@ -2542,7 +2515,7 @@ packages:
     resolution:
       { integrity: sha512-GRaAEriuT4zp9N4p1i8BDBYmEyfo+xQ3yHjJU4eiK5NDa1RmUZG+unZABUTK4/Ox/M+GaHwb6Ow8rUITrtjszA== }
     dependencies:
-      '@types/react': 18.2.15
+      '@types/react': 18.2.37
     dev: true
 
   /@types/react@18.2.15:
@@ -2552,6 +2525,7 @@ packages:
       '@types/prop-types': 15.7.9
       '@types/scheduler': 0.16.5
       csstype: 3.1.2
+    dev: true
 
   /@types/react@18.2.37:
     resolution:
@@ -2560,7 +2534,6 @@ packages:
       '@types/prop-types': 15.7.9
       '@types/scheduler': 0.16.5
       csstype: 3.1.2
-    dev: false
 
   /@types/sax@1.2.6:
     resolution:
@@ -7811,7 +7784,7 @@ packages:
       react: '*'
     dependencies:
       '@types/node': 18.18.8
-      '@types/react': 18.2.15
+      '@types/react': 18.2.37
       react: 18.2.0
     dev: false
 

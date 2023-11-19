@@ -1,16 +1,16 @@
 import starlight from '@astrojs/starlight';
 import tailwind from '@astrojs/tailwind';
+import vercelStatic from '@astrojs/vercel/static';
 import sentry from '@sentry/astro';
 import spotlight from '@spotlightjs/astro';
 import { defineConfig } from 'astro/config';
 import Inspect from 'vite-plugin-inspect';
 
-import vercelStatic from '@astrojs/vercel/static';
+import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://spotlightjs.com',
-  // base: '/spotlight',
   vite: {
     plugins: [
       Inspect({
@@ -89,6 +89,7 @@ export default defineConfig({
     tailwind({
       applyBaseStyles: false,
     }),
+    react(),
   ],
   output: 'static',
   adapter: vercelStatic(),
