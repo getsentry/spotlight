@@ -63,6 +63,12 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Sidecar',
+          autogenerate: {
+            directory: 'sidecar',
+          },
+        },
+        {
           label: 'Guides',
           items: [
             {

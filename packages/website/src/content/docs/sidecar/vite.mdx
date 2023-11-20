@@ -1,0 +1,18 @@
+---
+title: Run Sidecar with Vite
+---
+
+```sh
+npm install @spotlightjs/sidecar --save-dev
+```
+
+```js
+// vite.config.js
+import { defineConfig } from 'vite'
+import spotlightSidecar from '@spotlightjs/sidecar/vite-plugin';
+
+export default defineConfig({
+  plugins: [spotlightSidecar()],
+})
+
+```

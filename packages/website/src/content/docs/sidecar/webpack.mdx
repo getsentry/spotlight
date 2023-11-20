@@ -1,0 +1,35 @@
+---
+title: Run Sidecar with Webpack
+---
+
+```sh
+npm install webpack-hook-plugin --save-dev
+```
+
+```js
+// webpack.config.js
+const path = require("path");
+const WebpackHookPlugin = require("webpack-hook-plugin");
+
+module.exports = {
+  watch: true,
+  devServer: {
+    static: {
+      directory: path.join(__dirname, "dist"),
+    },
+    compress: true,
+    port: 9000,
+  },
+  entry: "./src/index.js",
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "dist"),
+  },
+  plugins: [
+    new WebpackHookPlugin({
+      onBuildStart: ["node node_modules/@spotlightjs/sidecar/src/run.js"],
+    }),
+  ],
+};
+
+```
