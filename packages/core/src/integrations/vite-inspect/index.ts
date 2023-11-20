@@ -1,7 +1,7 @@
 import type { Integration } from '../integration';
 import ViteInspect from './vite-inspect';
 
-export default function consoleIntegration() {
+export default function viteInspectIntegration() {
   return {
     name: 'vite-inspect',
     tabs: () => [
