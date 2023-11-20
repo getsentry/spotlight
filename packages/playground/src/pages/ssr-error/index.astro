@@ -1,7 +1,9 @@
 ---
 import {GET} from '../api/hello.ts'
 
+// @ts-ignore
 let response = await GET(Astro)
+// @ts-ignore
 const data = await response.json()
 ---
 

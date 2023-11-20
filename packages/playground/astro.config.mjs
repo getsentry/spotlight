@@ -17,27 +17,7 @@ export default defineConfig({
       sourcemap: true,
     },
     server: {},
-    plugins: [
-      {
-        id: 'test-plugin',
-        transform(code, id) {
-          //   if (code.includes("error")) {
-          //     console.log("----------");
-          //     console.log(code);
-          //   }
-          return code;
-        },
-        configureServer(server) {
-          server.middlewares.use((err, req, res, next) => {
-            console.log('----------');
-            console.log({
-              err,
-            });
-            next();
-          });
-        },
-      },
-    ],
+    plugins: [],
   },
   adapter: node({
     mode: 'standalone',

@@ -6,6 +6,7 @@ import App from './App.tsx';
 import globalStyles from './index.css?inline';
 import type { Integration } from './integrations/integration.ts';
 import { initIntegrations } from './integrations/integration.ts';
+import { WindowWithSpotlight } from './types.ts';
 
 export { default as console } from './integrations/console/index.ts';
 export { default as sentry } from './integrations/sentry/index.ts';
@@ -45,14 +46,23 @@ export async function init({
   showTriggerButton = true,
   integrations,
   defaultEventId,
+  injectImmediately = false,
 }: {
   integrations?: Integration[];
   fullScreen?: boolean;
   defaultEventId?: string;
   sidecarUrl?: string;
   showTriggerButton?: boolean;
+  injectImmediately?: boolean;
 } = {}) {
   if (typeof document === 'undefined') return;
+
+  // We only want to intialize and inject spotlight once. If it's already
+  // been initialized, we can just bail out.
+  const windowWithSpotlight = window as WindowWithSpotlight;
+  if (windowWithSpotlight.__spotlight_initialized) {
+    return;
+  }
 
   const initializedIntegrations = await initIntegrations(integrations);
 
@@ -88,9 +98,18 @@ export async function init({
     // </React.StrictMode>
   );
 
-  window.addEventListener('load', () => {
+  function injectSpotlight() {
     console.log('[spotlight] Injecting into application');
-
     document.body.append(docRoot);
-  });
+  }
+
+  if (injectImmediately) {
+    injectSpotlight();
+  } else {
+    window.addEventListener('load', () => {
+      injectSpotlight();
+    });
+  }
+
+  windowWithSpotlight.__spotlight_initialized = true;
 }
