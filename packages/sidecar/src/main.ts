@@ -1,4 +1,5 @@
 import { IncomingMessage, Server, ServerResponse, createServer } from 'http';
+import { bold, magenta } from 'kleur';
 
 const defaultResponse = `<!doctype html>
 <html>
@@ -100,7 +101,7 @@ function getCorsHeader(): { [name: string]: string } {
 }
 
 function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: MessageBuffer<Payload>): void {
-  console.log(`[spotlight] Received request ${req.method} ${req.url}`);
+  log(`Received request ${req.method} ${req.url}`);
   if (req.headers.accept && req.headers.accept == 'text/event-stream') {
     if (req.url == '/stream') {
       res.writeHead(200, {
@@ -177,10 +178,15 @@ function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
     }
   });
   server.listen(port, () => {
-    console.log(`[Spotlight] Sidecar listening on ${port}`);
+    log(`Sidecar listening on ${port}`);
   });
 
   return server;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function log(...args: any[]) {
+  console.log(bold(magenta('🔦 [Spotlight]')), ...args);
 }
 
 let serverInstance: Server;
@@ -195,7 +201,7 @@ export function setupSidecar(): void {
 
 function shutdown() {
   if (serverInstance) {
-    console.log('[Spotlight] Shutting down server');
+    log('Shutting down server');
     serverInstance.close();
   }
 }

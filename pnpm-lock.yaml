@@ -197,6 +197,10 @@ importers:
         version: 5.2.2
 
   packages/sidecar:
+    dependencies:
+      kleur:
+        specifier: ^4.1.5
+        version: 4.1.5
     devDependencies:
       '@spotlightjs/tsconfig':
         specifier: workspace:*
@@ -232,7 +236,7 @@ importers:
         version: 5.0.8
       '@sentry/astro':
         specifier: ^7.80.0
-        version: link:../../../sentry-javascript/packages/astro
+        version: 7.80.1(astro@3.5.4)
       '@types/react':
         specifier: ^18.0.21
         version: 18.2.37
@@ -1963,6 +1967,25 @@ packages:
       '@sentry/core': 7.80.1
       '@sentry/types': 7.80.1
       '@sentry/utils': 7.80.1
+    dev: false
+
+  /@sentry/astro@7.80.1(astro@3.5.4):
+    resolution:
+      { integrity: sha512-aKV8V5b8H5EY5JtCT0uZyy8D/Ne2RqNUqzQZbJb/HT8PuRvMUmWH1RJAb6jCUtH0GObgFZLoSP79xglA9IiZGA== }
+    engines: { node: '>=18.14.1' }
+    peerDependencies:
+      astro: 3.x
+    dependencies:
+      '@sentry/browser': 7.80.1
+      '@sentry/core': 7.80.1
+      '@sentry/node': 7.80.1
+      '@sentry/types': 7.80.1
+      '@sentry/utils': 7.80.1
+      '@sentry/vite-plugin': 2.9.0
+      astro: 3.5.4(typescript@5.2.2)
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
     dev: false
 
   /@sentry/astro@7.80.1(astro@3.5.5):
