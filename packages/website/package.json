@@ -19,10 +19,10 @@
     "@astrojs/vercel": "^5.2.0",
     "@fontsource/raleway": "^5.0.8",
     "@sentry/astro": "^7.80.0",
-    "@types/react": "^18.0.21",
-    "@types/react-dom": "^18.0.6",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
     "astro": "^3.5.4",
-    "react": "^18.0.0",
+    "react": "^18.2.0",
     "react-dom": "^18.0.0",
     "sharp": "^0.32.6",
     "tailwindcss": "^3.0.24"

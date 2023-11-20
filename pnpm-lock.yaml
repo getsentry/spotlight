@@ -118,11 +118,11 @@ importers:
         specifier: ^0.5.4
         version: 0.5.4(tailwindcss@3.3.3)
       '@types/react':
+        specifier: ^18.2.37
+        version: 18.2.37
+      '@types/react-dom':
         specifier: ^18.2.15
         version: 18.2.15
-      '@types/react-dom':
-        specifier: ^18.2.7
-        version: 18.2.7
       '@typescript-eslint/eslint-plugin':
         specifier: ^6.0.0
         version: 6.0.0(@typescript-eslint/parser@6.0.0)(eslint@8.45.0)(typescript@5.0.4)
@@ -238,16 +238,16 @@ importers:
         specifier: ^7.80.0
         version: 7.80.1(astro@3.5.4)
       '@types/react':
-        specifier: ^18.0.21
+        specifier: ^18.2.37
         version: 18.2.37
       '@types/react-dom':
-        specifier: ^18.0.6
+        specifier: ^18.2.15
         version: 18.2.15
       astro:
         specifier: ^3.5.4
         version: 3.5.4(typescript@5.2.2)
       react:
-        specifier: ^18.0.0
+        specifier: ^18.2.0
         version: 18.2.0
       react-dom:
         specifier: ^18.0.0
@@ -2532,23 +2532,6 @@ packages:
       { integrity: sha512-HWMdW+7r7MR5+PZqJF6YFNSCtjz1T0dsvo/f1BV6HkV+6erD/nA7wd9NM00KVG83zf2nJ7uATPO9ttdIPvi3gg== }
     dependencies:
       '@types/react': 18.2.37
-    dev: false
-
-  /@types/react-dom@18.2.7:
-    resolution:
-      { integrity: sha512-GRaAEriuT4zp9N4p1i8BDBYmEyfo+xQ3yHjJU4eiK5NDa1RmUZG+unZABUTK4/Ox/M+GaHwb6Ow8rUITrtjszA== }
-    dependencies:
-      '@types/react': 18.2.37
-    dev: true
-
-  /@types/react@18.2.15:
-    resolution:
-      { integrity: sha512-oEjE7TQt1fFTFSbf8kkNuc798ahTUzn3Le67/PWjE8MAfYAD/qB7O8hSTcromLFqHCt9bcdOg5GXMokzTjJ5SA== }
-    dependencies:
-      '@types/prop-types': 15.7.9
-      '@types/scheduler': 0.16.5
-      csstype: 3.1.2
-    dev: true
 
   /@types/react@18.2.37:
     resolution:

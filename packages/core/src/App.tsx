@@ -7,19 +7,20 @@ import { TriggerButtonCount } from './types';
 
 const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
 
+type AppProps = {
+  eventTarget: EventTarget;
+  fullScreen?: boolean;
+  showTriggerButton?: boolean;
+  defaultEventId?: string;
+  integrations?: Integration[];
+};
 export default function App({
   eventTarget,
   fullScreen = false,
   showTriggerButton = true,
   defaultEventId,
   integrations = [],
-}: {
-  eventTarget: EventTarget;
-  fullScreen?: boolean;
-  showTriggerButton?: boolean;
-  defaultEventId?: string;
-  integrations?: Integration[];
-}) {
+}: AppProps) {
   console.log('[Spotlight] App rerender');
 
   const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});

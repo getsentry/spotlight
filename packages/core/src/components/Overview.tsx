@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createElement, useState } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Integration, IntegrationData } from '~/integrations/integration';
 import Tabs from './Tabs';
@@ -40,16 +40,18 @@ export default function Overview({
         <Routes>
           <Route path="/not-found" element={<p>not fount</p>} key={'not-found'}></Route>
           {tabs.map(tab => {
-            const TabContent =
-              (tab.content && tab.content) || (() => <p>This tab doesn't seem to display anything (yet).</p>);
+            const TabContent = tab.content && tab.content;
 
-            return (
-              <Route
-                path={`/${tab.id}/*`}
-                key={tab.id}
-                element={<TabContent processedEvents={tab.processedEvents} key={tab.id} />}
-              ></Route>
-            );
+            if (TabContent) {
+              return (
+                <Route
+                  path={`/${tab.id}/*`}
+                  key={tab.id}
+                  element={createElement(TabContent, { processedEvents: tab.processedEvents })}
+                ></Route>
+              );
+            }
+            return;
           })}
         </Routes>
       </MemoryRouter>
