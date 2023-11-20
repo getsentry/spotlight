@@ -19,6 +19,9 @@
     ".": {
       "import": "./dist/main.js",
       "types": "./dist/main.d.ts"
+    },
+    "./vite-plugin": {
+      "import": "./src/vite-plugin.js"
     }
   },
   "dependencies": {},
