@@ -33,15 +33,11 @@ ${buildClientInit(options)}
 /**
  * Hook into Vite's client code to enable Spotlight if an error occurs.
  *
- * TODO: only init spotlight, if there isn't already a spotlight instance running!
- *       this could happen when the error overlay is shown after the pageload.
- *       For example, in an island performing an erroneous endpoint fetch
- *
- * - `enableOverlay` is defined in Vite's client code:
+ * Used variables from Vite's client code:
+ * - `enableOverlay` to check if the overlay should be shown
  *    @see https://github.com/vitejs/vite/blob/b9ee620108819e06023e4303af75a61d3e4e4d76/packages/vite/src/client/client.ts#L289
- * - `socket` is defined in Vite's client code and is used to communicate with the server:
+ * - `socket` to listen for incoming error events:
  *    @see https://github.com/vitejs/vite/blob/b9ee620108819e06023e4303af75a61d3e4e4d76/packages/vite/src/client/client.ts#L67
- *
  */
 export const buildSpotlightErrorPageSnippet = (options: ClientInitOptions) => `
 ${buildClientImport(options.importPath)}
