@@ -6,8 +6,31 @@ import url from 'url';
 
 const PKG_NAME = '@spotlightjs/astro';
 
-const createPlugin = (): AstroIntegration => {
+const errorPageInjectionPlugin = () => {
   const thisFilePath = url.fileURLToPath(import.meta.url);
+  return {
+    name: 'spotlight-vite-client-snippet-plugin',
+    transform(code, id, opts = {}) {
+      if (opts.ssr) return;
+      if (!id.includes('vite/dist/client/client.mjs')) return;
+
+      const initSnippet = buildSpotlightErrorPageSnippet({
+        importPath: thisFilePath,
+        // Astro's toolbar isn't available in the error page
+        showTriggerButton: true,
+        // don't wait for the window.load event to be fired because in the error page,
+        // this already happened before spotlight is initialized
+        injectImmediately: true,
+      });
+
+      const modifiedCode = `${code}\n${initSnippet}\n`;
+
+      return modifiedCode;
+    },
+  };
+};
+
+const createPlugin = (): AstroIntegration => {
   return {
     name: PKG_NAME,
 
@@ -16,29 +39,7 @@ const createPlugin = (): AstroIntegration => {
         logger.info('[@spotlightjs/astro] Setting up Spotlight');
 
         if (command === 'dev') {
-          config.vite.plugins = [
-            {
-              name: 'spotlight-vite-client-snippet-plugin',
-              transform(code, id, opts = {}) {
-                if (opts.ssr) return;
-                if (!id.includes('vite/dist/client/client.mjs')) return;
-
-                const initSnippet = buildSpotlightErrorPageSnippet({
-                  importPath: thisFilePath,
-                  // Astro's toolbar isn't available in the error page
-                  showTriggerButton: true,
-                  // don't wait for the window.load event to be fired because in the error page,
-                  // this already happened before spotlight is initialized
-                  injectImmediately: true,
-                });
-
-                const modifiedCode = `${code}\n${initSnippet}\n`;
-
-                return modifiedCode;
-              },
-            },
-            ...(config.vite.plugins || []),
-          ];
+          config.vite.plugins = [errorPageInjectionPlugin(), ...(config.vite.plugins || [])];
 
           injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, showTriggerButton: false }));
           injectScript('page-ssr', SPOTLIGHT_SERVER_SNIPPET);

@@ -23,7 +23,7 @@ export default defineConfig({
     mode: 'standalone',
   }),
   integrations: [
-    svelte(),
+    svelte({ include: ['**/svelte/*'] }),
     react({ include: ['**/react/*'] }),
     sentry({
       debug: true,
