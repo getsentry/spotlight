@@ -22,7 +22,7 @@ Whenever you make a change that is users facing, you should add a changeset to y
 following command:
 
 ```bash
-onpm changeset:add
+pnpm changeset:add
 ```
 
 This will guide you through the process to define the changeset. You have to select which package(s) are affected by
