@@ -34,6 +34,7 @@ export default defineConfig({
         importPath: '@spotlightjs/core',
         showTriggerButton: true,
         injectImmediately: true,
+        integrationNames: ['sentry'],
       },
     }),
     starlight({
