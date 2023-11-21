@@ -1,22 +1,20 @@
 ---
 import FeatureCard from './FeatureCard.astro';
-import Section from './Section.astro'
+import Section from './Section.astro';
 import Highlight from './Highlight.astro';
 import AstroShowcase from './AstroShowcase.astro';
 ---
 
 <Highlight />
 
-<Section title="Try it with Astro" subTitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit">
+<Section title="Simple Setup" subTitle="Only one line of code">
   <FeatureCard
     title="Navigate your errors with ease"
     description="  Sed a porttitor nulla. Nam tempus imperdiet fringilla. Maecenas et velit dui. Integer sit amet libero ut sapien congue volutpat et ut odio. Fusce viverra, nulla sit amet suscipit varius."
-    imageSrc="/images/error.png"
   >
-    <AstroShowcase />
+    <img class="block rounded-lg" src="/images/init.png" width="100%" style={{ maxWidth: 'unset' }} />
   </FeatureCard>
 </Section>
-
 
 <Section title="Easy to customize" subTitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit">
   <FeatureCard
@@ -24,8 +22,8 @@ import AstroShowcase from './AstroShowcase.astro';
     description="Sed a porttitor nulla. Nam tempus imperdiet fringilla. Maecenas et velit dui. Integer sit amet libero ut sapien congue volutpat et ut odio. Fusce viverra, nulla sit amet suscipit varius, felis diam auctor est, at rutrum lacus metus sed metus. Quisque blandit lectus non elit interdum, vel elementum urna facilisis. Nullam pretium dignissim orci, sed blandit risus bibendum dignissim. Integer gravida tristique mi, vitae auctor orci lobortis at."
     reverse
   >
-  <img class="block rounded-lg" src="/images/error.png" width="100%" style={{maxWidth: 'unset'}} />
-</FeatureCard>
+    <img class="block rounded-lg" src="/images/error.png" width="100%" style={{ maxWidth: 'unset' }} />
+  </FeatureCard>
 </Section>
 
 <Section title="For every developer" subTitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit">
@@ -33,8 +31,6 @@ import AstroShowcase from './AstroShowcase.astro';
     title="Navigate your errors with ease"
     description="  Sed a porttitor nulla. Nam tempus imperdiet fringilla. Maecenas et velit dui. Integer sit amet libero ut sapien congue volutpat et ut odio. Fusce viverra, nulla sit amet suscipit varius."
   >
-  <img class="block rounded-lg" src="/images/error.png" width="100%" style={{maxWidth: 'unset'}} />
-</FeatureCard>
-</Section>
-
+    <AstroShowcase />
+  </FeatureCard>
 </Section>
