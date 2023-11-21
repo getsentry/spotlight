@@ -1,5 +1,17 @@
 # @spotlightjs/core
 
+## 0.0.8
+
+### Patch Changes
+
+- fix(sentry): Reverse stack traces of error events ([#56](https://github.com/getsentry/spotlight/pull/56))
+
+- feat(core): Add `injectImmediately` option
+  ([`7606b96`](https://github.com/getsentry/spotlight/commit/7606b96080c64bfedac480bc7ab30278c69e7eca))
+
+- fix(core): Ensure Spotlight is only initialized once
+  ([`7606b96`](https://github.com/getsentry/spotlight/commit/7606b96080c64bfedac480bc7ab30278c69e7eca))
+
 ## 0.0.7
 
 ### Patch Changes

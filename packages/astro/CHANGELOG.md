@@ -1,5 +1,18 @@
 # @spotlightjs/astro
 
+## 0.0.6
+
+### Patch Changes
+
+- feat(astro): Show Spotlight in Server Error Pages
+  ([`7606b96`](https://github.com/getsentry/spotlight/commit/7606b96080c64bfedac480bc7ab30278c69e7eca))
+
+- Updated dependencies
+  [[`60e3495`](https://github.com/getsentry/spotlight/commit/60e349537f3453d20d9b2d52d9ae98f46b4e338f),
+  [`7606b96`](https://github.com/getsentry/spotlight/commit/7606b96080c64bfedac480bc7ab30278c69e7eca),
+  [`7606b96`](https://github.com/getsentry/spotlight/commit/7606b96080c64bfedac480bc7ab30278c69e7eca)]:
+  - @spotlightjs/core@0.0.8
+
 ## 0.0.5
 
 ### Patch Changes
