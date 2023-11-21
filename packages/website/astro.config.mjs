@@ -29,7 +29,13 @@ export default defineConfig({
     sentry({
       debug: true,
     }),
-    spotlight(),
+    spotlight({
+      __debugOptions: {
+        importPath: '@spotlightjs/core',
+        showTriggerButton: true,
+        injectImmediately: true,
+      },
+    }),
     starlight({
       title: 'Spotlight',
       social: {

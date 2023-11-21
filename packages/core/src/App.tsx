@@ -5,14 +5,13 @@ import type { Integration, IntegrationData } from './integrations/integration';
 import { connectToSidecar } from './sidecar';
 import { TriggerButtonCount } from './types';
 
-const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
-
 type AppProps = {
   eventTarget: EventTarget;
   fullScreen?: boolean;
   showTriggerButton?: boolean;
   defaultEventId?: string;
   integrations?: Integration[];
+  sidecar: string;
 };
 export default function App({
   eventTarget,
@@ -20,6 +19,7 @@ export default function App({
   showTriggerButton = true,
   defaultEventId,
   integrations = [],
+  sidecar,
 }: AppProps) {
   console.log('[Spotlight] App rerender');
 
@@ -42,7 +42,7 @@ export default function App({
     );
 
     const cleanupListeners = connectToSidecar(
-      DEFAULT_SIDECAR,
+      sidecar,
       contentTypeToIntegrations,
       setIntegrationData,
       setOnline,
@@ -53,7 +53,7 @@ export default function App({
       console.log('[Spotlight] useeffect cleanup');
       cleanupListeners();
     };
-  }, [integrations]);
+  }, [integrations, sidecar]);
 
   eventTarget.addEventListener('open', () => {
     setOpen(true);

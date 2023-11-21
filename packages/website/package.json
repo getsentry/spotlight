@@ -19,6 +19,8 @@
     "@astrojs/vercel": "^5.2.0",
     "@fontsource/raleway": "^5.0.8",
     "@sentry/astro": "^7.80.0",
+    "@spotlightjs/astro": "workspace:*",
+    "@spotlightjs/core": "workspace:*",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "astro": "^3.5.4",
@@ -28,7 +30,6 @@
     "tailwindcss": "^3.0.24"
   },
   "devDependencies": {
-    "@spotlightjs/astro": "workspace:*",
     "@tailwindcss/typography": "^0.5.10",
     "typescript": "^5.0.2",
     "vite-plugin-inspect": "^0.7.42"

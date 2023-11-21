@@ -30,7 +30,13 @@ const errorPageInjectionPlugin = () => {
   };
 };
 
-const createPlugin = (): AstroIntegration => {
+export type SpotlightOptions =
+  | {
+      __debugOptions?: object;
+    }
+  | undefined;
+
+const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
   return {
     name: PKG_NAME,
 
@@ -43,6 +49,10 @@ const createPlugin = (): AstroIntegration => {
 
           injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, showTriggerButton: false }));
           injectScript('page-ssr', SPOTLIGHT_SERVER_SNIPPET);
+        } else {
+          if (options?.__debugOptions) {
+            injectScript('page', buildClientInitSnippet(options.__debugOptions));
+          }
         }
 
         const importPath = path.dirname(url.fileURLToPath(import.meta.url));

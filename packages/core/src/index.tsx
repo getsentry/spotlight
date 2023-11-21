@@ -41,12 +41,15 @@ export async function onClose(cb: () => void) {
   spotlightEventTarget.addEventListener('closed', cb);
 }
 
+const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
+
 export async function init({
   fullScreen = false,
   showTriggerButton = true,
   integrations,
   defaultEventId,
   injectImmediately = false,
+  sidecar = DEFAULT_SIDECAR,
 }: {
   integrations?: Integration[];
   fullScreen?: boolean;
@@ -54,6 +57,7 @@ export async function init({
   sidecarUrl?: string;
   showTriggerButton?: boolean;
   injectImmediately?: boolean;
+  sidecar?: string;
 } = {}) {
   if (typeof document === 'undefined') return;
 
@@ -94,6 +98,7 @@ export async function init({
       defaultEventId={defaultEventId}
       eventTarget={spotlightEventTarget}
       showTriggerButton={showTriggerButton}
+      sidecar={sidecar}
     />,
     // </React.StrictMode>
   );
