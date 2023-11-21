@@ -1,5 +1,11 @@
 # @spotlightjs/astro
 
+## 0.0.8
+
+### Patch Changes
+
+- fix(astro): Fix type in package.json keywords ([#66](https://github.com/getsentry/spotlight/pull/66))
+
 ## 0.0.7
 
 ### Patch Changes
