@@ -1,6 +1,0 @@
-{
-  "version": 2,
-  "name": "music-album",
-  "builds": [{ "src": "sidecar.js", "use": "@vercel/node" }],
-  "routes": [{ "src": "/stream", "dest": "/sidecar.js" }]
-}
