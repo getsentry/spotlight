@@ -1,3 +1,7 @@
+---
+// Used to override the default hero component
+---
+
 <style>
   @keyframes fade-in {
     from {
@@ -18,8 +22,8 @@
       color: #ffffff;
       text-shadow:
         0 0 10px #ffffff,
-        0 0 50px #00ffff,
-        0 0 75px #00ffff;
+        0 0 50px #a5b4fc,
+        0 0 75px #a5b4fc;
     }
   }
 
@@ -63,31 +67,31 @@
     gap: 2rem;
     opacity: 0;
     animation: fade-in 1s ease-in-out 1s forwards;
+  }
 
-    & > a {
-      display: block;
-      height: 3rem;
-      line-height: 3rem;
-      padding: 0 1.5rem;
-      cursor: pointer;
-      font-weight: 600;
-      border: 1px solid #ffffff80;
-      opacity: 0.5;
-      box-shadow: 0 0 5px #fff8, 0 0 5px #fff8 inset;
-      text-decoration: none;
-      color: #fff;
-      transition: all 0.1s ease-in-out;
-      border-radius: 0.5rem;
+  .actions > a {
+    display: block;
+    height: 3rem;
+    line-height: 3rem;
+    padding: 0 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    border: 1px solid #ffffff80;
+    opacity: 0.7;
+    box-shadow: 0 0 5px #fff8, 0 0 5px #fff8 inset;
+    text-decoration: none;
+    color: #fff;
+    transition: all 0.1s ease-in-out;
+    border-radius: 0.5rem;
+  }
 
-      &:hover {
-        opacity: 1;
-      }
-      &:first-child {
-        border: 1px solid rgba(113, 255, 255, 0.5);
-        color: rgba(113, 255, 255, 1);
-        box-shadow: 0 0 5px rgba(113, 255, 255, 0.5), 0 0 5px rgba(113, 255, 255, 0.5) inset;
-      }
-    }
+  .actions > a:hover {
+    opacity: 1;
+  }
+  .actions > a:first-child {
+    border: 1px solid #a5b4fc80;
+    color: #a5b4fc;
+    box-shadow: 0 0 5px #a5b4fc80, 0 0 5px #a5b4fc80 inset;
   }
 
   @media (min-width: 768px) {
