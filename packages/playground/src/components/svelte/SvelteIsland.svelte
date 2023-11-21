@@ -1,6 +1,6 @@
 <script>
   function throwError() {
-    throw new Error("This is an error from a svelte island");
+    throw new Error(" This is an error from a svelte island");
   }
 
   async function fetchData() {

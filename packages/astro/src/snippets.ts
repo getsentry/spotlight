@@ -1,6 +1,6 @@
 type SupportedIntegrations = 'sentry' | 'console' | 'viteInspect';
 
-type ClientInitOptions = {
+export type ClientInitOptions = {
   importPath: string;
   showTriggerButton?: boolean;
   integrationNames?: SupportedIntegrations[];
