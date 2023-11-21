@@ -1,0 +1,40 @@
+---
+const { title, subTitle } = Astro.props;
+---
+
+<style>
+  .section p {
+    margin-top: 0 !important;
+  }
+
+  h2.heading {
+    display: block;
+    font-size: 1.5rem;
+    letter-spacing: 0px; 
+    text-align: center;
+    text-shadow:
+        0 0 25px #fff7;
+  }
+
+  .sub-heading {
+    font-size: 1.25rem;
+    text-align: center;
+    margin: 0 0 0rem !important;
+  }
+
+  @media (min-width: 768px) {
+    h2.heading {
+      font-size: 2.5rem;
+      letter-spacing: 2px; 
+    }
+  }
+
+</style>
+
+<section class="section mb-32 flex justify-center flex-col">
+  <h2 class="heading mb-4">{title}</h2>
+  {subTitle ? (
+    <div class="sub-heading">{subTitle}</div>
+  ): null}
+  <slot />
+</section> 
