@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 0.0.6
+
+### Patch Changes
+
+- fix(sidecar): Build with Vite, typecheck with TSC
+  ([`af97107`](https://github.com/getsentry/spotlight/commit/af97107d599dbaaf0f89438e1c55be9663e18863))
+
 ## 0.0.5
 
 ### Patch Changes
