@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 0.0.9
+
+### Patch Changes
+
+- feat(astro): Add dev mode sourcemaps resolver Vite plugin ([#64](https://github.com/getsentry/spotlight/pull/64))
+
 ## 0.0.8
 
 ### Patch Changes
