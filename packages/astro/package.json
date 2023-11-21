@@ -28,7 +28,8 @@
   "dependencies": {
     "@spotlightjs/core": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
-    "astro": "^3.4.0"
+    "astro": "^3.4.0",
+    "source-map": "^0.7.4"
   },
   "devDependencies": {
     "typescript": "^5.0.2"

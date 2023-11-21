@@ -1,9 +1,9 @@
 import type { Envelope } from '@sentry/types';
-import { serializeEnvelope } from '@sentry/utils';
 
 import type { Integration } from '../integration';
 
 import sentryDataCache from './data/sentryDataCache';
+import { Spotlight } from './sentry-integration';
 import ErrorsTab from './tabs/ErrorsTab';
 import SdksTab from './tabs/SdksTab';
 import TracesTab from './tabs/TracesTab';
@@ -18,7 +18,7 @@ export default function sentryIntegration() {
     forwardedContentType: [HEADER],
 
     setup: () => {
-      hookIntoSentry();
+      addSpotlightIntegrationToSentry();
     },
 
     processEvent({ data }) {
@@ -66,12 +66,13 @@ export default function sentryIntegration() {
 type WindowWithSentry = Window & {
   __SENTRY__?: {
     hub: {
-      _stack: {
-        client: {
-          setupIntegrations: (val: boolean) => void;
-          on: (event: string, callback: (envelope: Envelope) => void) => void;
-        };
-      }[];
+      getClient: () =>
+        | {
+            setupIntegrations: (force: boolean) => void;
+            addIntegration(integration: Integration): void;
+            on: (event: string, callback: (envelope: Envelope) => void) => void;
+          }
+        | undefined;
     };
   };
 };
@@ -80,23 +81,12 @@ function isErrorEnvelope(envelope: Envelope) {
   return envelope[1].some(([itemHeader]) => itemHeader.type === 'event');
 }
 
-function hookIntoSentry() {
+function addSpotlightIntegrationToSentry() {
   // A very hacky way to hook into Sentry's SDK
   // but we love hacks
   const sentryHub = (window as WindowWithSentry).__SENTRY__?.hub;
-  const sentryClient = sentryHub?._stack[0]?.client;
-
-  sentryClient?.setupIntegrations(true);
-  sentryClient?.on('beforeEnvelope', (envelope: Envelope) => {
-    fetch('http://localhost:8969/stream', {
-      method: 'POST',
-      body: serializeEnvelope(envelope),
-      headers: {
-        'Content-Type': HEADER,
-      },
-      mode: 'cors',
-    }).catch(err => {
-      console.error(err);
-    });
-  });
+  const sentryClient = sentryHub?.getClient();
+  if (sentryClient) {
+    sentryClient.addIntegration(new Spotlight());
+  }
 }
