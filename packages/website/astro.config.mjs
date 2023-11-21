@@ -45,7 +45,6 @@ export default defineConfig({
         Hero: './src/components/Hero.astro',
         Header: './src/components/Header.astro',
       },
-
       sidebar: [
         {
           label: 'Start here',

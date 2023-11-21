@@ -2,6 +2,7 @@
 // Copy of the default header implementation with some changes:
 // - Removed the ThemeSelctor
 // - Removed divider that is between social icons and ThemeSelector
+// - Added a text that says "by Sentry" next to the social icons
 
 import type { Props } from '@astrojs/starlight/props';
 import Search from '@astrojs/starlight/components/Search.astro';
@@ -19,6 +20,7 @@ import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
 	</div>
 	<div class="sl-hidden md:sl-flex right-group">
 		<div class="sl-flex social-icons">
+      <span class="text-sm">by Sentry</span>
 			<SocialIcons {...Astro.props} />
 		</div>
 	</div>
