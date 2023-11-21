@@ -1,5 +1,24 @@
 import { Span } from '../types';
 
+function createFauxParent(
+  span: Span & {
+    parent_span_id: string;
+  },
+): Span & {
+  parent_span_id: null;
+} {
+  return {
+    trace_id: span.trace_id,
+    span_id: span.parent_span_id,
+    parent_span_id: null,
+    op: 'unknown',
+    // TODO: timestamps should represent whats encapsulated by children
+    start_timestamp: new Date().getTime(),
+    timestamp: new Date().getTime(),
+    status: 'unknown',
+  };
+}
+
 // mutates spans in place and adds children, as well as returns the top level tree
 export function groupSpans(spans: Span[]) {
   // ordered
@@ -17,10 +36,19 @@ export function groupSpans(spans: Span[]) {
       if (!parent.children) parent.children = [];
       parent.children.push(span);
     } else if (span.parent_span_id) {
-      const parentParent = sortedSpans.find(s => !s.parent_span_id);
+      let parentParent = sortedSpans.find(s => !s.parent_span_id);
       if (!parentParent) {
-        console.log('Cant create a faux parent');
-        return;
+        console.log(
+          `Unable to identify a faux parent (${span.parent_span_id}) for span (${span.span_id}) - root span not found. Creating imitation.`,
+        );
+        // XXX(dcramer): no idea why TSC thinks parent_span_id is not defined
+        parentParent = createFauxParent(
+          span as Span & {
+            parent_span_id: string;
+          },
+        );
+        tree.push(parentParent);
+        sortedSpans.unshift(parentParent);
       }
       parent = {
         trace_id: span.trace_id,
