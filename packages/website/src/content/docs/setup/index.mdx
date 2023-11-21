@@ -1,6 +1,78 @@
 ---
-title: Using Spotlight with your Framework
-description: A guide how to setup Spotlight for Astro
+title: Using Spotlight in your Environment
+description: A guide how to setup Spotlight in your environment
 ---
 
-Spotlight can be used with a variety of frameworks and even in your custom environment.
+Spotlight can be used with a variety of frameworks and even in your custom environment. See other guides like [Astro](/setup/astro/) if you want to use Spotlight with a specific framework.
+
+
+While it's not dependent on Sentry's SDKs it's recommended to use them to get the most out of Spotlight.
+
+## Frontend
+
+### Install
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Tabs>
+  <TabItem label="npm">
+  ```sh 
+  npm add --save-dev @spotlightjs/core 
+  ```
+  </TabItem>
+  <TabItem label="pnpm">
+  ```sh 
+  pnpm add -D @spotlightjs/core
+  ```
+  </TabItem>
+  <TabItem label="yarn">
+  ```sh 
+  yarn add @spotlightjs/core -D
+  ```
+  </TabItem>
+</Tabs>
+
+### Setup
+
+```js
+import * as Spotlight from '@spotlightjs/core';
+
+Spotlight.init();
+```
+
+---
+
+
+## Backend
+
+If you run Sentry also on your backend you need to tell the SDK to connect to Spotlight.
+
+### Install
+
+<Tabs>
+  <TabItem label="npm">
+  ```sh 
+  npm add --save-dev @spotlightjs/sidecar 
+  ```
+  </TabItem>
+  <TabItem label="pnpm">
+  ```sh 
+  pnpm add -D @spotlightjs/sidecar
+  ```
+  </TabItem>
+  <TabItem label="yarn">
+  ```sh 
+  yarn add @spotlightjs/sidecar -D
+  ```
+  </TabItem>
+</Tabs>
+
+### Setup
+
+```js
+import * as Sentry from '@sentry/node';
+import { connect } from '@spotlightjs/sidecar/connect'
+// ....
+Sentry.init({...});
+connect(Sentry.getCurrentHub()); // call connect right after Sentry.init
+```

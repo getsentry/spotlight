@@ -57,12 +57,12 @@ export default defineConfig({
           label: 'Setup',
           items: [
             {
-              label: 'for Astro',
-              link: '/setup/astro/',
+              label: 'Spotlight',
+              link: '/setup/',
             },
             {
-              label: 'for your project',
-              link: '/setup/',
+              label: 'for Astro',
+              link: '/setup/astro/',
             },
           ],
         },
