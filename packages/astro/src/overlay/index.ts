@@ -12,7 +12,7 @@ style="">
 
 export default {
   id: 'spotlight-plugin',
-  name: 'Sentry Spotlight',
+  name: 'Spotlight',
   icon: sentryLogo,
   init(_canvas, eventTarget) {
     eventTarget.dispatchEvent(
