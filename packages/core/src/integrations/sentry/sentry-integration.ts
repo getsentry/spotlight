@@ -17,7 +17,6 @@ export class Spotlight implements Integration {
           body: JSON.stringify(exception.stacktrace),
         });
         const stackTraceWithContext = await stackTraceWithContextResponse.json();
-        console.log('xxx', { stackTraceWithContext });
         exception.stacktrace = stackTraceWithContext;
       }
       return event;
