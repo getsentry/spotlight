@@ -35,7 +35,13 @@ export const sourceContextPlugin: () => Plugin = () => ({
         });
 
         req.on('end', async () => {
-          const stacktrace: SentryStackTrace = JSON.parse(requestBody);
+          const stacktrace = parseStackTrace(requestBody);
+
+          if (!stacktrace) {
+            res.writeHead(500);
+            res.end();
+            return;
+          }
 
           for (const frame of stacktrace.frames ?? []) {
             if (
@@ -43,8 +49,10 @@ export const sourceContextPlugin: () => Plugin = () => ({
               // let's ignore dependencies for now with this naive check
               !frame.filename.includes('/node_modules/')
             ) {
-              const generatedCodeResponse = await fetch(frame.filename);
-              const generatedCode = await generatedCodeResponse.text();
+              const generatedCode = await getGeneratedCodeFromServer(frame.filename);
+              if (!generatedCode) {
+                continue;
+              }
 
               // Extract the inline source map from the minified code
               const inlineSourceMapMatch = generatedCode.match(
@@ -70,6 +78,23 @@ export const sourceContextPlugin: () => Plugin = () => ({
     });
   },
 });
+
+async function getGeneratedCodeFromServer(filename: string): Promise<string | undefined> {
+  try {
+    const generatedCodeResponse = await fetch(filename);
+    return generatedCodeResponse.text();
+  } catch {
+    return undefined;
+  }
+}
+
+function parseStackTrace(requestBody: string): SentryStackTrace | undefined {
+  try {
+    return JSON.parse(requestBody) as SentryStackTrace;
+  } catch {
+    return undefined;
+  }
+}
 
 async function applySourceContextToFrame(sourceMapContent: string, frame: ValidSentryStackFrame) {
   const consumer = await new SourceMap.SourceMapConsumer(sourceMapContent);

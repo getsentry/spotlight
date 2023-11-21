@@ -11,13 +11,21 @@ export class Spotlight implements Integration {
       }
 
       for (const exception of event.exception.values ?? []) {
-        console.log('fetching', exception);
-        const stackTraceWithContextResponse = await fetch('/spotlight/contextlines', {
-          method: 'PUT',
-          body: JSON.stringify(exception.stacktrace),
-        });
-        const stackTraceWithContext = await stackTraceWithContextResponse.json();
-        exception.stacktrace = stackTraceWithContext;
+        try {
+          const stackTraceWithContextResponse = await fetch('/spotlight/contextlines', {
+            method: 'PUT',
+            body: JSON.stringify(exception.stacktrace),
+          });
+
+          if (!stackTraceWithContextResponse.ok || stackTraceWithContextResponse.status !== 200) {
+            continue;
+          }
+
+          const stackTraceWithContext = await stackTraceWithContextResponse.json();
+          exception.stacktrace = stackTraceWithContext;
+        } catch {
+          // Something went wrong, for now we just ignore it.
+        }
       }
       return event;
     });
