@@ -5,7 +5,6 @@ import path from 'path';
 import url from 'url';
 
 import { errorPageInjectionPlugin } from './vite/error-page';
-import { sourceContextPlugin } from './vite/source-context';
 
 const PKG_NAME = '@spotlightjs/astro';
 
@@ -25,6 +24,10 @@ const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
       'astro:config:setup': async ({ command, injectScript, addDevOverlayPlugin, logger, config }) => {
         if (command === 'dev') {
           logger.info('[@spotlightjs/astro] Setting up Spotlight');
+
+          // Importing this plugin dynamically because for some reason, the top level import
+          // caused a client error because the source-map library code was bundled into the client
+          const { sourceContextPlugin } = await import('./vite/source-context');
 
           config.vite.plugins = [
             errorPageInjectionPlugin({ importPath: thisFilePath }),
@@ -47,7 +50,7 @@ const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
 
       'astro:server:start': async () => {
         // Importing this dynamically because for some reason, the top level import
-        // caused a dev server error because sidecar code was bundled into the server
+        // caused a dev server error because the sidecar code was bundled into the server
         const { setupSidecar } = await import('@spotlightjs/sidecar');
         setupSidecar();
       },
