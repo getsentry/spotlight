@@ -3,37 +3,8 @@ title: Spotlight
 description: The debug toolbar you always wanted
 template: splash
 hero:
-  tagline: The debug toolbar you always wanted
-  image:
-    file: ../../assets/houston.webp
-  actions:
-    - text: Get started
-      link: /what-is-spotlight/
-      icon: right-arrow
-      variant: primary
-    - text: Read the Spotlight docs
-      link: /reference/configuration/
-
-
+  hidden: false
 ---
+import LandingPage from '../../components/LandingPage.astro'
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
-import ReactIsland from './error'
-
-## Next steps
-
-<CardGrid stagger>
-  <Card title="Easy to customize" icon="pencil">
-    Edit `src/content/docs/index.mdx` to see this page change.
-  </Card>
-  <Card title="TODO" icon="add-document">
-    TODO
-  </Card>
-  <Card title="TODO" icon="setting">
-    <button onClick="throwError()">Throw Error</button>
-  </Card>
-  <Card title="TODO" icon="open-book">
-    <ReactIsland client:load />
-  </Card>
-</CardGrid>
-
+<LandingPage/>

@@ -35,6 +35,11 @@ export default defineConfig({
       social: {
         github: 'https://github.com/getsentry/spotlight',
       },
+      components: {
+        Hero: './src/components/Hero.astro',
+        Header: './src/components/Header.astro',
+      },
+
       sidebar: [
         {
           label: 'Start here',
@@ -90,7 +95,7 @@ export default defineConfig({
           },
         },
       ],
-      customCss: ['./src/tailwind.css'],
+      customCss: ['./src/tailwind.css', './src/theme.css'],
     }),
     tailwind({
       applyBaseStyles: false,

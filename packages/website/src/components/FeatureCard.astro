@@ -1,0 +1,61 @@
+---
+const { title, description, accentColor, reverse } = Astro.props;
+---
+
+<style define:vars={{ accentColor }}>
+  .card {
+    display: flex;
+    gap: 3rem;
+    margin: 0 !important;
+    width: 67rem;
+    max-width: 100%;
+    padding: 1rem;
+    line-height: 2;
+    border-radius: 0.5rem;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  h4.heading {
+    display: block;
+    font-size: 1.5rem;
+    letter-spacing: 0px; 
+    text-align: center;
+  }
+
+  div.sub-heading {
+    font-size: 1.2rem;
+    text-align: center;
+    margin: 0 0 2rem !important;
+  }
+
+  @media (min-width: 768px) {
+    h2.heading {
+      font-size: 2.5rem;
+      letter-spacing: 2px; 
+    }
+    .card {
+      flex-direction: row;
+      gap: 3rem;
+      padding: 3rem;
+    }
+    .card.reverse {
+      flex-direction: row-reverse;
+    }
+  }
+</style>
+
+<div class={reverse ? "card reverse" : "card"} >
+  <div class="flex-1 flex-shrink-0 self-start pt-8">
+    <h5 class="mb-2">{title}</h5>
+    <p>{description}</p>
+  </div>
+  <div class="flex-1 max-w-xl h-max" style={{margin: 0}}>
+    <slot />
+  </div>
+</div> 
