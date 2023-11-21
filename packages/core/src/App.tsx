@@ -66,6 +66,9 @@ export default function App({
   useEffect(() => {
     if (!isOpen) {
       eventTarget.dispatchEvent(new CustomEvent('closed'));
+      document.body.style.overflow = 'auto';
+    } else {
+      document.body.style.overflow = 'hidden';
     }
   }, [isOpen, eventTarget]);
 
