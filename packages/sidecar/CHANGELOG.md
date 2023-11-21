@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 0.0.8
+
+### Patch Changes
+
+- Add node env comment
+  ([`6e60701`](https://github.com/getsentry/spotlight/commit/6e607016bf9be3fa59162b392f54837323c86bbd))
+
 ## 0.0.7
 
 ### Patch Changes
