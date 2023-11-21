@@ -32,7 +32,8 @@
     "source-map": "^0.7.4"
   },
   "devDependencies": {
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.2",
+    "vite": "^4.5.0"
   },
   "volta": {
     "extends": "../../package.json"

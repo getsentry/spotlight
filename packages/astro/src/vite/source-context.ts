@@ -1,4 +1,5 @@
 import * as SourceMap from 'source-map';
+import type { Plugin } from 'vite';
 
 import os from 'os';
 
@@ -22,7 +23,7 @@ type SentryStackTrace = {
 
 const CONTEXT_LINES_ENDPOINT = '/spotlight/contextlines';
 
-export const sourceContextPlugin = () => ({
+export const sourceContextPlugin: () => Plugin = () => ({
   name: 'spotlight-vite-resolve-contextlines-plugin',
   configureServer(server) {
     console.log(`[@spotlightjs/astro] Setting up ${CONTEXT_LINES_ENDPOINT} endpoint in Vite dev server`);

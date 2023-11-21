@@ -1,11 +1,12 @@
 import { buildSpotlightErrorPageSnippet } from '../snippets';
 
+import type { Plugin } from 'vite';
+
 type ErrorPagePluginOptions = {
   importPath: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const errorPageInjectionPlugin: (options: ErrorPagePluginOptions) => any = ({ importPath }) => {
+export const errorPageInjectionPlugin: (options: ErrorPagePluginOptions) => Plugin = ({ importPath }) => {
   return {
     name: 'spotlight-vite-client-snippet-plugin',
     transform(code, id, opts = {}) {
