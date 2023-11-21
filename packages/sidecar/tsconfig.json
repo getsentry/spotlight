@@ -1,0 +1,19 @@
+{
+  "extends": "@spotlightjs/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"]
+    },
+    "moduleResolution": "nodenext",
+    "esModuleInterop": false,
+    "target": "esnext",
+    "module": "nodenext",
+    "outDir": "dist",
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "declaration": true,
+    "emitDeclarationOnly": true
+  },
+  "include": ["src/*"]
+}

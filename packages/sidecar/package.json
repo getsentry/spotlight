@@ -5,12 +5,13 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && tsc",
     "build:watch": "exit 1",
     "clean": "rimraf dist"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "main": "dist/main.js",
   "module": "dist/main.js",
