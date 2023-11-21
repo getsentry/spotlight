@@ -1,5 +1,5 @@
 import { IncomingMessage, Server, ServerResponse, createServer } from 'http';
-import { bold, magenta } from 'kleur';
+import kleur from 'kleur';
 
 const defaultResponse = `<!doctype html>
 <html>
@@ -186,7 +186,7 @@ function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function log(...args: any[]) {
-  console.log(bold(magenta('🔦 [Spotlight]')), ...args);
+  console.log(kleur.bold(kleur.magenta('🔦 [Spotlight]')), ...args);
 }
 
 let serverInstance: Server;
