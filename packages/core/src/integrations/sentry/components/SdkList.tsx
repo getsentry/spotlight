@@ -28,7 +28,7 @@ export default function SdkList() {
             );
           })
         ) : (
-          <div className="p-6 text-indigo-300">Looks like there's no SDKs tha thave reported yet. 🤔</div>
+          <div className="p-6 text-indigo-300">Looks like there's no SDKs that have reported yet. 🤔</div>
         )}
       </div>
     </>
