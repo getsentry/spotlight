@@ -30,3 +30,5 @@ dist-ssr
 yalc.lock
 .vite-inspect
 .vercel
+
+junit.xml

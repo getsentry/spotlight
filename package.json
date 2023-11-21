@@ -11,6 +11,8 @@
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",
     "format": "prettier --write --cache .",
+    "test": "pnpm -r --stream --parallel run test",
+    "test:ci": "CI=true pnpm -r run test:ci",
     "yalc:publish": "yalc publish --push --sig --private",
     "changeset:add": "pnpm changeset",
     "changeset:consume": "pnpm changeset version",

@@ -9,6 +9,8 @@
     "build": "tsc && vite build",
     "build:watch": "vite build --watch",
     "preview": "vite preview",
+    "test": "vitest",
+    "test:ci": "vitest --coverage --reporter=junit --reporter=default --outputFile=junit.xml",
     "yalc:publish": "yalc publish --push --sig --private"
   },
   "files": [
@@ -36,21 +38,24 @@
     "usehooks-ts": "^2.9.1"
   },
   "devDependencies": {
-    "@spotlightjs/tsconfig": "workspace:*",
+    "@paralleldrive/cuid2": "^2.2.2",
     "@sentry/types": "^7.77.0",
+    "@spotlightjs/tsconfig": "workspace:*",
     "@tailwindcss/forms": "^0.5.4",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.3",
+    "@vitest/coverage-v8": "^0.34.6",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
     "vite-plugin-dts": "^3.5.2",
-    "vite-plugin-svgr": "^3.2.0"
+    "vite-plugin-svgr": "^3.2.0",
+    "vitest": "^0.34.6"
   },
   "volta": {
     "extends": "../../package.json"
