@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 0.0.7
+
+### Patch Changes
+
+- Add binary to package.json
+  ([`1ac3d88`](https://github.com/getsentry/spotlight/commit/1ac3d88a6504e54f3e0f92176ad28fa141eb65c1))
+
 ## 0.0.6
 
 ### Patch Changes
