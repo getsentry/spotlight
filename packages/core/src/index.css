@@ -21,7 +21,7 @@
 }
 
 .sentry-debugger {
-  @apply flex h-full flex-col overflow-auto rounded-lg bg-indigo-900 font-sans text-white shadow-xl;
+  @apply flex h-full flex-col overflow-auto overflow-x-hidden rounded-lg bg-indigo-900 font-sans text-white shadow-xl;
 }
 
 /* .sentry-debugger .tree li {
