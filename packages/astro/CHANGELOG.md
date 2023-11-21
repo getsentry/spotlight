@@ -1,5 +1,12 @@
 # @spotlightjs/astro
 
+## 0.0.9
+
+### Patch Changes
+
+- fix(astro): Dynamically import stacktrace symbolification plugin to avoid client side error
+  ([`33d2a0a`](https://github.com/getsentry/spotlight/commit/33d2a0a2ed8705d16e83e9fe5e8f1cdeb06d7fe3))
+
 ## 0.0.8
 
 ### Patch Changes
