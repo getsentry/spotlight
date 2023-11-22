@@ -1,8 +1,7 @@
 ---
-
-import { Fragment } from "react";
-import FeatureCard from "./FeatureCard.astro";
-import {Content as CodeBlock} from './codeblock.mdx';
+import { Fragment } from 'react';
+import FeatureCard from './FeatureCard.astro';
+import { Content as CodeBlock } from './codeblock.mdx';
 
 // Used to override the default hero component
 ---
@@ -20,8 +19,7 @@ import {Content as CodeBlock} from './codeblock.mdx';
   @keyframes fade-in-neon {
     from {
       color: #ffffff00;
-      text-shadow:
-        0 0 5px #ffffff00;
+      text-shadow: 0 0 5px #ffffff00;
     }
     to {
       color: #ffffff;
@@ -46,17 +44,18 @@ import {Content as CodeBlock} from './codeblock.mdx';
   .neon-header {
     color: #fff0;
     letter-spacing: 6px;
-    text-shadow:
-      0 0 5px #fff0;
+    text-shadow: 0 0 5px #fff0;
     font-weight: 500;
     font-size: 3rem;
     text-align: center;
     margin-bottom: 1rem;
     line-height: 1.5;
-    animation: fade-in 1s ease-in-out 0s forwards, fade-in-neon 1s ease-out 0.5s forwards;
-    font-family: "Raleway", sans-serif;
+    animation:
+      fade-in 1s ease-in-out 0s forwards,
+      fade-in-neon 1s ease-out 0.5s forwards;
+    font-family: 'Raleway', sans-serif;
   }
-  
+
   .sub-heading {
     color: #fff7;
     font-size: 1.2rem;
@@ -64,20 +63,21 @@ import {Content as CodeBlock} from './codeblock.mdx';
     text-align: center;
     max-width: 80%;
     opacity: 0;
-    margin-bottom: 3rem; 
+    margin-bottom: 3rem;
     animation: fade-in 1s ease-in-out 1s forwards;
   }
 
   .hero-image {
     width: 100%;
-    margin-bottom: 0rem; 
+    margin-bottom: 0rem;
     border-radius: 0.5rem;
-    opacity: 0; animation: fade-in 1s ease-in-out 1s forwards;
+    opacity: 0;
+    animation: fade-in 1s ease-in-out 1s forwards;
   }
 
   .install-wrapper {
     margin: 0;
-    max-width: 100%;;
+    max-width: 100%;
     opacity: 0;
     animation: fade-in 1s ease-in-out 1s forwards;
   }
@@ -86,7 +86,7 @@ import {Content as CodeBlock} from './codeblock.mdx';
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-top: 1rem; 
+    padding-top: 1rem;
     gap: 2rem;
   }
 
@@ -99,7 +99,9 @@ import {Content as CodeBlock} from './codeblock.mdx';
     font-weight: 600;
     border: 1px solid #ffffff70;
     opacity: 0.7;
-    box-shadow: 0 0 5px #fff8, 0 0 5px #fff8 inset;
+    box-shadow:
+      0 0 5px #fff8,
+      0 0 5px #fff8 inset;
     text-decoration: none;
     color: #ffffffcc;
     transition: all 0.1s ease-in-out;
@@ -113,7 +115,9 @@ import {Content as CodeBlock} from './codeblock.mdx';
   .actions > a:first-child {
     border: 1px solid #a5b4fcee;
     color: #a5b4fc;
-    box-shadow: 0 0 5px #a5b4fcee, 0 0 5px #a5b4fcee inset;
+    box-shadow:
+      0 0 5px #a5b4fcee,
+      0 0 5px #a5b4fcee inset;
   }
 
   @media (min-width: 768px) {
@@ -125,7 +129,6 @@ import {Content as CodeBlock} from './codeblock.mdx';
       letter-spacing: 3px;
     }
   }
-
 </style>
 
 <div class="wrapper">
@@ -137,11 +140,11 @@ import {Content as CodeBlock} from './codeblock.mdx';
       title="Get started now!"
       description={'Simply copy and paste this code snippet into your main javascript file.\nIf you need any more help, simply visit our documentation.'}
     >
-      <div />
+      <div></div>
       <CodeBlock />
     </FeatureCard>
     <p class="actions">
-      <a href="/what-is-spotlight/">Read the docs</a>
+      <a href="/about/">Get Started</a>
     </p>
   </div>
 </div>

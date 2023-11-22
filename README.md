@@ -1,48 +1,8 @@
 # Spotlight
 
-## What is Spotlight?
-
-Spotlight is Sentry for Development. Inspired by an old project Django Debug Toolbar. Spotlight brings a rich debug
+Spotlight is Sentry for Development. Inspired by an old project, Django Debug Toolbar, Spotlight brings a rich debug
 overlay into development environments, and it does it by leveraging the existing power of Sentry's SDKs.
 
-## Contributing / Running the repo
+For more information, see our [documentation](https://spotlightjs.com/about/).
 
-See [Contribute](https://spotlightjs.com/contribute/) for how to contribute and develop Spotlight.
-
-## More on Architecture
-
-At a high level, Spotlight consists of two components:
-
-1. An JavaScript overlay that renders inside of your application. The overlay is a simple npm package, and can
-   seamlessly run in any web application (or even independently!).
-
-2. A proxy server which which enables push-based communication to the overlay. This is achieved via a simple HTTP relay,
-   allowing SDKs to push events to it (even without a DSN being configured!), and allow the overlay to receive events
-   using an event stream.
-
-To adopt Spotlight, a customer would only need to load the dependency in their application:
-
-```shell
-npm add @spotlightjs/core
-```
-
-```typescript
-import * as Spotlight from '@spotlightjs/core';
-Spotlight.init();
-```
-
-That's it! A data relay will automatically launch from one of the SDKs, and all available SDKs will communicate with it.
-No configuration is required at the SDK level.
-
-The overlay itself behaves a little differently from Sentry. That's intentional both because this is for local
-development, but also because we don't believe our production implementation of certain components is our final
-implementation.
-
-Right now the overlay consists of three components:
-
-- Errors - very similar to Sentry
-- Traces - all transactions get clustered into a trace view, otherwise similar to Sentry
-- SDKs - simple data on which SDKs have streamed events up
-
-We do not render Replays, Profiling data, or Attachments currently. Profiles and Attachments feel useful, Replays less
-so unless you're running a remote/headless UI.
+See [Contribute](https://spotlightjs.com/contribute/) for how to contribute and develop against Spotlight.

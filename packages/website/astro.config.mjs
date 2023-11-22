@@ -49,7 +49,7 @@ export default defineConfig({
           items: [
             {
               label: 'What is Spotlight?',
-              link: '/what-is-spotlight/',
+              link: '/about/',
             },
             {
               label: 'Architecture',

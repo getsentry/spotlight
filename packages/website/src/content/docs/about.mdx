@@ -1,0 +1,41 @@
+---
+title: What is Spotlight?
+---
+
+Spotlight started out as a Hackweek project at Sentry:
+
+> Spotlight is Sentry for Development. Inspired by an old project, Django Debug Toolbar, Spotlight brings a rich debug
+overlay into development environments, and it does it by leveraging the existing power of Sentry's SDKs.
+
+At a high level, Spotlight consists of two components:
+
+1. An overlay that renders inside of your application. The overlay is a simple React application, and can
+   seamlessly run in any web application (or even independently!).
+
+2. A proxy server (the `sidecar`) which which enables push-based communication to the overlay. This is achieved via a simple HTTP relay,
+   allowing SDKs to push events to it, and allowing the overlay to receive events using an [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events).
+
+This means that adoption in most projects is two simple additions:
+
+```shell
+npm add @spotlightjs/core @spotlightjs/sidecar
+```
+
+Registering Spotlight in your frontend application:
+
+```typescript
+import * as Spotlight from '@spotlightjs/core';
+Spotlight.init();
+```
+
+Running the sidecar in the background:
+
+```shell
+npx @spotlightjs/sidecar
+```
+
+The overlay itself behaves a little differently from Sentry. That's intentional both because this is for local
+development, but also because the project is completely indepedent of Sentry (other than our guaranteed support).
+
+Spotlight can show you errors, traces, configurations settings, installed dependencies, you name it. Spotlight is developed with customizablity in mind, so you can add your own integrations to it.
+
