@@ -7,7 +7,7 @@
 }
 
 .neon-header {
-  @apply font-raleway font-extralight uppercase;
+  @apply font-raleway font-light;
 }
 
 header.header {
