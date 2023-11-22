@@ -36,6 +36,7 @@ class MessageBuffer<T> {
   private head = 0;
   private timeout = 10;
   private readers = new Map<string, (item: T) => void>();
+  private timeoutId: NodeJS.Timeout | undefined;
 
   constructor(size = 100) {
     this.size = size;
@@ -63,15 +64,19 @@ class MessageBuffer<T> {
   subscribe(callback: (item: T) => void): string {
     const readerId = generateUuidv4();
     this.readers.set(readerId, callback);
-    setTimeout(() => this.stream(readerId));
+    clearTimeout(this.timeoutId);
+    this.timeoutId = setTimeout(() => this.stream(readerId));
     return readerId;
   }
 
   unsubscribe(readerId: string): void {
     this.readers.delete(readerId);
+    clearTimeout(this.timeoutId);
   }
 
   stream(readerId: string, readPos = this.head): void {
+    clearTimeout(this.timeoutId);
+
     const cb = this.readers.get(readerId);
     if (!cb) return;
 
@@ -80,13 +85,15 @@ class MessageBuffer<T> {
     /* eslint-disable no-constant-condition */
     while (true) {
       item = this.items[atReadPos % this.size];
-      if (typeof item === 'undefined') {
+      // atReadPos >= this.writePos prevents the case where we have a full buffer
+      if (typeof item === 'undefined' || atReadPos >= this.writePos) {
         break;
       }
       cb(item[1]);
       atReadPos += 1;
     }
-    setTimeout(() => this.stream(readerId, atReadPos), 500);
+
+    this.timeoutId = setTimeout(() => this.stream(readerId, atReadPos), 500);
   }
 }
 
@@ -101,7 +108,6 @@ function getCorsHeader(): { [name: string]: string } {
 }
 
 function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: MessageBuffer<Payload>): void {
-  log(`Received request ${req.method} ${req.url}`);
   if (req.headers.accept && req.headers.accept == 'text/event-stream') {
     if (req.url == '/stream') {
       res.writeHead(200, {
@@ -113,7 +119,9 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
       res.flushHeaders();
 
       const sub = buffer.subscribe(([payloadType, data]) => {
+        log(`🕊️ sending to Spotlight`);
         res.write(`event:${payloadType}\n`);
+        // This is very important - SSE events are delimited by a newline
         data.split('\n').forEach(line => {
           res.write(`data:${line}\n`);
         });
@@ -122,6 +130,7 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
 
       req.on('close', () => {
         buffer.unsubscribe(sub);
+        res.end();
       });
     } else {
       res.writeHead(404);
@@ -136,6 +145,7 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
         });
         res.end();
       } else if (req.method === 'POST') {
+        log(`📩 Received event`);
         let body: string = '';
         req.on('readable', () => {
           const chunk = req.read();
@@ -186,7 +196,7 @@ function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function log(...args: any[]) {
-  console.log(kleur.bold(kleur.magenta('🔦 [Spotlight]')), ...args);
+  console.log(kleur.bold(kleur.magenta('🔎 [Spotlight]')), ...args);
 }
 
 let serverInstance: Server;
