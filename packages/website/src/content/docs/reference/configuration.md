@@ -3,13 +3,13 @@ title: Configuration
 description: All the configuration options for setting up Spotlight
 ---
 
-## Configure `spotlight`
+## `init`
 
 ```js
-import * as Spotlight from '@spotlightjs/core';
+import {init, sentry} as Spotlight from '@spotlightjs/core';
 
-Spotlight.init({
-  integrations: [Spotlight.sentry()],
+init({
+  integrations: [sentry()],
 });
 ```
 
@@ -17,7 +17,13 @@ Spotlight.init({
 
 **type:** [`SpotlightIntegration[]`](#spotlightintegration)
 
-Defines which integrations should be loaded for Spotlight.
+Defines which integrations should be loaded for Spotlight. Defaults to `[sentry()]`.
+
+```ts
+init({
+  integrations: [sentry()],
+});
+```
 
 #### `SpotlightIntegration`
 
@@ -32,8 +38,8 @@ type SpotlightIntegration = {};
 
 The Sidecar event-source stream endpoint.
 
-```js
-Spotlight.init({
+```ts
+init({
   sidecar: 'http://localhost:8969/stream',
 });
 ```
@@ -44,8 +50,8 @@ Spotlight.init({
 
 The anchor position for the toolbar.
 
-```js
-Spotlight.init({
+```ts
+init({
   anchor: 'centerRight',
 });
 ```
