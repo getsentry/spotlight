@@ -61,14 +61,13 @@ type WindowWithSentry = Window & {
 
 export function processEnvelope({ data }: RawEventContext) {
   console.log('[Spotlight] Received new envelope');
-
   const [rawHeader, ...rawEntries] = data.split(/\n/gm);
+
   const header = JSON.parse(rawHeader) as Envelope[0];
   console.log(`[Spotlight] Received new envelope from SDK ${header.sdk?.name || '(unknown)'}`);
 
   const items: Envelope[1][] = [];
   for (let i = 0; i < rawEntries.length; i += 2) {
-    console.log(rawEntries[i + 1]);
     items.push([JSON.parse(rawEntries[i]), JSON.parse(rawEntries[i + 1])]);
   }
 
