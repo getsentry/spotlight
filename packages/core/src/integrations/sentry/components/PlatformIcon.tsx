@@ -2,6 +2,7 @@ import { ReactComponent as DefaultIcon } from 'platformicons/svg/default.svg';
 import { ReactComponent as JavaScriptIcon } from 'platformicons/svg/javascript.svg';
 import { ReactComponent as NodeIcon } from 'platformicons/svg/nodejs.svg';
 import { ReactComponent as PythonIcon } from 'platformicons/svg/python.svg';
+import { ReactComponent as PhpIcon } from 'platformicons/svg/php.svg';
 
 import { ComponentPropsWithoutRef } from 'react';
 
@@ -22,6 +23,8 @@ export default function PlatformIcon({
       return <JavaScriptIcon width={size} height={size} {...props} />;
     case 'node':
       return <NodeIcon width={size} height={size} {...props} />;
+    case 'php':
+      return <PhpIcon width={size} height={size} {...props} />;
     default:
       return <DefaultIcon width={size} height={size} {...props} />;
   }
