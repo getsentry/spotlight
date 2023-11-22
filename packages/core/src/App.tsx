@@ -13,6 +13,7 @@ type AppProps = {
   integrations?: Integration[];
   sidecar: string;
 };
+
 export default function App({
   eventTarget,
   fullScreen = false,

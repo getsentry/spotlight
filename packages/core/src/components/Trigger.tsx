@@ -1,3 +1,5 @@
+import { ReactComponent as Logo } from '~/assets/glyph.svg';
+import classNames from '~/lib/classNames';
 import { TriggerButtonCount } from '~/types';
 
 export default function Trigger({
@@ -13,14 +15,17 @@ export default function Trigger({
 
   return (
     <div
-      className="sentry-trigger"
+      className={classNames(
+        'sentry-trigger',
+        count.severe === 0 ? 'bg-indigo-300 text-indigo-600' : 'bg-red-500 text-white',
+      )}
       style={{
         display: isOpen ? 'none' : undefined,
       }}
       onClick={() => setOpen(!isOpen)}
     >
-      Spotlight
-      <span className={count.severe === 0 ? 'bg-indigo-300 text-indigo-600' : 'bg-red-500 text-white'}>{countSum}</span>
+      <Logo height={24} width={24} />
+      <span>{countSum}</span>
     </div>
   );
 }

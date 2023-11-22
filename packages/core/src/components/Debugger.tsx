@@ -1,3 +1,4 @@
+import { ReactComponent as Logo } from '~/assets/glyph.svg';
 import { Integration, IntegrationData } from '~/integrations/integration';
 import classNames from '~/lib/classNames';
 import useKeyPress from '~/lib/useKeyPress';
@@ -34,14 +35,17 @@ export default function Debugger({
     >
       <div className="sentry-debugger">
         <div className="flex items-center gap-x-2 bg-indigo-950 px-6 py-4 text-indigo-200">
-          <h1 className="font-raleway flex flex-1 items-end gap-x-1 opacity-80">
-            <div className="text-3xl font-light uppercase tracking-widest">Spotlight</div>
+          <h1 className="font-raleway flex flex-1 items-end gap-x-1 leading-7 opacity-80">
+            <div className="inline-flex items-center gap-x-4">
+              <Logo height={32} width={32} />
+              <div className="text-3xl font-light uppercase leading-7 tracking-widest">Spotlight</div>
+            </div>
             <div className="flex items-center gap-x-1 text-sm text-indigo-300">
-              by{' '}
+              <span>by</span>
               <a href="https://sentry.io" className="font-semibold hover:underline">
                 Sentry
               </a>
-              <a href="https://github.com/getsentry/spotlight" rel="me" className="sl-flex">
+              <a href="https://github.com/getsentry/spotlight" rel="me" className="sl-flex ml-2">
                 <span className="sr-only">GitHub</span>
                 <svg
                   aria-hidden="true"

@@ -4,14 +4,14 @@
 
 .sentry-trigger {
   @apply fixed bottom-2 right-2 inline-flex items-center justify-center gap-x-2 rounded border px-3 py-2 font-medium opacity-80 hover:opacity-100;
-  @apply font-raleway border-indigo-950 bg-indigo-900 text-sm font-light uppercase tracking-widest text-white;
+  @apply font-raleway border-indigo-950 bg-indigo-900 font-light uppercase tracking-widest text-white;
 
   z-index: 999999;
   cursor: pointer;
 }
 
 .sentry-trigger span {
-  @apply rounded px-1.5 py-0.5 font-sans text-xs font-medium;
+  @apply rounded px-1.5 py-0.5 font-sans font-medium;
 }
 
 .fullscreen-blur {
