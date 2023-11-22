@@ -2,11 +2,12 @@
 title: Console
 ---
 
-```js
-...
-integrations: [console({configOptions})]
-...
+The console integration allows you to easily render console logs within Spotlight.
+
+```ts
+import { init, console } from "@spotlightjs/core";
+
+init({
+  integrations: [console()]
+});
 ```
-
-## `configOptions`
-
