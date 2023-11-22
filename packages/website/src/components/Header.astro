@@ -3,12 +3,13 @@
 // - Removed the ThemeSelctor
 // - Removed divider that is between social icons and ThemeSelector
 // - Added a text that says "by Sentry" next to the social icons
+// - Remove Search on landing page
 
 import type { Props } from '@astrojs/starlight/props';
 import Search from '@astrojs/starlight/components/Search.astro';
 import SiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
 import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
-
+const showSearch = Astro.props.slug !== ''
 ---
 
 <div class="header sl-flex">
@@ -16,7 +17,7 @@ import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
 		<SiteTitle {...Astro.props} />
 	</div>
 	<div class="sl-flex">
-		<Search {...Astro.props} />
+		{showSearch && <Search {...Astro.props} />}
 	</div>
 	<div class="sl-hidden md:sl-flex right-group">
 		<div class="sl-flex social-icons">
