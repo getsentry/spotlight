@@ -6,6 +6,7 @@ import spotlightEventTarget from './lib/eventTarget.ts';
 import App from './App.tsx';
 import { DEFAULT_ANCHOR, type Anchor } from './components/Trigger.tsx';
 import globalStyles from './index.css?inline';
+import { default as sentry } from './integrations/console/index.ts';
 import type { Integration } from './integrations/integration.ts';
 import { initIntegrations } from './integrations/integration.ts';
 import { WindowWithSpotlight } from './types.ts';
@@ -46,7 +47,7 @@ const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
 export async function init({
   fullScreen = false,
   showTriggerButton = true,
-  integrations,
+  integrations = [sentry()],
   defaultEventId,
   injectImmediately = false,
   sidecar = DEFAULT_SIDECAR,
