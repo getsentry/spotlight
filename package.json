@@ -1,5 +1,6 @@
 {
   "private": true,
+  "name": "spotlight",
   "type": "module",
   "scripts": {
     "dev:core": "pnpm --filter core dev",
