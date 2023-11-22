@@ -53,6 +53,48 @@ importers:
         specifier: ^5.0.2
         version: 5.2.2
 
+  demos/astro-playground:
+    dependencies:
+      '@astrojs/check':
+        specifier: ^0.3.1
+        version: 0.3.1(prettier@3.0.3)(typescript@5.2.2)
+      '@astrojs/node':
+        specifier: ^6.0.4
+        version: 6.0.4(astro@3.5.5)
+      '@astrojs/react':
+        specifier: ^3.0.5
+        version: 3.0.5(@types/react-dom@18.2.15)(@types/react@18.2.37)(react-dom@18.2.0)(react@18.2.0)(vite@4.5.0)
+      '@astrojs/svelte':
+        specifier: ^4.0.4
+        version: 4.0.4(astro@3.5.5)(svelte@5.0.0-next.4)(typescript@5.2.2)(vite@4.5.0)
+      '@sentry/astro':
+        specifier: ^7.80.1
+        version: 7.80.1(astro@3.5.5)
+      '@spotlightjs/astro':
+        specifier: workspace:*
+        version: link:../../packages/astro
+      '@types/react':
+        specifier: ^18.2.37
+        version: 18.2.37
+      '@types/react-dom':
+        specifier: ^18.2.15
+        version: 18.2.15
+      astro:
+        specifier: ^3.5.5
+        version: 3.5.5(typescript@5.2.2)
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.2.0(react@18.2.0)
+      svelte:
+        specifier: ^5.0.0-next.1
+        version: 5.0.0-next.4
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+
   packages/astro:
     dependencies:
       '@spotlightjs/core':
@@ -165,48 +207,6 @@ importers:
       vitest:
         specifier: ^0.34.6
         version: 0.34.6
-
-  packages/playground:
-    dependencies:
-      '@astrojs/check':
-        specifier: ^0.3.1
-        version: 0.3.1(prettier@3.0.3)(typescript@5.2.2)
-      '@astrojs/node':
-        specifier: ^6.0.4
-        version: 6.0.4(astro@3.5.5)
-      '@astrojs/react':
-        specifier: ^3.0.5
-        version: 3.0.5(@types/react-dom@18.2.15)(@types/react@18.2.37)(react-dom@18.2.0)(react@18.2.0)(vite@4.5.0)
-      '@astrojs/svelte':
-        specifier: ^4.0.4
-        version: 4.0.4(astro@3.5.5)(svelte@5.0.0-next.4)(typescript@5.2.2)(vite@4.5.0)
-      '@sentry/astro':
-        specifier: ^7.80.1
-        version: 7.80.1(astro@3.5.5)
-      '@spotlightjs/astro':
-        specifier: workspace:*
-        version: link:../astro
-      '@types/react':
-        specifier: ^18.2.37
-        version: 18.2.37
-      '@types/react-dom':
-        specifier: ^18.2.15
-        version: 18.2.15
-      astro:
-        specifier: ^3.5.5
-        version: 3.5.5(typescript@5.2.2)
-      react:
-        specifier: ^18.2.0
-        version: 18.2.0
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.2.0(react@18.2.0)
-      svelte:
-        specifier: ^5.0.0-next.1
-        version: 5.0.0-next.4
-      typescript:
-        specifier: ^5.2.2
-        version: 5.2.2
 
   packages/sidecar:
     dependencies:
@@ -1986,16 +1986,6 @@ packages:
       string-argv: 0.3.2
     dev: true
 
-  /@sentry-internal/tracing@7.80.0:
-    resolution:
-      { integrity: sha512-P1Ab9gamHLsbH9D82i1HY8xfq9dP8runvc4g50AAd6OXRKaJ45f2KGRZUmnMEVqBQ7YoPYp2LFMkrhNYbcZEoQ== }
-    engines: { node: '>=8' }
-    dependencies:
-      '@sentry/core': 7.80.0
-      '@sentry/types': 7.80.0
-      '@sentry/utils': 7.80.0
-    dev: false
-
   /@sentry-internal/tracing@7.80.1:
     resolution:
       { integrity: sha512-5gZ4LPIj2vpQl2/dHBM4uXMi9OI5E0VlOhJQt0foiuN6JJeiOjdpJFcfVqJk69wrc0deVENTtgKKktxqMwVeWQ== }
@@ -2062,8 +2052,8 @@ packages:
     engines: { node: '>= 14' }
     dependencies:
       '@sentry/cli': 2.21.2
-      '@sentry/node': 7.80.0
-      '@sentry/utils': 7.80.0
+      '@sentry/node': 7.80.1
+      '@sentry/utils': 7.80.1
       dotenv: 16.3.1
       find-up: 5.0.0
       glob: 9.3.2
@@ -2091,15 +2081,6 @@ packages:
       - supports-color
     dev: false
 
-  /@sentry/core@7.80.0:
-    resolution:
-      { integrity: sha512-nJiiymdTSEyI035/rdD3VOq6FlOZ2wWLR5bit9LK8a3rzHU3UXkwScvEo6zYgs0Xp1sC0yu1S9+0BEiYkmi29A== }
-    engines: { node: '>=8' }
-    dependencies:
-      '@sentry/types': 7.80.0
-      '@sentry/utils': 7.80.0
-    dev: false
-
   /@sentry/core@7.80.1:
     resolution:
       { integrity: sha512-3Yh+O9Q86MxwIuJFYtuSSoUCpdx99P1xDAqL0FIPTJ+ekaVMiUJq9NmyaNh9uN2myPSmxvEXW6q3z37zta9ZHg== }
@@ -2107,20 +2088,6 @@ packages:
     dependencies:
       '@sentry/types': 7.80.1
       '@sentry/utils': 7.80.1
-    dev: false
-
-  /@sentry/node@7.80.0:
-    resolution:
-      { integrity: sha512-J35fqe8J5ac/17ZXT0ML3opYGTOclqYNE9Sybs1y9n6BqacHyzH8By72YrdI03F7JJDHwrcGw+/H8hGpkCwi0Q== }
-    engines: { node: '>=8' }
-    dependencies:
-      '@sentry-internal/tracing': 7.80.0
-      '@sentry/core': 7.80.0
-      '@sentry/types': 7.80.0
-      '@sentry/utils': 7.80.0
-      https-proxy-agent: 5.0.1
-    transitivePeerDependencies:
-      - supports-color
     dev: false
 
   /@sentry/node@7.80.1:
@@ -2153,12 +2120,6 @@ packages:
       { integrity: sha512-nfb00XRJVi0QpDHg+JkqrmEBHsqBnxJu191Ded+Cs1OJ5oPXEW6F59LVcBScGvMqe+WEk1a73eH8XezwfgrTsA== }
     engines: { node: '>=8' }
 
-  /@sentry/types@7.80.0:
-    resolution:
-      { integrity: sha512-4bpMO+2jWiWLDa8zbTASWWNLWe6yhjfPsa7/6VH5y9x1NGtL8oRbqUsTgsvjF3nmeHEMkHQsC8NHPaQ/ibFmZQ== }
-    engines: { node: '>=8' }
-    dev: false
-
   /@sentry/types@7.80.1:
     resolution:
       { integrity: sha512-CVu4uPVTOI3U9kYiOdA085R7jX5H1oVODbs9y+A8opJ0dtJTMueCXgZyE8oXQ0NjGVs6HEeaLkOuiV0mj8X3yw== }
@@ -2171,14 +2132,6 @@ packages:
     engines: { node: '>=8' }
     dependencies:
       '@sentry/types': 7.77.0
-    dev: false
-
-  /@sentry/utils@7.80.0:
-    resolution:
-      { integrity: sha512-XbBCEl6uLvE50ftKwrEo6XWdDaZXHXu+kkHXTPWQEcnbvfZKLuG9V0Hxtxxq3xQgyWmuF05OH1GcqYqiO+v5Yg== }
-    engines: { node: '>=8' }
-    dependencies:
-      '@sentry/types': 7.80.0
     dev: false
 
   /@sentry/utils@7.80.1:
@@ -4262,7 +4215,7 @@ packages:
       supports-color:
         optional: true
     dependencies:
-      ms: 2.1.2
+      ms: 2.1.3
     dev: false
 
   /debug@4.3.4:
