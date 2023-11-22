@@ -42,7 +42,10 @@ Inject Spotlight into your application:
 ```js
 import * as Spotlight from '@spotlightjs/core';
 
-Spotlight.init();
+// only load Spotlight in dev
+if (process.env.NODE_ENV !== "production") {
+  Spotlight.init();
+}
 ```
 
 Upon loading your UI you should now see the Spotlight toolbar in bottom-right corner of your application.
