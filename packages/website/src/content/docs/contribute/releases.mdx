@@ -1,0 +1,9 @@
+---
+title: Publishing
+description: How-to publish a new release of Spotlight.
+---
+
+When you want to publish a new version, you need to trigger the
+[Prepare Publish](https://github.com/getsentry/spotlight/actions/workflows/prepare-publish.yml) Github Action. This
+action will open a PR with all versions bumped & changelogs updated according to the currently pending changesets. If
+you approve & merge this PR, these versions will automatically be published to NPM.

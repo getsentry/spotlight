@@ -83,16 +83,18 @@ export default defineConfig({
               label: 'Write an integration',
               link: '/guides/integration/',
             },
-            {
-              label: 'How to make a Release',
-              link: '/guides/release/',
-            },
           ],
         },
         {
           label: 'Integrations',
           autogenerate: {
             directory: 'integrations',
+          },
+        },
+        {
+          label: 'Contribute',
+          autogenerate: {
+            directory: 'contribute',
           },
         },
         {
