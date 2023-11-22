@@ -4,6 +4,7 @@ import fontStyles from '@fontsource/raleway/index.css?inline';
 import spotlightEventTarget from './lib/eventTarget.ts';
 
 import App from './App.tsx';
+import { type Anchor } from './components/Trigger.tsx';
 import globalStyles from './index.css?inline';
 import type { Integration } from './integrations/integration.ts';
 import { initIntegrations } from './integrations/integration.ts';
@@ -49,6 +50,7 @@ export async function init({
   defaultEventId,
   injectImmediately = false,
   sidecar = DEFAULT_SIDECAR,
+  anchor = 'bottomRight',
 }: {
   integrations?: Integration[];
   fullScreen?: boolean;
@@ -57,6 +59,7 @@ export async function init({
   showTriggerButton?: boolean;
   injectImmediately?: boolean;
   sidecar?: string;
+  anchor?: Anchor;
 } = {}) {
   if (typeof document === 'undefined') return;
 
@@ -97,6 +100,7 @@ export async function init({
       defaultEventId={defaultEventId}
       showTriggerButton={showTriggerButton}
       sidecar={sidecar}
+      anchor={anchor}
     />,
     // </React.StrictMode>
   );

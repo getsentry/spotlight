@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Debugger from './components/Debugger';
-import Trigger from './components/Trigger';
+import Trigger, { type Anchor } from './components/Trigger';
 import type { Integration, IntegrationData } from './integrations/integration';
 import { connectToSidecar } from './sidecar';
 import { TriggerButtonCount } from './types';
@@ -13,6 +13,7 @@ type AppProps = {
   defaultEventId?: string;
   integrations?: Integration[];
   sidecar: string;
+  anchor?: Anchor;
 };
 
 export default function App({
@@ -21,6 +22,7 @@ export default function App({
   defaultEventId,
   integrations = [],
   sidecar,
+  anchor,
 }: AppProps) {
   console.log('[Spotlight] App rerender');
 
@@ -89,7 +91,7 @@ export default function App({
 
   return (
     <>
-      {showTriggerButton && <Trigger isOpen={isOpen} setOpen={setOpen} count={triggerButtonCount} />}
+      {showTriggerButton && <Trigger isOpen={isOpen} setOpen={setOpen} count={triggerButtonCount} anchor={anchor} />}
       <Debugger
         isOpen={isOpen}
         setOpen={setOpen}
