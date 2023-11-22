@@ -1,5 +1,5 @@
 import { Envelope } from '@sentry/types';
-import { generate_uuidv4 } from '~/lib/uuid';
+import { generate_uuidv4 } from '../../../lib/uuid';
 import { Sdk, SentryErrorEvent, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
 import { groupSpans } from '../utils/traces';
 

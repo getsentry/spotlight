@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Outlet, Route, Routes, useParams } from 'react-router-dom';
-import Tabs from '~/components/Tabs';
+import Tabs from '../../../components/Tabs';
 import sentryDataCache from '../data/sentryDataCache';
 import { SentryEvent } from '../types';
 import EventBreadcrumbs from './EventBreadcrumbs';
