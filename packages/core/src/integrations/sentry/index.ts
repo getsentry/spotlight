@@ -63,16 +63,31 @@ export function processEnvelope({ data }: RawEventContext) {
   console.log('[Spotlight] Received new envelope');
   const [rawHeader, ...rawEntries] = data.split(/\n/gm);
 
-  const header = JSON.parse(rawHeader) as Envelope[0];
-  console.log(`[Spotlight] Received new envelope from SDK ${header.sdk?.name || '(unknown)'}`);
+  let envelope: Envelope | undefined;
 
-  const items: Envelope[1][] = [];
-  for (let i = 0; i < rawEntries.length; i += 2) {
-    items.push([JSON.parse(rawEntries[i]), JSON.parse(rawEntries[i + 1])]);
+  try {
+    const header = JSON.parse(rawHeader) as Envelope[0];
+    console.log(`[Spotlight] Received new envelope from SDK ${header.sdk?.name || '(unknown)'}`);
+
+    const items: Envelope[1][] = [];
+    for (let i = 0; i < rawEntries.length; i += 2) {
+      // guard both rawEntries[i] and rawEntries[i + 1] are defined and not empty
+      if (!rawEntries[i] || !rawEntries[i + 1]) {
+        continue;
+      }
+      items.push([JSON.parse(rawEntries[i]), JSON.parse(rawEntries[i + 1])]);
+    }
+
+    envelope = [header, items] as Envelope;
+    sentryDataCache.pushEnvelope(envelope);
+  } catch (e) {
+    console.log('[Spotlight] Error parsing envelope');
+    console.log(data);
   }
 
-  const envelope = [header, items] as Envelope;
-  sentryDataCache.pushEnvelope(envelope);
+  if (!envelope) {
+    return { event: undefined, severity: 'default' };
+  }
 
   return {
     event: envelope,
