@@ -1,5 +1,17 @@
 # @spotlightjs/core
 
+## 0.0.10
+
+### Patch Changes
+
+- Don't Overflow body when Spotlight is open
+  ([`e96a5c6`](https://github.com/getsentry/spotlight/commit/e96a5c6744ef59d79c6ed7164c9c8f6fe82d9aab))
+
+- Add connect function
+  ([`989b5b5`](https://github.com/getsentry/spotlight/commit/989b5b55cefb62240d12f65c9cf9fe9a041f03e1))
+
+- ref(core): Guard calls to symbolication endpoint ([#97](https://github.com/getsentry/spotlight/pull/97))
+
 ## 0.0.9
 
 ### Patch Changes
