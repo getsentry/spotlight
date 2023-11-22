@@ -68,7 +68,7 @@ function serializeEnvelope(envelope) {
   for (const item of items) {
     const [itemHeaders, payload] = item;
 
-    parts.push('\\n' + JSON.stringify(itemHeaders)+ '\\n');
+    parts.push('\n' + JSON.stringify(itemHeaders)+ '\n');
 
     parts.push(JSON.stringify(payload));
   }
