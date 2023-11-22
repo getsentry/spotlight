@@ -114,9 +114,6 @@ importers:
         specifier: ^2.9.1
         version: 2.9.1(react-dom@18.2.0)(react@18.2.0)
     devDependencies:
-      '@paralleldrive/cuid2':
-        specifier: ^2.2.2
-        version: 2.2.2
       '@sentry/types':
         specifier: ^7.77.0
         version: 7.77.0
@@ -1839,12 +1836,6 @@ packages:
       { integrity: sha512-9b8mPpKrfeGRuhFH5iO1iwCLeIIsV6+H1sRfxbkoGXIyQE2BTsPd9zqSqQJ+pv5sJ/hT5M1zvOFL02MnEezFug== }
     dev: true
 
-  /@noble/hashes@1.3.2:
-    resolution:
-      { integrity: sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ== }
-    engines: { node: '>= 16' }
-    dev: true
-
   /@nodelib/fs.scandir@2.1.5:
     resolution:
       { integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g== }
@@ -1915,13 +1906,6 @@ packages:
     requiresBuild: true
     dev: false
     optional: true
-
-  /@paralleldrive/cuid2@2.2.2:
-    resolution:
-      { integrity: sha512-ZOBkgDwEdoYVlSeRbYYXs0S9MejQofiVYoTbKzy/6GQa39/q5tQU2IX46+shYnUkpEl3wc+J6wRlar7r2EK2xA== }
-    dependencies:
-      '@noble/hashes': 1.3.2
-    dev: true
 
   /@pkgjs/parseargs@0.11.0:
     resolution:

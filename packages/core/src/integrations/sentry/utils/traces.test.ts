@@ -1,13 +1,13 @@
-import { createId } from '@paralleldrive/cuid2';
 import { describe, expect, test } from 'vitest';
+import { generate_uuidv4 } from '../../../lib/uuid';
 import { Span } from '../types';
 import { groupSpans } from './traces';
 
 function mockSpan({ duration, ...span }: Partial<Span> & { duration?: number } = {}): Span {
   const defaultTimestamp = new Date().getTime();
   return {
-    trace_id: createId(),
-    span_id: createId(),
+    trace_id: generate_uuidv4(),
+    span_id: generate_uuidv4(),
     op: 'unknown',
     status: 'unknown',
     start_timestamp: defaultTimestamp,
@@ -77,7 +77,7 @@ describe('groupSpans', () => {
   });
 
   test('missing root transactions as siblings, creates faux parent', () => {
-    const parent_span_id = createId();
+    const parent_span_id = generate_uuidv4();
     const span1 = mockSpan({
       parent_span_id,
     });
@@ -100,10 +100,10 @@ describe('groupSpans', () => {
 
   test('missing root transactions as independent children, creates faux parents', () => {
     const span1 = mockSpan({
-      parent_span_id: createId(),
+      parent_span_id: generate_uuidv4(),
     });
     const span2 = mockSpan({
-      parent_span_id: createId(),
+      parent_span_id: generate_uuidv4(),
       trace_id: span1.trace_id,
     });
     const result = groupSpans([span1, span2]);
