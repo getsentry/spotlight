@@ -2,6 +2,10 @@ body {
   background: #05010d;
 }
 
+dialog {
+  color: var(--sl-color-white);
+}
+
 :root,
 :root[data-theme='light'] {
   --sl-color-white: #fff;
