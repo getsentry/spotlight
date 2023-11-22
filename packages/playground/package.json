@@ -1,5 +1,5 @@
 {
-  "name": "@spotlightjs/spotlight-astro-playground",
+  "name": "@spotlightjs/astro-playground",
   "description": "Playground for testing Spotlight in an Astro SSR app with islands",
   "type": "module",
   "version": "0.0.0",

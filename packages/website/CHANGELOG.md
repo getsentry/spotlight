@@ -1,4 +1,4 @@
-# @spotlightjs/spotlight-website
+# @spotlightjs/website
 
 ## 0.0.1
 

@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@spotlightjs/spotlight-astro-playground", "@spotlightjs/spotlight-website"]
+  "ignore": ["@spotlightjs/astro-playground", "@spotlightjs/website"]
 }
