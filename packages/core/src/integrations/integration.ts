@@ -86,8 +86,10 @@ export type ProcessedEventContainer<T> = {
    *
    * @default value is 'default'
    */
-  severity?: 'default' | 'severe';
+  severity?: Severity;
 };
+
+export type Severity = 'default' | 'severe';
 
 export type IntegrationData<T> = Record<string, ProcessedEventContainer<T>[]>;
 
