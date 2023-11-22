@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 0.0.13
+
+### Patch Changes
+
+- fix(core): Ensure there's only one global spotlight event target
+  ([#121](https://github.com/getsentry/spotlight/pull/121))
+
 ## 0.0.12
 
 ### Patch Changes
