@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 0.0.10
+
+### Patch Changes
+
+- fix(sidecar): Fix memory leak
+  ([`e7ea41b`](https://github.com/getsentry/spotlight/commit/e7ea41bb22ebf5887aeb28e0eea6d6e69885d62c))
+
 ## 0.0.9
 
 ### Patch Changes
