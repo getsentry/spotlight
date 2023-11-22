@@ -1,7 +1,6 @@
 import ReactDOM from 'react-dom/client';
 
 import fontStyles from '@fontsource/raleway/index.css?inline';
-import spotlightEventTarget from './lib/eventTarget.ts';
 
 import App from './App.tsx';
 import { DEFAULT_ANCHOR, type Anchor } from './components/Trigger.tsx';
@@ -9,6 +8,7 @@ import globalStyles from './index.css?inline';
 import { default as sentry } from './integrations/console/index.ts';
 import type { Integration } from './integrations/integration.ts';
 import { initIntegrations } from './integrations/integration.ts';
+import { getSpotlightEventTarget } from './lib/eventTarget.ts';
 import { WindowWithSpotlight } from './types.ts';
 
 export { default as console } from './integrations/console/index.ts';
@@ -25,21 +25,21 @@ function createStyleSheet(styles: string) {
  * Open the Spotlight debugger Window
  */
 export async function openSpotlight() {
-  spotlightEventTarget.dispatchEvent(new CustomEvent('open'));
+  getSpotlightEventTarget().dispatchEvent(new CustomEvent('open'));
 }
 
 /**
  * Close the Spotlight debugger Window
  */
 export async function closeSpotlight() {
-  spotlightEventTarget.dispatchEvent(new CustomEvent('close'));
+  getSpotlightEventTarget().dispatchEvent(new CustomEvent('close'));
 }
 
 /**
  * Invokes the passed in callback when the Spotlight debugger Window is closed
  */
 export async function onClose(cb: () => void) {
-  spotlightEventTarget.addEventListener('closed', cb);
+  getSpotlightEventTarget().addEventListener('closed', cb);
 }
 
 const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
@@ -67,7 +67,7 @@ export async function init({
   // We only want to intialize and inject spotlight once. If it's already
   // been initialized, we can just bail out.
   const windowWithSpotlight = window as WindowWithSpotlight;
-  if (windowWithSpotlight.__spotlight_initialized) {
+  if (windowWithSpotlight.__spotlight) {
     return;
   }
 
@@ -118,6 +118,4 @@ export async function init({
       injectSpotlight();
     });
   }
-
-  windowWithSpotlight.__spotlight_initialized = true;
 }
