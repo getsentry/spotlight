@@ -4,5 +4,7 @@ export type TriggerButtonCount = {
 };
 
 export type WindowWithSpotlight = Window & {
-  __spotlight_initialized?: boolean;
+  __spotlight?: {
+    eventTarget?: EventTarget;
+  };
 };

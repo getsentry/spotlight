@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react';
 import Debugger from './components/Debugger';
 import Trigger, { type Anchor } from './components/Trigger';
 import type { Integration, IntegrationData } from './integrations/integration';
+import { getSpotlightEventTarget } from './lib/eventTarget';
 import { connectToSidecar } from './sidecar';
 import { TriggerButtonCount } from './types';
-
-import spotlightEventTarget from './lib/eventTarget';
 
 type AppProps = {
   fullScreen?: boolean;
@@ -57,6 +56,8 @@ export default function App({
       cleanupListeners();
     };
   }, [integrations, sidecar]);
+
+  const spotlightEventTarget = getSpotlightEventTarget();
 
   useEffect(() => {
     const onOpen = () => {
