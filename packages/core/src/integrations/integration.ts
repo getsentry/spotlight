@@ -71,7 +71,7 @@ export type IntegrationTab<T> = {
   active?: boolean;
 };
 
-type ProcessedEventContainer<T> = {
+export type ProcessedEventContainer<T> = {
   /**
    * The processed event data to be passed to your tabs.
    */
@@ -97,7 +97,7 @@ type TabsContext<T> = {
 
 type TabsCreationFunction<T> = (context: TabsContext<T>) => IntegrationTab<T>[];
 
-type RawEventContext = {
+export type RawEventContext = {
   /**
    * The content-type header of the event
    */

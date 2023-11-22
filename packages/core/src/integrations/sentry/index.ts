@@ -1,6 +1,6 @@
 import type { Envelope } from '@sentry/types';
 
-import type { Integration } from '../integration';
+import type { Integration, ProcessedEventContainer, RawEventContext } from '../integration';
 
 import sentryDataCache from './data/sentryDataCache';
 import { Spotlight } from './sentry-integration';
@@ -21,7 +21,7 @@ export default function sentryIntegration() {
       addSpotlightIntegrationToSentry();
     },
 
-    processEvent: processEnvelope({ data }),
+    processEvent: data => processEnvelope({ data }),
 
     tabs: () => [
       {
@@ -59,7 +59,9 @@ type WindowWithSentry = Window & {
   };
 };
 
-export function processEnvelope({ data }) {
+export function processEnvelope({
+  data,
+}: RawEventContext): ProcessedEventContainer<{ event: Envelope; severity: string }> {
   console.log('[Spotlight] Received new envelope');
 
   const [rawHeader, ...rawEntries] = data.split(/$/gm);
