@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 0.0.12
+
+### Patch Changes
+
+- fix(core): Use global event target instead of passing it via props
+  ([#109](https://github.com/getsentry/spotlight/pull/109))
+
 ## 0.0.11
 
 ### Patch Changes
