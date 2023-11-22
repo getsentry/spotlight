@@ -5,8 +5,9 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
+    "dev": "vite build --watch",
     "build": "vite build && tsc",
-    "build:watch": "exit 1",
+    "build:watch": "vite build --watch",
     "clean": "rimraf dist"
   },
   "files": [
