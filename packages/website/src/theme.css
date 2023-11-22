@@ -1,33 +1,41 @@
-/* Dark mode colors. */
-:root {
-  --sl-color-accent-low: #1c1f46;
-  --sl-color-accent: #6366f1;
-  --sl-color-accent-high: #a5b4fc;
-  --sl-color-white: #ffffff;
-  --sl-color-gray-1: #eceef2;
-  --sl-color-gray-2: #c0c2c7;
-  --sl-color-gray-3: #888b96;
-  --sl-color-gray-4: #545861;
-  --sl-color-gray-5: #2a2c34;
-  --sl-color-gray-6: #2a2c34;
-  --sl-color-black: #05010d;
-  --sl-color-bg-sidebar: var(--sl-color-black);
-  --sl-color-hairline-shade: var(--sl-color-gray-6);
+body {
+  background: #05010d;
 }
 
-/* Light mode colors. (same as dark mode) */
+:root,
 :root[data-theme='light'] {
-  --sl-color-accent-low: #1c1f46;
-  --sl-color-accent: #6366f1;
-  --sl-color-accent-high: #a5b4fc;
-  --sl-color-white: #ffffff;
-  --sl-color-gray-1: #eceef2;
-  --sl-color-gray-2: #c0c2c7;
-  --sl-color-gray-3: #888b96;
-  --sl-color-gray-4: #545861;
-  --sl-color-gray-5: #2a2c34;
-  --sl-color-gray-6: #2a2c34;
-  --sl-color-black: #05010d;
-  --sl-color-bg-sidebar: var(--sl-color-black);
-  --sl-color-hairline-shade: var(--sl-color-gray-6);
+  --sl-color-white: #fff;
+  --sl-color-accent-low: #1e1b4b;
+  --sl-color-accent: #4f46e5;
+  --sl-color-accent-high: #c7d2fe;
+  --sl-color-gray-1: hsl(224, 20%, 94%);
+  --sl-color-gray-2: hsl(224, 6%, 77%);
+  --sl-color-gray-3: hsl(224, 6%, 56%);
+  --sl-color-gray-4: hsl(224, 7%, 36%);
+  --sl-color-gray-5: hsl(224, 10%, 23%);
+  --sl-color-gray-6: hsl(224, 14%, 16%);
+  --sl-color-black: hsl(224, 10%, 10%);
+  --sl-color-text-accent: var(--sl-color-accent-high);
+  --sl-color-text-invert: var(--sl-color-accent-low);
+  --sl-color-bg-sidebar: var(--sl-color-gray-6);
+  --sl-hue-orange: 41;
+  --sl-color-orange-low: hsl(var(--sl-hue-orange), 39%, 22%);
+  --sl-color-orange: hsl(var(--sl-hue-orange), 82%, 63%);
+  --sl-color-orange-high: hsl(var(--sl-hue-orange), 82%, 87%);
+  --sl-hue-green: 101;
+  --sl-color-green-low: hsl(var(--sl-hue-green), 39%, 22%);
+  --sl-color-green: hsl(var(--sl-hue-green), 82%, 63%);
+  --sl-color-green-high: hsl(var(--sl-hue-green), 82%, 80%);
+  --sl-hue-blue: 234;
+  --sl-color-blue-low: hsl(var(--sl-hue-blue), 54%, 20%);
+  --sl-color-blue: hsl(var(--sl-hue-blue), 100%, 60%);
+  --sl-color-blue-high: hsl(var(--sl-hue-blue), 100%, 87%);
+  --sl-hue-purple: 281;
+  --sl-color-purple-low: hsl(var(--sl-hue-purple), 39%, 22%);
+  --sl-color-purple: hsl(var(--sl-hue-purple), 82%, 63%);
+  --sl-color-purple-high: hsl(var(--sl-hue-purple), 82%, 89%);
+  --sl-hue-red: 339;
+  --sl-color-red-low: hsl(var(--sl-hue-red), 39%, 22%);
+  --sl-color-red: hsl(var(--sl-hue-red), 82%, 63%);
+  --sl-color-red-high: hsl(var(--sl-hue-red), 82%, 87%);
 }
