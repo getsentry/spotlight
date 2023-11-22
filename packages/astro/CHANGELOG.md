@@ -1,5 +1,19 @@
 # @spotlightjs/astro
 
+## 0.0.12
+
+### Patch Changes
+
+- ref(astro): Guard requests and parsing in Vite Symbolication plugin
+  ([#97](https://github.com/getsentry/spotlight/pull/97))
+
+- Updated dependencies
+  [[`e96a5c6`](https://github.com/getsentry/spotlight/commit/e96a5c6744ef59d79c6ed7164c9c8f6fe82d9aab),
+  [`989b5b5`](https://github.com/getsentry/spotlight/commit/989b5b55cefb62240d12f65c9cf9fe9a041f03e1),
+  [`9f8d37a`](https://github.com/getsentry/spotlight/commit/9f8d37a38f8fee28c035a87766c065e2a59351eb)]:
+  - @spotlightjs/core@0.0.10
+  - @spotlightjs/sidecar@0.0.9
+
 ## 0.0.11
 
 ### Patch Changes
