@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 0.0.9
+
+### Patch Changes
+
+- Add connect function
+  ([`989b5b5`](https://github.com/getsentry/spotlight/commit/989b5b55cefb62240d12f65c9cf9fe9a041f03e1))
+
 ## 0.0.8
 
 ### Patch Changes
