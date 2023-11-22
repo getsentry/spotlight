@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import classNames from '~/lib/classNames';
+import classNames from '../../../../../lib/classNames';
 import { EventFrame, FrameVars } from '../../../types';
 
 function formatFilename(filename: string) {

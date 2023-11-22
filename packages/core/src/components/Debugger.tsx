@@ -1,7 +1,7 @@
 import { ReactComponent as Logo } from '~/assets/glyph.svg';
 import { Integration, IntegrationData } from '~/integrations/integration';
-import classNames from '~/lib/classNames';
-import useKeyPress from '~/lib/useKeyPress';
+import classNames from '../lib/classNames';
+import useKeyPress from '../lib/useKeyPress';
 import Overview from './Overview';
 
 export default function Debugger({

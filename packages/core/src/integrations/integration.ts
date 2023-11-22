@@ -71,7 +71,7 @@ export type IntegrationTab<T> = {
   active?: boolean;
 };
 
-type ProcessedEventContainer<T> = {
+export type ProcessedEventContainer<T> = {
   /**
    * The processed event data to be passed to your tabs.
    */
@@ -86,8 +86,10 @@ type ProcessedEventContainer<T> = {
    *
    * @default value is 'default'
    */
-  severity?: 'default' | 'severe';
+  severity?: Severity;
 };
+
+export type Severity = 'default' | 'severe';
 
 export type IntegrationData<T> = Record<string, ProcessedEventContainer<T>[]>;
 
@@ -97,7 +99,7 @@ type TabsContext<T> = {
 
 type TabsCreationFunction<T> = (context: TabsContext<T>) => IntegrationTab<T>[];
 
-type RawEventContext = {
+export type RawEventContext = {
   /**
    * The content-type header of the event
    */

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import classNames from '~/lib/classNames';
+import classNames from '../../../lib/classNames';
 import { useSentryTraces } from '../data/useSentryTraces';
 import { getDuration } from '../utils/duration';
 import PlatformIcon from './PlatformIcon';

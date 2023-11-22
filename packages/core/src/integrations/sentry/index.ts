@@ -1,6 +1,6 @@
 import type { Envelope } from '@sentry/types';
 
-import type { Integration } from '../integration';
+import type { Integration, RawEventContext, Severity } from '../integration';
 
 import sentryDataCache from './data/sentryDataCache';
 import { Spotlight } from './sentry-integration';
@@ -21,25 +21,7 @@ export default function sentryIntegration() {
       addSpotlightIntegrationToSentry();
     },
 
-    processEvent({ data }) {
-      console.log('[spotlight] Received new envelope');
-      const [rawHeader, ...rawEntries] = data.split('\n');
-      const header = JSON.parse(rawHeader) as Envelope[0];
-      console.log(`[Spotlight] Received new envelope from SDK ${header.sdk?.name || '(unknown)'}`);
-
-      const items: Envelope[1][] = [];
-      for (let i = 0; i < rawEntries.length; i += 2) {
-        items.push([JSON.parse(rawEntries[i]), JSON.parse(rawEntries[i + 1])]);
-      }
-
-      const envelope = [header, items] as Envelope;
-      sentryDataCache.pushEnvelope(envelope);
-
-      return {
-        event: envelope,
-        severity: isErrorEnvelope(envelope) ? 'severe' : 'default',
-      };
-    },
+    processEvent: (event: RawEventContext) => processEnvelope(event),
 
     tabs: () => [
       {
@@ -76,6 +58,27 @@ type WindowWithSentry = Window & {
     };
   };
 };
+
+export function processEnvelope({ data }: RawEventContext) {
+  console.log('[Spotlight] Received new envelope');
+  const [rawHeader, ...rawEntries] = data.split(/\n/gm);
+
+  const header = JSON.parse(rawHeader) as Envelope[0];
+  console.log(`[Spotlight] Received new envelope from SDK ${header.sdk?.name || '(unknown)'}`);
+
+  const items: Envelope[1][] = [];
+  for (let i = 0; i < rawEntries.length; i += 2) {
+    items.push([JSON.parse(rawEntries[i]), JSON.parse(rawEntries[i + 1])]);
+  }
+
+  const envelope = [header, items] as Envelope;
+  sentryDataCache.pushEnvelope(envelope);
+
+  return {
+    event: envelope,
+    severity: isErrorEnvelope(envelope) ? 'severe' : ('default' as Severity),
+  };
+}
 
 function isErrorEnvelope(envelope: Envelope) {
   return envelope[1].some(([itemHeader]) => itemHeader.type === 'event');

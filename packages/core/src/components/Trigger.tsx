@@ -1,6 +1,6 @@
 import { ReactComponent as Logo } from '~/assets/glyph.svg';
-import classNames from '~/lib/classNames';
-import { TriggerButtonCount } from '~/types';
+import classNames from '../lib/classNames';
+import { TriggerButtonCount } from '../types';
 
 export default function Trigger({
   isOpen,
