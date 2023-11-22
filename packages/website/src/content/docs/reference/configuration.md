@@ -9,7 +9,7 @@ description: All the configuration options for setting up Spotlight
 import * as Spotlight from '@spotlightjs/core';
 
 Spotlight.init({
-  integrations: [sentry()],
+  integrations: [Spotlight.sentry()],
 });
 ```
 
