@@ -21,11 +21,10 @@ const { title, description, accentColor, reverse } = Astro.props;
     overflow-x: hidden;
   }
 
-  h4.heading {
+  h5.heading {
     display: block;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     letter-spacing: 0px; 
-    text-align: center;
   }
 
   div.sub-heading {
@@ -42,7 +41,7 @@ const { title, description, accentColor, reverse } = Astro.props;
     .card {
       flex-direction: row;
       gap: 3rem;
-      padding: 3rem;
+      padding: 2rem;
     }
     .card.reverse {
       flex-direction: row-reverse;
@@ -51,8 +50,8 @@ const { title, description, accentColor, reverse } = Astro.props;
 </style>
 
 <div class={reverse ? "card reverse" : "card"} >
-  <div class="flex-1 flex-shrink-0 self-start pt-8">
-    <h5 class="mb-2">{title}</h5>
+  <div class="flex-1 flex-shrink-0">
+    <h5 class="mb-2 heading">{title}</h5>
     <p>{description}</p>
   </div>
   <div class="flex-1 max-w-xl h-max" style={{margin: 0}}>

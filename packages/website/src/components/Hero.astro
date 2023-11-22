@@ -1,4 +1,9 @@
 ---
+
+import { Fragment } from "react";
+import FeatureCard from "./FeatureCard.astro";
+import {Content as CodeBlock} from './codeblock.mdx';
+
 // Used to override the default hero component
 ---
 
@@ -33,7 +38,7 @@
     justify-content: center;
     position: relative;
     flex-direction: column;
-    padding-top: max(calc(10vh - 7rem), 0px);
+    padding-top: 6rem;
     padding-bottom: 12rem;
     min-height: calc(100vh - 54px);
   }
@@ -65,20 +70,24 @@
 
   .hero-image {
     width: 100%;
-    margin-bottom: 4rem; 
+    margin-bottom: 0rem; 
     border-radius: 0.5rem;
     opacity: 0; animation: fade-in 1s ease-in-out 1s forwards;
   }
 
-
+  .install-wrapper {
+    margin: 0;
+    max-width: 100%;;
+    opacity: 0;
+    animation: fade-in 1s ease-in-out 1s forwards;
+  }
 
   .actions {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding-top: 1rem; 
     gap: 2rem;
-    opacity: 0;
-    animation: fade-in 1s ease-in-out 1s forwards;
   }
 
   .actions > a {
@@ -123,7 +132,16 @@
   <h1 class="neon-header">Easy fullstack debugging</h1>
   <div class="sub-heading">Spotlight is a highly customizable debug tool embedded in your web app.</div>
   <img src="/images/hero-showcase.png" alt="Spotlight Hero" class="hero-image" />
-  <div class="actions">
-    <a href="/what-is-spotlight/">Read the docs</a>
+  <div class="install-wrapper">
+    <FeatureCard
+      title="Get started now!"
+      description={'Simply copy and paste this code snippet into your main javascript file.\nIf you need any more help, simply visit our documentation.'}
+    >
+      <div />
+      <CodeBlock />
+    </FeatureCard>
+    <p class="actions">
+      <a href="/what-is-spotlight/">Read the docs</a>
+    </p>
   </div>
 </div>
