@@ -3,14 +3,9 @@
         .favicon-stroke {
 
         }
-        #line { fill: black }
-        #outside-dot { fill: black }
-        #inside-dot { fill: black }
-        @media (prefers-color-scheme: dark) {
         #line { fill: white }
         #outside-dot { fill: white }
         #inside-dot { fill: white }
-        }
     </style>
     <rect width="256" height="256" fill="none" />
     <path

@@ -32,7 +32,11 @@ export default defineConfig({
     spotlight(),
     starlight({
       title: 'Spotlight',
+      logo: {
+        src: './public/images/glyph.svg',
+      },
       social: {
+        discord: 'https://discord.gg/sentry',
         github: 'https://github.com/getsentry/spotlight',
       },
       components: {
