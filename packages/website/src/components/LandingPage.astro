@@ -3,34 +3,34 @@ import FeatureCard from './FeatureCard.astro';
 import Section from './Section.astro';
 import Highlight from './Highlight.astro';
 import AstroShowcase from './AstroShowcase.astro';
-import {Content as CodeBlock} from './codeblock.mdx';
+import { Content as CodeBlock } from './codeblock.mdx';
 ---
 
 <Highlight />
 
-<Section title="Simple Setup" subTitle="Only one line of code">
+<Section title="Thirty Seconds to Liftoff">
   <FeatureCard
-    title="Navigate your errors with ease"
-    description="  Sed a porttitor nulla. Nam tempus imperdiet fringilla. Maecenas et velit dui. Integer sit amet libero ut sapien congue volutpat et ut odio. Fusce viverra, nulla sit amet suscipit varius."
+    title="As easy as npm install"
+    description="Two npm packages get you over the finish line. Inject the Spotlight overlay and run the sidecar."
   >
-  <CodeBlock />
+    <CodeBlock />
   </FeatureCard>
 </Section>
 
-<Section title="Easy to customize" subTitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit">
+<Section title="Works Everywhere">
   <FeatureCard
-    title="Navigate your errors with ease"
-    description="Sed a porttitor nulla. Nam tempus imperdiet fringilla. Maecenas et velit dui. Integer sit amet libero ut sapien congue volutpat et ut odio. Fusce viverra, nulla sit amet suscipit varius, felis diam auctor est, at rutrum lacus metus sed metus. Quisque blandit lectus non elit interdum, vel elementum urna facilisis. Nullam pretium dignissim orci, sed blandit risus bibendum dignissim. Integer gravida tristique mi, vitae auctor orci lobortis at."
+    title="Compatible with Sentry's universal SDKs"
+    description="Take the power of Sentry's telemetry and bring that into your development environment with Errors and Traces."
     reverse
   >
-    <img class="block rounded-lg" src="/images/error.png" width="100%" style={{ maxWidth: 'unset' }} />
+    <img class="block rounded-lg" src="/images/peated-sample-error.png" width="100%" style={{ maxWidth: 'unset' }} />
   </FeatureCard>
 </Section>
 
-<Section title="For every developer" subTitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit">
+<Section title="An Extension of You">
   <FeatureCard
-    title="Navigate your errors with ease"
-    description="  Sed a porttitor nulla. Nam tempus imperdiet fringilla. Maecenas et velit dui. Integer sit amet libero ut sapien congue volutpat et ut odio. Fusce viverra, nulla sit amet suscipit varius."
+    title="Customizable overlay to support your use cases"
+    description="The powerful overlay and event proxy make it easy to extend Spotlight to other concepts including first-party concerns."
   >
     <AstroShowcase />
   </FeatureCard>
