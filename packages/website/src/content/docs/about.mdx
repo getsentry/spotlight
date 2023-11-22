@@ -23,11 +23,11 @@ overlay into development environments, and it does it by leveraging the existing
 
 At a high level, Spotlight consists of two components:
 
-1. An overlay that renders inside of your application. The overlay is a simple React application, and can
+1. An overlay (`@spotlightjs/core`) that renders inside of your application. The overlay is a simple React application, and can
    seamlessly run in any web application (or even independently!).
 
-2. A proxy server (the `sidecar`) which which enables push-based communication to the overlay. This is achieved via a simple HTTP relay,
-   allowing SDKs to push events to it, and allowing the overlay to receive events using an [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events).
+2. A proxy server (`@spotlightjs/sidecar`) which enables push-based communication to the overlay. This is achieved via a simple HTTP relay,
+   allowing SDKs to push events to it, and allowing the overlay to receive events using [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events).
 
 This means that adoption in most projects is two simple additions:
 
