@@ -56,13 +56,23 @@ export default function App({
     };
   }, [integrations, sidecar]);
 
-  eventTarget.addEventListener('open', () => {
-    setOpen(true);
-  });
+  useEffect(() => {
+    const onOpen = () => {
+      setOpen(true);
+    };
 
-  eventTarget.addEventListener('close', () => {
-    setOpen(false);
-  });
+    const onClose = () => {
+      setOpen(false);
+    };
+
+    eventTarget.addEventListener('open', onOpen);
+    eventTarget.addEventListener('close', onClose);
+
+    return () => {
+      eventTarget.removeEventListener('open', onOpen);
+      eventTarget.removeEventListener('close', onClose);
+    };
+  }, [eventTarget]);
 
   useEffect(() => {
     if (!isOpen) {
