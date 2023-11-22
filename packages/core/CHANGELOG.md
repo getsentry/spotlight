@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 0.0.11
+
+### Patch Changes
+
+- fix(core): Use effect and cleanup spotlight event target listeners
+  ([#104](https://github.com/getsentry/spotlight/pull/104))
+
 ## 0.0.10
 
 ### Patch Changes
