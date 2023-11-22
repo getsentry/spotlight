@@ -1,0 +1,69 @@
+---
+title: Get Started
+description: A guide how to contribute to Spotlight.
+---
+
+Spotlight relies on a [pnpm](https://pnpm.io) monorepo. You'll need to install pnpm to get things going, which can be done with [Volta](https://volta.sh).
+
+Pull down the repo (or your fork):
+
+```shell
+git clone https://github.com/getsentry/spotlight.git
+```
+
+Ensure the node and pnpm are available:
+
+```shell
+volta install node pnpm
+```
+
+Lastly, install the package requirements:
+
+```shell
+pnpm install
+```
+
+## Development
+
+From there you can spin up the Spotlight repo into watch mode:
+
+```shell
+pnpm dev:core
+```
+
+Depending on what you're doing there's two paths to develop against the core.
+
+If you simply want to run Spotlight against the example application, you can spin that up using:
+
+```shell
+pnpm dev:playground
+```
+
+Additionally you may want to link it into an existing project. This is a little brittle, and we're not experts here, so your mileage may vary.
+
+First, when in the Spotlight root directory, you'll need to link the packages you're referencing (likely `@spotlightjs/core` and `@spotlightjs/sidecar`):
+
+```shell
+pnpm link --global -C packages/core
+pnpm link --global -C packages/sidecar
+```
+
+You can now link these within your project. For example if you're using `pnpm`:
+
+```shell
+pnpm link --global @spotlightjs/core
+pnpm link --global @spotlightjs/sidecar
+```
+
+## Repository Structure
+
+The monorepo is mostly straight forward, but here's a quick summary: 
+
+```
+spotlight
+└── packages                
+    ├── core         // @spotlightjs/core     - the main overlay
+    ├── sidecar      // @spotlightjs/sidecar  - the sidecar (proxy) for streaming data
+    ├── tsconfig     // @spotlightjs/tsconfig - shared tsconfig
+    └── website      // @spotlightjs/website  - the main overlay
+```

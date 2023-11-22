@@ -7,7 +7,7 @@ overlay into development environments, and it does it by leveraging the existing
 
 ## Contributing / Running the repo
 
-See [CONTIBUTING.md](./CONTRIBUTING.md) for how to contribute and develop Spotlight.
+See [Contribute](https://spotlightjs.com/contribute/) for how to contribute and develop Spotlight.
 
 ## More on Architecture
 
