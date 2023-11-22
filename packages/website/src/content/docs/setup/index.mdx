@@ -1,16 +1,21 @@
 ---
-title: Using Spotlight in your Environment
+title: Setup Spotlight
 description: A guide how to setup Spotlight in your environment
 ---
 
-Spotlight can be used with a variety of frameworks and even in your custom environment. See other guides like [Astro](/setup/astro/) if you want to use Spotlight with a specific framework.
+Spotlight can be used with a variety of frameworks and even in your custom environment. 
 
+While it's not dependent on Sentry, Spotlight is much more powerful if you're using Sentry's SDKs. It will leverage the error and traces they collect and render them locally.
 
-While it's not dependent on Sentry's SDKs it's recommended to use them to get the most out of Spotlight.
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-## Frontend
+<LinkCard title="Spotlight for Astro" description="Astro specific instructions for setting up Spotlight." href="/setup/astro/" />
 
-### Install
+## Overlay
+
+You'll start by registering the Spotlight package in your existing frontend application.
+
+Install the `@spotlightjs/core` package:
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
@@ -32,7 +37,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   </TabItem>
 </Tabs>
 
-### Setup
+Inject Spotlight into your application:
 
 ```js
 import * as Spotlight from '@spotlightjs/core';
@@ -40,39 +45,38 @@ import * as Spotlight from '@spotlightjs/core';
 Spotlight.init();
 ```
 
----
+Upon loading your UI you should now see the Spotlight toolbar in bottom-right corner of your application.
 
+For more options on how to configure Spotlight's UI, see [Configuration](/reference/configuration/).
 
-## Backend
+:::tip
+Spotlight will automatically configure [Sentry's Browser SDK](https://docs.sentry.io/platforms/javascript/) to send data to the default Sidecar.
 
-If you run Sentry also on your backend you need to tell the SDK to connect to Spotlight.
+If you are using additional runtimes, such as [Node.js](https://docs.sentry.io/platforms/node/), [PHP](https://docs.sentry.io/platforms/php/), or [Python](https://docs.sentry.io/platforms/python/), you should take a look at Sentry's SDKs on how to enable Spotlight. Generally this as easy as `spotlight = true` in `Sentry.init()`:
 
-### Install
-
-<Tabs>
-  <TabItem label="npm">
-  ```sh 
-  npm add --save-dev @spotlightjs/sidecar 
-  ```
-  </TabItem>
-  <TabItem label="pnpm">
-  ```sh 
-  pnpm add -D @spotlightjs/sidecar
-  ```
-  </TabItem>
-  <TabItem label="yarn">
-  ```sh 
-  yarn add @spotlightjs/sidecar -D
-  ```
-  </TabItem>
-</Tabs>
-
-### Setup
 
 ```js
-import * as Sentry from '@sentry/node';
-import { connect } from '@spotlightjs/sidecar/connect'
-// ....
-Sentry.init({...});
-connect(Sentry.getCurrentHub()); // call connect right after Sentry.init
+Sentry.init({
+  // ...
+  spotlight: true
+})
 ```
+
+:::
+
+---
+
+## Sidecar
+
+
+
+Spotlight's [architecture](/architecture/) require's a sidecar to be running alongside your service. This is to enable streaming data collection from your backend services into the Spotlight overlay.
+
+
+<LinkCard title="Node.js (No Framework)" href="/sidecar/npx/" />
+
+<CardGrid>
+  <LinkCard title="Vite" href="/sidecar/vite/" />
+  <LinkCard title="Webpack" href="/sidecar/webpack/" />
+</CardGrid>
+

@@ -1,6 +1,9 @@
 ---
 title: Write your own Integration
 description: A guide how to write a Spotlight Integration
+sidebar:
+  label: 'Building an Integration'
+  order: 999
 ---
 
 An integration in Spotlight is rather powerful. It can completely change the behavior, add, remove functionality from

@@ -45,7 +45,7 @@ export default defineConfig({
       },
       sidebar: [
         {
-          label: 'Start here',
+          label: 'About',
           items: [
             {
               label: 'What is Spotlight?',
@@ -75,15 +75,6 @@ export default defineConfig({
           autogenerate: {
             directory: 'sidecar',
           },
-        },
-        {
-          label: 'Guides',
-          items: [
-            {
-              label: 'Write an integration',
-              link: '/guides/integration/',
-            },
-          ],
         },
         {
           label: 'Integrations',

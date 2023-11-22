@@ -12,26 +12,26 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/react": "^3.0.5",
-    "@astrojs/starlight": "^0.11.2",
-    "@astrojs/starlight-tailwind": "^2.0.0",
+    "@astrojs/react": "^3.0.6",
+    "@astrojs/starlight": "^0.13.0",
+    "@astrojs/starlight-tailwind": "^2.0.1",
     "@astrojs/tailwind": "^5.0.2",
     "@astrojs/vercel": "^5.2.0",
-    "@fontsource/raleway": "^5.0.8",
-    "@sentry/astro": "^7.80.0",
+    "@fontsource/raleway": "^5.0.15",
+    "@sentry/astro": "^7.81.1",
     "@spotlightjs/astro": "workspace:*",
     "@spotlightjs/core": "workspace:*",
-    "@types/react": "^18.2.37",
-    "@types/react-dom": "^18.2.15",
-    "astro": "^3.5.4",
+    "@types/react": "^18.2.38",
+    "@types/react-dom": "^18.2.17",
+    "astro": "^3.6.0",
     "react": "^18.2.0",
-    "react-dom": "^18.0.0",
+    "react-dom": "^18.2.0",
     "sharp": "^0.32.6",
-    "tailwindcss": "^3.0.24"
+    "tailwindcss": "^3.3.5"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
-    "typescript": "^5.0.2",
+    "typescript": "^5.3.2",
     "vite-plugin-inspect": "^0.7.42"
   },
   "volta": {
