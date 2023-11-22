@@ -4,7 +4,7 @@ import fontStyles from '@fontsource/raleway/index.css?inline';
 import spotlightEventTarget from './lib/eventTarget.ts';
 
 import App from './App.tsx';
-import { type Anchor } from './components/Trigger.tsx';
+import { DEFAULT_ANCHOR, type Anchor } from './components/Trigger.tsx';
 import globalStyles from './index.css?inline';
 import type { Integration } from './integrations/integration.ts';
 import { initIntegrations } from './integrations/integration.ts';
@@ -50,7 +50,7 @@ export async function init({
   defaultEventId,
   injectImmediately = false,
   sidecar = DEFAULT_SIDECAR,
-  anchor = 'bottomRight',
+  anchor = DEFAULT_ANCHOR,
 }: {
   integrations?: Integration[];
   fullScreen?: boolean;
