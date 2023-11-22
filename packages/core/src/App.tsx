@@ -5,8 +5,9 @@ import type { Integration, IntegrationData } from './integrations/integration';
 import { connectToSidecar } from './sidecar';
 import { TriggerButtonCount } from './types';
 
+import spotlightEventTarget from './lib/eventTarget';
+
 type AppProps = {
-  eventTarget: EventTarget;
   fullScreen?: boolean;
   showTriggerButton?: boolean;
   defaultEventId?: string;
@@ -15,7 +16,6 @@ type AppProps = {
 };
 
 export default function App({
-  eventTarget,
   fullScreen = false,
   showTriggerButton = true,
   defaultEventId,
@@ -58,30 +58,32 @@ export default function App({
 
   useEffect(() => {
     const onOpen = () => {
+      console.log('[Spotlight] Open');
       setOpen(true);
     };
 
     const onClose = () => {
+      console.log('[Spotlight] Close');
       setOpen(false);
     };
 
-    eventTarget.addEventListener('open', onOpen);
-    eventTarget.addEventListener('close', onClose);
+    spotlightEventTarget.addEventListener('open', onOpen);
+    spotlightEventTarget.addEventListener('close', onClose);
 
     return () => {
-      eventTarget.removeEventListener('open', onOpen);
-      eventTarget.removeEventListener('close', onClose);
+      spotlightEventTarget.removeEventListener('open', onOpen);
+      spotlightEventTarget.removeEventListener('close', onClose);
     };
-  }, [eventTarget]);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) {
-      eventTarget.dispatchEvent(new CustomEvent('closed'));
+      spotlightEventTarget.dispatchEvent(new CustomEvent('closed'));
       document.body.style.overflow = 'auto';
     } else {
       document.body.style.overflow = 'hidden';
     }
-  }, [isOpen, eventTarget]);
+  }, [isOpen]);
 
   console.log('[Spotlight] Integrations', integrationData);
 

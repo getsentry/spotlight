@@ -1,6 +1,7 @@
 import ReactDOM from 'react-dom/client';
 
 import fontStyles from '@fontsource/raleway/index.css?inline';
+import spotlightEventTarget from './lib/eventTarget.ts';
 
 import App from './App.tsx';
 import globalStyles from './index.css?inline';
@@ -17,8 +18,6 @@ function createStyleSheet(styles: string) {
   sheet.replaceSync(styles);
   return sheet;
 }
-
-const spotlightEventTarget: EventTarget = new EventTarget();
 
 /**
  * Open the Spotlight debugger Window
@@ -96,7 +95,6 @@ export async function init({
       integrations={initializedIntegrations}
       fullScreen={fullScreen}
       defaultEventId={defaultEventId}
-      eventTarget={spotlightEventTarget}
       showTriggerButton={showTriggerButton}
       sidecar={sidecar}
     />,
