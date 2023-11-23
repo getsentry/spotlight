@@ -5,9 +5,9 @@ import fontStyles from '@fontsource/raleway/index.css?inline';
 import App from './App.tsx';
 import { DEFAULT_ANCHOR, type Anchor } from './components/Trigger.tsx';
 import globalStyles from './index.css?inline';
-import { default as sentry } from './integrations/console/index.ts';
 import type { Integration } from './integrations/integration.ts';
 import { initIntegrations } from './integrations/integration.ts';
+import { default as sentry } from './integrations/sentry/index.ts';
 import { getSpotlightEventTarget } from './lib/eventTarget.ts';
 import { WindowWithSpotlight } from './types.ts';
 
