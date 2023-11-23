@@ -68,6 +68,12 @@ export function processEnvelope({ data }: RawEventContext) {
       continue;
     }
     items.push([JSON.parse(rawEntries[i]), JSON.parse(rawEntries[i + 1])]);
+    // get type attribute from first and put it into the second
+    // this is needed because the type is not part of the envelope
+    // but we need it to determine the severity
+    if (items[i / 2][0].type) {
+      items[i / 2][1].type = items[i / 2][0].type;
+    }
   }
 
   const envelope = [header, items] as Envelope;
