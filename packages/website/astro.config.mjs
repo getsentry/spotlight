@@ -45,6 +45,33 @@ export default defineConfig({
         Hero: './src/components/Hero.astro',
         Header: './src/components/Header.astro',
       },
+
+      head: [
+        {
+          tag: 'meta',
+          attrs: { property: 'og:image', content: '/images/trace.png' },
+        },
+        {
+          tag: 'meta',
+          attrs: { property: 'twitter:image', content: '/images/trace.png' },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:description',
+            content:
+              "Spotlight is Sentry for Development. Inspired by an old project, Django Debug Toolbar, Spotlight brings a rich debug overlay into development environments, and it does it by leveraging the existing power of Sentry's SDKs.",
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'twitter:description',
+            content:
+              "Spotlight is Sentry for Development. Inspired by an old project, Django Debug Toolbar, Spotlight brings a rich debug overlay into development environments, and it does it by leveraging the existing power of Sentry's SDKs.",
+          },
+        },
+      ],
       sidebar: [
         {
           label: 'About',
