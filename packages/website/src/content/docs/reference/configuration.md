@@ -32,6 +32,18 @@ init({
 type SpotlightIntegration = {};
 ```
 
+### `debug`
+
+**type:** boolean **default:** false
+
+Enables some debug output in console for debugging.
+
+```ts
+init({
+  debug: true,
+});
+```
+
 ### `sidecar`
 
 **type:** string

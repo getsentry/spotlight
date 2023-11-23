@@ -29,7 +29,9 @@ export default defineConfig({
     sentry({
       debug: true,
     }),
-    spotlight(),
+    spotlight({
+      debug: true,
+    }),
     starlight({
       title: 'Spotlight',
       logo: {

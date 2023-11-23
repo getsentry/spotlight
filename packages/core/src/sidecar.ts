@@ -1,5 +1,6 @@
 import React from 'react';
 import { Integration, IntegrationData } from './integrations/integration';
+import { log } from './lib/logger';
 import { TriggerButtonCount } from './types';
 
 export function connectToSidecar(
@@ -9,14 +10,14 @@ export function connectToSidecar(
   setOnline: React.Dispatch<React.SetStateAction<boolean>>,
   setTriggerButtonCount: React.Dispatch<React.SetStateAction<TriggerButtonCount>>,
 ): () => void {
-  console.log('[Spotlight] Connecting to sidecar at', sidecar);
+  log('Connecting to sidecar at', sidecar);
   const source = new EventSource(sidecar);
 
   const contentTypeListeners: [contentType: string, listener: (event: MessageEvent) => void][] = [];
 
   for (const [contentType, integrations] of contentTypeToIntegrations.entries()) {
     const listener = (event: MessageEvent): void => {
-      console.log(`[spotlight] Received new ${contentType} event`);
+      log(`Received new ${contentType} event`);
       integrations.forEach(integration => {
         if (integration.processEvent) {
           const processedEvent = integration.processEvent({
@@ -43,7 +44,7 @@ export function connectToSidecar(
       });
     };
 
-    console.log('[spotlight] adding listener for', contentType, 'sum', contentTypeListeners.length);
+    log('Adding listener for', contentType, 'sum', contentTypeListeners.length);
 
     // `contentType` could for example be "application/x-sentry-envelope"
     contentTypeListeners.push([contentType, listener]);
@@ -52,7 +53,7 @@ export function connectToSidecar(
 
   source.addEventListener('open', () => {
     setOnline(true);
-    console.log('[Spotlight] open');
+    log('Open');
   });
 
   source.addEventListener('error', err => {
@@ -61,10 +62,10 @@ export function connectToSidecar(
   });
 
   return () => {
-    console.log(`[spotlight] removing ${contentTypeListeners.length} listeners`);
+    log(`Removing ${contentTypeListeners.length} listeners`);
     contentTypeListeners.forEach(typeAndListener => {
       source.removeEventListener(typeAndListener[0], typeAndListener[1]);
-      console.log('[spotlight] removed listner for type', typeAndListener[0]);
+      log('Removed listner for type', typeAndListener[0]);
     });
   };
 }

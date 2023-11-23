@@ -3,6 +3,7 @@ import Debugger from './components/Debugger';
 import Trigger, { type Anchor } from './components/Trigger';
 import type { Integration, IntegrationData } from './integrations/integration';
 import { getSpotlightEventTarget } from './lib/eventTarget';
+import { log } from './lib/logger';
 import { connectToSidecar } from './sidecar';
 import { TriggerButtonCount } from './types';
 
@@ -23,7 +24,7 @@ export default function App({
   sidecar,
   anchor,
 }: AppProps) {
-  console.log('[Spotlight] App rerender');
+  log('App rerender');
 
   const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});
   const [isOnline, setOnline] = useState(false);
@@ -52,7 +53,7 @@ export default function App({
     );
 
     return () => {
-      console.log('[Spotlight] useeffect cleanup');
+      log('useEffect cleanup');
       cleanupListeners();
     };
   }, [integrations, sidecar]);
@@ -61,12 +62,12 @@ export default function App({
 
   useEffect(() => {
     const onOpen = () => {
-      console.log('[Spotlight] Open');
+      log('Open');
       setOpen(true);
     };
 
     const onClose = () => {
-      console.log('[Spotlight] Close');
+      log('Close');
       setOpen(false);
     };
 
@@ -88,7 +89,7 @@ export default function App({
     }
   }, [isOpen]);
 
-  console.log('[Spotlight] Integrations', integrationData);
+  log('Integrations', integrationData);
 
   return (
     <>

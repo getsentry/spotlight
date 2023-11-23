@@ -21,7 +21,6 @@ export default function PlatformIcon({
   platform?: Platform;
   event?: SentryEvent;
 }) {
-  console.log('SDK:', platform, event?.platform);
   const name = platform || event?.platform || 'unknown';
   switch (name) {
     case 'ruby':

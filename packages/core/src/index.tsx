@@ -9,6 +9,7 @@ import type { Integration } from './integrations/integration.ts';
 import { initIntegrations } from './integrations/integration.ts';
 import { default as sentry } from './integrations/sentry/index.ts';
 import { getSpotlightEventTarget } from './lib/eventTarget.ts';
+import { activateLogger, log } from './lib/logger.ts';
 import { WindowWithSpotlight } from './types.ts';
 
 export { default as console } from './integrations/console/index.ts';
@@ -52,6 +53,7 @@ export async function init({
   injectImmediately = false,
   sidecar = DEFAULT_SIDECAR,
   anchor = DEFAULT_ANCHOR,
+  debug = false,
 }: {
   integrations?: Integration[];
   fullScreen?: boolean;
@@ -61,6 +63,7 @@ export async function init({
   injectImmediately?: boolean;
   sidecar?: string;
   anchor?: Anchor;
+  debug?: boolean;
 } = {}) {
   if (typeof document === 'undefined') return;
 
@@ -71,6 +74,9 @@ export async function init({
     return;
   }
 
+  if (debug) {
+    activateLogger();
+  }
   const initializedIntegrations = await initIntegrations(integrations);
 
   // build shadow dom container to contain styles
@@ -107,7 +113,7 @@ export async function init({
   );
 
   function injectSpotlight() {
-    console.log('[spotlight] Injecting into application');
+    log('Injecting into application');
     document.body.append(docRoot);
   }
 

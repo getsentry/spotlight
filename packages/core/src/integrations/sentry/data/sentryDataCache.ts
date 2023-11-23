@@ -81,7 +81,6 @@ class SentryDataCache {
 
     items.forEach(([itemHeader, itemData]) => {
       if (itemHeader.type === 'event' || itemHeader.type === 'transaction') {
-        console.log(sdkToPlatform(sdk.name));
         (itemData as SentryEvent).platform = sdkToPlatform(sdk.name);
         this.pushEvent(itemData as SentryEvent);
       }

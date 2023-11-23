@@ -11,8 +11,6 @@ import TracesTab from './tabs/TracesTab';
 const HEADER = 'application/x-sentry-envelope';
 
 export default function sentryIntegration() {
-  console.log('spotlight', sentryDataCache.getEvents());
-
   return {
     name: 'sentry',
     forwardedContentType: [HEADER],
@@ -60,12 +58,9 @@ type WindowWithSentry = Window & {
 };
 
 export function processEnvelope({ data }: RawEventContext) {
-  console.log('[Spotlight] Received new envelope');
   const [rawHeader, ...rawEntries] = data.split(/\n/gm);
 
   const header = JSON.parse(rawHeader) as Envelope[0];
-  console.log(`[Spotlight] Received new envelope from SDK ${header.sdk?.name || '(unknown)'}`);
-
   const items: Envelope[1][] = [];
   for (let i = 0; i < rawEntries.length; i += 2) {
     // guard both rawEntries[i] and rawEntries[i + 1] are defined and not empty

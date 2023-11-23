@@ -11,6 +11,7 @@ const PKG_NAME = '@spotlightjs/astro';
 export type SpotlightOptions =
   | {
       __debugOptions?: ClientInitOptions;
+      debug: boolean;
     }
   | undefined;
 
@@ -35,7 +36,7 @@ const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
             ...(config.vite.plugins || []),
           ];
 
-          injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, showTriggerButton: false }));
+          injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, showTriggerButton: false, ...options }));
           injectScript('page-ssr', SPOTLIGHT_SERVER_SNIPPET);
 
           const importPath = path.dirname(url.fileURLToPath(import.meta.url));

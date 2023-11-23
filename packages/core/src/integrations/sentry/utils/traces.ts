@@ -1,3 +1,4 @@
+import { log } from '../../../lib/logger';
 import { Span } from '../types';
 
 // mutates spans in place and adds children, as well as returns the top level tree
@@ -19,9 +20,9 @@ export function groupSpans(spans: Span[]) {
     } else if (span.parent_span_id) {
       const parentParent = sortedSpans.find(s => !s.parent_span_id);
       if (!parentParent) {
-        console.log(`Root span (${span.parent_span_id}) for span (${span.span_id}). Creating orphan.`);
+        log(`Root span (${span.parent_span_id}) for span (${span.span_id}). Creating orphan.`);
       } else {
-        console.log(`Creating orphan for parent (${span.parent_span_id}) for span (${span.span_id})`);
+        log(`Creating orphan for parent (${span.parent_span_id}) for span (${span.span_id})`);
       }
       parent = {
         trace_id: span.trace_id,
