@@ -2,6 +2,16 @@
 title: Architecture of Spotlight
 ---
 
-TODO
+import Architecture from "../../../public/images/architecture.png"; 
 
-Here will be a simple drawing of the different parts of Spotlight and how they interact.
+<img src={Architecture.src} width="80%" alt="Spotlight Architecture" />
+
+### Description
+
+Spotlight consists of 2 main components. The UI that is embeded in your Website. 
+And a Sidecar (Proxy) that streams incoming events to the UI.
+
+You can send any kind of events to the Sidecar, it forwards it to Spotlight and the integrations within Spotlight need to understand what to do with it.
+
+Spotlight by default has a Sentry integration, if you are using a Sentry SDK and enable the Spotliht connection (only required on the Server), Spotlight is able
+to render Traces/Errors and more in your frontend.
