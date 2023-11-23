@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 0.0.14
+
+### Patch Changes
+
+- Make Sentry default integration
+  ([`9f3bfe9`](https://github.com/getsentry/spotlight/commit/9f3bfe97bbbef260d6fa8c4d11ac0a6c40d0544a))
+
 ## 0.0.13
 
 ### Patch Changes
