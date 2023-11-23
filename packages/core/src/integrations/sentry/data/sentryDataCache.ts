@@ -14,6 +14,14 @@ type TraceSubscription = ['trace', (trace: Trace) => void];
 
 type Subscription = OnlineSubscription | EventSubscription | TraceSubscription;
 
+function sdkToPlatform(name: string) {
+  if (name.indexOf('javascript') !== -1) return 'javascript';
+  if (name.indexOf('python') !== -1) return 'python';
+  if (name.indexOf('php') !== -1) return 'php';
+  if (name.indexOf('ruby') !== -1) return 'ruby';
+  return 'unknown';
+}
+
 class SentryDataCache {
   protected events: SentryEvent[] = [];
   protected sdks: Sdk[] = [];
@@ -30,22 +38,51 @@ class SentryDataCache {
     initial.forEach(e => this.pushEvent(e));
   }
 
+  inferSdkFromEvent(event: SentryEvent) {
+    const sdk: Sdk = {
+      name: 'unknown',
+      version: 'unknown',
+      lastSeen: new Date().getTime(),
+    };
+
+    if (event.sdk) {
+      sdk.name = event.sdk.name || sdk.name;
+      sdk.version = event.sdk.version || sdk.version;
+    } else if (event.platform) {
+      sdk.name = event.platform;
+    }
+
+    return sdk;
+  }
+
   pushEnvelope(envelope: Envelope) {
     const [header, items] = envelope;
+    let sdk: Sdk;
     if (header.sdk && header.sdk.name && header.sdk.version) {
-      const existingSdk = this.sdks.find(s => s.name === header.sdk!.name && s.version === header.sdk!.version);
-      if (!existingSdk) {
-        this.sdks.push({
-          name: header.sdk.name,
-          version: header.sdk.version,
-          lastSeen: new Date(header.sent_at as string).getTime(),
-        });
-      } else {
-        existingSdk.lastSeen = new Date(header.sent_at as string).getTime();
-      }
+      sdk = {
+        name: header.sdk.name,
+        version: header.sdk.version,
+        lastSeen: new Date(header.sent_at as string).getTime(),
+      };
+    } else {
+      sdk = this.inferSdkFromEvent(items[0][1] as SentryEvent);
     }
+
+    const existingSdk = this.sdks.find(s => s.name === sdk!.name && s.version === sdk!.version);
+    if (!existingSdk) {
+      this.sdks.push({
+        name: sdk.name,
+        version: sdk.version,
+        lastSeen: new Date(header.sent_at as string).getTime(),
+      });
+    } else {
+      existingSdk.lastSeen = new Date(header.sent_at as string).getTime();
+    }
+
     items.forEach(([itemHeader, itemData]) => {
       if (itemHeader.type === 'event' || itemHeader.type === 'transaction') {
+        console.log(sdkToPlatform(sdk.name));
+        (itemData as SentryEvent).platform = sdkToPlatform(sdk.name);
         this.pushEvent(itemData as SentryEvent);
       }
     });

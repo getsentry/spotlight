@@ -25,7 +25,7 @@ export default function EventList() {
               key={e.event_id}
               to={e.event_id}
             >
-              <PlatformIcon platform={e.platform} className="text-indigo-300" />
+              <PlatformIcon event={e} className="text-indigo-300" />
               <div className="flex w-48 flex-col truncate font-mono text-indigo-300">
                 <span>{(e.event_id || '').substring(0, 8)}</span>
                 <TimeSince date={e.timestamp} />

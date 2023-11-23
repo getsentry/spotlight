@@ -3,7 +3,10 @@ import PlatformIcon from './PlatformIcon';
 import TimeSince from './TimeSince';
 
 function sdkToPlatform(name: string) {
-  if (name.indexOf('sentry.javascript') === 0) return 'javascript';
+  if (name.indexOf('javascript') === 0) return 'javascript';
+  if (name.indexOf('python') === 0) return 'python';
+  if (name.indexOf('php') === 0) return 'php';
+  if (name.indexOf('ruby') === 0) return 'ruby';
   return 'unknown';
 }
 

@@ -57,7 +57,7 @@ export default function EventDetails() {
   return (
     <>
       <div className="flex items-center gap-x-2 bg-indigo-950 px-6 py-4">
-        <PlatformIcon platform={event.platform} />
+        <PlatformIcon event={event} />
         <h1 className="max-w-full flex-1 truncate text-2xl">{renderEventTitle(event)}</h1>
         {!!traceCtx && (
           <div className="font-mono text-indigo-300">

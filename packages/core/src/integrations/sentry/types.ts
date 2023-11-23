@@ -59,6 +59,7 @@ type CommonEventAttrs = {
   contexts?: Contexts;
   tags?: Tags;
   extra?: { [key: string]: string | number };
+  sdk?: Sdk;
 };
 
 export type Context = {
