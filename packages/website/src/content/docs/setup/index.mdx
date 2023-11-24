@@ -60,23 +60,25 @@ If you are using additional runtimes, such as [Node.js](https://docs.sentry.io/p
 
 ```js
 Sentry.init({
-  // ...
   spotlight: true
 })
 ```
 
 :::
 
+<LinkCard title="Setup Spotlight with Sentry" description="Instructions for Node, Python, PHP & Ruby" href="/setup/sentry/" />
+
 ---
 
 ## Sidecar
 
-
-
 Spotlight's [architecture](/architecture/) require's a sidecar to be running alongside your service. This is to enable streaming data collection from your backend services into the Spotlight overlay.
 
 
-<LinkCard title="Node.js (No Framework)" href="/sidecar/npx/" />
+<CardGrid>
+  <LinkCard title="Sidecar" href="/sidecar/" />
+  <LinkCard title="Node.js (No Framework)" href="/sidecar/npx/" />
+</CardGrid>
 
 <CardGrid>
   <LinkCard title="Vite" href="/sidecar/vite/" />

@@ -2,6 +2,8 @@
 title: Run Sidecar with Vite
 ---
 
+We provide a Vite plugin that automatically starts & stops Sidecar for you when starting your Vite dev server.
+
 ```sh
 npm install @spotlightjs/sidecar --save-dev
 ```
@@ -14,5 +16,4 @@ import spotlightSidecar from '@spotlightjs/sidecar/vite-plugin';
 export default defineConfig({
   plugins: [spotlightSidecar()],
 })
-
 ```

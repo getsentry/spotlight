@@ -1,0 +1,72 @@
+---
+title: Setup Spotlight with Sentry's SDKs
+description: Use Spotlight with Sentry
+---
+
+Spotlight is built that you don't need Sentry to run it, it can contain any kind of integration. However, Sentry is the first integration we've built for Spotlight and it's a great way to get started.
+
+As mentioned on the previous page, if you want that you Sentry SDKs talk to the Sidecar, enable the `spotlight` setting:
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Tabs>
+  <TabItem label="JavaScript">
+  In the Browser you don't need to set `spotlight: true`, `Spotlight.init()` will automatically detect if Sentry is available and if so, hook into the SDK.
+  ```javascript 
+    Sentry.init({
+      dsn: 'DSN',
+    });
+    // In the frontend it's important that you init Spotlight after Sentry
+    Spotlight.init();
+  ```
+  </TabItem>
+  <TabItem label="Node">
+  ```javascript
+    Sentry.init({
+        dsn: 'DSN',
+        spotlight: true,
+    });
+  ```
+  </TabItem>
+  <TabItem label="Python">
+  ```python 
+    sentry_sdk.init(
+        dsn="DSN",
+        spotlight=True,
+    )
+  ```
+  </TabItem>
+  <TabItem label="PHP">
+  ```php 
+    Sentry\init([
+        'dsn' => 'DSN',
+        'spotlight' => true,
+    ]);
+  ```
+  </TabItem>
+  <TabItem label="Ruby">
+  ```ruby 
+    Sentry.init do |config|
+        config.dsn = 'DSN'
+        config.spotlight = true
+    end
+  ```
+  </TabItem>
+</Tabs>
+
+
+:::note
+
+It's recommended to use the `spotlight` setting only in development.
+Please add a check to make sure you only enable it in development.
+For example this:
+
+```javascript
+  Sentry.init({
+    dsn: 'DSN',
+    spotlight: process.env.NODE_ENV === 'development',
+  });
+```
+
+Depending on your setup & language this might be different.
+:::

@@ -95,6 +95,10 @@ export default defineConfig({
               link: '/setup/',
             },
             {
+              label: 'with Sentry',
+              link: '/setup/sentry/',
+            },
+            {
               label: 'for Astro',
               link: '/setup/astro/',
             },
