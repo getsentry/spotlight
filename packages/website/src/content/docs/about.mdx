@@ -14,7 +14,7 @@ overlay into development environments, and it does it by leveraging the existing
 
 At a high level, Spotlight consists of two components:
 
-1. An overlay (`@spotlightjs/core`) that renders inside of your application. The overlay is a simple React application, and can
+1. An overlay (`@spotlightjs/overlay`) that renders inside of your application. The overlay is a simple React application, and can
    seamlessly run in any web application (or even independently!).
 
 2. A proxy server (`@spotlightjs/sidecar`) which enables push-based communication to the overlay. This is achieved via a simple HTTP relay,
@@ -23,13 +23,13 @@ At a high level, Spotlight consists of two components:
 This means that adoption in most projects is two simple additions:
 
 ```shell
-npm add @spotlightjs/core @spotlightjs/sidecar
+npm add @spotlightjs/overlay @spotlightjs/sidecar
 ```
 
 Registering Spotlight in your frontend application:
 
 ```typescript
-import * as Spotlight from '@spotlightjs/core';
+import * as Spotlight from '@spotlightjs/overlay';
 Spotlight.init();
 ```
 

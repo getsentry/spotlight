@@ -26,7 +26,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@spotlightjs/core": "workspace:*",
+    "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
     "astro": "^3.4.0",
     "source-map": "^0.7.4"

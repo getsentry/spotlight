@@ -1,6 +1,6 @@
 {
-  "name": "@spotlightjs/core",
-  "description": "The core Spotlight package to add debug functionality to your web app.",
+  "name": "@spotlightjs/overlay",
+  "description": "The overlay of Spotlight to add debug interface to your web app.",
   "version": "0.0.15",
   "license": "Apache-2.0",
   "type": "module",

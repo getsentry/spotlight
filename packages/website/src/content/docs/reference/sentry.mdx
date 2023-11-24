@@ -6,7 +6,7 @@ description: Interface of SentryIntegration
 The Sentry integration is the default in Spotlight. It receives events and envelope formats from Sentry SDKs (when configured with `spotlight=true`) and renders those as Errors and Traces in the overlay.
 
 ```ts
-import { init, sentry } from "@spotlightjs/core";
+import { init, sentry } from "@spotlightjs/overlay";
 
 init({
   integrations: [sentry()],

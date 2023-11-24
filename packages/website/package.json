@@ -20,7 +20,7 @@
     "@fontsource/raleway": "^5.0.15",
     "@sentry/astro": "^7.81.1",
     "@spotlightjs/astro": "workspace:*",
-    "@spotlightjs/core": "workspace:*",
+    "@spotlightjs/overlay": "workspace:*",
     "@types/react": "^18.2.38",
     "@types/react-dom": "^18.2.17",
     "astro": "^3.6.0",

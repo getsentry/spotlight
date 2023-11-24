@@ -61,4 +61,4 @@ const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
 
 export default createPlugin;
 
-export * from '@spotlightjs/core';
+export * from '@spotlightjs/overlay';

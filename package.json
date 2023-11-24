@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:core": "pnpm --filter core dev",
+    "dev:overlay": "pnpm --filter overlay dev",
     "dev:website": "pnpm --filter website dev",
     "dev:playground": "pnpm --filter astro-playground dev",
     "build": "pnpm --filter=!astro-playground -r run build",
