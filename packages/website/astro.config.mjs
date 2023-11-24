@@ -44,6 +44,7 @@ export default defineConfig({
       components: {
         Hero: './src/components/Hero.astro',
         Header: './src/components/Header.astro',
+        ThemeProvider: './src/components/ThemeProvider.astro',
       },
 
       head: [
@@ -124,6 +125,10 @@ export default defineConfig({
           },
         },
       ],
+      expressiveCode: {
+        themes: ['starlight-dark'],
+        useStarlightUiThemeColors: true,
+      },
       customCss: ['./src/tailwind.css', './src/theme.css'],
     }),
     tailwind({

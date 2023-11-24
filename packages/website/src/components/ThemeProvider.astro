@@ -1,0 +1,14 @@
+---
+// Override the default ThemeProvider to completely disable light theme.
+---
+{/* This is intentionally inlined to avoid FOUC. */}
+<script is:inline>
+	window.StarlightThemeProvider = (() => {
+		document.documentElement.dataset.theme = 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+        // Do nothing as we disable the pickers.
+			},
+		};
+	})();
+</script>
