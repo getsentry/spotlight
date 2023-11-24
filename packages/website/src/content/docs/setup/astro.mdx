@@ -3,75 +3,62 @@ title: Using Spotlight with Astro
 description: A guide how to setup Spotlight for Astro
 ---
 
-## Install Sentry
+## Install Sentry & Spotlight
 
-To install Spotlight for Astro call:
+To install Sentry and Spotlight for Astro call:
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 <Tabs>
   <TabItem label="npm">
   ```sh 
-  npx astro add @sentry/astro 
+  npx astro add @sentry/astro @spotlightjs/astro 
   ```
   </TabItem>
   <TabItem label="pnpm">
   ```sh 
-  pnpm astro add @sentry/astro
+  pnpm astro add @sentry/astro @spotlightjs/astro 
   ```
   </TabItem>
   <TabItem label="yarn">
   ```sh 
-  yarn astro add @sentry/astro
+  yarn astro add @sentry/astro @spotlightjs/astro 
   ```
   </TabItem>
 </Tabs>
 
-After that, Astro should add the Spotlight integration to your `astro.config.mjs` file and should look something like this.
+After that, Astro should add the Sentry & Spotlight integration to your `astro.config.mjs` file and should look something like this.
 
 ```js
-import { defineConfig } from 'astro/config';   
-
-import sentry from "@sentry/astro";
-                                                 
-// https://astro.build/config                  
-export default defineConfig({                  
-  integrations: [sentry()]                
-});
+ import { defineConfig } from 'astro/config';  
+                                               
+ import sentry from "@sentry/astro";           
+ import spotlightjs from "@spotlightjs/astro"; 
+                                               
+ // https://astro.build/config                 
+ export default defineConfig({                 
+   integrations: [sentry(), spotlightjs()]     
+ });
 ```
 
-## Install Spotlight
+:::note
 
-To install Spotlight for Astro call:
+The order of the integrations is important. Sentry should be the first integration in the array, followed by Spotlight.
 
-<Tabs>
-  <TabItem label="npm">
-  ```sh 
-  npx astro add @spotlightjs/astro 
-  ```
-  </TabItem>
-  <TabItem label="pnpm">
-  ```sh 
-  pnpm astro add @spotlightjs/astro
-  ```
-  </TabItem>
-  <TabItem label="yarn">
-  ```sh 
-  yarn astro add @spotlightjs/astro 
-  ```
-  </TabItem>
-</Tabs>
+:::
 
-After that, Astro should add the Spotlight integration to your `astro.config.mjs` file and should look something like this.
+To complete your setup, you need to add your Sentry DSN to the `astro.config.mjs` file.
+See [Sentry's documentation](https://docs.sentry.io/platforms/javascript/guides/astro/) for more information.
+You final Sentry config should look something like this:
 
 ```js
-import { defineConfig } from 'astro/config';   
-
-import sentry from "@sentry/astro";
-import spotlightjs from "@spotlightjs/astro";  
-                                                 
-// https://astro.build/config                  
-export default defineConfig({                  
-  integrations: [sentry(), spotlightjs()]                
-});
+// ...
+sentry({
+    dsn: "DSN",
+    sourceMapsUploadOptions: {
+      project: "PROJECT_NAME",
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    },
+  }),
+//...
 ```

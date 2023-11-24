@@ -1,0 +1,22 @@
+---
+title: What is the Sidecar?
+description: A server forwarding events to Spotlight UI.
+---
+
+The Sidecar uses SSE (Server-Sent Events) to forward events to the Spotlight overlay. It is a standalone server that can be deployed on the same machine as the Spotlight overlay or on a different machine.
+
+It receives `POST` requests on `/stream` from the Sentry SDKs or any other source and forwards them to the Spotlight overlay via SSE.
+
+By default the Sidecar listens on port `8969` and the Spotlight overlay connects to it on `http://localhost:8969/stream`.
+
+The url can be configured via the `sidecar` config variable in the Spotlight overlay see [Configuration](/reference/configuration/#sidecar).
+
+Also in the Sentry SDKs the URL can be configured via the `spotlight` option, for example in the Python SDK:
+
+```python
+import sentry_sdk
+
+sentry_sdk.init(
+    spotlight="http://localhost:8969/stream",
+)
+```
