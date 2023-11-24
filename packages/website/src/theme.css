@@ -16,9 +16,9 @@ dialog {
   --sl-color-gray-2: hsl(224, 6%, 77%);
   --sl-color-gray-3: hsl(224, 6%, 56%);
   --sl-color-gray-4: hsl(224, 7%, 36%);
-  --sl-color-gray-5: hsl(224, 10%, 23%);
-  --sl-color-gray-6: hsl(224, 14%, 16%);
-  --sl-color-black: hsl(224, 10%, 10%);
+  --sl-color-gray-5: hsl(228, 13%, 23%);
+  --sl-color-gray-6: hsl(249, 29%, 13%);
+  --sl-color-black: hsl(249, 36%, 9%);
   --sl-color-text-accent: var(--sl-color-accent-high);
   --sl-color-text-invert: var(--sl-color-accent-low);
   --sl-color-bg-sidebar: var(--sl-color-gray-6);
