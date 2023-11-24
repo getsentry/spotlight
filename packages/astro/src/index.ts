@@ -23,6 +23,7 @@ const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
 
     hooks: {
       'astro:config:setup': async ({ command, injectScript, addDevOverlayPlugin, logger, config }) => {
+        console.log(config);
         if (command === 'dev') {
           logger.info('[@spotlightjs/astro] Setting up Spotlight');
 
@@ -36,7 +37,21 @@ const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
             ...(config.vite.plugins || []),
           ];
 
-          injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, showTriggerButton: false, ...options }));
+          let showTriggerButton = true;
+          // We suppose with 4.0 this will be promoted top level and expimental will be removed
+          // to keep backwards compatibility we check both
+          // @ts-ignore
+          if (config.devOverlay) {
+            // @ts-ignore
+            showTriggerButton = config.devOverlay ? false : true;
+          }
+          // @ts-ignore
+          if (config.experimental?.devOverlay) {
+            // @ts-ignore
+            showTriggerButton = config.experimental?.devOverlay ? false : true;
+          }
+
+          injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, showTriggerButton, ...options }));
           injectScript('page-ssr', SPOTLIGHT_SERVER_SNIPPET);
 
           const importPath = path.dirname(url.fileURLToPath(import.meta.url));
