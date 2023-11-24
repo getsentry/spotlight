@@ -1,0 +1,35 @@
+---
+import { Fragment } from 'react';
+const  { href } = Astro.props;
+
+// Used to override the default hero component
+---
+
+<style>
+  .link {
+    display: block;
+    height: 3rem;
+    width: fit-content;
+    line-height: 3rem;
+    padding: 0 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    border: 1px solid #ffffff70;
+    opacity: 0.7;
+    text-decoration: none;
+    transition: all 0.1s ease-in-out;
+    border-radius: 0.5rem;
+    border: 1px solid #a5b4fcee;
+    color: #a5b4fc !important;
+    box-shadow:
+      0 0 5px #a5b4fcee,
+      0 0 5px #a5b4fcee inset;
+  }
+
+  .link:hover {
+    opacity: 1;
+  }
+
+</style>
+
+<a class="link" href={href}><slot/></a>
