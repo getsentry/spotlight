@@ -1,5 +1,17 @@
 # @spotlightjs/astro
 
+## 0.0.18
+
+### Patch Changes
+
+- Add debug flag to Spotlight
+  ([`9f9370f`](https://github.com/getsentry/spotlight/commit/9f9370f71c3d9f84fecc9fa3b890f9ccc872a766))
+
+- Updated dependencies
+  [[`9f9370f`](https://github.com/getsentry/spotlight/commit/9f9370f71c3d9f84fecc9fa3b890f9ccc872a766),
+  [`d90c89c`](https://github.com/getsentry/spotlight/commit/d90c89ca6a9e86f33a4eaf4dbd6a160a4354cc3c)]:
+  - @spotlightjs/core@0.0.15
+
 ## 0.0.17
 
 ### Patch Changes
