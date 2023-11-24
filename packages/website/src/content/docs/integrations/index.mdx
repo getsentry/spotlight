@@ -5,4 +5,13 @@ sidebar:
   order: 0
 ---
 
-Integrations are how Spotlight exposes behavior in the Overlay. For example, the default [Sentry integration](./builtins/sentry/) enables the Errors and Traces panels.
+Integrations are how Spotlight exposes behavior in the Overlay. For example, the default [Sentry integration](/reference/sentry/) enables the Errors and Traces panels.
+
+The full content, including the tabs and panels are React components. This means you can create your own integrations and add them to the Overlay.
+The parts in red are for example all the parts provided by the Sentry integration.
+
+<img class="block rounded-lg" src="/images/integrations.png" width="100%" style={{ maxWidth: 'unset' }} />
+
+Spotlight overlay itself really only is a slim skeleton for configured integrations. The minimal configuration of an
+integration has to have is and name and a version. See the [integration interface](/reference/integration/) for more details.
+

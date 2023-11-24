@@ -29,8 +29,5 @@ export type IntegrationTab<T> = {
   }>;
 
   onSelect?: () => void;
-
-  // TODO: I don't think this should be user-facing
-  active?: boolean;
 };
 ```
