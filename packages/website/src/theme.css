@@ -6,6 +6,10 @@ dialog {
   color: var(--sl-color-white);
 }
 
+.expressive-code figure.frame {
+  max-width: 90vw;
+}
+
 :root,
 :root[data-theme='light'] {
   --sl-color-white: #fff;
