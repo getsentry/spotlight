@@ -1,5 +1,17 @@
 # @spotlightjs/astro
 
+## 0.0.19
+
+### Patch Changes
+
+- Renamed core to overlay package
+  ([`eacbe71`](https://github.com/getsentry/spotlight/commit/eacbe71b289703efe5b62519493049d5368297fb))
+
+- Updated dependencies
+  [[`eacbe71`](https://github.com/getsentry/spotlight/commit/eacbe71b289703efe5b62519493049d5368297fb)]:
+  - @spotlightjs/overlay@0.0.16
+  - @spotlightjs/sidecar@0.0.11
+
 ## 0.0.18
 
 ### Patch Changes

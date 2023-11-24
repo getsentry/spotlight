@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 0.0.16
+
+### Patch Changes
+
+- Renamed core to overlay package
+  ([`eacbe71`](https://github.com/getsentry/spotlight/commit/eacbe71b289703efe5b62519493049d5368297fb))
+
 ## 0.0.15
 
 ### Patch Changes
