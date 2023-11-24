@@ -23,7 +23,6 @@ const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
 
     hooks: {
       'astro:config:setup': async ({ command, injectScript, addDevOverlayPlugin, logger, config }) => {
-        console.log(config);
         if (command === 'dev') {
           logger.info('[@spotlightjs/astro] Setting up Spotlight');
 
