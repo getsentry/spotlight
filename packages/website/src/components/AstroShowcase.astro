@@ -10,8 +10,9 @@
     background-repeat: repeat;
     background-position: center;
     background-size: 20px 20px;
-    max-width: 435px;
-    min-width: 400px;
+    max-width: 90vw;
+    overflow: hidden;
+    padding: 0 2rem;
     height: 201px;
     border-radius: 5px;
   }
@@ -20,6 +21,7 @@
     display: flex;
     align-items: center;
     height: 56px;
+    flex-shrink: 0;
     background: linear-gradient(180deg, #13151A 0%, rgba(19, 21, 26, 0.88) 100%);
     border: 1px solid #343841;
     border-radius: 9999px;
@@ -29,6 +31,7 @@
 
   .dev-bar > button {
     display: flex;
+    flex-shrink: 0;
     position: relative;
     justify-content: center;
     align-items: center;
