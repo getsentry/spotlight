@@ -3,6 +3,7 @@ import FeatureCard from './FeatureCard.astro';
 import Section from './Section.astro';
 import Highlight from './Highlight.astro';
 import AstroShowcase from './AstroShowcase.astro';
+import Spotlight from './Spotlight.astro';
 import Footer from './Footer.astro';
 import DocsCta from './DocsCta.astro';
 import { Content as CodeBlock } from './codeblock.mdx';
@@ -22,6 +23,18 @@ import { Content as CodeBlock } from './codeblock.mdx';
   <img class="centered" src="/images/simple-event-flow.png" width="40%" style={{ margin: "0 auto", maxWidth: 'unset' }} />
 </Section>
 
+
+<Section title="Your perfect dev companion">
+  <FeatureCard
+    title="Embedded in your frontend"
+    description="Notifies you of errors and other signals as they happen. No more context switching."
+    linkUrl="/architecture/"
+    linkText="How?"
+    reverse
+  >
+    <Spotlight />
+  </FeatureCard>
+</Section>
 
 <Section title="Works Everywhere">
   <FeatureCard

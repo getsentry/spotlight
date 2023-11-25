@@ -1,0 +1,93 @@
+
+<style>
+    .showcase {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      flex-direction: column;
+      /* grid pattern background */
+      background-image: linear-gradient(90deg, #eee3 1px, transparent 1px), linear-gradient(180deg, #eee3 1px, transparent 1px);
+      background-repeat: repeat;
+      background-position: center;
+      background-size: 20px 20px;
+      max-width: 90vw;
+      overflow: hidden;
+      padding: 0 2rem;
+      height: 201px;
+      border-radius: 5px;
+    }
+  
+    .showcase > p { 
+      display: flex;
+      font-style: italic;
+    }
+    
+    .browser {
+      display: block;
+      position: relative;
+      align-items: center;
+      height: 162px;
+      width: 260px;
+      background-image: url('/images/browser.png');
+      background-size: cover; /* Add this line to scale the background image */
+      background-repeat: no-repeat;
+    }
+
+    .spotlight-trigger {
+      position: absolute;
+      height: 48px;
+      width: 48px;
+      border-radius: 5px;
+      background-color: #4c51bf;
+      bottom: 14px;
+      right: 14px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .spotlight-trigger > .icon {
+      height: 32px;
+      width: 32px;
+      margin-left: 8px;
+      margin-top: 8px;
+    }
+
+    .spotlight-trigger > .counter {
+        position: absolute;
+        top: -32px;
+        right: -8px;
+        height: 16px;
+        width: 16px;
+        border-radius: 50%;
+        background-color: #f56565;
+        color: #fff;
+        font-size: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+  
+  </style>
+  <script>
+    // #spotlight-counter slowly increases and resets to 0 when it reaches 100
+    // #spotlight-counter is updated every 100ms
+    
+    const counter = document.getElementById('spotlight-counter');
+    let count = 0;
+    setInterval(() => {
+      count++;
+      if (count > 100) {
+        count = 0;
+      }
+      counter.innerText = count;
+    }, 100);
+    </script>
+  <div class="showcase">
+    <div class="browser">
+      <div class="spotlight-trigger">
+        <img class="icon" src="/images/glyph.svg"/>
+        <div id="spotlight-counter" class="counter">0</div>
+      </div>
+    </div>
+  </div>
