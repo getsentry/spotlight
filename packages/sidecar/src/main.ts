@@ -152,14 +152,7 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
           if (chunk !== null) body += chunk;
         });
         req.on('end', () => {
-          if (req.headers['content-type'] == 'application/x-sentry-envelope') {
-            if (containsKnownEnvelopeType(body)) {
-              buffer.put([`${req.headers['content-type']}`, body]);
-            }
-          } else {
-            // It's not an Sentry envelope, so we just put it in the buffer
-            buffer.put([`${req.headers['content-type']}`, body]);
-          }
+          buffer.put([`${req.headers['content-type']}`, body]);
           res.writeHead(204, {
             'Cache-Control': 'no-cache',
             ...getCorsHeader(),
@@ -179,30 +172,6 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
       res.end();
     }
   }
-}
-
-function containsKnownEnvelopeType(body: string): boolean {
-  const [...rawEntries] = body.split(/\n/gm);
-
-  const items = [];
-  for (let i = 0; i < rawEntries.length; i++) {
-    if (!rawEntries[i]) {
-      continue;
-    }
-    // not ideal we json parse envelope entries here but it's the easiest way to get the type
-    items.push(JSON.parse(rawEntries[i]));
-  }
-
-  const allowedTypes = ['event', 'transaction'];
-  const types = items.map(item => item.type);
-
-  for (let i = 0; i < types.length; i++) {
-    if (allowedTypes.includes(types[i])) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
