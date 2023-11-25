@@ -9,6 +9,15 @@ import DocsCta from './DocsCta.astro';
 import { Content as CodeBlock } from './codeblock.mdx';
 ---
 
+
+<style>
+  img.centered {
+    margin: 0 auto !important;
+  }
+  
+  
+  </style>
+
 <Highlight />
 
 <Section title="Thirty Seconds to Liftoff">
@@ -20,7 +29,7 @@ import { Content as CodeBlock } from './codeblock.mdx';
   >
     <CodeBlock />
   </FeatureCard>
-  <img class="centered" src="/images/simple-event-flow.png" width="40%" style={{ margin: "0 auto", maxWidth: 'unset' }} />
+  <img class="centered lg:w-4/12 w-10/12" src="/images/simple-event-flow.png"  />
 </Section>
 
 
