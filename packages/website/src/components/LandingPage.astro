@@ -14,17 +14,24 @@ import { Content as CodeBlock } from './codeblock.mdx';
   <FeatureCard
     title="As easy as npm install"
     description="Two npm packages get you over the finish line. Inject the Spotlight overlay and run the sidecar."
+    linkUrl="/setup"
+    linkText="Setup"
   >
     <CodeBlock />
   </FeatureCard>
+  <img class="centered" src="/images/simple-event-flow.png" width="40%" style={{ margin: "0 auto", maxWidth: 'unset' }} />
 </Section>
+
 
 <Section title="Works Everywhere">
   <FeatureCard
     title="Compatible with Sentry's universal SDKs"
-    description="Take the power of Sentry's telemetry and bring that into your development environment with Errors and Traces."
+    description="Take the power of Sentry's telemetry and bring that into your development environment with Errors and Traces in both Frontend and Backend."
     reverse
+    linkUrl="/setup/sentry/"
+    linkText="Configure with Sentry"
   >
+  
     <img class="block rounded-lg" src="/images/error.png" width="100%" style={{ maxWidth: 'unset' }} />
   </FeatureCard>
 </Section>
@@ -33,6 +40,8 @@ import { Content as CodeBlock } from './codeblock.mdx';
   <FeatureCard
     title="Customizable overlay to support your use cases"
     description="The powerful overlay and event proxy make it easy to extend Spotlight to other concepts including first-party concerns."
+    linkUrl="/integrations/"
+    linkText="Customize"
   >
     <AstroShowcase />
   </FeatureCard>

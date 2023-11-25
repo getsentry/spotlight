@@ -1,5 +1,6 @@
 ---
-const { title, description, accentColor, reverse } = Astro.props;
+const { title, description, accentColor, reverse, linkText, linkUrl } = Astro.props;
+import { LinkCard } from '@astrojs/starlight/components';
 ---
 
 <style define:vars={{ accentColor }}>
@@ -33,6 +34,19 @@ const { title, description, accentColor, reverse } = Astro.props;
     margin: 0 0 2rem !important;
   }
 
+  .link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    color: var(--accentColor);
+    text-decoration: none;
+  }
+
+  .link::after {
+    content: "→";
+  }
+
   @media (min-width: 768px) {
     h2.heading {
       font-size: 2.5rem;
@@ -53,8 +67,9 @@ const { title, description, accentColor, reverse } = Astro.props;
   <div class="flex-1 flex-shrink-0">
     <h5 class="mb-2 heading">{title}</h5>
     <p>{description}</p>
+    {linkUrl && linkText ? <a href={linkUrl} class="link">{linkText}</a> : null}
   </div>
   <div class="flex-1 max-w-xl h-max" style={{margin: 0}}>
     <slot />
   </div>
-</div> 
+</div>
