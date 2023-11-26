@@ -51,7 +51,10 @@ function sendEnvelopesToSidecar(client: Client) {
         },
         mode: 'cors',
       }).catch(err => {
-        console.error(err);
+        console.error(
+          `Sentry SDK can't connect to Sidcar is it running? See: https://spotlightjs.com/sidecar/npx/`,
+          err,
+        );
       });
     });
   }

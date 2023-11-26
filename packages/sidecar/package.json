@@ -26,9 +26,6 @@
     "./vite-plugin": {
       "import": "./src/vite-plugin.js"
     },
-    "./connect": {
-      "import": "./src/connect.js"
-    },
     "./run": {
       "import": "./src/run.js"
     }
