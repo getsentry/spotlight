@@ -2,6 +2,7 @@
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
+const zlib = require('zlib');
 
 // Directory where the script is running
 const directoryPath = path.join(__dirname);
@@ -14,14 +15,20 @@ function sendData(filePath) {
       return;
     }
 
+    const headers = {
+      'Content-Type': 'application/x-sentry-envelope',
+    };
+
+    if (process.env.GZIP === '1') {
+      headers['Content-Encoding'] = 'gzip';
+    }
+
     const options = {
       hostname: 'localhost',
       port: 8969,
       path: '/stream',
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-sentry-envelope',
-      },
+      headers: headers,
     };
 
     const req = http.request(options, res => {
@@ -32,9 +39,18 @@ function sendData(filePath) {
       console.error(`Problem with request: ${error.message}`);
     });
 
-    // Send the data
-    req.write(data);
-    req.end();
+    // Check if GZIP environment variable is set to 1
+    if (process.env.GZIP === '1') {
+      zlib.gzip(data, (_error, compressedData) => {
+        // Send the compressed data
+        req.write(compressedData);
+        req.end();
+      });
+    } else {
+      // Send the data without compression
+      req.write(data);
+      req.end();
+    }
   });
 }
 

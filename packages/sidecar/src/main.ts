@@ -1,23 +1,6 @@
 import { IncomingMessage, Server, ServerResponse, createServer } from 'http';
 import kleur from 'kleur';
-
-const defaultResponse = `<!doctype html>
-<html>
-<head>
-        <title>pipe</title>
-</head>
-<body>
-        <pre id="output"></pre>
-        <script type="text/javascript">
-const Output = document.getElementById("output");
-var EvtSource = new EventSource('/stream');
-EvtSource.onmessage = function (event) {
-        Output.appendChild(document.createTextNode(event.data));
-        Output.appendChild(document.createElement("br"));
-};
-        </script>
-</body>
-</html>`;
+import { createGunzip, createInflate } from 'zlib';
 
 function generateUuidv4(): string {
   let dt = new Date().getTime();
@@ -121,7 +104,7 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
       const sub = buffer.subscribe(([payloadType, data]) => {
         log(`🕊️ sending to Spotlight`);
         res.write(`event:${payloadType}\n`);
-        // This is very important - SSE events are delimited by a newline
+        // This is very important - SSE events are delimited by two newlines
         data.split('\n').forEach(line => {
           res.write(`data:${line}\n`);
         });
@@ -147,11 +130,27 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
       } else if (req.method === 'POST') {
         log(`📩 Received event`);
         let body: string = '';
-        req.on('readable', () => {
-          const chunk = req.read();
-          if (chunk !== null) body += chunk;
+        let stream = req;
+
+        // Check for gzip or deflate encoding and create appropriate stream
+        const encoding = req.headers['content-encoding'];
+        if (encoding === 'gzip') {
+          // @ts-ignore
+          stream = req.pipe(createGunzip());
+        } else if (encoding === 'deflate') {
+          // @ts-ignore
+          stream = req.pipe(createInflate());
+        }
+
+        // Read the (potentially decompressed) stream
+        stream.on('readable', () => {
+          let chunk;
+          while ((chunk = stream.read()) !== null) {
+            body += chunk;
+          }
         });
-        req.on('end', () => {
+
+        stream.on('end', () => {
           buffer.put([`${req.headers['content-type']}`, body]);
           res.writeHead(204, {
             'Cache-Control': 'no-cache',
@@ -160,12 +159,6 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
           });
           res.end();
         });
-      } else {
-        res.writeHead(200, {
-          'Content-Type': 'text/html',
-        });
-        res.write(defaultResponse);
-        res.end();
       }
     } else {
       res.writeHead(404);
