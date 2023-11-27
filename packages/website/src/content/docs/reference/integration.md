@@ -1,6 +1,6 @@
 ---
 title: Integration
-description: Interface of an intergration
+description: Interface of an integration
 ---
 
 ```ts
