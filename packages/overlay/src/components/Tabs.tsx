@@ -53,22 +53,16 @@ export default function Tabs({ tabs, nested }: Props) {
               className={({ isActive }) =>
                 classNames(
                   isActive
-                    ? 'border-indigo-200 text-indigo-100'
-                    : 'border-transparent text-indigo-400 hover:border-indigo-400 hover:text-indigo-100',
+                    ? 'border-indigo-200 text-indigo-100 [&>.count]:bg-indigo-100 [&>.count]:text-indigo-600'
+                    : 'border-transparent text-indigo-400 hover:border-indigo-400 hover:text-indigo-100 [&>.count]:bg-indigo-700 [&>.count]:text-indigo-200',
                   '-m-y -mx-2 flex whitespace-nowrap border-b-2 px-2 py-3 text-sm font-medium',
                 )
               }
               onClick={() => tab.onSelect && tab.onSelect()}
-              aria-current={tab.active ? 'page' : undefined}
             >
               {tab.title}
               {tab.notificationCount !== undefined ? (
-                <span
-                  className={classNames(
-                    tab.active ? 'bg-indigo-100 text-indigo-600' : 'bg-indigo-700 text-indigo-200',
-                    'ml-3 hidden rounded px-2.5 py-0.5 text-xs font-medium md:inline-block',
-                  )}
-                >
+                <span className="count ml-3 hidden rounded px-2.5 py-0.5 text-xs font-medium md:inline-block">
                   {tab.notificationCount}
                 </span>
               ) : null}
