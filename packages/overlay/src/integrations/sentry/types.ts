@@ -86,7 +86,7 @@ export type Tags = {
 };
 
 export type SentryErrorEvent = CommonEventAttrs & {
-  type?: 'error' | 'default';
+  type?: 'error' | 'event' | 'default';
   exception: EventException;
 };
 

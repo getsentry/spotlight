@@ -214,11 +214,16 @@ class SentryDataCache {
 export default new SentryDataCache();
 
 function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
-  return !event.type;
+  return event.type != 'transaction';
 }
 
 function reverseStackTraces(errorEvent: SentryErrorEvent): void {
   if (!errorEvent.exception || !errorEvent.exception.values) {
+    return;
+  }
+  // Check if errorEvent.platform contains php, or python and if so return early
+  // as the stacktrace is already in the correct order.
+  if (errorEvent.platform && (errorEvent.platform.includes('php') || errorEvent.platform.includes('python'))) {
     return;
   }
   errorEvent.exception.values.forEach(value => {
