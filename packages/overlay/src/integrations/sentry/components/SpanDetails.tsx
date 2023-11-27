@@ -97,7 +97,7 @@ export default function SpanDetails({
         {span.op === 'resource.img' && span.description?.indexOf('/') === 0 && (
           <div>
             <h2 className="mb-2 font-bold uppercase">Preview</h2>
-            <img src={span.description} alt="preview" className="max-w-1/2 max-h-300" />
+            <img src={span.description} alt="preview" style={{ maxWidth: '50%', maxHeight: 400 }} />
           </div>
         )}
 
