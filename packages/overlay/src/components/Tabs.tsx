@@ -1,5 +1,5 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { IntegrationTab } from '~/integrations/integration';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { type IntegrationTab } from '~/integrations/integration';
 import classNames from '../lib/classNames';
 
 export type Props = {
@@ -29,7 +29,6 @@ export default function Tabs({ tabs, nested }: Props) {
           id="tabs"
           name="tabs"
           className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-          defaultValue={tabs.find(tab => tab.active)?.title}
           onChange={e => {
             const activeTab = tabs.find(tab => tab.id === e.target.value);
             if (activeTab && activeTab.onSelect) {
@@ -48,15 +47,17 @@ export default function Tabs({ tabs, nested }: Props) {
       <div className="hidden sm:block">
         <nav className="flex space-x-8 border-b border-b-indigo-900 px-6" aria-label="Tabs">
           {tabs.map(tab => (
-            <Link
+            <NavLink
               to={`${nested ? '' : '/'}${tab.id}`}
               key={tab.id}
-              className={classNames(
-                tab.active
-                  ? 'border-indigo-200 text-indigo-100'
-                  : 'border-transparent text-indigo-400 hover:border-indigo-400 hover:text-indigo-100',
-                '-m-y -mx-2 flex whitespace-nowrap border-b-2 px-2 py-3 text-sm font-medium',
-              )}
+              className={({ isActive }) =>
+                classNames(
+                  isActive
+                    ? 'border-indigo-200 text-indigo-100'
+                    : 'border-transparent text-indigo-400 hover:border-indigo-400 hover:text-indigo-100',
+                  '-m-y -mx-2 flex whitespace-nowrap border-b-2 px-2 py-3 text-sm font-medium',
+                )
+              }
               onClick={() => tab.onSelect && tab.onSelect()}
               aria-current={tab.active ? 'page' : undefined}
             >
@@ -71,7 +72,7 @@ export default function Tabs({ tabs, nested }: Props) {
                   {tab.notificationCount}
                 </span>
               ) : null}
-            </Link>
+            </NavLink>
           ))}
         </nav>
       </div>
