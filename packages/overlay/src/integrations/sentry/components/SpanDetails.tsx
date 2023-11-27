@@ -86,7 +86,7 @@ export default function SpanDetails({
         <div>
           <h2 className="mb-2 font-bold uppercase">Description</h2>
           {span.description ? (
-            <pre className="whitespace-pre-wrap font-mono text-indigo-300">
+            <pre className="whitespace-pre-wrap break-words font-mono text-indigo-300">
               {formatSpanDescription(span.description)}
             </pre>
           ) : (
