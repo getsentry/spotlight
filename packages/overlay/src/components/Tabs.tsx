@@ -45,7 +45,7 @@ export default function Tabs({ tabs, nested }: Props) {
         </select>
       </div>
       <div className="hidden sm:block">
-        <nav className="flex space-x-8 border-b border-b-indigo-900 px-6" aria-label="Tabs">
+        <nav className="flex space-x-8 border-b border-b-indigo-700 px-6" aria-label="Tabs">
           {tabs.map(tab => (
             <NavLink
               to={`${nested ? '' : '/'}${tab.id}`}

@@ -57,9 +57,9 @@ export default function SpanDetails({
               </span>
             </div>
             <div className="flex-1">
-              <div className="relative h-8 border border-indigo-600 py-1">
+              <div className="relative h-8 border border-indigo-800 py-1">
                 <div
-                  className="absolute bottom-0 top-0 -m-0.5 flex w-full items-center bg-indigo-600 p-0.5"
+                  className="absolute bottom-0 top-0 -m-0.5 flex w-full items-center bg-indigo-800 p-0.5"
                   style={{
                     left: `min(${((span.start_timestamp - startTimestamp) / totalDuration) * 100}%, 100% - 1px)`,
                     width: `max(1px, ${(spanDuration / totalDuration) * 100}%)`,

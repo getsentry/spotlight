@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import dataCache from '../data/sentryDataCache';
 import { getDuration } from '../utils/duration';
 import DateTime from './DateTime';
@@ -21,12 +21,17 @@ export default function TraceDetails() {
 
   return (
     <>
-      <div className="flex items-center gap-x-2 bg-indigo-950 px-6  py-4">
+      <div className="flex items-center gap-x-2 border-b border-b-indigo-700 bg-indigo-950 px-6 py-4">
         <PlatformIcon platform={trace.rootTransaction?.platform} />
         <h1 className="max-w-full flex-1 truncate text-2xl">{trace.rootTransactionName}</h1>
         <div className="font-mono text-indigo-300">
           <div>T: {trace.trace_id}</div>
-          <div>S: {trace.span_id}</div>
+          <div>
+            S:{' '}
+            <Link to={`/traces/${trace.trace_id}/${trace.span_id}`} className="underline">
+              {trace.span_id}
+            </Link>
+          </div>
         </div>
       </div>
       <div className="px-6 py-4">
@@ -44,18 +49,17 @@ export default function TraceDetails() {
           </span>
         </div>
       </div>
-      <div className="flex-1 divide-indigo-900 bg-indigo-950 px-6 py-4">
+      <div className="flex-1 px-2 pb-6">
         <SpanTree
           traceContext={trace}
           tree={trace.spanTree}
           startTimestamp={startTimestamp}
           totalDuration={totalDuration}
         />
-
-        {span ? (
-          <SpanDetails traceContext={trace} startTimestamp={startTimestamp} totalDuration={totalDuration} span={span} />
-        ) : null}
       </div>
+      {span ? (
+        <SpanDetails traceContext={trace} startTimestamp={startTimestamp} totalDuration={totalDuration} span={span} />
+      ) : null}
     </>
   );
 }

@@ -17,7 +17,7 @@ export function SidePanelHeader({
         {subtitle && <h3 className="font-mono">{subtitle}</h3>}
       </div>
       <Link
-        className="-my-1 flex cursor-pointer  items-center justify-center rounded px-6 py-1 font-mono text-2xl hover:bg-indigo-900"
+        className="-my-1 flex cursor-pointer items-center justify-center rounded px-6 py-1 font-mono text-2xl hover:bg-indigo-900"
         to={backTo}
       >
         {'✕'}

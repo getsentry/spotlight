@@ -77,7 +77,7 @@ export default function EventDetails() {
         )}
       </div>
       <Tabs tabs={tabs} nested={true} />
-      <div className="flex-1 divide-indigo-900 bg-indigo-950 px-6 py-4">
+      <div className="flex-1 px-6 py-4">
         <Routes>
           <Route path="breadcrumbs" element={<EventBreadcrumbs event={event} />} />
           <Route path="contexts" element={<EventContexts event={event} />} />
