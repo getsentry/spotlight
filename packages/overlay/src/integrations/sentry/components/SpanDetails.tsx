@@ -94,6 +94,13 @@ export default function SpanDetails({
           )}
         </div>
 
+        {span.op === 'resource.img' && span.description?.indexOf('/') === 0 && (
+          <div>
+            <h2 className="mb-2 font-bold uppercase">Preview</h2>
+            <img src={span.description} alt="preview" className="max-w-1/2 max-h-300" />
+          </div>
+        )}
+
         <div>
           <h2 className="mb-2 font-bold uppercase">Tags</h2>
           {span.tags && Object.keys(span.tags).length ? (
