@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
 import SidePanel, { SidePanelHeader } from '~/components/SidePanel';
@@ -20,12 +21,12 @@ function formatSpanDescription(desc: string) {
   return desc;
 }
 
-function formatValue(name: string, value: unknown) {
+function formatValue(name: string, value: unknown): ReactNode {
   if (typeof value === 'number') {
     if (name.indexOf('size') !== -1 || name.indexOf('length') !== -1) return formatBytes(value);
     return value.toLocaleString();
   }
-  return value;
+  return value as ReactNode;
 }
 
 export default function SpanDetails({
@@ -95,7 +96,7 @@ export default function SpanDetails({
         <div>
           <h2 className="mb-2 font-bold uppercase">Description</h2>
           {span.description ? (
-            <pre className="whitespace-pre-wrap break-words font-mono text-indigo-300">
+            <pre className="whitespace-pre-wrap break-words font-mono text-sm text-indigo-300">
               {formatSpanDescription(span.description)}
             </pre>
           ) : (
@@ -118,7 +119,7 @@ export default function SpanDetails({
         <div>
           <h2 className="mb-2 font-bold uppercase">Tags</h2>
           {span.tags && Object.keys(span.tags).length ? (
-            <table className="w-full">
+            <table className="w-full text-sm">
               <tbody>
                 {Object.entries(span.tags).map(([key, value]) => {
                   return (
@@ -140,7 +141,7 @@ export default function SpanDetails({
         </div>
         <div>
           <h2 className="mb-2 font-bold uppercase">Context</h2>
-          <table className="w-full">
+          <table className="w-full text-sm">
             <tbody>
               {[
                 ['status', span.status || ''],
@@ -176,7 +177,7 @@ export default function SpanDetails({
         {span.data && (
           <div>
             <h2 className="mb-2 font-bold uppercase">Data</h2>
-            <table className="w-full">
+            <table className="w-full text-sm">
               <tbody>
                 {Object.entries(span.data).map(([key, value]) => {
                   return (
@@ -195,21 +196,17 @@ export default function SpanDetails({
           </div>
         )}
 
-        <div>
-          <h2 className="mb-2 font-bold uppercase">Sub-tree</h2>
-          <div className="-mx-3 border border-indigo-900 bg-indigo-950">
-            {span.children?.length ? (
-              <SpanTree
-                traceContext={traceContext}
-                tree={span.children}
-                startTimestamp={startTimestamp}
-                totalDuration={totalDuration}
-              />
-            ) : (
-              <div className="p-4">No children present at this node.</div>
-            )}
+        {!!span.children?.length && (
+          <div>
+            <h2 className="mb-2 font-bold uppercase">Sub-tree</h2>
+            <SpanTree
+              traceContext={traceContext}
+              tree={span.children}
+              startTimestamp={startTimestamp}
+              totalDuration={totalDuration}
+            />
           </div>
-        </div>
+        )}
       </div>
     </SidePanel>
   );
