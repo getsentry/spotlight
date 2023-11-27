@@ -52,7 +52,9 @@ export default function SpanDetails({
             <div className="flex flex-1 items-center gap-x-1 text-indigo-300">
               <DateTime date={span.start_timestamp} />
               <span>&mdash;</span>
-              <span>{getDuration(startTimestamp, span.start_timestamp)} into trace</span>
+              <span>
+                <strong>{getDuration(startTimestamp, span.start_timestamp)} ms</strong> into trace
+              </span>
             </div>
             <div className="flex-1">
               <div className="relative h-8 border border-indigo-600 py-1">
