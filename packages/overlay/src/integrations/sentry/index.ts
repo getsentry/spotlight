@@ -25,7 +25,7 @@ export default function sentryIntegration() {
       {
         id: 'errors',
         title: 'Errors',
-        notificationCount: sentryDataCache.getEvents().filter(e => !e.type).length,
+        notificationCount: sentryDataCache.getEvents().filter(e => e.type != 'transaction').length,
         content: ErrorsTab,
       },
       {
