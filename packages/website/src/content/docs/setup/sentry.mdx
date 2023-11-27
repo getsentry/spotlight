@@ -5,7 +5,8 @@ description: Use Spotlight with Sentry
 
 Spotlight is built that you don't need Sentry to run it, it can contain any kind of integration. However, Sentry is the first integration we've built for Spotlight and it's a great way to get started.
 
-As mentioned on the previous page, if you want that you Sentry SDKs talk to the Sidecar, enable the `spotlight` setting:
+As mentioned on the previous page, if you want that you Sentry SDKs talk to the Sidecar, enable the `spotlight` setting.
+You do not require a `DSN` for this to work.
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
@@ -21,6 +22,9 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   ```
   </TabItem>
   <TabItem label="Node">
+  :::caution
+  Requires `@sentry/node` version `7.82.0` or higher.
+  :::
   ```javascript
     Sentry.init({
         dsn: 'DSN',
@@ -29,6 +33,9 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   ```
   </TabItem>
   <TabItem label="Python">
+  :::caution
+  Requires `sentry-sdk` version `1.37.0` or higher.
+  :::
   ```python 
     sentry_sdk.init(
         dsn="DSN",
@@ -37,14 +44,20 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   ```
   </TabItem>
   <TabItem label="PHP">
+  :::caution
+  Requires `sentry/sentry` version `4.1.0` or higher.
+  :::
   ```php 
-    Sentry\init([
+    \Sentry\init([
         'dsn' => 'DSN',
         'spotlight' => true,
     ]);
   ```
   </TabItem>
   <TabItem label="Ruby">
+  :::caution
+  Requires `sentry-ruby` version `5.14.0` or higher.
+  :::
   ```ruby 
     Sentry.init do |config|
         config.dsn = 'DSN'
