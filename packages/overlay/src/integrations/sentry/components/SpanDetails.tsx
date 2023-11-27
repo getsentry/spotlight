@@ -3,6 +3,7 @@ import { format as formatSQL } from 'sql-formatter';
 import SidePanel, { SidePanelHeader } from '~/components/SidePanel';
 import dataCache from '../data/sentryDataCache';
 import { SentryErrorEvent, Span, TraceContext } from '../types';
+import { formatBytes } from '../utils/bytes';
 import { getDuration } from '../utils/duration';
 import DateTime from './DateTime';
 import { ErrorTitle } from './Events/Error';
@@ -17,6 +18,14 @@ function formatSpanDescription(desc: string) {
     }
   }
   return desc;
+}
+
+function formatValue(name: string, value: unknown) {
+  if (typeof value === 'number') {
+    if (name.indexOf('size') !== -1 || name.indexOf('length') !== -1) return formatBytes(value);
+    return value.toLocaleString();
+  }
+  return value;
 }
 
 export default function SpanDetails({
@@ -97,7 +106,12 @@ export default function SpanDetails({
         {span.op === 'resource.img' && span.description?.indexOf('/') === 0 && (
           <div>
             <h2 className="mb-2 font-bold uppercase">Preview</h2>
-            <img src={span.description} alt="preview" style={{ maxWidth: '50%', maxHeight: 400 }} />
+            <a
+              href={span.description}
+              className="-m-2 inline-block max-w-sm cursor-pointer rounded border border-indigo-950 p-1 hover:border-indigo-700"
+            >
+              <img src={span.description} alt="preview" style={{ maxHeight: 300 }} />
+            </a>
           </div>
         )}
 
@@ -158,6 +172,28 @@ export default function SpanDetails({
             </tbody>
           </table>
         </div>
+
+        {span.data && (
+          <div>
+            <h2 className="mb-2 font-bold uppercase">Data</h2>
+            <table className="w-full">
+              <tbody>
+                {Object.entries(span.data).map(([key, value]) => {
+                  return (
+                    <tr key={key}>
+                      <th className="w-1/12 py-0.5 pr-4 text-left font-mono font-normal text-indigo-300">
+                        <div className="w-full truncate">{key}</div>
+                      </th>
+                      <td className="py-0.5">
+                        <pre className="whitespace-nowrap font-mono">{formatValue(key, value)}</pre>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         <div>
           <h2 className="mb-2 font-bold uppercase">Sub-tree</h2>

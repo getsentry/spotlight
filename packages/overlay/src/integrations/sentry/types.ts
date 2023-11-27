@@ -102,6 +102,7 @@ export type Span = {
   status: 'ok' | string;
   transaction?: SentryTransactionEvent;
   children?: Span[];
+  data?: Record<string, unknown>;
 };
 
 export type SentryTransactionEvent = CommonEventAttrs & {
