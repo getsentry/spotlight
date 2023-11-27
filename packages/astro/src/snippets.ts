@@ -7,7 +7,7 @@ export type ClientInitOptions = {
   injectImmediately?: boolean;
 };
 
-const DEFAULT_INTEGRATIONS = ['sentry', 'console', 'viteInspect'];
+const DEFAULT_INTEGRATIONS = ['sentry'];
 
 const buildClientImport = (importPath: string) => `import * as Spotlight from '${importPath}';`;
 
