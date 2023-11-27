@@ -81,11 +81,11 @@ ul.tree li:last-child:before {
 }
 
 .tree .node {
-  @apply flex w-[65%] items-center gap-x-1 overflow-auto py-1;
+  @apply flex w-[65%] items-center gap-x-1 overflow-auto py-1 pl-1;
 }
 
 .tree .waterfall {
-  @apply absolute left-[65%] right-0 h-7 border-l border-l-indigo-800 bg-indigo-950 py-1;
+  @apply absolute left-[65%] right-0 h-7 border-l border-l-indigo-800 bg-indigo-950 py-1 pl-1;
 }
 
 .table-values {
