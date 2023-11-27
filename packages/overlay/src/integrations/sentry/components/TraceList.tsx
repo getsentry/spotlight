@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import CardList from '~/components/CardList';
 import classNames from '../../../lib/classNames';
 import { useSentryTraces } from '../data/useSentryTraces';
 import { getDuration } from '../utils/duration';
@@ -10,13 +11,13 @@ export default function TraceList() {
 
   return (
     <>
-      <div className="divide-y divide-indigo-500 bg-indigo-950">
-        {traceList.length !== 0 ? (
-          traceList.map(trace => {
+      {traceList.length !== 0 ? (
+        <CardList>
+          {traceList.map(trace => {
             const duration = getDuration(trace.start_timestamp, trace.timestamp);
             return (
               <Link
-                className="flex cursor-pointer items-center gap-x-4 px-6 py-4 hover:bg-indigo-800"
+                className="flex cursor-pointer items-center gap-x-4 px-6 py-4 hover:bg-indigo-900"
                 key={trace.trace_id}
                 to={trace.trace_id}
               >
@@ -42,11 +43,11 @@ export default function TraceList() {
                 </div>
               </Link>
             );
-          })
-        ) : (
-          <div className="p-6 text-indigo-300">Looks like there's no traces recorded matching this query. 🤔</div>
-        )}
-      </div>
+          })}
+        </CardList>
+      ) : (
+        <div className="p-6 text-indigo-300">Looks like there's no traces recorded matching this query. 🤔</div>
+      )}
     </>
   );
 }

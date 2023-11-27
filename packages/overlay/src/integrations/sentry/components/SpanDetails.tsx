@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
+import SidePanel, { SidePanelHeader } from '~/components/SidePanel';
 import dataCache from '../data/sentryDataCache';
 import { SentryErrorEvent, Span, TraceContext } from '../types';
 import { getDuration } from '../utils/duration';
@@ -34,21 +35,16 @@ export default function SpanDetails({
   const errors = dataCache.getEventsByTrace(span.trace_id).filter(e => e.type !== 'transaction');
 
   return (
-    <div className="fixed bottom-0 left-1/4 right-0 top-0 h-full overflow-auto border-l border-l-indigo-400 bg-indigo-900 px-6 py-4">
-      <div className="mb-4 flex border-b border-b-indigo-400 pb-4">
-        <div className="flex-1">
-          <h2 className="text-xl text-indigo-300">Span Details</h2>
-          <h3 className="font-mono">
+    <SidePanel>
+      <SidePanelHeader
+        title="Span Details"
+        subtitle={
+          <>
             {span.op} <span className="text-indigo-500">&mdash;</span> {span.span_id}
-          </h3>
-        </div>
-        <Link
-          className="-my-1 -mr-3 cursor-pointer rounded bg-indigo-900 px-3 py-1 font-mono text-2xl hover:bg-black"
-          to={`/traces/${span.trace_id}`}
-        >
-          {'✕'}
-        </Link>
-      </div>
+          </>
+        }
+        backTo={`/traces/${span.trace_id}`}
+      />
 
       <div className="space-y-6">
         <div>
@@ -157,15 +153,19 @@ export default function SpanDetails({
         <div>
           <h2 className="mb-2 font-bold uppercase">Sub-tree</h2>
           <div className="-mx-3 border border-indigo-900 bg-indigo-950">
-            <SpanTree
-              traceContext={traceContext}
-              tree={span.children || []}
-              startTimestamp={startTimestamp}
-              totalDuration={totalDuration}
-            />
+            {span.children?.length ? (
+              <SpanTree
+                traceContext={traceContext}
+                tree={span.children}
+                startTimestamp={startTimestamp}
+                totalDuration={totalDuration}
+              />
+            ) : (
+              <div className="p-4">No children present at this node.</div>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </SidePanel>
   );
 }

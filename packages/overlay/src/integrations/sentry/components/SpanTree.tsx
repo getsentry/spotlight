@@ -34,8 +34,8 @@ export default function SpanTree({
           >
             <Link
               className={classNames(
-                'flex cursor-pointer text-sm hover:bg-indigo-800',
-                spanId === span.span_id ? 'bg-indigo-800' : '',
+                'flex cursor-pointer text-sm hover:bg-indigo-900',
+                spanId === span.span_id ? 'bg-indigo-900' : '',
               )}
               to={`/traces/${span.trace_id}/${span.span_id}`}
             >

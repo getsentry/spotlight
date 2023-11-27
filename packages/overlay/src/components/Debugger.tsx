@@ -34,7 +34,7 @@ export default function Debugger({
       }}
     >
       <div className="sentry-debugger">
-        <div className="flex items-center gap-x-2 bg-indigo-950 px-6 py-4 text-indigo-200">
+        <div className="flex items-center gap-x-2 px-6 py-4 text-indigo-200">
           <h1 className="font-raleway flex flex-1 items-end gap-x-1 leading-7 opacity-80">
             <div className="inline-flex items-center gap-x-4">
               <Logo height={32} width={32} />
@@ -72,7 +72,7 @@ export default function Debugger({
             </div>
           </h1>
           <button
-            className="-my-1 -mr-3 cursor-pointer rounded bg-indigo-950 px-3 py-1 font-mono text-2xl hover:bg-black"
+            className="-my-1 -mr-3 cursor-pointer rounded px-3 py-1 font-mono text-2xl hover:bg-indigo-900"
             onClick={() => {
               setOpen(false);
             }}

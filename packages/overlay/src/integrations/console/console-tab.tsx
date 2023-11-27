@@ -7,7 +7,7 @@ export default function ConsoleTab({ processedEvents }: Props) {
   const messages = (processedEvents || []) as ConsoleMessage[];
 
   return (
-    <div className="divide-y divide-indigo-500 bg-indigo-950 p-4">
+    <div className="divide-y divide-indigo-900 bg-indigo-950 p-4">
       <h1 className="mb-2 text-xl">Console Logs</h1>
       <div className="flex flex-col gap-2">
         {messages.map((message, index) => {

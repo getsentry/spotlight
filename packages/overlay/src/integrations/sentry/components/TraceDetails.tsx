@@ -44,7 +44,7 @@ export default function TraceDetails() {
           </span>
         </div>
       </div>
-      <div className="flex-1 divide-indigo-500 bg-indigo-950 px-6 py-4">
+      <div className="flex-1 divide-indigo-900 bg-indigo-950 px-6 py-4">
         <SpanTree
           traceContext={trace}
           tree={trace.spanTree}

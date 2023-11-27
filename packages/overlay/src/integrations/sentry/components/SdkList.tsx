@@ -1,3 +1,4 @@
+import CardList from '~/components/CardList';
 import { useSentrySdks } from '../data/useSentrySdks';
 import PlatformIcon from './PlatformIcon';
 import TimeSince from './TimeSince';
@@ -15,9 +16,9 @@ export default function SdkList() {
 
   return (
     <>
-      <div className="divide-y divide-indigo-500 bg-indigo-950">
-        {sdkList.length !== 0 ? (
-          sdkList.map(sdk => {
+      {sdkList.length !== 0 ? (
+        <CardList>
+          {sdkList.map(sdk => {
             return (
               <div className="flex items-center gap-x-4 px-6 py-4" key={`${sdk.name}-${sdk.version}`}>
                 <PlatformIcon platform={sdkToPlatform(sdk.name)} />
@@ -29,11 +30,11 @@ export default function SdkList() {
                 </div>
               </div>
             );
-          })
-        ) : (
-          <div className="p-6 text-indigo-300">Looks like there's no SDKs that have reported yet. 🤔</div>
-        )}
-      </div>
+          })}
+        </CardList>
+      ) : (
+        <div className="p-6 text-indigo-300">Looks like there's no SDKs that have reported yet. 🤔</div>
+      )}
     </>
   );
 }

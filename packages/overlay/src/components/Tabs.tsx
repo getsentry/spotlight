@@ -46,7 +46,7 @@ export default function Tabs({ tabs, nested }: Props) {
         </select>
       </div>
       <div className="hidden sm:block">
-        <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+        <nav className="flex space-x-8 border-b border-b-indigo-900 px-6" aria-label="Tabs">
           {tabs.map(tab => (
             <Link
               to={`${nested ? '' : '/'}${tab.id}`}
@@ -55,7 +55,7 @@ export default function Tabs({ tabs, nested }: Props) {
                 tab.active
                   ? 'border-indigo-200 text-indigo-100'
                   : 'border-transparent text-indigo-400 hover:border-indigo-400 hover:text-indigo-100',
-                '-mx-2 flex whitespace-nowrap border-b-2 px-2 py-3 text-sm font-medium',
+                '-m-y -mx-2 flex whitespace-nowrap border-b-2 px-2 py-3 text-sm font-medium',
               )}
               onClick={() => tab.onSelect && tab.onSelect()}
               aria-current={tab.active ? 'page' : undefined}
