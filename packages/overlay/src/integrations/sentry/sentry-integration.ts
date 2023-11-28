@@ -1,8 +1,24 @@
 import { Client, Envelope, Event, EventProcessor, Hub, Integration } from '@sentry/types';
 import { serializeEnvelope } from '@sentry/utils';
 
+type SpotlightBrowserIntegationOptions = {
+  /**
+   * The URL of the Sidecar instance to connect and forward events to.
+   * If not set, Spotlight will try to connect to the Sidecar running on localhost:8969.
+   *
+   * @default "http://localhost:8969/stream"
+   */
+  sidecarUrl?: string;
+};
 export class Spotlight implements Integration {
   public name: string = 'DevServerContextLines';
+
+  private _sidecarUrl: string;
+
+  public constructor(options?: SpotlightBrowserIntegationOptions) {
+    this._sidecarUrl = options?.sidecarUrl ?? 'http://localhost:8969/stream';
+    console.log('Spotlight: Using Sidecar URL', this._sidecarUrl);
+  }
 
   public setupOnce(addGlobalEventProcessor: (callback: EventProcessor) => void, getCurrentHub: () => Hub): void {
     addGlobalEventProcessor(async (event: Event) => {
@@ -32,18 +48,18 @@ export class Spotlight implements Integration {
 
     const client = getCurrentHub().getClient();
     if (client) {
-      sendEnvelopesToSidecar(client);
+      sendEnvelopesToSidecar(client, this._sidecarUrl);
     }
   }
 }
 
-function sendEnvelopesToSidecar(client: Client) {
+function sendEnvelopesToSidecar(client: Client, sidecarUrl: string) {
   // Ensure, integrations are initialized even if no DSN was set
   client?.setupIntegrations(true);
 
   if (client.on) {
     client?.on('beforeEnvelope', (envelope: Envelope) => {
-      fetch('http://localhost:8969/stream', {
+      fetch(sidecarUrl, {
         method: 'POST',
         body: serializeEnvelope(envelope),
         headers: {

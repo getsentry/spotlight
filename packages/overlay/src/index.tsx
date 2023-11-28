@@ -48,12 +48,12 @@ const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
 export async function init({
   fullScreen = false,
   showTriggerButton = true,
-  integrations = [sentry()],
   defaultEventId,
   injectImmediately = false,
   sidecar = DEFAULT_SIDECAR,
   anchor = DEFAULT_ANCHOR,
   debug = false,
+  integrations,
 }: {
   integrations?: Integration[];
   fullScreen?: boolean;
@@ -77,7 +77,11 @@ export async function init({
   if (debug) {
     activateLogger();
   }
-  const initializedIntegrations = await initIntegrations(integrations);
+
+  // Sentry is enabled by default
+  const defaultInitegrations = [sentry({ sidecarUrl: sidecar })];
+
+  const initializedIntegrations = await initIntegrations(integrations ?? defaultInitegrations);
 
   // build shadow dom container to contain styles
   const docRoot = document.createElement('div');

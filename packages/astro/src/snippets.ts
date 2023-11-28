@@ -1,3 +1,5 @@
+import type { SpotlightAstroIntegrationOptions } from './types';
+
 type SupportedIntegrations = 'sentry' | 'console' | 'viteInspect';
 
 export type ClientInitOptions = {
@@ -5,15 +7,15 @@ export type ClientInitOptions = {
   showTriggerButton?: boolean;
   integrationNames?: SupportedIntegrations[];
   injectImmediately?: boolean;
-};
-
-const DEFAULT_INTEGRATIONS = ['sentry'];
+} & SpotlightAstroIntegrationOptions;
 
 const buildClientImport = (importPath: string) => `import * as Spotlight from '${importPath}';`;
 
 const buildClientInit = (options: ClientInitOptions) => {
-  const integrations = options.integrationNames || DEFAULT_INTEGRATIONS;
-  const integrationCalls = integrations.map(i => `Spotlight.${i}()`).join(', ');
+  const integrationCalls = options.integrationNames
+    ? options.integrationNames.map(i => `Spotlight.${i}()`).join(', ')
+    : `Spotlight.sentry({sidecarUrl: ${options.sidecarUrl ? `'${options.sidecarUrl}'` : undefined}})`;
+
   return `
 Spotlight.init({
   integrations: [
@@ -22,6 +24,7 @@ Spotlight.init({
   showTriggerButton: ${options.showTriggerButton === false ? 'false' : 'true'},
   injectImmediately: ${options.injectImmediately === true ? 'true' : 'false'},
   debug: ${options.debug === true ? 'true' : 'false'},
+  ${options.sidecarUrl ? `sidecar: '${options.sidecarUrl}'` : ''}
 });
 `;
 };
@@ -58,8 +61,11 @@ if (enableOverlay) {
 }
 `;
 
-export const SPOTLIGHT_SERVER_SNIPPET = `
+export const buildServerSnippet: (options: SpotlightAstroIntegrationOptions) => string = options => `
 import * as _SentrySDKForSpotlight from '@sentry/astro';
+
 _SentrySDKForSpotlight.getClient().setupIntegrations(true);
-_SentrySDKForSpotlight.addIntegration(new _SentrySDKForSpotlight.Integrations.Spotlight());
+_SentrySDKForSpotlight.addIntegration(new _SentrySDKForSpotlight.Integrations.Spotlight({
+  ${options?.sidecarUrl ? `sidecarUrl: '${options.sidecarUrl}'` : ''}
+}));
 `;

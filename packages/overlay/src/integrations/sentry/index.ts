@@ -10,13 +10,17 @@ import TracesTab from './tabs/TracesTab';
 
 const HEADER = 'application/x-sentry-envelope';
 
-export default function sentryIntegration() {
+type SentryIntegrationOptions = {
+  sidecarUrl?: string;
+};
+
+export default function sentryIntegration(options?: SentryIntegrationOptions) {
   return {
     name: 'sentry',
     forwardedContentType: [HEADER],
 
     setup: () => {
-      addSpotlightIntegrationToSentry();
+      addSpotlightIntegrationToSentry(options);
     },
 
     processEvent: (event: RawEventContext) => processEnvelope(event),
@@ -89,12 +93,15 @@ function isErrorEnvelope(envelope: Envelope) {
   return envelope[1].some(([itemHeader]) => itemHeader.type === 'event');
 }
 
-function addSpotlightIntegrationToSentry() {
+function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
   // A very hacky way to hook into Sentry's SDK
   // but we love hacks
   const sentryHub = (window as WindowWithSentry).__SENTRY__?.hub;
   const sentryClient = sentryHub?.getClient();
   if (sentryClient) {
-    sentryClient.addIntegration(new Spotlight());
+    const spotlightIntegration = new Spotlight({
+      sidecarUrl: options?.sidecarUrl,
+    });
+    sentryClient.addIntegration(spotlightIntegration);
   }
 }
