@@ -2,7 +2,6 @@ import { createElement } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Integration, IntegrationData } from '~/integrations/integration';
 import Tabs from './Tabs';
-
 export default function Overview({
   integrations,
   integrationData,

@@ -1,6 +1,8 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { type IntegrationTab } from '~/integrations/integration';
 import classNames from '../lib/classNames';
+import { getSpotlightEventTarget } from '../lib/eventTarget';
+import useKeyPress from '../lib/useKeyPress';
 
 export type Props = {
   /**
@@ -18,6 +20,17 @@ export type Props = {
 
 export default function Tabs({ tabs, nested }: Props) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const spotlightEventTarget = getSpotlightEventTarget();
+
+  useKeyPress('Escape', () => {
+    if (location.pathname.split('/').length === 2) {
+      spotlightEventTarget.dispatchEvent(new CustomEvent('closed'));
+    } else {
+      navigate(-1);
+    }
+  });
+
   return (
     <div>
       <div className="sm:hidden">
@@ -50,6 +63,7 @@ export default function Tabs({ tabs, nested }: Props) {
             <NavLink
               to={`${nested ? '' : '/'}${tab.id}`}
               key={tab.id}
+              replace={true}
               className={({ isActive }) =>
                 classNames(
                   isActive

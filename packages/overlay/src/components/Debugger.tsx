@@ -1,7 +1,6 @@
 import { ReactComponent as Logo } from '~/assets/glyph.svg';
 import { Integration, IntegrationData } from '~/integrations/integration';
 import classNames from '../lib/classNames';
-import useKeyPress from '../lib/useKeyPress';
 import Overview from './Overview';
 
 export default function Debugger({
@@ -18,9 +17,6 @@ export default function Debugger({
   integrationData: IntegrationData<unknown>;
   isOnline: boolean;
 }) {
-  useKeyPress('Escape', () => {
-    setOpen(false);
-  });
   return (
     <div
       className={classNames('fullscreen-blur', isOpen ? '' : '!hidden')}
