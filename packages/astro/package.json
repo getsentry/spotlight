@@ -25,13 +25,16 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "peerDependencies": {
+    "astro": ">=3.4.0"
+  },
   "dependencies": {
     "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
-    "astro": "^3.4.0",
     "source-map": "^0.7.4"
   },
   "devDependencies": {
+    "astro": "^3.4.0",
     "typescript": "^5.0.2",
     "vite": "^4.5.0"
   },
