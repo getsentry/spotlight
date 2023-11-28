@@ -30,7 +30,11 @@ Registering Spotlight in your frontend application:
 
 ```typescript
 import * as Spotlight from '@spotlightjs/overlay';
-Spotlight.init();
+
+// only load Spotlight in dev
+if (process.env.NODE_ENV === "development") {
+  Spotlight.init();
+}
 ```
 
 Running the sidecar in the background:
