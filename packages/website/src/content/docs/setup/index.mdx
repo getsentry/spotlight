@@ -43,7 +43,7 @@ Inject Spotlight into your application:
 import * as Spotlight from '@spotlightjs/overlay';
 
 // only load Spotlight in dev
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV === "development") {
   Spotlight.init();
 }
 ```
@@ -53,9 +53,9 @@ Upon loading your UI you should now see the Spotlight toolbar in bottom-right co
 For more options on how to configure Spotlight's UI, see [Configuration](/reference/configuration/).
 
 :::tip
-Spotlight will automatically configure [Sentry's Browser SDK](https://docs.sentry.io/platforms/javascript/) to send data to the default Sidecar.
+Spotlight will automatically configure [Sentry's Browser SDKs](https://docs.sentry.io/platforms/javascript/) to send data to the default Sidecar.
 
-If you are using additional runtimes, such as [Node.js](https://docs.sentry.io/platforms/node/), [PHP](https://docs.sentry.io/platforms/php/), or [Python](https://docs.sentry.io/platforms/python/), you should take a look at Sentry's SDKs on how to enable Spotlight. Generally this as easy as `spotlight = true` in `Sentry.init()`:
+If you are using additional runtimes, such as [Node.js](https://docs.sentry.io/platforms/node/), [PHP](https://docs.sentry.io/platforms/php/), or [Python](https://docs.sentry.io/platforms/python/), you should take a look at Sentry's SDKs on how to enable Spotlight. Generally this as easy as `spotlight: true` in `Sentry.init()`:
 
 
 ```js
@@ -72,7 +72,7 @@ Sentry.init({
 
 ## Sidecar
 
-Spotlight's [architecture](/architecture/) require's a sidecar to be running alongside your service. This is to enable streaming data collection from your backend services into the Spotlight overlay.
+Spotlight's [architecture](/architecture/) requires a sidecar to be running alongside your service. This is to enable streaming data collection from your backend services into the Spotlight overlay.
 
 
 <CardGrid>
