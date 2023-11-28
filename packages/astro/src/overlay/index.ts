@@ -39,13 +39,15 @@ export default {
     });
 
     Spotlight.onOpen(() => {
-      eventTarget.dispatchEvent(
-        new CustomEvent('toggle-notification', {
-          detail: {
-            state: false,
-          },
-        }),
-      );
+      setTimeout(() => {
+        eventTarget.dispatchEvent(
+          new CustomEvent('toggle-notification', {
+            detail: {
+              state: false,
+            },
+          }),
+        );
+      }, 500);
     });
 
     Spotlight.onSevereEvent(() => {
