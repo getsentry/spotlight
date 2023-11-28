@@ -85,11 +85,20 @@ export default function App({
       spotlightEventTarget.dispatchEvent(new CustomEvent('closed'));
       document.body.style.overflow = 'auto';
     } else {
+      spotlightEventTarget.dispatchEvent(new CustomEvent('opened'));
       document.body.style.overflow = 'hidden';
     }
   }, [isOpen, spotlightEventTarget]);
 
-  log('Integrations', integrationData);
+  useEffect(() => {
+    if (triggerButtonCount.severe > 0) {
+      spotlightEventTarget.dispatchEvent(
+        new CustomEvent('severeEventCount', { detail: { count: triggerButtonCount.severe } }),
+      );
+    }
+  }, [triggerButtonCount, spotlightEventTarget]);
+
+  log('Integration data:', integrationData);
 
   return (
     <>
