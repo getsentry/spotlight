@@ -206,7 +206,7 @@ export default function SpanDetails({
             <h2 className="mb-2 font-bold uppercase">Sub-tree</h2>
             <SpanTree
               traceContext={traceContext}
-              tree={span.children}
+              tree={[span]}
               startTimestamp={startTimestamp}
               totalDuration={totalDuration}
             />
