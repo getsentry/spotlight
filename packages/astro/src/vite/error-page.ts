@@ -1,12 +1,13 @@
 import { buildSpotlightErrorPageSnippet } from '../snippets';
 
 import type { Plugin } from 'vite';
+import type { SpotlightAstroIntegrationOptions } from '../types';
 
 type ErrorPagePluginOptions = {
   importPath: string;
-};
+} & SpotlightAstroIntegrationOptions;
 
-export const errorPageInjectionPlugin: (options: ErrorPagePluginOptions) => Plugin = ({ importPath }) => {
+export const errorPageInjectionPlugin: (options: ErrorPagePluginOptions) => Plugin = options => {
   return {
     name: 'spotlight-vite-client-snippet-plugin',
     transform(code, id, opts = {}) {
@@ -14,7 +15,7 @@ export const errorPageInjectionPlugin: (options: ErrorPagePluginOptions) => Plug
       if (!id.includes('vite/dist/client/client.mjs')) return;
 
       const initSnippet = buildSpotlightErrorPageSnippet({
-        importPath,
+        ...options,
         // Astro's toolbar isn't available in the error page
         showTriggerButton: true,
         // don't wait for the window.load event to be fired because in the error page,

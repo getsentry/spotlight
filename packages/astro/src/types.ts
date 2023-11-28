@@ -14,7 +14,7 @@ export type SpotlightAstroIntegrationOptions =
       /**
        * If enabled, Spotlight will log additional debug output to the console.
        */
-      debug: boolean;
+      debug?: boolean;
 
       /**
        * Additional debug options.

@@ -45,13 +45,13 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
           }
 
           injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, showTriggerButton, ...options }));
-          injectScript('page-ssr', buildServerSnippet({ sidecarUrl: options?.sidecarUrl }));
+          injectScript('page-ssr', buildServerSnippet(options));
 
           const importPath = path.dirname(url.fileURLToPath(import.meta.url));
           const pluginPath = path.join(importPath, 'overlay/index.ts');
           addDevOverlayPlugin(pluginPath);
         } else if (options?.__debugOptions) {
-          injectScript('page', buildClientInitSnippet(options.__debugOptions));
+          injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, ...options }));
         }
       },
 

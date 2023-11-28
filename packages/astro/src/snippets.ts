@@ -9,13 +9,13 @@ export type ClientInitOptions = {
   injectImmediately?: boolean;
 } & SpotlightAstroIntegrationOptions;
 
-const DEFAULT_INTEGRATIONS = ['sentry'];
-
 const buildClientImport = (importPath: string) => `import * as Spotlight from '${importPath}';`;
 
 const buildClientInit = (options: ClientInitOptions) => {
-  const integrations = options.integrationNames || DEFAULT_INTEGRATIONS;
-  const integrationCalls = integrations.map(i => `Spotlight.${i}()`).join(', ');
+  const integrationCalls = options.integrationNames
+    ? options.integrationNames.map(i => `Spotlight.${i}()`).join(', ')
+    : `Spotlight.sentry({sidecarUrl: ${options.sidecarUrl ? `'${options.sidecarUrl}'` : undefined}})`;
+
   return `
 Spotlight.init({
   integrations: [
@@ -24,7 +24,7 @@ Spotlight.init({
   showTriggerButton: ${options.showTriggerButton === false ? 'false' : 'true'},
   injectImmediately: ${options.injectImmediately === true ? 'true' : 'false'},
   debug: ${options.debug === true ? 'true' : 'false'},
-  ${options.sidecarUrl ? `sidecarUrl: '${options.sidecarUrl}'` : ''}
+  ${options.sidecarUrl ? `sidecar: '${options.sidecarUrl}'` : ''}
 });
 `;
 };
@@ -61,15 +61,11 @@ if (enableOverlay) {
 }
 `;
 
-type ServerSnippetOptions = {
-  sidecarUrl?: string;
-};
-
-export const buildServerSnippet: (options: ServerSnippetOptions) => string = ({ sidecarUrl }) => `
+export const buildServerSnippet: (options: SpotlightAstroIntegrationOptions) => string = options => `
 import * as _SentrySDKForSpotlight from '@sentry/astro';
 
 _SentrySDKForSpotlight.getClient().setupIntegrations(true);
 _SentrySDKForSpotlight.addIntegration(new _SentrySDKForSpotlight.Integrations.Spotlight({
-  ${sidecarUrl ? `sidecarUrl: '${sidecarUrl}'` : ''}
+  ${options?.sidecarUrl ? `sidecarUrl: '${options.sidecarUrl}'` : ''}
 }));
 `;
