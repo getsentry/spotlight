@@ -19,7 +19,7 @@
     "@astrojs/tailwind": "^5.0.2",
     "@astrojs/vercel": "^5.2.0",
     "@fontsource/raleway": "^5.0.15",
-    "@sentry/astro": "^7.81.1",
+    "@sentry/astro": "^7.83.0",
     "@spotlightjs/astro": "workspace:*",
     "@spotlightjs/overlay": "workspace:*",
     "@types/react": "^18.2.38",
