@@ -37,5 +37,25 @@ export default {
         }),
       );
     });
+
+    Spotlight.onOpen(() => {
+      eventTarget.dispatchEvent(
+        new CustomEvent('toggle-notification', {
+          detail: {
+            state: false,
+          },
+        }),
+      );
+    });
+
+    Spotlight.onSevereEvent(() => {
+      eventTarget.dispatchEvent(
+        new CustomEvent('toggle-notification', {
+          detail: {
+            state: true,
+          },
+        }),
+      );
+    });
   },
 } satisfies DevOverlayPlugin;
