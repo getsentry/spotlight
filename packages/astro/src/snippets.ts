@@ -58,8 +58,15 @@ if (enableOverlay) {
 }
 `;
 
-export const SPOTLIGHT_SERVER_SNIPPET = `
+type ServerSnippetOptions = {
+  sidecarUrl?: string;
+};
+
+export const buildServerSnippet: (options: ServerSnippetOptions) => string = ({ sidecarUrl }) => `
 import * as _SentrySDKForSpotlight from '@sentry/astro';
+
 _SentrySDKForSpotlight.getClient().setupIntegrations(true);
-_SentrySDKForSpotlight.addIntegration(new _SentrySDKForSpotlight.Integrations.Spotlight());
+_SentrySDKForSpotlight.addIntegration(new _SentrySDKForSpotlight.Integrations.Spotlight({
+  ${sidecarUrl ? `sidecarUrl: '${sidecarUrl}'` : ''}
+}));
 `;

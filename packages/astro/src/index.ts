@@ -1,5 +1,5 @@
 import type { AstroIntegration } from 'astro';
-import { SPOTLIGHT_SERVER_SNIPPET, buildClientInitSnippet, type ClientInitOptions } from './snippets';
+import { buildClientInitSnippet, buildServerSnippet, type ClientInitOptions } from './snippets';
 
 import path from 'path';
 import url from 'url';
@@ -11,7 +11,22 @@ const PKG_NAME = '@spotlightjs/astro';
 export type SpotlightOptions =
   | {
       __debugOptions?: ClientInitOptions;
+
+      /**
+       * If enabled, Spotlight will log additional debug output to the console.
+       */
       debug: boolean;
+
+      /**
+       * Set this URL if you're running the Spotlight sidecar on a custom URL.
+       * Setting this URL will cause server- and client-side events to be forwarded to the sidcar running on the passed URL.
+       *
+       * IMPORTANT: This option assumes that you manually started the sidecar outside of Astro. Therefore, if it is set,
+       * the spotlight Astro integration will not start its own sidecar.
+       *
+       * @default 'http://localhost:8969/stream'
+       */
+      sidecarUrl?: string;
     }
   | undefined;
 
@@ -51,7 +66,7 @@ const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
           }
 
           injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, showTriggerButton, ...options }));
-          injectScript('page-ssr', SPOTLIGHT_SERVER_SNIPPET);
+          injectScript('page-ssr', buildServerSnippet({ sidecarUrl: options?.sidecarUrl }));
 
           const importPath = path.dirname(url.fileURLToPath(import.meta.url));
           const pluginPath = path.join(importPath, 'overlay/index.ts');
