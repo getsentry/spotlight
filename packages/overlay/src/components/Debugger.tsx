@@ -23,29 +23,26 @@ export default function Debugger({
   });
   return (
     <div
-      className="fullscreen-blur"
+      className={classNames('fullscreen-blur', isOpen ? '' : '!hidden')}
       onClick={e => {
         if (e.target === e.currentTarget) {
           setOpen(false);
         }
       }}
-      style={{
-        display: isOpen ? undefined : 'none',
-      }}
     >
       <div className="sentry-debugger">
-        <div className="flex items-center gap-x-2 px-6 py-4 text-indigo-200">
+        <div className="text-primary-200 flex items-center gap-x-2 px-6 py-4">
           <h1 className="font-raleway flex flex-1 items-end gap-x-1 leading-7 opacity-80">
             <div className="inline-flex items-center gap-x-4">
               <Logo height={32} width={32} />
               <div className="text-3xl font-light uppercase leading-7 tracking-widest">Spotlight</div>
             </div>
-            <div className="flex items-center gap-x-1 text-sm text-indigo-300">
+            <div className="text-primary-300 flex items-center gap-x-1 text-sm">
               <span>by</span>
-              <a href="https://sentry.io" className="font-semibold hover:underline">
+              <a href="https://sentry.io" target="_blank" className="font-semibold hover:underline">
                 Sentry
               </a>
-              <a href="https://github.com/getsentry/spotlight" rel="me" className="sl-flex ml-2">
+              <a href="https://github.com/getsentry/spotlight" target="_blank" rel="me" className="sl-flex ml-2">
                 <span className="sr-only">GitHub</span>
                 <svg
                   aria-hidden="true"
@@ -72,7 +69,7 @@ export default function Debugger({
             </div>
           </h1>
           <button
-            className="-my-1 -mr-3 cursor-pointer rounded px-3 py-1 font-mono text-2xl hover:bg-indigo-900"
+            className="hover:bg-primary-900 -my-1 -mr-3 cursor-pointer rounded px-3 py-1 font-mono text-2xl"
             onClick={() => {
               setOpen(false);
             }}

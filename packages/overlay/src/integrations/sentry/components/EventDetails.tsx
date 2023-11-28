@@ -56,11 +56,11 @@ export default function EventDetails() {
   const traceCtx = event.contexts?.trace;
   return (
     <>
-      <div className="flex items-center gap-x-2 bg-indigo-950 px-6 py-4">
+      <div className="bg-primary-950 flex items-center gap-x-2 px-6 py-4">
         <PlatformIcon event={event} />
         <h1 className="max-w-full flex-1 truncate text-2xl">{renderEventTitle(event)}</h1>
         {!!traceCtx && (
-          <div className="font-mono text-indigo-300">
+          <div className="text-primary-300 font-mono">
             <div>
               T:{' '}
               <Link className="cursor-pointer underline" to={`/traces/${traceCtx.trace_id}`}>

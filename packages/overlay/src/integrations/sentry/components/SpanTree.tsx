@@ -26,16 +26,11 @@ export default function SpanTree({
       {tree.map(span => {
         const spanDuration = getDuration(span.start_timestamp, span.timestamp);
         return (
-          <li
-            key={span.span_id}
-            style={{
-              paddingLeft: 16,
-            }}
-          >
+          <li key={span.span_id} className="pl-4">
             <Link
               className={classNames(
-                'flex cursor-pointer text-sm hover:bg-indigo-900',
-                spanId === span.span_id ? 'bg-indigo-900' : '',
+                'hover:bg-primary-900 flex cursor-pointer text-sm',
+                spanId === span.span_id ? 'bg-primary-900' : '',
               )}
               to={`/traces/${span.trace_id}/${span.span_id}`}
             >
@@ -53,12 +48,12 @@ export default function SpanTree({
               >
                 {span.transaction && <PlatformIcon size={16} platform={span.transaction.platform} />}
                 <span className="font-bold">{span.op}</span>
-                <span className="text-indigo-400">&ndash;</span>
+                <span className="text-primary-400">&ndash;</span>
                 <span className="block max-w-sm truncate">{span.description || span.span_id}</span>
               </div>
               <div className="waterfall">
                 <div
-                  className="absolute -m-0.5 w-full bg-indigo-900 p-0.5"
+                  className="bg-primary-900 absolute -m-0.5 w-full p-0.5"
                   style={{
                     left: `min(${((span.start_timestamp - startTimestamp) / totalDuration) * 100}%, 100% - 1px)`,
                     width: `max(1px, ${(spanDuration / totalDuration) * 100}%)`,

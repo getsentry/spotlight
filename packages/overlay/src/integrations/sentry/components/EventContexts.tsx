@@ -11,7 +11,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
   if (!contexts || !Object.values(contexts).find(v => !!v)) {
     return (
       <div className="space-y-4 px-6">
-        <div className="text-indigo-300">
+        <div className="text-primary-300">
           No context available for this event. Try adding some to make debugging easier.
         </div>
         <pre className="whitespace-pre-wrap ">{EXAMPLE_CONTEXT}</pre>
@@ -30,7 +30,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
                 {Object.entries(ctxValues).map(([key, value]) => {
                   return (
                     <tr key={key}>
-                      <th className="w-1/12 py-0.5 pr-4 text-left font-mono font-normal text-indigo-300">
+                      <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
                         <div className="w-full truncate">{key}</div>
                       </th>
                       <td className="py-0.5">

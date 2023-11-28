@@ -23,11 +23,11 @@ export default function Overview({
     })
     .flat();
 
-  const initalTab = tabs.length ? `/${tabs[0].id}` : '/no-tabs';
+  const initialTab = tabs.length ? `/${tabs[0].id}` : '/no-tabs';
 
   return (
     <>
-      <MemoryRouter initialEntries={[initalTab]}>
+      <MemoryRouter initialEntries={[initialTab]}>
         <Tabs tabs={tabs} />
         <Routes>
           <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={'not-found'}></Route>

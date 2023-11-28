@@ -50,7 +50,7 @@ export default function SpanDetails({
         title="Span Details"
         subtitle={
           <>
-            {span.op} <span className="text-indigo-500">&mdash;</span> {span.span_id}
+            {span.op} <span className="text-primary-500">&mdash;</span> {span.span_id}
           </>
         }
         backTo={`/traces/${span.trace_id}`}
@@ -59,7 +59,7 @@ export default function SpanDetails({
       <div className="space-y-6">
         <div>
           <div className="flex flex-col space-y-4">
-            <div className="flex flex-1 items-center gap-x-1 text-indigo-300">
+            <div className="text-primary-300 flex flex-1 items-center gap-x-1">
               <DateTime date={span.start_timestamp} />
               <span>&mdash;</span>
               <span>
@@ -67,9 +67,9 @@ export default function SpanDetails({
               </span>
             </div>
             <div className="flex-1">
-              <div className="relative h-8 border border-indigo-800 py-1">
+              <div className="border-primary-800 relative h-8 border py-1">
                 <div
-                  className="absolute bottom-0 top-0 -m-0.5 flex w-full items-center bg-indigo-800 p-0.5"
+                  className="bg-primary-800 absolute bottom-0 top-0 -m-0.5 flex w-full items-center p-0.5"
                   style={{
                     left: `min(${((span.start_timestamp - startTimestamp) / totalDuration) * 100}%, 100% - 1px)`,
                     width: `max(1px, ${(spanDuration / totalDuration) * 100}%)`,
@@ -96,11 +96,11 @@ export default function SpanDetails({
         <div>
           <h2 className="mb-2 font-bold uppercase">Description</h2>
           {span.description ? (
-            <pre className="whitespace-pre-wrap break-words font-mono text-sm text-indigo-300">
+            <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">
               {formatSpanDescription(span.description)}
             </pre>
           ) : (
-            <div className="text-indigo-300">No description recorded for this span.</div>
+            <div className="text-primary-300">No description recorded for this span.</div>
           )}
         </div>
 
@@ -109,7 +109,7 @@ export default function SpanDetails({
             <h2 className="mb-2 font-bold uppercase">Preview</h2>
             <a
               href={span.description}
-              className="-m-2 inline-block max-w-sm cursor-pointer rounded border border-indigo-950 p-1 hover:border-indigo-700"
+              className="border-primary-950 hover:border-primary-700 -m-2 inline-block max-w-sm cursor-pointer rounded border p-1"
             >
               <img src={span.description} alt="preview" style={{ maxHeight: 300 }} />
             </a>
@@ -124,7 +124,7 @@ export default function SpanDetails({
                 {Object.entries(span.tags).map(([key, value]) => {
                   return (
                     <tr key={key}>
-                      <th className="w-1/12 py-0.5 pr-4 text-left font-mono font-normal text-indigo-300">
+                      <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
                         <div className="w-full truncate">{key}</div>
                       </th>
                       <td className="py-0.5">
@@ -136,7 +136,7 @@ export default function SpanDetails({
               </tbody>
             </table>
           ) : (
-            <div className="text-indigo-300">No tags recorded for this span.</div>
+            <div className="text-primary-300">No tags recorded for this span.</div>
           )}
         </div>
         <div>
@@ -161,7 +161,7 @@ export default function SpanDetails({
               ].map(([key, value]) => {
                 return (
                   <tr key={key as string}>
-                    <th className="w-1/12 py-0.5 pr-4 text-left font-mono font-normal text-indigo-300">
+                    <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
                       <div className="w-full truncate">{key}</div>
                     </th>
                     <td className="py-0.5">
@@ -182,7 +182,7 @@ export default function SpanDetails({
                 {Object.entries(span.data).map(([key, value]) => {
                   return (
                     <tr key={key}>
-                      <th className="w-1/12 py-0.5 pr-4 text-left font-mono font-normal text-indigo-300">
+                      <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
                         <div className="w-full truncate">{key}</div>
                       </th>
                       <td className="py-0.5">

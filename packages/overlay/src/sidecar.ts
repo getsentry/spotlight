@@ -65,7 +65,7 @@ export function connectToSidecar(
     log(`Removing ${contentTypeListeners.length} listeners`);
     contentTypeListeners.forEach(typeAndListener => {
       source.removeEventListener(typeAndListener[0], typeAndListener[1]);
-      log('Removed listner for type', typeAndListener[0]);
+      log('Removed listener for type', typeAndListener[0]);
     });
   };
 }
