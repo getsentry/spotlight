@@ -40,7 +40,9 @@ export default function SpanTree({
                   span.transaction
                     ? span.status === 'ok'
                       ? 'text-green-400'
-                      : 'text-red-400'
+                      : span.status
+                      ? 'text-red-400'
+                      : ''
                     : span.status && span.status !== 'ok'
                     ? 'text-red-400'
                     : '',

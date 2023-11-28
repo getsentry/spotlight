@@ -30,8 +30,12 @@ export default function TraceList() {
                 <div className="flex flex-1 flex-col truncate font-mono">
                   <div>{trace.rootTransactionName}</div>
                   <div className="text-primary-300 flex space-x-2 text-sm">
-                    <div className={classNames(trace.status === 'ok' ? 'text-green-400' : 'text-red-400')}>
-                      {trace.status || 'unknown'}
+                    <div
+                      className={classNames(
+                        trace.status === 'ok' ? 'text-green-400' : trace.status ? 'text-red-400' : '',
+                      )}
+                    >
+                      {trace.status || ''}
                     </div>
                     <div>&mdash;</div>
                     <div>{duration} ms</div>
