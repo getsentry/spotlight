@@ -23,7 +23,7 @@ export default function SdkList() {
               <div className="flex items-center gap-x-4 px-6 py-4" key={`${sdk.name}-${sdk.version}`}>
                 <PlatformIcon platform={sdkToPlatform(sdk.name)} />
 
-                <div className="flex flex-col truncate font-mono text-indigo-300">
+                <div className="text-primary-300 flex flex-col truncate font-mono">
                   <div>{sdk.name}</div>
                   <div>{sdk.version}</div>
                   <TimeSince date={sdk.lastSeen} />
@@ -33,7 +33,7 @@ export default function SdkList() {
           })}
         </CardList>
       ) : (
-        <div className="p-6 text-indigo-300">Looks like there's no SDKs that have reported yet. 🤔</div>
+        <div className="text-primary-300 p-6">Looks like there's no SDKs that have reported yet. 🤔</div>
       )}
     </>
   );

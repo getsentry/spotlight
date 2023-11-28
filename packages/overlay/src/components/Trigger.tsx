@@ -35,13 +35,13 @@ function ToolbarItem({
   count?: number | null;
 }) {
   return (
-    <div className="gap-x relative flex items-center rounded p-3 hover:bg-indigo-400" {...props}>
+    <div className="gap-x hover:bg-primary-400 relative flex items-center rounded p-3" {...props}>
       {children}
 
       {!!count && (
         <span
           className={classNames(
-            severe ? 'bg-red-500' : 'bg-indigo-500',
+            severe ? 'bg-red-500' : 'bg-primary-500',
             'absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full font-sans text-[0.65rem] font-medium',
           )}
         >
@@ -71,13 +71,11 @@ export default function Trigger({
       className={classNames(
         'z-[999999]',
         'fixed inline-flex items-center rounded font-medium',
-        'font-raleway cursor-pointer bg-indigo-700 text-white',
+        'font-raleway bg-primary-700 cursor-pointer text-white',
         'flex-col',
         getAnchorClasses(anchor),
+        isOpen ? '!hidden' : '',
       )}
-      style={{
-        display: isOpen ? 'none' : undefined,
-      }}
       onClick={() => setOpen(!isOpen)}
     >
       <ToolbarItem count={countSum} severe={Boolean(count.severe)}>

@@ -33,11 +33,11 @@ export default function Error({ event }: { event: SentryErrorEvent }) {
         {values.map((value, valueIdx) => {
           return (
             <li key={valueIdx} className="space-y-4 font-mono">
-              <h3 className="flex flex-col bg-indigo-950">
+              <h3 className="bg-primary-950 flex flex-col">
                 <strong className="text-xl">{value.type}</strong>
                 <span className="">{value.value}</span>
               </h3>
-              <ul className="border border-indigo-600">
+              <ul className="border-primary-600 border">
                 {value.stacktrace?.frames.map((frame, frameIdx) => {
                   return <Frame key={frameIdx} frame={frame} defaultExpand={valueIdx === 0 && frameIdx === 0} />;
                 })}

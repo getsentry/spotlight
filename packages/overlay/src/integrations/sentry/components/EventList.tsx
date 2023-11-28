@@ -21,12 +21,12 @@ export default function EventList() {
       {matchingEvents.map(e => {
         return (
           <Link
-            className="flex cursor-pointer items-center gap-x-4 px-6 py-4 hover:bg-indigo-900"
+            className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-4"
             key={e.event_id}
             to={e.event_id}
           >
-            <PlatformIcon event={e} className="text-indigo-300" />
-            <div className="flex w-48 flex-col truncate font-mono text-indigo-300">
+            <PlatformIcon event={e} className="text-primary-300" />
+            <div className="text-primary-300 flex w-48 flex-col truncate font-mono">
               <span>{(e.event_id || '').substring(0, 8)}</span>
               <TimeSince date={e.timestamp} />
             </div>
@@ -36,6 +36,6 @@ export default function EventList() {
       })}
     </CardList>
   ) : (
-    <div className="p-6 text-indigo-300">Looks like there's no events recorded matching this query. 🤔</div>
+    <div className="text-primary-300 p-6">Looks like there's no events recorded matching this query. 🤔</div>
   );
 }

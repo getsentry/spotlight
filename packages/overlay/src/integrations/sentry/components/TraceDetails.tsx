@@ -21,10 +21,10 @@ export default function TraceDetails() {
 
   return (
     <>
-      <div className="flex items-center gap-x-2 border-b border-b-indigo-700 bg-indigo-950 px-6 py-4">
+      <div className="border-b-primary-700 bg-primary-950 flex items-center gap-x-2 border-b px-6 py-4">
         <PlatformIcon platform={trace.rootTransaction?.platform} />
         <h1 className="max-w-full flex-1 truncate text-2xl">{trace.rootTransactionName}</h1>
-        <div className="font-mono text-indigo-300">
+        <div className="text-primary-300 font-mono">
           <div>T: {trace.trace_id}</div>
           <div>
             S:{' '}
@@ -35,17 +35,17 @@ export default function TraceDetails() {
         </div>
       </div>
       <div className="px-6 py-4">
-        <div className="flex flex-1 items-center gap-x-1 text-indigo-300">
-          <div className="text-indigo-200">
+        <div className="text-primary-300 flex flex-1 items-center gap-x-1">
+          <div className="text-primary-200">
             <DateTime date={trace.start_timestamp} />
           </div>
           <span>&mdash;</span>
           <span>
-            <strong className="font-bold text-indigo-200">
+            <strong className="text-primary-200 font-bold">
               {getDuration(trace.start_timestamp, trace.timestamp).toLocaleString()} ms
             </strong>{' '}
             recorded in{' '}
-            <strong className="font-bold text-indigo-200">{trace.spans.length.toLocaleString()} spans</strong>
+            <strong className="text-primary-200 font-bold">{trace.spans.length.toLocaleString()} spans</strong>
           </span>
         </div>
       </div>

@@ -28,7 +28,7 @@ export default function Tabs({ tabs, nested }: Props) {
         <select
           id="tabs"
           name="tabs"
-          className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+          className="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:outline-none sm:text-sm"
           onChange={e => {
             const activeTab = tabs.find(tab => tab.id === e.target.value);
             if (activeTab && activeTab.onSelect) {
@@ -45,7 +45,7 @@ export default function Tabs({ tabs, nested }: Props) {
         </select>
       </div>
       <div className="hidden sm:block">
-        <nav className="flex space-x-8 border-b border-b-indigo-700 px-6" aria-label="Tabs">
+        <nav className="border-b-primary-700 flex space-x-8 border-b px-6" aria-label="Tabs">
           {tabs.map(tab => (
             <NavLink
               to={`${nested ? '' : '/'}${tab.id}`}
@@ -53,8 +53,8 @@ export default function Tabs({ tabs, nested }: Props) {
               className={({ isActive }) =>
                 classNames(
                   isActive
-                    ? 'border-indigo-200 text-indigo-100 [&>.count]:bg-indigo-100 [&>.count]:text-indigo-600'
-                    : 'border-transparent text-indigo-400 hover:border-indigo-400 hover:text-indigo-100 [&>.count]:bg-indigo-700 [&>.count]:text-indigo-200',
+                    ? 'border-primary-200 text-primary-100 [&>.count]:bg-primary-100 [&>.count]:text-primary-600'
+                    : 'text-primary-400 hover:border-primary-400 hover:text-primary-100 [&>.count]:bg-primary-700 [&>.count]:text-primary-200 border-transparent',
                   '-m-y -mx-2 flex whitespace-nowrap border-b-2 px-2 py-3 text-sm font-medium',
                 )
               }
