@@ -1,5 +1,18 @@
 # @spotlightjs/core
 
+## 0.0.17
+
+### Patch Changes
+
+- Don't reverse Stacktrace for PHP & Python
+  ([`00c86f1`](https://github.com/getsentry/spotlight/commit/00c86f1b574450ab1a0f62861a688965325699e7))
+
+- Fix error count in tab
+  ([`922f092`](https://github.com/getsentry/spotlight/commit/922f092a45bad917ef5b915c4933f90bfc1e4bf2))
+
+- Remove connect function from sidecar
+  ([`db73d24`](https://github.com/getsentry/spotlight/commit/db73d241bba120848732e063918afd73b34f9269))
+
 ## 0.0.16
 
 ### Patch Changes
