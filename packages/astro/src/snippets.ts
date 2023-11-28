@@ -1,3 +1,5 @@
+import type { SpotlightAstroIntegrationOptions } from './types';
+
 type SupportedIntegrations = 'sentry' | 'console' | 'viteInspect';
 
 export type ClientInitOptions = {
@@ -5,7 +7,7 @@ export type ClientInitOptions = {
   showTriggerButton?: boolean;
   integrationNames?: SupportedIntegrations[];
   injectImmediately?: boolean;
-};
+} & SpotlightAstroIntegrationOptions;
 
 const DEFAULT_INTEGRATIONS = ['sentry'];
 
@@ -22,6 +24,7 @@ Spotlight.init({
   showTriggerButton: ${options.showTriggerButton === false ? 'false' : 'true'},
   injectImmediately: ${options.injectImmediately === true ? 'true' : 'false'},
   debug: ${options.debug === true ? 'true' : 'false'},
+  ${options.sidecarUrl ? `sidecarUrl: '${options.sidecarUrl}'` : ''}
 });
 `;
 };

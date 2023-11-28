@@ -1,36 +1,15 @@
 import type { AstroIntegration } from 'astro';
-import { buildClientInitSnippet, buildServerSnippet, type ClientInitOptions } from './snippets';
+import { buildClientInitSnippet, buildServerSnippet } from './snippets';
 
 import path from 'path';
 import url from 'url';
 
+import type { SpotlightAstroIntegrationOptions } from './types';
 import { errorPageInjectionPlugin } from './vite/error-page';
 
 const PKG_NAME = '@spotlightjs/astro';
 
-export type SpotlightOptions =
-  | {
-      __debugOptions?: ClientInitOptions;
-
-      /**
-       * If enabled, Spotlight will log additional debug output to the console.
-       */
-      debug: boolean;
-
-      /**
-       * Set this URL if you're running the Spotlight sidecar on a custom URL.
-       * Setting this URL will cause server- and client-side events to be forwarded to the sidcar running on the passed URL.
-       *
-       * IMPORTANT: This option assumes that you manually started the sidecar outside of Astro. Therefore, if it is set,
-       * the spotlight Astro integration will not start its own sidecar.
-       *
-       * @default 'http://localhost:8969/stream'
-       */
-      sidecarUrl?: string;
-    }
-  | undefined;
-
-const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
+const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegration => {
   const thisFilePath = url.fileURLToPath(import.meta.url);
 
   return {
@@ -77,6 +56,11 @@ const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
       },
 
       'astro:server:start': async () => {
+        if (options?.sidecarUrl) {
+          // If users set a custom sidecar URL, we assume they started the sidecar manually outside of Astro.
+          // So we don't setup the default sidecar instance.
+          return;
+        }
         // Importing this dynamically because for some reason, the top level import
         // caused a dev server error because the sidecar code was bundled into the server
         const { setupSidecar } = await import('@spotlightjs/sidecar');
