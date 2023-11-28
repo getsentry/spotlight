@@ -9,7 +9,8 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "clean": "rimraf .astro .vercel .vite-inspect"
   },
   "dependencies": {
     "@astrojs/react": "^3.0.6",
