@@ -35,7 +35,7 @@ export default function Error({ event }: { event: SentryErrorEvent }) {
             <li key={valueIdx} className="space-y-4 font-mono">
               <h3 className="bg-primary-950 flex flex-col">
                 <strong className="text-xl">{value.type}</strong>
-                <span className="">{value.value}</span>
+                <pre>{value.value}</pre>
               </h3>
               <ul className="border-primary-600 border">
                 {value.stacktrace?.frames.map((frame, frameIdx) => {
