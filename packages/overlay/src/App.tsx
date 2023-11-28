@@ -78,7 +78,7 @@ export default function App({
       spotlightEventTarget.removeEventListener('open', onOpen);
       spotlightEventTarget.removeEventListener('close', onClose);
     };
-  }, []);
+  }, [spotlightEventTarget]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -87,7 +87,7 @@ export default function App({
     } else {
       document.body.style.overflow = 'hidden';
     }
-  }, [isOpen]);
+  }, [isOpen, spotlightEventTarget]);
 
   log('Integrations', integrationData);
 
