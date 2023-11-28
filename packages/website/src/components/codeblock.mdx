@@ -4,7 +4,10 @@ title: Setup Codeblock
 
 ```ts
 import * as Spotlight from '@spotlightjs/overlay';
-Spotlight.init();
+
+if (import.meta.env.DEV) {
+  Spotlight.init();
+}
 ```
 
 ```shell

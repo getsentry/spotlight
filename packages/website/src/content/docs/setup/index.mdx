@@ -22,31 +22,49 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 <Tabs>
   <TabItem label="npm">
   ```sh 
-  npm add --save-dev @spotlightjs/overlay 
+  npm add @spotlightjs/overlay 
   ```
   </TabItem>
   <TabItem label="pnpm">
   ```sh 
-  pnpm add -D @spotlightjs/overlay
+  pnpm add @spotlightjs/overlay
   ```
   </TabItem>
   <TabItem label="yarn">
   ```sh 
-  yarn add @spotlightjs/overlay -D
+  yarn add @spotlightjs/overlay
   ```
   </TabItem>
 </Tabs>
 
+:::note
+We're loading Spotlight with production dependencies as the import is static, but the expectation is it will be tree-shaken out using the environment test.
+:::
+
 Inject Spotlight into your application:
 
-```js
-import * as Spotlight from '@spotlightjs/overlay';
+<Tabs>
+  <TabItem label="Vite">
+  ```js
+  import * as Spotlight from '@spotlightjs/overlay';
 
-// only load Spotlight in dev
-if (process.env.NODE_ENV === "development") {
-  Spotlight.init();
-}
-```
+  // only load Spotlight in dev
+  if (import.meta.env.DEV) {
+    Spotlight.init();
+  }
+  ```
+  </TabItem>
+  <TabItem label="Other">
+  ```js
+  import * as Spotlight from '@spotlightjs/overlay';
+
+  // only load Spotlight in dev
+  if (process.env.NODE_ENV === "development") {
+    Spotlight.init();
+  }
+  ```
+  </TabItem>
+</Tabs>
 
 Upon loading your UI you should now see the Spotlight toolbar in bottom-right corner of your application.
 
