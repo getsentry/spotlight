@@ -43,6 +43,24 @@ export async function onClose(cb: () => void) {
   getSpotlightEventTarget().addEventListener('closed', cb);
 }
 
+/**
+ * Invokes the passed in callback when the Spotlight debugger Window is opened
+ */
+export async function onOpen(cb: () => void) {
+  getSpotlightEventTarget().addEventListener('opened', cb);
+}
+
+/**
+ * Register a callback that is invoked when a severe event is processed
+ * by a Spotlight integration.
+ * A count of the number of collected severe events is passed to the callback.
+ */
+export async function onSevereEvent(cb: (count: number) => void) {
+  getSpotlightEventTarget().addEventListener('severeEventCount', e => {
+    cb((e as CustomEvent).detail?.count ?? 1);
+  });
+}
+
 const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
 
 export async function init({
