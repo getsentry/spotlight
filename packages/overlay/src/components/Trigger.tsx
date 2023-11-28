@@ -74,7 +74,7 @@ export default function Trigger({
         'font-raleway bg-primary-700 cursor-pointer text-white',
         'flex-col',
         getAnchorClasses(anchor),
-        isOpen ? 'hidden' : '',
+        isOpen ? '!hidden' : '',
       )}
       onClick={() => setOpen(!isOpen)}
     >
