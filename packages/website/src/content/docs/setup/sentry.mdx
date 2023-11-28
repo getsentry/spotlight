@@ -28,7 +28,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   ```javascript
     Sentry.init({
         dsn: 'DSN',
-        spotlight: true,
+        spotlight: process.env.NODE_ENV === "development",
     });
   ```
   </TabItem>
@@ -39,6 +39,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   ```python 
     sentry_sdk.init(
         dsn="DSN",
+        # You should only load this in your development environment
         spotlight=True,
     )
   ```
@@ -50,6 +51,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   ```php 
     \Sentry\init([
         'dsn' => 'DSN',
+        // You should only load this in your development environment
         'spotlight' => true,
     ]);
   ```
@@ -61,25 +63,9 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   ```ruby 
     Sentry.init do |config|
         config.dsn = 'DSN'
+        # You should only load this in your development environment
         config.spotlight = true
     end
   ```
   </TabItem>
 </Tabs>
-
-
-:::note
-
-It's recommended to use the `spotlight` setting only in development.
-Please add a check to make sure you only enable it in development.
-For example this:
-
-```javascript
-  Sentry.init({
-    dsn: 'DSN',
-    spotlight: process.env.NODE_ENV === 'development',
-  });
-```
-
-Depending on your setup & language this might be different.
-:::
