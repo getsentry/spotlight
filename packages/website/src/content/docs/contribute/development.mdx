@@ -1,0 +1,18 @@
+---
+title: Development and Debugging
+description: How to run and test Spotlight locally.
+---
+
+### Capture data sent to the Sidecar
+
+You can run the Sidecar with `SPOTLIGHT_CAPTURE=1` to write the captured data to a file.
+So for example if any Sentry SDK sends an envelope to the Sidecar, it will be written to a file in the current directory looking like this: `application_x_sentry_envelope-1701167447043.txt`.
+
+All these files can be put into `./packages/overlay/_fixtures` and used for testing.
+Also, they can be attached to Github issues to reproduce bugs.
+
+### Send sample data to Spotlight
+
+If you run `pnpm sample` in `./packages/overlay` it will send a sample event to the Sidecar and therefore to Spotlight.
+All `.txt` files that are contained in `./packages/overlay/_fixtures` will be sent.
+This can be very handy when testing Spotlight locally.

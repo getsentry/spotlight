@@ -1,3 +1,4 @@
+import { createWriteStream } from 'fs';
 import { IncomingMessage, Server, ServerResponse, createServer } from 'http';
 import kleur from 'kleur';
 import { createGunzip, createInflate } from 'zlib';
@@ -152,6 +153,16 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
 
         stream.on('end', () => {
           buffer.put([`${req.headers['content-type']}`, body]);
+
+          if (process.env.SPOTLIGHT_CAPTURE) {
+            const timestamp = new Date().getTime();
+            const contentType = `${req.headers['content-type']}`;
+            const filename = `${contentType.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-${timestamp}.txt`;
+
+            createWriteStream(filename).write(body);
+            log(`🗃️ Saved data to ${filename}`);
+          }
+
           res.writeHead(204, {
             'Cache-Control': 'no-cache',
             ...getCorsHeader(),
