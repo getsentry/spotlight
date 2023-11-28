@@ -56,10 +56,8 @@ const createPlugin = (options?: SpotlightOptions): AstroIntegration => {
           const importPath = path.dirname(url.fileURLToPath(import.meta.url));
           const pluginPath = path.join(importPath, 'overlay/index.ts');
           addDevOverlayPlugin(pluginPath);
-        } else {
-          if (options?.__debugOptions) {
-            injectScript('page', buildClientInitSnippet(options.__debugOptions));
-          }
+        } else if (options?.__debugOptions) {
+          injectScript('page', buildClientInitSnippet(options.__debugOptions));
         }
       },
 

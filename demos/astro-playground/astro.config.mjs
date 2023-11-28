@@ -27,6 +27,9 @@ export default defineConfig({
     react({ include: ['**/react/*'] }),
     sentry({
       debug: true,
+      sourceMapsUploadOptions: {
+        enabled: false, // tmp deactivate until version after 7.83.0
+      },
     }),
     spotlight(),
   ],
