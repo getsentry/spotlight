@@ -1,7 +1,5 @@
 ---
 import { Fragment } from 'react';
-import FeatureCard from './FeatureCard.astro';
-import { Content as CodeBlock } from './codeblock.mdx';
 import ButtonLink from './ButtonLink.astro';
 
 // Used to override the default hero component
@@ -37,8 +35,8 @@ import ButtonLink from './ButtonLink.astro';
     justify-content: center;
     position: relative;
     flex-direction: column;
-    padding-top: 6rem;
-    padding-bottom: 12rem;
+    padding-top: 4rem;
+    padding-bottom: 8rem;
     min-height: calc(100vh - 54px);
   }
 
@@ -75,7 +73,6 @@ import ButtonLink from './ButtonLink.astro';
     opacity: 0;
     animation: fade-in 1s ease-in-out 1s forwards;
   }
-
 
   .actions {
     display: flex;
