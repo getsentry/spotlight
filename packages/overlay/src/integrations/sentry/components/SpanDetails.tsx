@@ -50,7 +50,12 @@ export default function SpanDetails({
         title="Span Details"
         subtitle={
           <>
-            {span.op} <span className="text-primary-500">&mdash;</span> {span.span_id}
+            {span.op && (
+              <>
+                {span.op} <span className="text-primary-500">&mdash;</span>{' '}
+              </>
+            )}
+            {span.span_id}
           </>
         }
         backTo={`/traces/${span.trace_id}`}

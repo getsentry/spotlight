@@ -47,8 +47,12 @@ export default function SpanTree({
                 )}
               >
                 {span.transaction && <PlatformIcon size={16} platform={span.transaction.platform} />}
-                <span className="font-bold">{span.op}</span>
-                <span className="text-primary-400">&ndash;</span>
+                {span.op && (
+                  <>
+                    <span className="font-bold">{span.op}</span>
+                    <span className="text-primary-400">&ndash;</span>
+                  </>
+                )}
                 <span className="block max-w-sm truncate">{span.description || span.span_id}</span>
               </div>
               <div className="waterfall">

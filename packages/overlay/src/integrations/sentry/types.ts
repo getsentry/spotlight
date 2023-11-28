@@ -94,7 +94,7 @@ export type Span = {
   trace_id: string;
   span_id: string;
   parent_span_id?: string | null;
-  op: string;
+  op?: string | null;
   description?: string | null;
   start_timestamp: number;
   tags?: Tags | null;
