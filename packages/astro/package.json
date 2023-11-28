@@ -18,7 +18,8 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "clean": "rimraf dist"
   },
   "type": "module",
   "main": "./src/index.tx",
