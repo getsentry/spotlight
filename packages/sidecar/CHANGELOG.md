@@ -1,5 +1,24 @@
 # @spotlightjs/sidecar
 
+## 0.0.12
+
+### Patch Changes
+
+- Accept gzip/deflate encoding for incoming envelopes
+  ([`f7d507e`](https://github.com/getsentry/spotlight/commit/f7d507eee12d743ed0b57b21800ee487f7076d2a))
+
+- Remove connect function from sidecar
+  ([`db73d24`](https://github.com/getsentry/spotlight/commit/db73d241bba120848732e063918afd73b34f9269))
+
+- Add SPOTLIGHT_CAPTURE mode
+  ([`6b8dd6d`](https://github.com/getsentry/spotlight/commit/6b8dd6d6852a103637beb3eecc42b7d43cc2301a))
+
+- Only if envelope is sent validate known types
+  ([`ddb36d2`](https://github.com/getsentry/spotlight/commit/ddb36d252adabb8c1c259a1a55703c39d6f3213e))
+
+- Accept all envelopes
+  ([`58a2cb3`](https://github.com/getsentry/spotlight/commit/58a2cb373d3d784983347aae4741c7b6e0b48119))
+
 ## 0.0.11
 
 ### Patch Changes

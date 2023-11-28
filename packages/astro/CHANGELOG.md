@@ -1,5 +1,31 @@
 # @spotlightjs/astro
 
+## 0.0.20
+
+### Patch Changes
+
+- ref(astro): Add `astro@>=3.4.0` as a peer dependency ([#151](https://github.com/getsentry/spotlight/pull/151))
+
+- Only keep Sentry as Default integration
+  ([`3b2f664`](https://github.com/getsentry/spotlight/commit/3b2f66441dc10da214e0326c7b6ffa4f4257ab79))
+
+- Don't make console/viteInspect default for Astro
+  ([`8ecab1d`](https://github.com/getsentry/spotlight/commit/8ecab1dbc0431b7b9c8636dec27974e0e1fe2b02))
+
+- Show Spotlight button if dev overlay is not enabled
+  ([`5eedd2d`](https://github.com/getsentry/spotlight/commit/5eedd2d1bfce2750475936c0e8a9064392342cf3))
+
+- Updated dependencies
+  [[`00c86f1`](https://github.com/getsentry/spotlight/commit/00c86f1b574450ab1a0f62861a688965325699e7),
+  [`922f092`](https://github.com/getsentry/spotlight/commit/922f092a45bad917ef5b915c4933f90bfc1e4bf2),
+  [`f7d507e`](https://github.com/getsentry/spotlight/commit/f7d507eee12d743ed0b57b21800ee487f7076d2a),
+  [`db73d24`](https://github.com/getsentry/spotlight/commit/db73d241bba120848732e063918afd73b34f9269),
+  [`6b8dd6d`](https://github.com/getsentry/spotlight/commit/6b8dd6d6852a103637beb3eecc42b7d43cc2301a),
+  [`ddb36d2`](https://github.com/getsentry/spotlight/commit/ddb36d252adabb8c1c259a1a55703c39d6f3213e),
+  [`58a2cb3`](https://github.com/getsentry/spotlight/commit/58a2cb373d3d784983347aae4741c7b6e0b48119)]:
+  - @spotlightjs/overlay@0.0.17
+  - @spotlightjs/sidecar@0.0.12
+
 ## 0.0.19
 
 ### Patch Changes
