@@ -29,7 +29,7 @@ export type Integration<T = any> = {
    *
    * Use this hook to setup any global state, instrument handlers, etc.
    */
-  setup?: () => void | Promise<void>;
+  setup?: () => void | Promise<void> | TeardownFunction;
 
   /**
    * Hook called whenever spotlight forwards a new raw event to this integration.
@@ -104,25 +104,31 @@ export type RawEventContext = {
   data: string;
 };
 
+type TeardownFunction = () => void | Promise<() => void>;
+
 // export type IntegrationParameter = Array<Integration<unknown>>;
 
-export async function initIntegrations(integrations?: Integration[]): Promise<Integration[]> {
+export async function initIntegrations(integrations?: Integration[]): Promise<[Integration[], TeardownFunction[]]> {
   if (!integrations) {
-    return [];
+    return [[], []];
   }
 
   const initializedIntegrations: Integration[] = [];
+  const teardownFns: TeardownFunction[] = [];
   // iterate over integrations and call their hooks
   for (const integration of integrations) {
     if (Array.isArray(integration)) {
-      initializedIntegrations.push(...(await initIntegrations(integration)));
+      const rv = await initIntegrations(integration);
+      initializedIntegrations.push(...rv[0]);
+      teardownFns.push(...rv[1]);
     } else if (integration) {
       if (integration.setup) {
-        await integration.setup();
+        const fn = await integration.setup();
+        if (fn) teardownFns.push(fn);
       }
       initializedIntegrations.push(integration);
     }
   }
 
-  return initializedIntegrations;
+  return [initializedIntegrations, teardownFns];
 }
