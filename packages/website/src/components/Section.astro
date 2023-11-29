@@ -10,11 +10,10 @@ const { title, subTitle } = Astro.props;
   h2.heading {
     display: block;
     font-size: 1.5rem;
-    letter-spacing: 0px; 
+    letter-spacing: 0px;
     text-align: center;
-    font-weight: 300;
-    text-shadow:
-        0 0 25px #fff7;
+    font-weight: 500;
+    text-shadow: 0 0 25px #fff7;
   }
 
   .sub-heading {
@@ -26,16 +25,14 @@ const { title, subTitle } = Astro.props;
   @media (min-width: 768px) {
     h2.heading {
       font-size: 2.5rem;
-      letter-spacing: 2px; 
+      letter-spacing: 2px;
     }
   }
-
 </style>
 
 <section class="section mb-32 flex justify-center flex-col">
   <h2 class="heading mb-4">{title}</h2>
-  {subTitle ? (
-    <div class="sub-heading">{subTitle}</div>
-  ): null}
+  {subTitle ? <div class="sub-heading">{subTitle}</div> : null}
   <slot />
-</section> 
+</section>
+
