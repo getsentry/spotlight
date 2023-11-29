@@ -1,3 +1,5 @@
+import { type ComponentType } from 'react';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Integration<T = any> = {
   /**
@@ -61,7 +63,7 @@ export type IntegrationTab<T> = {
   /**
    * JSX content of the tab. Go crazy, this is all yours!
    */
-  content?: React.ComponentType<{
+  content?: ComponentType<{
     processedEvents: T[];
   }>;
 
