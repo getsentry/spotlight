@@ -38,11 +38,24 @@ Start by installing the `@spotlightjs/spotlight` package in your existing fronte
 
 :::note
 We're loading Spotlight with production dependencies as the import is static, but the expectation is that it will be tree-shaken out by checking for a development environment.
+
+If you're using a dynamic import, its possible you can simply list this in your `devDependencies` intead.
 :::
 
 Inject the Spotlight overlay into your application:
 
 <Tabs>
+  <TabItem label="Dynamic Import">
+  If your bundler supports it, its recommended to do a dynamic import to aid tree-shaking:
+
+  ```js
+  if (process.env.NODE_ENV === "development") {
+    import('@spotlightjs/spotlight').then((Spotlight) =>
+      Spotlight.init({ injectImmediately: true })
+    );
+  }
+  ```
+  </TabItem>
   <TabItem label="Vite">
   ```js
   import * as Spotlight from '@spotlightjs/spotlight';
@@ -63,21 +76,6 @@ Inject the Spotlight overlay into your application:
   }
   ```
   </TabItem>
-  <TabItem label="Dynamic Import">
-
-  Some Frameworks like Angular don't tree shake away the entire Spotlight code in production builds when importing the package globally.
-  Instead, you can use a dynamic import to only load Spotlight in development:
-
-  ```js
-  if (process.env.NODE_ENV === "development") {
-    import('@spotlightjs/spotlight').then((Spotlight) =>
-      Spotlight.init({ injectImmediately: true })
-    );
-  }
-  ```
-
-  </TabItem>
-
 </Tabs>
 
 :::note

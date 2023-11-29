@@ -38,9 +38,9 @@ startTransition(() => {
   hydrateRoot(document, <RemixBrowser />);
 });
 
-import * as Spotlight from "@spotlightjs/spotlight";
-
 if (process.env.NODE_ENV === "development") {
-  Spotlight.init();
+  import("@spotlightjs/spotlight").then((Spotlight) =>
+    Spotlight.init({ injectImmediately: true }),
+  );
 }
 ```
