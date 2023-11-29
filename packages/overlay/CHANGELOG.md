@@ -1,5 +1,16 @@
 # @spotlightjs/core
 
+## 0.0.18
+
+### Patch Changes
+
+- Fix Breadcrumbs ([`d9c8ed0`](https://github.com/getsentry/spotlight/commit/d9c8ed0fbec2e015137758026a3b5eb0f4d874ba))
+
+- feat(overlay): Add `onOpen` and `onSevereEvent` callbacks ([#161](https://github.com/getsentry/spotlight/pull/161))
+
+- feat(core): Add support for custom sidecar URL in client Sentry integration
+  ([#160](https://github.com/getsentry/spotlight/pull/160))
+
 ## 0.0.17
 
 ### Patch Changes
