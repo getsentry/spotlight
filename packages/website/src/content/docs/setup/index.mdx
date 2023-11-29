@@ -15,23 +15,23 @@ While it's not dependent on Sentry, Spotlight is much more powerful if you're us
 
 ## Overlay
 
-Start by installing the `@spotlightjs/overlay` package in your existing frontend application.
+Start by installing the `@spotlightjs/spotlight` package in your existing frontend application.
 
 
 <Tabs>
   <TabItem label="npm">
   ```sh 
-  npm add @spotlightjs/overlay 
+  npm add @spotlightjs/spotlight 
   ```
   </TabItem>
   <TabItem label="pnpm">
   ```sh 
-  pnpm add @spotlightjs/overlay
+  pnpm add @spotlightjs/spotlight
   ```
   </TabItem>
   <TabItem label="yarn">
   ```sh 
-  yarn add @spotlightjs/overlay
+  yarn add @spotlightjs/spotlight
   ```
   </TabItem>
 </Tabs>
@@ -45,7 +45,7 @@ Inject the Spotlight overlay into your application:
 <Tabs>
   <TabItem label="Vite">
   ```js
-  import * as Spotlight from '@spotlightjs/overlay';
+  import * as Spotlight from '@spotlightjs/spotlight';
 
   // only load Spotlight in dev
   if (import.meta.env.DEV) {
@@ -55,7 +55,7 @@ Inject the Spotlight overlay into your application:
   </TabItem>
   <TabItem label="Other Bundlers">
   ```js
-  import * as Spotlight from '@spotlightjs/overlay';
+  import * as Spotlight from '@spotlightjs/spotlight';
 
   // only load Spotlight in dev
   if (process.env.NODE_ENV === "development") {
@@ -70,7 +70,7 @@ Inject the Spotlight overlay into your application:
 
   ```js
   if (process.env.NODE_ENV === "development") {
-    import('@spotlightjs/overlay').then((Spotlight) =>
+    import('@spotlightjs/spotlight').then((Spotlight) =>
       Spotlight.init({ injectImmediately: true })
     );
   }

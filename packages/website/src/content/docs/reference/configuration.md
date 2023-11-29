@@ -6,7 +6,7 @@ description: All the configuration options for setting up Spotlight
 ## `init`
 
 ```js
-import {init, sentry} as Spotlight from '@spotlightjs/overlay';
+import {init, sentry} as Spotlight from '@spotlightjs/spotlight';
 
 init({
   integrations: [sentry()],

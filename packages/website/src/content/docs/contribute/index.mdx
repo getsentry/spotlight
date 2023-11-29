@@ -41,18 +41,18 @@ pnpm dev:playground
 
 Additionally you may want to link it into an existing project. This is a little brittle, and we're not experts here, so your mileage may vary.
 
-First, when in the Spotlight root directory, you'll need to link the packages you're referencing (likely `@spotlightjs/overlay` and `@spotlightjs/sidecar`):
+{/* TODO: Can we just link @spotlightjs/spotlight? Probably?? */}
+
+First, when in the Spotlight root directory, you'll need to link the packages you're referencing (likely `@spotlightjs/spotlight`):
 
 ```shell
-pnpm link --global -C packages/overlay
-pnpm link --global -C packages/sidecar
+pnpm link --global -C packages/spotlight
 ```
 
 You can now link these within your project. For example if you're using `pnpm`:
 
 ```shell
-pnpm link --global @spotlightjs/overlay
-pnpm link --global @spotlightjs/sidecar
+pnpm link --global @spotlightjs/spotlight
 ```
 
 ## Repository Structure
@@ -62,8 +62,9 @@ The monorepo is mostly straight forward, but here's a quick summary:
 ```
 spotlight
 └── packages                
-    ├── overlay      // @spotlightjs/overlay  - the main overlay
-    ├── sidecar      // @spotlightjs/sidecar  - the sidecar (proxy) for streaming data
-    ├── tsconfig     // @spotlightjs/tsconfig - shared tsconfig
-    └── website      // @spotlightjs/website  - the main overlay
+    ├── overlay      // @spotlightjs/overlay   - the main overlay
+    ├── sidecar      // @spotlightjs/sidecar   - the sidecar (proxy) for streaming data
+    ├── spotlight    // @spotlightjs/spotlight - the main spotlight package, combining overlay and sidecar
+    ├── tsconfig     // @spotlightjs/tsconfig  - shared tsconfig
+    └── website      // @spotlightjs/website   - the main overlay
 ```
