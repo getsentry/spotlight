@@ -34,7 +34,9 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
                         <div className="w-full truncate">{key}</div>
                       </th>
                       <td className="py-0.5">
-                        <pre className="whitespace-nowrap font-mono">{JSON.stringify(value, undefined, 2)}</pre>
+                        <pre className="text-primary-300 whitespace-nowrap font-mono">
+                          {JSON.stringify(value, undefined, 2)}
+                        </pre>
                       </td>
                     </tr>
                   );
