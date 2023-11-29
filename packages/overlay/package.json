@@ -25,20 +25,7 @@
       "require": "./dist/sentry-spotlight.umd.cjs"
     }
   },
-  "dependencies": {
-    "@fontsource/raleway": "^5.0.8",
-    "@sentry/utils": "^7.77.0",
-    "autoprefixer": "^10.4.15",
-    "dayjs": "^1.11.9",
-    "platformicons": "^5.6.2",
-    "postcss": "^8.4.28",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.18.0",
-    "sql-formatter": "^12.2.4",
-    "tailwindcss": "^3.3.3",
-    "usehooks-ts": "^2.9.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@sentry/types": "^7.77.0",
     "@spotlightjs/tsconfig": "workspace:*",
@@ -55,7 +42,19 @@
     "vite": "^4.4.5",
     "vite-plugin-dts": "^3.5.2",
     "vite-plugin-svgr": "^3.2.0",
-    "vitest": "^0.34.6"
+    "vitest": "^0.34.6",
+    "@fontsource/raleway": "^5.0.8",
+    "@sentry/utils": "^7.77.0",
+    "autoprefixer": "^10.4.15",
+    "dayjs": "^1.11.9",
+    "platformicons": "^5.6.2",
+    "postcss": "^8.4.28",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.18.0",
+    "sql-formatter": "^12.2.4",
+    "tailwindcss": "^3.3.3",
+    "usehooks-ts": "^2.9.1"
   },
   "volta": {
     "extends": "../../package.json"
