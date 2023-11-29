@@ -2,22 +2,21 @@
 title: Setup Spotlight
 description: A guide how to setup Spotlight in your environment
 ---
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 Spotlight can be used with a variety of frameworks and even in your custom environment. 
 
 While it's not dependent on Sentry, Spotlight is much more powerful if you're using Sentry's SDKs. It will leverage the error and traces they collect and render them locally.
 
-import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+**Are you using Astro? Check out this guide instead:**
 
 <LinkCard title="Spotlight for Astro" description="Astro specific instructions for setting up Spotlight." href="/setup/astro/" />
 
 ## Overlay
 
-You'll start by registering the Spotlight package in your existing frontend application.
+Start by installing the `@spotlightjs/overlay` package in your existing frontend application.
 
-Install the `@spotlightjs/overlay` package:
-
-import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 <Tabs>
   <TabItem label="npm">
@@ -38,10 +37,10 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 </Tabs>
 
 :::note
-We're loading Spotlight with production dependencies as the import is static, but the expectation is it will be tree-shaken out using the environment test.
+We're loading Spotlight with production dependencies as the import is static, but the expectation is that it will be tree-shaken out by checking for a development environment.
 :::
 
-Inject Spotlight into your application:
+Inject the Spotlight overlay into your application:
 
 <Tabs>
   <TabItem label="Vite">
@@ -54,7 +53,7 @@ Inject Spotlight into your application:
   }
   ```
   </TabItem>
-  <TabItem label="Other">
+  <TabItem label="Other Bundlers">
   ```js
   import * as Spotlight from '@spotlightjs/overlay';
 
@@ -64,7 +63,27 @@ Inject Spotlight into your application:
   }
   ```
   </TabItem>
+  <TabItem label="Dynamic Import">
+
+  Some Frameworks like Angular don't tree shake away the entire Spotlight code in production builds when importing the package globally.
+  Instead, you can use a dynamic import to only load Spotlight in development:
+
+  ```js
+  if (process.env.NODE_ENV === "development") {
+    import('@spotlightjs/overlay').then((Spotlight) =>
+      Spotlight.init({ injectImmediately: true })
+    );
+  }
+  ```
+
+  </TabItem>
+
 </Tabs>
+
+:::note
+It's important that your check for the dev environment is actually tree-shaken away at production build time.
+We recommend comparing your build bundle size before and after adding the Spotlight overlay.
+:::
 
 Upon loading your UI you should now see the Spotlight toolbar in bottom-right corner of your application.
 
