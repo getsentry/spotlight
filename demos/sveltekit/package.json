@@ -1,5 +1,5 @@
 {
-	"name": "@spotlightjs/sveltekit-demo",
+	"name": "@spotlightjs/demo-sveltekit",
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "vite dev",
@@ -11,6 +11,10 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"clean": "rimraf .svelte-kit"
+	},
+	"dependencies": {
+		"@sentry/sveltekit": "^7.83.0",
+		"@spotlightjs/spotlight": "workspace:*"
 	},
 	"devDependencies": {
 		"@fontsource/fira-mono": "^4.5.10",
@@ -25,7 +29,7 @@
 		"eslint-plugin-svelte": "^2.30.0",
 		"prettier": "^3.0.0",
 		"prettier-plugin-svelte": "^3.0.0",
-		"svelte": "^5.0.0-next.1",
+		"svelte": "^4.2.7",
 		"svelte-check": "^3.6.0",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
