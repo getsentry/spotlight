@@ -14,7 +14,9 @@
     "dist",
     "src"
   ],
-  "bin": "./server.js",
+  "bin": {
+    "spotlight-sidecar": "./server.js"
+  },
   "main": "dist/main.js",
   "module": "dist/main.js",
   "types": "dist/main.d.ts",
