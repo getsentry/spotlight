@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 0.0.19
+
+### Patch Changes
+
+- Move everything to dev deps
+  ([`aeb507a`](https://github.com/getsentry/spotlight/commit/aeb507abc4c3ba0c988b6f158959947369061b7b))
+
 ## 0.0.18
 
 ### Patch Changes
