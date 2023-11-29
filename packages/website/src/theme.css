@@ -22,6 +22,7 @@ dialog {
   --sl-color-gray-4: hsl(224, 7%, 36%);
   --sl-color-gray-5: hsl(228, 13%, 23%);
   --sl-color-gray-6: hsl(249, 29%, 13%);
+  --sl-color-gray-7: hsl(245, 30%, 8%);
   --sl-color-black: hsl(249, 36%, 9%);
   --sl-color-text-accent: var(--sl-color-accent-high);
   --sl-color-text-invert: var(--sl-color-accent-low);
