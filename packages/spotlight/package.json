@@ -1,0 +1,23 @@
+{
+  "name": "@spotlightjs/spotlight",
+  "description": "Spotlight - Sentry for development. Containing the overlay and the sidecar.",
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {},
+  "main": "./spotlight.js",
+  "module": "./spotlight.mjs",
+  "exports": {
+    "sidecar": {
+      "import": "./sidecar.js",
+      "require": "./sidecar.cjs"
+    }
+  },
+  "dependencies": {
+    "@spotlightjs/overlay": "workspace:*",
+    "@spotlightjs/sidecar": "workspace:*"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}
