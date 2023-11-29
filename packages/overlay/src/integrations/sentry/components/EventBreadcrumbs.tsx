@@ -8,7 +8,6 @@ const EXAMPLE_BREADCRUMB = `Sentry.addBreadcrumb({
 });`;
 
 function extractBreadcrumbs(event: SentryEvent): Breadcrumb[] | undefined {
-  console.log(event);
   if (!event.breadcrumbs) return [];
 
   if (Array.isArray(event.breadcrumbs)) {
