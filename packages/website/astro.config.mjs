@@ -102,6 +102,10 @@ export default defineConfig({
               label: 'for Astro',
               link: '/setup/astro/',
             },
+            {
+              label: 'for Remix',
+              link: '/setup/remix/',
+            },
           ],
         },
         {
