@@ -3,13 +3,13 @@ title: Setup Codeblock
 ---
 
 ```ts
-import * as Spotlight from '@spotlightjs/overlay';
+import * as Spotlight from '@spotlightjs/spotlight';
 
-if (import.meta.env.DEV) {
+if (process.env.NODE_ENV === 'development') {
   Spotlight.init();
 }
 ```
 
 ```shell
-npx @spotlightjs/sidecar
+npx spotlight-sidecar
 ```
