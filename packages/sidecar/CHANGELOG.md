@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 0.0.14
+
+### Patch Changes
+
+- Move everything to dev deps
+  ([`aeb507a`](https://github.com/getsentry/spotlight/commit/aeb507abc4c3ba0c988b6f158959947369061b7b))
+
 ## 0.0.13
 
 ### Patch Changes
