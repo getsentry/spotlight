@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 0.0.13
+
+### Patch Changes
+
+- Rename binary to spotlight-sidecar
+  ([`b841b95`](https://github.com/getsentry/spotlight/commit/b841b95dd27e5b4253b9ad94b5afc8e55501f829))
+
 ## 0.0.12
 
 ### Patch Changes
