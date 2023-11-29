@@ -83,6 +83,7 @@ export function processEnvelope({ data }: RawEventContext) {
   const envelope = [header, items] as Envelope;
   sentryDataCache.pushEnvelope(envelope);
 
+  console.log(envelope);
   return {
     event: envelope,
     severity: isErrorEnvelope(envelope) ? 'severe' : ('default' as Severity),

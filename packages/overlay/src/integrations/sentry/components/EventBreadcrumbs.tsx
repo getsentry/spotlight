@@ -1,4 +1,4 @@
-import { SentryEvent } from '../types';
+import { Breadcrumb, SentryEvent } from '../types';
 import Time from './Time';
 
 const EXAMPLE_BREADCRUMB = `Sentry.addBreadcrumb({
@@ -7,8 +7,22 @@ const EXAMPLE_BREADCRUMB = `Sentry.addBreadcrumb({
   level: "info",
 });`;
 
+function extractBreadcrumbs(event: SentryEvent): Breadcrumb[] | undefined {
+  console.log(event);
+  if (!event.breadcrumbs) return [];
+
+  if (Array.isArray(event.breadcrumbs)) {
+    return event.breadcrumbs;
+  }
+
+  if (Array.isArray(event.breadcrumbs.values)) {
+    return event.breadcrumbs.values;
+  }
+}
+
 export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
-  if (!event.breadcrumbs || !event.breadcrumbs.values.length) {
+  const breadcrumbs = extractBreadcrumbs(event);
+  if (!breadcrumbs) {
     return (
       <div className="space-y-4 px-6">
         <div className="text-primary-300">
@@ -20,14 +34,17 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
   }
   return (
     <div className="divide-primary-800 -mx-2 space-y-2 divide-y">
-      {event.breadcrumbs.values.map((crumb, crumbIdx) => {
+      {breadcrumbs.map((crumb, crumbIdx) => {
+        if (!crumb.message) return null;
         return (
-          <div key={crumbIdx} className="flex items-center  p-2">
-            <div className="text-primary-300 w-32">
-              <Time date={crumb.timestamp} />
+          <div key={crumbIdx} className="flex gap-4 p-2">
+            <div className="flex flex-none flex-col">
+              <div className="text-primary-300">
+                <Time date={crumb.timestamp} format="HH:mm:ss" />
+              </div>
+              <div className="text-primary-300">{crumb.category || ' '}</div>
             </div>
-            <div className="text-primary-300 w-32 truncate">{crumb.category}</div>
-            <div className="flex-1 font-mono">{crumb.message}</div>
+            <pre className="grow whitespace-pre-line font-mono">{crumb.message}</pre>
           </div>
         );
       })}

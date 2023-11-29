@@ -36,20 +36,18 @@ export type EventException =
       value: EventExceptionValue;
     };
 
-export type Breadcrumbs = {
-  values: {
-    message: string;
-    category: string;
-    timestamp: string;
-    type: string | 'default';
-  }[];
+export type Breadcrumb = {
+  message: string;
+  category: string;
+  timestamp: string;
+  type: string | 'default';
 };
 
 type CommonEventAttrs = {
   // not always present, but we are forcing it in EventCache
   event_id: string;
   timestamp: number;
-  breadcrumbs?: Breadcrumbs;
+  breadcrumbs?: Breadcrumb[] | { values: Breadcrumb[] };
   transaction?: string;
   environment?: string;
   platform?: string;
