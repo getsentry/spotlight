@@ -27,7 +27,7 @@ module.exports = {
   },
   plugins: [
     new WebpackHookPlugin({
-      onBuildStart: ["node node_modules/@spotlightjs/sidecar/src/run.js"],
+      onBuildStart: [`node ${require.resolve('@spotlightjs/sidecar/src/run.js')}`],
     }),
   ],
 };
