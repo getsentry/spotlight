@@ -20,16 +20,17 @@ At a high level, Spotlight consists of two components:
 2. A proxy server (`@spotlightjs/sidecar`) which enables push-based communication to the overlay. This is achieved via a simple HTTP relay,
    allowing SDKs to push events to it, and allowing the overlay to receive events using [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events).
 
-This means that adoption in most projects is two simple additions:
+For convenience, these packages are combined in a single package (`@spotlightjs/spotlight`), which is the recommended way to use Spotlight.
+This means that adoption in most projects is as simple as adding a single dependency:
 
 ```shell
-npm add @spotlightjs/overlay @spotlightjs/sidecar
+npm add @spotlightjs/spotlight
 ```
 
 Registering Spotlight in your frontend application:
 
 ```typescript
-import * as Spotlight from '@spotlightjs/overlay';
+import * as Spotlight from '@spotlightjs/spotlight';
 
 // only load Spotlight in dev
 if (process.env.NODE_ENV === "development") {
@@ -40,7 +41,7 @@ if (process.env.NODE_ENV === "development") {
 Running the sidecar in the background:
 
 ```shell
-npx @spotlightjs/sidecar
+npx @spotlightjs/spotlight
 ```
 
 The overlay itself behaves a little differently from Sentry. That's intentional both because this is for local
