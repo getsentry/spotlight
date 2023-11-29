@@ -34,20 +34,7 @@ export default function SpanTree({
               )}
               to={`/traces/${span.trace_id}/${span.span_id}`}
             >
-              <div
-                className={classNames(
-                  'node',
-                  span.transaction
-                    ? span.status === 'ok'
-                      ? 'text-green-400'
-                      : span.status
-                      ? 'text-red-400'
-                      : ''
-                    : span.status && span.status !== 'ok'
-                    ? 'text-red-400'
-                    : '',
-                )}
-              >
+              <div className={classNames('node', span.status && span.status !== 'ok' ? 'text-red-400' : '')}>
                 {span.transaction && <PlatformIcon size={16} platform={span.transaction.platform} />}
                 {span.op && (
                   <>
