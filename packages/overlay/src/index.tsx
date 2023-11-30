@@ -63,7 +63,7 @@ export async function onSevereEvent(cb: (count: number) => void) {
 const DEFAULT_SIDECAR_URL = 'http://localhost:8969/stream';
 
 export async function init({
-  fullScreen = false,
+  openOnInit = false,
   showTriggerButton = true,
   defaultEventId,
   injectImmediately = false,
@@ -114,7 +114,7 @@ export async function init({
     // <React.StrictMode>
     <App
       integrations={initializedIntegrations}
-      fullScreen={fullScreen}
+      openOnInit={openOnInit}
       defaultEventId={defaultEventId}
       showTriggerButton={showTriggerButton}
       sidecarUrl={sidecarUrl}
