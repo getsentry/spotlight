@@ -12,10 +12,13 @@ export function groupSpans(spans: Span[]) {
     .sort(a => (a.parent_span_id ? 1 : 0));
 
   sortedSpans.forEach(span => {
-    let parent = idLookup.get(span.parent_span_id || '');
-    span.children = [];
+    let parent = getParentOfSpan(span, idLookup, sortedSpans);
+    log(`parent of span (${span.span_id}, ${span.op}, p: ${span.parent_span_id}) is ${parent?.span_id}`);
+    span.children = span.children || [];
     if (parent) {
-      if (!parent.children) parent.children = [];
+      if (!parent.children) {
+        parent.children = [];
+      }
       parent.children.push(span);
     } else if (span.parent_span_id) {
       const parentParent = sortedSpans.find(s => !s.parent_span_id);
@@ -23,6 +26,7 @@ export function groupSpans(spans: Span[]) {
         log(`Root span (${span.parent_span_id}) for span (${span.span_id}). Creating orphan.`);
       } else {
         log(`Creating orphan for parent (${span.parent_span_id}) for span (${span.span_id})`);
+        // log({ span });
       }
       parent = {
         trace_id: span.trace_id,
@@ -44,10 +48,21 @@ export function groupSpans(spans: Span[]) {
         tree.push(parent);
       }
     } else {
+      log('pushing parentless span', span);
       tree.push(span);
     }
     idLookup.set(span.span_id, span);
   });
 
   return tree;
+}
+
+function getParentOfSpan(span: Span, idLookup: Map<string, Span>, allSpans: Span[]): Span | undefined {
+  if (!span.parent_span_id) {
+    return undefined;
+  }
+  if (idLookup.has(span.parent_span_id)) {
+    return idLookup.get(span.parent_span_id);
+  }
+  return allSpans.find(s => s.span_id === span.parent_span_id);
 }
