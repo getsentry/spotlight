@@ -205,11 +205,25 @@ function log(...args: any[]) {
 
 let serverInstance: Server;
 
-export function setupSidecar(): void {
+const isValidPort = (value: string) => {
+  const portNumber = parseInt(value, 10);
+  return /^\d+$/.test(value) && portNumber > 0 && portNumber <= 65535;
+};
+
+export function setupSidecar(port: string): void {
+  let sidecarPort = 8969;
+
+  if (port && !isValidPort(port)) {
+    log('Please provide a valid port.');
+    process.exit(1);
+  } else if (port) {
+    sidecarPort = parseInt(port, 10);
+  }
+
   const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
 
   if (!serverInstance) {
-    serverInstance = startServer(buffer, 8969);
+    serverInstance = startServer(buffer, sidecarPort);
   }
 }
 
