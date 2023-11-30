@@ -7,8 +7,7 @@ import PlatformIcon from './PlatformIcon';
 import TimeSince from './TimeSince';
 
 function renderEvent(event: SentryEvent) {
-  if ('exception' in event) return <ErrorSummary event={event} />;
-  return null;
+  return <ErrorSummary event={event} />;
 }
 
 export default function EventList() {

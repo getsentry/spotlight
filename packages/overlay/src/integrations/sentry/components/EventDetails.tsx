@@ -9,13 +9,11 @@ import Error, { ErrorTitle } from './Events/Error';
 import PlatformIcon from './PlatformIcon';
 
 function renderEvent(event: SentryEvent) {
-  if ('exception' in event) return <Error event={event} />;
-  return null;
+  return <Error event={event} />;
 }
 
 function renderEventTitle(event: SentryEvent) {
-  if ('exception' in event) return <ErrorTitle event={event} />;
-  return 'Unknown Event';
+  return <ErrorTitle event={event} />;
 }
 
 export default function EventDetails() {

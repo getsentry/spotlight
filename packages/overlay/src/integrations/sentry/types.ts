@@ -47,6 +47,7 @@ type CommonEventAttrs = {
   // not always present, but we are forcing it in EventCache
   event_id: string;
   timestamp: number;
+  message?: string;
   breadcrumbs?: Breadcrumb[] | { values: Breadcrumb[] };
   transaction?: string;
   environment?: string;
