@@ -5,17 +5,15 @@ import sentryDataCache from '../data/sentryDataCache';
 import { SentryEvent } from '../types';
 import EventBreadcrumbs from './EventBreadcrumbs';
 import EventContexts from './EventContexts';
-import Error, { ErrorTitle } from './Events/Error';
+import Event, { EventTitle } from './Events/Event';
 import PlatformIcon from './PlatformIcon';
 
 function renderEvent(event: SentryEvent) {
-  if ('exception' in event) return <Error event={event} />;
-  return null;
+  return <Event event={event} />;
 }
 
 function renderEventTitle(event: SentryEvent) {
-  if ('exception' in event) return <ErrorTitle event={event} />;
-  return 'Unknown Event';
+  return <EventTitle event={event} />;
 }
 
 export default function EventDetails() {

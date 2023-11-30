@@ -42,7 +42,7 @@ export default function SpanDetails({
 }) {
   const spanDuration = getDuration(span.start_timestamp, span.timestamp);
 
-  const errors = dataCache.getEventsByTrace(span.trace_id).filter(e => e.type !== 'transaction');
+  const errors = dataCache.getEventsByTrace(span.trace_id).filter(e => e.type !== 'transaction' && 'exception' in e);
 
   return (
     <SidePanel>

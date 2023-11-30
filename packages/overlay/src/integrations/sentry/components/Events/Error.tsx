@@ -3,7 +3,6 @@ import Frame from './Error/Frame';
 
 export function ErrorTitle({ event }: { event: SentryErrorEvent }) {
   const values = arraifyValues(event.exception);
-
   return (
     <>
       <strong className="font-bold">{values[0].type}:</strong> {values[0].value}
@@ -24,7 +23,7 @@ export function ErrorSummary({ event }: { event: SentryErrorEvent }) {
   );
 }
 
-export default function Error({ event }: { event: SentryErrorEvent }) {
+export function Error({ event }: { event: SentryErrorEvent }) {
   const values = arraifyValues(event.exception);
 
   return (
