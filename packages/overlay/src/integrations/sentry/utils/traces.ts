@@ -13,7 +13,6 @@ export function groupSpans(spans: Span[]) {
 
   sortedSpans.forEach(span => {
     let parent = getParentOfSpan(span, idLookup, sortedSpans);
-    log(`parent of span (${span.span_id}, ${span.op}, p: ${span.parent_span_id}) is ${parent?.span_id}`);
     span.children = span.children || [];
     if (parent) {
       if (!parent.children) {
@@ -26,7 +25,6 @@ export function groupSpans(spans: Span[]) {
         log(`Root span (${span.parent_span_id}) for span (${span.span_id}). Creating orphan.`);
       } else {
         log(`Creating orphan for parent (${span.parent_span_id}) for span (${span.span_id})`);
-        // log({ span });
       }
       parent = {
         trace_id: span.trace_id,
@@ -48,7 +46,6 @@ export function groupSpans(spans: Span[]) {
         tree.push(parent);
       }
     } else {
-      log('pushing parentless span', span);
       tree.push(span);
     }
     idLookup.set(span.span_id, span);
