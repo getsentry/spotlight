@@ -60,14 +60,14 @@ export async function onSevereEvent(cb: (count: number) => void) {
   });
 }
 
-const DEFAULT_SIDECAR = 'http://localhost:8969/stream';
+const DEFAULT_SIDECAR_URL = 'http://localhost:8969/stream';
 
 export async function init({
   fullScreen = false,
   showTriggerButton = true,
   defaultEventId,
   injectImmediately = false,
-  sidecar = DEFAULT_SIDECAR,
+  sidecarUrl = DEFAULT_SIDECAR_URL,
   anchor = DEFAULT_ANCHOR,
   debug = false,
   integrations,
@@ -86,7 +86,7 @@ export async function init({
   }
 
   // Sentry is enabled by default
-  const defaultInitegrations = [sentry({ sidecarUrl: sidecar })];
+  const defaultInitegrations = [sentry({ sidecarUrl })];
 
   const initializedIntegrations = await initIntegrations(integrations ?? defaultInitegrations);
 
@@ -117,7 +117,7 @@ export async function init({
       fullScreen={fullScreen}
       defaultEventId={defaultEventId}
       showTriggerButton={showTriggerButton}
-      sidecar={sidecar}
+      sidecarUrl={sidecarUrl}
       anchor={anchor}
     />,
     // </React.StrictMode>

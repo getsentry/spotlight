@@ -12,7 +12,7 @@ type AppProps = {
   showTriggerButton?: boolean;
   defaultEventId?: string;
   integrations?: Integration[];
-  sidecar: string;
+  sidecarUrl: string;
   anchor?: Anchor;
 };
 
@@ -21,7 +21,7 @@ export default function App({
   showTriggerButton = true,
   defaultEventId,
   integrations = [],
-  sidecar,
+  sidecarUrl,
   anchor,
 }: AppProps) {
   log('App rerender');
@@ -45,7 +45,7 @@ export default function App({
     );
 
     const cleanupListeners = connectToSidecar(
-      sidecar,
+      sidecarUrl,
       contentTypeToIntegrations,
       setIntegrationData,
       setOnline,
@@ -56,7 +56,7 @@ export default function App({
       log('useEffect cleanup');
       cleanupListeners();
     };
-  }, [integrations, sidecar]);
+  }, [integrations, sidecarUrl]);
 
   const spotlightEventTarget = getSpotlightEventTarget();
 

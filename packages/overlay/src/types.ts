@@ -74,11 +74,6 @@ export type SpotlightOverlayOptions = {
    * TODO: Remove? No longer needed with new approach
    */
   defaultEventId?: string;
-
-  /**
-   * TODO: Remove! duplicate of `sidecarUrl`
-   */
-  sidecar?: string;
 };
 
 export type TriggerButtonCount = {

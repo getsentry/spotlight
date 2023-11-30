@@ -24,7 +24,7 @@ Spotlight.init({
   showTriggerButton: ${options.showTriggerButton === false ? 'false' : 'true'},
   injectImmediately: ${options.injectImmediately === true ? 'true' : 'false'},
   debug: ${options.debug === true ? 'true' : 'false'},
-  ${options.sidecarUrl ? `sidecar: '${options.sidecarUrl}'` : ''}
+  ${options.sidecarUrl ? `sidecarUrl: '${options.sidecarUrl}'` : ''}
 });
 `;
 };
