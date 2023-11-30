@@ -12,10 +12,12 @@ export function groupSpans(spans: Span[]) {
     .sort(a => (a.parent_span_id ? 1 : 0));
 
   sortedSpans.forEach(span => {
-    let parent = idLookup.get(span.parent_span_id || '');
-    span.children = [];
+    let parent = getParentOfSpan(span, idLookup, sortedSpans);
+    span.children ||= [];
     if (parent) {
-      if (!parent.children) parent.children = [];
+      if (!parent.children) {
+        parent.children = [];
+      }
       parent.children.push(span);
     } else if (span.parent_span_id) {
       const parentParent = sortedSpans.find(s => !s.parent_span_id);
@@ -38,7 +40,7 @@ export function groupSpans(spans: Span[]) {
       idLookup.set(parent.span_id, parent);
       // sortedSpans.splice(spanIdx, 0, parent);
       if (parentParent) {
-        if (!parentParent.children) parentParent.children = [];
+        parentParent.children ||= [];
         parentParent.children.push(parent);
       } else {
         tree.push(parent);
@@ -50,4 +52,14 @@ export function groupSpans(spans: Span[]) {
   });
 
   return tree;
+}
+
+function getParentOfSpan(span: Span, idLookup: Map<string, Span>, allSpans: Span[]): Span | undefined {
+  if (!span.parent_span_id) {
+    return undefined;
+  }
+  if (idLookup.has(span.parent_span_id)) {
+    return idLookup.get(span.parent_span_id);
+  }
+  return allSpans.find(s => s.span_id === span.parent_span_id);
 }
