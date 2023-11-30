@@ -13,7 +13,7 @@ export function groupSpans(spans: Span[]) {
 
   sortedSpans.forEach(span => {
     let parent = getParentOfSpan(span, idLookup, sortedSpans);
-    span.children = span.children || [];
+    span.children ||= [];
     if (parent) {
       if (!parent.children) {
         parent.children = [];
@@ -40,7 +40,7 @@ export function groupSpans(spans: Span[]) {
       idLookup.set(parent.span_id, parent);
       // sortedSpans.splice(spanIdx, 0, parent);
       if (parentParent) {
-        if (!parentParent.children) parentParent.children = [];
+        parentParent.children ||= [];
         parentParent.children.push(parent);
       } else {
         tree.push(parent);
