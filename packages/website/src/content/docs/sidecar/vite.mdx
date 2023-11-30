@@ -2,11 +2,29 @@
 title: Run Sidecar with Vite
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 We provide a Vite plugin that automatically starts & stops Sidecar for you when starting your Vite dev server.
 
-```sh
-npm install @spotlightjs/sidecar --save-dev
-```
+<Tabs>
+  <TabItem label="npm">
+    ```sh
+    npm install @spotlightjs/sidecar --save-dev
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```sh
+    pnpm add @spotlightjs/spotlight --save-dev
+    ```
+  </TabItem>
+    <TabItem label="yarn">
+    ```sh
+    yarn add @spotlightjs/spotlight --dev
+    ```
+  </TabItem>
+</Tabs>
+
+Add the plugin to your Vite config:
 
 ```js
 // vite.config.js
