@@ -128,8 +128,8 @@ export default function SpanDetails({
               <tbody>
                 {Object.entries(span.tags).map(([key, value]) => {
                   return (
-                    <tr key={key}>
-                      <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
+                    <tr key={key} className="text-primary-300">
+                      <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
                         <div className="w-full truncate">{key}</div>
                       </th>
                       <td className="py-0.5">
@@ -165,8 +165,8 @@ export default function SpanDetails({
                 ['op', span.op],
               ].map(([key, value]) => {
                 return (
-                  <tr key={key as string}>
-                    <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
+                  <tr key={key as string} className="text-primary-300">
+                    <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
                       <div className="w-full truncate">{key}</div>
                     </th>
                     <td className="py-0.5">
@@ -186,8 +186,8 @@ export default function SpanDetails({
               <tbody>
                 {Object.entries(span.data).map(([key, value]) => {
                   return (
-                    <tr key={key}>
-                      <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
+                    <tr key={key} className="text-primary-300">
+                      <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
                         <div className="w-full truncate">{key}</div>
                       </th>
                       <td className="py-0.5">
