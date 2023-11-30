@@ -3,14 +3,13 @@ import ReactDOM from 'react-dom/client';
 import fontStyles from '@fontsource/raleway/index.css?inline';
 
 import App from './App.tsx';
-import { DEFAULT_ANCHOR, type Anchor } from './components/Trigger.tsx';
+import { DEFAULT_ANCHOR } from './components/Trigger.tsx';
 import globalStyles from './index.css?inline';
-import type { Integration } from './integrations/integration.ts';
 import { initIntegrations } from './integrations/integration.ts';
 import { default as sentry } from './integrations/sentry/index.ts';
 import { getSpotlightEventTarget } from './lib/eventTarget.ts';
 import { activateLogger, log } from './lib/logger.ts';
-import { WindowWithSpotlight } from './types.ts';
+import { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
 
 export { default as console } from './integrations/console/index.ts';
 export { default as sentry } from './integrations/sentry/index.ts';
@@ -72,17 +71,7 @@ export async function init({
   anchor = DEFAULT_ANCHOR,
   debug = false,
   integrations,
-}: {
-  integrations?: Integration[];
-  fullScreen?: boolean;
-  defaultEventId?: string;
-  sidecarUrl?: string;
-  showTriggerButton?: boolean;
-  injectImmediately?: boolean;
-  sidecar?: string;
-  anchor?: Anchor;
-  debug?: boolean;
-} = {}) {
+}: SpotlightOverlayOptions = {}) {
   if (typeof document === 'undefined') return;
 
   // We only want to intialize and inject spotlight once. If it's already
