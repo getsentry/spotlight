@@ -34,7 +34,7 @@ type SpotlightIntegration = {};
 
 ### `debug`
 
-**type:** boolean **default:** false
+**type:** `boolean` **default:** `false`
 
 Enables some debug output in console for debugging.
 
@@ -72,4 +72,21 @@ init({
 
 ```ts
 type AnchorConfig = 'bottomRight' | 'bottomLeft' | 'centerRight' | 'centerLeft' | 'topLeft' | 'topRight';
+```
+
+### `injectImmediately`
+
+**type:** `boolean` **default:** `false`
+
+By default, Spotlight waits until the host page is loaded before injecting the Spotlight Overlay. Depending on how and
+when the `init` call is made, the `load` event might have already happened.
+
+By setting `injectImmediately` to `true`, the UI will be injected synchronously with the `init` call.
+
+Use this option, if you called `init()` but the Spotlight Overlay UI is not visible.
+
+```ts
+init({
+  injectImmediately: true,
+});
 ```
