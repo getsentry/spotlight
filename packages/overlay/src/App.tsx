@@ -1,23 +1,17 @@
 import { useEffect, useState } from 'react';
 import Debugger from './components/Debugger';
-import Trigger, { type Anchor } from './components/Trigger';
+import Trigger from './components/Trigger';
 import type { Integration, IntegrationData } from './integrations/integration';
 import { getSpotlightEventTarget } from './lib/eventTarget';
 import { log } from './lib/logger';
 import { connectToSidecar } from './sidecar';
-import { TriggerButtonCount } from './types';
+import { SpotlightOverlayOptions, TriggerButtonCount } from './types';
 
-type AppProps = {
-  fullScreen?: boolean;
-  showTriggerButton?: boolean;
-  defaultEventId?: string;
-  integrations?: Integration[];
-  sidecarUrl: string;
-  anchor?: Anchor;
-};
+type AppProps = Omit<SpotlightOverlayOptions, 'debug' | 'injectImmediately'> &
+  Required<Pick<SpotlightOverlayOptions, 'sidecarUrl'>>;
 
 export default function App({
-  fullScreen = false,
+  openOnInit = false,
   showTriggerButton = true,
   defaultEventId,
   integrations = [],
@@ -29,7 +23,7 @@ export default function App({
   const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});
   const [isOnline, setOnline] = useState(false);
   const [triggerButtonCount, setTriggerButtonCount] = useState<TriggerButtonCount>({ general: 0, severe: 0 });
-  const [isOpen, setOpen] = useState(fullScreen);
+  const [isOpen, setOpen] = useState(openOnInit);
 
   useEffect(() => {
     // Map that holds the information which kind of content type should be dispatched to which integration(s)

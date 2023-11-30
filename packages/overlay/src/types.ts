@@ -15,16 +15,6 @@ export type SpotlightOverlayOptions = {
   integrations?: Integration[];
 
   /**
-   * TODO: Rename
-   *
-   * If set to `true`, the Spotlight overlay Window will be opened immediately
-   * after calling the init.
-   *
-   * @default false - only the Spotlight button is visible.
-   */
-  fullScreen?: boolean;
-
-  /**
    * Set a URL to a custom Spotlight Sidecar instance. The Spotlight overlay
    * will use this URL instead of the default URL to connect to the sidecar
    * and to listen to incoming events.
@@ -34,13 +24,12 @@ export type SpotlightOverlayOptions = {
   sidecarUrl?: string;
 
   /**
-   * If set to `false`, the Spotlight button will not be visible.
-   * This is useful if Spotlight is integrated into an existing UI,
-   * such as the Astro Dev Overlay.
+   * If set to `true`, the Spotlight overlay Window will be opened immediately
+   * after calling the init function.
    *
-   * @default true
+   * @default false - only the Spotlight button is visible.
    */
-  showTriggerButton?: boolean;
+  openOnInit?: boolean;
 
   /**
    * By default, Spotlight waits until the host page is loaded before injecting the
@@ -55,6 +44,15 @@ export type SpotlightOverlayOptions = {
    * @default false
    */
   injectImmediately?: boolean;
+
+  /**
+   * If set to `false`, the Spotlight button will not be visible.
+   * This is useful if Spotlight is integrated into an existing UI,
+   * such as the Astro Dev Overlay.
+   *
+   * @default true
+   */
+  showTriggerButton?: boolean;
 
   /**
    * Set this option to define where the spotlight button should be anchored.

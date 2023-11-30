@@ -92,3 +92,10 @@ init({
   injectImmediately: true,
 });
 ```
+
+### `openOnInit`
+
+**type:** `boolean` **default:** `false`
+
+If set to `true`, the Spotlight overlay Window will be opened immediately after calling the init function. By default,
+only the button is visible.
