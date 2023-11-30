@@ -2,12 +2,12 @@ import { Link } from 'react-router-dom';
 import CardList from '~/components/CardList';
 import { useSentryEvents } from '../data/useSentryEvents';
 import { SentryEvent } from '../types';
-import { ErrorSummary } from './Events/Error';
+import { EventSummary } from './Events/Event';
 import PlatformIcon from './PlatformIcon';
 import TimeSince from './TimeSince';
 
 function renderEvent(event: SentryEvent) {
-  return <ErrorSummary event={event} />;
+  return <EventSummary event={event} />;
 }
 
 export default function EventList() {
