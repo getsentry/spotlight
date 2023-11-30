@@ -4,14 +4,14 @@ import { log } from './lib/logger';
 import { TriggerButtonCount } from './types';
 
 export function connectToSidecar(
-  sidecar: string,
+  sidecarUrl: string,
   contentTypeToIntegrations: Map<string, Integration<unknown>[]>,
   setIntegrationData: React.Dispatch<React.SetStateAction<IntegrationData<unknown>>>,
   setOnline: React.Dispatch<React.SetStateAction<boolean>>,
   setTriggerButtonCount: React.Dispatch<React.SetStateAction<TriggerButtonCount>>,
 ): () => void {
-  log('Connecting to sidecar at', sidecar);
-  const source = new EventSource(sidecar);
+  log('Connecting to sidecar at', sidecarUrl);
+  const source = new EventSource(sidecarUrl);
 
   const contentTypeListeners: [contentType: string, listener: (event: MessageEvent) => void][] = [];
 
