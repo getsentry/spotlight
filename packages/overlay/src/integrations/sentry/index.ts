@@ -1,6 +1,6 @@
 import type { Envelope } from '@sentry/types';
 
-import type { Integration, RawEventContext, Severity } from '../integration';
+import type { Integration, RawEventContext } from '../integration';
 
 import sentryDataCache from './data/sentryDataCache';
 import { Spotlight } from './sentry-integration';
@@ -25,25 +25,34 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
 
     processEvent: (event: RawEventContext) => processEnvelope(event),
 
-    tabs: () => [
-      {
-        id: 'errors',
-        title: 'Errors',
-        notificationCount: sentryDataCache.getEvents().filter(e => e.type != 'transaction').length,
-        content: ErrorsTab,
-      },
-      {
-        id: 'traces',
-        title: 'Traces',
-        notificationCount: sentryDataCache.getTraces().length,
-        content: TracesTab,
-      },
-      {
-        id: 'sdks',
-        title: 'SDKs',
-        content: SdksTab,
-      },
-    ],
+    tabs: () => {
+      const errorsCount = sentryDataCache.getEvents().filter(e => e.type != 'transaction').length;
+
+      return [
+        {
+          id: 'errors',
+          title: 'Errors',
+          notificationCount: {
+            count: errorsCount,
+            severe: errorsCount > 0,
+          },
+          content: ErrorsTab,
+        },
+        {
+          id: 'traces',
+          title: 'Traces',
+          notificationCount: {
+            count: sentryDataCache.getTraces().length,
+          },
+          content: TracesTab,
+        },
+        {
+          id: 'sdks',
+          title: 'SDKs',
+          content: SdksTab,
+        },
+      ];
+    },
   } satisfies Integration<Envelope>;
 }
 
@@ -85,12 +94,7 @@ export function processEnvelope({ data }: RawEventContext) {
 
   return {
     event: envelope,
-    severity: isErrorEnvelope(envelope) ? 'severe' : ('default' as Severity),
   };
-}
-
-function isErrorEnvelope(envelope: Envelope) {
-  return envelope[1].some(([itemHeader]) => itemHeader.type === 'event');
 }
 
 function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {

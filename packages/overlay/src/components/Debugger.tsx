@@ -1,5 +1,6 @@
 import { ReactComponent as Logo } from '~/assets/glyph.svg';
 import { Integration, IntegrationData } from '~/integrations/integration';
+import { NotificationCount } from '~/types';
 import classNames from '../lib/classNames';
 import Overview from './Overview';
 
@@ -9,6 +10,7 @@ export default function Debugger({
   setOpen,
   integrationData,
   isOnline,
+  setTriggerButtonCount: setNotificationCount,
 }: {
   integrations: Integration[];
   isOpen: boolean;
@@ -16,6 +18,7 @@ export default function Debugger({
   defaultEventId?: string;
   integrationData: IntegrationData<unknown>;
   isOnline: boolean;
+  setTriggerButtonCount: (count: NotificationCount) => void;
 }) {
   return (
     <div
@@ -74,7 +77,11 @@ export default function Debugger({
           </button>
         </div>
 
-        <Overview integrations={integrations} integrationData={integrationData} />
+        <Overview
+          integrations={integrations}
+          integrationData={integrationData}
+          setTriggerButtonCount={setNotificationCount}
+        />
       </div>
     </div>
   );

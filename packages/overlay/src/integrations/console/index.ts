@@ -15,7 +15,7 @@ export default function consoleIntegration() {
       {
         id: 'console',
         title: 'Browser Console Logs',
-        notificationCount: processedEvents.length,
+        notificationCount: { count: processedEvents.length },
         content: ConsoleTab,
       },
     ],

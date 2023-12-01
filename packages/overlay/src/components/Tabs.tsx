@@ -52,7 +52,7 @@ export default function Tabs({ tabs, nested }: Props) {
         >
           {tabs.map((tab, tabIdx) => (
             <option key={tabIdx} value={tab.id}>
-              {tab.title} {tab.notificationCount}
+              {tab.title} {tab.notificationCount?.count}
             </option>
           ))}
         </select>
@@ -77,7 +77,7 @@ export default function Tabs({ tabs, nested }: Props) {
               {tab.title}
               {tab.notificationCount !== undefined ? (
                 <span className="count ml-3 hidden rounded px-2.5 py-0.5 text-xs font-medium md:inline-block">
-                  {tab.notificationCount}
+                  {tab.notificationCount?.count}
                 </span>
               ) : null}
             </NavLink>
