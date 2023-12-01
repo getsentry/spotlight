@@ -77,7 +77,7 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
               replace={true}
               className={({ isActive }) =>
                 classNames(
-                  isActive || tab.active
+                  isActive
                     ? 'border-primary-200 text-primary-100 [&>.count]:bg-primary-100 [&>.count]:text-primary-600'
                     : 'text-primary-400 hover:border-primary-400 hover:text-primary-100 [&>.count]:bg-primary-700 [&>.count]:text-primary-200 border-transparent',
                   '-m-y -mx-2 flex whitespace-nowrap border-b-2 px-2 py-3 text-sm font-medium',
