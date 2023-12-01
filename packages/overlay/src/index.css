@@ -85,7 +85,7 @@ ul.tree li:last-child:before {
 }
 
 .tree .waterfall {
-  @apply border-l-primary-800 bg-primary-950 absolute left-[65%] right-0 h-7 border-l py-1 pl-1;
+  @apply border-l-primary-800 bg-primary-950 absolute left-[45%] right-0 h-7 border-l py-1 pl-1;
 }
 
 .table-values {

@@ -42,14 +42,16 @@ export default function SpanTree({
                     <span className="text-primary-400">&ndash;</span>
                   </>
                 )}
-                <span className="block max-w-sm truncate">{span.description || span.span_id}</span>
+                <span className="block max-w-sm truncate" title={span.description || span.span_id}>
+                  {span.description || span.span_id}
+                </span>
               </div>
               <div className="waterfall">
                 <div
                   className="bg-primary-900 absolute -m-0.5 w-full p-0.5"
                   style={{
-                    left: `min(${((span.start_timestamp - startTimestamp) / totalDuration) * 100}%, 100% - 1px)`,
-                    width: `max(1px, ${(spanDuration / totalDuration) * 100}%)`,
+                    left: `min(${((span.start_timestamp - startTimestamp) / totalDuration) * 100}%, 95% - 1px)`,
+                    width: `max(1px, ${(spanDuration / totalDuration) * 95}%)`,
                   }}
                 >
                   <span className={classNames('whitespace-nowrap', getSpanDurationClassName(spanDuration))}>
