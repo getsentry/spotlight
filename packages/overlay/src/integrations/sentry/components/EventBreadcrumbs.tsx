@@ -23,7 +23,7 @@ function extractBreadcrumbs(event: SentryEvent): Breadcrumb[] | undefined {
 
 export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
   const breadcrumbs = extractBreadcrumbs(event);
-  if (!breadcrumbs || (Array.isArray(breadcrumbs) && breadcrumbs.length === 0)) {
+  if (!breadcrumbs || !breadcrumbs.length)) {
     return (
       <div className="space-y-4">
         <div className="text-primary-300">
