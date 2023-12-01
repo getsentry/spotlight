@@ -23,9 +23,9 @@ export default function Tabs({ tabs, nested }: Props) {
   const location = useLocation();
   const spotlightEventTarget = getSpotlightEventTarget();
 
-  useKeyPress('Escape', () => {
+  useKeyPress(['Escape'], () => {
     if (location.pathname.split('/').length === 2) {
-      spotlightEventTarget.dispatchEvent(new CustomEvent('closed'));
+      spotlightEventTarget.dispatchEvent(new CustomEvent('close'));
     } else {
       navigate(-1);
     }

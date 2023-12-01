@@ -4,6 +4,7 @@ import Trigger from './components/Trigger';
 import type { Integration, IntegrationData } from './integrations/integration';
 import { getSpotlightEventTarget } from './lib/eventTarget';
 import { log } from './lib/logger';
+import useKeyPress from './lib/useKeyPress';
 import { connectToSidecar } from './sidecar';
 import { NotificationCount, SpotlightOverlayOptions } from './types';
 
@@ -24,6 +25,14 @@ export default function App({
   const [isOnline, setOnline] = useState(false);
   const [triggerButtonCount, setTriggerButtonCount] = useState<NotificationCount>({ count: 0, severe: false });
   const [isOpen, setOpen] = useState(openOnInit);
+
+  useKeyPress(['ctrlKey', 'shiftKey', 's'], () => {
+    setOpen(prev => !prev);
+  });
+
+  useKeyPress(['metaKey', 'shiftKey', 's'], () => {
+    setOpen(prev => !prev);
+  });
 
   useEffect(() => {
     // Map that holds the information which kind of content type should be dispatched to which integration(s)
@@ -59,18 +68,10 @@ export default function App({
       setOpen(false);
     };
 
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event && (event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 's') {
-        setOpen(prevValue => !prevValue);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyPress);
     spotlightEventTarget.addEventListener('open', onOpen);
     spotlightEventTarget.addEventListener('close', onClose);
 
     return () => {
-      document.removeEventListener('keydown', handleKeyPress);
       spotlightEventTarget.removeEventListener('open', onOpen);
       spotlightEventTarget.removeEventListener('close', onClose);
     };
