@@ -1,7 +1,9 @@
 ---
 title: Using Spotlight with Remix
-description: A guide how to setup Spotlight for Astro
+description: A guide how to setup Spotlight for Remix
 ---
+
+import { Content as InstallCommand } from "../../../components/InstallCommand.mdx";
 
 ## Install Sentry & Spotlight
 
@@ -11,25 +13,7 @@ Follow the [Remix Getting Started](https://docs.sentry.io/platforms/javascript/g
 This guide is focused on Remix _without Vite_. It needs Vite added to the documentation, but the steps should be similar.
 :::
 
-import { Tabs, TabItem } from '@astrojs/starlight/components';
-
-<Tabs>
-  <TabItem label="npm">
-  ```sh 
-  npm add @spotlightjs/spotlight
-  ```
-  </TabItem>
-  <TabItem label="pnpm">
-  ```sh 
-  pnpm add @spotlightjs/spotlight
-  ```
-  </TabItem>
-  <TabItem label="yarn">
-  ```sh 
-  yarn add @spotlightjs/spotlight
-  ```
-  </TabItem>
-</Tabs>
+<InstallCommand/>
 
 Initialize Spotlight within `entry.client.js`, after you've hydrated the document:
 
