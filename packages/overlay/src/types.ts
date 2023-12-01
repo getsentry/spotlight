@@ -74,9 +74,17 @@ export type SpotlightOverlayOptions = {
   defaultEventId?: string;
 };
 
-export type TriggerButtonCount = {
-  general: number;
-  severe: number;
+export type NotificationCount = {
+  /**
+   * Numbers of notifications
+   */
+  count: number;
+
+  /**
+   * Indicating that among the notification count, there's at least one severe notification.
+   * (This has impact on the UI, e.g. the notification count badge will be red)
+   */
+  severe?: boolean;
 };
 
 export type WindowWithSpotlight = Window & {

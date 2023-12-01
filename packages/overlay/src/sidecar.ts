@@ -1,14 +1,12 @@
 import React from 'react';
 import { Integration, IntegrationData } from './integrations/integration';
 import { log } from './lib/logger';
-import { TriggerButtonCount } from './types';
 
 export function connectToSidecar(
   sidecarUrl: string,
   contentTypeToIntegrations: Map<string, Integration<unknown>[]>,
   setIntegrationData: React.Dispatch<React.SetStateAction<IntegrationData<unknown>>>,
   setOnline: React.Dispatch<React.SetStateAction<boolean>>,
-  setTriggerButtonCount: React.Dispatch<React.SetStateAction<TriggerButtonCount>>,
 ): () => void {
   log('Connecting to sidecar at', sidecarUrl);
   const source = new EventSource(sidecarUrl);
@@ -30,13 +28,6 @@ export function connectToSidecar(
               return {
                 ...prev,
                 [integrationName]: [...(prev[integrationName] || []), processedEvent],
-              };
-            });
-            setTriggerButtonCount(prev => {
-              const keyToUpdate = processedEvent.severity === 'severe' ? 'severe' : 'general';
-              return {
-                ...prev,
-                [keyToUpdate]: prev[keyToUpdate] + 1,
               };
             });
           }

@@ -1,4 +1,5 @@
 import { type ComponentType } from 'react';
+import { NotificationCount } from '~/types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Integration<T = any> = {
@@ -58,7 +59,7 @@ export type IntegrationTab<T> = {
    * If this property is set, a count badge will be displayed
    * next to the tab title with the specified value.
    */
-  notificationCount?: number;
+  notificationCount?: NotificationCount;
 
   /**
    * JSX content of the tab. Go crazy, this is all yours!
@@ -75,17 +76,6 @@ export type ProcessedEventContainer<T> = {
    * The processed event data to be passed to your tabs.
    */
   event: T;
-
-  /**
-   * A level indicating the impact or severity of the processed event. Set this to
-   * 'severe' if the event is critical and users should be aware of it (e.g. a thrown error).
-   *
-   * If this is set to 'severe', a red notification count badge will be displayed
-   * next to the spotlight trigger button in the UI.
-   *
-   * @default value is 'default'
-   */
-  severity?: Severity;
 };
 
 export type Severity = 'default' | 'severe';

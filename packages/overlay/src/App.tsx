@@ -5,7 +5,7 @@ import type { Integration, IntegrationData } from './integrations/integration';
 import { getSpotlightEventTarget } from './lib/eventTarget';
 import { log } from './lib/logger';
 import { connectToSidecar } from './sidecar';
-import { SpotlightOverlayOptions, TriggerButtonCount } from './types';
+import { NotificationCount, SpotlightOverlayOptions } from './types';
 
 type AppProps = Omit<SpotlightOverlayOptions, 'debug' | 'injectImmediately'> &
   Required<Pick<SpotlightOverlayOptions, 'sidecarUrl'>>;
@@ -22,7 +22,7 @@ export default function App({
 
   const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});
   const [isOnline, setOnline] = useState(false);
-  const [triggerButtonCount, setTriggerButtonCount] = useState<TriggerButtonCount>({ general: 0, severe: 0 });
+  const [triggerButtonCount, setTriggerButtonCount] = useState<NotificationCount>({ count: 0, severe: false });
   const [isOpen, setOpen] = useState(openOnInit);
 
   useEffect(() => {
@@ -38,13 +38,7 @@ export default function App({
         }),
     );
 
-    const cleanupListeners = connectToSidecar(
-      sidecarUrl,
-      contentTypeToIntegrations,
-      setIntegrationData,
-      setOnline,
-      setTriggerButtonCount,
-    );
+    const cleanupListeners = connectToSidecar(sidecarUrl, contentTypeToIntegrations, setIntegrationData, setOnline);
 
     return () => {
       log('useEffect cleanup');
@@ -85,9 +79,9 @@ export default function App({
   }, [isOpen, spotlightEventTarget]);
 
   useEffect(() => {
-    if (triggerButtonCount.severe > 0) {
+    if (triggerButtonCount.severe) {
       spotlightEventTarget.dispatchEvent(
-        new CustomEvent('severeEventCount', { detail: { count: triggerButtonCount.severe } }),
+        new CustomEvent('severeEventCount', { detail: { count: triggerButtonCount.count } }),
       );
     }
   }, [triggerButtonCount, spotlightEventTarget]);
@@ -96,7 +90,9 @@ export default function App({
 
   return (
     <>
-      {showTriggerButton && <Trigger isOpen={isOpen} setOpen={setOpen} count={triggerButtonCount} anchor={anchor} />}
+      {showTriggerButton && (
+        <Trigger isOpen={isOpen} setOpen={setOpen} notificationCount={triggerButtonCount} anchor={anchor} />
+      )}
       <Debugger
         isOpen={isOpen}
         setOpen={setOpen}
@@ -104,6 +100,7 @@ export default function App({
         defaultEventId={defaultEventId}
         integrations={integrations}
         integrationData={integrationData}
+        setTriggerButtonCount={setTriggerButtonCount}
       />
     </>
   );

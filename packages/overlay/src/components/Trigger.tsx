@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef } from 'react';
 import { ReactComponent as Logo } from '~/assets/glyph.svg';
 import classNames from '../lib/classNames';
-import { TriggerButtonCount } from '../types';
+import { NotificationCount } from '../types';
 
 export const DEFAULT_ANCHOR = 'bottomRight';
 
@@ -55,15 +55,15 @@ function ToolbarItem({
 export default function Trigger({
   isOpen,
   setOpen,
-  count,
+  notificationCount,
   anchor = DEFAULT_ANCHOR,
 }: {
   isOpen: boolean;
   setOpen: (value: boolean) => void;
-  count: TriggerButtonCount;
+  notificationCount: NotificationCount;
   anchor?: Anchor;
 }) {
-  const countSum = count.general + count.severe;
+  const countSum = notificationCount.count;
   const iconSize = 24;
 
   return (
@@ -78,7 +78,7 @@ export default function Trigger({
       )}
       onClick={() => setOpen(!isOpen)}
     >
-      <ToolbarItem count={countSum} severe={Boolean(count.severe)}>
+      <ToolbarItem count={countSum} severe={Boolean(notificationCount.severe)}>
         <Logo height={iconSize} width={iconSize} />
       </ToolbarItem>
     </div>
