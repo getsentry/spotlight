@@ -34,7 +34,7 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
       spotlightEventTarget.addEventListener('sentry:showError', onRenderError as EventListener);
 
       return () => {
-        spotlightEventTarget.removeEventListener('renderSentryEvent', onRenderError as EventListener);
+        spotlightEventTarget.removeEventListener('sentry:showError', onRenderError as EventListener);
       };
     },
 
