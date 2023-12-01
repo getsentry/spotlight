@@ -14,6 +14,9 @@ export default {
       colors: {
         primary: colors.indigo,
       },
+      gridTemplateColumns: {
+        '2-auto': 'minmax(auto, max-content) 1fr',
+      },
     },
   },
 } satisfies Config;
