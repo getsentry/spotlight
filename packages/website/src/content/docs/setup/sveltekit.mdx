@@ -1,0 +1,67 @@
+---
+title: Using Spotlight with Sveltekit
+description: A guide how to setup Spotlight for Sveltekit
+---
+
+import { Content as InstallCommand } from '../../../components/InstallCommand.mdx';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Install Sentry 
+
+Follow the [Sveltekit Getting Started](https://docs.sentry.io/platforms/javascript/guides/sveltekit/) guide on Sentry, and continue from there.
+
+## Install Spotlight
+
+<InstallCommand/>
+
+Initialize Spotlight after Sentry and start the Sidecar on the server. Just add a little code to your [SvelteKit hooks](https://kit.svelte.dev/docs/hooks) files:
+
+<Tabs>
+
+<TabItem label="Client">
+```javascript {3, 13-17}
+// hooks.client.js
+import * as Sentry from '@sentry/sveltekit';
+import * as Spotlight from '@spotlightjs/spotlight';
+
+Sentry.init({
+  dsn: '___DSN___',
+  tracesSampleRate: 1.0,
+  // ...your Sentry options
+});
+
+export const handleError = Sentry.handleErrorWithSentry();
+
+if (import.meta.env.DEV) {
+	Spotlight.init({ 
+    injectImmediately: true, 
+  });
+}
+```
+</TabItem>
+
+<TabItem label="Server">
+```javascript {3, 9, 15-17} ins="spotlight:"
+// hooks.server.js
+import * as Sentry from '@sentry/sveltekit';
+import { setupSidecar } from '@spotlightjs/spotlight/sidecar';
+
+Sentry.init({
+  dsn: '___DSN___',
+  tracesSampleRate: 1.0,
+  // ...your Sentry options
+	spotlight: import.meta.env.DEV
+});
+
+export const handleError = Sentry.handleErrorWithSentry();
+export const handle = Sentry.sentryHandle();
+
+if (import.meta.env.DEV) {
+	setupSidecar();
+}
+```
+</TabItem>
+
+</Tabs>
+
+That's it! Check out the [Configuration](/reference/configuration/) to further customize Spotlight.

@@ -106,6 +106,10 @@ export default defineConfig({
               label: 'for Remix',
               link: '/setup/remix/',
             },
+            {
+              label: 'for SvelteKit',
+              link: '/setup/sveltekit/',
+            },
           ],
         },
         {
