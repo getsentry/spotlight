@@ -102,10 +102,6 @@ export default defineConfig({
               label: 'for Other Frameworks',
               link: '/setup/other/',
             },
-            {
-              label: 'with Sentry',
-              link: '/setup/sentry/',
-            },
           ],
         },
         {
