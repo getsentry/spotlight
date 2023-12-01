@@ -46,8 +46,6 @@ export default function Overview({
     setTriggerButtonCount(notificationCountSum);
   }, [notificationCountSum, setTriggerButtonCount]);
 
-  const initialTab = tabs.length ? `/${tabs[0].id}` : '/no-tabs';
-
   return (
     <>
       <Tabs tabs={tabs} setOpen={setOpen} />
