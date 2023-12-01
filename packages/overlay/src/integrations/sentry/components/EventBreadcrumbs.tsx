@@ -40,12 +40,17 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
         return (
           <Fragment key={crumbIdx}>
             <div className="flex flex-none flex-col p-2">
-              <div className="text-primary-300">
+              <div className="text-lg font-semibold">{crumb.category || ' '}</div>
+              <div className="text-primary-300 text-xs">
                 <Time date={crumb.timestamp} format="HH:mm:ss" />
               </div>
-              <div className="text-primary-300">{crumb.category || ' '}</div>
             </div>
-            <pre className={classNames('grow whitespace-pre-line p-2 !font-mono', crumbIdx === 0 ? '!border-t-0' : '')}>
+            <pre
+              className={classNames(
+                'flex grow items-center whitespace-pre-line p-2 !font-mono',
+                crumbIdx === 0 ? '!border-t-0' : '',
+              )}
+            >
               {crumb.message}
             </pre>
           </Fragment>
