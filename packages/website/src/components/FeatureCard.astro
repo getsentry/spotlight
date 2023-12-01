@@ -1,5 +1,5 @@
 ---
-const { title, description, accentColor, reverse, linkText, linkUrl } = Astro.props;
+const { title, description, accentColor, reverse, linkText, linkUrl, imageUrl } = Astro.props;
 import { LinkCard } from '@astrojs/starlight/components';
 ---
 
@@ -68,6 +68,7 @@ import { LinkCard } from '@astrojs/starlight/components';
     <h5 class="mb-2 heading">{title}</h5>
     <p>{description}</p>
     {linkUrl && linkText ? <a href={linkUrl} class="link">{linkText}</a> : null}
+    <slot name="image"/>
   </div>
   <div class="flex-1 max-w-xl h-max" style={{margin: 0}}>
     <slot />

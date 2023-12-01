@@ -2,7 +2,11 @@
 title: Setup Codeblock
 ---
 
-```ts
+```shell title="1. Install Spotlight"
+npm install @spotlightjs/spotlight
+```
+
+```ts title="2. Init the Overlay" frame="terminal"
 import * as Spotlight from '@spotlightjs/spotlight';
 
 if (process.env.NODE_ENV === 'development') {
@@ -10,6 +14,6 @@ if (process.env.NODE_ENV === 'development') {
 }
 ```
 
-```shell
+```shell title="3. Start the Sidecar"
 npx spotlight-sidecar
 ```
