@@ -1,5 +1,5 @@
 import { createElement, useEffect, useState } from 'react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { Integration, IntegrationData } from '~/integrations/integration';
 import { NotificationCount } from '~/types';
 import Tabs from './Tabs';
@@ -8,10 +8,12 @@ export default function Overview({
   integrations,
   integrationData,
   setTriggerButtonCount,
+  setOpen,
 }: {
   integrations: Integration[];
   integrationData: IntegrationData<unknown>;
   setTriggerButtonCount: (count: NotificationCount) => void;
+  setOpen: (value: boolean) => void;
 }) {
   const [notificationCountSum, setNotificationCountSum] = useState<NotificationCount>({ count: 0, severe: false });
 
@@ -44,30 +46,26 @@ export default function Overview({
     setTriggerButtonCount(notificationCountSum);
   }, [notificationCountSum, setTriggerButtonCount]);
 
-  const initialTab = tabs.length ? `/${tabs[0].id}` : '/no-tabs';
-
   return (
     <>
-      <MemoryRouter initialEntries={[initialTab]}>
-        <Tabs tabs={tabs} />
-        <Routes>
-          <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={'not-found'}></Route>
-          {tabs.map(tab => {
-            const TabContent = tab.content && tab.content;
+      <Tabs tabs={tabs} setOpen={setOpen} />
+      <Routes>
+        <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={'not-found'}></Route>
+        {tabs.map(tab => {
+          const TabContent = tab.content && tab.content;
 
-            if (TabContent) {
-              return (
-                <Route
-                  path={`/${tab.id}/*`}
-                  key={tab.id}
-                  element={createElement(TabContent, { processedEvents: tab.processedEvents })}
-                ></Route>
-              );
-            }
-            return null;
-          })}
-        </Routes>
-      </MemoryRouter>
+          if (TabContent) {
+            return (
+              <Route
+                path={`/${tab.id}/*`}
+                key={tab.id}
+                element={createElement(TabContent, { processedEvents: tab.processedEvents })}
+              ></Route>
+            );
+          }
+          return null;
+        })}
+      </Routes>
     </>
   );
 }

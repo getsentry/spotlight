@@ -1,7 +1,6 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { type IntegrationTab } from '~/integrations/integration';
 import classNames from '../lib/classNames';
-import { getSpotlightEventTarget } from '../lib/eventTarget';
 import useKeyPress from '../lib/useKeyPress';
 
 export type Props = {
@@ -9,23 +8,35 @@ export type Props = {
    * Array of tabs to display.
    */
   tabs: IntegrationTab<unknown>[];
+} & (NestedTabsProps | TopLevelTabsProps);
 
+type NestedTabsProps = {
   /**
    * Whether the tabs are nested inside another tab.
    * If `nested` is `true`, links will be set relative to the parent
    * tab route instead of absolute to the root.
    */
-  nested?: boolean;
+  nested: true;
+
+  setOpen?: undefined;
 };
 
-export default function Tabs({ tabs, nested }: Props) {
+type TopLevelTabsProps = {
+  nested?: false;
+
+  /**
+   * Setter to control the open state of the overlay
+   */
+  setOpen: (value: boolean) => void;
+};
+
+export default function Tabs({ tabs, nested, setOpen }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
-  const spotlightEventTarget = getSpotlightEventTarget();
 
   useKeyPress(['Escape'], () => {
-    if (location.pathname.split('/').length === 2) {
-      spotlightEventTarget.dispatchEvent(new CustomEvent('close'));
+    if (setOpen && location.pathname.split('/').length === 2) {
+      setOpen(false);
     } else {
       navigate(-1);
     }

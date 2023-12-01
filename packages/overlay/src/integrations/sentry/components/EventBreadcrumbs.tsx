@@ -1,3 +1,5 @@
+import { Fragment } from 'react';
+import classNames from '~/lib/classNames';
 import { Breadcrumb, SentryEvent } from '../types';
 import Time from './Time';
 
@@ -21,9 +23,9 @@ function extractBreadcrumbs(event: SentryEvent): Breadcrumb[] | undefined {
 
 export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
   const breadcrumbs = extractBreadcrumbs(event);
-  if (!breadcrumbs) {
+  if (!breadcrumbs || !breadcrumbs.length) {
     return (
-      <div className="space-y-4 px-6">
+      <div className="space-y-4">
         <div className="text-primary-300">
           No breadcrumbs available for this event. Try adding some to make debugging easier.
         </div>
@@ -32,19 +34,26 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
     );
   }
   return (
-    <div className="divide-primary-800 -mx-2 space-y-2 divide-y">
+    <div className="divide-primary-800 grid-cols-2-auto -mx-2 grid space-y-2 divide-y">
       {breadcrumbs.map((crumb, crumbIdx) => {
         if (!crumb.message) return null;
         return (
-          <div key={crumbIdx} className="flex gap-4 p-2">
-            <div className="flex flex-none flex-col">
-              <div className="text-primary-300">
+          <Fragment key={crumbIdx}>
+            <div className="flex flex-none flex-col p-2">
+              <div className="text-lg font-semibold">{crumb.category || ' '}</div>
+              <div className="text-primary-300 text-xs">
                 <Time date={crumb.timestamp} format="HH:mm:ss" />
               </div>
-              <div className="text-primary-300">{crumb.category || ' '}</div>
             </div>
-            <pre className="grow whitespace-pre-line font-mono">{crumb.message}</pre>
-          </div>
+            <pre
+              className={classNames(
+                'flex grow items-center whitespace-pre-line p-2 !font-mono',
+                crumbIdx === 0 ? '!border-t-0' : '',
+              )}
+            >
+              {crumb.message}
+            </pre>
+          </Fragment>
         );
       })}
     </div>

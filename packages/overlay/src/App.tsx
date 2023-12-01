@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Debugger from './components/Debugger';
 import Trigger from './components/Trigger';
 import type { Integration, IntegrationData } from './integrations/integration';
@@ -14,7 +15,6 @@ type AppProps = Omit<SpotlightOverlayOptions, 'debug' | 'injectImmediately'> &
 export default function App({
   openOnInit = false,
   showTriggerButton = true,
-  defaultEventId,
   integrations = [],
   sidecarUrl,
   anchor,
@@ -57,10 +57,17 @@ export default function App({
 
   const spotlightEventTarget = getSpotlightEventTarget();
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    const onOpen = () => {
+    const onOpen = (
+      e: CustomEvent<{
+        path: string | undefined;
+      }>,
+    ) => {
       log('Open');
       setOpen(true);
+      if (e.detail.path) navigate(e.detail.path);
     };
 
     const onClose = () => {
@@ -68,14 +75,21 @@ export default function App({
       setOpen(false);
     };
 
-    spotlightEventTarget.addEventListener('open', onOpen);
+    const onNavigate = (e: CustomEvent<string>) => {
+      log('Navigate');
+      navigate(e.detail);
+    };
+
+    spotlightEventTarget.addEventListener('open', onOpen as EventListener);
     spotlightEventTarget.addEventListener('close', onClose);
+    spotlightEventTarget.addEventListener('navigate', onNavigate as EventListener);
 
     return () => {
-      spotlightEventTarget.removeEventListener('open', onOpen);
+      spotlightEventTarget.removeEventListener('open', onOpen as EventListener);
       spotlightEventTarget.removeEventListener('close', onClose);
+      spotlightEventTarget.removeEventListener('navigate', onNavigate as EventListener);
     };
-  }, [spotlightEventTarget]);
+  }, [spotlightEventTarget, navigate]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -106,7 +120,6 @@ export default function App({
         isOpen={isOpen}
         setOpen={setOpen}
         isOnline={isOnline}
-        defaultEventId={defaultEventId}
         integrations={integrations}
         integrationData={integrationData}
         setTriggerButtonCount={setTriggerButtonCount}

@@ -15,7 +15,6 @@ export default function Debugger({
   integrations: Integration[];
   isOpen: boolean;
   setOpen: (value: boolean) => void;
-  defaultEventId?: string;
   integrationData: IntegrationData<unknown>;
   isOnline: boolean;
   setTriggerButtonCount: (count: NotificationCount) => void;
@@ -81,6 +80,7 @@ export default function Debugger({
           integrations={integrations}
           integrationData={integrationData}
           setTriggerButtonCount={setNotificationCount}
+          setOpen={setOpen}
         />
       </div>
     </div>
