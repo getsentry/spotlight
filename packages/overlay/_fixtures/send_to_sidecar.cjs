@@ -54,16 +54,29 @@ function sendData(filePath) {
   });
 }
 
-// Read all .txt files from the directory
-fs.readdir(directoryPath, (err, files) => {
-  if (err) {
-    console.log('Unable to scan directory: ' + err);
-    return;
-  }
-
-  files.forEach(file => {
-    if (path.extname(file) === '.txt') {
-      sendData(path.join(directoryPath, file));
+function readDir(directoryPath) {
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
+      console.log('Unable to scan directory: ' + err);
+      return;
     }
+
+    files.forEach(file => {
+      const filePath = path.join(directoryPath, file);
+      fs.stat(filePath, (err, stats) => {
+        if (err) {
+          console.log('Error retrieving file stats: ' + err);
+          return;
+        }
+
+        if (stats.isDirectory()) {
+          readDir(filePath); // Recursive call to readDir for directories
+        } else if (path.extname(file) === '.txt') {
+          sendData(filePath);
+        }
+      });
+    });
   });
-});
+}
+
+readDir(directoryPath);
