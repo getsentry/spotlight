@@ -6,7 +6,7 @@ description: All the configuration options for setting up Spotlight
 ## `init`
 
 ```js
-import {init, sentry} as Spotlight from '@spotlightjs/spotlight';
+import { init, sentry } as Spotlight from '@spotlightjs/spotlight';
 
 init({
   integrations: [sentry()],
@@ -99,3 +99,20 @@ init({
 
 If set to `true`, the Spotlight overlay Window will be opened immediately after calling the init function. By default,
 only the button is visible.
+
+## `trigger`
+
+Trigger an event within Spotlight.
+
+```js
+import { trigger } as Spotlight from '@spotlightjs/spotlight';
+
+trigger("sentry:showError", {
+  event: string,
+  eventId: string,
+});
+```
+
+```ts
+type TriggerFunction = (eventName: string, eventPayload?: unknown)
+```
