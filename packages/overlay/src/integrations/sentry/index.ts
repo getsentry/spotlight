@@ -1,5 +1,4 @@
 import type { Envelope } from '@sentry/types';
-import { openSpotlight } from '~/index';
 import { getSpotlightEventTarget } from '../../lib/eventTarget';
 import { log } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
@@ -20,7 +19,7 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
     name: 'sentry',
     forwardedContentType: [HEADER],
 
-    setup: () => {
+    setup: ({ open }) => {
       addSpotlightIntegrationToSentry(options);
 
       const spotlightEventTarget = getSpotlightEventTarget();
@@ -29,7 +28,7 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
         log('Sentry Event', e.detail.event_id);
         if (e.detail.event) sentryDataCache.pushEvent(e.detail.event);
         // TODO: handle async
-        openSpotlight(`/errors/${e.detail.eventId}`);
+        open(`/errors/${e.detail.eventId}`);
       };
 
       spotlightEventTarget.addEventListener('sentry:showError', onRenderError as EventListener);

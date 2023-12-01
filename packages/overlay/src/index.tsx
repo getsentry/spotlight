@@ -6,7 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import App from './App.tsx';
 import { DEFAULT_ANCHOR } from './components/Trigger.tsx';
 import globalStyles from './index.css?inline';
-import { initIntegrations } from './integrations/integration.ts';
+import { SpotlightContext, initIntegrations } from './integrations/integration.ts';
 import { default as sentry } from './integrations/sentry/index.ts';
 import { getSpotlightEventTarget } from './lib/eventTarget.ts';
 import { activateLogger, log } from './lib/logger.ts';
@@ -109,7 +109,12 @@ export async function init({
   // Sentry is enabled by default
   const defaultInitegrations = [sentry({ sidecarUrl })];
 
-  const [initializedIntegrations] = await initIntegrations(integrations ?? defaultInitegrations);
+  const context: SpotlightContext = {
+    open: openSpotlight,
+    close: closeSpotlight,
+  };
+
+  const [initializedIntegrations] = await initIntegrations(integrations ?? defaultInitegrations, context);
 
   // build shadow dom container to contain styles
   const docRoot = document.createElement('div');

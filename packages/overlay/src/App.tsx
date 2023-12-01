@@ -72,12 +72,12 @@ export default function App({
       navigate(e.detail);
     };
 
-    spotlightEventTarget.addEventListener('open', onOpen);
+    spotlightEventTarget.addEventListener('open', onOpen as EventListener);
     spotlightEventTarget.addEventListener('close', onClose);
     spotlightEventTarget.addEventListener('navigate', onNavigate as EventListener);
 
     return () => {
-      spotlightEventTarget.removeEventListener('open', onOpen);
+      spotlightEventTarget.removeEventListener('open', onOpen as EventListener);
       spotlightEventTarget.removeEventListener('close', onClose);
       spotlightEventTarget.removeEventListener('navigate', onNavigate as EventListener);
     };
