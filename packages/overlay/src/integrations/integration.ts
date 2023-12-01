@@ -1,6 +1,11 @@
 import { type ComponentType } from 'react';
 import { NotificationCount } from '~/types';
 
+export type SpotlightContext = {
+  open: (path: string | undefined) => void;
+  close: () => void;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Integration<T = any> = {
   /**
@@ -29,7 +34,7 @@ export type Integration<T = any> = {
    *
    * Use this hook to setup any global state, instrument handlers, etc.
    */
-  setup?: () => void | Promise<void>;
+  setup?: (context: SpotlightContext) => void | Promise<void> | TeardownFunction;
 
   /**
    * Hook called whenever spotlight forwards a new raw event to this integration.
@@ -109,25 +114,34 @@ export type RawEventContext = {
   data: string;
 };
 
+type TeardownFunction = () => void | Promise<() => void>;
+
 // export type IntegrationParameter = Array<Integration<unknown>>;
 
-export async function initIntegrations(integrations?: Integration[]): Promise<Integration[]> {
+export async function initIntegrations(
+  integrations: Integration[] = [],
+  context: SpotlightContext,
+): Promise<[Integration[], TeardownFunction[]]> {
   if (!integrations) {
-    return [];
+    return [[], []];
   }
 
   const initializedIntegrations: Integration[] = [];
+  const teardownFns: TeardownFunction[] = [];
   // iterate over integrations and call their hooks
   for (const integration of integrations) {
     if (Array.isArray(integration)) {
-      initializedIntegrations.push(...(await initIntegrations(integration)));
+      const rv = await initIntegrations(integration, context);
+      initializedIntegrations.push(...rv[0]);
+      teardownFns.push(...rv[1]);
     } else if (integration) {
       if (integration.setup) {
-        await integration.setup();
+        const fn = await integration.setup(context);
+        if (fn) teardownFns.push(fn);
       }
       initializedIntegrations.push(integration);
     }
   }
 
-  return initializedIntegrations;
+  return [initializedIntegrations, teardownFns];
 }

@@ -24,6 +24,7 @@ function sdkToPlatform(name: string) {
 
 class SentryDataCache {
   protected events: SentryEvent[] = [];
+  protected eventIds: Set<string> = new Set<string>();
   protected sdks: Sdk[] = [];
   protected traces: Trace[] = [];
   protected tracesById: { [id: string]: Trace } = {};
@@ -96,6 +97,8 @@ class SentryDataCache {
       event.event_id = generate_uuidv4();
     }
 
+    if (this.eventIds.has(event.event_id)) return;
+
     if (isErrorEvent(event)) {
       reverseStackTraces(event);
     }
@@ -167,6 +170,7 @@ class SentryDataCache {
       this.subscribers.forEach(([type, cb]) => type === 'trace' && cb(trace));
     }
     this.subscribers.forEach(([type, cb]) => type === 'event' && cb(event));
+    this.eventIds.add(event.event_id);
   }
 
   getEvents() {
