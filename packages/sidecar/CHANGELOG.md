@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 0.0.15
+
+### Patch Changes
+
+- feat(sidecar): Support setting a custom port ([#189](https://github.com/getsentry/spotlight/pull/189))
+
 ## 0.0.14
 
 ### Patch Changes

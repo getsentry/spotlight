@@ -1,5 +1,18 @@
 # @spotlightjs/core
 
+## 0.0.20
+
+### Patch Changes
+
+- fix(overlay): Account for inverted BE->FE traces ([#185](https://github.com/getsentry/spotlight/pull/185))
+
+- Use proper log command
+  ([`5923ddc`](https://github.com/getsentry/spotlight/commit/5923ddc2f253a52c3bdb8302603fa6970b044fa2))
+
+- feat(sidecar): Support setting a custom port ([#189](https://github.com/getsentry/spotlight/pull/189))
+
+- ref(overlay): Rename `fullscreen` option to `openOnInit` ([#182](https://github.com/getsentry/spotlight/pull/182))
+
 ## 0.0.19
 
 ### Patch Changes
