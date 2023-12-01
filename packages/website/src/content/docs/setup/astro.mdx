@@ -3,9 +3,9 @@ title: Using Spotlight with Astro
 description: A guide how to setup Spotlight for Astro
 ---
 
-## Install Sentry & Spotlight
+Setting up Spotlight in Astro easy using Astro's extension system.
 
-To install Sentry and Spotlight for Astro call:
+Start by adding the `@sentry/astro` and `@spotlightjs/astro` dependencies:
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
@@ -30,38 +30,23 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 After that, Astro should add the Sentry & Spotlight integration to your `astro.config.mjs` file and should look something like this.
 
 ```js
- import { defineConfig } from 'astro/config';  
+import { defineConfig } from 'astro/config';  
                                                
- import sentry from "@sentry/astro";           
- import spotlightjs from "@spotlightjs/astro"; 
+import sentry from "@sentry/astro";           
+import spotlightjs from "@spotlightjs/astro"; 
                                                
- // https://astro.build/config                 
- export default defineConfig({                 
-   integrations: [sentry(), spotlightjs()]     
- });
+// https://astro.build/config                 
+export default defineConfig({
+  // Order matters here! `spotlightjs()` should come after `sentry()`                 
+  integrations: [sentry(), spotlightjs()]     
+});
 ```
 
-:::note
+:::note[Sentry in Production]
+If you're using Sentry in production, don't forget to bind the `DSN` and source map configuration:
 
-The order of the integrations is important. Sentry should be the first integration in the array, followed by Spotlight.
-
-:::
-
-To complete your setup, you need to add your Sentry DSN to the `astro.config.mjs` file.
 See [Sentry's documentation](https://docs.sentry.io/platforms/javascript/guides/astro/) for more information.
-You final Sentry config should look something like this:
-
-```js
-// astro.config.mjs
-sentry({
-    dsn: "DSN",
-    sourceMapsUploadOptions: {
-      project: "PROJECT_NAME",
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-    },
-  }),
-//...
-```
+:::
 
 ## Configure Other Sentry SDKs
 
