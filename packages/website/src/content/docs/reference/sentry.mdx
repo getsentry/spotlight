@@ -12,3 +12,14 @@ init({
   integrations: [sentry()],
 });
 ```
+
+Additionally it includes an event to trigger synchronously rendering an error:
+
+```js
+import { trigger } as Spotlight from '@spotlightjs/spotlight';
+
+trigger("sentry:showError", {
+  eventId: string,
+  event?: Event,
+});
+```

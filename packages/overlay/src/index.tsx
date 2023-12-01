@@ -2,10 +2,11 @@ import ReactDOM from 'react-dom/client';
 
 import fontStyles from '@fontsource/raleway/index.css?inline';
 
+import { MemoryRouter } from 'react-router-dom';
 import App from './App.tsx';
 import { DEFAULT_ANCHOR } from './components/Trigger.tsx';
 import globalStyles from './index.css?inline';
-import { initIntegrations } from './integrations/integration.ts';
+import { SpotlightContext, initIntegrations } from './integrations/integration.ts';
 import { default as sentry } from './integrations/sentry/index.ts';
 import { getSpotlightEventTarget } from './lib/eventTarget.ts';
 import { activateLogger, log } from './lib/logger.ts';
@@ -14,6 +15,8 @@ import { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
 export { default as console } from './integrations/console/index.ts';
 export { default as sentry } from './integrations/sentry/index.ts';
 export { default as viteInspect } from './integrations/vite-inspect/index.ts';
+
+const DEFAULT_SIDECAR_URL = 'http://localhost:8969/stream';
 
 function createStyleSheet(styles: string) {
   const sheet = new CSSStyleSheet();
@@ -24,8 +27,12 @@ function createStyleSheet(styles: string) {
 /**
  * Open the Spotlight debugger Window
  */
-export async function openSpotlight() {
-  getSpotlightEventTarget().dispatchEvent(new CustomEvent('open'));
+export async function openSpotlight(path?: string | undefined) {
+  getSpotlightEventTarget().dispatchEvent(
+    new CustomEvent('open', {
+      detail: { path },
+    }),
+  );
 }
 
 /**
@@ -60,12 +67,25 @@ export async function onSevereEvent(cb: (count: number) => void) {
   });
 }
 
-const DEFAULT_SIDECAR_URL = 'http://localhost:8969/stream';
+/**
+ * Trigger an event in Spotlight.
+ *
+ * This is primarily useful for handling an uncaught error/crash, and forcing the debugger
+ * to render vs a native error handler.
+ *
+ * e.g. trigger("sentry.showError", {eventId});
+ */
+export async function trigger(eventName: string, payload: unknown) {
+  getSpotlightEventTarget().dispatchEvent(
+    new CustomEvent(eventName, {
+      detail: payload,
+    }),
+  );
+}
 
 export async function init({
   openOnInit = false,
   showTriggerButton = true,
-  defaultEventId,
   injectImmediately = false,
   sidecarUrl = DEFAULT_SIDECAR_URL,
   anchor = DEFAULT_ANCHOR,
@@ -88,7 +108,12 @@ export async function init({
   // Sentry is enabled by default
   const defaultInitegrations = [sentry({ sidecarUrl })];
 
-  const initializedIntegrations = await initIntegrations(integrations ?? defaultInitegrations);
+  const context: SpotlightContext = {
+    open: openSpotlight,
+    close: closeSpotlight,
+  };
+
+  const [initializedIntegrations] = await initIntegrations(integrations ?? defaultInitegrations, context);
 
   // build shadow dom container to contain styles
   const docRoot = document.createElement('div');
@@ -110,16 +135,31 @@ export async function init({
     });
   }
 
+  const tabs = initializedIntegrations
+    .map(integration => {
+      if (integration.tabs) {
+        return integration.tabs({ processedEvents: [] }).map(tab => ({
+          ...tab,
+          processedEvents: [],
+        }));
+      }
+      return [];
+    })
+    .flat();
+
+  const initialTab = tabs.length ? `/${tabs[0].id}` : '/no-tabs';
+
   ReactDOM.createRoot(appRoot).render(
     // <React.StrictMode>
-    <App
-      integrations={initializedIntegrations}
-      openOnInit={openOnInit}
-      defaultEventId={defaultEventId}
-      showTriggerButton={showTriggerButton}
-      sidecarUrl={sidecarUrl}
-      anchor={anchor}
-    />,
+    <MemoryRouter initialEntries={[initialTab]}>
+      <App
+        integrations={initializedIntegrations}
+        openOnInit={openOnInit}
+        showTriggerButton={showTriggerButton}
+        sidecarUrl={sidecarUrl}
+        anchor={anchor}
+      />
+    </MemoryRouter>,
     // </React.StrictMode>
   );
 

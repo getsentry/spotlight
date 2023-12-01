@@ -4,6 +4,11 @@ description: Interface of an integration
 ---
 
 ```ts
+export type SpotlightContext = {
+  open: (path: string | undefined) => void;
+  close: () => void;
+};
+
 export type Integration<T = any> = {
   /**
    * Name of the integration
@@ -31,7 +36,7 @@ export type Integration<T = any> = {
    *
    * Use this hook to setup any global state, instrument handlers, etc.
    */
-  setup?: () => void | Promise<void>;
+  setup?: (context: SpotlightContext) => void | Promise<void>;
 
   /**
    * Hook called whenever spotlight forwards a new raw event to this integration.
