@@ -95,20 +95,16 @@ export default defineConfig({
               link: '/setup/',
             },
             {
-              label: 'with Sentry',
-              link: '/setup/sentry/',
-            },
-            {
               label: 'for Astro',
               link: '/setup/astro/',
             },
             {
-              label: 'for Remix',
-              link: '/setup/remix/',
+              label: 'for Other Frameworks',
+              link: '/setup/other/',
             },
             {
-              label: 'for SvelteKit',
-              link: '/setup/sveltekit/',
+              label: 'with Sentry',
+              link: '/setup/sentry/',
             },
           ],
         },
@@ -140,6 +136,9 @@ export default defineConfig({
       expressiveCode: {
         themes: ['starlight-dark'],
         useStarlightUiThemeColors: true,
+      },
+      editLink: {
+        baseUrl: 'https://github.com/getsentry/spotlight/edit/main/packages/website/',
       },
       customCss: ['./src/tailwind.css', './src/theme.css'],
     }),
