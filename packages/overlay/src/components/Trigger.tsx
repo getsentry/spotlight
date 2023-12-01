@@ -76,6 +76,7 @@ export default function Trigger({
         getAnchorClasses(anchor),
         isOpen ? '!hidden' : '',
       )}
+      title="Spotlight by Sentry"
       onClick={() => setOpen(!isOpen)}
     >
       <ToolbarItem count={countSum} severe={Boolean(notificationCount.severe)}>

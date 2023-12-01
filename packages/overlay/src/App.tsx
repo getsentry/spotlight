@@ -59,10 +59,18 @@ export default function App({
       setOpen(false);
     };
 
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event && event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 's') {
+        setOpen(prevValue => !prevValue);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
     spotlightEventTarget.addEventListener('open', onOpen);
     spotlightEventTarget.addEventListener('close', onClose);
 
     return () => {
+      document.removeEventListener('keydown', handleKeyPress);
       spotlightEventTarget.removeEventListener('open', onOpen);
       spotlightEventTarget.removeEventListener('close', onClose);
     };

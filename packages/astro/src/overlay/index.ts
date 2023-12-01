@@ -48,6 +48,14 @@ export default {
           }),
         );
       }, 500);
+
+      eventTarget.dispatchEvent(
+        new CustomEvent('toggle-plugin', {
+          detail: {
+            state: true,
+          },
+        }),
+      );
     });
 
     Spotlight.onSevereEvent(() => {
