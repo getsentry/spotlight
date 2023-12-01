@@ -60,7 +60,7 @@ export default function App({
     };
 
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event && event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 's') {
+      if (event && (event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 's') {
         setOpen(prevValue => !prevValue);
       }
     };
