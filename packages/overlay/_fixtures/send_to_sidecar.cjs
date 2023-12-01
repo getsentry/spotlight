@@ -25,7 +25,7 @@ function sendData(filePath) {
 
     const options = {
       hostname: 'localhost',
-      port: 8969,
+      port: process.env.PORT_NUMBER || 8969,
       path: '/stream',
       method: 'POST',
       headers: headers,

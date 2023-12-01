@@ -1,3 +1,4 @@
 #!/usr/bin/env node
 const { setupSidecar } = await import('./dist/main.js');
-setupSidecar();
+const port = process.argv[2];
+setupSidecar(port);
