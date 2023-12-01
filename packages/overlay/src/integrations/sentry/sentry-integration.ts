@@ -1,5 +1,6 @@
 import { Client, Envelope, Event, EventProcessor, Hub, Integration } from '@sentry/types';
 import { serializeEnvelope } from '@sentry/utils';
+import { log } from '../../lib/logger';
 
 type SpotlightBrowserIntegationOptions = {
   /**
@@ -17,7 +18,7 @@ export class Spotlight implements Integration {
 
   public constructor(options?: SpotlightBrowserIntegationOptions) {
     this._sidecarUrl = options?.sidecarUrl ?? 'http://localhost:8969/stream';
-    console.log('Spotlight: Using Sidecar URL', this._sidecarUrl);
+    log('Using Sidecar URL', this._sidecarUrl);
   }
 
   public setupOnce(addGlobalEventProcessor: (callback: EventProcessor) => void, getCurrentHub: () => Hub): void {
