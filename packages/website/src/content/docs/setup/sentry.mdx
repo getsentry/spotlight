@@ -3,19 +3,21 @@ title: Setup Spotlight with Sentry's SDKs
 description: Use Spotlight with Sentry
 ---
 
-Spotlight is built that you don't need Sentry to run it, it can contain any kind of integration. However, Sentry is the first integration we've built for Spotlight and it's a great way to get started.
+Spotlight is built that you don't need Sentry to run it. 
+It can contain any kind of integration. 
+However, Sentry is the first integration we've built for Spotlight and it's a **great way to get started**.
 
-As mentioned on the previous page, if you want that you Sentry SDKs talk to the Sidecar, enable the `spotlight` setting.
-You do not require a `DSN` for this to work.
+If you want your Sentry SDKs to talk to the Sidecar, enable the `spotlight` setting.
+You don't need a `dsn` for Spotlight to work.
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 <Tabs>
-  <TabItem label="JavaScript">
+  <TabItem label="JavaScript (Browser)">
   In the Browser you don't need to set `spotlight: true`, `Spotlight.init()` will automatically detect if Sentry is available and if so, hook into the SDK.
   ```javascript 
     Sentry.init({
-      dsn: 'DSN',
+      dsn: '___DSN___',
     });
     // In the frontend it's important that you init Spotlight after Sentry
     Spotlight.init();
@@ -27,7 +29,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   :::
   ```javascript
     Sentry.init({
-        dsn: 'DSN',
+        dsn: '___DSN___',
         spotlight: process.env.NODE_ENV === "development",
     });
   ```
@@ -38,7 +40,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   :::
   ```python 
     sentry_sdk.init(
-        dsn="DSN",
+        dsn="___DSN___",
         # You should only load this in your development environment
         spotlight=True,
     )
@@ -50,7 +52,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   :::
   ```php 
     \Sentry\init([
-        'dsn' => 'DSN',
+        'dsn' => '___DSN___',
         // You should only load this in your development environment
         'spotlight' => true,
     ]);
@@ -62,7 +64,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   :::
   ```ruby 
     Sentry.init do |config|
-        config.dsn = 'DSN'
+        config.dsn = '___DSN___'
         # You should only load this in your development environment
         config.spotlight = true
     end
