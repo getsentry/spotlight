@@ -27,7 +27,7 @@ function createStyleSheet(styles: string) {
 /**
  * Open the Spotlight debugger Window
  */
-export async function openSpotlight(path: string | undefined) {
+export async function openSpotlight(path?: string | undefined) {
   getSpotlightEventTarget().dispatchEvent(
     new CustomEvent('open', {
       detail: { path },
@@ -86,7 +86,6 @@ export async function trigger(eventName: string, payload: unknown) {
 export async function init({
   openOnInit = false,
   showTriggerButton = true,
-  defaultEventId,
   injectImmediately = false,
   sidecarUrl = DEFAULT_SIDECAR_URL,
   anchor = DEFAULT_ANCHOR,
@@ -156,7 +155,6 @@ export async function init({
       <App
         integrations={initializedIntegrations}
         openOnInit={openOnInit}
-        defaultEventId={defaultEventId}
         showTriggerButton={showTriggerButton}
         sidecarUrl={sidecarUrl}
         anchor={anchor}

@@ -14,7 +14,6 @@ type AppProps = Omit<SpotlightOverlayOptions, 'debug' | 'injectImmediately'> &
 export default function App({
   openOnInit = false,
   showTriggerButton = true,
-  defaultEventId,
   integrations = [],
   sidecarUrl,
   anchor,
@@ -112,7 +111,6 @@ export default function App({
         isOpen={isOpen}
         setOpen={setOpen}
         isOnline={isOnline}
-        defaultEventId={defaultEventId}
         integrations={integrations}
         integrationData={integrationData}
         setTriggerButtonCount={setTriggerButtonCount}
