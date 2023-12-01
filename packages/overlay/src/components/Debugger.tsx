@@ -81,6 +81,7 @@ export default function Debugger({
           integrations={integrations}
           integrationData={integrationData}
           setTriggerButtonCount={setNotificationCount}
+          setOpen={setOpen}
         />
       </div>
     </div>

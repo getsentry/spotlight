@@ -8,10 +8,12 @@ export default function Overview({
   integrations,
   integrationData,
   setTriggerButtonCount,
+  setOpen,
 }: {
   integrations: Integration[];
   integrationData: IntegrationData<unknown>;
   setTriggerButtonCount: (count: NotificationCount) => void;
+  setOpen: (value: boolean) => void;
 }) {
   const [notificationCountSum, setNotificationCountSum] = useState<NotificationCount>({ count: 0, severe: false });
 
@@ -49,7 +51,7 @@ export default function Overview({
   return (
     <>
       <MemoryRouter initialEntries={[initialTab]}>
-        <Tabs tabs={tabs} />
+        <Tabs tabs={tabs} setOpen={setOpen} />
         <Routes>
           <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={'not-found'}></Route>
           {tabs.map(tab => {
