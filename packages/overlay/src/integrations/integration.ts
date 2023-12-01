@@ -68,6 +68,11 @@ export type IntegrationTab<T> = {
     processedEvents: T[];
   }>;
 
+  /**
+   * Whether tab is active
+   */
+  active?: boolean;
+
   onSelect?: () => void;
 };
 
