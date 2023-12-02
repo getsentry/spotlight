@@ -20,10 +20,10 @@ export default function SdkList() {
         <CardList>
           {sdkList.map(sdk => {
             return (
-              <div className="flex items-center gap-x-4 px-6 py-4" key={`${sdk.name}-${sdk.version}`}>
+              <div className="flex items-center gap-x-4 px-6 py-2" key={`${sdk.name}-${sdk.version}`}>
                 <PlatformIcon platform={sdkToPlatform(sdk.name)} />
 
-                <div className="text-primary-300 flex flex-col truncate font-mono">
+                <div className="text-primary-300 flex flex-col truncate font-mono text-sm">
                   <div>{sdk.name}</div>
                   <div>{sdk.version}</div>
                   <TimeSince date={sdk.lastSeen} />

@@ -17,17 +17,17 @@ export default function TraceList() {
             const duration = getDuration(trace.start_timestamp, trace.timestamp);
             return (
               <Link
-                className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-4"
+                className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
                 key={trace.trace_id}
                 to={trace.trace_id}
               >
                 <PlatformIcon platform={trace.rootTransaction?.platform} />
 
-                <div className="text-primary-300 flex w-48 flex-col truncate font-mono">
+                <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
                   <div>{trace.trace_id.substring(0, 8)}</div>
                   <TimeSince date={trace.start_timestamp} />
                 </div>
-                <div className="flex flex-1 flex-col truncate font-mono">
+                <div className="flex flex-col truncate font-mono">
                   <div>{trace.rootTransactionName}</div>
                   <div className="text-primary-300 flex space-x-2 text-sm">
                     <div
