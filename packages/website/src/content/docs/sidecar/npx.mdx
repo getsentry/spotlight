@@ -8,15 +8,32 @@ To run Sidecar independently with NPX, run the following command:
 <Tabs>
   <TabItem label="npm and yarn">
     ```sh
-    npx @spotlightjs/spotlight
+    npx @spotlightjs/spotlight [optionalPort]
     ```
   </TabItem>
   <TabItem label="pnpm">
     ```sh
-    pnpx @spotlightjs/spotlight
+    pnpx @spotlightjs/spotlight [optionalPort]
     ```
   </TabItem>
 </Tabs>
 
 
-This starts the server on port `8969`.
+Replace `[optionalPort]` with the desired port number. If no port number is provided, the default port is set to `8969`.
+
+### Example
+
+<Tabs>
+  <TabItem label="npm and yarn">
+    ```sh
+    npx @spotlightjs/spotlight 3001
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```sh
+    pnpx @spotlightjs/spotlight 3001
+    ```
+  </TabItem>
+</Tabs>
+
+This command will start the Sidecar server on port `3001`. If no port is specified, the server will default to port `8969`.

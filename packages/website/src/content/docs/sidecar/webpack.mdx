@@ -27,8 +27,8 @@ module.exports = {
   },
   plugins: [
     new WebpackHookPlugin({
-      onBuildStart: ['npx @spotlightjs/spotlight'],
-      // Or you packagemanager of you choice e.g. yarn run spotlight-sidecar
+      onBuildStart: ['npx @spotlightjs/spotlight [optionalPort]'],
+      // Or your package manager of choice, e.g., yarn run spotlight-sidecar [optionalPort]
     }),
   ],
 };
