@@ -25,7 +25,14 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
     name: PKG_NAME,
 
     hooks: {
-      'astro:config:setup': async ({ command, injectScript, addDevOverlayPlugin, logger, config }) => {
+      'astro:config:setup': async ({
+        command,
+        injectScript,
+        addDevOverlayPlugin,
+        addDevToolbarApp,
+        logger,
+        config,
+      }) => {
         if (command === 'dev') {
           logger.info('[@spotlightjs/astro] Setting up Spotlight');
 
@@ -58,7 +65,14 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
 
           const importPath = path.dirname(url.fileURLToPath(import.meta.url));
           const pluginPath = path.join(importPath, 'overlay/index.ts');
-          addDevOverlayPlugin(pluginPath);
+
+          // `addDevToolbarApp` was added in Astro 4.0.0-beta.4
+          if (typeof addDevToolbarApp === 'function') {
+            addDevToolbarApp(pluginPath);
+          } else {
+            // fall back to old name for pre 4.x support
+            addDevOverlayPlugin(pluginPath);
+          }
         } else if (options?.__debugOptions) {
           injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, ...options }));
         }
