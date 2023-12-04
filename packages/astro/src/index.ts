@@ -1,4 +1,4 @@
-import type { AstroIntegration } from 'astro';
+import type { AstroConfig, AstroIntegration } from 'astro';
 import { buildClientInitSnippet, buildServerSnippet } from './snippets';
 
 import path from 'path';
@@ -8,6 +8,15 @@ import type { SpotlightAstroIntegrationOptions } from './types';
 import { errorPageInjectionPlugin } from './vite/error-page';
 
 const PKG_NAME = '@spotlightjs/astro';
+
+type AstroConfigWithExperimentalDevOverlay = AstroConfig & {
+  experimental?: {
+    /**
+     * This used to be the way of enabling the dev overlay pre Astro 4.x
+     */
+    devOverlay?: boolean;
+  };
+};
 
 const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegration => {
   const thisFilePath = url.fileURLToPath(import.meta.url);
@@ -30,19 +39,15 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
             ...(config.vite.plugins || []),
           ];
 
-          let showTriggerButton = true;
-          // We suppose with 4.0 this will be promoted top level and expimental will be removed
-          // to keep backwards compatibility we check both
-          // @ts-ignore
-          if (config.devOverlay) {
-            // @ts-ignore
-            showTriggerButton = config.devOverlay ? false : true;
-          }
-          // @ts-ignore
-          if (config.experimental?.devOverlay) {
-            // @ts-ignore
-            showTriggerButton = config.experimental?.devOverlay ? false : true;
-          }
+          // Since Astro 4.0.0-beta.4, `devToolbar` is set and enabled by default.
+          // For a brief amount of time it also used to be `devOverlay`
+          const hasToolbarEnabled = !config.devToolbar.enabled && !config.devOverlay.enabled;
+
+          // before Astro 4, `devOverlay` was disabled by default and under `experimental`
+          const hasExperimentalDevOverlayEnabled =
+            (config as AstroConfigWithExperimentalDevOverlay).experimental?.devOverlay === true;
+
+          const showTriggerButton = !hasToolbarEnabled && !hasExperimentalDevOverlayEnabled;
 
           injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, showTriggerButton, ...options }));
           injectScript('page-ssr', buildServerSnippet(options));
