@@ -40,12 +40,16 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
           ];
 
           // Since Astro 4.0.0-beta.4, `devToolbar` is set and enabled by default.
-          // For a brief amount of time it also used to be `devOverlay`
-          const hasToolbarEnabled = !config.devToolbar.enabled && !config.devOverlay.enabled;
+          // briefly, `devOverlay` was also added to the config but is now deprecated.
+          // Setting either of these to `true` or not setting any of them in the config file
+          // will lead to both of them being enabled by the time this hook is called.
+          // Setting one of them to `false` will not set the other one to false.
+          // Therefore, both of them have to be `true` that we know that the toolbar is in fact active.
+          const hasToolbarEnabled = config.devToolbar.enabled && config.devOverlay.enabled;
 
-          // before Astro 4, `devOverlay` was disabled by default and under `experimental`
-          const hasExperimentalDevOverlayEnabled =
-            (config as AstroConfigWithExperimentalDevOverlay).experimental?.devOverlay === true;
+          // Before Astro 4, `devOverlay` was disabled by default and under `experimental`
+          const hasExperimentalDevOverlayEnabled = !!(config as AstroConfigWithExperimentalDevOverlay).experimental
+            ?.devOverlay;
 
           const showTriggerButton = !hasToolbarEnabled && !hasExperimentalDevOverlayEnabled;
 
