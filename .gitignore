@@ -32,3 +32,6 @@ yalc.lock
 .vercel
 
 junit.xml
+
+# Build artifacts
+*.tgz
