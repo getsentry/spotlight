@@ -27,7 +27,8 @@
     ".": "./src/index.ts"
   },
   "peerDependencies": {
-    "astro": ">=3.4.0 || >=4.0.0-beta"
+    "astro": ">=3.4.0 || >=4.0.0-beta",
+    "@sentry/astro": ">=7.84.0"
   },
   "dependencies": {
     "@spotlightjs/overlay": "workspace:*",
