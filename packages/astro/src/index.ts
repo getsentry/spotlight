@@ -66,7 +66,7 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
           const importPath = path.dirname(url.fileURLToPath(import.meta.url));
           const pluginPath = path.join(importPath, 'overlay/index.ts');
 
-          // `addDevToolbarApp` was added in Astro 4.0.0-beta.4
+          // `addDevToolbarApp` was added in Astro 4.0.0-beta.4.
           if (typeof addDevToolbarApp === 'function') {
             addDevToolbarApp(pluginPath);
           } else {
