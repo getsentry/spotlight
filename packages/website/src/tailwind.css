@@ -8,6 +8,7 @@
 
 .neon-header {
   @apply font-raleway font-light;
+  word-wrap: break-word;
 }
 
 header.header {
