@@ -1,8 +1,8 @@
 import CardList from '~/components/CardList';
+import TimeSince from '../../../components/TimeSince';
 import { useSentrySdks } from '../data/useSentrySdks';
 import { sdkToPlatform } from '../utils/sdkToPlatform';
 import PlatformIcon from './PlatformIcon';
-import TimeSince from './TimeSince';
 
 export default function SdkList() {
   const sdkList = useSentrySdks();

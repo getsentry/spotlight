@@ -23,7 +23,6 @@ export default function PlatformIcon({
   event?: SentryEvent;
 }) {
   const name = platform || event?.platform || 'unknown';
-  console.log({ name });
   switch (name) {
     case 'ruby':
       return <RubyIcon width={size} height={size} {...props} />;
