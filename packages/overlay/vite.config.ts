@@ -13,11 +13,9 @@ const removeReactDevToolsMessagePlugin: () => Plugin = () => ({
     if (id.includes(`${sep}react-dom${sep}`) && code.includes('__REACT_DEVTOOLS_GLOBAL_HOOK__')) {
       const ms = new MagicString(code);
       ms.replaceAll('__REACT_DEVTOOLS_GLOBAL_HOOK__', '({ isDisabled: true })');
-      const map = ms.generateMap({ hires: true });
-      console.log(map);
       return {
         code: ms.toString(),
-        map,
+        map: ms.generateMap({ hires: true }),
       };
     }
   },
