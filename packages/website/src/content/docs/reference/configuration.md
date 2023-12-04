@@ -105,7 +105,7 @@ only the button is visible.
 Trigger an event within Spotlight.
 
 ```js
-import { trigger } as Spotlight from '@spotlightjs/spotlight';
+import { trigger } from '@spotlightjs/spotlight';
 
 trigger("sentry:showError", {
   event: string,
