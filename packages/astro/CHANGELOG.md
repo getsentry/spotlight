@@ -1,5 +1,16 @@
 # @spotlightjs/astro
 
+## 0.0.24
+
+### Patch Changes
+
+- Updated dependencies
+  [[`766e7d5`](https://github.com/getsentry/spotlight/commit/766e7d5ae8002e680e8d8b15db35a4e5b0519e55),
+  [`766e7d5`](https://github.com/getsentry/spotlight/commit/766e7d5ae8002e680e8d8b15db35a4e5b0519e55),
+  [`218be1c`](https://github.com/getsentry/spotlight/commit/218be1c252fd782437467b9abd9b6e117a9818b5),
+  [`e9e9839`](https://github.com/getsentry/spotlight/commit/e9e9839583f8e653362b140c549960f911053a98)]:
+  - @spotlightjs/overlay@0.0.21
+
 ## 0.0.23
 
 ### Patch Changes
