@@ -1,8 +1,27 @@
 import react from '@vitejs/plugin-react';
+import MagicString from 'magic-string';
+import { sep } from 'node:path';
 import { resolve } from 'path';
+import type { Plugin } from 'vite';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import svgr from 'vite-plugin-svgr';
+
+const removeReactDevToolsMessagePlugin: () => Plugin = () => ({
+  name: 'remove-react-devtools-message',
+  transform(code, id) {
+    if (id.includes(`${sep}react-dom${sep}`) && code.includes('__REACT_DEVTOOLS_GLOBAL_HOOK__')) {
+      const ms = new MagicString(code);
+      ms.replaceAll('__REACT_DEVTOOLS_GLOBAL_HOOK__', '({ isDisabled: true })');
+      const map = ms.generateMap({ hires: true });
+      console.log(map);
+      return {
+        code: ms.toString(),
+        map,
+      };
+    }
+  },
+});
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,6 +31,7 @@ export default defineConfig({
       insertTypesEntry: true,
     }),
     svgr(),
+    removeReactDevToolsMessagePlugin(),
   ],
   resolve: {
     alias: {
@@ -20,24 +40,11 @@ export default defineConfig({
   },
   build: {
     lib: {
-      // Could also be a dictionary or array of multiple entry points
       entry: resolve(__dirname, 'src/index.tsx'),
       name: 'sentry-spotlight',
       // the proper extensions will be added
       fileName: 'sentry-spotlight',
     },
     sourcemap: true,
-    // rollupOptions: {
-    //   // make sure to externalize deps that shouldn't be bundled
-    //   // into your library
-    //   external: ["vue"],
-    //   output: {
-    //     // Provide global variables to use in the UMD build
-    //     // for externalized deps
-    //     globals: {
-    //       vue: "Vue",
-    //     },
-    //   },
-    // },
   },
 });
