@@ -1,5 +1,19 @@
 # @spotlightjs/core
 
+## 0.0.21
+
+### Patch Changes
+
+- ref(integrations): Remove `severe` property from `processEvent` return type
+  ([#195](https://github.com/getsentry/spotlight/pull/195))
+
+- fix(overlay): Fix trigger button count ([#195](https://github.com/getsentry/spotlight/pull/195))
+
+- fix(sentry): Breadcrumbs UI improvement and minor bug fix (#194)
+  ([`218be1c`](https://github.com/getsentry/spotlight/commit/218be1c252fd782437467b9abd9b6e117a9818b5))
+
+- feat(overlay): Add tags to error event contexts view ([#199](https://github.com/getsentry/spotlight/pull/199))
+
 ## 0.0.20
 
 ### Patch Changes
