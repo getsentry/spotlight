@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { processEnvelope } from '../index';
-import sentryDataCache from './sentryDataCache';
+import sentryDataCache from '../integrations/sentry/data/sentryDataCache';
+import { processEnvelope } from '../integrations/sentry/index';
 
 import fs from 'fs';
 

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { generate_uuidv4 } from '../../../lib/uuid';
-import { Span } from '../types';
-import { groupSpans } from './traces';
+import { Span } from '../integrations/sentry/types';
+import { groupSpans } from '../integrations/sentry/utils/traces';
+import { generate_uuidv4 } from '../lib/uuid';
 
 function mockSpan({ duration, ...span }: Partial<Span> & { duration?: number } = {}): Span {
   const defaultTimestamp = new Date().getTime();
