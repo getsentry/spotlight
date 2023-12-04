@@ -235,8 +235,8 @@ importers:
         specifier: ^0.30.5
         version: 0.30.5
       platformicons:
-        specifier: ^5.6.2
-        version: 5.6.2(react@18.2.0)
+        specifier: ^5.8.3
+        version: 5.8.3(react@18.2.0)
       postcss:
         specifier: ^8.4.28
         version: 8.4.31
@@ -9318,9 +9318,9 @@ packages:
       pathe: 1.1.1
     dev: true
 
-  /platformicons@5.6.2(react@18.2.0):
+  /platformicons@5.8.3(react@18.2.0):
     resolution:
-      { integrity: sha512-2X/cWYohEqVAMQiz/MCVjgJaFEX/jiSXncqcgnMztPcsCSL5JpLn4d8CBeSBjpMIDTlCvGF90p0vM0oc7yGTpA== }
+      { integrity: sha512-uwqQaG0HKla+ZfzD0WDT5pikncd1lq26Vjppsy10GGLf6bxMfZ/4crgDKefcGrSr/R+I76asvAZVNQpKuhvPzA== }
     peerDependencies:
       react: '*'
     dependencies:
