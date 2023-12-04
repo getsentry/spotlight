@@ -1,6 +1,7 @@
 import { Envelope } from '@sentry/types';
 import { generate_uuidv4 } from '../../../lib/uuid';
 import { Sdk, SentryErrorEvent, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
+import { sdkToPlatform } from '../utils/sdkToPlatform';
 import { groupSpans } from '../utils/traces';
 
 function toTimestamp(date: string | number) {
@@ -13,14 +14,6 @@ type EventSubscription = ['event', (event: SentryEvent) => void];
 type TraceSubscription = ['trace', (trace: Trace) => void];
 
 type Subscription = OnlineSubscription | EventSubscription | TraceSubscription;
-
-function sdkToPlatform(name: string) {
-  if (name.indexOf('javascript') !== -1) return 'javascript';
-  if (name.indexOf('python') !== -1) return 'python';
-  if (name.indexOf('php') !== -1) return 'php';
-  if (name.indexOf('ruby') !== -1) return 'ruby';
-  return 'unknown';
-}
 
 class SentryDataCache {
   protected events: SentryEvent[] = [];

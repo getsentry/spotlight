@@ -1,15 +1,8 @@
 import CardList from '~/components/CardList';
 import { useSentrySdks } from '../data/useSentrySdks';
+import { sdkToPlatform } from '../utils/sdkToPlatform';
 import PlatformIcon from './PlatformIcon';
 import TimeSince from './TimeSince';
-
-function sdkToPlatform(name: string) {
-  if (name.indexOf('javascript') !== -1) return 'javascript';
-  if (name.indexOf('python') !== -1) return 'python';
-  if (name.indexOf('php') !== -1) return 'php';
-  if (name.indexOf('ruby') !== -1) return 'ruby';
-  return 'unknown';
-}
 
 export default function SdkList() {
   const sdkList = useSentrySdks();
