@@ -1,5 +1,25 @@
 # @spotlightjs/astro
 
+## 0.0.25
+
+### Patch Changes
+
+- feat(astro): Use Astro integration logger instead of default logger
+  ([#226](https://github.com/getsentry/spotlight/pull/226))
+
+- ref(astro): Check for Astro 4 `config.devToolbar` in Spotlight integration
+  ([#212](https://github.com/getsentry/spotlight/pull/212))
+
+- Updated dependencies
+  [[`d3d1770`](https://github.com/getsentry/spotlight/commit/d3d1770e450852c9cadaa279028084e9494cf657),
+  [`7f5b581`](https://github.com/getsentry/spotlight/commit/7f5b581a8e4599c6d42d485046399dc73f59f579),
+  [`129a3d4`](https://github.com/getsentry/spotlight/commit/129a3d4abdbcbe6c17007e352ee9e7d883febf25),
+  [`129a3d4`](https://github.com/getsentry/spotlight/commit/129a3d4abdbcbe6c17007e352ee9e7d883febf25),
+  [`688b07f`](https://github.com/getsentry/spotlight/commit/688b07ff0ccaee8b8aed71a856c4382906485f79),
+  [`0fdd4c3`](https://github.com/getsentry/spotlight/commit/0fdd4c3dc106c806037c1c419486f585d6f97e2d)]:
+  - @spotlightjs/overlay@0.0.22
+  - @spotlightjs/sidecar@0.0.16
+
 ## 0.0.24
 
 ### Patch Changes

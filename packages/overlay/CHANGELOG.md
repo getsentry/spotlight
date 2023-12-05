@@ -1,5 +1,18 @@
 # @spotlightjs/core
 
+## 0.0.22
+
+### Patch Changes
+
+- fix(overlay): Open overlay on Ctrl+F12 instead of Ctrl/Cmd+Shift+F12
+  ([#224](https://github.com/getsentry/spotlight/pull/224))
+
+- fix: Exports types from overlay ([#222](https://github.com/getsentry/spotlight/pull/222))
+
+- fix(overlay): Remove React Dev Tools warning ([#209](https://github.com/getsentry/spotlight/pull/209))
+
+- feat(overlay): Add Astro platform icon ([#214](https://github.com/getsentry/spotlight/pull/214))
+
 ## 0.0.21
 
 ### Patch Changes

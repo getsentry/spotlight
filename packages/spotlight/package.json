@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/spotlight",
   "description": "Spotlight - Sentry for development. Containing the overlay and the sidecar.",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
