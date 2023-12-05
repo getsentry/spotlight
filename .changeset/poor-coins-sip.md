@@ -2,4 +2,4 @@
 '@spotlightjs/spotlight': patch
 ---
 
-ref(spotlight): Adjust `setupSidecar` call to pass port in options object
+ref(spotlight): Adjust `setupSidecar` calls to pass port in options object
