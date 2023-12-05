@@ -5,7 +5,7 @@ export default function spotlightSidecar(port) {
     name: 'spotlightjs-sidecar',
 
     configureServer() {
-      setupSidecar(port);
+      setupSidecar({ port });
     },
   };
 }
