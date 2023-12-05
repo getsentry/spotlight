@@ -1,5 +1,15 @@
 # @spotlightjs/astro
 
+## 0.0.26
+
+### Patch Changes
+
+- fix(astro): Adjust dev toolbar check after Astro 4.0 stable release
+  ([#229](https://github.com/getsentry/spotlight/pull/229))
+
+- Add guard if Sentry SDK is not there
+  ([`7ba3809`](https://github.com/getsentry/spotlight/commit/7ba38099c347619ad36dc46ce2c24f77112303be))
+
 ## 0.0.25
 
 ### Patch Changes
