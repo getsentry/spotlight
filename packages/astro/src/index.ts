@@ -78,16 +78,18 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
         }
       },
 
-      'astro:server:start': async () => {
+      'astro:server:start': async ({ logger }) => {
         if (options?.sidecarUrl) {
+          logger.debug('Detected custom sidecar URL. Skipping default sidecar setup.');
           // If users set a custom sidecar URL, we assume they started the sidecar manually outside of Astro.
           // So we don't setup the default sidecar instance.
           return;
         }
+
         // Importing this dynamically because for some reason, the top level import
         // caused a dev server error because the sidecar code was bundled into the server
         const { setupSidecar } = await import('@spotlightjs/sidecar');
-        setupSidecar();
+        setupSidecar({ logger });
       },
     },
   };
