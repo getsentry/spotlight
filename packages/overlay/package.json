@@ -19,6 +19,7 @@
     "dist"
   ],
   "main": "./dist/sentry-spotlight.js",
+  "types": "./dist/sentry-spotlight.d.ts",
   "exports": {
     ".": {
       "types": "./dist/sentry-spotlight.d.ts",
