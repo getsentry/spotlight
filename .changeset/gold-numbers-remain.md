@@ -3,4 +3,4 @@
 '@spotlightjs/overlay': patch
 ---
 
-exports types from overlay
+fix: Exports types from overlay
