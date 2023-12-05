@@ -20,6 +20,7 @@
   },
   "main": "./dist/overlay.cjs",
   "module": "./dist/overlay.js",
+  "types": "./dist/overlay.d.ts",
   "exports": {
     ".": {
       "types": "./dist/overlay.d.ts",
