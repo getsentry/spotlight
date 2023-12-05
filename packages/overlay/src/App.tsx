@@ -26,11 +26,7 @@ export default function App({
   const [triggerButtonCount, setTriggerButtonCount] = useState<NotificationCount>({ count: 0, severe: false });
   const [isOpen, setOpen] = useState(openOnInit);
 
-  useKeyPress(['ctrlKey', 'shiftKey', 's'], () => {
-    setOpen(prev => !prev);
-  });
-
-  useKeyPress(['metaKey', 'shiftKey', 's'], () => {
+  useKeyPress(['ctrlKey', 'F12'], () => {
     setOpen(prev => !prev);
   });
 
