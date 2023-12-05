@@ -7,7 +7,8 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "playwright test"
   },
   "dependencies": {
     "@astrojs/node": "^6.0.4",
@@ -17,6 +18,8 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.3.1",
+    "@playwright/test": "^1.40.1",
+    "@types/node": "^18",
     "typescript": "^5.3.2"
   }
 }

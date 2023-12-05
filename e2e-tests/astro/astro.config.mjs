@@ -10,4 +10,5 @@ export default defineConfig({
   integrations: [sentry(), spotlightjs()],
   adapter: node({ mode: 'standalone' }),
   output: 'server',
+  devToolbar: { enabled: true },
 });
