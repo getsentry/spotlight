@@ -6,7 +6,7 @@ title: Run Sidecar with Webpack
 npm install webpack-hook-plugin @spotlightjs/spotlight --save-dev
 ```
 
-```js
+```js {2,20-23}
 // webpack.config.js
 const path = require("path");
 const WebpackHookPlugin = require("webpack-hook-plugin");
@@ -28,7 +28,7 @@ module.exports = {
   plugins: [
     new WebpackHookPlugin({
       onBuildStart: ['npx @spotlightjs/spotlight'],
-      // Or you packagemanager of you choice e.g. yarn run spotlight-sidecar
+      // Or you package manager of you choice e.g. yarn run spotlight-sidecar
     }),
   ],
 };
