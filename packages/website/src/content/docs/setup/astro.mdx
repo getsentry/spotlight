@@ -3,7 +3,7 @@ title: Using Spotlight with Astro
 description: A guide how to setup Spotlight for Astro
 ---
 
-Setting up Spotlight in Astro easy using Astro's extension system.
+Set up Spotlight in Astro with one command by using Astro's integration system.
 
 Start by adding the `@sentry/astro` and `@spotlightjs/astro` dependencies:
 
@@ -27,6 +27,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   </TabItem>
 </Tabs>
 
+
 After that, Astro should add the Sentry & Spotlight integration to your `astro.config.mjs` file and should look something like this.
 
 ```js
@@ -41,6 +42,11 @@ export default defineConfig({
   integrations: [sentry(), spotlightjs()]     
 });
 ```
+:::note[Sentry SDK Version]
+
+If you're already using the `@sentry/astro` SDK in your project, make sure it's on version 7.84.0 or newer.
+
+:::
 
 :::note[Sentry in Production]
 If you're using Sentry in production, don't forget to bind the `DSN` and source map configuration:
