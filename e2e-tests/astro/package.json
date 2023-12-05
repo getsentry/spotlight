@@ -10,8 +10,13 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^6.0.4",
     "@sentry/astro": "^7.85.0",
     "@spotlightjs/astro": "workspace:^",
     "astro": "^4.0.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.3.1",
+    "typescript": "^5.3.2"
   }
 }
