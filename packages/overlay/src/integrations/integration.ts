@@ -1,9 +1,10 @@
 import { type ComponentType } from 'react';
-import { NotificationCount } from '~/types';
+import { type ExperimentsConfig, type NotificationCount } from '~/types';
 
 export type SpotlightContext = {
   open: (path: string | undefined) => void;
   close: () => void;
+  experiments: ExperimentsConfig;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,22 +1,19 @@
-import ReactDOM from 'react-dom/client';
-
 import fontStyles from '@fontsource/raleway/index.css?inline';
-
+import ReactDOM from 'react-dom/client';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App.tsx';
-import { DEFAULT_ANCHOR } from './components/Trigger.tsx';
+import { DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from './constants.ts';
 import globalStyles from './index.css?inline';
-import { SpotlightContext, initIntegrations } from './integrations/integration.ts';
+import { initIntegrations, type SpotlightContext } from './integrations/integration.ts';
 import { default as sentry } from './integrations/sentry/index.ts';
 import { getSpotlightEventTarget } from './lib/eventTarget.ts';
 import { activateLogger, log } from './lib/logger.ts';
+import { SpotlightContextProvider } from './lib/useSpotlightContext.tsx';
 import { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
 
 export { default as console } from './integrations/console/index.ts';
 export { default as sentry } from './integrations/sentry/index.ts';
 export { default as viteInspect } from './integrations/vite-inspect/index.ts';
-
-const DEFAULT_SIDECAR_URL = 'http://localhost:8969/stream';
 
 function createStyleSheet(styles: string) {
   const sheet = new CSSStyleSheet();
@@ -91,8 +88,11 @@ export async function init({
   anchor = DEFAULT_ANCHOR,
   debug = false,
   integrations,
+  experiments = DEFAULT_EXPERIMENTS,
 }: SpotlightOverlayOptions = {}) {
   if (typeof document === 'undefined') return;
+
+  const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };
 
   // We only want to intialize and inject spotlight once. If it's already
   // been initialized, we can just bail out.
@@ -111,6 +111,7 @@ export async function init({
   const context: SpotlightContext = {
     open: openSpotlight,
     close: closeSpotlight,
+    experiments: finalExperiments,
   };
 
   const [initializedIntegrations] = await initIntegrations(integrations ?? defaultInitegrations, context);
@@ -152,13 +153,15 @@ export async function init({
   ReactDOM.createRoot(appRoot).render(
     // <React.StrictMode>
     <MemoryRouter initialEntries={[initialTab]}>
-      <App
-        integrations={initializedIntegrations}
-        openOnInit={openOnInit}
-        showTriggerButton={showTriggerButton}
-        sidecarUrl={sidecarUrl}
-        anchor={anchor}
-      />
+      <SpotlightContextProvider context={context}>
+        <App
+          integrations={initializedIntegrations}
+          openOnInit={openOnInit}
+          showTriggerButton={showTriggerButton}
+          sidecarUrl={sidecarUrl}
+          anchor={anchor}
+        />
+      </SpotlightContextProvider>
     </MemoryRouter>,
     // </React.StrictMode>
   );

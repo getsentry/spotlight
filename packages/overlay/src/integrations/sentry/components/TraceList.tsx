@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import CardList from '~/components/CardList';
 import Badge from '../../../components/Badge';
+import CardList from '../../../components/CardList';
 import TimeSince from '../../../components/TimeSince';
 import classNames from '../../../lib/classNames';
+import { useSpotlightContext } from '../../../lib/useSpotlightContext';
 import { useSentryHelpers } from '../data/useSentryHelpers';
 import { useSentryTraces } from '../data/useSentryTraces';
 import { getDuration } from '../utils/duration';
@@ -13,8 +14,9 @@ import PlatformIcon from './PlatformIcon';
 export default function TraceList() {
   const traceList = useSentryTraces();
   const helpers = useSentryHelpers();
+  const context = useSpotlightContext();
 
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
   const filteredTraces = showAll ? traceList : traceList.filter(t => helpers.isLocalToSession(t.trace_id) !== false);
   const hiddenItemCount = traceList.length - filteredTraces.length;
 

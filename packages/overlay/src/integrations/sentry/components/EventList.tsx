@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Badge from '~/components/Badge';
-import CardList from '~/components/CardList';
+import { useSpotlightContext } from '~/lib/useSpotlightContext';
+import Badge from '../../../components/Badge';
+import CardList from '../../../components/CardList';
 import TimeSince from '../../../components/TimeSince';
 import { useSentryEvents } from '../data/useSentryEvents';
 import { useSentryHelpers } from '../data/useSentryHelpers';
@@ -17,10 +18,11 @@ function renderEvent(event: SentryEvent) {
 export default function EventList() {
   const events = useSentryEvents();
   const helpers = useSentryHelpers();
+  const context = useSpotlightContext();
 
   const matchingEvents = events.filter(e => e.type !== 'transaction');
 
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
   const filteredEvents = showAll
     ? matchingEvents
     : matchingEvents.filter(
