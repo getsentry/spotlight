@@ -41,7 +41,13 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
     processEvent: (event: RawEventContext) => processEnvelope(event),
 
     tabs: () => {
-      const errorsCount = sentryDataCache.getEvents().filter(e => e.type != 'transaction').length;
+      const errorsCount = sentryDataCache
+        .getEvents()
+        .filter(
+          e =>
+            e.type != 'transaction' &&
+            (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
+        ).length;
 
       return [
         {
@@ -57,7 +63,7 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
           id: 'traces',
           title: 'Traces',
           notificationCount: {
-            count: sentryDataCache.getTraces().length,
+            count: sentryDataCache.getTraces().filter(t => sentryDataCache.isTraceLocal(t.trace_id) !== false).length,
           },
           content: TracesTab,
         },

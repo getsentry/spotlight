@@ -21,6 +21,7 @@ class SentryDataCache {
   protected sdks: Sdk[] = [];
   protected traces: Trace[] = [];
   protected tracesById: { [id: string]: Trace } = {};
+  protected localTraceIds: Set<string> = new Set<string>();
 
   protected subscribers: Map<string, Subscription> = new Map();
 
@@ -99,9 +100,10 @@ class SentryDataCache {
     event.timestamp = toTimestamp(event.timestamp);
     if (event.start_timestamp) event.start_timestamp = toTimestamp(event.start_timestamp);
 
+    const traceCtx = event.contexts?.trace;
+
     this.events.push(event);
 
-    const traceCtx = event.contexts?.trace;
     if (traceCtx) {
       const existingTrace = this.tracesById[traceCtx.trace_id];
       const startTs = event.start_timestamp ? event.start_timestamp : new Date().getTime();
@@ -205,6 +207,27 @@ class SentryDataCache {
     return () => {
       this.subscribers.delete(id);
     };
+  }
+
+  /**
+   * Mark a traceId as being seen in the local session.
+   *
+   * @param traceId
+   */
+  trackLocalTrace(traceId: string) {
+    this.localTraceIds.add(traceId);
+  }
+
+  /**
+   * Determine if a traceId was seen in the local session.
+   *
+   * A result of `null` means "unknown", which implies there is no known
+   * information about any session-initiated traces.
+   */
+  isTraceLocal(traceId: string): boolean | null {
+    if (this.localTraceIds.has(traceId)) return true;
+    if (this.localTraceIds.size > 0) return false;
+    return null;
   }
 }
 
