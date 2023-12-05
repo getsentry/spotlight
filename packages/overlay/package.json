@@ -21,6 +21,7 @@
   "main": "./dist/sentry-spotlight.js",
   "exports": {
     ".": {
+      "types": "./dist/sentry-spotlight.d.ts",
       "import": "./dist/sentry-spotlight.js",
       "require": "./dist/sentry-spotlight.umd.cjs"
     }
