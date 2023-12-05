@@ -10,6 +10,8 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@sentry/astro": "^7.85.0",
+    "@spotlightjs/astro": "workspace:^",
     "astro": "^4.0.1"
   }
 }
