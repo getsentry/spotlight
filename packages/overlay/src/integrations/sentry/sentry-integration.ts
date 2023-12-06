@@ -1,6 +1,7 @@
 import { Client, Envelope, Event, EventProcessor, Hub, Integration } from '@sentry/types';
 import { serializeEnvelope } from '@sentry/utils';
 import { log } from '../../lib/logger';
+import sentryDataCache from './data/sentryDataCache';
 
 type SpotlightBrowserIntegationOptions = {
   /**
@@ -23,6 +24,11 @@ export class Spotlight implements Integration {
 
   public setupOnce(addGlobalEventProcessor: (callback: EventProcessor) => void, getCurrentHub: () => Hub): void {
     addGlobalEventProcessor(async (event: Event) => {
+      const traceId = event.contexts?.trace?.trace_id;
+      if (traceId) {
+        sentryDataCache.trackLocalTrace(traceId);
+      }
+
       if (event.type || !event.exception || !event.exception.values) {
         return event;
       }

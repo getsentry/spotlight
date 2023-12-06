@@ -1,13 +1,10 @@
 import { ComponentPropsWithoutRef } from 'react';
 import { ReactComponent as Logo } from '~/assets/glyph.svg';
+import { DEFAULT_ANCHOR } from '~/constants';
 import classNames from '../lib/classNames';
-import { NotificationCount } from '../types';
+import { NotificationCount, type AnchorConfig } from '../types';
 
-export const DEFAULT_ANCHOR = 'bottomRight';
-
-export type Anchor = 'bottomRight' | 'bottomLeft' | 'centerRight' | 'centerLeft' | 'topLeft' | 'topRight';
-
-function getAnchorClasses(anchor: Anchor) {
+function getAnchorClasses(anchor: AnchorConfig) {
   switch (anchor) {
     case 'centerRight':
       return 'bottom-[45%] right-4';
@@ -61,7 +58,7 @@ export default function Trigger({
   isOpen: boolean;
   setOpen: (value: boolean) => void;
   notificationCount: NotificationCount;
-  anchor?: Anchor;
+  anchor?: AnchorConfig;
 }) {
   const countSum = notificationCount.count;
   const iconSize = 24;

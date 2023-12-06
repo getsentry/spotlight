@@ -9,14 +9,11 @@ import DocsCta from './DocsCta.astro';
 import { Content as CodeBlock } from './codeblock.mdx';
 ---
 
-
 <style>
   img.centered {
     margin: 0 auto !important;
   }
-  
-  
-  </style>
+</style>
 
 <Highlight />
 
@@ -24,15 +21,14 @@ import { Content as CodeBlock } from './codeblock.mdx';
   <FeatureCard
     title="As easy as npm install"
     description="Install Spotlight, inject the Spotlight overlay and run the sidecar."
-    linkUrl="/setup"
+    linkUrl="/setup/"
     linkText="Setup"
   >
-    <img slot="image" class="!hidden md:!block lg:w-8/12 mt-12 mx-auto " src="/images/simple-event-flow.png"  />
+    <img slot="image" class="!hidden md:!block lg:w-8/12 mt-12 mx-auto" src="/images/simple-event-flow.png" />
     <CodeBlock />
-    <img class="md:!hidden mx-auto !mt-12 w-8/12" src="/images/simple-event-flow.png"  />
+    <img class="md:!hidden mx-auto !mt-12 w-8/12" src="/images/simple-event-flow.png" />
   </FeatureCard>
 </Section>
-
 
 <Section title="Your perfect dev companion">
   <FeatureCard
@@ -51,10 +47,9 @@ import { Content as CodeBlock } from './codeblock.mdx';
     title="Compatible with Sentry's universal SDKs"
     description="Take the power of Sentry's telemetry and bring that into your development environment with Errors and Traces in both Frontend and Backend."
     reverse
-    linkUrl="/setup/sentry/"
+    linkUrl="/integrations/sentry/"
     linkText="Configure with Sentry"
   >
-  
     <img class="block rounded-lg" src="/images/error.png" width="100%" style={{ maxWidth: 'unset' }} />
   </FeatureCard>
 </Section>

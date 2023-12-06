@@ -1,5 +1,52 @@
 # @spotlightjs/astro
 
+## 1.0.0
+
+### Major Changes
+
+- meta: Bump `@spotlightjs` packages to version 1.0.0 ([#228](https://github.com/getsentry/spotlight/pull/228))
+
+  This change sets all public `@spotlightjs` packages to major version 1.0.0. From now on, we will follow semantic
+  versioning.
+
+### Patch Changes
+
+- Updated dependencies
+  [[`240e6b8`](https://github.com/getsentry/spotlight/commit/240e6b823e1e5dc72501f70f9535c08848d35b83),
+  [`e18fb33`](https://github.com/getsentry/spotlight/commit/e18fb33de66f2bd9d549795b8f96d6e71b9214d6)]:
+  - @spotlightjs/overlay@1.0.0
+  - @spotlightjs/sidecar@1.0.0
+
+## 0.0.26
+
+### Patch Changes
+
+- fix(astro): Adjust dev toolbar check after Astro 4.0 stable release
+  ([#229](https://github.com/getsentry/spotlight/pull/229))
+
+- Add guard if Sentry SDK is not there
+  ([`7ba3809`](https://github.com/getsentry/spotlight/commit/7ba38099c347619ad36dc46ce2c24f77112303be))
+
+## 0.0.25
+
+### Patch Changes
+
+- feat(astro): Use Astro integration logger instead of default logger
+  ([#226](https://github.com/getsentry/spotlight/pull/226))
+
+- ref(astro): Check for Astro 4 `config.devToolbar` in Spotlight integration
+  ([#212](https://github.com/getsentry/spotlight/pull/212))
+
+- Updated dependencies
+  [[`d3d1770`](https://github.com/getsentry/spotlight/commit/d3d1770e450852c9cadaa279028084e9494cf657),
+  [`7f5b581`](https://github.com/getsentry/spotlight/commit/7f5b581a8e4599c6d42d485046399dc73f59f579),
+  [`129a3d4`](https://github.com/getsentry/spotlight/commit/129a3d4abdbcbe6c17007e352ee9e7d883febf25),
+  [`129a3d4`](https://github.com/getsentry/spotlight/commit/129a3d4abdbcbe6c17007e352ee9e7d883febf25),
+  [`688b07f`](https://github.com/getsentry/spotlight/commit/688b07ff0ccaee8b8aed71a856c4382906485f79),
+  [`0fdd4c3`](https://github.com/getsentry/spotlight/commit/0fdd4c3dc106c806037c1c419486f585d6f97e2d)]:
+  - @spotlightjs/overlay@0.0.22
+  - @spotlightjs/sidecar@0.0.16
+
 ## 0.0.24
 
 ### Patch Changes

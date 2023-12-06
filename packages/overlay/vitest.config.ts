@@ -13,7 +13,7 @@ export default defineConfig({
     },
     globals: true,
     // setupFiles: ["./src/test/setup-test-env.ts"],
-    include: ['./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    include: ['./test/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     watchExclude: ['.*\\/node_modules\\/.*', '.*\\/dist\\/.*'],
   },
   resolve: {

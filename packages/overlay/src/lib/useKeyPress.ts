@@ -9,11 +9,15 @@ import { useEffect } from 'react';
 export default function useKeyPress(keys: string[], action: () => void, propagate = false) {
   useEffect(() => {
     function onKeyup(e: KeyboardEvent) {
-      if (!propagate) e.stopPropagation();
+      if (!propagate) {
+        e.stopPropagation();
+      }
 
       if (
         keys.every((key: string) => {
-          if (key in e) return e[key as keyof KeyboardEvent];
+          if (key in e) {
+            return e[key as keyof KeyboardEvent];
+          }
           return e.key.toLowerCase() === key.toLowerCase();
         })
       ) {
@@ -23,6 +27,8 @@ export default function useKeyPress(keys: string[], action: () => void, propagat
 
     window.addEventListener('keyup', onKeyup);
 
-    return () => window.removeEventListener('keyup', onKeyup);
+    return () => {
+      window.removeEventListener('keyup', onKeyup);
+    };
   }, [keys, action, propagate]);
 }

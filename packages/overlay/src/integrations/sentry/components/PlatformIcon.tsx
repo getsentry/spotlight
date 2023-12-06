@@ -1,3 +1,4 @@
+import { ReactComponent as AstroIcon } from 'platformicons/svg/astro.svg';
 import { ReactComponent as DefaultIcon } from 'platformicons/svg/default.svg';
 import { ReactComponent as JavaScriptIcon } from 'platformicons/svg/javascript.svg';
 import { ReactComponent as NodeIcon } from 'platformicons/svg/nodejs.svg';
@@ -27,6 +28,8 @@ export default function PlatformIcon({
       return <RubyIcon width={size} height={size} {...props} />;
     case 'python':
       return <PythonIcon width={size} height={size} {...props} />;
+    case 'javascript.astro':
+      return <AstroIcon width={size} height={size} {...props} />;
     case 'javascript':
       return <JavaScriptIcon width={size} height={size} {...props} />;
     case 'node':

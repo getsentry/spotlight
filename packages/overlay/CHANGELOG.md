@@ -1,5 +1,32 @@
 # @spotlightjs/core
 
+## 1.0.0
+
+### Major Changes
+
+- meta: Bump `@spotlightjs` packages to version 1.0.0 ([#228](https://github.com/getsentry/spotlight/pull/228))
+
+  This change sets all public `@spotlightjs` packages to major version 1.0.0. From now on, we will follow semantic
+  versioning.
+
+### Patch Changes
+
+- feat(overlay): Add experiments configuration and Spotlight Context
+  ([#231](https://github.com/getsentry/spotlight/pull/231))
+
+## 0.0.22
+
+### Patch Changes
+
+- fix(overlay): Open overlay on Ctrl+F12 instead of Ctrl/Cmd+Shift+F12
+  ([#224](https://github.com/getsentry/spotlight/pull/224))
+
+- fix: Exports types from overlay ([#222](https://github.com/getsentry/spotlight/pull/222))
+
+- fix(overlay): Remove React Dev Tools warning ([#209](https://github.com/getsentry/spotlight/pull/209))
+
+- feat(overlay): Add Astro platform icon ([#214](https://github.com/getsentry/spotlight/pull/214))
+
 ## 0.0.21
 
 ### Patch Changes

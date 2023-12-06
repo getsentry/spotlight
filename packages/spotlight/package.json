@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/spotlight",
   "description": "Spotlight - Sentry for development. Containing the overlay and the sidecar.",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
@@ -20,6 +20,7 @@
   },
   "main": "./dist/overlay.cjs",
   "module": "./dist/overlay.js",
+  "types": "./dist/overlay.d.ts",
   "exports": {
     ".": {
       "types": "./dist/overlay.d.ts",
@@ -39,7 +40,7 @@
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
     "typescript": "^5.0.2",
-    "vite": "^4.5.0"
+    "vite": "^4.5.1"
   },
   "volta": {
     "extends": "../../package.json"

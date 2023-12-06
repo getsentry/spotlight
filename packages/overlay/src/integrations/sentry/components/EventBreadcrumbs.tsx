@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import classNames from '~/lib/classNames';
+import Time from '../../../components/Time';
 import { Breadcrumb, SentryEvent } from '../types';
-import Time from './Time';
 
 const EXAMPLE_BREADCRUMB = `Sentry.addBreadcrumb({
   category: "auth",

@@ -1,5 +1,22 @@
 # @spotlightjs/sidecar
 
+## 1.0.0
+
+### Major Changes
+
+- meta: Bump `@spotlightjs` packages to version 1.0.0 ([#228](https://github.com/getsentry/spotlight/pull/228))
+
+  This change sets all public `@spotlightjs` packages to major version 1.0.0. From now on, we will follow semantic
+  versioning.
+
+## 0.0.16
+
+### Patch Changes
+
+- feat(sidecar): Accept options object in `setupSidecar` ([#226](https://github.com/getsentry/spotlight/pull/226))
+
+- feat(sidecar): Inject optional custom logger ([#226](https://github.com/getsentry/spotlight/pull/226))
+
 ## 0.0.15
 
 ### Patch Changes

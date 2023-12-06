@@ -1,5 +1,10 @@
-import { Anchor } from './components/Trigger';
-import { Integration } from './integrations/integration';
+import { type Integration } from './integrations/integration';
+
+export type ExperimentName = 'sentry:focus-local-events';
+
+export type ExperimentsConfig = Record<ExperimentName, boolean>;
+
+export type AnchorConfig = 'bottomRight' | 'bottomLeft' | 'centerRight' | 'centerLeft' | 'topLeft' | 'topRight';
 
 export type SpotlightOverlayOptions = {
   /**
@@ -59,7 +64,7 @@ export type SpotlightOverlayOptions = {
    *
    * @default "bottomRight"
    */
-  anchor?: Anchor;
+  anchor?: AnchorConfig;
 
   /**
    * If set to `true`, the Spotlight overlay will log additional debug messages to the console.
@@ -72,6 +77,11 @@ export type SpotlightOverlayOptions = {
    * TODO: Remove? No longer needed with new approach
    */
   defaultEventId?: string;
+
+  /**
+   * Experimental configuration.
+   */
+  experiments?: ExperimentsConfig;
 };
 
 export type NotificationCount = {

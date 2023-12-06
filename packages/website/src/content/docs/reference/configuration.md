@@ -70,11 +70,35 @@ init({
 });
 ```
 
+### `experiments`
+
+**type:** [`ExperimentsConfig`](#experimentsconfig)
+
+Experimental configuration.
+
+```ts
+init({
+  experiments: {
+    'sentry:focus-local-events': false,
+  },
+});
+```
+
 #### `AnchorConfig`
 
 ```ts
 type AnchorConfig = 'bottomRight' | 'bottomLeft' | 'centerRight' | 'centerLeft' | 'topLeft' | 'topRight';
 ```
+
+#### `ExperimentsConfig`
+
+```ts
+type ExperimentsConfig = Record<ExperimentName, boolean>;
+```
+
+Experiment names are:
+
+- `sentry:focus-local-events` - if set to true, errors and traces will hide events from other sessions when possible.
 
 ### `injectImmediately`
 
@@ -107,7 +131,7 @@ Trigger an event within Spotlight.
 ```js
 import { trigger } from '@spotlightjs/spotlight';
 
-trigger("sentry:showError", {
+trigger('sentry:showError', {
   event: string,
   eventId: string,
 });

@@ -5,16 +5,21 @@ This is package is specifically built to add Spotlight to your Astro application
 ## Installation
 
 ```js
-npx astro add @spotlightjs/astro
+npx astro add @sentry/astro @spotlightjs/astro
 ```
 
 ## Usage
 
 ```js
 // astro.config.mjs
-import spotlight from '@spotlightjs/astro';
+import { defineConfig } from 'astro/config';
 
+import sentry from '@sentry/astro';
+import spotlightjs from '@spotlightjs/astro';
+
+// https://astro.build/config
 export default defineConfig({
-  integrations: [spotlight()],
+  // Order matters here!  `sentry()` should come before `spotlightjs()`
+  integrations: [sentry(), spotlightjs()],
 });
 ```

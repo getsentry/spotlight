@@ -1,19 +1,38 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import CardList from '~/components/CardList';
+import Badge from '../../../components/Badge';
+import CardList from '../../../components/CardList';
+import TimeSince from '../../../components/TimeSince';
 import classNames from '../../../lib/classNames';
+import { useSpotlightContext } from '../../../lib/useSpotlightContext';
+import { useSentryHelpers } from '../data/useSentryHelpers';
 import { useSentryTraces } from '../data/useSentryTraces';
 import { getDuration } from '../utils/duration';
+import HiddenItemsButton from './HiddenItemsButton';
 import PlatformIcon from './PlatformIcon';
-import TimeSince from './TimeSince';
 
 export default function TraceList() {
   const traceList = useSentryTraces();
+  const helpers = useSentryHelpers();
+  const context = useSpotlightContext();
+
+  const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
+  const filteredTraces = showAll ? traceList : traceList.filter(t => helpers.isLocalToSession(t.trace_id) !== false);
+  const hiddenItemCount = traceList.length - filteredTraces.length;
 
   return (
     <>
       {traceList.length !== 0 ? (
         <CardList>
-          {traceList.map(trace => {
+          {hiddenItemCount > 0 && (
+            <HiddenItemsButton
+              itemCount={hiddenItemCount}
+              onClick={() => {
+                setShowAll(true);
+              }}
+            />
+          )}
+          {filteredTraces.map(trace => {
             const duration = getDuration(trace.start_timestamp, trace.timestamp);
             return (
               <Link
@@ -24,7 +43,12 @@ export default function TraceList() {
                 <PlatformIcon platform={trace.rootTransaction?.platform} />
 
                 <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
-                  <div>{trace.trace_id.substring(0, 8)}</div>
+                  <div className="flex items-center gap-x-2">
+                    <div>{trace.trace_id.substring(0, 8)}</div>
+                    {helpers.isLocalToSession(trace.trace_id) ? (
+                      <Badge title="This trace is part of your local session.">Local</Badge>
+                    ) : null}
+                  </div>
                   <TimeSince date={trace.start_timestamp} />
                 </div>
                 <div className="flex flex-col truncate font-mono">
