@@ -1,5 +1,22 @@
 # @spotlightjs/astro
 
+## 1.0.0
+
+### Major Changes
+
+- meta: Bump `@spotlightjs` packages to version 1.0.0 ([#228](https://github.com/getsentry/spotlight/pull/228))
+
+  This change sets all public `@spotlightjs` packages to major version 1.0.0. From now on, we will follow semantic
+  versioning.
+
+### Patch Changes
+
+- Updated dependencies
+  [[`240e6b8`](https://github.com/getsentry/spotlight/commit/240e6b823e1e5dc72501f70f9535c08848d35b83),
+  [`e18fb33`](https://github.com/getsentry/spotlight/commit/e18fb33de66f2bd9d549795b8f96d6e71b9214d6)]:
+  - @spotlightjs/overlay@1.0.0
+  - @spotlightjs/sidecar@1.0.0
+
 ## 0.0.26
 
 ### Patch Changes
