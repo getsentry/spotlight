@@ -1,5 +1,19 @@
 # @spotlightjs/core
 
+## 1.0.0
+
+### Major Changes
+
+- meta: Bump `@spotlightjs` packages to version 1.0.0 ([#228](https://github.com/getsentry/spotlight/pull/228))
+
+  This change sets all public `@spotlightjs` packages to major version 1.0.0. From now on, we will follow semantic
+  versioning.
+
+### Patch Changes
+
+- feat(overlay): Add experiments configuration and Spotlight Context
+  ([#231](https://github.com/getsentry/spotlight/pull/231))
+
 ## 0.0.22
 
 ### Patch Changes
