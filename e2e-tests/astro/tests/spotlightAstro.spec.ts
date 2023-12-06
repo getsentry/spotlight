@@ -3,7 +3,7 @@ import { waitForAstroToolbar } from './utils/test-utils';
 
 const ASTRO_TOOLBAR_SPOTLIGHT_BTN = 'button[data-plugin-id="spotlight-plugin"]';
 
-test('has Astro Dev Toolbar and Spotlight toolbar app', async ({ page }) => {
+test('has Astro Dev Toolbar', async ({ page }) => {
   await page.goto('http://localhost:4321');
 
   await expect(page).toHaveTitle(/Astro/);
@@ -25,17 +25,34 @@ test('Astro dev toolbar has spotlight button', async ({ page }) => {
   expect(spotlightTriggerButtonVisible).toBe(false);
 });
 
-test('clicking on spotlight button opens and closes spotlight', async ({ page }) => {
+test('clicking on spotlight button opens and closes Spotlight', async ({ page }) => {
   await page.goto('http://localhost:4321');
   await waitForAstroToolbar(page);
 
+  // Closed at the beginning
+  await expect(page.getByText('Connected to Sidecar')).toBeHidden();
+
+  // Open after first click
   await page.click(ASTRO_TOOLBAR_SPOTLIGHT_BTN);
+  await expect(page.getByText('Connected to Sidecar')).toBeVisible();
 
-  await page.waitForTimeout(1000);
-  expect(await page.getByText('Spotlight by Sentry').isVisible()).toBe(true);
-
+  // Close after another click
   await page.click(ASTRO_TOOLBAR_SPOTLIGHT_BTN);
-  await page.waitForTimeout(1000);
+  await expect(page.getByText('Connected to Sidecar')).toBeHidden();
+});
 
-  expect(await page.getByText('Spotlight by Sentry').isVisible()).toBe(false);
+test('pressing CTRL+F12 opens and closes Spotlight', async ({ page }) => {
+  await page.goto('http://localhost:4321');
+  await waitForAstroToolbar(page);
+
+  // Closed at the beginning
+  await expect(page.getByText('Connected to Sidecar')).toBeHidden();
+
+  // Open after first keypress
+  await page.keyboard.press('Control+F12');
+  await expect(page.getByText('Connected to Sidecar')).toBeVisible();
+
+  // Close after first keypress
+  await page.keyboard.press('Control+F12');
+  await expect(page.getByText('Connected to Sidecar')).toBeHidden();
 });
