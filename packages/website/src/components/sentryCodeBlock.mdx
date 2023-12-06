@@ -34,7 +34,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
     sentry_sdk.init(
         dsn="___DSN___",
         # You should only load this in your development environment
-        spotlight=True,
+        spotlight=bool(os.environ.get("DEV")),
     )
   ```
   </TabItem>
@@ -46,7 +46,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
     \Sentry\init([
         'dsn' => '___DSN___',
         // You should only load this in your development environment
-        'spotlight' => true,
+        'spotlight' => App::environment(['local']),
     ]);
   ```
   </TabItem>
@@ -58,7 +58,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
     Sentry.init do |config|
         config.dsn = '___DSN___'
         # You should only load this in your development environment
-        config.spotlight = true
+        config.spotlight = Rails.env.development?
     end
   ```
   </TabItem>
