@@ -13,10 +13,10 @@
     "clean": "rimraf .astro .vercel .vite-inspect"
   },
   "dependencies": {
-    "@astrojs/react": "^3.0.6",
+    "@astrojs/react": "^3.0.7",
     "@astrojs/starlight": "^0.13.0",
     "@astrojs/starlight-tailwind": "^2.0.1",
-    "@astrojs/tailwind": "^5.0.2",
+    "@astrojs/tailwind": "^5.0.3",
     "@astrojs/vercel": "^5.2.0",
     "@fontsource/raleway": "^5.0.15",
     "@sentry/astro": "^7.85.0",
@@ -24,7 +24,7 @@
     "@spotlightjs/overlay": "workspace:*",
     "@types/react": "^18.2.38",
     "@types/react-dom": "^18.2.17",
-    "astro": "^3.6.0",
+    "astro": "^4.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sharp": "^0.32.6",

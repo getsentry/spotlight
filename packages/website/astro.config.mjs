@@ -22,9 +22,7 @@ export default defineConfig({
       sourcemap: true,
     },
   },
-  experimental: {
-    devOverlay: true,
-  },
+  devOverlay: true,
   integrations: [
     sentry({
       debug: true,
