@@ -26,6 +26,11 @@ export default defineConfig({
   integrations: [
     sentry({
       debug: true,
+      dsn: 'https://b6308e6c658001f198a10016d828a0d9@o1.ingest.sentry.io/4506349052231680',
+      sourceMapsUploadOptions: {
+        project: 'spotlight-website',
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+      },
     }),
     spotlight({
       debug: true,
