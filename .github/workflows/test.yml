@@ -1,4 +1,4 @@
-name: Test
+name: Build & Test
 
 on:
   push:
@@ -6,7 +6,8 @@ on:
   pull_request:
 
 jobs:
-  test:
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +21,12 @@ jobs:
         run: pnpm install
       - name: Build packages
         run: pnpm build
+
+  test-unit:
+    name: Unit Tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Run tests
         run: pnpm test:ci
       - name: Publish Test Report
@@ -31,3 +38,11 @@ jobs:
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  test-e2e:
+    name: E2E Tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run tests
+        run: pnpm test:e2e:ci
