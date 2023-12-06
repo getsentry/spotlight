@@ -2,9 +2,26 @@
 title: Roadmap
 description: The future of Spotlight - How we think of it today.
 ---
+import Roadmap from '../../components/Roadmap.astro'
+import RoadmapEntry from '../../components/RoadmapEntry.astro'
 
-
-import Roadmap from './roadmap.astro'
-
-
-<Roadmap />
+<Roadmap>
+    <RoadmapEntry 
+    title="Spotlight v1 (Astro)"
+    date="Released on December 6th, 2023"
+    description="Spotlight first shipped in December 2023. It's an overlay similar to Chrome Devtools leveraging Sentry SDKs to
+        capture events launching with native Astro support."
+        linkText="Share your thoughts here"
+        linkUrl="https://github.com/getsentry/spotlight/discussions/215" />
+    <RoadmapEntry 
+    title="Spotlight v2"
+    date="Planned to release in January 2024"
+    description="Expand platform native support (TBD). Enable Spotlight to replace native framework error pages."
+    />
+    <RoadmapEntry 
+    title="Spotlight v3"
+    date="TBD"
+    description="Tell us what you think and start a discussion on Github here:"
+        linkText="Github Discussions"
+        linkUrl="https://github.com/getsentry/spotlight/discussions/" />
+</Roadmap>
