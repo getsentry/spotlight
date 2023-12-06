@@ -3,8 +3,10 @@ title: Using Spotlight with Astro
 description: A guide how to setup Spotlight for Astro
 ---
 
-Set up Spotlight in Astro with one command by using Astro's integration system.
+By Adding Spotlight to your Astro application, you can get deep insights into errors and performance issues across your entire stacks.
+On this page you'll learn how to install and add Spotlight to your Astro Dev Toolbar with just one command.
 
+## 1. Installation
 Start by adding the `@sentry/astro` and `@spotlightjs/astro` dependencies:
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
@@ -27,8 +29,11 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   </TabItem>
 </Tabs>
 
+## 2. Configuration
 
-After that, Astro should add the Sentry & Spotlight integration to your `astro.config.mjs` file and should look something like this.
+
+The Astro CLI should have already added the Sentry & Spotlight integration to your `astro.config.mjs` file during installation.
+It should look similarly to the example below. Otherwise, import and register the Sentry and Spotlight integrations:
 
 ```js {3-4, 9}
 import { defineConfig } from 'astro/config';  
@@ -44,7 +49,7 @@ export default defineConfig({
 ```
 :::note[Sentry SDK Version]
 
-If you're already using the `@sentry/astro` SDK in your project, make sure it's on version 7.84.0 or newer.
+If you're already using the `@sentry/astro` SDK in your application, make sure it's on version 7.84.0 or newer.
 
 :::
 
@@ -54,7 +59,7 @@ If you're using Sentry in production, don't forget to bind the `DSN` and source 
 See [Sentry's documentation](https://docs.sentry.io/platforms/javascript/guides/astro/) for more information.
 :::
 
-## Configure Other Sentry SDKs
+## 3. Configure Other Sentry SDKs
 
 If your Astro application is interacting with other services, such as a Python API, you can also configure those SDKs to work with Spotlight. You don't need to be using the Sentry service to take advantage of Sentry's SDKs to power Spotlight.
 
