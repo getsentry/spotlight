@@ -38,7 +38,7 @@ export default defineConfig({
         src: './public/images/glyph.svg',
       },
       social: {
-        discord: 'https://discord.gg/sentry',
+        discord: 'https://discord.com/channels/621778831602221064/1176977569678114847',
         github: 'https://github.com/getsentry/spotlight',
       },
       components: {
