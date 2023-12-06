@@ -1,3 +1,4 @@
 packages:
   - 'packages/*'
   - 'demos/*'
+  - 'e2e-tests/*'

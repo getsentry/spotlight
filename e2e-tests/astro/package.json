@@ -1,0 +1,26 @@
+{
+  "name": "@spotlightjs/e2e-tests-astro",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "dependencies": {
+    "@astrojs/node": "^6.0.4",
+    "@sentry/astro": "^7.85.0",
+    "@spotlightjs/astro": "workspace:^",
+    "astro": "^4.0.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.3.1",
+    "@playwright/test": "^1.40.1",
+    "@types/node": "^18",
+    "typescript": "^5.3.2"
+  }
+}
