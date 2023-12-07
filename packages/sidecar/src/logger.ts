@@ -6,10 +6,10 @@ export type SidecarLogger = {
 };
 
 const defaultLogger: SidecarLogger = {
-  info: (message: string) => console.log(message),
-  warn: (message: string) => console.warn(message),
-  error: (message: string) => console.error(message),
-  debug: (message: string) => console.debug(message),
+  info: (message: string) => console.log('🔎 [Spotlight]', message),
+  warn: (message: string) => console.warn('🔎 [Spotlight]', message),
+  error: (message: string) => console.error('🔎 [Spotlight]', message),
+  debug: (message: string) => console.debug('🔎 [Spotlight]', message),
 };
 
 let injectedLogger: SidecarLogger | undefined = undefined;

@@ -1,6 +1,6 @@
 import { createWriteStream, readFile } from 'fs';
 import { IncomingMessage, Server, ServerResponse, createServer } from 'http';
-import { extname, join, resolve } from 'path';
+import { extname, join } from 'path';
 import { createGunzip, createInflate } from 'zlib';
 import { SidecarLogger, activateLogger, logger } from './logger.js';
 import { MessageBuffer } from './messageBuffer.js';
@@ -23,6 +23,12 @@ type SideCarOptions = {
    * @default - a simple logger logging to the console.
    */
   logger?: SidecarLogger;
+
+  /**
+   * The base path of the sidecar.
+   * Defaults to '/dist/overlay'.
+   */
+  basePath?: string;
 };
 
 function getCorsHeader(): { [name: string]: string } {
@@ -33,7 +39,10 @@ function getCorsHeader(): { [name: string]: string } {
   };
 }
 
-function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: MessageBuffer<Payload>): void {
+/**
+ * Returns true of the request was handled, false otherwise.
+ */
+function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: MessageBuffer<Payload>): boolean {
   if (req.headers.accept && req.headers.accept == 'text/event-stream') {
     if (req.url == '/stream') {
       res.writeHead(200, {
@@ -62,6 +71,7 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
       res.writeHead(404);
       res.end();
     }
+    return true;
   } else {
     if (req.url == '/stream') {
       if (req.method === 'OPTIONS') {
@@ -113,15 +123,13 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
           res.end();
         });
       }
-    } else {
-      serveFile(req, res);
+      return true;
     }
   }
+  return false;
 }
 
-function serveFile(req: IncomingMessage, res: ServerResponse): void {
-  const basePath = process.env.SPOTLIGHT_SERVER_BASE_PATH || '/dist/overlay';
-
+function serveFile(req: IncomingMessage, res: ServerResponse, basePath: string): void {
   let filePath = '.' + req.url;
   if (filePath == './') {
     filePath = './src/index.html';
@@ -141,7 +149,7 @@ function serveFile(req: IncomingMessage, res: ServerResponse): void {
       break;
   }
 
-  readFile(join(resolve(), basePath, filePath), function (error, content) {
+  readFile(join(basePath, '/dist/overlay/', filePath), function (error, content) {
     if (error) {
       res.writeHead(404);
       res.end();
@@ -152,9 +160,12 @@ function serveFile(req: IncomingMessage, res: ServerResponse): void {
   });
 }
 
-function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
+function startServer(buffer: MessageBuffer<Payload>, port: number, basePath?: string): Server {
   const server = createServer((req, res) => {
-    handleStreamRequest(req, res, buffer);
+    const handled = handleStreamRequest(req, res, buffer);
+    if (!handled && basePath) {
+      serveFile(req, res, basePath);
+    }
   });
 
   server.on('error', e => {
@@ -167,9 +178,10 @@ function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
       }, 5000);
     }
   });
+
   server.listen(port, () => {
     logger.info(`Sidecar listening on ${port}`);
-    if (process.env.OVERLAY) {
+    if (basePath) {
       logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
     }
   });
@@ -187,7 +199,7 @@ const isValidPort = (value: string | number) => {
   return value > 0 && value <= 65535;
 };
 
-export function setupSidecar({ port, logger: customLogger }: SideCarOptions = {}): void {
+export function setupSidecar({ port, logger: customLogger, basePath }: SideCarOptions = {}): void {
   let sidecarPort = DEFAULT_PORT;
 
   if (customLogger) {
@@ -204,7 +216,7 @@ export function setupSidecar({ port, logger: customLogger }: SideCarOptions = {}
   const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
 
   if (!serverInstance) {
-    serverInstance = startServer(buffer, sidecarPort);
+    serverInstance = startServer(buffer, sidecarPort, basePath);
   }
 }
 

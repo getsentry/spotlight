@@ -367,9 +367,6 @@ importers:
       '@spotlightjs/astro':
         specifier: workspace:*
         version: link:../astro
-      '@spotlightjs/overlay':
-        specifier: workspace:*
-        version: link:../overlay
       '@types/react':
         specifier: ^18.2.38
         version: 18.2.38
