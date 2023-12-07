@@ -10,6 +10,12 @@ env:
   CACHED_BUILD_PATHS: |
     ${{ github.workspace }}/packages/*/dist
     ${{ github.workspace }}/packages/*/bin
+
+  DEP_CACHE_KEY: ${{ github.event.inputs.commit || github.sha }}
+  CACHED_DEP_PATHS: |
+    ${{ github.workspace }}/packages/*/node_modules  
+    ${{ github.workspace }}/node_modules
+
 jobs:
   build:
     name: Build
@@ -28,12 +34,17 @@ jobs:
       - name: Install deps
         run: pnpm install
 
+      - name: Update dependency cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CACHED_DEP_PATHS }}
+          key: ${{ env.DEP_CACHE_KEY }}
+
       - name: Build packages
         run: pnpm build
 
       - name: Update build cache
         uses: actions/cache@v3
-        id: cache_built_packages
         with:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
@@ -53,9 +64,14 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
 
-      - name: Update build cache
+      - name: Restore dependency cache
         uses: actions/cache@v3
-        id: cache_built_packages
+        with:
+          path: ${{ env.CACHED_DEP_PATHS }}
+          key: ${{ env.DEP_CACHE_KEY }}
+
+      - name: Restore build cache
+        uses: actions/cache@v3
         with:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
@@ -87,9 +103,14 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
 
-      - name: Update build cache
+      - name: Restore dependency cache
         uses: actions/cache@v3
-        id: cache_built_packages
+        with:
+          path: ${{ env.CACHED_DEP_PATHS }}
+          key: ${{ env.DEP_CACHE_KEY }}
+
+      - name: Restore build cache
+        uses: actions/cache@v3
         with:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
