@@ -1,5 +1,6 @@
-import { createWriteStream } from 'fs';
+import { createWriteStream, readFile } from 'fs';
 import { IncomingMessage, Server, ServerResponse, createServer } from 'http';
+import { join, resolve } from 'path';
 import { createGunzip, createInflate } from 'zlib';
 import { SidecarLogger, activateLogger, logger } from './logger.js';
 import { MessageBuffer } from './messageBuffer.js';
@@ -113,8 +114,15 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
         });
       }
     } else {
-      res.writeHead(404);
-      res.end();
+      readFile(join(resolve(), 'src', 'overlay.html'), (err, content) => {
+        if (err) {
+          res.writeHead(500);
+          res.end(`Something went wrong: ${err.code}`);
+        } else {
+          res.writeHead(200, { 'Content-Type': 'text/html' });
+          res.end(content, 'utf-8');
+        }
+      });
     }
   }
 }
@@ -134,6 +142,7 @@ function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
   });
   server.listen(port, () => {
     logger.info(`Sidecar listening on ${port}`);
+    logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
   });
 
   return server;
