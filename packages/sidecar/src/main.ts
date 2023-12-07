@@ -25,8 +25,8 @@ type SideCarOptions = {
   logger?: SidecarLogger;
 
   /**
-   * The base path of the sidecar.
-   * Defaults to '/dist/overlay'.
+   * The base path from where the static files should be served.
+   * '/dist/overlay' will always be appended to this path.
    */
   basePath?: string;
 };
