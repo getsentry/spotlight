@@ -120,7 +120,7 @@ jobs:
           key: ${{ env.BUILD_CACHE_KEY }}
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: pnpm exec playwright install --with-deps
 
       - name: Run tests
         run: pnpm test:e2e:ci
