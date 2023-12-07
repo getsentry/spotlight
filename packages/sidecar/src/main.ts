@@ -1,6 +1,6 @@
 import { createWriteStream, readFile } from 'fs';
 import { IncomingMessage, Server, ServerResponse, createServer } from 'http';
-import { join, resolve } from 'path';
+import { extname, join, resolve } from 'path';
 import { createGunzip, createInflate } from 'zlib';
 import { SidecarLogger, activateLogger, logger } from './logger.js';
 import { MessageBuffer } from './messageBuffer.js';
@@ -114,17 +114,42 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
         });
       }
     } else {
-      readFile(join(resolve(), 'src', 'overlay.html'), (err, content) => {
-        if (err) {
-          res.writeHead(500);
-          res.end(`Something went wrong: ${err.code}`);
-        } else {
-          res.writeHead(200, { 'Content-Type': 'text/html' });
-          res.end(content, 'utf-8');
-        }
-      });
+      serveFile(req, res);
     }
   }
+}
+
+function serveFile(req: IncomingMessage, res: ServerResponse): void {
+  const basePath = process.env.SPOTLIGHT_SERVER_BASE_PATH || '/dist/overlay';
+
+  let filePath = '.' + req.url;
+  if (filePath == './') {
+    filePath = './src/index.html';
+  }
+
+  const extName = extname(filePath);
+  let contentType = 'text/html';
+  switch (extName) {
+    case '.js':
+      contentType = 'text/javascript';
+      break;
+    case '.css':
+      contentType = 'text/css';
+      break;
+    case '.json':
+      contentType = 'application/json';
+      break;
+  }
+
+  readFile(join(resolve(), basePath, filePath), function (error, content) {
+    if (error) {
+      res.writeHead(404);
+      res.end();
+    } else {
+      res.writeHead(200, { 'Content-Type': contentType });
+      res.end(content, 'utf-8');
+    }
+  });
 }
 
 function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
@@ -134,15 +159,19 @@ function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
 
   server.on('error', e => {
     if ('code' in e && e.code === 'EADDRINUSE') {
+      logger.info(`Port ${port} in use, retrying...`);
       setTimeout(() => {
         server.close();
         server.listen(port);
+        logger.info(`Port ${port} in use, retrying...`);
       }, 5000);
     }
   });
   server.listen(port, () => {
     logger.info(`Sidecar listening on ${port}`);
-    logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
+    if (process.env.OVERLAY) {
+      logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
+    }
   });
 
   return server;

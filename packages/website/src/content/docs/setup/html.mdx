@@ -1,0 +1,30 @@
+---
+title: Setup Spotlight Overlay directly in HTML
+description: Use the overlay directly in HTML
+---
+
+
+
+```html
+<!doctype html>
+<html>
+  <head>
+    <title>Spotlight</title>
+    <!-- Set process for development environment -->
+    <script>
+      window.process = { env: { NODE_ENV: 'development' } };
+    </script>
+    <!-- Load Spotlight.js from the CDN -->
+    <script type="module" src="https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.js"></script>
+  </head>
+  <body>
+    <!-- Import and initialize Spotlight in a separate script tag -->
+    <script type="module">
+      import * as Spotlight from 'https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.js';
+      Spotlight.init({
+        openOnInit: true,
+      });
+    </script>
+  </body>
+</html>
+```
