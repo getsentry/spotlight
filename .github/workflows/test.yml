@@ -1,33 +1,123 @@
-name: Test
+name: Build & Test
 
 on:
   push:
     branches: [main]
   pull_request:
 
+env:
+  BUILD_CACHE_KEY: ${{ github.event.inputs.commit || github.sha }}
+  CACHED_BUILD_PATHS: |
+    ${{ github.workspace }}/packages/*/dist
+    ${{ github.workspace }}/packages/*/bin
+
+  DEP_CACHE_KEY: ${{ github.event.inputs.commit || github.sha }}
+  CACHED_DEP_PATHS: |
+    ${{ github.workspace }}/packages/*/node_modules  
+    ${{ github.workspace }}/e2e-tests/*/node_modules  
+    ${{ github.workspace }}/demos/*/node_modules  
+    ${{ github.workspace }}/node_modules
+
 jobs:
-  test:
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Install pnpm
         uses: pnpm/action-setup@v2
+
       - name: Setup Node
         uses: actions/setup-node@v3
+
       - name: Install deps
         run: pnpm install
+
+      - name: Update dependency cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CACHED_DEP_PATHS }}
+          key: ${{ env.DEP_CACHE_KEY }}
+
       - name: Build packages
         run: pnpm build
+
+      - name: Update build cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CACHED_BUILD_PATHS }}
+          key: ${{ env.BUILD_CACHE_KEY }}
+
+  test-unit:
+    name: Unit Tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Restore dependency cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CACHED_DEP_PATHS }}
+          key: ${{ env.DEP_CACHE_KEY }}
+
+      - name: Restore build cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CACHED_BUILD_PATHS }}
+          key: ${{ env.BUILD_CACHE_KEY }}
+
       - name: Run tests
         run: pnpm test:ci
+
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v4
         if: success() || failure()
         with:
           report_paths: '**/junit.xml'
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  test-e2e:
+    name: E2E Tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Restore dependency cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CACHED_DEP_PATHS }}
+          key: ${{ env.DEP_CACHE_KEY }}
+
+      - name: Restore build cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CACHED_BUILD_PATHS }}
+          key: ${{ env.BUILD_CACHE_KEY }}
+
+      - name: Run tests
+        run: pnpm test:e2e:ci
