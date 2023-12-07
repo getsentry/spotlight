@@ -54,7 +54,7 @@ Set this option if you have the sidecar running on another URL than the default 
 
 ```ts
 init({
-  sidecar: 'http://localhost:8969/stream',
+  sidecarUrl: 'http://localhost:8969/stream',
 });
 ```
 
