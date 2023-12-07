@@ -9,7 +9,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:ci": "playwright install --with-deps && playwright test"
   },
   "dependencies": {
     "@astrojs/node": "^6.0.4",

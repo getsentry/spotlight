@@ -14,7 +14,7 @@
     "test": "pnpm -r --stream --parallel run test",
     "test:e2e": "pnpm -r --stream --parallel run test:e2e",
     "test:ci": "CI=true pnpm -r run test:ci",
-    "test:e2e:ci": "CI=true pnpm -r run test:e2e",
+    "test:e2e:ci": "CI=true pnpm -r run test:e2e:ci",
     "yalc:publish": "yalc publish --push --sig --private",
     "changeset:add": "pnpm changeset",
     "changeset:consume": "pnpm changeset version",
