@@ -166,6 +166,10 @@ function startServer(buffer: MessageBuffer<Payload>, port: number, basePath?: st
     if (!handled && basePath) {
       serveFile(req, res, basePath);
     }
+    if (!handled && !basePath) {
+      res.writeHead(404);
+      res.end();
+    }
   });
 
   server.on('error', e => {
