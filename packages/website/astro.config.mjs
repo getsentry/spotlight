@@ -109,6 +109,10 @@ export default defineConfig({
               label: 'for Other Frameworks',
               link: '/setup/other/',
             },
+            {
+              label: 'Just HTML',
+              link: '/setup/html/',
+            },
           ],
         },
         {
