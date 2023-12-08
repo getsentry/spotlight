@@ -1,5 +1,6 @@
-import { createWriteStream } from 'fs';
+import { createWriteStream, readFile } from 'fs';
 import { IncomingMessage, Server, ServerResponse, createServer } from 'http';
+import { extname, join } from 'path';
 import { createGunzip, createInflate } from 'zlib';
 import { SidecarLogger, activateLogger, logger } from './logger.js';
 import { MessageBuffer } from './messageBuffer.js';
@@ -22,6 +23,12 @@ type SideCarOptions = {
    * @default - a simple logger logging to the console.
    */
   logger?: SidecarLogger;
+
+  /**
+   * The base path from where the static files should be served.
+   * '/dist/overlay' will always be appended to this path.
+   */
+  basePath?: string;
 };
 
 function getCorsHeader(): { [name: string]: string } {
@@ -32,7 +39,10 @@ function getCorsHeader(): { [name: string]: string } {
   };
 }
 
-function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: MessageBuffer<Payload>): void {
+/**
+ * Returns true of the request was handled, false otherwise.
+ */
+function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: MessageBuffer<Payload>): boolean {
   if (req.headers.accept && req.headers.accept == 'text/event-stream') {
     if (req.url == '/stream') {
       res.writeHead(200, {
@@ -61,6 +71,7 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
       res.writeHead(404);
       res.end();
     }
+    return true;
   } else {
     if (req.url == '/stream') {
       if (req.method === 'OPTIONS') {
@@ -112,28 +123,71 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
           res.end();
         });
       }
+      return true;
+    }
+  }
+  return false;
+}
+
+function serveFile(req: IncomingMessage, res: ServerResponse, basePath: string): void {
+  let filePath = '.' + req.url;
+  if (filePath == './') {
+    filePath = './src/index.html';
+  }
+
+  const extName = extname(filePath);
+  let contentType = 'text/html';
+  switch (extName) {
+    case '.js':
+      contentType = 'text/javascript';
+      break;
+    case '.css':
+      contentType = 'text/css';
+      break;
+    case '.json':
+      contentType = 'application/json';
+      break;
+  }
+
+  readFile(join(basePath, '/dist/overlay/', filePath), function (error, content) {
+    if (error) {
+      res.writeHead(404);
+      res.end();
     } else {
+      res.writeHead(200, { 'Content-Type': contentType });
+      res.end(content, 'utf-8');
+    }
+  });
+}
+
+function startServer(buffer: MessageBuffer<Payload>, port: number, basePath?: string): Server {
+  const server = createServer((req, res) => {
+    const handled = handleStreamRequest(req, res, buffer);
+    if (!handled && basePath) {
+      serveFile(req, res, basePath);
+    }
+    if (!handled && !basePath) {
       res.writeHead(404);
       res.end();
     }
-  }
-}
-
-function startServer(buffer: MessageBuffer<Payload>, port: number): Server {
-  const server = createServer((req, res) => {
-    handleStreamRequest(req, res, buffer);
   });
 
   server.on('error', e => {
     if ('code' in e && e.code === 'EADDRINUSE') {
+      logger.info(`Port ${port} in use, retrying...`);
       setTimeout(() => {
         server.close();
         server.listen(port);
+        logger.info(`Port ${port} in use, retrying...`);
       }, 5000);
     }
   });
+
   server.listen(port, () => {
     logger.info(`Sidecar listening on ${port}`);
+    if (basePath) {
+      logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
+    }
   });
 
   return server;
@@ -149,7 +203,7 @@ const isValidPort = (value: string | number) => {
   return value > 0 && value <= 65535;
 };
 
-export function setupSidecar({ port, logger: customLogger }: SideCarOptions = {}): void {
+export function setupSidecar({ port, logger: customLogger, basePath }: SideCarOptions = {}): void {
   let sidecarPort = DEFAULT_PORT;
 
   if (customLogger) {
@@ -166,7 +220,7 @@ export function setupSidecar({ port, logger: customLogger }: SideCarOptions = {}
   const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
 
   if (!serverInstance) {
-    serverInstance = startServer(buffer, sidecarPort);
+    serverInstance = startServer(buffer, sidecarPort, basePath);
   }
 }
 

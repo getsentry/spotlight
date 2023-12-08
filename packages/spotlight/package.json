@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite build --watch",
-    "build": "vite build && tsc",
+    "build": "vite build && vite build --config vite.overlay.config.ts && tsc",
     "build:watch": "vite build --watch",
     "yalc:publish": "yalc publish --push --sig --private",
     "clean": "rimraf dist"

@@ -5,7 +5,6 @@ export class MessageBuffer<T> {
   private head = 0;
   private timeout = 10;
   private readers = new Map<string, (item: T) => void>();
-  private timeoutId: NodeJS.Timeout | undefined;
 
   constructor(size = 100) {
     this.size = size;
@@ -33,19 +32,15 @@ export class MessageBuffer<T> {
   subscribe(callback: (item: T) => void): string {
     const readerId = generateUuidv4();
     this.readers.set(readerId, callback);
-    clearTimeout(this.timeoutId);
-    this.timeoutId = setTimeout(() => this.stream(readerId));
+    setTimeout(() => this.stream(readerId));
     return readerId;
   }
 
   unsubscribe(readerId: string): void {
     this.readers.delete(readerId);
-    clearTimeout(this.timeoutId);
   }
 
   stream(readerId: string, readPos = this.head): void {
-    clearTimeout(this.timeoutId);
-
     const cb = this.readers.get(readerId);
     if (!cb) return;
 
@@ -62,7 +57,7 @@ export class MessageBuffer<T> {
       atReadPos += 1;
     }
 
-    this.timeoutId = setTimeout(() => this.stream(readerId, atReadPos), 500);
+    setTimeout(() => this.stream(readerId, atReadPos), 500);
   }
 }
 
