@@ -26,7 +26,6 @@ type SideCarOptions = {
 
   /**
    * The base path from where the static files should be served.
-   * '/dist/overlay' will always be appended to this path.
    */
   basePath?: string;
 };
@@ -128,7 +127,6 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
   }
   return false;
 }
-
 function serveFile(req: IncomingMessage, res: ServerResponse, basePath: string): void {
   let filePath = '.' + req.url;
   if (filePath == './') {
@@ -149,7 +147,7 @@ function serveFile(req: IncomingMessage, res: ServerResponse, basePath: string):
       break;
   }
 
-  readFile(join(basePath, '/dist/overlay/', filePath), function (error, content) {
+  readFile(join(basePath, filePath), function (error, content) {
     if (error) {
       res.writeHead(404);
       res.end();
