@@ -1,5 +1,15 @@
 # @spotlightjs/sidecar
 
+## 1.1.0
+
+### Minor Changes
+
+- Serve Overlay from Sidecar ([#248](https://github.com/getsentry/spotlight/pull/248))
+
+### Patch Changes
+
+- Fix Sidecar Multitenancy ([#248](https://github.com/getsentry/spotlight/pull/248))
+
 ## 1.0.0
 
 ### Major Changes
