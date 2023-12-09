@@ -1,5 +1,16 @@
 # @spotlightjs/spotlight
 
+## 1.1.1
+
+### Patch Changes
+
+- Fix Overlay loading path
+  ([`3fd1029`](https://github.com/getsentry/spotlight/commit/3fd1029a1d16a68bae16155a10d72903b7acd2b5))
+
+- Updated dependencies
+  [[`3fd1029`](https://github.com/getsentry/spotlight/commit/3fd1029a1d16a68bae16155a10d72903b7acd2b5)]:
+  - @spotlightjs/sidecar@1.1.1
+
 ## 1.1.0
 
 ### Minor Changes
