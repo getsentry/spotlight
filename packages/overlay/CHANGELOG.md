@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 1.0.1
+
+### Patch Changes
+
+- added expand collapse for spans ([#253](https://github.com/getsentry/spotlight/pull/253))
+
 ## 1.0.0
 
 ### Major Changes
