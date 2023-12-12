@@ -29,7 +29,7 @@ const createWindow = () => {
     backgroundColor: '#1e1b4b',
   });
 
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
     win.loadURL(process.env['ELECTRON_RENDERER_URL']);
