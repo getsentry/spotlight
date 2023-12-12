@@ -18,6 +18,7 @@ export default function App({
   integrations = [],
   sidecarUrl,
   anchor,
+  fullPage = false,
 }: AppProps) {
   log('App rerender');
 
@@ -113,12 +114,13 @@ export default function App({
         <Trigger isOpen={isOpen} setOpen={setOpen} notificationCount={triggerButtonCount} anchor={anchor} />
       )}
       <Debugger
-        isOpen={isOpen}
+        isOpen={fullPage || isOpen}
         setOpen={setOpen}
         isOnline={isOnline}
         integrations={integrations}
         integrationData={integrationData}
         setTriggerButtonCount={setTriggerButtonCount}
+        fullPage={fullPage}
       />
     </>
   );

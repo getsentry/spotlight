@@ -1,3 +1,4 @@
+import { setupSidecar } from '@spotlightjs/sidecar';
 import { attachTitlebarToWindow, setupTitlebar } from 'custom-electron-titlebar/main';
 import { BrowserWindow, app } from 'electron';
 import path from 'path';
@@ -45,4 +46,6 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+
+  setupSidecar();
 });

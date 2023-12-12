@@ -82,6 +82,13 @@ export type SpotlightOverlayOptions = {
    * Experimental configuration.
    */
   experiments?: ExperimentsConfig;
+
+  /**
+   * If set to `true`, the Spotlight overlay will be rendered in full page mode.
+   * It can't be closed nor minimized.
+   * This is useful for replaceing error page or in when directly rendered as an html page
+   */
+  fullPage?: boolean;
 };
 
 export type NotificationCount = {

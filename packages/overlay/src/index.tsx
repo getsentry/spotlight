@@ -89,6 +89,7 @@ export async function init({
   debug = false,
   integrations,
   experiments = DEFAULT_EXPERIMENTS,
+  fullPage = false,
 }: SpotlightOverlayOptions = {}) {
   if (typeof document === 'undefined') return;
 
@@ -160,6 +161,7 @@ export async function init({
           showTriggerButton={showTriggerButton}
           sidecarUrl={sidecarUrl}
           anchor={anchor}
+          fullPage={fullPage}
         />
       </SpotlightContextProvider>
     </MemoryRouter>,
