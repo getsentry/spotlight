@@ -7,5 +7,6 @@ export function sdkToPlatform(name: string) {
   if (name.includes('python')) return 'python';
   if (name.includes('php')) return 'php';
   if (name.includes('ruby')) return 'ruby';
+  if (name.includes('dotnet')) return 'dotnet';
   return 'unknown';
 }
