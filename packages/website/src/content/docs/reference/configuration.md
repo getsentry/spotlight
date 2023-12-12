@@ -124,7 +124,7 @@ init({
 If set to `true`, the Spotlight overlay Window will be opened immediately after calling the init function. By default,
 only the button is visible.
 
-## `trigger`
+### `trigger`
 
 Trigger an event within Spotlight.
 
@@ -140,3 +140,11 @@ trigger('sentry:showError', {
 ```ts
 type TriggerFunction = (eventName: string, eventPayload?: unknown)
 ```
+
+### `fullPage`
+
+**type:** `boolean` **default:** `false`
+
+If set to `true`, the Spotlight overlay will be rendered directly in the HTML as a relative `<div/>`. It's helpful and
+goes well with `injectImmediately`. It's used for rendering a blocking page like an error page or dedicated HTML. Also
+the ability for closing the overlay is disabled when this is avitce.
