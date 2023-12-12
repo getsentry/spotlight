@@ -9,8 +9,12 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build"
   },
-  "volta": {
-    "extends": "../../package.json"
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "icon": "./src/icons/mac/icon.icns"
+      }
+    }
   },
   "dependencies": {
     "@spotlightjs/overlay": "workspace:*",
@@ -18,5 +22,8 @@
     "custom-electron-titlebar": "^4.2.7",
     "electron": "^28.0.0",
     "electron-vite": "^1.0.29"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }
