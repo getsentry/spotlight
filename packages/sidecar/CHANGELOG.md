@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 1.2.0
+
+### Minor Changes
+
+- Make shipped HTML fullscreen
+  ([`fdd14c7`](https://github.com/getsentry/spotlight/commit/fdd14c7e84172f2a0b9bc355968537e161335636))
+
 ## 1.1.1
 
 ### Patch Changes
