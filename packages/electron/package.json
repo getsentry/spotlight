@@ -1,0 +1,27 @@
+{
+  "name": "@spotlightjs/electron",
+  "description": "Electron app for Spotlight",
+  "author": "Sentry",
+  "license": "Apache-2.0",
+  "private": true,
+  "version": "0.0.1",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "start": "electron-vite preview",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "build:win": "pnpm build && electron-builder --win --config",
+    "build:mac": "pnpm build && electron-builder --mac --config",
+    "build:linux": "pnpm build && electron-builder --linux --config"
+  },
+  "devDependencies": {
+    "@spotlightjs/overlay": "workspace:*",
+    "@spotlightjs/sidecar": "workspace:*",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "electron-vite": "^1.0.29"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

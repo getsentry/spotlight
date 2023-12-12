@@ -89,6 +89,7 @@ export async function init({
   debug = false,
   integrations,
   experiments = DEFAULT_EXPERIMENTS,
+  fullPage = false,
 }: SpotlightOverlayOptions = {}) {
   if (typeof document === 'undefined') return;
 
@@ -121,10 +122,12 @@ export async function init({
   docRoot.id = 'sentry-spotlight-root';
   const shadow = docRoot.attachShadow({ mode: 'open' });
   const appRoot = document.createElement('div');
-  appRoot.style.position = 'absolute';
-  appRoot.style.top = '0';
-  appRoot.style.left = '0';
-  appRoot.style.right = '0';
+  if (!fullPage) {
+    appRoot.style.position = 'absolute';
+    appRoot.style.top = '0';
+    appRoot.style.left = '0';
+    appRoot.style.right = '0';
+  }
   shadow.appendChild(appRoot);
 
   const ssGlobal = createStyleSheet(globalStyles);
@@ -160,6 +163,7 @@ export async function init({
           showTriggerButton={showTriggerButton}
           sidecarUrl={sidecarUrl}
           anchor={anchor}
+          fullPage={fullPage}
         />
       </SpotlightContextProvider>
     </MemoryRouter>,

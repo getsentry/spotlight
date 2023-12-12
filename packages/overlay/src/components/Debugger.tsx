@@ -4,6 +4,34 @@ import { NotificationCount } from '~/types';
 import classNames from '../lib/classNames';
 import Overview from './Overview';
 
+function FullscreenBlur({
+  isOpen,
+  setOpen,
+  fullPage,
+  children,
+}: {
+  isOpen: boolean;
+  setOpen: (value: boolean) => void;
+  fullPage: boolean;
+  children: React.ReactNode;
+}) {
+  if (fullPage) {
+    return <>{children}</>;
+  }
+  return (
+    <div
+      className={classNames('spotlight-fullscreen-blur', isOpen ? '' : '!hidden')}
+      onClick={e => {
+        if (e.target === e.currentTarget) {
+          setOpen(false);
+        }
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function Debugger({
   integrations,
   isOpen,
@@ -11,6 +39,7 @@ export default function Debugger({
   integrationData,
   isOnline,
   setTriggerButtonCount: setNotificationCount,
+  fullPage,
 }: {
   integrations: Integration[];
   isOpen: boolean;
@@ -18,17 +47,11 @@ export default function Debugger({
   integrationData: IntegrationData<unknown>;
   isOnline: boolean;
   setTriggerButtonCount: (count: NotificationCount) => void;
+  fullPage: boolean;
 }) {
   return (
-    <div
-      className={classNames('fullscreen-blur', isOpen ? '' : '!hidden')}
-      onClick={e => {
-        if (e.target === e.currentTarget) {
-          setOpen(false);
-        }
-      }}
-    >
-      <div className="sentry-debugger">
+    <FullscreenBlur isOpen={isOpen} setOpen={setOpen} fullPage={fullPage}>
+      <div className={classNames('spotlight-debugger', fullPage ? 'spotlight-fullscreen' : '')}>
         <div className="text-primary-200 flex items-center gap-x-2 px-6 py-4">
           <h1 className="font-raleway flex flex-1 items-end gap-x-1 leading-7 opacity-80">
             <div className="inline-flex items-center gap-x-4">
@@ -66,14 +89,16 @@ export default function Debugger({
               </div>
             </div>
           </h1>
-          <button
-            className="hover:bg-primary-900 -my-1 -mr-3 cursor-pointer rounded px-3 py-1 font-mono text-2xl"
-            onClick={() => {
-              setOpen(false);
-            }}
-          >
-            {'✕'}
-          </button>
+          {!fullPage && (
+            <button
+              className="hover:bg-primary-900 -my-1 -mr-3 cursor-pointer rounded px-3 py-1 font-mono text-2xl"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              {'✕'}
+            </button>
+          )}
         </div>
 
         <Overview
@@ -83,6 +108,6 @@ export default function Debugger({
           setOpen={setOpen}
         />
       </div>
-    </div>
+    </FullscreenBlur>
   );
 }
