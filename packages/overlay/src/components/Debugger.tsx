@@ -4,6 +4,34 @@ import { NotificationCount } from '~/types';
 import classNames from '../lib/classNames';
 import Overview from './Overview';
 
+function FullscreenBlur({
+  isOpen,
+  setOpen,
+  fullPage,
+  children,
+}: {
+  isOpen: boolean;
+  setOpen: (value: boolean) => void;
+  fullPage: boolean;
+  children: React.ReactNode;
+}) {
+  if (fullPage) {
+    return <>{children}</>;
+  }
+  return (
+    <div
+      className={classNames('spotlight-fullscreen-blur', isOpen ? '' : '!hidden')}
+      onClick={e => {
+        if (e.target === e.currentTarget) {
+          setOpen(false);
+        }
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function Debugger({
   integrations,
   isOpen,
@@ -22,15 +50,8 @@ export default function Debugger({
   fullPage: boolean;
 }) {
   return (
-    <div
-      className={classNames('fullscreen-blur', isOpen ? '' : '!hidden')}
-      onClick={e => {
-        if (e.target === e.currentTarget) {
-          setOpen(false);
-        }
-      }}
-    >
-      <div className={classNames('sentry-debugger', fullPage ? 'fullscreen' : '')}>
+    <FullscreenBlur isOpen={isOpen} setOpen={setOpen} fullPage={fullPage}>
+      <div className={classNames('spotlight-debugger', fullPage ? 'spotlight-fullscreen' : '')}>
         <div className="text-primary-200 flex items-center gap-x-2 px-6 py-4">
           <h1 className="font-raleway flex flex-1 items-end gap-x-1 leading-7 opacity-80">
             <div className="inline-flex items-center gap-x-4">
@@ -87,6 +108,6 @@ export default function Debugger({
           setOpen={setOpen}
         />
       </div>
-    </div>
+    </FullscreenBlur>
   );
 }
