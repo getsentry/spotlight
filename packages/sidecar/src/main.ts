@@ -2,7 +2,7 @@ import { createWriteStream, readFile } from 'fs';
 import { IncomingMessage, Server, ServerResponse, createServer } from 'http';
 import { extname, join } from 'path';
 import { createGunzip, createInflate } from 'zlib';
-import { SidecarLogger, activateLogger, logger } from './logger.js';
+import { SidecarLogger, activateLogger, enableDebugLogging, logger } from './logger.js';
 import { MessageBuffer } from './messageBuffer.js';
 
 const DEFAULT_PORT = 8969;
@@ -28,6 +28,11 @@ type SideCarOptions = {
    * The base path from where the static files should be served.
    */
   basePath?: string;
+
+  /**
+   * More verbose logging.
+   */
+  debug?: boolean;
 };
 
 function getCorsHeader(): { [name: string]: string } {
@@ -202,11 +207,15 @@ const isValidPort = (value: string | number) => {
   return value > 0 && value <= 65535;
 };
 
-export function setupSidecar({ port, logger: customLogger, basePath }: SideCarOptions = {}): void {
+export function setupSidecar({ port, logger: customLogger, basePath, debug }: SideCarOptions = {}): void {
   let sidecarPort = DEFAULT_PORT;
 
   if (customLogger) {
     activateLogger(customLogger);
+  }
+
+  if (debug || process.env.SPOTLIGHT_DEBUG) {
+    enableDebugLogging(true);
   }
 
   if (port && !isValidPort(port)) {
