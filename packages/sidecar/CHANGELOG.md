@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 1.3.1
+
+### Patch Changes
+
+- Add debug mode ([`486f94b`](https://github.com/getsentry/spotlight/commit/486f94b6050be4761a119cb74f284edc93b04fab))
+
 ## 1.3.0
 
 ### Minor Changes
