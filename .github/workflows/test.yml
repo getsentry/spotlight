@@ -153,8 +153,5 @@ jobs:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
 
-      - name: Build
-        run: pnpm install && pnpm build
-
       - name: Build DMG
         run: cd packages/electron && pnpm install && pnpm build:mac
