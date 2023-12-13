@@ -7,5 +7,11 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@spotlightjs/astro-playground", "@spotlightjs/website", "@spotlightjs/demo-sveltekit"]
+  "ignore": [
+    "@spotlightjs/astro-playground",
+    "@spotlightjs/website",
+    "@spotlightjs/demo-sveltekit",
+    "@spotlightjs/electron",
+    "@spotlightjs/e2e-tests-astro"
+  ]
 }
