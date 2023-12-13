@@ -1,5 +1,15 @@
 # @spotlightjs/core
 
+## 1.2.0
+
+### Minor Changes
+
+- dotnet logo ([#265](https://github.com/getsentry/spotlight/pull/265))
+
+### Patch Changes
+
+- Fix react errors ([`0c2a229`](https://github.com/getsentry/spotlight/commit/0c2a229f53f356b6413fded3352f108c0d955333))
+
 ## 1.1.0
 
 ### Minor Changes
