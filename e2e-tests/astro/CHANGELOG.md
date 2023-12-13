@@ -1,5 +1,12 @@
 # @spotlightjs/e2e-tests-astro
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @spotlightjs/astro@1.0.4
+
 ## 0.0.4
 
 ### Patch Changes
