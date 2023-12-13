@@ -155,4 +155,4 @@ jobs:
           key: ${{ env.BUILD_CACHE_KEY }}
 
       - name: Build DM
-        run: cd packages/electron && pnpm build:mac
+        run: cd packages/electron && pnpm install && pnpm build:mac
