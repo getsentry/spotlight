@@ -153,7 +153,7 @@ jobs:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
 
-      - name: Build DM
+      - name: Build
         run: pnpm install && pnpm build
 
       - name: Build DMG
