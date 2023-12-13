@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 1.3.0
+
+### Minor Changes
+
+- ref(sidecar): Stream endpoint returns 200 instead of 204 ([#266](https://github.com/getsentry/spotlight/pull/266))
+
 ## 1.2.0
 
 ### Minor Changes
