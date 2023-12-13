@@ -2,4 +2,4 @@
 '@spotlightjs/sidecar': minor
 ---
 
-stream endpoint returns 200 instead of 204
+ref(sidecar): Stream endpoint returns 200 instead of 204
