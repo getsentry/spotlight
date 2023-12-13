@@ -124,7 +124,6 @@ jobs:
 
   electron:
     name: Electron Build
-    needs: build
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -155,4 +154,7 @@ jobs:
           key: ${{ env.BUILD_CACHE_KEY }}
 
       - name: Build DM
+        run: pnpm install && pnpm build
+
+      - name: Build DMG
         run: cd packages/electron && pnpm install && pnpm build:mac
