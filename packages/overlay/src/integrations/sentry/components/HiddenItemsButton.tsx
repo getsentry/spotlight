@@ -14,7 +14,7 @@ export default function HiddenItemsButton({
       <strong>
         {itemCount.toLocaleString()} {itemCount !== 1 ? 'items were' : 'item was'} hidden from different sessions.
       </strong>
-      <button className="hover:bg-primary-900 border-primary-500 rounded border px-1.5 py-0.5">Reveal</button>
+      <a className="hover:bg-primary-900 border-primary-500 rounded border px-1.5 py-0.5">Reveal</a>
     </button>
   );
 }

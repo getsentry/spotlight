@@ -21,6 +21,7 @@ export default function SpanTree({
       {tree.map(span => {
         return (
           <SpanItem
+            key={span.span_id}
             traceContext={traceContext}
             depth={depth}
             span={span}
