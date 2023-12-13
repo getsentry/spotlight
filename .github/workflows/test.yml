@@ -121,3 +121,38 @@ jobs:
 
       - name: Run tests
         run: pnpm test:e2e:ci
+
+  electron:
+    name: Electron Build
+    needs: build
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Restore dependency cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CACHED_DEP_PATHS }}
+          key: ${{ env.DEP_CACHE_KEY }}
+
+      - name: Restore build cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CACHED_BUILD_PATHS }}
+          key: ${{ env.BUILD_CACHE_KEY }}
+
+      - name: Build DM
+        run: cd packages/electron && pnpm build:mac

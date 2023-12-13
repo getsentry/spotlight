@@ -22,7 +22,7 @@ nsis:
   createDesktopShortcut: always
 mac:
   icon: resources/icons/mac/icon.icns
-  target: zip
+  target: dmg
   identity: null # don't sign the app
 #   entitlementsInherit: build/entitlements.mac.plist
 #   extendInfo:
