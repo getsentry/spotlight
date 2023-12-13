@@ -114,7 +114,8 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
             logger.info(`🗃️ Saved data to ${filename}`);
           }
 
-          res.writeHead(204, {
+          // 204 would be more appropriate but returning 200 to match what /envelope returns
+          res.writeHead(200, {
             'Cache-Control': 'no-cache',
             ...getCorsHeader(),
             Connection: 'keep-alive',
