@@ -124,6 +124,7 @@ jobs:
 
   electron:
     name: Electron Build
+    needs: build
     runs-on: ${{ matrix.os }}
 
     strategy:
