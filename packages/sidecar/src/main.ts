@@ -198,6 +198,7 @@ function startServer(buffer: MessageBuffer<Payload>, port: number, basePath?: st
 }
 
 let serverInstance: Server;
+const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
 
 const isValidPort = (value: string | number) => {
   if (typeof value === 'string') {
@@ -225,14 +226,16 @@ export function setupSidecar({ port, logger: customLogger, basePath, debug }: Si
     sidecarPort = typeof port === 'string' ? parseInt(port, 10) : port;
   }
 
-  const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
-
   if (!serverInstance) {
     serverInstance = startServer(buffer, sidecarPort, basePath);
   }
 }
 
-function shutdown() {
+export function clearBuffer(): void {
+  buffer.clear();
+}
+
+export function shutdown() {
   if (serverInstance) {
     logger.info('Shutting down Server');
     serverInstance.close();

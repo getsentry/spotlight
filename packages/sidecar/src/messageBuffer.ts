@@ -59,6 +59,13 @@ export class MessageBuffer<T> {
 
     setTimeout(() => this.stream(readerId, atReadPos), 500);
   }
+
+  clear(): void {
+    this.items = new Array(this.size);
+    this.writePos = 0;
+    this.head = 0;
+    this.readers = new Map<string, (item: T) => void>();
+  }
 }
 
 function generateUuidv4(): string {

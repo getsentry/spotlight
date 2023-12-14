@@ -14,9 +14,13 @@
     "build:mac": "pnpm build && electron-builder --mac --config",
     "build:linux": "pnpm build && electron-builder --linux --config"
   },
-  "devDependencies": {
+  "dependencies": {
     "@spotlightjs/overlay": "workspace:*",
-    "@spotlightjs/sidecar": "workspace:*",
+    "@spotlightjs/sidecar": "workspace:*"
+  },
+  "devDependencies": {
+    "@electron/notarize": "^2.2.0",
+    "dotenv": "^16.3.1",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1",
     "electron-vite": "^1.0.29"
