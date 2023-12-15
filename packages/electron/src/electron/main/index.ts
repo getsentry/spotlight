@@ -1,6 +1,12 @@
+import * as Sentry from '@sentry/electron/main';
 import { clearBuffer, setupSidecar } from '@spotlightjs/sidecar';
 import { BrowserWindow, Menu, app, shell } from 'electron';
 import path from 'path';
+
+Sentry.init({
+  dsn: 'https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976',
+  tracesSampleRate: 1.0,
+});
 
 let alwaysOnTop = false;
 

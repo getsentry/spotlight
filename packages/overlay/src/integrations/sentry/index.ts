@@ -12,6 +12,7 @@ const HEADER = 'application/x-sentry-envelope';
 
 type SentryIntegrationOptions = {
   sidecarUrl?: string;
+  injectIntoSDK?: boolean;
 };
 
 export default function sentryIntegration(options?: SentryIntegrationOptions) {
@@ -119,6 +120,7 @@ export function processEnvelope({ data }: RawEventContext) {
 }
 
 function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
+  if (options?.injectIntoSDK === false) return;
   // A very hacky way to hook into Sentry's SDK
   // but we love hacks
   const sentryHub = (window as WindowWithSentry).__SENTRY__?.hub;

@@ -33,6 +33,7 @@ yalc.lock
 .vercel
 .env
 *.p12
+sentry.properties
 
 junit.xml
 

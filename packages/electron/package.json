@@ -15,15 +15,17 @@
     "build:linux": "pnpm build && electron-builder --linux --config"
   },
   "dependencies": {
+    "@sentry/electron": "4.15.1",
     "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*"
   },
   "devDependencies": {
     "@electron/notarize": "^2.2.0",
+    "@sentry/vite-plugin": "2.10.2",
     "dotenv": "^16.3.1",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1",
-    "electron-vite": "^1.0.29"
+    "electron-vite": "^2.0.0-beta.1"
   },
   "volta": {
     "extends": "../../package.json"
