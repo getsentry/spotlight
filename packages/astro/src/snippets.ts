@@ -9,7 +9,7 @@ export type ClientInitOptions = {
   injectImmediately?: boolean;
 } & SpotlightAstroIntegrationOptions;
 
-const buildClientImport = (importPath: string) => `import * as Spotlight from '${importPath}';`;
+const buildClientImport = (importPath: string) => `import * as Spotlight from ${JSON.stringify(importPath)};`;
 
 const buildClientInit = (options: ClientInitOptions) => {
   const integrationCalls = options.integrationNames
