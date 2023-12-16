@@ -13,9 +13,10 @@
 }
 
 .spotlight-fullscreen {
-  @apply relative h-screen w-screen rounded-none;
+  @apply relative rounded-none shadow-none;
   margin: 0;
 }
+
 /* .sentry-debugger .tree li {
   position: relative;
 }

@@ -1,6 +1,7 @@
 import fontStyles from '@fontsource/raleway/index.css?inline';
 import ReactDOM from 'react-dom/client';
 import { MemoryRouter } from 'react-router-dom';
+import colors from 'tailwindcss/colors';
 import App from './App.tsx';
 import { DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from './constants.ts';
 import globalStyles from './index.css?inline';
@@ -122,7 +123,10 @@ export async function init({
   docRoot.id = 'sentry-spotlight-root';
   const shadow = docRoot.attachShadow({ mode: 'open' });
   const appRoot = document.createElement('div');
-  if (!fullPage) {
+  if (fullPage) {
+    docRoot.style.height = '100%';
+    docRoot.style.backgroundColor = colors.indigo[950];
+  } else {
     appRoot.style.position = 'absolute';
     appRoot.style.top = '0';
     appRoot.style.left = '0';

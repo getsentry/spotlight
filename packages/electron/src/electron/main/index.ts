@@ -52,6 +52,12 @@ const createWindow = () => {
   win.webContents.on('did-start-loading', () => {
     clearBuffer();
   });
+
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.executeJavaScript(
+      `document.querySelector('#sentry-spotlight-root').shadowRoot.querySelector('.spotlight-fullscreen > :first-child').style.cssText = 'padding-top: 34px; -webkit-user-select: none; -webkit-app-region:drag;'`,
+    );
+  });
 };
 
 app.on('window-all-closed', () => {
