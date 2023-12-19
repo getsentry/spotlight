@@ -1,4 +1,10 @@
-# spotlight
+# @spotlightjs/electron
+
+## 0.0.7
+
+### Patch Changes
+
+- Publish ([`bde85dd`](https://github.com/getsentry/spotlight/commit/bde85dd39629575706eacf537ba31036f7f791cc))
 
 ## 0.0.6
 
