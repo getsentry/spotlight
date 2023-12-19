@@ -1,5 +1,11 @@
 # spotlight
 
+## 0.0.5
+
+### Patch Changes
+
+- Publish ([`11b9ab8`](https://github.com/getsentry/spotlight/commit/11b9ab83bca07b8700e84de5f7b257b4292c6de7))
+
 ## 0.0.4
 
 ### Patch Changes
