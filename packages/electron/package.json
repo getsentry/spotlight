@@ -10,7 +10,7 @@
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
-    "build:mac": "pnpm build && electron-builder --config"
+    "build:mac": "pnpm build && node electron-builder.js"
   },
   "dependencies": {
     "@sentry/electron": "4.15.1",
