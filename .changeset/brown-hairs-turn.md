@@ -1,0 +1,5 @@
+---
+'spotlight': patch
+---
+
+Publish step

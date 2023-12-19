@@ -67,4 +67,23 @@ jobs:
         run: pnpm build
 
       - name: Build Electron
+        env:
+          APPLEID: ${{ secrets.APPLEID }}
+          APPLEIDPASS: ${{ secrets.APPLEIDPASS }}
+          TEAMID: ${{ secrets.TEAMID }}
+          CERT_PASS: ${{ secrets.CERT_PASS }}
+          MAIN_VITE_SENTRY_ORG: ${{ secrets.MAIN_VITE_SENTRY_ORG }}
+          MAIN_VITE_SENTRY_PROJECT: ${{ secrets.MAIN_VITE_SENTRY_PROJECT }}
+          MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: cd packages/electron && pnpm build:mac
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/*.zip
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
