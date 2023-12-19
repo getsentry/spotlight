@@ -43,11 +43,12 @@ jobs:
 
   electron:
     name: Electron Build
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-12
 
     strategy:
+      fail-fast: false
       matrix:
-        os: [macos-latest, macos-13-large]
+        platform: [x64, arm64]
 
     steps:
       - uses: actions/checkout@v4
@@ -84,6 +85,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: packages/electron/dist/*.zip
-          tag: Electron App
+          tag: ${{ github.ref }}
+          release_name: Electron App
           overwrite: true
           file_glob: true
