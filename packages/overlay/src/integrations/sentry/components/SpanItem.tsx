@@ -13,15 +13,17 @@ const SpanItem = ({
   totalDuration,
   depth = 1,
   traceContext,
+  collapsible = false,
 }: {
   span: Span;
   startTimestamp: number;
   totalDuration: number;
   depth?: number;
   traceContext: TraceContext;
+  collapsible?: boolean;
 }) => {
   const { spanId } = useParams();
-  const [renderChildren, setRenderChildren] = useState(depth <= 5);
+  const [renderChildren, setRenderChildren] = useState(!collapsible || depth <= 5);
 
   const spanDuration = getDuration(span.start_timestamp, span.timestamp);
 
@@ -35,7 +37,7 @@ const SpanItem = ({
         to={`/traces/${span.trace_id}/${span.span_id}`}
       >
         <div className={classNames('node', span.status && span.status !== 'ok' ? 'text-red-400' : '')}>
-          {(span.children || []).length > 0 && (
+          {collapsible && (span.children || []).length > 0 && (
             <div
               className="bg-primary-600 mr-1 flex items-center gap-1 rounded-lg px-1 text-xs font-bold text-white"
               onClick={e => {
@@ -84,6 +86,7 @@ const SpanItem = ({
           startTimestamp={startTimestamp}
           totalDuration={totalDuration}
           depth={depth + 1}
+          collapsible={collapsible}
         />
       )}
     </li>

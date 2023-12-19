@@ -34,11 +34,13 @@ export default function SpanDetails({
   span,
   startTimestamp,
   totalDuration,
+  collapsible = false,
 }: {
   traceContext: TraceContext;
   span: Span;
   startTimestamp: number;
   totalDuration: number;
+  collapsible?: boolean;
 }) {
   const spanDuration = getDuration(span.start_timestamp, span.timestamp);
 
@@ -209,6 +211,7 @@ export default function SpanDetails({
               tree={[span]}
               startTimestamp={startTimestamp}
               totalDuration={totalDuration}
+              collapsible={collapsible}
             />
           </div>
         )}

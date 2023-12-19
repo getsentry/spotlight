@@ -7,12 +7,14 @@ export default function SpanTree({
   startTimestamp,
   totalDuration,
   depth = 1,
+  collapsible = false,
 }: {
   traceContext: TraceContext;
   tree: Span[];
   startTimestamp: number;
   totalDuration: number;
   depth?: number;
+  collapsible?: boolean;
 }) {
   if (!tree || !tree.length) return null;
 
@@ -27,6 +29,7 @@ export default function SpanTree({
             span={span}
             startTimestamp={startTimestamp}
             totalDuration={totalDuration}
+            collapsible={collapsible}
           />
         );
       })}
