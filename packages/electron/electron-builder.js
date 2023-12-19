@@ -20,7 +20,7 @@ const config = {
     target: [
       {
         target: 'zip',
-        arch: ['universal'],
+        arch: ['x64', 'arm64'],
       },
     ],
     icon: 'resources/icons/mac/icon.icns',
