@@ -1,6 +1,6 @@
 ---
 '@spotlightjs/spotlight': patch
-'@spotlightjs/electron': patch
+'spotlight': patch
 '@spotlightjs/overlay': patch
 ---
 
