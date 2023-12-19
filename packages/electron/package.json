@@ -4,7 +4,7 @@
   "author": "Sentry",
   "license": "Apache-2.0",
   "private": true,
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "./out/main/index.js",
   "scripts": {
     "start": "electron-vite preview",
