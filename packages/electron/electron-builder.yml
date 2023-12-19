@@ -5,13 +5,14 @@ productName: Spotlight
 files:
   - '!**/.vscode/*'
   - '!src/*'
+  - '!scripts/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
-#afterSign: build/notarize.js
+afterSign: scripts/notarize.js
 win:
   executableName: Spotlight
   icon: resources/icons/win/icon.ico
@@ -22,7 +23,12 @@ nsis:
   createDesktopShortcut: always
 mac:
   icon: resources/icons/mac/icon.icns
+  hardenedRuntime: true
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  gatekeeperAssess: false
   target: zip
+  cscLink: ./cert.p12
   # identity: null # don't sign the app
 #   entitlementsInherit: build/entitlements.mac.plist
 #   extendInfo:

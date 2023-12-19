@@ -31,6 +31,9 @@ dist-ssr
 yalc.lock
 .vite-inspect
 .vercel
+.env
+*.p12
+sentry.properties
 
 junit.xml
 
