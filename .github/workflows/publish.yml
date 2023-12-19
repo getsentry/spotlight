@@ -40,3 +40,31 @@ jobs:
         with:
           publish: pnpm changeset:publish
           createGithubReleases: true
+
+  electron:
+    name: Electron Build
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Install deps
+        run: pnpm install
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Build Electron
+        run: cd packages/electron && pnpm build:mac
