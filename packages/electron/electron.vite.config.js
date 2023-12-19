@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
           project: env.MAIN_VITE_SENTRY_PROJECT,
           authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
           release: {
-            name: `${process.env.npm_package_name}@${process.env.npm_package_version}`,
+            name: `spotlight@${process.env.npm_package_version}`,
           },
         }),
       ],
@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
           project: env.MAIN_VITE_SENTRY_PROJECT,
           authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
           release: {
-            name: `${process.env.npm_package_name}@${process.env.npm_package_version}`,
+            name: `spotlight@${process.env.npm_package_version}`,
           },
         }),
       ],
@@ -59,7 +59,7 @@ export default defineConfig(({ mode }) => {
           project: env.MAIN_VITE_SENTRY_PROJECT,
           authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
           release: {
-            name: `${process.env.npm_package_name}@${process.env.npm_package_version}`,
+            name: `spotlight@${process.env.npm_package_version}`,
           },
         }),
       ],
