@@ -1,5 +1,0 @@
----
-'@spotlightjs/electron': patch
----
-
-Publish
