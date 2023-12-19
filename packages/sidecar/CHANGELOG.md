@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 1.3.2
+
+### Patch Changes
+
+- Expose shutdown and buffer clear function
+  ([`fa53bd6`](https://github.com/getsentry/spotlight/commit/fa53bd621b093b60eb8aed7e464f87af8beceb9e))
+
 ## 1.3.1
 
 ### Patch Changes
