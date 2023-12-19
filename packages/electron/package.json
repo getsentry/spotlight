@@ -1,5 +1,5 @@
 {
-  "name": "@spotlightjs/electron",
+  "name": "spotlight",
   "description": "Electron app for Spotlight",
   "author": "Sentry",
   "license": "Apache-2.0",
@@ -10,9 +10,7 @@
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
-    "build:win": "pnpm build && electron-builder --win --config",
-    "build:mac": "pnpm build && electron-builder --mac --config",
-    "build:linux": "pnpm build && electron-builder --linux --config"
+    "build:mac": "pnpm build && node electron-builder.js"
   },
   "dependencies": {
     "@sentry/electron": "4.15.1",

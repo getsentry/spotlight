@@ -18,6 +18,9 @@ export default defineConfig(({ mode }) => {
           org: env.MAIN_VITE_SENTRY_ORG,
           project: env.MAIN_VITE_SENTRY_PROJECT,
           authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
+          release: {
+            name: `${process.env.npm_package_name}@${process.env.npm_package_version}`,
+          },
         }),
       ],
       build: {
@@ -35,6 +38,9 @@ export default defineConfig(({ mode }) => {
           org: env.MAIN_VITE_SENTRY_ORG,
           project: env.MAIN_VITE_SENTRY_PROJECT,
           authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
+          release: {
+            name: `${process.env.npm_package_name}@${process.env.npm_package_version}`,
+          },
         }),
       ],
       build: {
@@ -52,6 +58,9 @@ export default defineConfig(({ mode }) => {
           org: env.MAIN_VITE_SENTRY_ORG,
           project: env.MAIN_VITE_SENTRY_PROJECT,
           authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
+          release: {
+            name: `${process.env.npm_package_name}@${process.env.npm_package_version}`,
+          },
         }),
       ],
       root: '.',
