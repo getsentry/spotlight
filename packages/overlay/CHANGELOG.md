@@ -1,5 +1,15 @@
 # @spotlightjs/core
 
+## 1.2.1
+
+### Patch Changes
+
+- Remove Scrollbars in fullscreen
+  ([`f15e006`](https://github.com/getsentry/spotlight/commit/f15e0068a64459cf8078c4369ca4108152c09b27))
+
+- Add injectIntoSDK as option to Sentry integration
+  ([`86e1cb4`](https://github.com/getsentry/spotlight/commit/86e1cb43f19c866cdad31c354496181a8ed8bbbf))
+
 ## 1.2.0
 
 ### Minor Changes
