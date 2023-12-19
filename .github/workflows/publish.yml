@@ -45,10 +45,10 @@ jobs:
     name: Electron Build
     runs-on: macos-12
 
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [arm64]
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     platform: [x64, arm64]
 
     steps:
       - uses: actions/checkout@v4

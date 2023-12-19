@@ -20,12 +20,12 @@ const config = {
     target: [
       {
         target: 'zip',
-        arch: ['x64', 'arm64'],
+        arch: ['universal'],
       },
     ],
     icon: 'resources/icons/mac/icon.icns',
     hardenedRuntime: true,
-    gatekeeperAssess: true,
+    gatekeeperAssess: false,
     entitlements: 'build/entitlements.mac.plist',
     entitlementsInherit: 'build/entitlements.mac.plist',
     cscLink: process.env.CSC_LINK,

@@ -3,6 +3,10 @@ import { Fragment } from 'react';
 import ButtonLink from './ButtonLink.astro';
 
 // Used to override the default hero component
+
+const response = await fetch('https://api.github.com/repos/getsentry/spotlight/releases/latest');
+const data = await response.json();
+const downloadUrl = data?.assets?.[0]?.browser_download_url;
 ---
 
 <style>
@@ -95,5 +99,6 @@ import ButtonLink from './ButtonLink.astro';
   <img src="/images/trace.png" alt="Spotlight Hero" class="hero-image" />
   <p class="actions">
     <ButtonLink href="/about/">Get Started</ButtonLink>
+    <ButtonLink href={downloadUrl}>Download for Mac (macOS 12+)</ButtonLink>
   </p>
 </div>
