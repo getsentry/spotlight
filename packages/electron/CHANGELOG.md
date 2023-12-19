@@ -1,5 +1,11 @@
 # spotlight
 
+## 0.0.3
+
+### Patch Changes
+
+- Publish step ([`03adeba`](https://github.com/getsentry/spotlight/commit/03adeba07bab092bbc66e2ac859ea38fbd82a77b))
+
 ## 0.0.2
 
 ### Patch Changes
