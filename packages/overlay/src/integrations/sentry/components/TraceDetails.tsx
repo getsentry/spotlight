@@ -18,6 +18,7 @@ export default function TraceDetails() {
 
   const startTimestamp = trace.start_timestamp;
   const totalDuration = trace.timestamp - startTimestamp;
+  const isCollapsible = trace.transactions.length > 1 || trace.spans.length >= 50;
 
   return (
     <>
@@ -55,10 +56,17 @@ export default function TraceDetails() {
           tree={trace.spanTree}
           startTimestamp={startTimestamp}
           totalDuration={totalDuration}
+          collapsible={isCollapsible}
         />
       </div>
       {span ? (
-        <SpanDetails traceContext={trace} startTimestamp={startTimestamp} totalDuration={totalDuration} span={span} />
+        <SpanDetails
+          traceContext={trace}
+          startTimestamp={startTimestamp}
+          totalDuration={totalDuration}
+          span={span}
+          collapsible={isCollapsible}
+        />
       ) : null}
     </>
   );
