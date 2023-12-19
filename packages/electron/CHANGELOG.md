@@ -1,5 +1,12 @@
 # spotlight
 
+## 0.0.6
+
+### Patch Changes
+
+- Publish Electron App
+  ([`f90b49d`](https://github.com/getsentry/spotlight/commit/f90b49da56e9aa2dadfc5ffb3557ac2a0470ad7d))
+
 ## 0.0.5
 
 ### Patch Changes
