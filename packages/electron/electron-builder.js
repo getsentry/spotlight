@@ -17,12 +17,17 @@ const config = {
     '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}',
   ],
   mac: {
+    target: [
+      {
+        target: 'zip',
+        arch: ['x64', 'arm64'],
+      },
+    ],
     icon: 'resources/icons/mac/icon.icns',
     hardenedRuntime: true,
-    gatekeeperAssess: false,
+    gatekeeperAssess: true,
     entitlements: 'build/entitlements.mac.plist',
     entitlementsInherit: 'build/entitlements.mac.plist',
-    target: 'zip',
     cscLink: process.env.CSC_LINK,
     cscKeyPassword: process.env.CSC_KEY_PASSWORD,
   },
