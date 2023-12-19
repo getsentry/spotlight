@@ -13,14 +13,6 @@ files:
 asarUnpack:
   - resources/**
 afterSign: scripts/notarize.js
-win:
-  executableName: Spotlight
-  icon: resources/icons/win/icon.ico
-nsis:
-  artifactName: ${name}-${version}-setup.${ext}
-  shortcutName: ${productName}
-  uninstallDisplayName: ${productName}
-  createDesktopShortcut: always
 mac:
   icon: resources/icons/mac/icon.icns
   hardenedRuntime: true
@@ -28,26 +20,4 @@ mac:
   entitlementsInherit: build/entitlements.mac.plist
   gatekeeperAssess: false
   target: zip
-  cscLink: ./cert.p12
-  # identity: null # don't sign the app
-#   entitlementsInherit: build/entitlements.mac.plist
-#   extendInfo:
-#     - NSCameraUsageDescription: Application requests access to the device's camera.
-#     - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-#     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-#     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
-dmg:
-  artifactName: ${name}-${version}.${ext}
-linux:
-  target:
-    - AppImage
-    - snap
-    - deb
-  maintainer: electronjs.org
-  category: Utility
-appImage:
-  artifactName: ${name}-${version}.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates
