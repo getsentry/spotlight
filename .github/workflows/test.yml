@@ -124,7 +124,6 @@ jobs:
 
   electron:
     name: Electron Build
-    needs: build
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -142,20 +141,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
 
-      - name: Restore dependency cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.CACHED_DEP_PATHS }}
-          key: ${{ env.DEP_CACHE_KEY }}
-
-      - name: Restore build cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
-
       - name: Install deps
         run: pnpm install
+
+      - name: Build packages
+        run: pnpm build
 
       - name: Build Electron
         run: cd packages/electron && pnpm build:mac
