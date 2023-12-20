@@ -1,5 +1,11 @@
 # @spotlightjs/electron
 
+## 0.0.12
+
+### Patch Changes
+
+- This time it will work ([#291](https://github.com/getsentry/spotlight/pull/291))
+
 ## 0.0.11
 
 ### Patch Changes
