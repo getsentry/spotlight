@@ -35,20 +35,14 @@ jobs:
 
       - name: Gets latest created release info
         id: latest_release_info
-        uses: InsonusK/get-latest-release@v1.0.1
+        uses: thebritican/fetch-latest-release@v1
         with:
-          myToken: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Print result'
         run: |
-          echo "id: ${{ steps.latest_release_info.outputs.id }}"
           echo "name: ${{ steps.latest_release_info.outputs.name }}"
           echo "tag_name: ${{ steps.latest_release_info.outputs.tag_name }}"
-          echo "created_at: ${{ steps.latest_release_info.outputs.created_at }}"
-          echo "draft: ${{ steps.latest_release_info.outputs.draft }}"
-          echo "prerelease: ${{ steps.latest_release_info.outputs.prerelease }}"
-          echo "url: ${{ steps.latest_release_info.outputs.url }}"
-          echo "html_url: ${{ steps.latest_release_info.outputs.html_url }}"
 
       - name: Install deps
         run: pnpm install
