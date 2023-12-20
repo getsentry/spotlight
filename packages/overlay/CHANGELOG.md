@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 1.2.2
+
+### Patch Changes
+
+- added condition to make SpanTree collapsible ([#287](https://github.com/getsentry/spotlight/pull/287))
+
 ## 1.2.1
 
 ### Patch Changes
