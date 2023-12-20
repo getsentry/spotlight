@@ -1,5 +1,16 @@
 # @spotlightjs/electron
 
+## 0.0.9
+
+### Patch Changes
+
+- Split App into two architectures
+  ([`a27064f`](https://github.com/getsentry/spotlight/commit/a27064fedb85c737359193a3607e8e86eeb309ab))
+
+- Updated dependencies
+  [[`66f7470`](https://github.com/getsentry/spotlight/commit/66f74705aca014c89cdd6ebc587f79eac78b0df5)]:
+  - @spotlightjs/overlay@1.2.2
+
 ## 0.0.8
 
 ### Patch Changes
