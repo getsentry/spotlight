@@ -1,5 +1,11 @@
 # @spotlightjs/electron
 
+## 0.0.11
+
+### Patch Changes
+
+- Another Release ([`7f232ce`](https://github.com/getsentry/spotlight/commit/7f232cecfc96ded3fc89a951bce744fa91c58eb6))
+
 ## 0.0.10
 
 ### Patch Changes
