@@ -29,7 +29,7 @@ export function SidePanelHeader({
 export default function SidePanel(props: Omit<ComponentPropsWithoutRef<'div'>, 'className'>) {
   return (
     <div
-      className="border-l-primary-400 from-primary-900 to-primary-950 fixed bottom-0 left-1/4 right-0 top-0 h-full overflow-auto border-l bg-gradient-to-br to-20% px-6 py-4"
+      className="spotlight-sidepanel border-l-primary-400 from-primary-900 to-primary-950 fixed bottom-0 left-1/4 right-0 top-0 h-full overflow-auto border-l bg-gradient-to-br to-20% px-6 py-4"
       {...props}
     />
   );

@@ -6,6 +6,7 @@ import path from 'path';
 Sentry.init({
   dsn: 'https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976',
   tracesSampleRate: 1.0,
+  release: 'spotlight@' + process.env.npm_package_version,
 });
 
 let alwaysOnTop = false;
@@ -56,7 +57,7 @@ const createWindow = () => {
 
   win.webContents.on('did-finish-load', () => {
     win.webContents.executeJavaScript(
-      `document.querySelector('#sentry-spotlight-root').shadowRoot.querySelector('.spotlight-fullscreen > :first-child').style.cssText = 'padding-top: 34px; -webkit-user-select: none; -webkit-app-region:drag;'`,
+      `document.querySelector('#sentry-spotlight-root').shadowRoot.querySelector('.spotlight-fullscreen > :first-child').style.cssText = 'padding-top: 34px; -webkit-app-region:drag;'`,
     );
   });
 };
