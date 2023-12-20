@@ -43,6 +43,7 @@ jobs:
 
   electron:
     name: Electron Build
+    needs: publish
     runs-on: macos-latest
 
     # strategy:
@@ -80,12 +81,17 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: cd packages/electron && pnpm build:mac
 
+      - name: Gets latest created release info
+        id: latest_release_info
+        uses: jossef/action-latest-release-info@v1.2.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: packages/electron/dist/*.zip
-          tag: ${{ github.ref }}
-          release_name: Electron App
-          overwrite: true
+          tag: ${{ steps.latest_release_info.outputs.tag_name }}
           file_glob: true
+          make_latest: false
