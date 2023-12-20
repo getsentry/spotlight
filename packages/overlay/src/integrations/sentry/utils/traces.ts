@@ -8,8 +8,8 @@ export function groupSpans(spans: Span[]) {
   // hash with pointers
   const idLookup = new Map<string, Span>();
 
-  const sortedSpans = [...spans] // need to sort root(s) first
-    .sort(a => (a.parent_span_id ? 1 : 0));
+  // need to sort root(s) first
+  const sortedSpans = [...spans].sort((a, b) => (a.parent_span_id ? 1 : 0) - (b.parent_span_id ? 1 : 0));
 
   sortedSpans.forEach(span => {
     let parent = getParentOfSpan(span, idLookup, sortedSpans);
