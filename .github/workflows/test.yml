@@ -35,7 +35,7 @@ jobs:
 
       - name: Gets latest created release info
         id: latest_release_info
-        uses: thebritican/fetch-latest-release@v1
+        uses: gregziegan/fetch-latest-release@v2.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
