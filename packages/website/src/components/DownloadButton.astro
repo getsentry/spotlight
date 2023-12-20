@@ -1,0 +1,51 @@
+---
+import { Fragment } from 'react';
+
+const response = await fetch('https://api.github.com/repos/getsentry/spotlight/releases/latest');
+const data = await response.json();
+const downloadUrl = data?.assets?.[0]?.browser_download_url;
+const links = [
+  {
+    text: 'Download for Mac',
+    url: downloadUrl,
+  },
+  {
+    text: 'Download for Windows',
+    url: downloadUrl,
+  },
+  {
+    text: 'Download for Linux',
+    url: downloadUrl,
+  },
+];
+---
+
+<style>
+  .dropdown .dropdown-menu {
+    display: none;
+    z-index: 0;
+  }
+
+  .dropdown:hover .dropdown-menu {
+    display: block;
+    z-index: 100;
+  }
+</style>
+
+<div class="p-4">
+  <div class="group relative text-center">
+    or download for<br />
+    <a
+      href="#"
+      class="inline-flex items-center justify-center px-2 py-2 text-base font-small text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
+    >
+      Mac (arm)
+    </a>
+    <a
+      href="#"
+      class="inline-flex items-center justify-center px-2 py-2 text-base font-small text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
+    >
+      Mac (Intel)
+    </a>
+  </div>
+</div>
