@@ -33,6 +33,18 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
 
+      - name: Gets latest created release info
+        id: latest_release_info
+        uses: pozetroninc/github-action-get-latest-release@v0.7.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: use secret
+        shell: bash
+        run: |
+          RELEASE="${{ steps.latest_release_info.outputs.release }}"
+          echo "We retrieved our masked secret: $RELEASE"
+
       - name: Install deps
         run: pnpm install
 
