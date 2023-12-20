@@ -24,3 +24,7 @@ Spotlight.init({
   showTriggerButton: false,
   integrations: [Spotlight.sentry({ injectIntoSDK: false })],
 });
+
+Spotlight.onSevereEvent(count => {
+  window.electronAPI.setBadgeCount(count);
+});

@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/electron/main';
 import { clearBuffer, setupSidecar } from '@spotlightjs/sidecar';
-import { BrowserWindow, Menu, app, shell } from 'electron';
+import { BrowserWindow, Menu, app, ipcMain, shell } from 'electron';
 import path from 'path';
 
 Sentry.init({
@@ -51,6 +51,7 @@ const createWindow = () => {
 
   win.webContents.on('did-start-loading', () => {
     clearBuffer();
+    app.setBadgeCount(0);
   });
 
   win.webContents.on('did-finish-load', () => {
@@ -164,6 +165,10 @@ const template = [
   },
 ];
 
+function handleBadgeCount(event, count) {
+  app.setBadgeCount(count);
+}
+
 const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 
@@ -174,5 +179,6 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 
+  ipcMain.on('set-badge-count', handleBadgeCount);
   setupSidecar();
 });
