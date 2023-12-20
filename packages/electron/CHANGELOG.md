@@ -1,5 +1,12 @@
 # @spotlightjs/electron
 
+## 0.0.10
+
+### Patch Changes
+
+- Add Badge to app icon
+  ([`d094dad`](https://github.com/getsentry/spotlight/commit/d094dad0ee70a4e0ddc6d30378acdede6be16f7d))
+
 ## 0.0.9
 
 ### Patch Changes
