@@ -35,15 +35,20 @@ jobs:
 
       - name: Gets latest created release info
         id: latest_release_info
-        uses: pozetroninc/github-action-get-latest-release@v0.7.0
+        uses: InsonusK/get-latest-release@v1.0.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          myToken: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: use secret
-        shell: bash
+      - name: 'Print result'
         run: |
-          RELEASE="${{ steps.latest_release_info.outputs.release }}"
-          echo "We retrieved our masked secret: $RELEASE"
+          echo "id: ${{ steps.latest_release_info.outputs.id }}"
+          echo "name: ${{ steps.latest_release_info.outputs.name }}"
+          echo "tag_name: ${{ steps.latest_release_info.outputs.tag_name }}"
+          echo "created_at: ${{ steps.latest_release_info.outputs.created_at }}"
+          echo "draft: ${{ steps.latest_release_info.outputs.draft }}"
+          echo "prerelease: ${{ steps.latest_release_info.outputs.prerelease }}"
+          echo "url: ${{ steps.latest_release_info.outputs.url }}"
+          echo "html_url: ${{ steps.latest_release_info.outputs.html_url }}"
 
       - name: Install deps
         run: pnpm install
