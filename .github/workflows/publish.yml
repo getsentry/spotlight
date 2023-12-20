@@ -83,15 +83,15 @@ jobs:
 
       - name: Gets latest created release info
         id: latest_release_info
-        uses: jossef/action-latest-release-info@v1.2.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: pozetroninc/github-action-get-latest-release@v0.7.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: packages/electron/dist/*.zip
-          tag: ${{ steps.latest_release_info.outputs.tag_name }}
+          tag: ${{ steps.latest_release_info.outputs.release }}
           file_glob: true
           make_latest: false
