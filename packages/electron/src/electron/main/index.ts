@@ -173,6 +173,17 @@ function handleBadgeCount(event, count) {
 const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 
+function payload(body: string) {
+  Sentry.configureScope(scope => {
+    scope.clearAttachments();
+    scope.addAttachment({
+      data: body,
+      filename: 'payload.txt',
+      contentType: 'text/plain',
+    });
+  });
+}
+
 app.whenReady().then(() => {
   createWindow();
 
@@ -181,5 +192,9 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on('set-badge-count', handleBadgeCount);
-  setupSidecar();
+
+  setupSidecar({
+    port: 8969,
+    incomingPayload: payload,
+  });
 });

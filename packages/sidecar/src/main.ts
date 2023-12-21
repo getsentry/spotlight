@@ -9,6 +9,8 @@ const DEFAULT_PORT = 8969;
 
 type Payload = [string, string];
 
+type IncomingPayloadCallback = (body: string) => void;
+
 type SideCarOptions = {
   /**
    * The port on which the sidecar should listen.
@@ -33,6 +35,12 @@ type SideCarOptions = {
    * More verbose logging.
    */
   debug?: boolean;
+
+  /**
+   * A callback that will be called with the incoming message.
+   * Helpful for debugging.
+   */
+  incomingPayload?: IncomingPayloadCallback;
 };
 
 function getCorsHeader(): { [name: string]: string } {
@@ -46,7 +54,12 @@ function getCorsHeader(): { [name: string]: string } {
 /**
  * Returns true of the request was handled, false otherwise.
  */
-function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: MessageBuffer<Payload>): boolean {
+function handleStreamRequest(
+  req: IncomingMessage,
+  res: ServerResponse,
+  buffer: MessageBuffer<Payload>,
+  incomingPayload?: IncomingPayloadCallback,
+): boolean {
   if (req.headers.accept && req.headers.accept == 'text/event-stream') {
     if (req.url == '/stream') {
       res.writeHead(200, {
@@ -110,13 +123,17 @@ function handleStreamRequest(req: IncomingMessage, res: ServerResponse, buffer: 
         stream.on('end', () => {
           buffer.put([`${req.headers['content-type']}`, body]);
 
-          if (process.env.SPOTLIGHT_CAPTURE) {
+          if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
             const timestamp = new Date().getTime();
             const contentType = `${req.headers['content-type']}`;
             const filename = `${contentType.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-${timestamp}.txt`;
 
-            createWriteStream(filename).write(body);
-            logger.info(`🗃️ Saved data to ${filename}`);
+            if (incomingPayload) {
+              incomingPayload(body);
+            } else {
+              createWriteStream(filename).write(body);
+              logger.info(`🗃️ Saved data to ${filename}`);
+            }
           }
 
           // 204 would be more appropriate but returning 200 to match what /envelope returns
@@ -164,9 +181,14 @@ function serveFile(req: IncomingMessage, res: ServerResponse, basePath: string):
   });
 }
 
-function startServer(buffer: MessageBuffer<Payload>, port: number, basePath?: string): Server {
+function startServer(
+  buffer: MessageBuffer<Payload>,
+  port: number,
+  basePath?: string,
+  incomingPayload?: IncomingPayloadCallback,
+): Server {
   const server = createServer((req, res) => {
-    const handled = handleStreamRequest(req, res, buffer);
+    const handled = handleStreamRequest(req, res, buffer, incomingPayload);
     if (!handled && basePath) {
       serveFile(req, res, basePath);
     }
@@ -208,7 +230,13 @@ const isValidPort = (value: string | number) => {
   return value > 0 && value <= 65535;
 };
 
-export function setupSidecar({ port, logger: customLogger, basePath, debug }: SideCarOptions = {}): void {
+export function setupSidecar({
+  port,
+  logger: customLogger,
+  basePath,
+  debug,
+  incomingPayload,
+}: SideCarOptions = {}): void {
   let sidecarPort = DEFAULT_PORT;
 
   if (customLogger) {
@@ -227,7 +255,7 @@ export function setupSidecar({ port, logger: customLogger, basePath, debug }: Si
   }
 
   if (!serverInstance) {
-    serverInstance = startServer(buffer, sidecarPort, basePath);
+    serverInstance = startServer(buffer, sidecarPort, basePath, incomingPayload);
   }
 }
 
