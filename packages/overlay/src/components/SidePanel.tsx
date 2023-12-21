@@ -1,5 +1,6 @@
-import { ComponentPropsWithoutRef, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { type ReactNode } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { SidePanelProps } from '~/types';
 
 export function SidePanelHeader({
   title,
@@ -26,11 +27,18 @@ export function SidePanelHeader({
   );
 }
 
-export default function SidePanel(props: Omit<ComponentPropsWithoutRef<'div'>, 'className'>) {
+export default function SidePanel(props: SidePanelProps) {
+  const navigateTo = useNavigate();
   return (
     <div
-      className="spotlight-sidepanel border-l-primary-400 from-primary-900 to-primary-950 fixed bottom-0 left-1/4 right-0 top-0 h-full overflow-auto border-l bg-gradient-to-br to-20% px-6 py-4"
-      {...props}
-    />
+      className="fixed bottom-0 left-0 right-0 top-0 z-10 bg-black  bg-opacity-30"
+      onClick={() => navigateTo(props.backTo)}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        className="border-l-primary-400 from-primary-900 to-primary-950 fixed bottom-0 left-1/4 right-0 top-0 z-20 h-full overflow-auto border-l bg-gradient-to-br to-20% px-6 py-4"
+        {...props}
+      />
+    </div>
   );
 }

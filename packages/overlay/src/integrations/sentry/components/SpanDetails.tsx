@@ -47,7 +47,7 @@ export default function SpanDetails({
   const errors = dataCache.getEventsByTrace(span.trace_id).filter(e => e.type !== 'transaction' && 'exception' in e);
 
   return (
-    <SidePanel>
+    <SidePanel backTo={`/traces/${span.trace_id}`}>
       <SidePanelHeader
         title="Span Details"
         subtitle={
