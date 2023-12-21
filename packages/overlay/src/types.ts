@@ -1,3 +1,4 @@
+import { ComponentPropsWithoutRef } from 'react';
 import { type Integration } from './integrations/integration';
 
 export type ExperimentName = 'sentry:focus-local-events';
@@ -108,4 +109,8 @@ export type WindowWithSpotlight = Window & {
   __spotlight?: {
     eventTarget?: EventTarget;
   };
+};
+
+export type SidePanelProps = Omit<ComponentPropsWithoutRef<'div'>, 'className'> & {
+  backTo: string;
 };
