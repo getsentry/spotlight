@@ -1,5 +1,16 @@
 # @spotlightjs/spotlight
 
+## 1.2.6
+
+### Patch Changes
+
+- Updated dependencies
+  [[`b864dbd`](https://github.com/getsentry/spotlight/commit/b864dbda8007eb3a509b5045b9775140c04a519c),
+  [`14eadb9`](https://github.com/getsentry/spotlight/commit/14eadb97f34d3430e201cc3a29170bf22f02e4ff),
+  [`fed3835`](https://github.com/getsentry/spotlight/commit/fed3835e989b10b82d52a079be15738bf5527c61)]:
+  - @spotlightjs/sidecar@1.3.3
+  - @spotlightjs/overlay@1.2.3
+
 ## 1.2.5
 
 ### Patch Changes

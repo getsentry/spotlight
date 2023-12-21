@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 1.3.3
+
+### Patch Changes
+
+- Add callback for incoming requests
+  ([`b864dbd`](https://github.com/getsentry/spotlight/commit/b864dbda8007eb3a509b5045b9775140c04a519c))
+
 ## 1.3.2
 
 ### Patch Changes
