@@ -1,12 +1,16 @@
 import * as Sentry from '@sentry/electron/main';
 import { clearBuffer, setupSidecar } from '@spotlightjs/sidecar';
-import { BrowserWindow, Menu, app, ipcMain, shell } from 'electron';
+import { BrowserWindow, Menu, app, dialog, ipcMain, shell } from 'electron';
+import Store from 'electron-store';
 import path from 'path';
+
+const store = new Store();
 
 Sentry.init({
   dsn: 'https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976',
   tracesSampleRate: 1.0,
   release: 'spotlight@' + process.env.npm_package_version,
+  beforeSend: askForPermissionToSendToSentry,
 });
 
 let alwaysOnTop = false;
@@ -154,6 +158,37 @@ const template = [
     ],
   },
   {
+    label: 'Settings',
+    submenu: [
+      {
+        label: 'Send Error Reports',
+        id: 'sentry-enabled',
+        type: 'checkbox',
+        checked: store.get('sentry-enabled') === true,
+        click: () => {
+          if (store.get('sentry-enabled') === undefined || store.get('sentry-enabled') === false) {
+            store.set('sentry-enabled', true);
+          } else {
+            store.set('sentry-enabled', false);
+          }
+        },
+      },
+      {
+        label: 'Send Payload to Sentry',
+        id: 'sentry-send-envelopes',
+        type: 'checkbox',
+        checked: store.get('sentry-send-envelopes') === true,
+        click: () => {
+          if (store.get('sentry-send-envelopes') === undefined || store.get('sentry-send-envelopes') === false) {
+            store.set('sentry-send-envelopes', true);
+          } else {
+            store.set('sentry-send-envelopes', false);
+          }
+        },
+      },
+    ],
+  },
+  {
     role: 'help',
     submenu: [
       {
@@ -169,19 +204,94 @@ const template = [
 function handleBadgeCount(event, count) {
   app.setBadgeCount(count);
 }
-
 const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 
-function payload(body: string) {
-  Sentry.configureScope(scope => {
-    scope.clearAttachments();
-    scope.addAttachment({
-      data: body,
-      filename: 'payload.txt',
-      contentType: 'text/plain',
-    });
+store.onDidChange('sentry-enabled', newValue => {
+  const item = menu.getMenuItemById('sentry-enabled');
+  if (item) {
+    item.checked = newValue as boolean;
+  }
+});
+
+store.onDidChange('sentry-send-envelopes', newValue => {
+  const item = menu.getMenuItemById('sentry-send-envelopes');
+  if (item) {
+    item.checked = newValue as boolean;
+  }
+});
+
+async function askForPermissionToSendToSentry(event: Sentry.Event, hint?: Sentry.EventHint) {
+  if (store.get('sentry-enabled') === false) {
+    return null;
+  } else if (store.get('sentry-enabled') === true) {
+    if (hint && hint.attachments && hint.attachments.length > 0) {
+      return askToSendEnvelope(event, hint);
+    }
+    return event;
+  }
+
+  const { response } = await dialog.showMessageBox({
+    type: 'question',
+    buttons: ['Yes', 'No'],
+    title: 'Spotlight',
+    message: 'Spotlight encountered an error. Would you like to send an error report to the developers?',
+    detail: 'This will help us improve Spotlight.',
   });
+
+  if (response === 1) {
+    store.set('sentry-enabled', false);
+    return null;
+  } else {
+    store.set('sentry-enabled', true);
+    if (hint && hint.attachments && hint.attachments.length > 0) {
+      return askToSendEnvelope(event, hint);
+    }
+    return event;
+  }
+}
+
+async function askToSendEnvelope(event: Sentry.Event, hint?: Sentry.EventHint) {
+  if (store.get('sentry-send-envelopes') === false) {
+    return null;
+  } else if (store.get('sentry-send-envelopes') === true) {
+    return event;
+  }
+
+  const { response } = await dialog.showMessageBox({
+    type: 'question',
+    buttons: ['Yes', 'No'],
+    title: 'Spotlight',
+    message: 'Can we also send the payload Spotlight received so we can fully reproduce the error?',
+    detail: 'Again, just makes things eaiser for us.',
+  });
+
+  if (response === 1) {
+    Sentry.configureScope(scope => {
+      scope.clearAttachments();
+    });
+    if (hint && hint.attachments && hint.attachments.length > 0) {
+      hint.attachments = [];
+    }
+    store.set('sentry-send-envelopes', false);
+    return event;
+  } else {
+    store.set('sentry-send-envelopes', true);
+    return event;
+  }
+}
+
+function storeIncomingPayload(body: string) {
+  if (store.get('sentry-send-envelopes') === true || store.get('sentry-send-envelopes') === undefined) {
+    Sentry.configureScope(scope => {
+      scope.clearAttachments();
+      scope.addAttachment({
+        data: body,
+        filename: 'payload.txt',
+        contentType: 'text/plain',
+      });
+    });
+  }
 }
 
 app.whenReady().then(() => {
@@ -195,6 +305,6 @@ app.whenReady().then(() => {
 
   setupSidecar({
     port: 8969,
-    incomingPayload: payload,
+    incomingPayload: storeIncomingPayload,
   });
 });

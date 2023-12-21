@@ -17,7 +17,8 @@
   "dependencies": {
     "@sentry/electron": "4.15.1",
     "@spotlightjs/overlay": "workspace:*",
-    "@spotlightjs/sidecar": "workspace:*"
+    "@spotlightjs/sidecar": "workspace:*",
+    "electron-store": "^8.1.0"
   },
   "devDependencies": {
     "@electron/notarize": "^2.2.0",
