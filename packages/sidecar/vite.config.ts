@@ -13,6 +13,7 @@ export default defineConfig({
   build: {
     ssr: './src/main.ts',
     outDir: './dist',
+    sourcemap: true,
   },
   ssr: {
     noExternal,
