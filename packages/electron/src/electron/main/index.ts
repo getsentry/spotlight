@@ -236,7 +236,7 @@ async function askForPermissionToSendToSentry(event: Sentry.Event, hint?: Sentry
     buttons: ['Yes', 'No'],
     title: 'Spotlight',
     message: 'Spotlight encountered an error. Would you like to send an error report to the developers?',
-    detail: 'This will help us improve Spotlight.',
+    detail: 'This will help us improve Spotlight. (Can be changed in the settings menu)',
   });
 
   if (response === 1) {
@@ -263,7 +263,7 @@ async function askToSendEnvelope(event: Sentry.Event, hint?: Sentry.EventHint) {
     buttons: ['Yes', 'No'],
     title: 'Spotlight',
     message: 'Can we also send the payload Spotlight received so we can fully reproduce the error?',
-    detail: 'Again, just makes things eaiser for us.',
+    detail: 'Again, just makes things eaiser for us. (Can be changed in the settings menu)',
   });
 
   if (response === 1) {
