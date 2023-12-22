@@ -1,5 +1,13 @@
 # @spotlightjs/core
 
+## 1.2.3
+
+### Patch Changes
+
+- Added a UX to close the sidepanel is clicked outside ([#297](https://github.com/getsentry/spotlight/pull/297))
+
+- fixed sorting of spans across browsers ([#293](https://github.com/getsentry/spotlight/pull/293))
+
 ## 1.2.2
 
 ### Patch Changes
