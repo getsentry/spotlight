@@ -14,51 +14,6 @@ Sentry.init({
   beforeSend: askForPermissionToSendToSentry,
 });
 
-const sendErrorReport = (error: Error) => {
-  Sentry.captureException(error);
-};
-
-const sendRejectionReport = <T>({ reason, promise }: RejectionReason<T>) => {
-  Sentry.captureException(reason, {
-    extra: {
-      promise,
-    },
-  });
-};
-
-const handleErrorsAndRejections = () => {
-  process.on('uncaughtException', (error: Error) => {
-    const userResponse = dialog.showMessageBoxSync({
-      type: 'question',
-      buttons: ['Yes', 'No'],
-      title: 'Error Report',
-      message: 'An error occurred. Do you want to send a report for debugging?',
-    });
-
-    if (userResponse === 0) {
-      sendErrorReport(error);
-    } else {
-      console.log({ error });
-    }
-  });
-
-  process.on('unhandledRejection', <T>(reason: RejectionReason<T>) => {
-    const userResponse = dialog.showMessageBoxSync({
-      type: 'question',
-      buttons: ['Yes', 'No'],
-      title: 'Error Report',
-      message: 'An error occurred. Do you want to send a report for debugging?',
-    });
-
-    if (userResponse === 0) {
-      sendRejectionReport(reason);
-    } else {
-      console.log({ reason });
-    }
-  });
-};
-handleErrorsAndRejections();
-
 let alwaysOnTop = false;
 
 const createWindow = () => {
@@ -354,3 +309,49 @@ app.whenReady().then(() => {
     incomingPayload: storeIncomingPayload,
   });
 });
+
+const sendErrorReport = (error: Error) => {
+  Sentry.captureException(error);
+};
+
+const sendRejectionReport = <T>({ reason, promise }: RejectionReason<T>) => {
+  Sentry.captureException(reason, {
+    extra: {
+      promise,
+    },
+  });
+};
+
+const handleErrorsAndRejections = () => {
+  process.on('uncaughtException', (error: Error) => {
+    const userResponse = dialog.showMessageBoxSync({
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Error Report',
+      message: 'An error occurred. Do you want to send a report for debugging?',
+    });
+
+    if (userResponse === 0) {
+      sendErrorReport(error);
+    } else {
+      console.log({ error });
+    }
+  });
+
+  process.on('unhandledRejection', <T>(reason: RejectionReason<T>) => {
+    const userResponse = dialog.showMessageBoxSync({
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Error Report',
+      message: 'An error occurred. Do you want to send a report for debugging?',
+    });
+
+    if (userResponse === 0) {
+      sendRejectionReport(reason);
+    } else {
+      console.log({ reason });
+    }
+  });
+};
+
+handleErrorsAndRejections();
