@@ -2,4 +2,5 @@
 '@spotlightjs/electron': patch
 ---
 
-added functions to report error in case of error in app.
+1. Added functions to report error in case of error in app.
+2. Added a error page for Electron app.
