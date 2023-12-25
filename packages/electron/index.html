@@ -11,9 +11,43 @@
         height: 100%;
         width: 100%;
       }
+
+      .error {
+        color: #fff;
+        text-shadow: 0 0 5px #fff;
+        text-align: center;
+        font-family: system-ui, sans-serif;
+      }
+      .header {
+        letter-spacing: 6px;
+        font-weight: 500;
+        font-size: 3rem;
+        line-height: 1.5;
+      }
+      .error-page-navbar {
+        display: flex;
+        width: 100%;
+        gap: 5px;
+        align-items: center;
+      }
+      .spotlight-title {
+        color: #fff;
+        font-weight: 700;
+        font-size: 1rem;
+        font-family: system-ui, sans-serif;
+      }
     </style>
   </head>
   <body>
+    <div id="error-screen" style="display: none">
+      <div class="error-page-navbar">
+        <img alt="spotlight-icon" src="./resources/sized.png" width="50" height="50" />
+        <p class="spotlight-title">Spotlight</p>
+      </div>
+      <h1 class="error header">Oops! An error occurred.</h1>
+      <p class="error description">Press Ctrl/Cmd + R to reload the app.</p>
+    </div>
+
     <script type="module" src="./src/index.ts"></script>
   </body>
 </html>

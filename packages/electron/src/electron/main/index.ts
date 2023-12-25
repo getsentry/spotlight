@@ -15,9 +15,10 @@ Sentry.init({
 });
 
 let alwaysOnTop = false;
+let win;
 
 const createWindow = () => {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 900,
     height: 600,
     minWidth: 900,
@@ -322,8 +323,21 @@ const sendRejectionReport = <T>({ reason, promise }: RejectionReason<T>) => {
   });
 };
 
+const showErrorMessage = () => {
+  if (win) {
+    win.webContents.executeJavaScript(`      
+      const spotlightRoot = document.getElementById('sentry-spotlight-root');
+      const errorScreen = document.getElementById('error-screen');
+      
+      if (spotlightRoot) spotlightRoot.style.display = 'none';
+      if (errorScreen) errorScreen.style.display = 'block';
+    `);
+  }
+};
+
 const handleErrorsAndRejections = () => {
   process.on('uncaughtException', (error: Error) => {
+    showErrorMessage();
     const userResponse = dialog.showMessageBoxSync({
       type: 'question',
       buttons: ['Yes', 'No'],
@@ -339,6 +353,7 @@ const handleErrorsAndRejections = () => {
   });
 
   process.on('unhandledRejection', <T>(reason: RejectionReason<T>) => {
+    showErrorMessage();
     const userResponse = dialog.showMessageBoxSync({
       type: 'question',
       buttons: ['Yes', 'No'],
