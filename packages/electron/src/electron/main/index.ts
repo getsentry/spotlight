@@ -14,9 +14,10 @@ Sentry.init({
 });
 
 let alwaysOnTop = false;
+let win;
 
 const createWindow = () => {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 900,
     height: 600,
     minWidth: 900,
@@ -221,7 +222,20 @@ store.onDidChange('sentry-send-envelopes', newValue => {
   }
 });
 
+const showErrorMessage = () => {
+  if (win) {
+    win.webContents.executeJavaScript(`      
+      const spotlightRoot = document.getElementById('sentry-spotlight-root');
+      const errorScreen = document.getElementById('error-screen');
+      
+      if (spotlightRoot) spotlightRoot.style.display = 'none';
+      if (errorScreen) errorScreen.style.display = 'block';
+    `);
+  }
+};
+
 async function askForPermissionToSendToSentry(event: Sentry.Event, hint?: Sentry.EventHint) {
+  showErrorMessage();
   if (store.get('sentry-enabled') === false) {
     return null;
   } else if (store.get('sentry-enabled') === true) {
