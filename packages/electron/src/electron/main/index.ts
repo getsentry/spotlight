@@ -3,7 +3,6 @@ import { clearBuffer, setupSidecar } from '@spotlightjs/sidecar';
 import { BrowserWindow, Menu, app, dialog, ipcMain, shell } from 'electron';
 import Store from 'electron-store';
 import path from 'path';
-import { RejectionReason } from '../../types';
 
 const store = new Store();
 
@@ -224,6 +223,7 @@ store.onDidChange('sentry-send-envelopes', newValue => {
 });
 
 async function askForPermissionToSendToSentry(event: Sentry.Event, hint?: Sentry.EventHint) {
+  showErrorMessage();
   if (store.get('sentry-enabled') === false) {
     return null;
   } else if (store.get('sentry-enabled') === true) {
@@ -311,18 +311,6 @@ app.whenReady().then(() => {
   });
 });
 
-const sendErrorReport = (error: Error) => {
-  Sentry.captureException(error);
-};
-
-const sendRejectionReport = <T>({ reason, promise }: RejectionReason<T>) => {
-  Sentry.captureException(reason, {
-    extra: {
-      promise,
-    },
-  });
-};
-
 const showErrorMessage = () => {
   if (win) {
     win.webContents.executeJavaScript(`      
@@ -334,39 +322,3 @@ const showErrorMessage = () => {
     `);
   }
 };
-
-const handleErrorsAndRejections = () => {
-  process.on('uncaughtException', (error: Error) => {
-    showErrorMessage();
-    const userResponse = dialog.showMessageBoxSync({
-      type: 'question',
-      buttons: ['Yes', 'No'],
-      title: 'Error Report',
-      message: 'An error occurred. Do you want to send a report for debugging?',
-    });
-
-    if (userResponse === 0) {
-      sendErrorReport(error);
-    } else {
-      console.log({ error });
-    }
-  });
-
-  process.on('unhandledRejection', <T>(reason: RejectionReason<T>) => {
-    showErrorMessage();
-    const userResponse = dialog.showMessageBoxSync({
-      type: 'question',
-      buttons: ['Yes', 'No'],
-      title: 'Error Report',
-      message: 'An error occurred. Do you want to send a report for debugging?',
-    });
-
-    if (userResponse === 0) {
-      sendRejectionReport(reason);
-    } else {
-      console.log({ reason });
-    }
-  });
-};
-
-handleErrorsAndRejections();
