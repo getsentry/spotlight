@@ -8,11 +8,11 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   <TabItem label="JavaScript (Browser)">
   In the Browser you don't need to set `spotlight: true`, `Spotlight.init()` will automatically detect if Sentry is available and if so, hook into the SDK.
   ```javascript {5}
-    Sentry.init({
-      dsn: '___DSN___',
-    });
-    // In the frontend it's important that you init Spotlight after Sentry
-    Spotlight.init();
+  Sentry.init({
+    dsn: '___DSN___',
+  });
+  // In the frontend it's important that you init Spotlight after Sentry
+  Spotlight.init();
   ```
   </TabItem>
   <TabItem label="Node">
@@ -20,10 +20,10 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   Requires `@sentry/node` version `7.82.0` or higher.
   :::
   ```javascript {3}
-    Sentry.init({
-        dsn: '___DSN___',
-        spotlight: process.env.NODE_ENV === "development",
-    });
+  Sentry.init({
+      dsn: '___DSN___',
+      spotlight: process.env.NODE_ENV === "development",
+  });
   ```
   </TabItem>
   <TabItem label="Python">
@@ -31,11 +31,11 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   Requires `sentry-sdk` version `1.37.0` or higher.
   :::
   ```python {4}
-    sentry_sdk.init(
-        dsn="___DSN___",
-        # You should only load this in your development environment
-        spotlight=bool(os.environ.get("DEV")),
-    )
+  sentry_sdk.init(
+      dsn="___DSN___",
+      # You should only load this in your development environment
+      spotlight=bool(os.environ.get("DEV")),
+  )
   ```
   </TabItem>
   <TabItem label="PHP">
@@ -43,11 +43,11 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   Requires `sentry/sentry` version `4.1.0` or higher.
   :::
   ```php {4}
-    \Sentry\init([
-        'dsn' => '___DSN___',
-        // You should only load this in your development environment
-        'spotlight' => App::environment(['local']),
-    ]);
+  \Sentry\init([
+      'dsn' => '___DSN___',
+      // You should only load this in your development environment
+      'spotlight' => App::environment(['local']),
+  ]);
   ```
   </TabItem>
   <TabItem label="Ruby">
@@ -55,11 +55,26 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   Requires `sentry-ruby` version `5.15.0` or higher.
   :::
   ```ruby {4}
-    Sentry.init do |config|
-        config.dsn = '___DSN___'
-        # You should only load this in your development environment
-        config.spotlight = Rails.env.development?
-    end
+  Sentry.init do |config|
+      config.dsn = '___DSN___'
+      # You should only load this in your development environment
+      config.spotlight = Rails.env.development?
+  end
+  ```
+  </TabItem>
+  <TabItem label=".NET">
+  :::caution
+  Requires `sentry-dotnet` version `4.0.0` or higher.
+  :::
+  ```csharp {3-6}
+  SentrySdk.Init(o =>
+  {
+      o.Dsn = "___DSN___";
+#if DEBUG
+      // You should only load this in your development environment
+      o.EnableSpotlight = true;
+#endif
+  });
   ```
   </TabItem>
 </Tabs>
