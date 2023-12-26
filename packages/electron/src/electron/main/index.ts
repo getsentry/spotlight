@@ -222,6 +222,18 @@ store.onDidChange('sentry-send-envelopes', newValue => {
   }
 });
 
+const showErrorMessage = () => {
+  if (win) {
+    win.webContents.executeJavaScript(`      
+      const spotlightRoot = document.getElementById('sentry-spotlight-root');
+      const errorScreen = document.getElementById('error-screen');
+      
+      if (spotlightRoot) spotlightRoot.style.display = 'none';
+      if (errorScreen) errorScreen.style.display = 'block';
+    `);
+  }
+};
+
 async function askForPermissionToSendToSentry(event: Sentry.Event, hint?: Sentry.EventHint) {
   showErrorMessage();
   if (store.get('sentry-enabled') === false) {
@@ -310,15 +322,3 @@ app.whenReady().then(() => {
     incomingPayload: storeIncomingPayload,
   });
 });
-
-const showErrorMessage = () => {
-  if (win) {
-    win.webContents.executeJavaScript(`      
-      const spotlightRoot = document.getElementById('sentry-spotlight-root');
-      const errorScreen = document.getElementById('error-screen');
-      
-      if (spotlightRoot) spotlightRoot.style.display = 'none';
-      if (errorScreen) errorScreen.style.display = 'block';
-    `);
-  }
-};
