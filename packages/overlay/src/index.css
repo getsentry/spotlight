@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 .spotlight-fullscreen-blur {
-  @apply fixed flex h-screen w-screen flex-col overflow-auto bg-black bg-opacity-50 backdrop-blur-sm backdrop-filter;
+  @apply fixed flex h-screen w-screen flex-col overflow-hidden bg-black bg-opacity-50 backdrop-blur-sm backdrop-filter;
   z-index: 999998;
 }
 
 .spotlight-debugger {
-  @apply from-primary-900 to-primary-950 flex h-full flex-col overflow-auto overflow-x-hidden rounded-lg bg-gradient-to-br to-20% font-sans text-white shadow-xl;
+  @apply from-primary-900 to-primary-950 flex h-full flex-col overflow-hidden rounded-lg bg-gradient-to-br to-20% font-sans text-white shadow-xl;
   margin: 2.5vh;
 }
 
@@ -19,30 +19,6 @@
 .spotlight-sidepanel {
   -webkit-app-region: no-drag;
 }
-
-/* .sentry-debugger .tree li {
-  position: relative;
-}
-.sentry-debugger .tree li > div > div {
-  position: relative;
-}
-
-.sentry-debugger .tree li .node::before {
-  @apply border-b-2 border-primary-400 border-l-2;
-
-  display: block;
-  left: -10px;
-  width: 10px;
-  content: "";
-  margin-top: -13px;
-  height: 15px;
-}
-
-.sentry-debugger .tree li:first-child .node::before {
-}
-
-.sentry-debugger .tree li:last-child .node::before {
-} */
 
 ul.tree {
   position: relative;
@@ -107,11 +83,3 @@ ul.tree li:last-child:before {
 .table-values tbody td {
   @apply border-primary-950 border-y px-2 py-1;
 }
-
-/* 
-<th className="w-/12 text-left text-primary-300 font-normal font-mono pr-4 py-0.5">
-<div className="truncate w-full">{key}</div>
-</th>
-<td className="py-0.5">
-<pre className="whitespace-nowrap font-mono">{value}</pre>
-</td> */

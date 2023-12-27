@@ -52,7 +52,7 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
         <select
           id="tabs"
           name="tabs"
-          className="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:outline-none sm:text-sm"
+          className="border-primary-800 bg-primary-800 hover:bg-primary-700 hover:border-primary-700 focus:bg-primary-800 text-primary-100 block w-full rounded-md py-2 pl-3 pr-10 focus:outline-none sm:text-sm"
           onChange={e => {
             const activeTab = tabs.find(tab => tab.id === e.target.value);
             if (activeTab && activeTab.onSelect) {
