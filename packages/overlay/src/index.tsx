@@ -126,6 +126,7 @@ export async function init({
   if (fullPage) {
     docRoot.style.height = '100%';
     docRoot.style.backgroundColor = colors.indigo[950];
+    appRoot.style.height = 'inherit';
   } else {
     appRoot.style.position = 'absolute';
     appRoot.style.top = '0';
