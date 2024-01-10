@@ -61,7 +61,11 @@ jobs:
     name: Docker Image
     needs: publish
     runs-on: ubuntu-latest
-    if: inputs.docker == 'true'
+    if: |
+      always()
+      && inputs.docker == 'true'
+      && jobs.publish.result != 'failure'
+      && jobs.publish.result != 'cancelled'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -89,8 +93,11 @@ jobs:
     name: Electron Build
     needs: publish
     runs-on: macos-latest
-    if: inputs.electron == 'true'
-
+    if: |
+      always()
+      && inputs.electron == 'true'
+      && jobs.publish.result != 'failure'
+      && jobs.publish.result != 'cancelled'
     # strategy:
     #   fail-fast: false
     #   matrix:
