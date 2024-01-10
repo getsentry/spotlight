@@ -1,14 +1,17 @@
 name: Publish
-
 on:
   push:
     branches:
       - main
     paths:
       - '**/CHANGELOG.md'
-
+  workflow_dispatch:
+    inputs:
+      nocache:
+        description: 'Do not rely on existing Docker layer cache'
+        default: false
+        type: boolean
 concurrency: ${{ github.workflow }}-${{ github.ref }}
-
 jobs:
   publish:
     name: Publish
@@ -40,6 +43,33 @@ jobs:
         with:
           publish: pnpm changeset:publish
           createGithubReleases: true
+
+  docker:
+    name: Docker Image
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        run: docker login --username '${{ github.actor }}' --password-stdin ghcr.io <<< "$GHCR_TOKEN"
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Docker Context
+        run: docker buildx create --driver docker-container --use
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          cache-from: type=gha,scope=prod
+          no-cache: ${{ inputs.nocache == 'true' }}
+          push: true
+          tags: |
+            ghcr.io/getsentry/spotlight:latest
+            ghcr.io/getsentry/spotlight:${{ github.sha }}
 
   electron:
     name: Electron Build
