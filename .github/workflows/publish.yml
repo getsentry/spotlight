@@ -67,6 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !cancelled()
+      && inputs.docker == 'true'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
