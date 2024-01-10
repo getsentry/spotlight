@@ -88,6 +88,10 @@ jobs:
             ghcr.io/getsentry/spotlight:latest
             ghcr.io/getsentry/spotlight:${{ github.sha }}
 
+      - name: Summarize
+        run: |
+          echo "**Tag:** ``ghcr.io/getsentry/spotlight:${{ github.sha }}``" >> $GITHUB_STEP_SUMMARY
+
   electron:
     name: Electron Build
     needs: publish
