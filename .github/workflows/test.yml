@@ -13,9 +13,9 @@ env:
 
   DEP_CACHE_KEY: ${{ github.event.inputs.commit || github.sha }}
   CACHED_DEP_PATHS: |
-    ${{ github.workspace }}/packages/*/node_modules  
-    ${{ github.workspace }}/e2e-tests/*/node_modules  
-    ${{ github.workspace }}/demos/*/node_modules  
+    ${{ github.workspace }}/packages/*/node_modules
+    ${{ github.workspace }}/e2e-tests/*/node_modules
+    ${{ github.workspace }}/demos/*/node_modules
     ${{ github.workspace }}/node_modules
 
 jobs:
@@ -70,7 +70,7 @@ jobs:
 
       - name: Configure Docker Context
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.docker_any_changed == 'true' }}
-        run: docker buildx create --driver docker-container --use
+        uses: docker/setup-buildx-action@v3
 
       - name: Build Docker Image
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.docker_any_changed == 'true' }}
