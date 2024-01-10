@@ -23,6 +23,10 @@ on:
         description: 'Publish Electron package'
         default: false
         type: boolean
+      test:
+        description: 'Test'
+        default: false
+        type: boolean
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   publish:
@@ -63,8 +67,6 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !cancelled()
-      && inputs.docker == 'true'
-      && (needs.publish.result == 'success' || needs.publish.result == 'skipped')
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
