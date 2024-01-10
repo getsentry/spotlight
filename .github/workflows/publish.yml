@@ -62,10 +62,9 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
     if: |
-      always()
+      !cancelled()
       && inputs.docker == 'true'
-      && needs.publish.result != 'failure'
-      && needs.publish.result != 'cancelled'
+      && (needs.publish.result == 'success' || needs.publish.result == 'skipped')
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -94,10 +93,9 @@ jobs:
     needs: publish
     runs-on: macos-latest
     if: |
-      always()
+      !cancelled()
       && inputs.electron == 'true'
-      && needs.publish.result != 'failure'
-      && needs.publish.result != 'cancelled'
+      && (needs.publish.result == 'success' || needs.publish.result == 'skipped')
     # strategy:
     #   fail-fast: false
     #   matrix:
