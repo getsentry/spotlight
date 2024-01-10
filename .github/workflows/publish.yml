@@ -11,6 +11,18 @@ on:
         description: 'Do not rely on existing Docker layer cache'
         default: false
         type: boolean
+      docker:
+        description: 'Publish Docker package'
+        default: false
+        type: boolean
+      npm:
+        description: 'Publish NPM package (immutable)'
+        default: false
+        type: boolean
+      electron:
+        description: 'Publish Electron package'
+        default: false
+        type: boolean
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   publish:
@@ -21,6 +33,7 @@ jobs:
     if: |
       contains(github.event.head_commit.message, 'meta(changelog)') 
       && contains(github.event.head_commit.message, 'Update package versions')
+      && inputs.npm == 'true'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -48,6 +61,7 @@ jobs:
     name: Docker Image
     needs: publish
     runs-on: ubuntu-latest
+    if: inputs.docker == 'true'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -75,6 +89,7 @@ jobs:
     name: Electron Build
     needs: publish
     runs-on: macos-latest
+    if: inputs.electron == 'true'
 
     # strategy:
     #   fail-fast: false
