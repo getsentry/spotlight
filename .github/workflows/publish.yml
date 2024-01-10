@@ -33,7 +33,7 @@ jobs:
     if: |
       contains(github.event.head_commit.message, 'meta(changelog)') 
       && contains(github.event.head_commit.message, 'Update package versions')
-      && inputs.npm == 'true'
+      && inputs.npm
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !cancelled()
-      && inputs.docker == 'true'
+      && inputs.docker
       && (needs.publish.result == 'success' || needs.publish.result == 'skipped')
     steps:
       - name: Checkout Repo
@@ -82,7 +82,7 @@ jobs:
         with:
           context: .
           cache-from: type=gha,scope=prod
-          no-cache: ${{ inputs.nocache == 'true' }}
+          no-cache: ${{ inputs.nocache }}
           push: true
           tags: |
             ghcr.io/getsentry/spotlight:latest
@@ -94,7 +94,7 @@ jobs:
     runs-on: macos-latest
     if: |
       !cancelled()
-      && inputs.electron == 'true'
+      && inputs.electron
       && (needs.publish.result == 'success' || needs.publish.result == 'skipped')
     # strategy:
     #   fail-fast: false
