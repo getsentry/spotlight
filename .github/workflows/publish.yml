@@ -62,7 +62,7 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
     if: |
-      always()
+      !cancelled()
       && inputs.docker == 'true'
       && (needs.publish.result == 'success' || needs.publish.result == 'skipped')
     steps:
@@ -93,7 +93,7 @@ jobs:
     needs: publish
     runs-on: macos-latest
     if: |
-      always()
+      !cancelled()
       && inputs.electron == 'true'
       && (needs.publish.result == 'success' || needs.publish.result == 'skipped')
     # strategy:
