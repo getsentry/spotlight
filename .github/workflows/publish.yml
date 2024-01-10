@@ -67,7 +67,6 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !cancelled()
-      && ${{ inputs.docker == 'true' }}
       && (needs.publish.result == 'success' || needs.publish.result == 'skipped')
     steps:
       - name: Checkout Repo
