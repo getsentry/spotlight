@@ -64,6 +64,7 @@ jobs:
     if: |
       !cancelled()
       && inputs.docker == 'true'
+      && (needs.publish.result == 'success' || needs.publish.result == 'skipped')
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
