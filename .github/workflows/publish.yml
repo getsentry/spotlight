@@ -64,8 +64,8 @@ jobs:
     if: |
       always()
       && inputs.docker == 'true'
-      && jobs.publish.result != 'failure'
-      && jobs.publish.result != 'cancelled'
+      && needs.publish.result != 'failure'
+      && needs.publish.result != 'cancelled'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -96,8 +96,8 @@ jobs:
     if: |
       always()
       && inputs.electron == 'true'
-      && jobs.publish.result != 'failure'
-      && jobs.publish.result != 'cancelled'
+      && needs.publish.result != 'failure'
+      && needs.publish.result != 'cancelled'
     # strategy:
     #   fail-fast: false
     #   matrix:
