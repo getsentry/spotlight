@@ -9,12 +9,12 @@ COPY . /app
 # https://github.com/pnpm/pnpm/issues/6295
 RUN echo "dedupe-peer-dependents=false" > .npmrc
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm run --filter="./packages/sidecar" build
-RUN pnpm deploy --filter="./packages/sidecar" --prod /deploy/sidecar
+RUN pnpm run --filter="./packages/spotlight" build
+RUN pnpm deploy --filter="./packages/spotlight" --prod /deploy/spotlight
 
 FROM base as sidecar
 # FROM gcr.io/distroless/nodejs20-debian12 as sidecar
-COPY --from=build /deploy/sidecar /app
+COPY --from=build /deploy/spotlight /app
 WORKDIR /app
 EXPOSE 8969
-ENTRYPOINT [ "./server.js" ]
+ENTRYPOINT [ "./bin/run.js" ]
