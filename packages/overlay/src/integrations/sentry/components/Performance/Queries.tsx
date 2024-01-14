@@ -89,7 +89,11 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
       </table>
     );
   }
-  return <div>No Database queries found. Add integration in Sentry initialization to track Database queries.</div>;
+  return (
+    <div className="text-primary-300">
+      No Database queries found. Add integration in Sentry initialization to track Database queries.
+    </div>
+  );
 };
 
 export default Queries;
