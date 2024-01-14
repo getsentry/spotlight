@@ -242,12 +242,6 @@ function reverseStackTraces(errorEvent: SentryErrorEvent): void {
     return;
   }
 
-  // TODO: To check if stacktrace is already reverse or not for php and python.
-  // Check if errorEvent.platform contains php, or python and if so return early
-  // as the stacktrace is already in the correct order.
-  // if (errorEvent.platform && (errorEvent.platform.includes('php') || errorEvent.platform.includes('python'))) {
-  //   return;
-  // }
   errorEvent.exception.values.forEach(value => {
     if (value.stacktrace) {
       value.stacktrace.frames.reverse();
