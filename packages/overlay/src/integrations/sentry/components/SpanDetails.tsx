@@ -47,7 +47,7 @@ export default function SpanDetails({
   const errors = dataCache.getEventsByTrace(span.trace_id).filter(e => e.type !== 'transaction' && 'exception' in e);
 
   return (
-    <SidePanel backTo={`/traces/${span.trace_id}`}>
+    <SidePanel backto={`/traces/${span.trace_id}`}>
       <SidePanelHeader
         title="Span Details"
         subtitle={
@@ -60,7 +60,7 @@ export default function SpanDetails({
             {span.span_id}
           </>
         }
-        backTo={`/traces/${span.trace_id}`}
+        backto={`/traces/${span.trace_id}`}
       />
 
       <div className="space-y-6">

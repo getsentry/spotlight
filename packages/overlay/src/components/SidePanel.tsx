@@ -5,11 +5,11 @@ import { SidePanelProps } from '~/types';
 export function SidePanelHeader({
   title,
   subtitle,
-  backTo,
+  backto,
 }: {
   title: ReactNode;
   subtitle?: ReactNode;
-  backTo: string;
+  backto: string;
 }) {
   return (
     <div className="border-b-primary-400 mb-4 flex border-b pb-4">
@@ -19,7 +19,7 @@ export function SidePanelHeader({
       </div>
       <Link
         className="hover:bg-primary-900 -my-1 flex cursor-pointer items-center justify-center rounded px-6 py-1 font-mono text-2xl"
-        to={backTo}
+        to={backto}
       >
         {'✕'}
       </Link>
@@ -32,7 +32,7 @@ export default function SidePanel(props: SidePanelProps) {
   return (
     <div
       className="fixed bottom-0 left-0 right-0 top-0 z-10 bg-black  bg-opacity-30"
-      onClick={() => navigateTo(props.backTo)}
+      onClick={() => navigateTo(props.backto)}
     >
       <div
         onClick={e => e.stopPropagation()}
