@@ -47,7 +47,7 @@ Sentry.init({
 });
 
 if (process.env.NODE_ENV === 'development') {
-	Spotlight.init();
+  Spotlight.init();
 }
 ```
 </TabItem>
@@ -56,7 +56,6 @@ if (process.env.NODE_ENV === 'development') {
 ```javascript {3, 7} ins="spotlight:"
 // sentry.server.config.(js/ts)
 import * as Sentry from '@sentry/nextjs';
-import * as Spotlight from '@spotlightjs/spotlight';
 
 Sentry.init({
   dsn: '___DSN___',
@@ -70,7 +69,6 @@ Sentry.init({
 ```javascript {3, 7} ins="spotlight:"
 // sentry.edge.config.(js/ts)
 import * as Sentry from '@sentry/nextjs';
-import * as Spotlight from '@spotlightjs/spotlight';
 
 Sentry.init({
   dsn: '___DSN___',
