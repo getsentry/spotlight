@@ -102,11 +102,15 @@ export default defineConfig({
               link: '/setup/',
             },
             {
-              label: 'for Astro',
+              label: 'For Astro',
               link: '/setup/astro/',
             },
             {
-              label: 'for Other Frameworks',
+              label: 'For Next.js',
+              link: '/setup/nextjs/',
+            },
+            {
+              label: 'For Other Frameworks',
               link: '/setup/other/',
             },
             {

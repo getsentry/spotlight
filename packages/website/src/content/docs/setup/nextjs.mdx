@@ -1,0 +1,99 @@
+---
+title: Using Spotlight with Next.js
+description: A guide how to setup Spotlight for Next.js
+---
+
+import { Content as InstallCommand } from "../../../components/InstallCommand.mdx";
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+## Prerequisites
+
+Before integrating Spotlight with Next.js, make sure you have the following prerequisites:
+
+1. **Next.js Project**: Ensure you have a Next.js project set up. If you don't have one, you can create a new Next.js project by following the <a href="https://nextjs.org/docs/getting-started/installation" target="_blank">official documentation</a>.
+
+2. **Sentry Integration**: Sentry should already be integrated into your Next.js project. If you haven't set up Sentry, follow the <a href="https://docs.sentry.io/platforms/javascript/guides/nextjs/" target="_blank">official documentation</a>.
+
+
+## Installation
+
+<InstallCommand />
+
+## Configuration
+
+:::caution
+  Requires `@sentry/nextjs` version `7.82.0` or higher.
+:::
+Initialize Spotlight within `sentry.client.config.js`, after you've initialized the Sentry:
+
+Initialize Spotlight after Sentry and start the Sidecar on the server. Just add a little code to your [SvelteKit hooks](https://kit.svelte.dev/docs/hooks) files:
+
+<Tabs>
+
+<TabItem label="Client">
+In the Browser you don't need to set `spotlight: true`, `Spotlight.init()` will automatically detect if Sentry is available and if so, hook into the SDK.
+
+Hence, it is optional for `sentry.client.config.(js/ts)` in `Sentry.init()`
+```javascript {3, 10-12}
+// sentry.client.config.(js/ts)
+import * as Sentry from '@sentry/nextjs';
+import * as Spotlight from '@spotlightjs/spotlight';
+
+Sentry.init({
+  dsn: '___DSN___',
+  spotlight: process.env.NODE_ENV === 'development' // Optional for client
+  // ...other Sentry options
+});
+
+if (process.env.NODE_ENV === 'development') {
+	Spotlight.init();
+}
+```
+</TabItem>
+
+<TabItem label="Server">
+```javascript {3, 7} ins="spotlight:"
+// sentry.server.config.(js/ts)
+import * as Sentry from '@sentry/nextjs';
+import * as Spotlight from '@spotlightjs/spotlight';
+
+Sentry.init({
+  dsn: '___DSN___',
+  spotlight: process.env.NODE_ENV === 'development'
+  // ...other Sentry options
+});
+```
+</TabItem>
+
+<TabItem label="Edge">
+```javascript {3, 7} ins="spotlight:"
+// sentry.edge.config.(js/ts)
+import * as Sentry from '@sentry/nextjs';
+import * as Spotlight from '@spotlightjs/spotlight';
+
+Sentry.init({
+  dsn: '___DSN___',
+  spotlight: process.env.NODE_ENV === 'development'
+  // ...other Sentry options
+});
+```
+</TabItem>
+
+</Tabs>
+
+For more options on how to configure Spotlight, see [Configuration](/reference/configuration/).
+
+
+
+## Run the Sidecar
+
+Spotlight's [architecture](/architecture/) requires a sidecar to be running alongside your service. This is to enable streaming data collection from your backend services into the Spotlight overlay.
+
+
+<CardGrid>
+  <LinkCard title="Vite" href="/sidecar/vite/" />
+  <LinkCard title="Webpack" href="/sidecar/webpack/" />
+  <LinkCard title="Other" href="/sidecar/npx/" />
+</CardGrid>
+
