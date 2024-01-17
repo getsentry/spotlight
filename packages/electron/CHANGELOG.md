@@ -1,5 +1,20 @@
 # @spotlightjs/electron
 
+## 0.0.14
+
+### Patch Changes
+
+- 1. Added functions to report errors in case of an error in the app.
+     ([#303](https://github.com/getsentry/spotlight/pull/303))
+  2. Added an error page for the Electron app.
+- Updated dependencies
+  [[`f77819a`](https://github.com/getsentry/spotlight/commit/f77819af59ff6c369795ae190b0b3630454f0a00),
+  [`f5a555d`](https://github.com/getsentry/spotlight/commit/f5a555dfc29e752c02cf856d75a92348d1e5920d),
+  [`60b1b69`](https://github.com/getsentry/spotlight/commit/60b1b69293a15d56a3ecac5127d66e57b2640d6c),
+  [`43f3196`](https://github.com/getsentry/spotlight/commit/43f3196163851f828e4bfe151a34af2ad2c21798)]:
+  - @spotlightjs/overlay@1.3.0
+  - @spotlightjs/sidecar@1.3.4
+
 ## 0.0.13
 
 ### Patch Changes

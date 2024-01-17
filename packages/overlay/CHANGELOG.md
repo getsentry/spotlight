@@ -1,5 +1,22 @@
 # @spotlightjs/core
 
+## 1.3.0
+
+### Minor Changes
+
+- Added performance and nested queries tab in spotlight to capture DB queries
+  ([#314](https://github.com/getsentry/spotlight/pull/314))
+
+### Patch Changes
+
+- updated dockerfile to use packages/spotlight build to serve index page
+  ([#311](https://github.com/getsentry/spotlight/pull/311))
+
+- ui improvements ([#305](https://github.com/getsentry/spotlight/pull/305))
+
+- Reverse the error stack trace for php and python platform events
+  ([#312](https://github.com/getsentry/spotlight/pull/312))
+
 ## 1.2.3
 
 ### Patch Changes
