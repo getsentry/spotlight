@@ -109,12 +109,20 @@ export default defineConfig({
               link: '/setup/nextjs/',
             },
             {
-              label: 'For Other Frameworks',
-              link: '/setup/other/',
+              label: 'For Remix',
+              link: '/setup/remix/',
+            },
+            {
+              label: 'For SvelteKit',
+              link: '/setup/sveltekit/',
             },
             {
               label: 'Just HTML',
               link: '/setup/html/',
+            },
+            {
+              label: 'For Other Frameworks',
+              link: '/setup/other/',
             },
           ],
         },
