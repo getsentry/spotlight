@@ -1,6 +1,6 @@
 <!-- 
-Tick these boxes IF they're applicable for your PR.
-- Changesets are only required for PRs to Spotlight lbirary packages (e.g. @spotlightjs/overlay). Not for the website/docs or demo app contributions.
+Tick these boxes IF they're applicable to your PR.
+- Changesets are only required for PRs to Spotlight library packages (e.g. @spotlightjs/overlay). Not for the website/docs or demo app contributions.
 - Typo correction or small bugfix PRs don't require an issue. If you're making a bigger change, please open an issue first. 
 -->
 Before opening this PR:
