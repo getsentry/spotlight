@@ -5,6 +5,8 @@ sidebar:
     order: 0
 ---
 
+import { LinkCard } from '@astrojs/starlight/components';
+
 The Sidecar uses SSE (Server-Sent Events) to forward events to the Spotlight overlay. It is a standalone server that can be deployed on the same machine as the Spotlight overlay or on a different machine.
 
 It receives `POST` requests on `/stream` from the Sentry SDKs or any other source and forwards them to the Spotlight overlay via SSE.
