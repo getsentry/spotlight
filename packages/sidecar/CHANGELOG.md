@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 1.3.4
+
+### Patch Changes
+
+- updated dockerfile to use packages/spotlight build to serve index page
+  ([#311](https://github.com/getsentry/spotlight/pull/311))
+
 ## 1.3.3
 
 ### Patch Changes
