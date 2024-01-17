@@ -111,6 +111,10 @@ export function processEnvelope({ data }: RawEventContext) {
       continue;
     }
     const header = JSON.parse(rawEntries[i]);
+    if (header.type && header.type == 'statsd') {
+      // skip metric events
+      continue;
+    }
     const payload = JSON.parse(rawEntries[i + 1]);
     // data sanitization
     if (header.type) {
