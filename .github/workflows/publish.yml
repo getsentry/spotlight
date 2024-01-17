@@ -13,15 +13,15 @@ on:
         type: boolean
       docker:
         description: 'Publish Docker package'
-        default: false
+        default: true
         type: boolean
       npm:
         description: 'Publish NPM package (immutable)'
-        default: false
+        default: true
         type: boolean
       electron:
         description: 'Publish Electron package'
-        default: false
+        default: true
         type: boolean
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
