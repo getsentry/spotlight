@@ -25,8 +25,8 @@ on:
         type: boolean
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
-  publish:
-    name: Publish
+  npm:
+    name: NPM Package
     runs-on: ubuntu-latest
     # For whatever reason, yaml does not like the full "meta(changelog): Update package versions" string
     # So we check this in two parts
@@ -59,12 +59,12 @@ jobs:
 
   docker:
     name: Docker Image
-    needs: publish
+    needs: npm
     runs-on: ubuntu-latest
     if: |
       !cancelled()
       && inputs.docker
-      && (needs.publish.result == 'success' || needs.publish.result == 'skipped')
+      && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -98,12 +98,12 @@ jobs:
 
   electron:
     name: Electron Build
-    needs: publish
+    needs: npm
     runs-on: macos-latest
     if: |
       !cancelled()
       && inputs.electron
-      && (needs.publish.result == 'success' || needs.publish.result == 'skipped')
+      && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
     # strategy:
     #   fail-fast: false
     #   matrix:
