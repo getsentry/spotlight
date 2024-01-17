@@ -33,7 +33,7 @@ Initialize Spotlight within `sentry.client.config.js`, after you've initialized 
 In the Browser you don't need to set `spotlight: true`, `Spotlight.init()` will automatically detect if Sentry is available and if so, hook into the SDK.
 
 Hence, it is optional for `sentry.client.config.(js/ts)` in `Sentry.init()`
-```javascript {3, 10-12}
+```javascript {3, 11-13}
 // sentry.client.config.(js/ts)
 import * as Sentry from '@sentry/nextjs';
 import * as Spotlight from '@spotlightjs/spotlight';
@@ -51,7 +51,7 @@ if (process.env.NODE_ENV === 'development') {
 </TabItem>
 
 <TabItem label="Server">
-```javascript {3, 7} ins="spotlight:"
+```javascript {6} ins="spotlight:"
 // sentry.server.config.(js/ts)
 import * as Sentry from '@sentry/nextjs';
 
@@ -64,7 +64,7 @@ Sentry.init({
 </TabItem>
 
 <TabItem label="Edge">
-```javascript {3, 7} ins="spotlight:"
+```javascript {6} ins="spotlight:"
 // sentry.edge.config.(js/ts)
 import * as Sentry from '@sentry/nextjs';
 
