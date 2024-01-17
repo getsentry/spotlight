@@ -112,5 +112,5 @@ export type WindowWithSpotlight = Window & {
 };
 
 export type SidePanelProps = Omit<ComponentPropsWithoutRef<'div'>, 'className'> & {
-  backTo: string;
+  backto: string;
 };
