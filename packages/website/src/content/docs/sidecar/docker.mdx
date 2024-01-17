@@ -9,5 +9,10 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 We provide a Docker container which runs the Sidecar (including the overlay).
 
 ```
-docker run --rm --pull always --name spotlight -d -p 8969:8969/tcp ghcr.io/getsentry/spotlight:latest
+docker run --rm \
+    --pull always \
+    --name spotlight \
+    --detach \
+    -p 8969:8969/tcp \
+    ghcr.io/getsentry/spotlight:latest
 ```
