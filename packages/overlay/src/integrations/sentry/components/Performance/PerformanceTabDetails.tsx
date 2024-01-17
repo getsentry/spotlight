@@ -49,9 +49,6 @@ export default function PerformanceTabDetails() {
           }}
         />
       )}
-      <div className="bg-primary-950 px-6 py-4">
-        <span className="text-2xl">Performance</span>
-      </div>
       <Tabs tabs={tabs} nested />
       <div className="flex-1 px-6 py-4">
         <Routes>
