@@ -114,3 +114,14 @@ export type WindowWithSpotlight = Window & {
 export type SidePanelProps = Omit<ComponentPropsWithoutRef<'div'>, 'className'> & {
   backto: string;
 };
+
+export type CrumbProps = {
+  id: string;
+  label: string;
+  link?: boolean;
+  to?: string;
+};
+
+export type BreadcrumbProps = {
+  crumbs: CrumbProps[];
+};

@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { Outlet, Route, Routes } from 'react-router-dom';
+import Tabs from '~/components/Tabs';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
-import Tabs from '../../../../components/Tabs';
 import { useSentrySpans } from '../../data/useSentrySpans';
 import HiddenItemsButton from '../HiddenItemsButton';
 import Queries from './Queries';
 import QueryTraces from './QueryTraces';
-import Resources from './Resources';
-import { WebVitals } from './WebVitals';
 
 export default function PerformanceTabDetails() {
   const context = useSpotlightContext();
@@ -25,18 +23,6 @@ export default function PerformanceTabDetails() {
       active: activeTab === 'queries',
       onSelect: () => setActiveTab('queries'),
     },
-    {
-      id: 'resources',
-      title: 'Resources',
-      active: activeTab === 'resources',
-      onSelect: () => setActiveTab('resources'),
-    },
-    {
-      id: 'webVitals',
-      title: 'Web Vitals',
-      active: activeTab === 'webVitals',
-      onSelect: () => setActiveTab('webVitals'),
-    },
   ];
 
   return (
@@ -50,10 +36,8 @@ export default function PerformanceTabDetails() {
         />
       )}
       <Tabs tabs={tabs} nested />
-      <div className="flex-1 px-6 py-4">
+      <div className="flex-1">
         <Routes>
-          <Route path="resources" element={<Resources />} />
-          <Route path="webVitals" element={<WebVitals />} />
           <Route path="queries/:type" element={<QueryTraces showAll={showAll} />} />
           {/* Default tab */}
           <Route path="*" element={<Queries showAll={showAll} />} />
