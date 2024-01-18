@@ -90,7 +90,7 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
     );
   }
   return (
-    <div className="text-primary-300">
+    <div className="text-primary-300 px-6 py-4">
       No Database queries found. Add integration in Sentry initialization to track Database queries.
     </div>
   );
