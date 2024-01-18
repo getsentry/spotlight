@@ -11,17 +11,17 @@ export default function PerformanceTabDetails() {
   const context = useSpotlightContext();
   const [allSpans, localSpans] = useSentrySpans();
 
-  const [activeTab, setActiveTab] = useState('queries');
+  const [activeTab, setActiveTab] = useState('');
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
 
   const hiddenItemCount = allSpans.length - localSpans.length;
 
   const tabs = [
     {
-      id: 'queries',
+      id: '', // To set the tab as default and to navigate back properly
       title: 'Queries',
-      active: activeTab === 'queries',
-      onSelect: () => setActiveTab('queries'),
+      active: activeTab === '',
+      onSelect: () => setActiveTab(''),
     },
   ];
 
