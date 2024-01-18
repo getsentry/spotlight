@@ -49,38 +49,38 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
   if (queriesData) {
     return (
       <table className="divide-primary-700 min-w-full divide-y">
-        <thead className="bg-primary-900">
+        <thead>
           <tr>
-            <th scope="col" className="px-4 py-3.5 text-left text-sm font-semibold">
+            <th scope="col" className="text-primary-100 px-6 py-3.5 text-left text-sm font-semibold">
               Query Type
             </th>
-            <th scope="col" className="px-4 py-3.5 text-right text-sm font-semibold">
+            <th scope="col" className="text-primary-100 px-6 py-3.5 text-right text-sm font-semibold">
               Queries per minute
             </th>
-            <th scope="col" className="px-4 py-3.5 text-right text-sm font-semibold">
+            <th scope="col" className="text-primary-100 px-6 py-3.5 text-right text-sm font-semibold">
               Avg Time
             </th>
-            <th scope="col" className="px-4 py-3.5 text-right text-sm font-semibold">
+            <th scope="col" className="text-primary-100 px-6 py-3.5 text-right text-sm font-semibold">
               Total Time
             </th>
           </tr>
         </thead>
-        <tbody className="bg-primary-900 bg-opacity-50">
+        <tbody>
           {queriesData.map(query => (
             <tr key={query.type} className="hover:bg-primary-900">
-              <td className="whitespace-nowrap px-4 py-4 text-left text-sm font-medium text-gray-200">
-                <Link className="hover:underline" to={`/performance/queries/${query.type}`}>
+              <td className="text-primary-200 whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
+                <Link className="truncate hover:underline" to={`/performance/queries/${query.type}`}>
                   {query.type}
                 </Link>
               </td>
-              <td className="whitespace-nowrap px-4 py-4 text-right text-sm font-medium text-gray-200">
+              <td className="text-primary-200 whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                 {query.queriesPerMinute}
                 {'/min'}
               </td>
-              <td className="whitespace-nowrap px-4 py-4 text-right text-sm font-medium text-gray-200">
+              <td className="text-primary-200 whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                 {getFormattedDuration(query.avgTime)}
               </td>
-              <td className="whitespace-nowrap px-4 py-4 text-right text-sm font-medium text-gray-200">
+              <td className="text-primary-200 whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                 {getFormattedDuration(query.totalTime)}
               </td>
             </tr>
@@ -90,7 +90,7 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
     );
   }
   return (
-    <div className="text-primary-300">
+    <div className="text-primary-300 px-6 py-4">
       No Database queries found. Add integration in Sentry initialization to track Database queries.
     </div>
   );
