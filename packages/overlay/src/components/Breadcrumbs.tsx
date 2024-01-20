@@ -3,7 +3,7 @@ import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
 import classNames from '~/lib/classNames';
 import { BreadcrumbProps } from '~/types';
 
-const Breadcrumbs = ({ crumbs }: BreadcrumbProps) => {
+export default function Breadcrumbs({ crumbs }: BreadcrumbProps) {
   return (
     <div className="flex items-center gap-1 px-6 py-4">
       {crumbs.map((crumb, index) => {
@@ -31,6 +31,4 @@ const Breadcrumbs = ({ crumbs }: BreadcrumbProps) => {
       })}
     </div>
   );
-};
-
-export default Breadcrumbs;
+}

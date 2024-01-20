@@ -5,7 +5,8 @@ import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import { useSentrySpans } from '../../data/useSentrySpans';
 import HiddenItemsButton from '../HiddenItemsButton';
 import Queries from './Queries';
-import QueryTraces from './QueryTraces';
+import QuerySummary from './QuerySummary';
+import Resources from './Resources';
 
 export default function PerformanceTabDetails() {
   const context = useSpotlightContext();
@@ -18,10 +19,16 @@ export default function PerformanceTabDetails() {
 
   const tabs = [
     {
-      id: '', // To set the tab as default and to navigate back properly
+      id: 'queries',
       title: 'Queries',
-      active: activeTab === '',
-      onSelect: () => setActiveTab(''),
+      active: activeTab === 'queries',
+      onSelect: () => setActiveTab('queries'),
+    },
+    {
+      id: 'resources',
+      title: 'Resources',
+      active: activeTab === 'resources',
+      onSelect: () => setActiveTab('resources'),
     },
   ];
 
@@ -38,7 +45,8 @@ export default function PerformanceTabDetails() {
       <Tabs tabs={tabs} nested />
       <div className="flex-1">
         <Routes>
-          <Route path="queries/:type" element={<QueryTraces showAll={showAll} />} />
+          <Route path="queries/:type" element={<QuerySummary showAll={showAll} />} />
+          <Route path="resources" element={<Resources showAll={showAll} />} />
           {/* Default tab */}
           <Route path="*" element={<Queries showAll={showAll} />} />
         </Routes>
