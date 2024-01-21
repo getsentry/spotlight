@@ -16,8 +16,19 @@
   @apply relative rounded-none shadow-none;
   margin: 0;
 }
+
 .spotlight-sidepanel {
   -webkit-app-region: no-drag;
+  animation: sidepanel 100ms ease-in;
+}
+
+@keyframes sidepanel {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 ul.tree {
