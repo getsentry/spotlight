@@ -105,7 +105,7 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
                 >
                   <div
                     className={classNames(
-                      'flex cursor-pointer items-center gap-1',
+                      'flex cursor-pointer select-none items-center gap-1',
                       header.primary ? 'justify-start' : 'justify-end',
                     )}
                     onClick={() => toggleSortOrder(header.sortKey)}

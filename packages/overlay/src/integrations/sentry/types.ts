@@ -1,3 +1,5 @@
+import { Measurements } from '@sentry/types';
+
 export type FrameVars = {
   [key: string]: string;
 };
@@ -59,6 +61,7 @@ type CommonEventAttrs = {
   tags?: Tags;
   extra?: { [key: string]: string | number };
   sdk?: Sdk;
+  measurements?: Measurements;
 };
 
 export type Context = {
@@ -131,4 +134,59 @@ export type Sdk = {
   name: string;
   version: string;
   lastSeen: number;
+};
+
+export type SentryEventWithPerformanceData = Omit<SentryEvent, 'measurements'> & {
+  measurements: Record<
+    string,
+    {
+      value: number;
+      unit: string;
+    }
+  > & {
+    'score.total': {
+      value: number;
+      unit: string;
+    };
+    'score.fcp': {
+      value: number;
+      unit: string;
+    };
+    'score.lcp': {
+      value: number;
+      unit: string;
+    };
+    'score.fid': {
+      value: number;
+      unit: string;
+    };
+    'score.cls': {
+      value: number;
+      unit: string;
+    };
+    'score.ttfb': {
+      value: number;
+      unit: string;
+    };
+    'score.weight.fcp': {
+      value: number;
+      unit: string;
+    };
+    'score.weight.lcp': {
+      value: number;
+      unit: string;
+    };
+    'score.weight.fid': {
+      value: number;
+      unit: string;
+    };
+    'score.weight.cls': {
+      value: number;
+      unit: string;
+    };
+    'score.weight.ttfb': {
+      value: number;
+      unit: string;
+    };
+  };
 };

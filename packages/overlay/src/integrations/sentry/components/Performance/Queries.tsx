@@ -105,7 +105,7 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
                 key={header.id}
                 scope="col"
                 className={classNames(
-                  'text-primary-100 px-6 py-3.5 text-sm font-semibold',
+                  'text-primary-100 select-none px-6 py-3.5 text-sm font-semibold',
                   header.primary ? 'w-2/5' : 'w-[15%]',
                 )}
               >

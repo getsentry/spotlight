@@ -78,3 +78,115 @@ export const QUERY_SUMMARY_HEADERS = [
     sortKey: QUERY_SUMMARY_SORT_KEYS.timeSpent,
   },
 ];
+
+export const WEB_VITALS_SORT_KEYS = {
+  pages: 'Pages',
+  lcp: 'LCP',
+  fcp: 'FCP',
+  fid: 'FID',
+  cls: 'CLS',
+  ttfb: 'TTFB',
+  score: 'PERFORMANCE_SCORE',
+};
+
+export const WEB_VITALS_HEADERS = [
+  {
+    id: 'pages',
+    title: 'Pages',
+    sortKey: WEB_VITALS_SORT_KEYS.pages,
+    primary: true,
+  },
+  {
+    id: 'lcp',
+    title: 'LCP',
+    sortKey: WEB_VITALS_SORT_KEYS.lcp,
+  },
+  {
+    id: 'fcp',
+    title: 'FCP',
+    sortKey: WEB_VITALS_SORT_KEYS.fcp,
+  },
+  {
+    id: 'fid',
+    title: 'FID',
+    sortKey: WEB_VITALS_SORT_KEYS.fid,
+  },
+  {
+    id: 'cls',
+    title: 'CLS',
+    sortKey: WEB_VITALS_SORT_KEYS.cls,
+  },
+  {
+    id: 'ttfb',
+    title: 'TTFB',
+    sortKey: WEB_VITALS_SORT_KEYS.ttfb,
+  },
+  {
+    id: 'score',
+    title: 'Perf Score',
+    sortKey: WEB_VITALS_SORT_KEYS.score,
+  },
+];
+
+export type WebVitals = 'lcp' | 'fcp' | 'cls' | 'ttfb' | 'fid';
+
+export const PERFORMANCE_SCORE = {
+  profiles: [
+    {
+      name: 'Chrome',
+      scoreComponents: [
+        { measurement: 'fcp', weight: 0.15, p10: 900.0, p50: 1600.0, optional: false },
+        { measurement: 'lcp', weight: 0.3, p10: 1200.0, p50: 2400.0, optional: false },
+        { measurement: 'fid', weight: 0.3, p10: 100.0, p50: 300.0, optional: true },
+        { measurement: 'cls', weight: 0.15, p10: 0.1, p50: 0.25, optional: false },
+        { measurement: 'ttfb', weight: 0.1, p10: 200.0, p50: 400.0, optional: false },
+      ],
+      condition: { op: 'eq', name: 'event.contexts.browser.name', value: 'Chrome' },
+    },
+    // TODO: Currently not getting browser data in events, so made these comments and sticked to chrome always.
+    // {
+    //   "name": "Firefox",
+    //   "scoreComponents": [
+    //     {"measurement": "fcp", "weight": 0.15, "p10": 900.0, "p50": 1600.0, "optional": false},
+    //     {"measurement": "lcp", "weight": 0.0, "p10": 1200.0, "p50": 2400.0, "optional": false},
+    //     {"measurement": "fid", "weight": 0.30, "p10": 100.0, "p50": 300.0, "optional": true},
+    //     {"measurement": "cls", "weight": 0.0, "p10": 0.1, "p50": 0.25, "optional": false},
+    //     {"measurement": "ttfb", "weight": 0.10, "p10": 200.0, "p50": 400.0, "optional": false}
+    //   ],
+    //   "condition": {"op": "eq", "name": "event.contexts.browser.name", "value": "Firefox"}
+    // },
+    // {
+    //   "name": "Safari",
+    //   "scoreComponents": [
+    //     {"measurement": "fcp", "weight": 0.15, "p10": 900.0, "p50": 1600.0, "optional": false},
+    //     {"measurement": "lcp", "weight": 0.0, "p10": 1200.0, "p50": 2400.0, "optional": false},
+    //     {"measurement": "fid", "weight": 0.0, "p10": 100.0, "p50": 300.0, "optional": true},
+    //     {"measurement": "cls", "weight": 0.0, "p10": 0.1, "p50": 0.25, "optional": false},
+    //     {"measurement": "ttfb", "weight": 0.10, "p10": 200.0, "p50": 400.0, "optional": false}
+    //   ],
+    //   "condition": {"op": "eq", "name": "event.contexts.browser.name", "value": "Safari"}
+    // },
+    // {
+    //   "name": "Edge",
+    //   "scoreComponents": [
+    //     {"measurement": "fcp", "weight": 0.15, "p10": 900.0, "p50": 1600.0, "optional": false},
+    //     {"measurement": "lcp", "weight": 0.30, "p10": 1200.0, "p50": 2400.0, "optional": false},
+    //     {"measurement": "fid", "weight": 0.30, "p10": 100.0, "p50": 300.0, "optional": true},
+    //     {"measurement": "cls", "weight": 0.15, "p10": 0.1, "p50": 0.25, "optional": false},
+    //     {"measurement": "ttfb", "weight": 0.10, "p10": 200.0, "p50": 400.0, "optional": false}
+    //   ],
+    //   "condition": {"op": "eq", "name": "event.contexts.browser.name", "value": "Edge"}
+    // },
+    // {
+    //   "name": "Opera",
+    //   "scoreComponents": [
+    //     {"measurement": "fcp", "weight": 0.15, "p10": 900.0, "p50": 1600.0, "optional": false},
+    //     {"measurement": "lcp", "weight": 0.30, "p10": 1200.0, "p50": 2400.0, "optional": false},
+    //     {"measurement": "fid", "weight": 0.30, "p10": 100.0, "p50": 300.0, "optional": true},
+    //     {"measurement": "cls", "weight": 0.15, "p10": 0.1, "p50": 0.25, "optional": false},
+    //     {"measurement": "ttfb", "weight": 0.10, "p10": 200.0, "p50": 400.0, "optional": false}
+    //   ],
+    //   "condition": {"op": "eq", "name": "event.contexts.browser.name", "value": "Opera"}
+    // }
+  ],
+};
