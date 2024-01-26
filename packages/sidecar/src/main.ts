@@ -298,7 +298,6 @@ export function setupSidecar({
   isSidecarRunning(sidecarPort).then(isRunning => {
     if (isRunning) {
       logger.info(`Sidecar is already running on port ${sidecarPort}`);
-      process.exit(1);
     } else {
       if (!serverInstance) {
         serverInstance = startServer(buffer, sidecarPort, basePath, incomingPayload);
