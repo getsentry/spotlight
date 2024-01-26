@@ -73,7 +73,7 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
     );
   }, [showAll, sort]);
 
-  if (filteredDBSpans && type) {
+  if (type && filteredDBSpans && filteredDBSpans.length) {
     return (
       <>
         <Breadcrumbs

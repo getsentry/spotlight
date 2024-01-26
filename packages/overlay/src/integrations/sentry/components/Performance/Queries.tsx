@@ -95,7 +95,7 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
     }
   }, [showAll, sort]);
 
-  if (queriesData) {
+  if (queriesData && queriesData.length) {
     return (
       <table className="divide-primary-700 w-full table-fixed divide-y">
         <thead>

@@ -115,7 +115,7 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
     }
   }, [sort, showAll]);
 
-  if (resources) {
+  if (resources && resources.length) {
     return (
       <table className="divide-primary-700 w-full table-fixed divide-y">
         <thead>
