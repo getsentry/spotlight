@@ -105,7 +105,10 @@ const WebVitalsDetail = () => {
           </div>
           <div className="flex w-full flex-wrap justify-center gap-2">
             {projectScoreHeaders.map(header => (
-              <div className="bg-primary-900 border-primary-400 flex w-80 flex-col items-center gap-4 rounded-lg border p-2 shadow-lg">
+              <div
+                key={header.id}
+                className="bg-primary-900 border-primary-400 flex w-80 flex-col items-center gap-4 rounded-lg border p-2 shadow-lg"
+              >
                 <span className="text-primary-300 text-base font-semibold">{header.label}</span>
                 <span className="text-primary-300 text-sm font-light">{header.description}</span>
                 <h2 className="text-primary-300 text-lg font-bold">{header.score ?? '-'}</h2>

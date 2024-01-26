@@ -64,7 +64,7 @@ function RingChart({
       currentRotate += (360 * maxValue) / sumMaxValues;
 
       const cx = radius + barWidth / 2;
-      const key = `${cx}-${backgroundColors[index]}`;
+      const key = `${cx}-${backgroundColors[index]}-${segmentColors[index]}`;
 
       return [
         <circle
