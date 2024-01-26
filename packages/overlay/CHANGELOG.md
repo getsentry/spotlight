@@ -1,5 +1,18 @@
 # @spotlightjs/core
 
+## 1.3.1
+
+### Patch Changes
+
+- 1. Resource tab added ([#327](https://github.com/getsentry/spotlight/pull/327))
+  2. Queries tab and query Summary table improvements
+  3. Added sorting for tables
+
+- fixed ui for queries tab and added common breadcrumb component
+  ([#323](https://github.com/getsentry/spotlight/pull/323))
+
+- Fix fetch implementation to not cause endless loop ([#335](https://github.com/getsentry/spotlight/pull/335))
+
 ## 1.3.0
 
 ### Minor Changes

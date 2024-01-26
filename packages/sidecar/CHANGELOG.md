@@ -1,5 +1,15 @@
 # @spotlightjs/sidecar
 
+## 1.3.5
+
+### Patch Changes
+
+- Fixed setupSidecar function to not exit the process when existing sidecar is detected.
+  ([#334](https://github.com/getsentry/spotlight/pull/334))
+
+- Added a health route for sidecar with a header to check if sidecar is already running on port or not, to prevent
+  ([#325](https://github.com/getsentry/spotlight/pull/325)) unnecessary retries
+
 ## 1.3.4
 
 ### Patch Changes
