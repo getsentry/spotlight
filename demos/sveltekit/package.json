@@ -36,5 +36,8 @@
 		"vite": "^4.5.1",
 		"vitest": "^0.34.0"
 	},
-	"type": "module"
+	"type": "module",
+	"volta": {
+		"extends": "../../package.json"
+	}
 }
