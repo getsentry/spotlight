@@ -190,3 +190,18 @@ export type SentryEventWithPerformanceData = Omit<SentryEvent, 'measurements'> &
     };
   };
 };
+
+export type MetricScoreProps = {
+  fcpScore: number;
+  lcpScore: number;
+  clsScore: number;
+  fidScore: number;
+  ttfbScore: number;
+};
+export type MetricWeightsProps = {
+  fcp: number;
+  lcp: number;
+  cls: number;
+  fid: number;
+  ttfb: number;
+};

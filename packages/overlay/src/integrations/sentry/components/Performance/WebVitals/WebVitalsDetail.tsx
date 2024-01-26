@@ -1,26 +1,12 @@
 import { useParams } from 'react-router-dom';
 import Breadcrumbs from '~/components/Breadcrumbs';
-import { PERFORMANCE_SCORE } from '~/integrations/sentry/constants';
+import { PERFORMANCE_SCORE_PROFILES } from '~/integrations/sentry/constants';
 import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
-import { SentryEventWithPerformanceData } from '~/integrations/sentry/types';
+import { MetricScoreProps, MetricWeightsProps, SentryEventWithPerformanceData } from '~/integrations/sentry/types';
 import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
+import { normalizePerformanceScore } from '../../../utils/webVitals';
 import PerformanceChart from './PerformanceChart';
-import { normalizePerformanceScore } from './utils';
 
-type MetricScoreProps = {
-  fcpScore: number;
-  lcpScore: number;
-  clsScore: number;
-  fidScore: number;
-  ttfbScore: number;
-};
-type MetricWeightsProps = {
-  fcp: number;
-  lcp: number;
-  cls: number;
-  fid: number;
-  ttfb: number;
-};
 const WebVitalsDetail = () => {
   const events = useSentryEvents();
   const { page } = useParams();
@@ -30,7 +16,7 @@ const WebVitalsDetail = () => {
     .filter(event => event.event_id === page)
     .map(event => {
       const updatedEvent = { ...event };
-      normalizePerformanceScore(updatedEvent, PERFORMANCE_SCORE);
+      normalizePerformanceScore(updatedEvent, PERFORMANCE_SCORE_PROFILES);
       measurementEvents.push(updatedEvent as unknown as SentryEventWithPerformanceData);
     });
 

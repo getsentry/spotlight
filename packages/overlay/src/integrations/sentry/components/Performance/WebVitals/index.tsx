@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
-import { PERFORMANCE_SCORE, WEB_VITALS_HEADERS, WEB_VITALS_SORT_KEYS } from '~/integrations/sentry/constants';
+import { PERFORMANCE_SCORE_PROFILES, WEB_VITALS_HEADERS, WEB_VITALS_SORT_KEYS } from '~/integrations/sentry/constants';
 import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
 import { SentryEventWithPerformanceData } from '~/integrations/sentry/types';
 import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
 import classNames from '~/lib/classNames';
-import { normalizePerformanceScore } from './utils';
+import { normalizePerformanceScore } from '../../../utils/webVitals';
 
 const WebVitals = ({ showAll }: { showAll: boolean }) => {
   const events = useSentryEvents();
@@ -67,14 +67,18 @@ const WebVitals = ({ showAll }: { showAll: boolean }) => {
     for (const event of events) {
       if (
         event.measurements &&
-        (event.measurements['fcp'] ||
-          event.measurements['cls'] ||
-          event.measurements['ttfb'] ||
-          event.measurements['lcp'] ||
-          event.measurements['fid'])
+        event?.contexts?.trace?.op === 'pageload'
+        // TODO: Skipping this check because of not getting all required metrics
+        // && !PERFORMANCE_SCORE_PROFILES.profiles[0].scoreComponents.some(c => {
+        //   return (
+        //     !Object.prototype.hasOwnProperty.call(event.measurements, c.measurement) &&
+        //     Math.abs(c.weight) >= Number.EPSILON &&
+        //     !c.optional
+        //   );
+        // })
       ) {
         const updatedEvent = { ...event };
-        normalizePerformanceScore(updatedEvent, PERFORMANCE_SCORE);
+        normalizePerformanceScore(updatedEvent, PERFORMANCE_SCORE_PROFILES);
         _measurementEvents.push(updatedEvent as unknown as SentryEventWithPerformanceData);
       }
     }

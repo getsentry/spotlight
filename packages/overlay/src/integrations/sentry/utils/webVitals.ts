@@ -1,4 +1,5 @@
 import { SentryEvent } from '~/integrations/sentry/types';
+import { WebVitals } from '../constants';
 
 const SQRT_2 = Math.sqrt(2);
 
@@ -87,7 +88,7 @@ export function normalizePerformanceScore(
   }
 
   for (const profile of performanceScore.profiles) {
-    // TODO: To check a matching condition as done in relay.
+    // TODO: To check a matching condition as done in relay. Skipped right now because Browser type is not coming in Event data
     // const condition = profile.condition;
     // if (condition && !matchCondition(condition, event)) {
     //   continue;
@@ -98,11 +99,7 @@ export function normalizePerformanceScore(
     if (measurements) {
       let shouldAddTotal = false;
 
-      /**
-       *  TODO: to not calculate the performance score if required measurement metrics are not present.
-       *  Commenting right now because we are not getting all metrics always
-       * */
-
+      // TODO: To calculate performance score if all required metric fields are present in event measurement data.
       // if (
       //   profile.scoreComponents.some(c => {
       //     return (
@@ -168,4 +165,64 @@ export function normalizePerformanceScore(
       break;
     }
   }
+}
+
+export function calculateLabelCoordinates(
+  size: number,
+  x: number,
+  y: number,
+  barWidth: number,
+  metricWeights: {
+    [key in WebVitals]: number;
+  },
+  labelWidthPadding: number,
+  labelHeightPadding: number,
+  radiusPadding: number,
+) {
+  const radius = size / 2 + barWidth + radiusPadding;
+  const center = {
+    x: x + size / 2 - labelWidthPadding / 2,
+    y: y + size / 2 + labelHeightPadding / 2,
+  };
+  const sumMaxValues = Object.values(metricWeights).reduce((acc, val) => acc + val, 0);
+  const BASE_ANGLE = -90;
+  const weightToAngle = (weight: number) => (weight / sumMaxValues) * 360;
+  const [lcpAngle, fcpAngle, fidAngle, clsAngle, ttfbAngle] = [
+    metricWeights.lcp,
+    metricWeights.fcp,
+    metricWeights.fid,
+    metricWeights.cls,
+    metricWeights.ttfb,
+  ].map(weightToAngle);
+  const lcpX = center.x + radius * Math.cos(((BASE_ANGLE + lcpAngle / 2) * Math.PI) / 180);
+  const lcpY = center.y + radius * Math.sin(((BASE_ANGLE + lcpAngle / 2) * Math.PI) / 180);
+  const fcpX = center.x + radius * Math.cos(((BASE_ANGLE + lcpAngle + fcpAngle / 2) * Math.PI) / 180);
+  const fcpY = center.y + radius * Math.sin(((BASE_ANGLE + lcpAngle + fcpAngle / 2) * Math.PI) / 180);
+  const fidX = center.x + radius * Math.cos(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle / 2) * Math.PI) / 180);
+  const fidY = center.y + radius * Math.sin(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle / 2) * Math.PI) / 180);
+  const clsX =
+    center.x + radius * Math.cos(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle + clsAngle / 2) * Math.PI) / 180);
+  const clsY =
+    center.y + radius * Math.sin(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle + clsAngle / 2) * Math.PI) / 180);
+  // Padding hack for now since ttfb label is longer than the others
+  const ttfbX =
+    center.x -
+    12 +
+    radius * Math.cos(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle + clsAngle + ttfbAngle / 2) * Math.PI) / 180);
+  const ttfbY =
+    center.y +
+    radius * Math.sin(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle + clsAngle + ttfbAngle / 2) * Math.PI) / 180);
+
+  return {
+    lcpX,
+    lcpY,
+    fcpX,
+    fcpY,
+    fidX,
+    fidY,
+    clsX,
+    clsY,
+    ttfbX,
+    ttfbY,
+  };
 }

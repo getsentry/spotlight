@@ -86,7 +86,7 @@ export const WEB_VITALS_SORT_KEYS = {
   fid: 'FID',
   cls: 'CLS',
   ttfb: 'TTFB',
-  score: 'PERFORMANCE_SCORE',
+  score: 'PERFORMANCE_TOTAL_SCORE',
 };
 
 export const WEB_VITALS_HEADERS = [
@@ -130,7 +130,7 @@ export const WEB_VITALS_HEADERS = [
 
 export type WebVitals = 'lcp' | 'fcp' | 'cls' | 'ttfb' | 'fid';
 
-export const PERFORMANCE_SCORE = {
+export const PERFORMANCE_SCORE_PROFILES = {
   profiles: [
     {
       name: 'Chrome',

@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
 import RingChart from '~/components/RingChart';
+import { MetricScoreProps, MetricWeightsProps } from '~/integrations/sentry/types';
+import { calculateLabelCoordinates } from '~/integrations/sentry/utils/webVitals';
 import classNames from '~/lib/classNames';
 import { WebVitals } from '../../../constants';
 import useMouseTracking from '../../../hooks/useMouseTracking';
@@ -34,20 +36,6 @@ function WebVitalLabel({ webVital, coordinates, labelCoordinates = {} }: WebVita
   );
 }
 
-type MetricScoreProps = {
-  fcpScore: number;
-  lcpScore: number;
-  clsScore: number;
-  fidScore: number;
-  ttfbScore: number;
-};
-type MetricWeightsProps = {
-  fcp: number;
-  lcp: number;
-  cls: number;
-  fid: number;
-  ttfb: number;
-};
 type PerformanceChartProps = {
   metricScore: MetricScoreProps;
   metricWeights: MetricWeightsProps;
@@ -56,6 +44,9 @@ type PerformanceChartProps = {
   barWidth?: number;
   left?: number;
   top?: number;
+  labelWidthPadding?: number;
+  labelHeightPadding?: number;
+  radiusPadding?: number;
 };
 
 const PerformanceChart = ({
@@ -66,6 +57,9 @@ const PerformanceChart = ({
   barWidth = 25,
   left = 40,
   top = 25,
+  labelWidthPadding = 28,
+  labelHeightPadding = 14,
+  radiusPadding = 4,
 }: PerformanceChartProps) => {
   const [webVitalTooltip, setWebVitalTooltip] = useState<WebVitals | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -80,69 +74,6 @@ const PerformanceChart = ({
     },
   });
 
-  function calculateLabelCoordinates(
-    size: number,
-    x: number,
-    y: number,
-    barWidth: number,
-    metricWeights: {
-      [key in WebVitals]: number;
-    },
-    labelWidthPadding: number,
-    labelHeightPadding: number,
-    radiusPadding: number,
-  ) {
-    const radius = size / 2 + barWidth + radiusPadding;
-    const center = {
-      x: x + size / 2 - labelWidthPadding / 2,
-      y: y + size / 2 + labelHeightPadding / 2,
-    };
-    const sumMaxValues = Object.values(metricWeights).reduce((acc, val) => acc + val, 0);
-    const BASE_ANGLE = -90;
-    const weightToAngle = (weight: number) => (weight / sumMaxValues) * 360;
-    const [lcpAngle, fcpAngle, fidAngle, clsAngle, ttfbAngle] = [
-      metricWeights.lcp,
-      metricWeights.fcp,
-      metricWeights.fid,
-      metricWeights.cls,
-      metricWeights.ttfb,
-    ].map(weightToAngle);
-    const lcpX = center.x + radius * Math.cos(((BASE_ANGLE + lcpAngle / 2) * Math.PI) / 180);
-    const lcpY = center.y + radius * Math.sin(((BASE_ANGLE + lcpAngle / 2) * Math.PI) / 180);
-    const fcpX = center.x + radius * Math.cos(((BASE_ANGLE + lcpAngle + fcpAngle / 2) * Math.PI) / 180);
-    const fcpY = center.y + radius * Math.sin(((BASE_ANGLE + lcpAngle + fcpAngle / 2) * Math.PI) / 180);
-    const fidX = center.x + radius * Math.cos(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle / 2) * Math.PI) / 180);
-    const fidY = center.y + radius * Math.sin(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle / 2) * Math.PI) / 180);
-    const clsX =
-      center.x + radius * Math.cos(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle + clsAngle / 2) * Math.PI) / 180);
-    const clsY =
-      center.y + radius * Math.sin(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle + clsAngle / 2) * Math.PI) / 180);
-    // Padding hack for now since ttfb label is longer than the others
-    const ttfbX =
-      center.x -
-      12 +
-      radius * Math.cos(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle + clsAngle + ttfbAngle / 2) * Math.PI) / 180);
-    const ttfbY =
-      center.y +
-      radius * Math.sin(((BASE_ANGLE + lcpAngle + fcpAngle + fidAngle + clsAngle + ttfbAngle / 2) * Math.PI) / 180);
-
-    return {
-      lcpX,
-      lcpY,
-      fcpX,
-      fcpY,
-      fidX,
-      fidY,
-      clsX,
-      clsY,
-      ttfbX,
-      ttfbY,
-    };
-  }
-
-  const labelWidthPadding = 28;
-  const labelHeightPadding = 14;
-  const radiusPadding = 4;
   const { lcpX, lcpY, fcpX, fcpY, fidX, fidY, clsX, clsY, ttfbX, ttfbY } = calculateLabelCoordinates(
     size,
     left,
