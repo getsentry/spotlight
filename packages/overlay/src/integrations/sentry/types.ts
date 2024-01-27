@@ -3,7 +3,7 @@ export type FrameVars = {
 };
 
 export type EventFrame = {
-  filename: string;
+  filename?: string;
   abs_path?: string;
   function?: string;
   module?: string;

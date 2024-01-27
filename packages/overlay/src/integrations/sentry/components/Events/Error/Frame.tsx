@@ -31,7 +31,15 @@ function ContextLocals({ vars }: { vars: FrameVars }) {
   );
 }
 
-export default function Frame({ frame, defaultExpand = false }: { frame: EventFrame; defaultExpand: boolean }) {
+export default function Frame({
+  frame,
+  defaultExpand = false,
+  platform,
+}: {
+  frame: EventFrame;
+  defaultExpand: boolean;
+  platform?: string;
+}) {
   const [isOpen, setOpen] = useState(defaultExpand);
 
   const hasSource = !!frame.context_line;
@@ -44,7 +52,17 @@ export default function Frame({ frame, defaultExpand = false }: { frame: EventFr
         )}
         onClick={() => setOpen(!isOpen)}
       >
-        <span className="text-primary-100">{formatFilename(frame.filename)}</span> in{' '}
+        {platform === 'java' ? (
+          frame.module ? (
+            <span className="text-primary-100">{`${formatFilename(frame.module)} in `}</span>
+          ) : frame.filename ? (
+            <span className="text-primary-100">{`${formatFilename(frame.filename)} in `}</span>
+          ) : null
+        ) : frame.filename ? (
+          <span className="text-primary-100">{`${formatFilename(frame.filename)} in `}</span>
+        ) : frame.module ? (
+          <span className="text-primary-100">{`${formatFilename(frame.module)} in `}</span>
+        ) : null}
         <span className="text-primary-100">{frame.function}</span>
         {frame.lineno !== undefined && (
           <>
