@@ -7,6 +7,8 @@ import HiddenItemsButton from '../HiddenItemsButton';
 import Queries from './Queries';
 import QuerySummary from './QuerySummary';
 import Resources from './Resources';
+import WebVitals from './WebVitals';
+import WebVitalsDetail from './WebVitals/WebVitalsDetail';
 
 export default function PerformanceTabDetails() {
   const context = useSpotlightContext();
@@ -23,6 +25,12 @@ export default function PerformanceTabDetails() {
       title: 'Queries',
       active: activeTab === 'queries',
       onSelect: () => setActiveTab('queries'),
+    },
+    {
+      id: 'webvitals',
+      title: 'Web Vitals',
+      active: activeTab === 'webvitals',
+      onSelect: () => setActiveTab('webvitals'),
     },
     {
       id: 'resources',
@@ -47,6 +55,8 @@ export default function PerformanceTabDetails() {
         <Routes>
           <Route path="queries/:type" element={<QuerySummary showAll={showAll} />} />
           <Route path="resources" element={<Resources showAll={showAll} />} />
+          <Route path="webvitals" element={<WebVitals showAll={showAll} />} />
+          <Route path="webvitals/:page" element={<WebVitalsDetail />} />
           {/* Default tab */}
           <Route path="*" element={<Queries showAll={showAll} />} />
         </Routes>

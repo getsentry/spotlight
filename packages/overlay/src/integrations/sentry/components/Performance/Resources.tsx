@@ -115,7 +115,7 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
     }
   }, [sort, showAll]);
 
-  if (resources) {
+  if (resources && resources.length) {
     return (
       <table className="divide-primary-700 w-full table-fixed divide-y">
         <thead>
@@ -131,7 +131,7 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
               >
                 <div
                   className={classNames(
-                    'flex cursor-pointer items-center gap-1',
+                    'flex cursor-pointer select-none items-center gap-1',
                     header.primary ? 'justify-start' : 'justify-end',
                   )}
                   onClick={() => toggleSortOrder(header.sortKey)}
