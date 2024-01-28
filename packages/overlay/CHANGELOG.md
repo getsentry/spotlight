@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 1.4.1
+
+### Patch Changes
+
+- Fix use native fetch for context lines
+  ([`c47c1d6`](https://github.com/getsentry/spotlight/commit/c47c1d6857c7b9b0282f65317b53616997218281))
+
 ## 1.4.0
 
 ### Minor Changes
