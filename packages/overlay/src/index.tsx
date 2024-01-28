@@ -81,6 +81,14 @@ export async function trigger(eventName: string, payload: unknown) {
   );
 }
 
+function isSpotlightInjected() {
+  const windowWithSpotlight = window as WindowWithSpotlight;
+  if (windowWithSpotlight.__spotlight && window.document.getElementById('sentry-spotlight-root')) {
+    return true;
+  }
+  return false;
+}
+
 export async function init({
   openOnInit = false,
   showTriggerButton = true,
@@ -98,10 +106,7 @@ export async function init({
 
   // We only want to intialize and inject spotlight once. If it's already
   // been initialized, we can just bail out.
-  const windowWithSpotlight = window as WindowWithSpotlight;
-  if (windowWithSpotlight.__spotlight) {
-    return;
-  }
+  if (isSpotlightInjected()) return;
 
   if (debug) {
     activateLogger();
@@ -187,4 +192,9 @@ export async function init({
       injectSpotlight();
     });
   }
+  window.addEventListener('error', () => {
+    if (!isSpotlightInjected()) {
+      injectSpotlight();
+    }
+  });
 }
