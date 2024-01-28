@@ -1,5 +1,19 @@
 # @spotlightjs/core
 
+## 1.4.0
+
+### Minor Changes
+
+- Added WebVitals in Performance Section ([#330](https://github.com/getsentry/spotlight/pull/330))
+
+### Patch Changes
+
+- Event stack trace should have filename as optional and added a condition to prefer module name instead of filename
+  ([#332](https://github.com/getsentry/spotlight/pull/332)) incase when platform is java
+
+- Fixed condition where client removes the spotlight because of some error.
+  ([#340](https://github.com/getsentry/spotlight/pull/340))
+
 ## 1.3.1
 
 ### Patch Changes
