@@ -94,3 +94,11 @@ ul.tree li:last-child:before {
 .table-values tbody td {
   @apply border-primary-950 border-y px-2 py-1;
 }
+
+.hydration-error-wrapper pre {
+  @apply !text-primary-300;
+}
+
+.hydration-error-wrapper td[class^='css-'][class$='-title-block'] {
+  @apply !bg-primary-900;
+}
