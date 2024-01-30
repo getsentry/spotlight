@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/overlay",
   "description": "The overlay of Spotlight to add debug interface to your web app.",
-  "version": "1.2.3",
+  "version": "1.4.1",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
@@ -41,7 +41,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "typescript": "^5.0.2",
-    "vite": "^4.5.1",
+    "vite": "^4.5.2",
     "vite-plugin-dts": "^3.5.2",
     "vite-plugin-svgr": "^3.2.0",
     "vitest": "^0.34.6",

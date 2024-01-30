@@ -1,5 +1,51 @@
 # @spotlightjs/electron
 
+## 0.0.17
+
+### Patch Changes
+
+- Updated dependencies
+  [[`c47c1d6`](https://github.com/getsentry/spotlight/commit/c47c1d6857c7b9b0282f65317b53616997218281)]:
+  - @spotlightjs/overlay@1.4.1
+
+## 0.0.16
+
+### Patch Changes
+
+- Updated dependencies
+  [[`908cc08`](https://github.com/getsentry/spotlight/commit/908cc083f981c81b68a11109545d183184bbdd06),
+  [`92d5962`](https://github.com/getsentry/spotlight/commit/92d5962b77b0a3419dd729452af40d9c40a30ecc),
+  [`080b607`](https://github.com/getsentry/spotlight/commit/080b607bf8a3b4419b54170b137776497043836a)]:
+  - @spotlightjs/overlay@1.4.0
+
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies
+  [[`996754b`](https://github.com/getsentry/spotlight/commit/996754bc915572165cabcf66337afd74e64f7eb8),
+  [`5f13735`](https://github.com/getsentry/spotlight/commit/5f13735699b92f07360d48100a0aee37af26feb6),
+  [`5691e9c`](https://github.com/getsentry/spotlight/commit/5691e9cc4d7f2be537e5c9de82a3540a8aa8fbd9),
+  [`3eb0afd`](https://github.com/getsentry/spotlight/commit/3eb0afd9934ea16c99603a749db60352cc426908),
+  [`52a6eab`](https://github.com/getsentry/spotlight/commit/52a6eab5f3030e9dcd781f5dd6afb80f15cb46db)]:
+  - @spotlightjs/overlay@1.3.1
+  - @spotlightjs/sidecar@1.3.5
+
+## 0.0.14
+
+### Patch Changes
+
+- 1. Added functions to report errors in case of an error in the app.
+     ([#303](https://github.com/getsentry/spotlight/pull/303))
+  2. Added an error page for the Electron app.
+- Updated dependencies
+  [[`f77819a`](https://github.com/getsentry/spotlight/commit/f77819af59ff6c369795ae190b0b3630454f0a00),
+  [`f5a555d`](https://github.com/getsentry/spotlight/commit/f5a555dfc29e752c02cf856d75a92348d1e5920d),
+  [`60b1b69`](https://github.com/getsentry/spotlight/commit/60b1b69293a15d56a3ecac5127d66e57b2640d6c),
+  [`43f3196`](https://github.com/getsentry/spotlight/commit/43f3196163851f828e4bfe151a34af2ad2c21798)]:
+  - @spotlightjs/overlay@1.3.0
+  - @spotlightjs/sidecar@1.3.4
+
 ## 0.0.13
 
 ### Patch Changes

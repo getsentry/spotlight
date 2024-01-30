@@ -5,6 +5,7 @@ import type { Integration, RawEventContext } from '../integration';
 import sentryDataCache from './data/sentryDataCache';
 import { Spotlight } from './sentry-integration';
 import ErrorsTab from './tabs/ErrorsTab';
+import PerformanceTab from './tabs/PerformanceTab';
 import SdksTab from './tabs/SdksTab';
 import TracesTab from './tabs/TracesTab';
 
@@ -50,6 +51,8 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
             (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
         ).length;
 
+      const localTraces = sentryDataCache.getTraces().filter(t => sentryDataCache.isTraceLocal(t.trace_id) !== false);
+
       return [
         {
           id: 'errors',
@@ -64,9 +67,14 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
           id: 'traces',
           title: 'Traces',
           notificationCount: {
-            count: sentryDataCache.getTraces().filter(t => sentryDataCache.isTraceLocal(t.trace_id) !== false).length,
+            count: localTraces.length,
           },
           content: TracesTab,
+        },
+        {
+          id: 'performance',
+          title: 'Performance',
+          content: PerformanceTab,
         },
         {
           id: 'sdks',
@@ -103,6 +111,10 @@ export function processEnvelope({ data }: RawEventContext) {
       continue;
     }
     const header = JSON.parse(rawEntries[i]);
+    if (header.type && header.type == 'statsd') {
+      // skip metric events
+      continue;
+    }
     const payload = JSON.parse(rawEntries[i + 1]);
     // data sanitization
     if (header.type) {

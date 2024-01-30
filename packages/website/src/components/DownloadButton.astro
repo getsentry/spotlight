@@ -46,7 +46,7 @@ const links = assets.map(asset => {
       links.map(link => (
         <a
           href={link.url}
-          class="inline-flex items-center justify-center px-2 py-2 mx-2 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
+          class="downloadButton inline-flex items-center justify-center px-2 py-2 mx-2 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
         >
           {link.name}
         </a>
@@ -56,3 +56,15 @@ const links = assets.map(asset => {
     <span class="text-xs text-gray-400">latest version: {version}</span>
   </div>
 </div>
+
+<script>
+  import * as Sentry from '@sentry/astro';
+  function incrementDownload(e) {
+    console.log('incrementing download', e);
+    Sentry.metrics.increment('downloads', 1);
+  }
+
+  document.querySelectorAll('.downloadButton').forEach(button => {
+    button.addEventListener('click', incrementDownload);
+  });
+</script>

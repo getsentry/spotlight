@@ -1,23 +1,39 @@
 name: Publish
-
 on:
   push:
     branches:
       - main
     paths:
       - '**/CHANGELOG.md'
-
+  workflow_dispatch:
+    inputs:
+      nocache:
+        description: 'Do not rely on existing Docker layer cache'
+        default: false
+        type: boolean
+      docker:
+        description: 'Publish Docker package'
+        default: true
+        type: boolean
+      npm:
+        description: 'Publish NPM package (immutable)'
+        default: true
+        type: boolean
+      electron:
+        description: 'Publish Electron package'
+        default: true
+        type: boolean
 concurrency: ${{ github.workflow }}-${{ github.ref }}
-
 jobs:
-  publish:
-    name: Publish
+  npm:
+    name: NPM Package
     runs-on: ubuntu-latest
     # For whatever reason, yaml does not like the full "meta(changelog): Update package versions" string
     # So we check this in two parts
     if: |
-      contains(github.event.head_commit.message, 'meta(changelog)') 
-      && contains(github.event.head_commit.message, 'Update package versions')
+      (contains(github.event.head_commit.message, 'meta(changelog)')
+        && contains(github.event.head_commit.message, 'Update package versions'))
+      || inputs.npm
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -41,11 +57,53 @@ jobs:
           publish: pnpm changeset:publish
           createGithubReleases: true
 
+  docker:
+    name: Docker Image
+    needs: npm
+    runs-on: ubuntu-latest
+    if: |
+      !cancelled()
+      && inputs.docker
+      && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          cache-from: type=gha,scope=prod
+          no-cache: ${{ inputs.nocache }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/getsentry/spotlight:latest
+            ghcr.io/getsentry/spotlight:${{ github.sha }}
+
+      - name: Summarize
+        run: |
+          echo "**Tag:** ``ghcr.io/getsentry/spotlight:${{ github.sha }}``" >> $GITHUB_STEP_SUMMARY
+
   electron:
     name: Electron Build
-    needs: publish
+    needs: npm
     runs-on: macos-latest
-
+    if: |
+      !cancelled()
+      && inputs.electron
+      && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
     # strategy:
     #   fail-fast: false
     #   matrix:

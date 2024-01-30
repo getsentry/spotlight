@@ -25,8 +25,7 @@ export default defineConfig({
   devOverlay: true,
   integrations: [
     sentry({
-      debug: true,
-      dsn: 'https://b6308e6c658001f198a10016d828a0d9@o1.ingest.sentry.io/4506349052231680',
+      clientInitPath: 'sentry.client.config.mjs',
       sourceMapsUploadOptions: {
         project: 'spotlight-website',
         authToken: process.env.SENTRY_AUTH_TOKEN,
@@ -102,16 +101,28 @@ export default defineConfig({
               link: '/setup/',
             },
             {
-              label: 'for Astro',
+              label: 'For Astro',
               link: '/setup/astro/',
             },
             {
-              label: 'for Other Frameworks',
-              link: '/setup/other/',
+              label: 'For Next.js',
+              link: '/setup/nextjs/',
+            },
+            {
+              label: 'For Remix',
+              link: '/setup/remix/',
+            },
+            {
+              label: 'For SvelteKit',
+              link: '/setup/sveltekit/',
             },
             {
               label: 'Just HTML',
               link: '/setup/html/',
+            },
+            {
+              label: 'For Other Frameworks',
+              link: '/setup/other/',
             },
           ],
         },

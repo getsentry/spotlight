@@ -38,7 +38,14 @@ export function Error({ event }: { event: SentryErrorEvent }) {
               </h3>
               <ul className="border-primary-600 border">
                 {value.stacktrace?.frames.map((frame, frameIdx) => {
-                  return <Frame key={frameIdx} frame={frame} defaultExpand={valueIdx === 0 && frameIdx === 0} />;
+                  return (
+                    <Frame
+                      key={frameIdx}
+                      frame={frame}
+                      defaultExpand={valueIdx === 0 && frameIdx === 0}
+                      platform={event.platform}
+                    />
+                  );
                 })}
               </ul>
             </li>

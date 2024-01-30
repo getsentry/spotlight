@@ -35,7 +35,8 @@ export class Spotlight implements Integration {
 
       for (const exception of event.exception.values ?? []) {
         try {
-          const stackTraceWithContextResponse = await fetch('/spotlight/contextlines', {
+          const makeFetch = getNativeFetchImplementation();
+          const stackTraceWithContextResponse = await makeFetch('/spotlight/contextlines', {
             method: 'PUT',
             body: JSON.stringify(exception.stacktrace),
           });
@@ -65,8 +66,10 @@ function sendEnvelopesToSidecar(client: Client, sidecarUrl: string) {
   client?.setupIntegrations(true);
 
   if (client.on) {
+    const makeFetch = getNativeFetchImplementation();
+
     client?.on('beforeEnvelope', (envelope: Envelope) => {
-      fetch(sidecarUrl, {
+      makeFetch(sidecarUrl, {
         method: 'POST',
         body: serializeEnvelope(envelope),
         headers: {
@@ -81,4 +84,23 @@ function sendEnvelopesToSidecar(client: Client, sidecarUrl: string) {
       });
     });
   }
+}
+
+type FetchImpl = typeof fetch;
+type WrappedFetchImpl = FetchImpl & { __sentry_original__: FetchImpl };
+
+/**
+ * We want to get an unpatched fetch implementation to avoid capturing our own calls.
+ * TODO: We might need to expose this as a utitly function so people can make requests without the SDK picking it put
+ */
+export function getNativeFetchImplementation(): FetchImpl {
+  if (fetchIsWrapped(window.fetch)) {
+    return window.fetch.__sentry_original__;
+  }
+
+  return window.fetch;
+}
+
+function fetchIsWrapped(fetchImpl: FetchImpl): fetchImpl is WrappedFetchImpl {
+  return '__sentry_original__' in fetchImpl;
 }

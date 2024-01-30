@@ -1,5 +1,56 @@
 # @spotlightjs/core
 
+## 1.4.1
+
+### Patch Changes
+
+- Fix use native fetch for context lines
+  ([`c47c1d6`](https://github.com/getsentry/spotlight/commit/c47c1d6857c7b9b0282f65317b53616997218281))
+
+## 1.4.0
+
+### Minor Changes
+
+- Added WebVitals in Performance Section ([#330](https://github.com/getsentry/spotlight/pull/330))
+
+### Patch Changes
+
+- Event stack trace should have filename as optional and added a condition to prefer module name instead of filename
+  ([#332](https://github.com/getsentry/spotlight/pull/332)) incase when platform is java
+
+- Fixed condition where client removes the spotlight because of some error.
+  ([#340](https://github.com/getsentry/spotlight/pull/340))
+
+## 1.3.1
+
+### Patch Changes
+
+- 1. Resource tab added ([#327](https://github.com/getsentry/spotlight/pull/327))
+  2. Queries tab and query Summary table improvements
+  3. Added sorting for tables
+
+- fixed ui for queries tab and added common breadcrumb component
+  ([#323](https://github.com/getsentry/spotlight/pull/323))
+
+- Fix fetch implementation to not cause endless loop ([#335](https://github.com/getsentry/spotlight/pull/335))
+
+## 1.3.0
+
+### Minor Changes
+
+- Added performance and nested queries tab in spotlight to capture DB queries
+  ([#314](https://github.com/getsentry/spotlight/pull/314))
+
+### Patch Changes
+
+- updated dockerfile to use packages/spotlight build to serve index page
+  ([#311](https://github.com/getsentry/spotlight/pull/311))
+
+- ui improvements ([#305](https://github.com/getsentry/spotlight/pull/305))
+
+- Reverse the error stack trace for php and python platform events
+  ([#312](https://github.com/getsentry/spotlight/pull/312))
+
 ## 1.2.3
 
 ### Patch Changes

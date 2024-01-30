@@ -1,11 +1,12 @@
 import { createWriteStream, readFile } from 'fs';
-import { IncomingMessage, Server, ServerResponse, createServer } from 'http';
+import { IncomingMessage, Server, ServerResponse, createServer, get } from 'http';
 import { extname, join } from 'path';
 import { createGunzip, createInflate } from 'zlib';
 import { SidecarLogger, activateLogger, enableDebugLogging, logger } from './logger.js';
 import { MessageBuffer } from './messageBuffer.js';
 
 const DEFAULT_PORT = 8969;
+const SERVER_IDENTIFIER = 'spotlight-by-sentry';
 
 type Payload = [string, string];
 
@@ -51,6 +52,11 @@ function getCorsHeader(): { [name: string]: string } {
   };
 }
 
+function getSpotlightHeader() {
+  return {
+    'X-Powered-by': SERVER_IDENTIFIER,
+  };
+}
 /**
  * Returns true of the request was handled, false otherwise.
  */
@@ -66,6 +72,7 @@ function handleStreamRequest(
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         ...getCorsHeader(),
+        ...getSpotlightHeader(),
         Connection: 'keep-alive',
       });
       res.flushHeaders();
@@ -95,6 +102,7 @@ function handleStreamRequest(
         res.writeHead(204, {
           'Cache-Control': 'no-cache',
           ...getCorsHeader(),
+          ...getSpotlightHeader(),
         });
         res.end();
       } else if (req.method === 'POST') {
@@ -140,6 +148,7 @@ function handleStreamRequest(
           res.writeHead(200, {
             'Cache-Control': 'no-cache',
             ...getCorsHeader(),
+            ...getSpotlightHeader(),
             Connection: 'keep-alive',
           });
           res.end();
@@ -188,13 +197,22 @@ function startServer(
   incomingPayload?: IncomingPayloadCallback,
 ): Server {
   const server = createServer((req, res) => {
-    const handled = handleStreamRequest(req, res, buffer, incomingPayload);
-    if (!handled && basePath) {
-      serveFile(req, res, basePath);
-    }
-    if (!handled && !basePath) {
-      res.writeHead(404);
-      res.end();
+    if (req.url === '/health') {
+      res.writeHead(200, {
+        'Content-Type': 'text/plain',
+        ...getCorsHeader(),
+        ...getSpotlightHeader(),
+      });
+      res.end('OK');
+    } else {
+      const handled = handleStreamRequest(req, res, buffer, incomingPayload);
+      if (!handled && basePath) {
+        serveFile(req, res, basePath);
+      }
+      if (!handled && !basePath) {
+        res.writeHead(404);
+        res.end();
+      }
     }
   });
 
@@ -224,11 +242,35 @@ const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
 
 const isValidPort = (value: string | number) => {
   if (typeof value === 'string') {
-    const portNumber = parseInt(value, 10);
+    const portNumber = Number(value);
     return /^\d+$/.test(value) && portNumber > 0 && portNumber <= 65535;
   }
   return value > 0 && value <= 65535;
 };
+
+function isSidecarRunning(port: string | number | undefined) {
+  return new Promise(resolve => {
+    const options = {
+      hostname: 'localhost',
+      port: port,
+      path: '/health',
+      method: 'GET',
+      timeout: 5000,
+    };
+
+    const healthReq = get(options, res => {
+      const serverIdentifier = res.headers['x-powered-by'];
+      if (serverIdentifier === 'spotlight-by-sentry') {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });
+    healthReq.on('error', () => {
+      resolve(false);
+    });
+  });
+}
 
 export function setupSidecar({
   port,
@@ -251,12 +293,17 @@ export function setupSidecar({
     logger.info('Please provide a valid port.');
     process.exit(1);
   } else if (port) {
-    sidecarPort = typeof port === 'string' ? parseInt(port, 10) : port;
+    sidecarPort = typeof port === 'string' ? Number(port) : port;
   }
-
-  if (!serverInstance) {
-    serverInstance = startServer(buffer, sidecarPort, basePath, incomingPayload);
-  }
+  isSidecarRunning(sidecarPort).then(isRunning => {
+    if (isRunning) {
+      logger.info(`Sidecar is already running on port ${sidecarPort}`);
+    } else {
+      if (!serverInstance) {
+        serverInstance = startServer(buffer, sidecarPort, basePath, incomingPayload);
+      }
+    }
+  });
 }
 
 export function clearBuffer(): void {
