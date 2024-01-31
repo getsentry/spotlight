@@ -99,6 +99,6 @@ ul.tree li:last-child:before {
   @apply !text-primary-300;
 }
 
-.hydration-error-wrapper td[class^='css-'][class$='-title-block'] {
+.hydration-error-wrapper td[class^='react-diff'][class$='title-block'] {
   @apply !bg-primary-900;
 }
