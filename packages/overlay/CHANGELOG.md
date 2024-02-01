@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 1.5.0
+
+### Minor Changes
+
+- Added a hydration-overlay extension for Nextjs projects ([#343](https://github.com/getsentry/spotlight/pull/343))
+
 ## 1.4.1
 
 ### Patch Changes
