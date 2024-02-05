@@ -24,6 +24,13 @@ export class Spotlight implements Integration {
 
   public setupOnce(addGlobalEventProcessor: (callback: EventProcessor) => void, getCurrentHub: () => Hub): void {
     addGlobalEventProcessor(async (event: Event) => {
+      // We don't want to send interaction transactions/root spans created from
+      // clicks within Spotlight to Sentry. Neither do we want them to be sent to
+      // spotlight.
+      if (isSpotlightInteraction(event)) {
+        return null;
+      }
+
       const traceId = event.contexts?.trace?.trace_id;
       if (traceId) {
         sentryDataCache.trackLocalTrace(traceId);
@@ -103,4 +110,15 @@ export function getNativeFetchImplementation(): FetchImpl {
 
 function fetchIsWrapped(fetchImpl: FetchImpl): fetchImpl is WrappedFetchImpl {
   return '__sentry_original__' in fetchImpl;
+}
+
+/**
+ * Flags if the event is a transaction created from an interaction with the spotlight UI.
+ */
+function isSpotlightInteraction(event: Event): boolean {
+  if (event.type === 'transaction' && event.contexts?.trace?.op === 'ui.action.click' && event.spans) {
+    const hasSpotlightDescriptor = event.spans.find(s => s.description?.includes('#sentry-spotlight'));
+    return !!hasSpotlightDescriptor;
+  }
+  return false;
 }
