@@ -5,6 +5,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "preview": "next dev",
     "test:e2e": "playwright test"
   },
   "dependencies": {
