@@ -1,5 +1,13 @@
 # @spotlightjs/sidecar
 
+## 1.4.0
+
+### Minor Changes
+
+- 1. Added a DELETE /clear API route for sidecar to wipe out all data from buffer.
+     ([#345](https://github.com/getsentry/spotlight/pull/345))
+  2. Added a cta in overlay to clear data(only present when sentry integration is added).
+
 ## 1.3.5
 
 ### Patch Changes

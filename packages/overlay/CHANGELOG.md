@@ -1,5 +1,18 @@
 # @spotlightjs/core
 
+## 1.6.0
+
+### Minor Changes
+
+- 1. Added a DELETE /clear API route for sidecar to wipe out all data from buffer.
+     ([#345](https://github.com/getsentry/spotlight/pull/345))
+  2. Added a cta in overlay to clear data(only present when sentry integration is added).
+
+### Patch Changes
+
+- fix(overlay): Drop interaction transactions from overlay interactions
+  ([#348](https://github.com/getsentry/spotlight/pull/348))
+
 ## 1.5.0
 
 ### Minor Changes
