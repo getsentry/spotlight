@@ -13,8 +13,12 @@ export default defineConfig({
   timeout: 30 * 1000,
   // Test directory
   testDir: path.join(__dirname, 'tests'),
-  // If a test fails, no retries
-  retries: 0,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!process.env.CI,
+  /* Retry on CI only */
+  retries: process.env.CI ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: process.env.CI ? 1 : undefined,
   // Artifacts folder where screenshots, videos, and traces are stored.
   outputDir: 'test-results/',
 
