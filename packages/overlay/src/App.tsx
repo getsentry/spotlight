@@ -26,6 +26,7 @@ export default function App({
   const [isOnline, setOnline] = useState(false);
   const [triggerButtonCount, setTriggerButtonCount] = useState<NotificationCount>({ count: 0, severe: false });
   const [isOpen, setOpen] = useState(openOnInit);
+  const [reloadSpotlight, setReloadSpotlight] = useState<number>(0);
 
   useKeyPress(['ctrlKey', 'F12'], () => {
     setOpen(prev => !prev);
@@ -50,7 +51,7 @@ export default function App({
       log('useEffect cleanup');
       cleanupListeners();
     };
-  }, [integrations, sidecarUrl]);
+  }, [integrations, sidecarUrl, reloadSpotlight]);
 
   const spotlightEventTarget = getSpotlightEventTarget();
 
@@ -121,6 +122,7 @@ export default function App({
         integrationData={integrationData}
         setTriggerButtonCount={setTriggerButtonCount}
         fullPage={fullPage}
+        setReloadSpotlight={setReloadSpotlight}
       />
     </>
   );
