@@ -126,8 +126,52 @@ const template = [
   {
     label: 'View',
     submenu: [
-      { role: 'reload' },
-      { role: 'forceReload' },
+      {
+        label: 'Reload',
+        accelerator: 'CmdOrCtrl+R',
+        click: () => {
+          try {
+            win.webContents.executeJavaScript(`
+            try{
+              const spotlightRoot = document.getElementById('sentry-spotlight-root');
+              window?.__spotlight?.eventTarget.dispatchEvent(
+                new CustomEvent("sentry:clearEvents", {
+                  detail: {},
+                }),
+              );
+            } catch(err){
+              console.error(err)
+            }
+            `);
+            win.webContents.reload();
+          } catch (error) {
+            console.error(error);
+          }
+        },
+      },
+      {
+        label: 'Force Reload',
+        accelerator: 'CmdOrCtrl+Shift+R',
+        click: () => {
+          try {
+            win.webContents.executeJavaScript(`
+            try{
+              const spotlightRoot = document.getElementById('sentry-spotlight-root');
+              window?.__spotlight?.eventTarget.dispatchEvent(
+                new CustomEvent("sentry:clearEvents", {
+                  detail: {},
+                }),
+              );
+            } catch(err){
+              console.error(err)
+            }
+            `);
+            win.webContents.reloadIgnoringCache();
+          } catch (error) {
+            console.error(error);
+          }
+        },
+      },
       { role: 'toggleDevTools' },
       { type: 'separator' },
       { role: 'resetZoom' },

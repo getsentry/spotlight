@@ -1,16 +1,9 @@
-import { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ReactComponent as Logo } from '~/assets/glyph.svg';
 import { Integration, IntegrationData } from '~/integrations/integration';
-import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
-import { SentryEventsContext } from '~/integrations/sentry/data/sentryEventsContext';
-import { getNativeFetchImplementation } from '~/integrations/sentry/sentry-integration';
+import { getSpotlightEventTarget } from '~/lib/eventTarget';
 import { NotificationCount } from '~/types';
 import classNames from '../lib/classNames';
 import Overview from './Overview';
-
-// TODO: To expose the port and sidecar url across the app instead of hardcoded
-const PORT = 8969;
 
 function FullscreenBlur({
   isOpen,
@@ -48,7 +41,6 @@ export default function Debugger({
   isOnline,
   setTriggerButtonCount: setNotificationCount,
   fullPage,
-  setReloadSpotlight,
 }: {
   integrations: Integration[];
   isOpen: boolean;
@@ -57,30 +49,9 @@ export default function Debugger({
   isOnline: boolean;
   setTriggerButtonCount: (count: NotificationCount) => void;
   fullPage: boolean;
-  setReloadSpotlight: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const isSentryIntegrationAdded = integrations.some(integration => integration.name === 'sentry');
-  const { setEvents } = useContext(SentryEventsContext);
-  const navigate = useNavigate();
-
-  const clearEvents = () => {
-    const sidecarUrl = `http://localhost:${PORT}/clear`;
-    const makeFetch = getNativeFetchImplementation();
-    makeFetch(sidecarUrl, {
-      method: 'DELETE',
-      mode: 'cors',
-    }).catch(err => {
-      console.error(
-        `Sentry SDK can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`,
-        err,
-      );
-    });
-
-    setEvents({ action: 'RESET', e: [] });
-    sentryDataCache.resetData();
-    navigate('/errors');
-    setReloadSpotlight(prev => prev + 1);
-  };
+  const isElectronAppInstance = (window as Window & { electronAPI?: object }).electronAPI;
 
   return (
     <FullscreenBlur isOpen={isOpen} setOpen={setOpen} fullPage={fullPage}>
@@ -122,10 +93,16 @@ export default function Debugger({
               </div>
             </div>
           </h1>
-          {isSentryIntegrationAdded && (
+          {isSentryIntegrationAdded && isElectronAppInstance === undefined && (
             <button
               className="bg-primary-950 text-primary-300 border-primary-300 hover:bg-primary-900 hover:border-primary-900 mr-1 rounded-md border px-2 py-1 hover:transition-colors"
-              onClick={() => clearEvents()}
+              onClick={() => {
+                getSpotlightEventTarget().dispatchEvent(
+                  new CustomEvent('sentry:clearEvents', {
+                    detail: {},
+                  }),
+                );
+              }}
             >
               Clear Events
             </button>
@@ -141,7 +118,6 @@ export default function Debugger({
             </button>
           )}
         </div>
-
         <Overview
           integrations={integrations}
           integrationData={integrationData}

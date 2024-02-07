@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Debugger from './components/Debugger';
 import Trigger from './components/Trigger';
 import type { Integration, IntegrationData } from './integrations/integration';
+import sentryDataCache from './integrations/sentry/data/sentryDataCache';
+import { SentryEventsContext } from './integrations/sentry/data/sentryEventsContext';
+import { getNativeFetchImplementation } from './integrations/sentry/sentry-integration';
 import { getSpotlightEventTarget } from './lib/eventTarget';
 import { log } from './lib/logger';
 import useKeyPress from './lib/useKeyPress';
@@ -21,7 +24,7 @@ export default function App({
   fullPage = false,
 }: AppProps) {
   log('App rerender');
-
+  const { setEvents } = useContext(SentryEventsContext);
   const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});
   const [isOnline, setOnline] = useState(false);
   const [triggerButtonCount, setTriggerButtonCount] = useState<NotificationCount>({ count: 0, severe: false });
@@ -57,6 +60,25 @@ export default function App({
 
   const navigate = useNavigate();
 
+  const clearEvents = () => {
+    const makeFetch = getNativeFetchImplementation();
+    makeFetch(sidecarUrl, {
+      method: 'DELETE',
+      mode: 'cors',
+    }).catch(err => {
+      console.error(
+        `Sentry SDK can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`,
+        err,
+      );
+      return;
+    });
+
+    setEvents({ action: 'RESET', e: [] });
+    sentryDataCache.resetData();
+    navigate('/errors');
+    setReloadSpotlight(prev => prev + 1);
+  };
+
   useEffect(() => {
     const onOpen = (
       e: CustomEvent<{
@@ -81,11 +103,13 @@ export default function App({
     spotlightEventTarget.addEventListener('open', onOpen as EventListener);
     spotlightEventTarget.addEventListener('close', onClose);
     spotlightEventTarget.addEventListener('navigate', onNavigate as EventListener);
+    spotlightEventTarget.addEventListener('sentry:clearEvents', clearEvents as EventListener);
 
     return () => {
       spotlightEventTarget.removeEventListener('open', onOpen as EventListener);
       spotlightEventTarget.removeEventListener('close', onClose);
       spotlightEventTarget.removeEventListener('navigate', onNavigate as EventListener);
+      spotlightEventTarget.removeEventListener('sentry:clearEvents', clearEvents as EventListener);
     };
   }, [spotlightEventTarget, navigate]);
 
@@ -122,7 +146,6 @@ export default function App({
         integrationData={integrationData}
         setTriggerButtonCount={setTriggerButtonCount}
         fullPage={fullPage}
-        setReloadSpotlight={setReloadSpotlight}
       />
     </>
   );
