@@ -200,6 +200,14 @@ class SentryDataCache {
     return trace.spans.find(s => s.span_id === spanId);
   }
 
+  resetData() {
+    this.events = [];
+    this.eventIds = new Set<string>();
+    this.traces = [];
+    this.tracesById = {};
+    this.localTraceIds = new Set<string>();
+  }
+
   subscribe(...args: Subscription) {
     const id = generate_uuidv4();
     this.subscribers.set(id, args);

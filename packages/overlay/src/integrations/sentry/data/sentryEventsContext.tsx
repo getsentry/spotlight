@@ -3,25 +3,49 @@ import React, { useEffect, useReducer } from 'react';
 import { SentryEvent } from '../types';
 import sentryDataCache from './sentryDataCache';
 
-export const SentryEventsContext = React.createContext<SentryEvent[]>([]);
+interface SetEventsAction {
+  e: SentryEvent | SentryEvent[];
+  action: string;
+}
 
-function eventReducer(state: SentryEvent[], message: SentryEvent) {
-  return [message, ...state];
+interface SentryEventsContextProps {
+  events: SentryEvent[];
+  setEvents: React.Dispatch<SetEventsAction>;
+}
+
+export const SentryEventsContext = React.createContext<SentryEventsContextProps>({
+  events: [],
+  setEvents: () => {},
+});
+
+function eventReducer(state: SentryEvent[], message: SetEventsAction): SentryEvent[] {
+  if (message.action === 'RESET' && Array.isArray(message.e)) {
+    return message.e;
+  } else if (message.action === 'APPEND' && !Array.isArray(message.e)) {
+    return [message.e, ...state];
+  }
+
+  return state;
 }
 
 export const SentryEventsContextProvider: React.FC<{
   children: ReactNode;
 }> = ({ children }) => {
-  const [events, addEvents] = useReducer(eventReducer, sentryDataCache.getEvents());
+  const [events, setEvents] = useReducer(eventReducer, sentryDataCache.getEvents());
 
   useEffect(() => {
     const unsubscribe = sentryDataCache.subscribe('event', (e: SentryEvent) => {
-      addEvents(e);
+      setEvents({ action: 'APPEND', e });
     });
     return () => {
       unsubscribe();
     };
-  });
+  }, []);
 
-  return <SentryEventsContext.Provider value={events}>{children}</SentryEventsContext.Provider>;
+  const contextValue: SentryEventsContextProps = {
+    events,
+    setEvents,
+  };
+
+  return <SentryEventsContext.Provider value={contextValue}>{children}</SentryEventsContext.Provider>;
 };

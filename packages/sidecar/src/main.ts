@@ -49,6 +49,7 @@ function getCorsHeader(): { [name: string]: string } {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,PUT,OPTIONS,DELETE,PATCH',
   };
 }
 
@@ -196,27 +197,68 @@ function startServer(
   basePath?: string,
   incomingPayload?: IncomingPayloadCallback,
 ): Server {
-  const server = createServer((req, res) => {
+  const server = createServer(handleRequest);
+
+  server.on('error', handleServerError);
+
+  server.listen(port, () => {
+    handleServerListen(port, basePath);
+  });
+
+  return server;
+
+  function handleRequest(req: IncomingMessage, res: ServerResponse): void {
     if (req.url === '/health') {
+      handleHealthRequest(res);
+    } else if (req.url === '/clear') {
+      handleClearRequest(req, res);
+    } else {
+      handleOtherRequest(req, res);
+    }
+  }
+
+  function handleHealthRequest(res: ServerResponse): void {
+    res.writeHead(200, {
+      'Content-Type': 'text/plain',
+      ...getCorsHeader(),
+      ...getSpotlightHeader(),
+    });
+    res.end('OK');
+  }
+
+  function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Cache-Control': 'no-cache',
+        ...getCorsHeader(),
+        ...getSpotlightHeader(),
+      });
+      res.end();
+    } else if (req.method === 'DELETE') {
       res.writeHead(200, {
         'Content-Type': 'text/plain',
         ...getCorsHeader(),
         ...getSpotlightHeader(),
       });
-      res.end('OK');
-    } else {
-      const handled = handleStreamRequest(req, res, buffer, incomingPayload);
-      if (!handled && basePath) {
-        serveFile(req, res, basePath);
-      }
-      if (!handled && !basePath) {
-        res.writeHead(404);
-        res.end();
-      }
+      clearBuffer();
+      res.end('Cleared');
     }
-  });
+  }
 
-  server.on('error', e => {
+  function handleOtherRequest(req: IncomingMessage, res: ServerResponse): void {
+    const handled = handleStreamRequest(req, res, buffer, incomingPayload);
+
+    if (!handled && basePath) {
+      serveFile(req, res, basePath);
+    }
+
+    if (!handled && !basePath) {
+      res.writeHead(404);
+      res.end();
+    }
+  }
+
+  function handleServerError(e: { code?: string }): void {
     if ('code' in e && e.code === 'EADDRINUSE') {
       logger.info(`Port ${port} in use, retrying...`);
       setTimeout(() => {
@@ -225,16 +267,14 @@ function startServer(
         logger.info(`Port ${port} in use, retrying...`);
       }, 5000);
     }
-  });
+  }
 
-  server.listen(port, () => {
+  function handleServerListen(port: number, basePath?: string): void {
     logger.info(`Sidecar listening on ${port}`);
     if (basePath) {
       logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
     }
-  });
-
-  return server;
+  }
 }
 
 let serverInstance: Server;

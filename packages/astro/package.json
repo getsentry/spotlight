@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/astro",
   "description": "Add spotlight to your Astro toolbar, for better debugging.",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "license": "Apache-2.0",
   "author": "Sentry",
   "repository": "git@github.com:getsentry/spotlight.git",
