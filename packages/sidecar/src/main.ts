@@ -154,14 +154,6 @@ function handleStreamRequest(
           });
           res.end();
         });
-      } else if (req.method === 'DELETE') {
-        res.writeHead(200, {
-          'Content-Type': 'text/plain',
-          ...getCorsHeader(),
-          ...getSpotlightHeader(),
-        });
-        clearBuffer();
-        res.end('Cleared');
       }
       return true;
     }
@@ -218,6 +210,8 @@ function startServer(
   function handleRequest(req: IncomingMessage, res: ServerResponse): void {
     if (req.url === '/health') {
       handleHealthRequest(res);
+    } else if (req.url === '/clear') {
+      handleClearRequest(req, res);
     } else {
       handleOtherRequest(req, res);
     }
@@ -230,6 +224,25 @@ function startServer(
       ...getSpotlightHeader(),
     });
     res.end('OK');
+  }
+
+  function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Cache-Control': 'no-cache',
+        ...getCorsHeader(),
+        ...getSpotlightHeader(),
+      });
+      res.end();
+    } else if (req.method === 'DELETE') {
+      res.writeHead(200, {
+        'Content-Type': 'text/plain',
+        ...getCorsHeader(),
+        ...getSpotlightHeader(),
+      });
+      clearBuffer();
+      res.end('Cleared');
+    }
   }
 
   function handleOtherRequest(req: IncomingMessage, res: ServerResponse): void {

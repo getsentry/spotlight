@@ -62,7 +62,11 @@ export default function App({
 
   const clearEvents = () => {
     const makeFetch = getNativeFetchImplementation();
-    makeFetch(sidecarUrl, {
+    const sidecarUrlObject: URL = new URL(sidecarUrl);
+    const host: string = sidecarUrlObject?.hostname;
+    const port: string = sidecarUrlObject?.port;
+    const clearEventsUrl: string = `http://${host}:${port}/clear`;
+    makeFetch(clearEventsUrl, {
       method: 'DELETE',
       mode: 'cors',
     }).catch(err => {
