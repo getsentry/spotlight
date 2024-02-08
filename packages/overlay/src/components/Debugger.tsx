@@ -51,7 +51,7 @@ export default function Debugger({
   fullPage: boolean;
 }) {
   const isSentryIntegrationAdded = integrations.some(integration => integration.name === 'sentry');
-  const isElectronAppInstance = (window as Window & { electronAPI?: object }).electronAPI;
+  const isElectronAppInstance = (window as Window & { electronAPI?: object })?.electronAPI !== undefined;
 
   return (
     <FullscreenBlur isOpen={isOpen} setOpen={setOpen} fullPage={fullPage}>
@@ -93,7 +93,7 @@ export default function Debugger({
               </div>
             </div>
           </h1>
-          {isSentryIntegrationAdded && isElectronAppInstance === undefined && (
+          {isSentryIntegrationAdded && !isElectronAppInstance && (
             <button
               className="bg-primary-950 text-primary-300 border-primary-300 hover:bg-primary-900 hover:border-primary-900 mr-1 rounded-md border px-2 py-1 hover:transition-colors"
               onClick={() => {
