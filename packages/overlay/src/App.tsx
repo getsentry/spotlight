@@ -80,6 +80,7 @@ export default function App({
     setEvents({ action: 'RESET', e: [] });
     sentryDataCache.resetData();
     navigate('/errors');
+    setIntegrationData({});
     setReloadSpotlight(prev => prev + 1);
   };
 
