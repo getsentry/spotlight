@@ -1,0 +1,27 @@
+{
+  "name": "@spotlightjs/e2e-tests-nextjs",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "preview": "next dev",
+    "test:e2e:prepare": "playwright install --with-deps",
+    "test:e2e": "playwright test",
+    "test:e2e:ci": "pnpm test:e2e:prepare && pnpm test:e2e"
+  },
+  "dependencies": {
+    "@sentry/nextjs": "^7.99.0",
+    "next": "latest",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@spotlightjs/spotlight": "workspace:*",
+    "@playwright/test": "^1.40.1",
+    "@types/node": "20.10.4",
+    "@types/react": "18.2.45",
+    "typescript": "5.3.3",
+    "webpack-hook-plugin": "^1.0.7"
+  }
+}

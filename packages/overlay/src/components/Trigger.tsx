@@ -73,6 +73,7 @@ export default function Trigger({
         getAnchorClasses(anchor),
         isOpen ? '!hidden' : '',
       )}
+      id="spotlight-overlay-trigger"
       title="Spotlight by Sentry"
       onClick={() => setOpen(!isOpen)}
     >
