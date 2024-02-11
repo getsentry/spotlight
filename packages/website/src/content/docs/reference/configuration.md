@@ -5,6 +5,14 @@ description: All the configuration options for setting up Spotlight
 
 ## `init`
 
+To initialize spotlight in your app using following configuration options:
+
+#### `integrations`
+
+**type:** [`SpotlightIntegration[]`](#spotlightintegration)
+
+Defines which integrations should be loaded for Spotlight. Defaults to `[sentry()]`.
+
 ```js
 import { init, sentry } as Spotlight from '@spotlightjs/spotlight';
 
@@ -13,26 +21,7 @@ init({
 });
 ```
 
-### `integrations`
-
-**type:** [`SpotlightIntegration[]`](#spotlightintegration)
-
-Defines which integrations should be loaded for Spotlight. Defaults to `[sentry()]`.
-
-```ts
-init({
-  integrations: [sentry()],
-});
-```
-
-#### `SpotlightIntegration`
-
-```ts
-// TODO
-type SpotlightIntegration = {};
-```
-
-### `debug`
+#### `debug`
 
 **type:** `boolean` **default:** `false`
 
@@ -44,7 +33,7 @@ init({
 });
 ```
 
-### `sidecarUrl`
+#### `sidecarUrl`
 
 **type:** `string` **default:** `"http://localhost:8969/stream"`
 
@@ -58,7 +47,7 @@ init({
 });
 ```
 
-### `anchor`
+#### `anchor`
 
 **type:** [`AnchorConfig`](#anchorconfig)
 
@@ -70,7 +59,7 @@ init({
 });
 ```
 
-### `experiments`
+#### `experiments`
 
 **type:** [`ExperimentsConfig`](#experimentsconfig)
 
@@ -100,7 +89,7 @@ Experiment names are:
 
 - `sentry:focus-local-events` - if set to true, errors and traces will hide events from other sessions when possible.
 
-### `injectImmediately`
+#### `injectImmediately`
 
 **type:** `boolean` **default:** `false`
 
@@ -117,14 +106,47 @@ init({
 });
 ```
 
-### `openOnInit`
+#### `openOnInit`
 
 **type:** `boolean` **default:** `false`
 
 If set to `true`, the Spotlight overlay Window will be opened immediately after calling the init function. By default,
 only the button is visible.
 
-### `trigger`
+```ts
+init({
+  opneOnInit: true,
+});
+```
+
+#### `fullPage`
+
+**type:** `boolean` **default:** `false`
+
+If set to `true`, the Spotlight overlay will be rendered directly in the HTML as a relative `<div/>`. It's helpful and
+goes well with `injectImmediately`. It's used for rendering a blocking page like an error page or dedicated HTML. Also
+the ability for closing the overlay is disabled when this is avitce.
+
+```ts
+init({
+  fullPage: true,
+});
+```
+
+#### `showClearEventsButton`
+
+**type:** `boolean` **default:** `true`
+
+If set to `true`, the Spotlight overlay will have a clear events button on top. On clicking the button, all events
+processed from sidecar will be removed.
+
+```ts
+init({
+  showClearEventsButton: true,
+});
+```
+
+## `trigger`
 
 Trigger an event within Spotlight.
 
@@ -141,10 +163,9 @@ trigger('sentry:showError', {
 type TriggerFunction = (eventName: string, eventPayload?: unknown)
 ```
 
-### `fullPage`
+## `SpotlightIntegration`
 
-**type:** `boolean` **default:** `false`
-
-If set to `true`, the Spotlight overlay will be rendered directly in the HTML as a relative `<div/>`. It's helpful and
-goes well with `injectImmediately`. It's used for rendering a blocking page like an error page or dedicated HTML. Also
-the ability for closing the overlay is disabled when this is avitce.
+```ts
+// TODO
+type SpotlightIntegration = {};
+```

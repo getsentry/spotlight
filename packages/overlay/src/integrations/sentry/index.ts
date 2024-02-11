@@ -83,6 +83,10 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
         },
       ];
     },
+
+    reset: () => {
+      sentryDataCache.resetData();
+    },
   } satisfies Integration<Envelope>;
 }
 
