@@ -25,7 +25,7 @@ module.exports = withSentryConfig(
 
     // Suppresses source map uploading logs during build
     silent: true,
-    org: '@spotlightjs/e2e-tests',
+    org: 'sentry',
     project: 'e2e-tests-nextjs',
   },
   {
