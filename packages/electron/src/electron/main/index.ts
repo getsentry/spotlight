@@ -135,7 +135,7 @@ const template = [
             try{
               const spotlightRoot = document.getElementById('sentry-spotlight-root');
               window?.__spotlight?.eventTarget.dispatchEvent(
-                new CustomEvent("sentry:clearEvents", {
+                new CustomEvent("clearEvents", {
                   detail: {},
                 }),
               );
@@ -158,7 +158,7 @@ const template = [
             try{
               const spotlightRoot = document.getElementById('sentry-spotlight-root');
               window?.__spotlight?.eventTarget.dispatchEvent(
-                new CustomEvent("sentry:clearEvents", {
+                new CustomEvent("clearEvents", {
                   detail: {},
                 }),
               );

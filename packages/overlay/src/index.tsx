@@ -100,6 +100,7 @@ export async function init({
   integrations,
   experiments = DEFAULT_EXPERIMENTS,
   fullPage = false,
+  showClearEventsButton = true,
 }: SpotlightOverlayOptions = {}) {
   if (typeof document === 'undefined') return;
 
@@ -175,6 +176,7 @@ export async function init({
           sidecarUrl={sidecarUrl}
           anchor={anchor}
           fullPage={fullPage}
+          showClearEventsButton={showClearEventsButton}
         />
       </SpotlightContextProvider>
     </MemoryRouter>,

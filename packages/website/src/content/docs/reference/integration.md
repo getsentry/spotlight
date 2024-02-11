@@ -49,5 +49,12 @@ export type Integration<T = any> = {
    * The returned object will be passed to your tabs function.
    */
   processEvent?: (eventContext: RawEventContext) => ProcessedEventContainer<T> | undefined;
+
+  /**
+   * To reset the integration.
+   *
+   * @returns void
+   */
+  reset?: () => void;
 };
 ```

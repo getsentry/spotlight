@@ -41,6 +41,7 @@ export default function Debugger({
   isOnline,
   setTriggerButtonCount: setNotificationCount,
   fullPage,
+  showClearEventsButton,
 }: {
   integrations: Integration[];
   isOpen: boolean;
@@ -49,10 +50,8 @@ export default function Debugger({
   isOnline: boolean;
   setTriggerButtonCount: (count: NotificationCount) => void;
   fullPage: boolean;
+  showClearEventsButton: boolean;
 }) {
-  const isSentryIntegrationAdded = integrations.some(integration => integration.name === 'sentry');
-  const isElectronAppInstance = (window as Window & { electronAPI?: object })?.electronAPI !== undefined;
-
   return (
     <FullscreenBlur isOpen={isOpen} setOpen={setOpen} fullPage={fullPage}>
       <div className={classNames('spotlight-debugger', fullPage ? 'spotlight-fullscreen' : '')}>
@@ -93,12 +92,12 @@ export default function Debugger({
               </div>
             </div>
           </h1>
-          {isSentryIntegrationAdded && !isElectronAppInstance && (
+          {showClearEventsButton && (
             <button
               className="bg-primary-950 text-primary-300 border-primary-300 hover:bg-primary-900 hover:border-primary-900 mr-1 rounded-md border px-2 py-1 hover:transition-colors"
               onClick={() => {
                 getSpotlightEventTarget().dispatchEvent(
-                  new CustomEvent('sentry:clearEvents', {
+                  new CustomEvent('clearEvents', {
                     detail: {},
                   }),
                 );

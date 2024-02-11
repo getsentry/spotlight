@@ -1,11 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Debugger from './components/Debugger';
 import Trigger from './components/Trigger';
 import type { Integration, IntegrationData } from './integrations/integration';
-import sentryDataCache from './integrations/sentry/data/sentryDataCache';
-import { SentryEventsContext } from './integrations/sentry/data/sentryEventsContext';
-import { getNativeFetchImplementation } from './integrations/sentry/sentry-integration';
 import { getSpotlightEventTarget } from './lib/eventTarget';
 import { log } from './lib/logger';
 import useKeyPress from './lib/useKeyPress';
@@ -22,9 +19,9 @@ export default function App({
   sidecarUrl,
   anchor,
   fullPage = false,
+  showClearEventsButton = true,
 }: AppProps) {
   log('App rerender');
-  const { setEvents } = useContext(SentryEventsContext);
   const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});
   const [isOnline, setOnline] = useState(false);
   const [triggerButtonCount, setTriggerButtonCount] = useState<NotificationCount>({ count: 0, severe: false });
@@ -61,26 +58,26 @@ export default function App({
   const navigate = useNavigate();
 
   const clearEvents = () => {
-    const makeFetch = getNativeFetchImplementation();
     const sidecarUrlObject: URL = new URL(sidecarUrl);
     const host: string = sidecarUrlObject?.hostname;
     const port: string = sidecarUrlObject?.port;
     const clearEventsUrl: string = `http://${host}:${port}/clear`;
-    makeFetch(clearEventsUrl, {
+
+    fetch(clearEventsUrl, {
       method: 'DELETE',
       mode: 'cors',
     }).catch(err => {
-      console.error(
-        `Sentry SDK can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`,
-        err,
-      );
+      console.error(`Spotlight can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`, err);
       return;
     });
 
-    setEvents({ action: 'RESET', e: [] });
-    sentryDataCache.resetData();
-    navigate('/errors');
-    setIntegrationData({});
+    integrations.forEach(integration => {
+      const IntegrationName = integration.name;
+      if (integration.processEvent) {
+        setIntegrationData(prev => ({ ...prev, [IntegrationName]: [] }));
+        if (integration.reset) integration.reset();
+      }
+    });
     setReloadSpotlight(prev => prev + 1);
   };
 
@@ -108,13 +105,13 @@ export default function App({
     spotlightEventTarget.addEventListener('open', onOpen as EventListener);
     spotlightEventTarget.addEventListener('close', onClose);
     spotlightEventTarget.addEventListener('navigate', onNavigate as EventListener);
-    spotlightEventTarget.addEventListener('sentry:clearEvents', clearEvents as EventListener);
+    spotlightEventTarget.addEventListener('clearEvents', clearEvents as EventListener);
 
     return () => {
       spotlightEventTarget.removeEventListener('open', onOpen as EventListener);
       spotlightEventTarget.removeEventListener('close', onClose);
       spotlightEventTarget.removeEventListener('navigate', onNavigate as EventListener);
-      spotlightEventTarget.removeEventListener('sentry:clearEvents', clearEvents as EventListener);
+      spotlightEventTarget.removeEventListener('clearEvents', clearEvents as EventListener);
     };
   }, [spotlightEventTarget, navigate]);
 
@@ -151,6 +148,7 @@ export default function App({
         integrationData={integrationData}
         setTriggerButtonCount={setTriggerButtonCount}
         fullPage={fullPage}
+        showClearEventsButton={showClearEventsButton}
       />
     </>
   );
