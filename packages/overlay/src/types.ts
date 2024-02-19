@@ -90,6 +90,14 @@ export type SpotlightOverlayOptions = {
    * This is useful for replaceing error page or in when directly rendered as an html page
    */
   fullPage?: boolean;
+
+  /**
+   * If set to `false`, spotlight overlay will not have Clear Events button.
+   * This is useful to clear data in spotlight.
+   *
+   * @default true
+   */
+  showClearEventsButton?: boolean;
 };
 
 export type NotificationCount = {

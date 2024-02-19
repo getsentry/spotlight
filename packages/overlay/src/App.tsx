@@ -19,9 +19,9 @@ export default function App({
   sidecarUrl,
   anchor,
   fullPage = false,
+  showClearEventsButton = true,
 }: AppProps) {
   log('App rerender');
-
   const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});
   const [isOnline, setOnline] = useState(false);
   const [triggerButtonCount, setTriggerButtonCount] = useState<NotificationCount>({ count: 0, severe: false });
@@ -57,6 +57,30 @@ export default function App({
 
   const navigate = useNavigate();
 
+  const clearEvents = () => {
+    const sidecarUrlObject: URL = new URL(sidecarUrl);
+    const host: string = sidecarUrlObject?.hostname;
+    const port: string = sidecarUrlObject?.port;
+    const clearEventsUrl: string = `http://${host}:${port}/clear`;
+
+    fetch(clearEventsUrl, {
+      method: 'DELETE',
+      mode: 'cors',
+    }).catch(err => {
+      console.error(`Spotlight can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`, err);
+      return;
+    });
+
+    integrations.forEach(integration => {
+      const IntegrationName = integration.name;
+      if (integration.processEvent) {
+        setIntegrationData(prev => ({ ...prev, [IntegrationName]: [] }));
+        if (integration.reset) integration.reset();
+      }
+    });
+    setReloadSpotlight(prev => prev + 1);
+  };
+
   useEffect(() => {
     const onOpen = (
       e: CustomEvent<{
@@ -81,11 +105,13 @@ export default function App({
     spotlightEventTarget.addEventListener('open', onOpen as EventListener);
     spotlightEventTarget.addEventListener('close', onClose);
     spotlightEventTarget.addEventListener('navigate', onNavigate as EventListener);
+    spotlightEventTarget.addEventListener('clearEvents', clearEvents as EventListener);
 
     return () => {
       spotlightEventTarget.removeEventListener('open', onOpen as EventListener);
       spotlightEventTarget.removeEventListener('close', onClose);
       spotlightEventTarget.removeEventListener('navigate', onNavigate as EventListener);
+      spotlightEventTarget.removeEventListener('clearEvents', clearEvents as EventListener);
     };
   }, [spotlightEventTarget, navigate]);
 
@@ -122,7 +148,7 @@ export default function App({
         integrationData={integrationData}
         setTriggerButtonCount={setTriggerButtonCount}
         fullPage={fullPage}
-        setReloadSpotlight={setReloadSpotlight}
+        showClearEventsButton={showClearEventsButton}
       />
     </>
   );
