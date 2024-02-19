@@ -57,6 +57,7 @@ if (enableOverlay) {
   socket.addEventListener('message', (event) => {
     const dataJson = JSON.parse(event.data);
     if (dataJson.type === 'error') {
+      document?.body?.style.margin = 0;
       ${buildClientInit(options)}
     }
   });
