@@ -137,7 +137,7 @@ class SentryDataCache {
 
           if (txn.spans) {
             allSpans.push(
-              txn.spans.map(s => ({
+              ...txn.spans.map(s => ({
                 ...s,
                 timestamp: toTimestamp(s.timestamp),
                 start_timestamp: toTimestamp(s.start_timestamp),

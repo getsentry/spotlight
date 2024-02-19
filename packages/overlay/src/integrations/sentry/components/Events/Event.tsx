@@ -1,7 +1,7 @@
 import { SentryEvent } from '../../types';
 import { Error, ErrorSummary, ErrorTitle } from './Error';
 
-function EventMessage(event: SentryEvent) {
+function getEventMessage(event: SentryEvent) {
   if (typeof event.message === 'string') {
     return event.message;
   } else if (event.message !== undefined && typeof event.message.formatted === 'string') {
@@ -18,7 +18,7 @@ export function EventTitle({ event }: { event: SentryEvent }) {
 
   return (
     <>
-      <strong className="font-bold">{EventMessage(event)}</strong>
+      <strong className="font-bold">{getEventMessage(event)}</strong>
     </>
   );
 }
@@ -30,7 +30,7 @@ export function EventSummary({ event }: { event: SentryEvent }) {
   return (
     <div className="space-y-4 font-mono">
       <h3 className="flex flex-col">
-        <strong className="text-xl">{EventMessage(event)}</strong>
+        <strong className="text-xl">{getEventMessage(event)}</strong>
       </h3>
     </div>
   );
@@ -44,7 +44,7 @@ export default function Event({ event }: { event: SentryEvent }) {
   return (
     <h3 className="bg-primary-950 flex flex-col">
       <strong className="text-xl">Message:</strong>
-      <pre>{EventMessage(event)}</pre>
+      <pre>{getEventMessage(event)}</pre>
     </h3>
   );
 }
