@@ -23,6 +23,13 @@ describe('Sentry Integration', () => {
     expect((processedEnvelope.event[1][0][1] as any).type).toEqual('transaction');
   });
 
+  test('Process Java Transaction Envelope', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_java.txt', 'utf-8');
+    const processedEnvelope = processEnvelope({ data: envelope, contentType: 'test' });
+    expect(processedEnvelope).not.toBe(undefined);
+    expect((processedEnvelope.event[1][0][1] as any).type).toEqual('transaction');
+  });
+
   test('Process Astro SSR pageload (BE -> FE) trace', () => {
     const nodeEnvelope = fs.readFileSync('./_fixtures/envelope_astro_ssr_node.txt', 'utf-8');
     const processedNodeEnvelope = processEnvelope({ data: nodeEnvelope, contentType: 'test' });
