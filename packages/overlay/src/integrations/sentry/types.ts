@@ -49,6 +49,7 @@ type CommonEventAttrs = {
   // not always present, but we are forcing it in EventCache
   event_id: string;
   timestamp: number;
+  message?: SentryFormattedMessage;
   breadcrumbs?: Breadcrumb[] | { values: Breadcrumb[] };
   transaction?: string;
   environment?: string;
@@ -61,7 +62,6 @@ type CommonEventAttrs = {
   extra?: { [key: string]: string | number };
   sdk?: Sdk;
   measurements?: Measurements;
-  message?: SentryFormattedMessage;
 };
 
 export type Context = {
@@ -96,7 +96,6 @@ export type SentryFormattedMessage =
 
 export type SentryErrorEvent = CommonEventAttrs & {
   type?: 'error' | 'event' | 'message' | 'default';
-  message?: SentryFormattedMessage;
   exception: EventException;
 };
 
