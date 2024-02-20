@@ -124,23 +124,26 @@ class SentryDataCache {
         trace.transactions.sort((a, b) => a.start_timestamp - b.start_timestamp);
 
         // recompute tree as we might have txn out of order
-        // XXX: we're trusting timestamps, wihch are not trustworthy
+        // XXX: we're trusting timestamps, which are not trustworthy
         const allSpans: Span[] = [];
         trace.transactions.forEach(txn => {
-          allSpans.push(
-            {
-              ...txn.contexts.trace,
-              start_timestamp: txn.start_timestamp,
-              timestamp: txn.timestamp,
-              description: traceCtx.description || txn.transaction,
-              transaction: txn,
-            },
-            ...txn.spans.map(s => ({
-              ...s,
-              timestamp: toTimestamp(s.timestamp),
-              start_timestamp: toTimestamp(s.start_timestamp),
-            })),
-          );
+          allSpans.push({
+            ...txn.contexts.trace,
+            start_timestamp: txn.start_timestamp,
+            timestamp: txn.timestamp,
+            description: traceCtx.description || txn.transaction,
+            transaction: txn,
+          });
+
+          if (txn.spans) {
+            allSpans.push(
+              ...txn.spans.map(s => ({
+                ...s,
+                timestamp: toTimestamp(s.timestamp),
+                start_timestamp: toTimestamp(s.start_timestamp),
+              })),
+            );
+          }
         });
         trace.spans = allSpans;
         trace.spanTree = groupSpans(trace.spans);
