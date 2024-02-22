@@ -60,4 +60,14 @@ describe('Sentry Integration', () => {
     expect(createdTrace.spanTree[0].children).toHaveLength(1);
     expect(createdTrace.spanTree[0].children![0].children).toHaveLength(45);
   });
+
+  test('Process Angular Envelope', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_angular.txt', 'utf-8');
+    expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
+  });
+
+  test('Process Java Formatted Message Envelope', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_java_formatted_message.txt', 'utf-8');
+    expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
+  });
 });
