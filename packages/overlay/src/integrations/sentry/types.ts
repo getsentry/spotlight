@@ -49,7 +49,7 @@ type CommonEventAttrs = {
   // not always present, but we are forcing it in EventCache
   event_id: string;
   timestamp: number;
-  message?: string;
+  message?: SentryFormattedMessage;
   breadcrumbs?: Breadcrumb[] | { values: Breadcrumb[] };
   transaction?: string;
   environment?: string;
@@ -87,8 +87,15 @@ export type Tags = {
   [key: string]: string;
 };
 
+export type SentryFormattedMessage =
+  | string
+  | {
+      formatted: string;
+      params?: [];
+    };
+
 export type SentryErrorEvent = CommonEventAttrs & {
-  type?: 'error' | 'event' | 'default';
+  type?: 'error' | 'event' | 'message' | 'default';
   exception: EventException;
 };
 
@@ -109,7 +116,7 @@ export type Span = {
 
 export type SentryTransactionEvent = CommonEventAttrs & {
   type: 'transaction';
-  spans: Span[];
+  spans?: Span[];
   start_timestamp: string;
   contexts: Contexts & {
     trace: TraceContext;

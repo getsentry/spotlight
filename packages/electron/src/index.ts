@@ -23,6 +23,7 @@ Spotlight.init({
   injectImmediately: true,
   showTriggerButton: false,
   integrations: [Spotlight.sentry({ injectIntoSDK: false })],
+  showClearEventsButton: false,
 });
 
 Spotlight.onSevereEvent(count => {

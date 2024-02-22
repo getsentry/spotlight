@@ -1,5 +1,4 @@
 import fontStyles from '@fontsource/raleway/index.css?inline';
-import ReactDOM from 'react-dom/client';
 import { MemoryRouter } from 'react-router-dom';
 import colors from 'tailwindcss/colors';
 import App from './App.tsx';
@@ -10,13 +9,14 @@ import { default as sentry } from './integrations/sentry/index.ts';
 import { getSpotlightEventTarget } from './lib/eventTarget.ts';
 import { activateLogger, log } from './lib/logger.ts';
 import { SpotlightContextProvider } from './lib/useSpotlightContext.tsx';
+import { React, ReactDOM } from './react-instance.tsx'; // Import specific exports
 import { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
 
 export { default as console } from './integrations/console/index.ts';
 export { default as hydrationError } from './integrations/hydration-error/index.ts';
 export { default as sentry } from './integrations/sentry/index.ts';
 export { default as viteInspect } from './integrations/vite-inspect/index.ts';
-
+export { React, ReactDOM };
 function createStyleSheet(styles: string) {
   const sheet = new CSSStyleSheet();
   sheet.replaceSync(styles);
@@ -100,6 +100,7 @@ export async function init({
   integrations,
   experiments = DEFAULT_EXPERIMENTS,
   fullPage = false,
+  showClearEventsButton = true,
 }: SpotlightOverlayOptions = {}) {
   if (typeof document === 'undefined') return;
 
@@ -175,6 +176,7 @@ export async function init({
           sidecarUrl={sidecarUrl}
           anchor={anchor}
           fullPage={fullPage}
+          showClearEventsButton={showClearEventsButton}
         />
       </SpotlightContextProvider>
     </MemoryRouter>,
