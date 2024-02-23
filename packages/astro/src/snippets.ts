@@ -8,6 +8,7 @@ export type ClientInitOptions = {
   integrationNames?: SupportedIntegrations[];
   injectImmediately?: boolean;
   fullPage?: boolean;
+  showFirstIncomingError?: boolean;
 } & SpotlightAstroIntegrationOptions;
 
 const buildClientImport = (importPath: string) => `import * as Spotlight from ${JSON.stringify(importPath)};`;
@@ -15,7 +16,10 @@ const buildClientImport = (importPath: string) => `import * as Spotlight from ${
 const buildClientInit = (options: ClientInitOptions) => {
   const integrationCalls = options.integrationNames
     ? options.integrationNames.map(i => `Spotlight.${i}()`).join(', ')
-    : `Spotlight.sentry({sidecarUrl: ${options.sidecarUrl ? `'${options.sidecarUrl}'` : undefined}})`;
+    : `Spotlight.sentry({
+      sidecarUrl: ${options.sidecarUrl ? `'${options.sidecarUrl}'` : undefined},
+      showFirstIncomingError: ${options.showFirstIncomingError === true ? `'true'` : 'false'},
+    })`;
 
   return `
 Spotlight.init({
@@ -57,7 +61,6 @@ if (enableOverlay) {
   socket.addEventListener('message', (event) => {
     const dataJson = JSON.parse(event.data);
     if (dataJson.type === 'error') {
-      document?.body?.style.margin = 0;
       ${buildClientInit(options)}
     }
   });
