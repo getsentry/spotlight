@@ -31,6 +31,11 @@ export default defineConfig({
     svgr(),
     removeReactDevToolsMessagePlugin(),
   ],
+  define: {
+    'process.env.NODE_ENV': "'development'",
+    'process.env.JEST_WORKER_ID': 1,
+    process: {},
+  },
   resolve: {
     alias: {
       '~': resolve(__dirname, 'src'),
