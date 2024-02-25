@@ -1,5 +1,28 @@
 # @spotlightjs/core
 
+## 1.7.0
+
+### Minor Changes
+
+- Add support for message events and transactions without spans
+  ([#357](https://github.com/getsentry/spotlight/pull/357))
+
+### Patch Changes
+
+- Added a id for trigger button and added e2e test for nextjs with custom integration
+  ([#347](https://github.com/getsentry/spotlight/pull/347))
+
+- React and react-dom exported for custom integrations ([#347](https://github.com/getsentry/spotlight/pull/347))
+
+- 1. Removed clear events button for electron app. ([#352](https://github.com/getsentry/spotlight/pull/352))
+  2. Added clear events function in Reload and force reload toolbar options in electron app.
+  3. Created a event listener to clear events data.
+  4. Added a reset function in integration.
+
+- Added testcase for angular and java message sample file ([#359](https://github.com/getsentry/spotlight/pull/359))
+
+- Define process variables for webpack builds ([#361](https://github.com/getsentry/spotlight/pull/361))
+
 ## 1.6.0
 
 ### Minor Changes
