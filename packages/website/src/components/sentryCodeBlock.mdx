@@ -4,6 +4,8 @@ title: Sentry Setup Codeblock
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
+### Web platforms
+
 <Tabs>
   <TabItem label="JavaScript (Browser)">
   In the Browser you don't need to set `spotlight: true`, `Spotlight.init()` will automatically detect if Sentry is available and if so, hook into the SDK.
@@ -42,7 +44,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   :::caution
   Requires `sentry/sentry` version `4.1.0` or higher.
   :::
-  ```php {4}
+  ```php {4} 
   \Sentry\init([
       'dsn' => '___DSN___',
       // You should only load this in your development environment
@@ -74,6 +76,64 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
       // You should only load this in your development environment
       o.EnableSpotlight = true;
 #endif
+  });
+  ```
+  </TabItem>
+</Tabs>
+
+### Mobile platforms
+
+<Tabs>
+  <TabItem label="Android">
+  :::caution
+  Requires `sentry-java` version `7.4.0` or higher.
+  :::
+  ```kotlin {4}
+  SentryAndroid.init(this, options -> {
+      options.setDsn("___DSN___");
+      // You should only enable this in your development environment
+      if (BuildConfig.DEBUG) {
+          options.isEnableSpotlight = true;
+      }
+  });
+  ```
+  </TabItem>
+  <TabItem label="iOS">
+  :::caution
+  Requires `sentry-cocoa` version `8.21.0` or higher.
+  :::
+  ```swift {4}
+  SentrySDK.start { options in
+      options.dsn = "___DSN___"
+      // You should only enable this in your development environment
+#if DEBUG
+      options.enableSpotlight = true
+#endif
+  }
+  ```
+  </TabItem>
+  <TabItem label="React Native">
+  :::caution
+  Requires `sentry-react-native` version `5.18.0` or higher.
+  :::
+  ```typescript {4}
+  Sentry.init({
+      dsn: '___DSN___',
+      enableSpotlight: __DEV__,
+  });
+  ```
+  </TabItem>
+  <TabItem label="Flutter">
+  :::caution
+  Requires `sentry-dart` version `7.15.0` or higher.
+  :::
+  ```dart {4}
+  await SentryFlutter.init((options) {
+      options.dsn = '___DSN___';
+      // You should only enable this in your development environment
+      if (kDebugMode) {
+          options.spotlight = Spotlight(enabled: true);
+      }
   });
   ```
   </TabItem>
