@@ -95,6 +95,18 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
       options.isEnableSpotlight = BuildConfig.DEBUG;
   });
   ```
+
+  You also need to allow cleartext traffic from your emulator to the Sidecar on your host machine by adding the following to `src/debug/res/xml/network.xml`:
+  ```xml {6}
+  <?xml version="1.0" encoding="utf-8"?>
+  <network-security-config>
+      <domain-config cleartextTrafficPermitted="true">
+          <!-- Allow cleartext traffic from the emulator to the host machine -->
+          <!-- See https://developer.android.com/studio/run/emulator-networking for more details -->
+          <domain includeSubdomains="true">10.0.2.2</domain>
+      </domain-config>
+  </network-security-config>
+  ```
   </TabItem>
   <TabItem label="iOS">
   :::caution
