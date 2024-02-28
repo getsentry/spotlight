@@ -68,7 +68,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   :::caution
   Requires `sentry-dotnet` version `4.0.0` or higher.
   :::
-  ```csharp {3-6}
+  ```csharp {4-7}
   SentrySdk.Init(o =>
   {
       o.Dsn = "___DSN___";
@@ -112,7 +112,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   :::caution
   Requires `sentry-cocoa` version `8.21.0` or higher.
   :::
-  ```swift {4}
+  ```swift {3-6}
   SentrySDK.start { options in
       options.dsn = "___DSN___"
 #if DEBUG
@@ -126,7 +126,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   :::caution
   Requires `sentry-react-native` version `5.18.0` or higher.
   :::
-  ```typescript {4}
+  ```typescript {3}
   Sentry.init({
       dsn: '___DSN___',
       enableSpotlight: __DEV__,
