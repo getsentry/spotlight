@@ -1,8 +1,10 @@
 ---
-title: Sentry Setup Codeblock
+title: Sentry Setup Codeblock Web Platforms
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+### Web platforms
 
 <Tabs>
   <TabItem label="JavaScript (Browser)">
@@ -42,7 +44,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   :::caution
   Requires `sentry/sentry` version `4.1.0` or higher.
   :::
-  ```php {4}
+  ```php {4} 
   \Sentry\init([
       'dsn' => '___DSN___',
       // You should only load this in your development environment
@@ -66,7 +68,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
   :::caution
   Requires `sentry-dotnet` version `4.0.0` or higher.
   :::
-  ```csharp {3-6}
+  ```csharp {4-7}
   SentrySdk.Init(o =>
   {
       o.Dsn = "___DSN___";
