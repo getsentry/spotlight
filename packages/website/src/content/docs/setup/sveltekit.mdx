@@ -9,15 +9,20 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 This guide gets Spotlight up and running in SvelteKit with Sentry. 
 You don't strictly need Sentry for Spotlight to work, we highly recommend it.
 
-## Install Sentry 
+## 1. Installation
+
+#### Install Sentry
 
 Follow the [Sveltekit Getting Started](https://docs.sentry.io/platforms/javascript/guides/sveltekit/) guide on Sentry to install and configure Sentry.
 
-## Install Spotlight
+#### Install Spotlight
 
 Install the Spotlight package:
 
 <InstallCommand/>
+
+
+## 2. Configuration
 
 Initialize Spotlight after Sentry and start the Sidecar on the server. Just add a little code to your [SvelteKit hooks](https://kit.svelte.dev/docs/hooks) files:
 

@@ -13,7 +13,7 @@ There's a few steps to get started:
 2. Run the [Sidecar](#run-the-sidecar) concurrently with your development server.
 3. Configure [Sentry's SDKs to send to Spotlight](#leverage-sentry-sdks) by passing `spotlight=True`.
 
-## Configure the Overlay
+## 1. Installation
 
 Start by installing the `@spotlightjs/spotlight` package in your existing frontend application.
 
@@ -40,6 +40,8 @@ We're loading Spotlight with production dependencies as the import is static, bu
 
 If you're using a dynamic import, its possible you can simply list this in your `devDependencies` instead.
 :::
+
+## 2. Configuration
 
 Inject the Spotlight overlay into your application:
 
@@ -104,7 +106,7 @@ Sentry.init({
 
 ---
 
-## Run the Sidecar
+## 3. Run the Sidecar
 
 Spotlight's [architecture](/architecture/) requires a sidecar to be running alongside your service. This is to enable streaming data collection from your backend services into the Spotlight overlay.
 
@@ -116,7 +118,7 @@ Spotlight's [architecture](/architecture/) requires a sidecar to be running alon
 </CardGrid>
 
 
-## Leverage Sentry SDKs
+## Bonus: Leverage Sentry SDKs
 
 To get the most value out of Spotlight, configure Sentry's SDKs. You don't need to be using the Sentry service to take advantage of Sentry's SDKs to power Spotlight.
 
