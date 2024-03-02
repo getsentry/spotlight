@@ -8,7 +8,7 @@ export type ClientInitOptions = {
   integrationNames?: SupportedIntegrations[];
   injectImmediately?: boolean;
   fullPage?: boolean;
-  showFirstIncomingError?: boolean;
+  showRecentError?: boolean;
 } & SpotlightAstroIntegrationOptions;
 
 const buildClientImport = (importPath: string) => `import * as Spotlight from ${JSON.stringify(importPath)};`;
@@ -18,7 +18,7 @@ const buildClientInit = (options: ClientInitOptions) => {
     ? options.integrationNames.map(i => `Spotlight.${i}()`).join(', ')
     : `Spotlight.sentry({
       sidecarUrl: ${options.sidecarUrl ? `'${options.sidecarUrl}'` : undefined},
-      showFirstIncomingError: ${options.showFirstIncomingError === true ? `'true'` : 'false'},
+      showRecentError: ${options.showRecentError === true ? `'true'` : 'false'},
     })`;
 
   return `

@@ -22,7 +22,7 @@ export const errorPageInjectionPlugin: (options: ErrorPagePluginOptions) => Plug
         // don't wait for the window.load event to be fired because in the error page,
         // this already happened before spotlight is initialized
         injectImmediately: true,
-        showFirstIncomingError: true,
+        showRecentError: true,
       });
 
       // Checking if there is a ErrorOverlay class added by Astro
