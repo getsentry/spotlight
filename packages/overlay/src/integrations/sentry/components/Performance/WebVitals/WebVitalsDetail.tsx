@@ -119,7 +119,7 @@ const WebVitalsDetail = () => {
       </>
     );
   }
-  return <div className="text-primary-300 px-6 py-4">Invalid Data. Please try again.</div>;
+  return <p className="text-primary-300 px-6 py-4">No measurement found.</p>;
 };
 
 export default WebVitalsDetail;
