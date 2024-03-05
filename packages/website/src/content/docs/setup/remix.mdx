@@ -4,8 +4,10 @@ description: A guide how to setup Spotlight for Remix
 ---
 
 import { Content as InstallCommand } from "../../../components/InstallCommand.mdx";
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-## Install Sentry & Spotlight
+
+## 1. Installation
 
 Follow the [Remix Getting Started](https://docs.sentry.io/platforms/javascript/guides/remix/) guide on Sentry, and continue from there.
 
@@ -15,7 +17,10 @@ This guide is focused on Remix _without Vite_. It needs Vite added to the docume
 
 <InstallCommand/>
 
-Initialize Spotlight within `entry.client.js`, after you've hydrated the document:
+
+## 2. Configuration
+
+Initialize Spotlight within `sentry.client.js`, after you've hydrated the document:
 
 ```ts
 startTransition(() => {
@@ -28,3 +33,13 @@ if (process.env.NODE_ENV === "development") {
   );
 }
 ```
+
+## 3. Run the Sidecar
+
+Spotlight's [architecture](/architecture/) requires a sidecar to be running alongside your service. This is to enable streaming data collection from your backend services into the Spotlight overlay.
+
+<CardGrid>
+  <LinkCard title="Vite" href="/sidecar/vite/" />
+  <LinkCard title="Webpack" href="/sidecar/webpack/" />
+  <LinkCard title="Other" href="/sidecar/npx/" />
+</CardGrid>
