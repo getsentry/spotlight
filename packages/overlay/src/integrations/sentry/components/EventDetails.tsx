@@ -21,13 +21,13 @@ export default function EventDetails() {
   const [activeTab, setActiveTab] = useState('details');
 
   if (!eventId) {
-    return <p>Unknown event id</p>;
+    return <p className="text-primary-300 p-6">Unknown event id</p>;
   }
 
   const event = sentryDataCache.getEventById(eventId);
 
   if (!event) {
-    return <p>Event not found</p>;
+    return <p className="text-primary-300 p-6">Event not found.</p>;
   }
 
   const tabs = [

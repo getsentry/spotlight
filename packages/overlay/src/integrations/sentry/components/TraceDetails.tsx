@@ -10,10 +10,21 @@ export default function TraceDetails() {
   const { traceId, spanId } = useParams();
 
   if (!traceId) {
-    return <p>Unknown trace id</p>;
+    return <p className="text-primary-300 p-6">Unknown trace id</p>;
   }
 
   const trace = dataCache.getTraceById(traceId);
+
+  if (!trace) {
+    return (
+      <p className="text-primary-300 p-6">
+        Trace not found. Check for more{' '}
+        <Link to="/traces" className="underline">
+          traces
+        </Link>
+      </p>
+    );
+  }
   const span = spanId ? dataCache.getSpanById(trace.trace_id, spanId) : undefined;
 
   const startTimestamp = trace.start_timestamp;

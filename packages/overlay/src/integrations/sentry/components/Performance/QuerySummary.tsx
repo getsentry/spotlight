@@ -151,6 +151,7 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
       </>
     );
   }
+  return <p className="text-primary-300 px-6 py-4">Query not found.</p>;
 };
 
 export default QuerySummary;
