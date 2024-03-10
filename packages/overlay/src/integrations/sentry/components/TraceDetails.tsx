@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import dataCache from '../data/sentryDataCache';
 import { getDuration } from '../utils/duration';
@@ -8,6 +9,7 @@ import SpanTree from './SpanTree';
 
 export default function TraceDetails() {
   const { traceId, spanId } = useParams();
+  const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
 
   if (!traceId) {
     return <p className="text-primary-300 p-6">Unknown trace id</p>;
@@ -68,6 +70,8 @@ export default function TraceDetails() {
           startTimestamp={startTimestamp}
           totalDuration={totalDuration}
           collapsible={isCollapsible}
+          spanNodeWidth={spanNodeWidth}
+          setSpanNodeWidth={setSpanNodeWidth}
         />
       </div>
       {span ? (
