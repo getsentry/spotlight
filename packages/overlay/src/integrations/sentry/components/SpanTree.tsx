@@ -8,6 +8,8 @@ export default function SpanTree({
   totalDuration,
   depth = 1,
   collapsible = false,
+  spanNodeWidth,
+  setSpanNodeWidth,
 }: {
   traceContext: TraceContext;
   tree: Span[];
@@ -15,6 +17,8 @@ export default function SpanTree({
   totalDuration: number;
   depth?: number;
   collapsible?: boolean;
+  spanNodeWidth: number;
+  setSpanNodeWidth?: (val: number) => void;
 }) {
   if (!tree || !tree.length) return null;
 
@@ -30,6 +34,8 @@ export default function SpanTree({
             startTimestamp={startTimestamp}
             totalDuration={totalDuration}
             collapsible={collapsible}
+            spanNodeWidth={spanNodeWidth}
+            setSpanNodeWidth={setSpanNodeWidth}
           />
         );
       })}

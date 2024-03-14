@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
 import SidePanel, { SidePanelHeader } from '~/components/SidePanel';
@@ -42,6 +42,8 @@ export default function SpanDetails({
   totalDuration: number;
   collapsible?: boolean;
 }) {
+  const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
+
   const spanDuration = getDuration(span.start_timestamp, span.timestamp);
 
   const errors = dataCache.getEventsByTrace(span.trace_id).filter(e => e.type !== 'transaction' && 'exception' in e);
@@ -212,6 +214,8 @@ export default function SpanDetails({
               startTimestamp={startTimestamp}
               totalDuration={totalDuration}
               collapsible={collapsible}
+              spanNodeWidth={spanNodeWidth}
+              setSpanNodeWidth={setSpanNodeWidth}
             />
           </div>
         )}
