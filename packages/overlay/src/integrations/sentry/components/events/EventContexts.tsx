@@ -1,5 +1,5 @@
-import { SentryEvent } from '../types';
-import Tags from './Tags';
+import { SentryEvent } from '../../types';
+import Tags from '../Tags';
 
 const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
   name: "Mighty Fighter",

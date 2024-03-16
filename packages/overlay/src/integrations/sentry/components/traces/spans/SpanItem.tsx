@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
-import classNames from '../../../lib/classNames';
-import { Span, TraceContext } from '../types';
-import { getDuration, getSpanDurationClassName } from '../utils/duration';
-import PlatformIcon from './PlatformIcon';
+import classNames from '../../../../../lib/classNames';
+import { Span, TraceContext } from '../../../types';
+import { getDuration, getSpanDurationClassName } from '../../../utils/duration';
+import PlatformIcon from '../../PlatformIcon';
 import SpanTree from './SpanTree';
 
 const SpanItem = ({

@@ -7,8 +7,8 @@ import HiddenItemsButton from '../HiddenItemsButton';
 import Queries from './Queries';
 import QuerySummary from './QuerySummary';
 import Resources from './Resources';
-import WebVitals from './WebVitals';
-import WebVitalsDetail from './WebVitals/WebVitalsDetail';
+import WebVitals from './webVitals';
+import WebVitalsDetail from './webVitals/WebVitalsDetail';
 
 export default function PerformanceTabDetails() {
   const context = useSpotlightContext();

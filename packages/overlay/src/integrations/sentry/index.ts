@@ -4,6 +4,7 @@ import { log } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
 import sentryDataCache from './data/sentryDataCache';
 import { Spotlight } from './sentry-integration';
+import DeveloperInfo from './tabs/DeveloperInfo';
 import ErrorsTab from './tabs/ErrorsTab';
 import PerformanceTab from './tabs/PerformanceTab';
 import SdksTab from './tabs/SdksTab';
@@ -80,6 +81,11 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
           id: 'sdks',
           title: 'SDKs',
           content: SdksTab,
+        },
+        {
+          id: 'devInfo',
+          title: 'Developer Info',
+          content: DeveloperInfo,
         },
       ];
     },

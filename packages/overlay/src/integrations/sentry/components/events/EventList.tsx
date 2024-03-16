@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
-import Badge from '../../../components/Badge';
-import CardList from '../../../components/CardList';
-import TimeSince from '../../../components/TimeSince';
-import { useSentryEvents } from '../data/useSentryEvents';
-import { useSentryHelpers } from '../data/useSentryHelpers';
-import { SentryEvent } from '../types';
-import { EventSummary } from './Events/Event';
-import HiddenItemsButton from './HiddenItemsButton';
-import PlatformIcon from './PlatformIcon';
+import Badge from '../../../../components/Badge';
+import CardList from '../../../../components/CardList';
+import TimeSince from '../../../../components/TimeSince';
+import { useSentryEvents } from '../../data/useSentryEvents';
+import { useSentryHelpers } from '../../data/useSentryHelpers';
+import { SentryEvent } from '../../types';
+import HiddenItemsButton from '../HiddenItemsButton';
+import PlatformIcon from '../PlatformIcon';
+import { EventSummary } from './Event';
 
 function renderEvent(event: SentryEvent) {
   return <EventSummary event={event} />;

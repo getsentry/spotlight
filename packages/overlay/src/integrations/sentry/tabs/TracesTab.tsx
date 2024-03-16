@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
-import TraceDetails from '../components/TraceDetails';
-import TraceList from '../components/TraceList';
+import TraceDetails from '../components/traces/TraceDetails';
+import TraceList from '../components/traces/TraceList';
 import { SentryEventsContextProvider } from '../data/sentryEventsContext';
 
 export default function ErrorsTab() {

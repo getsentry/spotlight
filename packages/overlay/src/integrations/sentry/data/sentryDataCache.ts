@@ -22,6 +22,7 @@ class SentryDataCache {
   protected traces: Trace[] = [];
   protected tracesById: { [id: string]: Trace } = {};
   protected localTraceIds: Set<string> = new Set<string>();
+  protected envelopes: Envelope[] = [];
 
   protected subscribers: Map<string, Subscription> = new Map();
 
@@ -51,6 +52,7 @@ class SentryDataCache {
   }
 
   pushEnvelope(envelope: Envelope) {
+    this.envelopes.push(envelope);
     const [header, items] = envelope;
     let sdk: Sdk;
     if (header.sdk && header.sdk.name && header.sdk.version) {
@@ -181,6 +183,10 @@ class SentryDataCache {
 
   getSdks() {
     return [...this.sdks];
+  }
+
+  getEnvelopes() {
+    return [...this.envelopes];
   }
 
   getEventById(id: string) {
