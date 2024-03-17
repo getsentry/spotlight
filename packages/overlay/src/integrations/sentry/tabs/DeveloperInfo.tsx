@@ -1,9 +1,15 @@
-import ReactJson from 'react-json-view';
-import sentryDataCache from '../data/sentryDataCache';
+import EnvelopeList from '../components/developerInfo/EnvelopeList';
+import { SentryEventsContextProvider } from '../data/sentryEventsContext';
 
-export default function DeveloperInfo() {
-  const envelopes = sentryDataCache.getEnvelopes();
-  console.log({ envelopes });
+import { Route, Routes } from 'react-router-dom';
 
-  return envelopes.map(envelope => <ReactJson src={envelope} theme="monokai" />);
+export default function DeveloperInfoTab() {
+  return (
+    <SentryEventsContextProvider>
+      <Routes>
+        <Route path="/:eventId" element={<EnvelopeList />} />
+        <Route path="/" element={<EnvelopeList />} />
+      </Routes>
+    </SentryEventsContextProvider>
+  );
 }

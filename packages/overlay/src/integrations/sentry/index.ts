@@ -110,7 +110,8 @@ type WindowWithSentry = Window & {
   };
 };
 
-export function processEnvelope({ data }: RawEventContext) {
+export function processEnvelope(rawEvent: RawEventContext) {
+  const { data } = rawEvent;
   const [rawHeader, ...rawEntries] = data.split(/\n/gm);
 
   const header = JSON.parse(rawHeader) as Envelope[0];
@@ -134,10 +135,11 @@ export function processEnvelope({ data }: RawEventContext) {
   }
 
   const envelope = [header, items] as Envelope;
-  sentryDataCache.pushEnvelope(envelope);
+  sentryDataCache.pushEnvelope({ envelope, rawEnvelope: rawEvent });
 
   return {
     event: envelope,
+    rawEvent: data,
   };
 }
 
