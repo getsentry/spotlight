@@ -1,5 +1,5 @@
-import { EventException, EventExceptionValue, SentryErrorEvent } from '../../types';
-import Frame from './Error/Frame';
+import { EventException, EventExceptionValue, SentryErrorEvent } from '../../../types';
+import Frame from './Frame';
 
 export function ErrorTitle({ event }: { event: SentryErrorEvent }) {
   const values = arraifyValues(event.exception);

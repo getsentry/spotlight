@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link, Outlet, Route, Routes, useParams } from 'react-router-dom';
-import Tabs from '../../../components/Tabs';
-import sentryDataCache from '../data/sentryDataCache';
-import { SentryEvent } from '../types';
+import Tabs from '../../../../components/Tabs';
+import sentryDataCache from '../../data/sentryDataCache';
+import { SentryEvent } from '../../types';
+import PlatformIcon from '../PlatformIcon';
+import Event, { EventTitle } from './Event';
 import EventBreadcrumbs from './EventBreadcrumbs';
 import EventContexts from './EventContexts';
-import Event, { EventTitle } from './Events/Event';
-import PlatformIcon from './PlatformIcon';
 
 function renderEvent(event: SentryEvent) {
   return <Event event={event} />;

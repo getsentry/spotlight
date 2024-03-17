@@ -60,7 +60,8 @@
     "magic-string": "^0.30.5",
     "beautify": "^0.0.8",
     "react-diff-viewer-continued": "^3.4.0",
-    "@types/beautify": "^0.0.3"
+    "@types/beautify": "^0.0.3",
+    "react-json-view": "^1.21.3"
   },
   "volta": {
     "extends": "../../package.json"

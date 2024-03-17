@@ -4,6 +4,7 @@ import { log } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
 import sentryDataCache from './data/sentryDataCache';
 import { Spotlight } from './sentry-integration';
+import DeveloperInfo from './tabs/DeveloperInfo';
 import ErrorsTab from './tabs/ErrorsTab';
 import PerformanceTab from './tabs/PerformanceTab';
 import SdksTab from './tabs/SdksTab';
@@ -81,6 +82,11 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
           title: 'SDKs',
           content: SdksTab,
         },
+        {
+          id: 'devInfo',
+          title: 'Developer Info',
+          content: DeveloperInfo,
+        },
       ];
     },
 
@@ -104,7 +110,8 @@ type WindowWithSentry = Window & {
   };
 };
 
-export function processEnvelope({ data }: RawEventContext) {
+export function processEnvelope(rawEvent: RawEventContext) {
+  const { data } = rawEvent;
   const [rawHeader, ...rawEntries] = data.split(/\n/gm);
 
   const header = JSON.parse(rawHeader) as Envelope[0];
@@ -128,10 +135,11 @@ export function processEnvelope({ data }: RawEventContext) {
   }
 
   const envelope = [header, items] as Envelope;
-  sentryDataCache.pushEnvelope(envelope);
+  sentryDataCache.pushEnvelope({ envelope, rawEnvelope: rawEvent });
 
   return {
     event: envelope,
+    rawEvent: rawEvent,
   };
 }
 

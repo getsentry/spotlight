@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import dataCache from '../data/sentryDataCache';
-import { getDuration } from '../utils/duration';
-import DateTime from './DateTime';
-import PlatformIcon from './PlatformIcon';
-import SpanDetails from './SpanDetails';
-import SpanTree from './SpanTree';
+import dataCache from '../../data/sentryDataCache';
+import { getDuration } from '../../utils/duration';
+import DateTime from '../DateTime';
+import PlatformIcon from '../PlatformIcon';
+import SpanDetails from './spans/SpanDetails';
+import SpanTree from './spans/SpanTree';
 
 export default function TraceDetails() {
   const { traceId, spanId } = useParams();

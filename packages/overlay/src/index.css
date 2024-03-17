@@ -102,3 +102,17 @@ ul.tree li:last-child:before {
 .hydration-error-wrapper td[class^='react-diff'][class$='title-block'] {
   @apply !bg-primary-900;
 }
+
+.react-json-view {
+  @apply !bg-primary-900 rounded-sm !bg-opacity-50 p-2;
+}
+
+.react-json-view .string-value {
+  word-break: break-word;
+}
+input:checked {
+  @apply bg-primary-900;
+}
+input:checked ~ .dot {
+  @apply bg-primary-800 translate-x-full;
+}

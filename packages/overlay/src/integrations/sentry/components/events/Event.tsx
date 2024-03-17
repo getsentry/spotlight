@@ -1,5 +1,5 @@
 import { SentryEvent } from '../../types';
-import { Error, ErrorSummary, ErrorTitle } from './Error';
+import { Error, ErrorSummary, ErrorTitle } from './error/Error';
 
 function getEventMessage(event: SentryEvent) {
   if (typeof event.message === 'string') {

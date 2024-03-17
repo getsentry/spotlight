@@ -1,4 +1,5 @@
 import { Envelope } from '@sentry/types';
+import { RawEventContext } from '~/integrations/integration';
 import { generate_uuidv4 } from '../../../lib/uuid';
 import { Sdk, SentryErrorEvent, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
 import { sdkToPlatform } from '../utils/sdkToPlatform';
@@ -22,6 +23,10 @@ class SentryDataCache {
   protected traces: Trace[] = [];
   protected tracesById: { [id: string]: Trace } = {};
   protected localTraceIds: Set<string> = new Set<string>();
+  protected envelopes: {
+    envelope: Envelope;
+    rawEnvelope: RawEventContext;
+  }[] = [];
 
   protected subscribers: Map<string, Subscription> = new Map();
 
@@ -50,7 +55,8 @@ class SentryDataCache {
     return sdk;
   }
 
-  pushEnvelope(envelope: Envelope) {
+  pushEnvelope({ envelope, rawEnvelope }: { envelope: Envelope; rawEnvelope: RawEventContext }) {
+    this.envelopes.push({ envelope, rawEnvelope });
     const [header, items] = envelope;
     let sdk: Sdk;
     if (header.sdk && header.sdk.name && header.sdk.version) {
@@ -183,6 +189,10 @@ class SentryDataCache {
     return [...this.sdks];
   }
 
+  getEnvelopes() {
+    return [...this.envelopes];
+  }
+
   getEventById(id: string) {
     return this.events.find(e => e.event_id === id);
   }
@@ -204,6 +214,7 @@ class SentryDataCache {
   }
 
   resetData() {
+    this.envelopes = [];
     this.events = [];
     this.eventIds = new Set<string>();
     this.traces = [];
