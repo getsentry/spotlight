@@ -1,6 +1,7 @@
 import { Envelope, EnvelopeItem } from '@sentry/types';
-import ReactJson from 'react-json-view';
+import { Suspense, lazy } from 'react';
 import { RawEventContext } from '~/integrations/integration';
+const LazyReactJson = lazy(() => import('react-json-view'));
 
 export default function JsonViewer({
   data,
@@ -14,38 +15,40 @@ export default function JsonViewer({
   clipboardEnabled?: boolean;
 }) {
   return (
-    <ReactJson
-      theme="bright"
-      shouldCollapse={({ src, type }) => type === 'array' && Object.values(src).length > 5}
-      src={data}
-      enableClipboard={clipboardEnabled}
-      onEdit={
-        editingEnabled &&
-        (e => {
-          if (e.new_value == 'error') {
-            return false;
-          }
-          onUpdateData(e.updated_src);
-        })
-      }
-      onDelete={
-        editingEnabled &&
-        (e => {
-          if (e.new_value == 'error') {
-            return false;
-          }
-          onUpdateData(e.updated_src);
-        })
-      }
-      onAdd={
-        editingEnabled &&
-        (e => {
-          if (e.new_value == 'error') {
-            return false;
-          }
-          onUpdateData(e.updated_src);
-        })
-      }
-    />
+    <Suspense fallback={<div>loading...</div>}>
+      <LazyReactJson
+        theme="bright"
+        shouldCollapse={({ src, type }) => type === 'array' && Object.values(src).length > 5}
+        src={data}
+        enableClipboard={clipboardEnabled}
+        onEdit={
+          editingEnabled &&
+          (e => {
+            if (e.new_value == 'error') {
+              return false;
+            }
+            onUpdateData(e.updated_src);
+          })
+        }
+        onDelete={
+          editingEnabled &&
+          (e => {
+            if (e.new_value == 'error') {
+              return false;
+            }
+            onUpdateData(e.updated_src);
+          })
+        }
+        onAdd={
+          editingEnabled &&
+          (e => {
+            if (e.new_value == 'error') {
+              return false;
+            }
+            onUpdateData(e.updated_src);
+          })
+        }
+      />
+    </Suspense>
   );
 }

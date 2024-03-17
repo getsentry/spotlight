@@ -26,7 +26,7 @@ describe('Sentry Integration', () => {
   test('Process Java Transaction Envelope', () => {
     const envelope = fs.readFileSync('./_fixtures/envelope_java.txt', 'utf-8');
     const processedEnvelope = processEnvelope({ data: envelope, contentType: 'test' });
-    expect(processedEnvelope).not.toBe(undefined);
+    expect(processedEnvelope.event).not.toBe(undefined);
     expect((processedEnvelope.event[1][0][1] as any).type).toEqual('transaction');
   });
 

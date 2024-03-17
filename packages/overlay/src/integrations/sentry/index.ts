@@ -139,7 +139,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
 
   return {
     event: envelope,
-    rawEvent: data,
+    rawEvent: rawEvent,
   };
 }
 
