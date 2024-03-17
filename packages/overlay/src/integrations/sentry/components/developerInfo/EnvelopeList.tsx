@@ -62,12 +62,15 @@ export default function EnvelopeList() {
                           ) : null}
                         </div>
                       </div>
-                      {(header.sent_at as string | Date | number) && (
-                        <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
-                          <h2 className="text-xs">Recieved </h2>
+
+                      <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
+                        <h2 className="text-xs">Recieved </h2>
+                        {(header.sent_at as string | Date | number) ? (
                           <TimeSince date={header.sent_at as string | Date | number} />
-                        </div>
-                      )}
+                        ) : (
+                          '-'
+                        )}
+                      </div>
                     </div>
                   </Link>
                 );
