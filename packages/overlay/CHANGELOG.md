@@ -1,5 +1,22 @@
 # @spotlightjs/core
 
+## 1.8.0
+
+### Minor Changes
+
+- Added Developer Info tab to check the envelopes recived from Sentry
+  ([#378](https://github.com/getsentry/spotlight/pull/378))
+
+### Patch Changes
+
+- - Fixed the empty trace scenario on trace detail page when clear events button is clicked.
+    ([#366](https://github.com/getsentry/spotlight/pull/366))
+  - fixed some semantics and empty state labels
+
+- - Added Span Resizer in traces, which will allow user to resize the span name and waterfall.
+    ([#373](https://github.com/getsentry/spotlight/pull/373))
+  - Added icon for clear events button.
+
 ## 1.7.0
 
 ### Minor Changes
