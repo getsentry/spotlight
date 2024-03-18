@@ -5,7 +5,7 @@ description: A guide how to setup Spotlight for Remix
 
 import { Content as InstallCommand } from "../../../components/InstallCommand.mdx";
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
-
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 ## 1. Installation
 
@@ -20,9 +20,22 @@ This guide is focused on Remix _without Vite_. It needs Vite added to the docume
 
 ## 2. Configuration
 
-Initialize Spotlight within `sentry.client.js`, after you've hydrated the document:
+Initialize Spotlight within `entry.client.js`, after you've hydrated the document:
 
-```ts
+<Tabs>
+
+<TabItem label="Client">
+In the Browser you don't need to set `spotlight: true`, `Spotlight.init()` will automatically detect if Sentry is available and if so, hook into the SDK.
+
+```ts {13-17}
+// entry.client.(js/ts)
+import * as Sentry from "@sentry/remix";
+
+Sentry.init({
+    dsn: "__DSN__",
+    // ...other Sentry options
+})
+
 startTransition(() => {
   hydrateRoot(document, <RemixBrowser />);
 });
@@ -33,6 +46,22 @@ if (process.env.NODE_ENV === "development") {
   );
 }
 ```
+</TabItem>
+
+<TabItem label="Server">
+```javascript {6} ins="spotlight:"
+// entry.server.(js/ts)
+import * as Sentry from '@sentry/remix';
+
+Sentry.init({
+  dsn: '___DSN___',
+  spotlight: process.env.NODE_ENV === 'development'
+  // ...other Sentry options
+});
+```
+</TabItem>
+
+</Tabs>
 
 ## 3. Run the Sidecar
 
