@@ -7,6 +7,8 @@ export type ClientInitOptions = {
   showTriggerButton?: boolean;
   integrationNames?: SupportedIntegrations[];
   injectImmediately?: boolean;
+  fullPage?: boolean;
+  showRecentError?: boolean;
 } & SpotlightAstroIntegrationOptions;
 
 const buildClientImport = (importPath: string) => `import * as Spotlight from ${JSON.stringify(importPath)};`;
@@ -14,7 +16,10 @@ const buildClientImport = (importPath: string) => `import * as Spotlight from ${
 const buildClientInit = (options: ClientInitOptions) => {
   const integrationCalls = options.integrationNames
     ? options.integrationNames.map(i => `Spotlight.${i}()`).join(', ')
-    : `Spotlight.sentry({sidecarUrl: ${options.sidecarUrl ? `'${options.sidecarUrl}'` : undefined}})`;
+    : `Spotlight.sentry({
+      sidecarUrl: ${options.sidecarUrl ? `'${options.sidecarUrl}'` : undefined},
+      showRecentError: ${options.showRecentError === true ? `'true'` : 'false'},
+    })`;
 
   return `
 Spotlight.init({
@@ -23,6 +28,7 @@ Spotlight.init({
   ],
   showTriggerButton: ${options.showTriggerButton === false ? 'false' : 'true'},
   injectImmediately: ${options.injectImmediately === true ? 'true' : 'false'},
+  fullPage: ${options.fullPage === true ? 'true' : 'false'},
   debug: ${options.debug === true ? 'true' : 'false'},
   ${options.sidecarUrl ? `sidecarUrl: '${options.sidecarUrl}'` : ''}
 });
