@@ -44,7 +44,7 @@ export default function EnvelopeList() {
             {(showAll ? allEnvelopes : localEnvelopes).map(({ envelope }: { envelope: Envelope }) => {
               const header: Envelope[0] = envelope[0];
               const envelopeEventId: string | unknown = header.event_id;
-              const { trace_id } = header?.trace as { trace_id: string };
+              const { trace_id } = (header?.trace as { trace_id?: string }) || {};
               if (typeof envelopeEventId === 'string') {
                 return (
                   <Link key={envelopeEventId} to={`/devInfo/${header.event_id}`}>
