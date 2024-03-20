@@ -8,16 +8,22 @@ export default function JsonViewer({
   onUpdateData = () => {},
   editingEnabled = false,
   clipboardEnabled = false,
+  displayDataTypes = false,
+  quotesOnKeys = false,
 }: {
   data: Envelope[0] | EnvelopeItem | RawEventContext;
   onUpdateData?: (value: unknown) => void;
   editingEnabled?: boolean;
   clipboardEnabled?: boolean;
+  displayDataTypes?: boolean;
+  quotesOnKeys?: boolean;
 }) {
   return (
     <Suspense fallback={<div>loading...</div>}>
       <LazyReactJson
         theme="bright"
+        displayDataTypes={displayDataTypes}
+        quotesOnKeys={quotesOnKeys}
         shouldCollapse={({ src, type }) => type === 'array' && Object.values(src).length > 5}
         src={data}
         enableClipboard={clipboardEnabled}

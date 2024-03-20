@@ -1,4 +1,4 @@
-import { Envelope } from '@sentry/types';
+import { Envelope, EnvelopeItem } from '@sentry/types';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Badge from '~/components/Badge';
@@ -45,6 +45,7 @@ export default function EnvelopeList() {
               const header: Envelope[0] = envelope[0];
               const envelopeEventId: string | unknown = header.event_id;
               const { trace_id } = (header?.trace as { trace_id?: string }) || {};
+              const envelopeItem = envelope[1].length > 0 ? (envelope[1][0] as EnvelopeItem) : null;
               if (typeof envelopeEventId === 'string') {
                 return (
                   <Link key={envelopeEventId} to={`/devInfo/${header.event_id}`}>
@@ -54,7 +55,7 @@ export default function EnvelopeList() {
                     >
                       <PlatformIcon platform={sdkToPlatform(header.sdk?.name || 'unknown')} />
                       <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
-                        <h2 className="text-xs">Event Id</h2>
+                        <h2 className="text-primary-50 text-xs">Event Id</h2>
                         <div className="flex items-center gap-x-2">
                           <div>{envelopeEventId.substring(0, 8)}</div>
                           {trace_id && helpers.isLocalToSession(trace_id) ? (
@@ -64,7 +65,11 @@ export default function EnvelopeList() {
                       </div>
 
                       <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
-                        <h2 className="text-xs">Recieved </h2>
+                        <h2 className="text-primary-50 text-xs">Type</h2>
+                        {envelopeItem && envelopeItem[0]?.type ? <>{envelopeItem[0].type}</> : '-'}
+                      </div>
+                      <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
+                        <h2 className="text-primary-50 text-xs">Recieved</h2>
                         {(header.sent_at as string | Date | number) ? (
                           <TimeSince date={header.sent_at as string | Date | number} />
                         ) : (
