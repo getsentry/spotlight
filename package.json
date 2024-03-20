@@ -5,6 +5,7 @@
     "dev:overlay": "pnpm --filter overlay dev",
     "dev:website": "pnpm --filter website dev",
     "dev:playground": "pnpm --filter astro-playground dev",
+    "dev:electron": "pnpm --filter electron dev",
     "build": "pnpm --filter=!astro-playground -r run build",
     "preview": "pnpm -r run preview",
     "lint": "eslint . --cache --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
