@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Badge from '../../../../components/Badge';
+import Badge from '~/ui/Badge';
 import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
 import classNames from '../../../../lib/classNames';

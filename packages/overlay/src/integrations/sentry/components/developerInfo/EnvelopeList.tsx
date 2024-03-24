@@ -1,9 +1,9 @@
 import { Envelope, EnvelopeItem } from '@sentry/types';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import Badge from '~/components/Badge';
 import TimeSince from '~/components/TimeSince';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
+import Badge from '~/ui/Badge';
 import sentryDataCache from '../../data/sentryDataCache';
 import { useSentryEnvelopes } from '../../data/useSentryEnvelopes';
 import { useSentryHelpers } from '../../data/useSentryHelpers';

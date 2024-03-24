@@ -3,7 +3,7 @@ import TraceDetails from '../components/traces/TraceDetails';
 import TraceList from '../components/traces/TraceList';
 import { SentryEventsContextProvider } from '../data/sentryEventsContext';
 
-export default function ErrorsTab() {
+export default function TracesTab() {
   return (
     <SentryEventsContextProvider>
       <Routes>

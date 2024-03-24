@@ -1,9 +1,9 @@
 import { useParams } from 'react-router-dom';
-import Breadcrumbs from '~/components/Breadcrumbs';
 import { PERFORMANCE_SCORE_PROFILES } from '~/integrations/sentry/constants';
 import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
 import { MetricScoreProps, MetricWeightsProps, SentryEventWithPerformanceData } from '~/integrations/sentry/types';
 import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
+import Breadcrumbs from '~/ui/Breadcrumbs';
 import { normalizePerformanceScore } from '../../../utils/webVitals';
 import PerformanceChart from './PerformanceChart';
 
