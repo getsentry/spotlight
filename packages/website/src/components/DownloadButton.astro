@@ -1,14 +1,20 @@
 ---
 import { Fragment } from 'react';
 
-const response = await fetch('https://api.github.com/repos/getsentry/spotlight/releases/latest');
-const data = await response.json();
-const assets = data?.assets;
+let response = await fetch('https://api.github.com/repos/getsentry/spotlight/releases');
+let releases = await response.json();
+
+let assets = [];
 let version = null;
+let releaseIndex = 0;
+
+while (assets.length === 0 && releaseIndex < releases.length) {
+  assets = releases[releaseIndex].assets;
+  releaseIndex++;
+}
+
 const links = assets.map(asset => {
   if (asset.name.includes('mac')) {
-    // parse version from filename eg:
-    // https://github.com/getsentry/spotlight/releases/download/%40spotlightjs/electron%400.0.12/Spotlight-0.0.12-arm64-mac.zip
     const versionMatch = asset.name.match(/Spotlight-(.*)-.*.zip/);
     if (versionMatch) {
       version = versionMatch[1];
