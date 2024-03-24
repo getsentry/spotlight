@@ -1,5 +1,13 @@
 # @spotlightjs/core
 
+## 1.8.1
+
+### Patch Changes
+
+- - Fixed the scneario when trace_id is not present in envelope ex: metrics event.
+    ([#381](https://github.com/getsentry/spotlight/pull/381))
+  - Added event type and fixed formatting of envelope info.
+
 ## 1.8.0
 
 ### Minor Changes

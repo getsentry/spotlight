@@ -1,5 +1,13 @@
 # @spotlightjs/electron
 
+## 0.0.22
+
+### Patch Changes
+
+- Updated dependencies
+  [[`0d5d677`](https://github.com/getsentry/spotlight/commit/0d5d677a78fecd7f5027792d211b0c18f906b8e1)]:
+  - @spotlightjs/overlay@1.8.1
+
 ## 0.0.21
 
 ### Patch Changes
