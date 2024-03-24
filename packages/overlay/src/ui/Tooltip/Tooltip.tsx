@@ -14,15 +14,13 @@ const getPositionClass = (position: string) => {
   }
 };
 
-const Tooltip = ({
-  content,
-  position = 'right',
-  children,
-}: {
+export type TooltipProps = {
   content: string | ReactNode;
   position?: 'top' | 'bottom' | 'left' | 'right';
   children: ReactNode;
-}) => {
+};
+
+const Tooltip = ({ content, position = 'right', children }: TooltipProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const handleMouseEnter = () => {

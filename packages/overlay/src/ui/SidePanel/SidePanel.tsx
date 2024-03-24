@@ -1,6 +1,9 @@
-import { type ReactNode } from 'react';
+import { ComponentPropsWithoutRef, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { SidePanelProps } from '~/types';
+
+export type SidePanelProps = Omit<ComponentPropsWithoutRef<'div'>, 'className'> & {
+  backto: string;
+};
 
 export function SidePanelHeader({
   title,

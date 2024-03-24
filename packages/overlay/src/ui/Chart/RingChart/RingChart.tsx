@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import classNames from '~/lib/classNames';
 
-type Props = React.HTMLAttributes<SVGSVGElement> & {
+export type RingChartProps = React.HTMLAttributes<SVGSVGElement> & {
   backgroundColors: string[];
   maxValues: number[];
   segmentColors: string[];
@@ -44,7 +44,7 @@ function RingChart({
   onHoverActions,
   onUnhover,
   ...p
-}: Props) {
+}: RingChartProps) {
   const foreignObjectSize = size / 2;
   const foreignObjectOffset = size / 4;
 
