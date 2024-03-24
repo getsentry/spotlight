@@ -53,7 +53,7 @@ export default function EnvelopeList() {
                       key={`${header.event_id}`}
                       className=" hover:bg-primary-900 border-b-primary-900 flex  cursor-pointer items-center gap-4 border-b px-6 py-2 transition-all"
                     >
-                      <PlatformIcon platform={sdkToPlatform(header.sdk?.name || 'unknown')} />
+                      <PlatformIcon className="rounded-md" platform={sdkToPlatform(header.sdk?.name || 'unknown')} />
                       <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
                         <h2 className="text-primary-50 text-xs">Event Id</h2>
                         <div className="flex items-center gap-x-2">

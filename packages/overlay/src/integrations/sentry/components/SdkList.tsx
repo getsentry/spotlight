@@ -14,7 +14,7 @@ export default function SdkList() {
           {sdkList.map(sdk => {
             return (
               <div className="flex items-center gap-x-4 px-6 py-2" key={`${sdk.name}-${sdk.version}`}>
-                <PlatformIcon platform={sdkToPlatform(sdk.name)} />
+                <PlatformIcon className="rounded-md" platform={sdkToPlatform(sdk.name)} />
 
                 <div className="text-primary-300 flex flex-col truncate font-mono text-sm">
                   <div>{sdk.name}</div>

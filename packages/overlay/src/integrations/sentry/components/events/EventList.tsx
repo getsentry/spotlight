@@ -48,7 +48,7 @@ export default function EventList() {
             key={e.event_id}
             to={`${e.event_id}/details`}
           >
-            <PlatformIcon event={e} className="text-primary-300" />
+            <PlatformIcon event={e} className="text-primary-300 rounded-md" />
             <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
               <div className="flex items-center gap-x-2">
                 <div>{(e.event_id || '').substring(0, 8)}</div>
