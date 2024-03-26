@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
-import SidePanel, { SidePanelHeader } from '~/components/SidePanel';
+import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
 import dataCache from '../../../data/sentryDataCache';
 import { SentryErrorEvent, Span, TraceContext } from '../../../types';
 import { formatBytes } from '../../../utils/bytes';

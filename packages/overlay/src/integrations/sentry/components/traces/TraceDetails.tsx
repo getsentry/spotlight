@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import dataCache from '../../data/sentryDataCache';
 import { getDuration } from '../../utils/duration';
 import DateTime from '../DateTime';
-import PlatformIcon from '../PlatformIcon';
+import TraceIcon from './TraceIcon';
 import SpanDetails from './spans/SpanDetails';
 import SpanTree from './spans/SpanTree';
 
@@ -36,7 +36,7 @@ export default function TraceDetails() {
   return (
     <>
       <div className="border-b-primary-700 bg-primary-950 flex items-center gap-x-2 border-b px-6 py-4">
-        <PlatformIcon platform={trace.rootTransaction?.platform} />
+        <TraceIcon trace={trace} />
         <h1 className="max-w-full flex-1 truncate text-2xl">{trace.rootTransactionName}</h1>
         <div className="text-primary-300 font-mono">
           <div>T: {trace.trace_id}</div>

@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
-import RingChart from '~/components/RingChart';
 import { MetricScoreProps, MetricWeightsProps } from '~/integrations/sentry/types';
 import { calculateLabelCoordinates } from '~/integrations/sentry/utils/webVitals';
 import classNames from '~/lib/classNames';
+import { RingChart } from '~/ui/Chart';
 import { WebVitals } from '../../../constants';
 import useMouseTracking from '../../../hooks/useMouseTracking';
 

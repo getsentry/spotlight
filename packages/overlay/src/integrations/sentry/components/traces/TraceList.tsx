@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Badge from '../../../../components/Badge';
+import Badge from '~/ui/Badge';
 import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
 import classNames from '../../../../lib/classNames';
@@ -9,7 +9,7 @@ import { useSentryHelpers } from '../../data/useSentryHelpers';
 import { useSentryTraces } from '../../data/useSentryTraces';
 import { getDuration } from '../../utils/duration';
 import HiddenItemsButton from '../HiddenItemsButton';
-import PlatformIcon from '../PlatformIcon';
+import TraceIcon from './TraceIcon';
 
 export default function TraceList() {
   const traceList = useSentryTraces();
@@ -40,8 +40,7 @@ export default function TraceList() {
                 key={trace.trace_id}
                 to={trace.trace_id}
               >
-                <PlatformIcon platform={trace.rootTransaction?.platform} />
-
+                <TraceIcon trace={trace} />
                 <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
                   <div className="flex items-center gap-x-2">
                     <div>{trace.trace_id.substring(0, 8)}</div>

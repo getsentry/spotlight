@@ -1,7 +1,17 @@
 import { Link } from 'react-router-dom';
 import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
 import classNames from '~/lib/classNames';
-import { BreadcrumbProps } from '~/types';
+
+export type CrumbProps = {
+  id: string;
+  label: string;
+  link?: boolean;
+  to?: string;
+};
+
+export type BreadcrumbProps = {
+  crumbs: CrumbProps[];
+};
 
 export default function Breadcrumbs({ crumbs }: BreadcrumbProps) {
   return (

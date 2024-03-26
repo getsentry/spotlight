@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
-import Tooltip from '~/components/Tooltip';
 import classNames from '~/lib/classNames';
+import Tooltip from '~/ui/Tooltip';
 import { RESOURCES_SORT_KEYS, RESOURCE_HEADERS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
 import { Span } from '../../types';

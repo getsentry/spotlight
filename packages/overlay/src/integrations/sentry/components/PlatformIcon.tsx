@@ -17,33 +17,39 @@ type Platform = 'python' | 'javascript' | 'node' | 'ruby' | 'csharp' | string;
 export default function PlatformIcon({
   platform,
   event,
-  size = 42,
+  size,
+  width = 42,
+  height = 42,
+  title,
   ...props
 }: ComponentPropsWithoutRef<'svg'> & {
   size?: number;
   platform?: Platform;
   event?: SentryEvent;
+  height?: number;
+  width?: number;
+  title?: string;
 }) {
   const name = platform || event?.platform || 'unknown';
   switch (name) {
     case 'ruby':
-      return <RubyIcon width={size} height={size} {...props} />;
+      return <RubyIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
     case 'python':
-      return <PythonIcon width={size} height={size} {...props} />;
+      return <PythonIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
     case 'javascript.astro':
-      return <AstroIcon width={size} height={size} {...props} />;
+      return <AstroIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
     case 'javascript':
-      return <JavaScriptIcon width={size} height={size} {...props} />;
+      return <JavaScriptIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
     case 'node':
-      return <NodeIcon width={size} height={size} {...props} />;
+      return <NodeIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
     case 'php':
-      return <PhpIcon width={size} height={size} {...props} />;
+      return <PhpIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
     case 'dotnet':
     case 'csharp': // event.platform is 'csharp'
-      return <DotNetIcon width={size} height={size} {...props} />;
+      return <DotNetIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
     case 'dotnet.maui':
-      return <DotNetMauiIcon width={size} height={size} {...props} />;
+      return <DotNetMauiIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
     default:
-      return <DefaultIcon width={size} height={size} {...props} />;
+      return <DefaultIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
   }
 }

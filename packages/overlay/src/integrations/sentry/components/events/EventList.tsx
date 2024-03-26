@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
-import Badge from '../../../../components/Badge';
+import Badge from '~/ui/Badge';
 import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
 import { useSentryEvents } from '../../data/useSentryEvents';
@@ -48,7 +48,7 @@ export default function EventList() {
             key={e.event_id}
             to={`${e.event_id}/details`}
           >
-            <PlatformIcon event={e} className="text-primary-300" />
+            <PlatformIcon event={e} className="text-primary-300 rounded-md" />
             <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
               <div className="flex items-center gap-x-2">
                 <div>{(e.event_id || '').substring(0, 8)}</div>

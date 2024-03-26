@@ -1,7 +1,7 @@
 import { Envelope } from '@sentry/types';
 import { useState } from 'react';
-import SidePanel, { SidePanelHeader } from '~/components/SidePanel';
 import { RawEventContext } from '~/integrations/integration';
+import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
 import JsonViewer from './JsonViewer';
 
 export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; rawEnvelope: RawEventContext } }) {
