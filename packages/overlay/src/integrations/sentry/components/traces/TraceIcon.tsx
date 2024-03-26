@@ -7,7 +7,7 @@ export type TraceIconProps = {
 };
 
 function getPlatformsFromTrace(trace: Trace) {
-  return [...new Set(trace.transactions.map(transaction => sdkToPlatform(transaction.sdk?.name || 'unknown')))];
+  return [...new Set((trace.transactions || []).map(transaction => sdkToPlatform(transaction.sdk?.name || 'unknown')))];
 }
 
 export default function TraceIcon({ trace }: TraceIconProps) {
