@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 2.0.0-alpha.0
+
+### Major Changes
+
+- feat: Make Spotlight compatible with Sentry SDKs v8
+
 ## 1.8.2
 
 ### Patch Changes

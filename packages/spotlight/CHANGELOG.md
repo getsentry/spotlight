@@ -1,5 +1,16 @@
 # @spotlightjs/spotlight
 
+## 2.0.0-alpha.0
+
+### Major Changes
+
+- feat: Make Spotlight compatible with Sentry SDKs v8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @spotlightjs/overlay@2.0.0-alpha.0
+
 ## 1.2.16
 
 ### Patch Changes

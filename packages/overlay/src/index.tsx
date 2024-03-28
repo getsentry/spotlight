@@ -115,7 +115,7 @@ export async function init({
   }
 
   // Sentry is enabled by default
-  const defaultInitegrations = [sentry({ sidecarUrl })];
+  const defaultIntegrations = [sentry({ sidecarUrl })];
 
   const context: SpotlightContext = {
     open: openSpotlight,
@@ -123,7 +123,7 @@ export async function init({
     experiments: finalExperiments,
   };
 
-  const [initializedIntegrations] = await initIntegrations(integrations ?? defaultInitegrations, context);
+  const [initializedIntegrations] = await initIntegrations(integrations ?? defaultIntegrations, context);
 
   // build shadow dom container to contain styles
   const docRoot = document.createElement('div');

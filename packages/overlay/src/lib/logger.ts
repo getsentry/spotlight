@@ -13,3 +13,9 @@ export function log(...args: unknown[]) {
     console.log('🔎 [Spotlight]', ...args);
   }
 }
+
+export function warn(...args: unknown[]) {
+  if (loggerActive) {
+    console.warn('🔎 [Spotlight]', ...args);
+  }
+}

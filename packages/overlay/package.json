@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/overlay",
   "description": "The overlay of Spotlight to add debug interface to your web app.",
-  "version": "1.8.2",
+  "version": "2.0.0-alpha.0",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
@@ -29,7 +29,8 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@sentry/types": "^7.77.0",
+    "@sentry/types": "^8.0.0-alpha.7",
+    "@sentry/utils": "^8.0.0-alpha.7",
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
@@ -46,7 +47,6 @@
     "vite-plugin-svgr": "^3.2.0",
     "vitest": "^0.34.6",
     "@fontsource/raleway": "^5.0.8",
-    "@sentry/utils": "^7.77.0",
     "autoprefixer": "^10.4.15",
     "dayjs": "^1.11.9",
     "platformicons": "^5.8.3",
