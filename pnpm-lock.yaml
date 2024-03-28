@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -289,11 +289,11 @@ importers:
         specifier: ^5.0.8
         version: 5.0.15
       '@sentry/types':
-        specifier: ^7.77.0
-        version: 7.81.1
+        specifier: ^8.0.0-alpha.7
+        version: 8.0.0-alpha.7
       '@sentry/utils':
-        specifier: ^7.77.0
-        version: 7.81.1
+        specifier: ^8.0.0-alpha.7
+        version: 8.0.0-alpha.7
       '@spotlightjs/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -3715,7 +3715,7 @@ packages:
     dependencies:
       '@sentry/cli': 2.23.0
       '@sentry/node': 7.98.0
-      '@sentry/utils': 7.98.0
+      '@sentry/utils': 7.99.0
       dotenv: 16.3.1
       find-up: 5.0.0
       glob: 9.3.2
@@ -3733,7 +3733,7 @@ packages:
     dependencies:
       '@sentry/cli': 2.23.0
       '@sentry/node': 7.98.0
-      '@sentry/utils': 7.98.0
+      '@sentry/utils': 7.99.0
       dotenv: 16.3.1
       find-up: 5.0.0
       glob: 9.3.2
@@ -4147,12 +4147,6 @@ packages:
       '@sentry-internal/tracing': 7.83.0
     dev: false
 
-  /@sentry/types@7.81.1:
-    resolution:
-      { integrity: sha512-dvJvGyctiaPMIQqa46k56Re5IODWMDxiHJ1UjBs/WYDLrmWFPGrEbyJ8w8CYLhYA+7qqrCyIZmHbWSTRIxstHw== }
-    engines: { node: '>=8' }
-    dev: true
-
   /@sentry/types@7.83.0:
     resolution:
       { integrity: sha512-Bd+zJcy8p1VgCfQqUprmUaw0QPWUV+GmCt6zJRHrHTb2pwLahXv6sHJvQ8F8Va6S7Keuy088U+kHzUFGQLMZMQ== }
@@ -4186,14 +4180,11 @@ packages:
     resolution:
       { integrity: sha512-94qwOw4w40sAs5mCmzcGyj8ZUu/KhnWnuMZARRq96k+SjRW/tHFAOlIdnFSrt3BLPvSOK7R3bVAskZQ0N4FTmA== }
     engines: { node: '>=8' }
-    dev: false
 
-  /@sentry/utils@7.81.1:
+  /@sentry/types@8.0.0-alpha.7:
     resolution:
-      { integrity: sha512-gq+MDXIirHKxNZ+c9/lVvCXd6y2zaZANujwlFggRH2u9SRiPaIXVilLpvMm4uJqmqBMEcY81ArujExtHvkbCqg== }
-    engines: { node: '>=8' }
-    dependencies:
-      '@sentry/types': 7.81.1
+      { integrity: sha512-ibOquIxPhEwkuosVxrzMOJYrbJscdY6sk0m2/YxIOSSGnlFEFQQ5hJQNyxH6EXr3Zgpt9K/ubnNWdS+w1IeLfg== }
+    engines: { node: '>=14.18' }
     dev: true
 
   /@sentry/utils@7.83.0:
@@ -4241,7 +4232,14 @@ packages:
     engines: { node: '>=8' }
     dependencies:
       '@sentry/types': 7.99.0
-    dev: false
+
+  /@sentry/utils@8.0.0-alpha.7:
+    resolution:
+      { integrity: sha512-i1Qo1xxzW07HmYuP53YRyrbXSymOJ3i9zG7nFRJK7Xq5SQrakrSm/TEoVEnbK+JIJyvo+xx0QfvQUcuMrTl7IA== }
+    engines: { node: '>=14.18' }
+    dependencies:
+      '@sentry/types': 8.0.0-alpha.7
+    dev: true
 
   /@sentry/vercel-edge@7.99.0:
     resolution:
@@ -6152,7 +6150,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.22.2
-      caniuse-lite: 1.0.30001570
+      caniuse-lite: 1.0.30001584
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -6358,7 +6356,7 @@ packages:
     engines: { node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7 }
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001559
+      caniuse-lite: 1.0.30001584
       electron-to-chromium: 1.4.572
       node-releases: 2.0.13
       update-browserslist-db: 1.0.13(browserslist@4.22.1)
@@ -6369,7 +6367,7 @@ packages:
     engines: { node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7 }
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001570
+      caniuse-lite: 1.0.30001584
       electron-to-chromium: 1.4.613
       node-releases: 2.0.14
       update-browserslist-db: 1.0.13(browserslist@4.22.2)
@@ -6526,23 +6524,14 @@ packages:
       { integrity: sha512-xlx1yCK2Oc1APsPXDL2LdlNP6+uu8OCDdhOBSVT279M/S+y75O30C2VuD8T2ogdePBBl7PfPF4504tnLgX3zfw== }
     engines: { node: '>=14.16' }
 
-  /caniuse-lite@1.0.30001559:
-    resolution:
-      { integrity: sha512-cPiMKZgqgkg5LY3/ntGeLFUpi6tzddBNS58A4tnTgQw1zON7u2sZMU7SzOeVH4tj20++9ggL+V6FDOFMTaFFYA== }
-
   /caniuse-lite@1.0.30001564:
     resolution:
       { integrity: sha512-DqAOf+rhof+6GVx1y+xzbFPeOumfQnhYzVnZD6LAXijR77yPtm9mfOcqOnT3mpnJiZVT+kwLAFnRlZcIz+c6bg== }
     dev: true
 
-  /caniuse-lite@1.0.30001570:
-    resolution:
-      { integrity: sha512-+3e0ASu4sw1SWaoCtvPeyXp+5PsjigkSt8OXZbF9StH5pQWbxEjLAZE3n8Aup5udop1uRiKA7a4utUk/uoSpUw== }
-
   /caniuse-lite@1.0.30001584:
     resolution:
       { integrity: sha512-LOz7CCQ9M1G7OjJOF9/mzmqmj3jE/7VOmrfw6Mgs0E8cjOsbRXQJHsPBfmBOXDskXKrHLyyW3n7kpDW/4BsfpQ== }
-    dev: false
 
   /ccount@2.0.1:
     resolution:

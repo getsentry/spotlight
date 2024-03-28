@@ -1,9 +1,9 @@
-import type { Envelope } from '@sentry/types';
+import type { Envelope, Integration as SentryIntegration } from '@sentry/types';
 import { getSpotlightEventTarget } from '../../lib/eventTarget';
-import { log } from '../../lib/logger';
+import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
 import sentryDataCache from './data/sentryDataCache';
-import { Spotlight } from './sentry-integration';
+import { spotlightIntegration } from './sentry-integration';
 import DeveloperInfo from './tabs/DeveloperInfo';
 import ErrorsTab from './tabs/ErrorsTab';
 import PerformanceTab from './tabs/PerformanceTab';
@@ -98,14 +98,14 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
 
 type WindowWithSentry = Window & {
   __SENTRY__?: {
-    hub: {
-      getClient: () =>
-        | {
-            setupIntegrations: (force: boolean) => void;
-            addIntegration(integration: Integration): void;
-            on: (event: string, callback: (envelope: Envelope) => void) => void;
-          }
-        | undefined;
+    acs?: {
+      getCurrentScope: () => {
+        getClient: () =>
+          | {
+              addIntegration(integration: SentryIntegration): void;
+            }
+          | undefined;
+      };
     };
   };
 };
@@ -144,15 +144,27 @@ export function processEnvelope(rawEvent: RawEventContext) {
 }
 
 function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
-  if (options?.injectIntoSDK === false) return;
-  // A very hacky way to hook into Sentry's SDK
-  // but we love hacks
-  const sentryHub = (window as WindowWithSentry).__SENTRY__?.hub;
-  const sentryClient = sentryHub?.getClient();
-  if (sentryClient) {
-    const spotlightIntegration = new Spotlight({
+  if (options?.injectIntoSDK === false) {
+    return;
+  }
+
+  // A very hacky way to hook into Sentry's v8 JS SDK
+  // but we love hacks :)
+
+  const sentryGlobal = (window as WindowWithSentry).__SENTRY__?.acs;
+
+  if (!sentryGlobal) {
+    warn("Couldn't find the Sentry SDK on this page. Make sure you're using a Sentry SDK with version 8.0.0 or higher");
+    return;
+  }
+
+  try {
+    const integration = spotlightIntegration({
       sidecarUrl: options?.sidecarUrl,
     });
-    sentryClient.addIntegration(spotlightIntegration);
+    sentryGlobal.getCurrentScope().getClient()?.addIntegration(integration);
+  } catch (e) {
+    warn('Failed to add Spotlight integration to Sentry', e);
+    log('Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose');
   }
 }
