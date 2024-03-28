@@ -1,5 +1,13 @@
 # @spotlightjs/core
 
+## 1.8.2
+
+### Patch Changes
+
+- - Moved all ui components to UI folder for better strucutre of files.
+    ([#384](https://github.com/getsentry/spotlight/pull/384))
+  - Updated Trace platform icon to contain all platforms #140
+
 ## 1.8.1
 
 ### Patch Changes
