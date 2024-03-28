@@ -73,7 +73,6 @@ export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOption
       return event;
     },
     afterAllSetup: (client: Client) => {
-      console.log('xx - afterAllSetup');
       sendEnvelopesToSidecar(client, _sidecarUrl);
     },
   } satisfies Integration;
@@ -83,7 +82,6 @@ function sendEnvelopesToSidecar(client: Client, sidecarUrl: string) {
   const makeFetch = getNativeFetchImplementation();
 
   client.on('beforeEnvelope', (envelope: Envelope) => {
-    console.log('xx - onBeforeEnvelope');
     makeFetch(sidecarUrl, {
       method: 'POST',
       body: serializeEnvelope(envelope),
@@ -97,18 +95,6 @@ function sendEnvelopesToSidecar(client: Client, sidecarUrl: string) {
         err,
       );
     });
-  });
-
-  console.log('xx - afterAllSetup registering beforeSendEvent');
-  client.on('beforeSendEvent', evt => {
-    console.log('xx - beforeSendEvent');
-    console.log(evt);
-  });
-
-  console.log('xx - afterAllSetup registering preprocessEvent');
-  client.on('preprocessEvent', evt => {
-    console.log('xx - preprocessEvent');
-    console.log(evt);
   });
 }
 
