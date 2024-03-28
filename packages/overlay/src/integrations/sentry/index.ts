@@ -167,4 +167,6 @@ function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
     warn('Failed to add Spotlight integration to Sentry', e);
     log('Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose');
   }
+
+  log('Added Spotlight integration to Sentry SDK');
 }
