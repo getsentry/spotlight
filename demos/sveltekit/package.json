@@ -13,7 +13,7 @@
 		"clean": "rimraf .svelte-kit"
 	},
 	"dependencies": {
-		"@sentry/sveltekit": "^8.0.0-alpha.7",
+		"@sentry/sveltekit": "7.99.0",
 		"@spotlightjs/spotlight": "workspace:*"
 	},
 	"devDependencies": {

@@ -4,12 +4,15 @@ Spotlight was updated to version 2 to ensure compatibility with version 8 of Sen
 
 Here's what you need to do to update to version 2:
 
-- Ensure that you use a version 8 of your `@sentry/<sdk>` SDKs
-- Good news: There are **no public API** changes! You don't need to make any changes in your code.
+- Ensure that you use version `8` or `>=7.99.0` of your `@sentry/<sdk>` SDKs. Older v7 versions will not work correctly
+  anymore.
+- Good news: There are **no public API** changes! You don't need to make any changes to your code.
 
 ## Details
 
-The reason is that if Spotlight's Sentry integration is used (enabled by default), the Spotlight overlay interacts with
-the Sentry SDK in the overlay's host page. The SDK APIs the overlay interacted with changed, which required changes in
-the overlay that are no longer compatible with v7 of the Sentry SDKs. Hence, we can't support both, v7 and v8 in one
-Spotlight version.
+The reason for publishing a Spotlight major version is that if Spotlight's Sentry integration is used (enabled by
+default), the Spotlight overlay interacts with the Sentry SDK in the overlay's host page. The SDK APIs the overlay
+interacted with changed, which required changes in the Spotlight overlay that are no longer compatible with v7 versions
+prior to `7.99.0` of the Sentry JS SDKs. Hence, we can't support all v7 and v8 SDK versions in one Spotlight version.
+
+If you're using older v7 versions than `7.99.0`, consider upgrading to version `8` or `>=7.99.0`.
