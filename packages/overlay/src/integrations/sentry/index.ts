@@ -183,13 +183,8 @@ function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
     return;
   }
 
-  const sdkDisabled =
-    !sentryClient.getOptions().enabled === false ||
-    // if there's no or an invalid DSN, there's no transport
-    !sentryClient.getTransport() !== undefined;
-
-  if (sdkDisabled) {
-    log('Sentry SDK is disabled. Enabling SDK integrations for Spotlight.');
+  if (!sentryClient.getDsn()) {
+    log("Sentry SDK doesn't have a valid DSN. Enabling SDK integrations for just Spotlight.");
     try {
       const sentryIntegrations = sentryClient.getOptions().integrations;
       for (const i of sentryIntegrations) {
