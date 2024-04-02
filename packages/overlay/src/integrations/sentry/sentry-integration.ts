@@ -32,7 +32,9 @@ export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOption
 
   return {
     name: 'SpotlightBrowser',
-    setupOnce: () => {},
+    setupOnce: () => {
+      /* Empty function to ensure compatibility w/ JS SDK v7 >= 7.99.0 */
+    },
     setup: () => {
       log('Using Sidecar URL', _sidecarUrl);
     },
