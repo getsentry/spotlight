@@ -135,6 +135,7 @@ class SentryDataCache {
         trace.transactions.forEach(txn => {
           allSpans.push({
             ...txn.contexts.trace,
+            tags: txn?.tags,
             start_timestamp: txn.start_timestamp,
             timestamp: txn.timestamp,
             description: traceCtx.description || txn.transaction,
