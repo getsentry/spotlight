@@ -152,7 +152,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
  * increasing production build bundle size.
  *
  * Specifically, we:
- * - Enable SDK integrations if the SDK is configured without a DSN. This way, we
+ * - Enable SDK integrations if the SDK is configured without a DSN or disabled. This way, we
  *   can still capture events _only_ for spotlight
  * - Add a spotlight Sentry integration to the SDK that forwards events to the
  *   the spotlight sidecar ({@link spotlightIntegration})
@@ -171,18 +171,25 @@ function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
     (window as WindowWithSentry).__SENTRY__?.hub;
 
   if (!sentryGlobal) {
-    warn("Couldn't find the Sentry SDK on this page. Make sure you're using a Sentry SDK with version 8.0.0 or higher");
+    log(
+      "Couldn't find the Sentry SDK on this page. If you're using a Sentry SDK, make sure you're using version >=7.99.0 or 8.x",
+    );
     return;
   }
 
   const sentryClient = sentryGlobal.getClient();
   if (!sentryClient) {
-    warn("Couldn't find a Sentry SDK client. Make sure you're using a Sentry SDK with version 8.0.0 or higher");
+    warn("Couldn't find a Sentry SDK client. Make sure you're using a Sentry SDK with version >=7.99.0 or 8.x");
     return;
   }
 
-  if (!sentryClient.getOptions().dsn) {
-    log('Sentry SDK is configured without a DSN. Enabling SDK integrations for Spotlight.');
+  const sdkDisabled =
+    !sentryClient.getOptions().enabled === false ||
+    // if there's no or an invalid DSN, there's no transport
+    !sentryClient.getTransport() !== undefined;
+
+  if (sdkDisabled) {
+    log('Sentry SDK is disabled. Enabling SDK integrations for Spotlight.');
     try {
       const sentryIntegrations = sentryClient.getOptions().integrations;
       for (const i of sentryIntegrations) {
