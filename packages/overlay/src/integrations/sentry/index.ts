@@ -1,9 +1,9 @@
-import type { Envelope } from '@sentry/types';
+import type { Client, Envelope } from '@sentry/types';
 import { getSpotlightEventTarget } from '../../lib/eventTarget';
-import { log } from '../../lib/logger';
+import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
 import sentryDataCache from './data/sentryDataCache';
-import { Spotlight } from './sentry-integration';
+import { spotlightIntegration } from './sentry-integration';
 import DeveloperInfo from './tabs/DeveloperInfo';
 import ErrorsTab from './tabs/ErrorsTab';
 import PerformanceTab from './tabs/PerformanceTab';
@@ -98,14 +98,14 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
 
 type WindowWithSentry = Window & {
   __SENTRY__?: {
-    hub: {
-      getClient: () =>
-        | {
-            setupIntegrations: (force: boolean) => void;
-            addIntegration(integration: Integration): void;
-            on: (event: string, callback: (envelope: Envelope) => void) => void;
-          }
-        | undefined;
+    /** Future-proof v8 way of accessing Sentry APIs via the global */
+    acs?: {
+      getCurrentScope: () => {
+        getClient: () => Client | undefined;
+      };
+    };
+    hub?: {
+      getClient: () => Client | undefined;
     };
   };
 };
@@ -146,16 +146,68 @@ export function processEnvelope(rawEvent: RawEventContext) {
   };
 }
 
+/**
+ * Takes care of injecting spotlight-specific behavior into the Sentry SDK by
+ * accessing the global __SENTRY__ carrier object.
+ *
+ * This is admittedly extremely hacky but it's the only way to hook into the SDK
+ * without requiring users to manually register a spotlight integration or unnecessarily
+ * increasing production build bundle size.
+ *
+ * Specifically, we:
+ * - Enable SDK integrations if the SDK is configured without a DSN or disabled. This way, we
+ *   can still capture events _only_ for spotlight
+ * - Add a spotlight Sentry integration to the SDK that forwards events to the
+ *   the spotlight sidecar ({@link spotlightIntegration})
+ *
+ * @param options options of the Sentry integration for Spotlight
+ */
 function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
-  if (options?.injectIntoSDK === false) return;
-  // A very hacky way to hook into Sentry's SDK
-  // but we love hacks
-  const sentryHub = (window as WindowWithSentry).__SENTRY__?.hub;
-  const sentryClient = sentryHub?.getClient();
-  if (sentryClient) {
-    const spotlightIntegration = new Spotlight({
+  if (options?.injectIntoSDK === false) {
+    return;
+  }
+
+  const sentryGlobal =
+    // This is what we expect the v8-stable accessor to be
+    (window as WindowWithSentry).__SENTRY__?.acs?.getCurrentScope() ||
+    // This is the current accessor (v7 and v8-alpha)
+    (window as WindowWithSentry).__SENTRY__?.hub;
+
+  if (!sentryGlobal) {
+    log(
+      "Couldn't find the Sentry SDK on this page. If you're using a Sentry SDK, make sure you're using version >=7.99.0 or 8.x",
+    );
+    return;
+  }
+
+  const sentryClient = sentryGlobal.getClient();
+  if (!sentryClient) {
+    warn("Couldn't find a Sentry SDK client. Make sure you're using a Sentry SDK with version >=7.99.0 or 8.x");
+    return;
+  }
+
+  if (!sentryClient.getDsn()) {
+    log("Sentry SDK doesn't have a valid DSN. Enabling SDK integrations for just Spotlight.");
+    try {
+      const sentryIntegrations = sentryClient.getOptions().integrations;
+      for (const i of sentryIntegrations) {
+        sentryClient.addIntegration(i);
+      }
+    } catch (e) {
+      warn('Failed to enable all SDK integrations for Spotlight', e);
+      log('Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose');
+    }
+  }
+
+  try {
+    const integration = spotlightIntegration({
       sidecarUrl: options?.sidecarUrl,
     });
-    sentryClient.addIntegration(spotlightIntegration);
+    sentryClient.addIntegration(integration);
+  } catch (e) {
+    warn('Failed to add Spotlight integration to Sentry', e);
+    log('Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose');
   }
+
+  log('Added Spotlight integration to Sentry SDK');
 }
