@@ -65,8 +65,7 @@ export const buildServerSnippet: (options: SpotlightAstroIntegrationOptions) => 
 import * as _SentrySDKForSpotlight from '@sentry/astro';
 
 if (_SentrySDKForSpotlight && _SentrySDKForSpotlight.getClient()) {
-  _SentrySDKForSpotlight.getClient().setupIntegrations(true);
-  _SentrySDKForSpotlight.addIntegration(new _SentrySDKForSpotlight.Integrations.Spotlight({
+  _SentrySDKForSpotlight.addIntegration(_SentrySDKForSpotlight.spotlightIntegration({
     ${options?.sidecarUrl ? `sidecarUrl: '${options.sidecarUrl}'` : ''}
   }));
 } else {

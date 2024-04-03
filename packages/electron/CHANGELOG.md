@@ -1,5 +1,11 @@
 # @spotlightjs/electron
 
+## 1.0.0-alpha.0
+
+### Major Changes
+
+- feat: Make Spotlight compatible with Sentry SDKs v8
+
 ## 0.0.24
 
 ### Patch Changes
@@ -8,6 +14,11 @@
   [[`4a8c36a`](https://github.com/getsentry/spotlight/commit/4a8c36a435c3af9ac820be7ee1a6e1d94c377f8e),
   [`2e0b536`](https://github.com/getsentry/spotlight/commit/2e0b536b0b0ce3a5b92023f2c9c973bd819dd263)]:
   - @spotlightjs/overlay@1.8.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @spotlightjs/overlay@2.0.0-alpha.0
 
 ## 0.0.23
 
