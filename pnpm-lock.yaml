@@ -276,6 +276,9 @@ importers:
       electron-builder:
         specifier: ^24.9.1
         version: 24.9.1
+      electron-updater:
+        specifier: ^6.1.8
+        version: 6.1.8
       electron-vite:
         specifier: ^2.0.0-beta.1
         version: 2.0.0-beta.1(vite@4.5.2)
@@ -7524,6 +7527,22 @@ packages:
     resolution:
       { integrity: sha512-r4x5+FowKG6q+/Wj0W9nidx7QO31BJwmR2uEo+Qh3YLGQ8SbBAFuDFpTxzly/I2gsbrFwBuIjrMp423L3O5U3w== }
 
+  /electron-updater@6.1.8:
+    resolution:
+      { integrity: sha512-hhOTfaFAd6wRHAfUaBhnAOYc+ymSGCWJLtFkw4xJqOvtpHmIdNHnXDV9m1MHC+A6q08Abx4Ykgyz/R5DGKNAMQ== }
+    dependencies:
+      builder-util-runtime: 9.2.3
+      fs-extra: 10.1.0
+      js-yaml: 4.1.0
+      lazy-val: 1.0.5
+      lodash.escaperegexp: 4.1.2
+      lodash.isequal: 4.5.0
+      semver: 7.5.4
+      tiny-typed-emitter: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /electron-vite@2.0.0-beta.1(vite@4.5.2):
     resolution:
       { integrity: sha512-4KNb6+yWYEnmHG2exTUiS470Z38dllgkYy7rIV9kkIT4dVLVXu0ShBGct/94tDW004o++vCtd/Blqogv9nUI6Q== }
@@ -10004,6 +10023,11 @@ packages:
   /lodash.curry@4.1.1:
     resolution:
       { integrity: sha512-/u14pXGviLaweY5JI0IUzgzF2J6Ne8INyzAZjImcryjgkZ+ebruBxy2/JaOOkTqScddcYtakjhSaeemV8lR0tA== }
+    dev: true
+
+  /lodash.escaperegexp@4.1.2:
+    resolution:
+      { integrity: sha512-TM9YBvyC84ZxE3rgfefxUWiQKLilstD6k7PTGt6wfbtXF8ixIJLOL3VYyV/z+ZiPLsVxAsKAFVwWlWeb2Y8Yyw== }
     dev: true
 
   /lodash.flow@3.5.0:
@@ -14253,6 +14277,11 @@ packages:
     dependencies:
       globalyzer: 0.1.0
       globrex: 0.1.2
+
+  /tiny-typed-emitter@2.1.0:
+    resolution:
+      { integrity: sha512-qVtvMxeXbVej0cQWKqVSSAHmKZEHAvxdF8HEUBFWts8h+xEo5m/lEiPakuyZ3BnCBjOD8i24kzNOiOLLgsSxhA== }
+    dev: true
 
   /tinybench@2.5.1:
     resolution:

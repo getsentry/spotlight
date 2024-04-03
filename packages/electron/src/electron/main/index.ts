@@ -1,10 +1,50 @@
 import * as Sentry from '@sentry/electron/main';
 import { clearBuffer, setupSidecar } from '@spotlightjs/sidecar';
 import { BrowserWindow, Menu, app, dialog, ipcMain, shell } from 'electron';
+
 import Store from 'electron-store';
+import { autoUpdater } from 'electron-updater';
 import path from 'path';
 
 const store = new Store();
+
+autoUpdater.setFeedURL({
+  provider: 'github',
+  repo: 'getsentry/spotlight',
+  owner: 'getsentry',
+});
+
+app.whenReady().then(() => {
+  autoUpdater.checkForUpdates();
+});
+
+autoUpdater.on('update-available', () => {
+  dialog
+    .showMessageBox({
+      type: 'info',
+      message: 'A new version of the app is available. Do you want to update now?',
+      buttons: ['Update', 'Cancel'],
+    })
+    .then(response => {
+      if (response.response === 0) {
+        autoUpdater.downloadUpdate();
+      }
+    });
+});
+
+autoUpdater.on('update-downloaded', () => {
+  dialog
+    .showMessageBox({
+      type: 'info',
+      message: 'The update has been downloaded. Restart the application to apply the changes.',
+      buttons: ['Restart', 'Later'],
+    })
+    .then(response => {
+      if (response.response === 0) {
+        autoUpdater.quitAndInstall();
+      }
+    });
+});
 
 Sentry.init({
   dsn: 'https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976',
@@ -240,6 +280,12 @@ const template = [
         label: 'Learn More',
         click: async () => {
           await shell.openExternal('https://spotlightjs.com');
+        },
+      },
+      {
+        label: 'Check for updates',
+        click() {
+          autoUpdater.checkForUpdates();
         },
       },
     ],

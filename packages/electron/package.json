@@ -27,7 +27,8 @@
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1",
     "electron-vite": "^2.0.0-beta.1",
-    "rollup-plugin-sourcemaps": "^0.6.3"
+    "rollup-plugin-sourcemaps": "^0.6.3",
+    "electron-updater": "^6.1.8"
   },
   "volta": {
     "extends": "../../package.json"
