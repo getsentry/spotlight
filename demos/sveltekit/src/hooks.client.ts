@@ -7,7 +7,7 @@ Sentry.init({
 });
 
 if (import.meta.env.DEV) {
-	initSpotlight({ injectImmediately: true, anchor: 'bottomRight' });
+	initSpotlight({ injectImmediately: true, anchor: 'bottomRight', debug: true });
 }
 
 export const handleError = Sentry.handleErrorWithSentry();

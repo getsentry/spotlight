@@ -1,9 +1,9 @@
-import { Client, Envelope, Event, EventProcessor, Hub, Integration } from '@sentry/types';
+import { Client, Envelope, Event, Integration } from '@sentry/types';
 import { serializeEnvelope } from '@sentry/utils';
 import { log } from '../../lib/logger';
 import sentryDataCache from './data/sentryDataCache';
 
-type SpotlightBrowserIntegationOptions = {
+type SpotlightBrowserIntegrationOptions = {
   /**
    * The URL of the Sidecar instance to connect and forward events to.
    * If not set, Spotlight will try to connect to the Sidecar running on localhost:8969.
@@ -12,18 +12,33 @@ type SpotlightBrowserIntegationOptions = {
    */
   sidecarUrl?: string;
 };
-export class Spotlight implements Integration {
-  public name: string = 'DevServerContextLines';
 
-  private _sidecarUrl: string;
+/**
+ * A Sentry integration for Spotlight integration that the Overlay will inject automatically.
+ * This integration does a couple of things:
+ *
+ *  - Try to enrich stack traces by querying a potentially existing context lines integration
+ *    on the server side  (@see packages/astro/src/vite/source-context.ts)
+ *  - Drop transactions created from interactions with the Spotlight UI
+ *  - Forward Sentry events sent from the browser SDK to the Sidecar instance running on
+ *    either on http://localhost:8969/stream or on the supplied `sidecarUrl` option.
+ *
+ * @param options - Configuration options for the integration ({@link SpotlightBrowserIntegrationOptions})
+ *
+ * @returns Sentry integration for Spotlight.
+ */
+export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOptions) => {
+  const _sidecarUrl = options?.sidecarUrl ?? 'http://localhost:8969/stream';
 
-  public constructor(options?: SpotlightBrowserIntegationOptions) {
-    this._sidecarUrl = options?.sidecarUrl ?? 'http://localhost:8969/stream';
-    log('Using Sidecar URL', this._sidecarUrl);
-  }
-
-  public setupOnce(addGlobalEventProcessor: (callback: EventProcessor) => void, getCurrentHub: () => Hub): void {
-    addGlobalEventProcessor(async (event: Event) => {
+  return {
+    name: 'SpotlightBrowser',
+    setupOnce: () => {
+      /* Empty function to ensure compatibility w/ JS SDK v7 >= 7.99.0 */
+    },
+    setup: () => {
+      log('Using Sidecar URL', _sidecarUrl);
+    },
+    processEvent: async (event: Event) => {
       // We don't want to send interaction transactions/root spans created from
       // clicks within Spotlight to Sentry. Neither do we want them to be sent to
       // spotlight.
@@ -59,38 +74,31 @@ export class Spotlight implements Integration {
         }
       }
       return event;
-    });
-
-    const client = getCurrentHub().getClient();
-    if (client) {
-      sendEnvelopesToSidecar(client, this._sidecarUrl);
-    }
-  }
-}
+    },
+    afterAllSetup: (client: Client) => {
+      sendEnvelopesToSidecar(client, _sidecarUrl);
+    },
+  } satisfies Integration;
+};
 
 function sendEnvelopesToSidecar(client: Client, sidecarUrl: string) {
-  // Ensure, integrations are initialized even if no DSN was set
-  client?.setupIntegrations(true);
+  const makeFetch = getNativeFetchImplementation();
 
-  if (client.on) {
-    const makeFetch = getNativeFetchImplementation();
-
-    client?.on('beforeEnvelope', (envelope: Envelope) => {
-      makeFetch(sidecarUrl, {
-        method: 'POST',
-        body: serializeEnvelope(envelope),
-        headers: {
-          'Content-Type': 'application/x-sentry-envelope',
-        },
-        mode: 'cors',
-      }).catch(err => {
-        console.error(
-          `Sentry SDK can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`,
-          err,
-        );
-      });
+  client.on('beforeEnvelope', (envelope: Envelope) => {
+    makeFetch(sidecarUrl, {
+      method: 'POST',
+      body: serializeEnvelope(envelope),
+      headers: {
+        'Content-Type': 'application/x-sentry-envelope',
+      },
+      mode: 'cors',
+    }).catch(err => {
+      console.error(
+        `Sentry SDK can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`,
+        err,
+      );
     });
-  }
+  });
 }
 
 type FetchImpl = typeof fetch;
@@ -98,7 +106,6 @@ type WrappedFetchImpl = FetchImpl & { __sentry_original__: FetchImpl };
 
 /**
  * We want to get an unpatched fetch implementation to avoid capturing our own calls.
- * TODO: We might need to expose this as a utitly function so people can make requests without the SDK picking it put
  */
 export function getNativeFetchImplementation(): FetchImpl {
   if (fetchIsWrapped(window.fetch)) {
