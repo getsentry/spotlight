@@ -18,32 +18,28 @@ app.whenReady().then(() => {
   autoUpdater.checkForUpdates();
 });
 
-autoUpdater.on('update-available', () => {
-  dialog
-    .showMessageBox({
-      type: 'info',
-      message: 'A new version of the app is available. Do you want to update now?',
-      buttons: ['Update', 'Cancel'],
-    })
-    .then(response => {
-      if (response.response === 0) {
-        autoUpdater.downloadUpdate();
-      }
-    });
+autoUpdater.on('update-available', async () => {
+  const { response } = await dialog.showMessageBox({
+    type: 'info',
+    message: 'A new version of the app is available. Do you want to update now?',
+    buttons: ['Update', 'Cancel'],
+  });
+
+  if (response === 0) {
+    autoUpdater.downloadUpdate();
+  }
 });
 
-autoUpdater.on('update-downloaded', () => {
-  dialog
-    .showMessageBox({
-      type: 'info',
-      message: 'The update has been downloaded. Restart the application to apply the changes.',
-      buttons: ['Restart', 'Later'],
-    })
-    .then(response => {
-      if (response.response === 0) {
-        autoUpdater.quitAndInstall();
-      }
-    });
+autoUpdater.on('update-downloaded', async () => {
+  const { response } = await dialog.showMessageBox({
+    type: 'info',
+    message: 'The update has been downloaded. Restart the application to apply the changes.',
+    buttons: ['Restart', 'Later'],
+  });
+
+  if (response === 0) {
+    autoUpdater.quitAndInstall();
+  }
 });
 
 Sentry.init({
