@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/overlay",
   "description": "The overlay of Spotlight to add debug interface to your web app.",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
