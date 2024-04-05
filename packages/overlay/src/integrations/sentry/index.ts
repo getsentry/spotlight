@@ -122,13 +122,16 @@ export function processEnvelope(rawEvent: RawEventContext) {
       continue;
     }
     const header = JSON.parse(rawEntries[i]);
-    if (header.type && header.type == 'statsd') {
-      // skip metric events
-      continue;
+    let payload;
+    try {
+      payload = JSON.parse(rawEntries[i + 1]);
+    } catch (e) {
+      // payload will not be json always, like in metrics events.
+      log(e);
+      payload = rawEntries[i + 1];
     }
-    const payload = JSON.parse(rawEntries[i + 1]);
     // data sanitization
-    if (header.type) {
+    if (header.type && typeof payload === 'object') {
       payload.type = header.type;
     }
     items.push([header, payload]);
