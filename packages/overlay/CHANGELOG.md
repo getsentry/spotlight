@@ -1,5 +1,14 @@
 # @spotlightjs/core
 
+## 1.8.3
+
+### Patch Changes
+
+- - To add tags from event instead of event context for root spans
+    ([#389](https://github.com/getsentry/spotlight/pull/389))
+
+- - To display metrics event as well in event envelopes ([#393](https://github.com/getsentry/spotlight/pull/393))
+
 ## 1.8.2
 
 ### Patch Changes
