@@ -6,6 +6,8 @@ export function sdkToPlatform(name: string) {
   if (name.includes('javascript')) return 'javascript';
   if (name.includes('java')) return 'java';
   if (name.includes('python')) return 'python';
+  if (name.includes('php.laravel')) return 'php.laravel';
+  if (name.includes('php.symfony')) return 'php.symfony';
   if (name.includes('php')) return 'php';
   if (name.includes('ruby')) return 'ruby';
   if (name.includes('dotnet')) return 'dotnet';
