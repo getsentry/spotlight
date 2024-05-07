@@ -1,13 +1,17 @@
 import { useContext } from 'react';
-import sentryDataCache from './sentryDataCache';
+import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import { SentryEventsContext } from './sentryEventsContext';
 
 export const useSentryHelpers = () => {
   useContext(SentryEventsContext);
+  const { projectId } = useSpotlightContext();
 
   return {
-    isLocalToSession: (traceId: string) => {
-      return sentryDataCache.isTraceLocal(traceId);
+    isEventLocalToSession: (eventProjectId: string) => {
+      return eventProjectId === projectId;
+    },
+    isTraceLocalToSession: (traceProjectIds: Set<string>) => {
+      return traceProjectIds.has(projectId);
     },
   };
 };

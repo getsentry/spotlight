@@ -41,47 +41,48 @@ export default function EnvelopeList() {
             <h1 className="text-2xl font-bold">Event Envelopes</h1>
           </div>
           <div className="flex flex-col">
-            {(showAll ? allEnvelopes : localEnvelopes).map(({ envelope }: { envelope: Envelope }) => {
-              const header: Envelope[0] = envelope[0];
-              const envelopeEventId: string | unknown = header.event_id;
-              const { trace_id } = (header?.trace as { trace_id?: string }) || {};
-              const envelopeItem = envelope[1].length > 0 ? (envelope[1][0] as EnvelopeItem) : null;
-              if (typeof envelopeEventId === 'string') {
-                return (
-                  <Link key={envelopeEventId} to={`/devInfo/${header.event_id}`}>
-                    <div
-                      key={`${header.event_id}`}
-                      className=" hover:bg-primary-900 border-b-primary-900 flex  cursor-pointer items-center gap-4 border-b px-6 py-2 transition-all"
-                    >
-                      <PlatformIcon className="rounded-md" platform={sdkToPlatform(header.sdk?.name || 'unknown')} />
-                      <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
-                        <h2 className="text-primary-50 text-xs">Event Id</h2>
-                        <div className="flex items-center gap-x-2">
-                          <div>{envelopeEventId.substring(0, 8)}</div>
-                          {trace_id && helpers.isLocalToSession(trace_id) ? (
-                            <Badge title="This trace is part of your local session.">Local</Badge>
-                          ) : null}
+            {(showAll ? allEnvelopes : localEnvelopes).map(
+              ({ envelope, projectId }: { envelope: Envelope; projectId: string }) => {
+                const header: Envelope[0] = envelope[0];
+                const envelopeEventId: string | unknown = header.event_id;
+                const envelopeItem = envelope[1].length > 0 ? (envelope[1][0] as EnvelopeItem) : null;
+                if (typeof envelopeEventId === 'string') {
+                  return (
+                    <Link key={envelopeEventId} to={`/devInfo/${header.event_id}`}>
+                      <div
+                        key={`${header.event_id}`}
+                        className=" hover:bg-primary-900 border-b-primary-900 flex  cursor-pointer items-center gap-4 border-b px-6 py-2 transition-all"
+                      >
+                        <PlatformIcon className="rounded-md" platform={sdkToPlatform(header.sdk?.name || 'unknown')} />
+                        <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
+                          <h2 className="text-primary-50 text-xs">Event Id</h2>
+                          <div className="flex items-center gap-x-2">
+                            <div>{envelopeEventId.substring(0, 8)}</div>
+                            {helpers.isEventLocalToSession(projectId) ? (
+                              <Badge title="This trace is part of your local session.">Local</Badge>
+                            ) : null}
+                          </div>
+                        </div>
+
+                        <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
+                          <h2 className="text-primary-50 text-xs">Type</h2>
+                          {envelopeItem && envelopeItem[0]?.type ? <>{envelopeItem[0].type}</> : '-'}
+                        </div>
+                        <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
+                          <h2 className="text-primary-50 text-xs">Recieved</h2>
+                          {(header.sent_at as string | Date | number) ? (
+                            <TimeSince date={header.sent_at as string | Date | number} />
+                          ) : (
+                            '-'
+                          )}
                         </div>
                       </div>
-
-                      <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
-                        <h2 className="text-primary-50 text-xs">Type</h2>
-                        {envelopeItem && envelopeItem[0]?.type ? <>{envelopeItem[0].type}</> : '-'}
-                      </div>
-                      <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
-                        <h2 className="text-primary-50 text-xs">Recieved</h2>
-                        {(header.sent_at as string | Date | number) ? (
-                          <TimeSince date={header.sent_at as string | Date | number} />
-                        ) : (
-                          '-'
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                );
-              }
-              return null;
-            })}
+                    </Link>
+                  );
+                }
+                return null;
+              },
+            )}
           </div>
         </div>
         {selectedEnvelope && <EnvelopeDetails data={selectedEnvelope} />}

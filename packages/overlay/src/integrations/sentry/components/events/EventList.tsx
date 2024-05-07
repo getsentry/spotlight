@@ -25,9 +25,7 @@ export default function EventList() {
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
   const filteredEvents = showAll
     ? matchingEvents
-    : matchingEvents.filter(
-        e => (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
-      );
+    : matchingEvents.filter(e => helpers.isEventLocalToSession(e.projectId));
   const hiddenItemCount = matchingEvents.length - filteredEvents.length;
 
   return matchingEvents.length !== 0 ? (
@@ -41,7 +39,6 @@ export default function EventList() {
         />
       )}
       {filteredEvents.map(e => {
-        const traceId = e.contexts?.trace?.trace_id;
         return (
           <Link
             className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
@@ -52,7 +49,7 @@ export default function EventList() {
             <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
               <div className="flex items-center gap-x-2">
                 <div>{(e.event_id || '').substring(0, 8)}</div>
-                {traceId && helpers.isLocalToSession(traceId) ? (
+                {helpers.isEventLocalToSession(e.projectId) ? (
                   <Badge title="This event is part of your local session.">Local</Badge>
                 ) : null}
               </div>

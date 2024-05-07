@@ -15,6 +15,7 @@ const HEADER = 'application/x-sentry-envelope';
 type SentryIntegrationOptions = {
   sidecarUrl?: string;
   injectIntoSDK?: boolean;
+  projectId?: string;
 };
 
 export default function sentryIntegration(options?: SentryIntegrationOptions) {
@@ -46,13 +47,9 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
     tabs: () => {
       const errorsCount = sentryDataCache
         .getEvents()
-        .filter(
-          e =>
-            e.type != 'transaction' &&
-            (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
-        ).length;
+        .filter(e => e.type != 'transaction' && e.projectId === options?.projectId).length;
 
-      const localTraces = sentryDataCache.getTraces().filter(t => sentryDataCache.isTraceLocal(t.trace_id) !== false);
+      const localTraces = sentryDataCache.getTraces().filter(t => t.eventProjectIds.has(options?.projectId || ''));
 
       return [
         {
@@ -112,7 +109,8 @@ type WindowWithSentry = Window & {
 
 export function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
-  const [rawHeader, ...rawEntries] = data.split(/\n/gm);
+  const [project, rawHeader, ...rawEntries] = data.split(/\n/gm);
+  const projectDetails = JSON.parse(project || '{}');
 
   const header = JSON.parse(rawHeader) as Envelope[0];
   const items: Envelope[1][] = [];
@@ -135,7 +133,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
   }
 
   const envelope = [header, items] as Envelope;
-  sentryDataCache.pushEnvelope({ envelope, rawEnvelope: rawEvent });
+  sentryDataCache.pushEnvelope({ envelope, rawEnvelope: rawEvent, projectId: projectDetails.project_id });
 
   return {
     event: envelope,
@@ -199,6 +197,7 @@ function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
   try {
     const integration = spotlightIntegration({
       sidecarUrl: options?.sidecarUrl,
+      projectId: options?.projectId,
     });
     sentryClient.addIntegration(integration);
   } catch (e) {

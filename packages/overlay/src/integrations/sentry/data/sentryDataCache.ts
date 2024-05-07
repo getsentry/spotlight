@@ -26,6 +26,7 @@ class SentryDataCache {
   protected envelopes: {
     envelope: Envelope;
     rawEnvelope: RawEventContext;
+    projectId: string;
   }[] = [];
 
   protected subscribers: Map<string, Subscription> = new Map();
@@ -55,8 +56,16 @@ class SentryDataCache {
     return sdk;
   }
 
-  pushEnvelope({ envelope, rawEnvelope }: { envelope: Envelope; rawEnvelope: RawEventContext }) {
-    this.envelopes.push({ envelope, rawEnvelope });
+  pushEnvelope({
+    envelope,
+    rawEnvelope,
+    projectId,
+  }: {
+    envelope: Envelope;
+    rawEnvelope: RawEventContext;
+    projectId: string;
+  }) {
+    this.envelopes.push({ envelope, rawEnvelope, projectId });
     const [header, items] = envelope;
     let sdk: Sdk;
     if (header.sdk && header.sdk.name && header.sdk.version) {
@@ -83,6 +92,7 @@ class SentryDataCache {
     items.forEach(([itemHeader, itemData]) => {
       if (itemHeader.type === 'event' || itemHeader.type === 'transaction') {
         (itemData as SentryEvent).platform = sdkToPlatform(sdk.name);
+        (itemData as SentryEvent).projectId = projectId;
         this.pushEvent(itemData as SentryEvent);
       }
     });
@@ -123,8 +133,12 @@ class SentryDataCache {
         status: traceCtx.status,
         rootTransactionName: event.transaction || '(unknown transaction)',
         rootTransaction: null,
+        eventProjectIds: new Set(),
       };
 
+      if (trace.eventProjectIds as Set<string>) {
+        trace.eventProjectIds.add(event.projectId);
+      }
       if (event.type === 'transaction') {
         trace.transactions.push(event);
         trace.transactions.sort((a, b) => a.start_timestamp - b.start_timestamp);

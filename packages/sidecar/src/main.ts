@@ -8,7 +8,7 @@ import { MessageBuffer } from './messageBuffer.js';
 const DEFAULT_PORT = 8969;
 const SERVER_IDENTIFIER = 'spotlight-by-sentry';
 
-type Payload = [string, string];
+type Payload = [string, string, string];
 
 type IncomingPayloadCallback = (body: string) => void;
 
@@ -78,9 +78,10 @@ function handleStreamRequest(
       });
       res.flushHeaders();
 
-      const sub = buffer.subscribe(([payloadType, data]) => {
+      const sub = buffer.subscribe(([payloadType, data, projectId]) => {
         logger.debug(`🕊️ sending to Spotlight`);
         res.write(`event:${payloadType}\n`);
+        res.write(`data:{"project_id": "${projectId}"}\n`);
         // This is very important - SSE events are delimited by two newlines
         data.split('\n').forEach(line => {
           res.write(`data:${line}\n`);
@@ -130,7 +131,7 @@ function handleStreamRequest(
         });
 
         stream.on('end', () => {
-          buffer.put([`${req.headers['content-type']}`, body]);
+          buffer.put([`${req.headers['content-type']}`, body, `${req.headers['spotlight-project-id']}`]);
 
           if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
             const timestamp = new Date().getTime();

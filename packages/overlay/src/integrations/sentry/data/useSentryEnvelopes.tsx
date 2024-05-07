@@ -8,9 +8,9 @@ export const useSentryEnvelopes = () => {
   const helpers = useSentryHelpers();
   const allEnvelopes = sentryDataCache.getEnvelopes();
 
-  const localEnvelopes = allEnvelopes.filter(({ envelope }) => {
+  const localEnvelopes = allEnvelopes.filter(({ envelope, projectId }) => {
     const { trace_id } = (envelope[0]?.trace as { trace_id?: string }) || {};
-    if (trace_id) return helpers.isLocalToSession(trace_id) !== false;
+    if (trace_id) return helpers.isEventLocalToSession(projectId);
     return false;
   });
   return [allEnvelopes, localEnvelopes];

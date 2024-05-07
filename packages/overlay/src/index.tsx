@@ -9,6 +9,7 @@ import { default as sentry } from './integrations/sentry/index.ts';
 import { getSpotlightEventTarget } from './lib/eventTarget.ts';
 import { activateLogger, log } from './lib/logger.ts';
 import { SpotlightContextProvider } from './lib/useSpotlightContext.tsx';
+import { generate_uuidv4 } from './lib/uuid.ts';
 import { React, ReactDOM } from './react-instance.tsx'; // Import specific exports
 import { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
 
@@ -101,6 +102,7 @@ export async function init({
   experiments = DEFAULT_EXPERIMENTS,
   fullPage = false,
   showClearEventsButton = true,
+  projectId = generate_uuidv4(),
 }: SpotlightOverlayOptions = {}) {
   if (typeof document === 'undefined') return;
 
@@ -115,12 +117,13 @@ export async function init({
   }
 
   // Sentry is enabled by default
-  const defaultIntegrations = [sentry({ sidecarUrl })];
+  const defaultIntegrations = [sentry({ sidecarUrl, projectId })];
 
   const context: SpotlightContext = {
     open: openSpotlight,
     close: closeSpotlight,
     experiments: finalExperiments,
+    projectId,
   };
 
   const [initializedIntegrations] = await initIntegrations(integrations ?? defaultIntegrations, context);

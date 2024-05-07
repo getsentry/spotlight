@@ -75,6 +75,7 @@ export type TraceContext = {
   op: string;
   description?: string | null;
   status: 'ok' | string;
+  eventProjectIds: Set<string>;
 };
 
 export type Contexts = {
@@ -97,6 +98,7 @@ export type SentryFormattedMessage =
 export type SentryErrorEvent = CommonEventAttrs & {
   type?: 'error' | 'event' | 'message' | 'default';
   exception: EventException;
+  projectId: string;
 };
 
 export type Span = {
@@ -121,6 +123,7 @@ export type SentryTransactionEvent = CommonEventAttrs & {
   contexts: Contexts & {
     trace: TraceContext;
   };
+  projectId: string;
 };
 
 export type SentryEvent = SentryErrorEvent | SentryTransactionEvent;

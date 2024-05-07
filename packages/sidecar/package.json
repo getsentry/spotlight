@@ -8,7 +8,8 @@
     "dev": "vite build --watch",
     "build": "vite build && tsc",
     "build:watch": "vite build --watch",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "sidecar": "npx spotlight-sidecar"
   },
   "files": [
     "dist",

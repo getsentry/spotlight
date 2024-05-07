@@ -97,6 +97,14 @@ export type SpotlightOverlayOptions = {
    * @default true
    */
   showClearEventsButton?: boolean;
+
+  /**
+   * The id of project where Spotlight is used.
+   * This is useful to filter data based on projects.
+   *
+   * @default uuidv4
+   */
+  projectId?: string;
 };
 
 export type NotificationCount = {

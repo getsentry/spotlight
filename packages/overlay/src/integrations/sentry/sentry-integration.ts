@@ -1,7 +1,7 @@
 import { Client, Envelope, Event, Integration } from '@sentry/types';
 import { serializeEnvelope } from '@sentry/utils';
+import { generate_uuidv4 } from '~/lib/uuid';
 import { log } from '../../lib/logger';
-import sentryDataCache from './data/sentryDataCache';
 
 type SpotlightBrowserIntegrationOptions = {
   /**
@@ -11,6 +11,13 @@ type SpotlightBrowserIntegrationOptions = {
    * @default "http://localhost:8969/stream"
    */
   sidecarUrl?: string;
+
+  /**
+   * Set this to have a same spotlight project id set to server and client sentry events.
+   *
+   * @default uuidv4
+   */
+  projectId?: string;
 };
 
 /**
@@ -29,6 +36,7 @@ type SpotlightBrowserIntegrationOptions = {
  */
 export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOptions) => {
   const _sidecarUrl = options?.sidecarUrl ?? 'http://localhost:8969/stream';
+  const _projectId = options?.projectId ?? generate_uuidv4();
 
   return {
     name: 'SpotlightBrowser',
@@ -44,11 +52,6 @@ export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOption
       // spotlight.
       if (isSpotlightInteraction(event)) {
         return null;
-      }
-
-      const traceId = event.contexts?.trace?.trace_id;
-      if (traceId) {
-        sentryDataCache.trackLocalTrace(traceId);
       }
 
       if (event.type || !event.exception || !event.exception.values) {
@@ -76,12 +79,12 @@ export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOption
       return event;
     },
     afterAllSetup: (client: Client) => {
-      sendEnvelopesToSidecar(client, _sidecarUrl);
+      sendEnvelopesToSidecar(client, _sidecarUrl, _projectId);
     },
   } satisfies Integration;
 };
 
-function sendEnvelopesToSidecar(client: Client, sidecarUrl: string) {
+function sendEnvelopesToSidecar(client: Client, sidecarUrl: string, projectId: string) {
   const makeFetch = getNativeFetchImplementation();
 
   client.on('beforeEnvelope', (envelope: Envelope) => {
@@ -90,6 +93,7 @@ function sendEnvelopesToSidecar(client: Client, sidecarUrl: string) {
       body: serializeEnvelope(envelope),
       headers: {
         'Content-Type': 'application/x-sentry-envelope',
+        'spotlight-project-id': projectId,
       },
       mode: 'cors',
     }).catch(err => {

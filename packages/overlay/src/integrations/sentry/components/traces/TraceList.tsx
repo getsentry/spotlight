@@ -17,7 +17,7 @@ export default function TraceList() {
   const context = useSpotlightContext();
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
-  const filteredTraces = showAll ? traceList : traceList.filter(t => helpers.isLocalToSession(t.trace_id) !== false);
+  const filteredTraces = showAll ? traceList : traceList.filter(t => helpers.isTraceLocalToSession(t.eventProjectIds));
   const hiddenItemCount = traceList.length - filteredTraces.length;
 
   return (
@@ -44,7 +44,7 @@ export default function TraceList() {
                 <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
                   <div className="flex items-center gap-x-2">
                     <div>{trace.trace_id.substring(0, 8)}</div>
-                    {helpers.isLocalToSession(trace.trace_id) ? (
+                    {helpers.isTraceLocalToSession(trace.eventProjectIds) ? (
                       <Badge title="This trace is part of your local session.">Local</Badge>
                     ) : null}
                   </div>
