@@ -138,6 +138,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
   return {
     event: envelope,
     rawEvent: rawEvent,
+    projectId: projectDetails.project_id,
   };
 }
 
