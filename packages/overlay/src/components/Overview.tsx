@@ -51,7 +51,11 @@ export default function Overview({
       <Tabs tabs={tabs} setOpen={setOpen} />
       <div className="flex-1 overflow-auto overflow-x-hidden">
         <Routes>
-          <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={'not-found'}></Route>
+          <Route
+            path="/not-found"
+            element={<div className="text-primary-300 p-6">Not Found - How'd you manage to get here?</div>}
+            key={'not-found'}
+          ></Route>
           {tabs.map(tab => {
             const TabContent = tab.content && tab.content;
 

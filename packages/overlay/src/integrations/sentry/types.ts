@@ -1,4 +1,5 @@
-import { Measurements } from '@sentry/types';
+import { Envelope, Measurements } from '@sentry/types';
+import { Integration } from '../integration';
 
 export type FrameVars = {
   [key: string]: string;
@@ -211,4 +212,25 @@ export type MetricWeightsProps = {
   cls: number;
   fid: number;
   ttfb: number;
+};
+
+export type WindowWithSentry = Window & {
+  __SENTRY__?: {
+    hub: {
+      getClient: () =>
+        | {
+            setupIntegrations: (force: boolean) => void;
+            addIntegration(integration: Integration): void;
+            on: (event: string, callback: (envelope: Envelope) => void) => void;
+            getOptions: () => {
+              _metadata: {
+                sdk: {
+                  version: string;
+                };
+              };
+            };
+          }
+        | undefined;
+    };
+  };
 };

@@ -190,3 +190,5 @@ export const PERFORMANCE_SCORE_PROFILES = {
     // }
   ],
 };
+
+export const SDK_VERSION_SUPPORT_REGEX = /^[0-7]\.\d+\.\d+$/;
