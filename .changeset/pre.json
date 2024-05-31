@@ -13,5 +13,5 @@
     "@spotlightjs/tsconfig": "1.0.0",
     "@spotlightjs/website": "0.0.1"
   },
-  "changesets": ["gorgeous-coins-tickle"]
+  "changesets": ["gorgeous-coins-tickle", "happy-adults-jam"]
 }
