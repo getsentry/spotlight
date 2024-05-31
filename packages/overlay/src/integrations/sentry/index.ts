@@ -96,27 +96,6 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
   } satisfies Integration<Envelope>;
 }
 
-type VersionedCarrier = { version: string } & Record<Exclude<string, 'version'>, { stack: V8AsyncContextStrategy }>;
-
-type V8AsyncContextStrategy = {
-  getScope?: () => {
-    getClient?: () => Client | undefined;
-  };
-};
-
-type LegacyCarrier = {
-  /** 8.0.0-8.5.0 way if accessing client */
-  stack?: V8AsyncContextStrategy;
-  /** pre-v8 way of accessing client (v7 and earlier) */
-  hub?: {
-    getClient?: () => Client | undefined;
-  };
-};
-
-type WindowWithSentry = Window & {
-  __SENTRY__?: LegacyCarrier & VersionedCarrier;
-};
-
 export function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
   const [rawHeader, ...rawEntries] = data.split(/\n/gm);
@@ -152,6 +131,27 @@ export function processEnvelope(rawEvent: RawEventContext) {
     rawEvent: rawEvent,
   };
 }
+
+type V8Carrier = {
+  stack: {
+    getScope?: () => {
+      getClient?: () => Client | undefined;
+    };
+  };
+};
+
+type LegacyCarrier = {
+  /** pre-v8 way of accessing client (v7 and earlier) */
+  hub?: {
+    getClient?: () => Client | undefined;
+  };
+};
+
+type VersionedCarrier = { version: string } & Record<Exclude<string, 'version'>, V8Carrier>;
+
+type WindowWithSentry = Window & {
+  __SENTRY__?: LegacyCarrier & VersionedCarrier;
+};
 
 /**
  * Takes care of injecting spotlight-specific behavior into the Sentry SDK by
