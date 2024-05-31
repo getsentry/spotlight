@@ -1,5 +1,18 @@
 # @spotlightjs/electron
 
+## 1.0.0-alpha.2
+
+### Minor Changes
+
+- feat: Support versioned Sentry carrier object introduced in 8.6.0+
+  ([#402](https://github.com/getsentry/spotlight/pull/402))
+
+### Patch Changes
+
+- Updated dependencies
+  [[`010162a4672cae3be20379730e18826627a6f01b`](https://github.com/getsentry/spotlight/commit/010162a4672cae3be20379730e18826627a6f01b)]:
+  - @spotlightjs/overlay@2.0.0-alpha.2
+
 ## 1.0.0-alpha.1
 
 ### Major Changes

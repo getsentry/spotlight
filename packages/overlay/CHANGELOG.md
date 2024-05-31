@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 2.0.0-alpha.2
+
+### Minor Changes
+
+- feat: Support versioned Sentry carrier object introduced in 8.6.0+
+  ([#402](https://github.com/getsentry/spotlight/pull/402))
+
 ## 2.0.0-alpha.1
 
 ### Major Changes
