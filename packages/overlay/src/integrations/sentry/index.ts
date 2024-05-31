@@ -96,18 +96,25 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
   } satisfies Integration<Envelope>;
 }
 
-type WindowWithSentry = Window & {
-  __SENTRY__?: {
-    /** Future-proof v8 way of accessing Sentry APIs via the global */
-    acs?: {
-      getCurrentScope: () => {
-        getClient: () => Client | undefined;
-      };
-    };
-    hub?: {
-      getClient: () => Client | undefined;
-    };
+type VersionedCarrier = { version: string } & Record<Exclude<string, 'version'>, { acs: V8AsyncContextStrategy }>;
+
+type V8AsyncContextStrategy = {
+  getCurrentScope?: () => {
+    getClient?: () => Client | undefined;
   };
+};
+
+type LegacyCarrier = {
+  /** 8.0.0-8.5.0 way if accessing client */
+  acs?: V8AsyncContextStrategy;
+  /** pre-v8 way of accessing client (v7 and earlier) */
+  hub?: {
+    getClient?: () => Client | undefined;
+  };
+};
+
+type WindowWithSentry = Window & {
+  __SENTRY__?: LegacyCarrier & VersionedCarrier;
 };
 
 export function processEnvelope(rawEvent: RawEventContext) {
@@ -167,22 +174,11 @@ function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
     return;
   }
 
-  const sentryGlobal =
-    // This is what we expect the v8-stable accessor to be
-    (window as WindowWithSentry).__SENTRY__?.acs?.getCurrentScope() ||
-    // This is the current accessor (v7 and v8-alpha)
-    (window as WindowWithSentry).__SENTRY__?.hub;
+  const sentryCarrier = (window as WindowWithSentry).__SENTRY__;
+  const sentryClient = sentryCarrier && getSentryClient(sentryCarrier);
 
-  if (!sentryGlobal) {
-    log(
-      "Couldn't find the Sentry SDK on this page. If you're using a Sentry SDK, make sure you're using version >=7.99.0 or 8.x",
-    );
-    return;
-  }
-
-  const sentryClient = sentryGlobal.getClient();
   if (!sentryClient) {
-    warn("Couldn't find a Sentry SDK client. Make sure you're using a Sentry SDK with version >=7.99.0 or 8.x");
+    log("Couldn't find a Sentry SDK client. Make sure you're using a Sentry SDK with version >=7.99.0 or 8.x");
     return;
   }
 
@@ -210,4 +206,39 @@ function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
   }
 
   log('Added Spotlight integration to Sentry SDK');
+}
+
+/**
+ * Accesses the `window.__SENTRY__` carrier object and tries to get the Sentry client
+ * from it. This function supports all carrier object structures from v7 to all versions
+ * of v8.
+ */
+function getSentryClient(sentryCarrier: LegacyCarrier & VersionedCarrier): Client | undefined {
+  // 8.6.0+ way to get the client
+  if (sentryCarrier.version) {
+    const versionedCarrier = sentryCarrier[sentryCarrier.version];
+    const scope = versionedCarrier?.acs?.getCurrentScope?.();
+    if (typeof scope?.getClient === 'function') {
+      return scope.getClient();
+    }
+  }
+
+  // 8.0.0-8.5.0 way to get the client
+  if (sentryCarrier.acs) {
+    const acs = sentryCarrier.acs;
+    const scope = typeof acs.getCurrentScope === 'function' ? acs.getCurrentScope() : undefined;
+    if (typeof scope?.getClient === 'function') {
+      return scope.getClient();
+    }
+  }
+
+  // pre-v8 way to get the client
+  if (sentryCarrier.hub) {
+    const hub = sentryCarrier.hub;
+    if (typeof hub.getClient === 'function') {
+      return hub.getClient();
+    }
+  }
+
+  return undefined;
 }
