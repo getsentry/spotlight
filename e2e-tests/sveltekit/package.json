@@ -1,0 +1,48 @@
+{
+	"name": "@spotlightjs/e2e-tests-sveltekit",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test": "vitest",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write .",
+		"clean": "rimraf .svelte-kit",
+		"test:e2e:prepare": "playwright install --with-deps",
+		"test:e2e": "playwright test",
+		"test:e2e:ci": "pnpm test:e2e:prepare && pnpm test:e2e"
+	},
+	"dependencies": {
+		"@sentry/sveltekit": "8.7.0"
+	},
+	"devDependencies": {
+		"@fontsource/fira-mono": "^4.5.10",
+		"@neoconfetti/svelte": "^1.0.0",
+		"@spotlightjs/spotlight": "workspace:*",
+		"@sveltejs/adapter-auto": "^2.0.0",
+		"@sveltejs/kit": "^1.27.4",
+		"@types/cookie": "^0.5.1",
+		"@typescript-eslint/eslint-plugin": "^6.0.0",
+		"@typescript-eslint/parser": "^6.0.0",
+		"eslint": "^8.28.0",
+		"eslint-config-prettier": "^9.0.0",
+		"eslint-plugin-svelte": "^2.30.0",
+		"prettier": "^3.0.0",
+		"prettier-plugin-svelte": "^3.0.0",
+		"svelte": "^4.2.7",
+		"svelte-check": "^3.6.0",
+		"tslib": "^2.4.1",
+		"typescript": "^5.0.0",
+		"vite": "^4.5.2",
+		"vitest": "^0.34.0",
+		"@types/node": "20.10.4",
+		"@playwright/test": "^1.40.1"
+	},
+	"type": "module",
+	"volta": {
+		"extends": "../../package.json"
+	}
+}
