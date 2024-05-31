@@ -224,16 +224,7 @@ function getSentryClient(sentryCarrier: LegacyCarrier & VersionedCarrier): Clien
     }
   }
 
-  // 8.0.0-8.5.0 way to get the client
-  if (sentryCarrier.stack) {
-    const stack = sentryCarrier.stack;
-    const scope = typeof stack.getScope === 'function' ? stack.getScope() : undefined;
-    if (typeof scope?.getClient === 'function') {
-      return scope.getClient();
-    }
-  }
-
-  // pre-v8 way to get the client
+  // pre-8.6.0 (+v7) way to get the client
   if (sentryCarrier.hub) {
     const hub = sentryCarrier.hub;
     if (typeof hub.getClient === 'function') {
