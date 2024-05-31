@@ -96,17 +96,17 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
   } satisfies Integration<Envelope>;
 }
 
-type VersionedCarrier = { version: string } & Record<Exclude<string, 'version'>, { acs: V8AsyncContextStrategy }>;
+type VersionedCarrier = { version: string } & Record<Exclude<string, 'version'>, { stack: V8AsyncContextStrategy }>;
 
 type V8AsyncContextStrategy = {
-  getCurrentScope?: () => {
+  getScope?: () => {
     getClient?: () => Client | undefined;
   };
 };
 
 type LegacyCarrier = {
   /** 8.0.0-8.5.0 way if accessing client */
-  acs?: V8AsyncContextStrategy;
+  stack?: V8AsyncContextStrategy;
   /** pre-v8 way of accessing client (v7 and earlier) */
   hub?: {
     getClient?: () => Client | undefined;
@@ -217,16 +217,17 @@ function getSentryClient(sentryCarrier: LegacyCarrier & VersionedCarrier): Clien
   // 8.6.0+ way to get the client
   if (sentryCarrier.version) {
     const versionedCarrier = sentryCarrier[sentryCarrier.version];
-    const scope = versionedCarrier?.acs?.getCurrentScope?.();
+    const scope =
+      typeof versionedCarrier?.stack?.getScope === 'function' ? versionedCarrier?.stack?.getScope?.() : undefined;
     if (typeof scope?.getClient === 'function') {
       return scope.getClient();
     }
   }
 
   // 8.0.0-8.5.0 way to get the client
-  if (sentryCarrier.acs) {
-    const acs = sentryCarrier.acs;
-    const scope = typeof acs.getCurrentScope === 'function' ? acs.getCurrentScope() : undefined;
+  if (sentryCarrier.stack) {
+    const stack = sentryCarrier.stack;
+    const scope = typeof stack.getScope === 'function' ? stack.getScope() : undefined;
     if (typeof scope?.getClient === 'function') {
       return scope.getClient();
     }
