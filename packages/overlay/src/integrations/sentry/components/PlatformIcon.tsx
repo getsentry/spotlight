@@ -2,11 +2,13 @@ import { ReactComponent as AstroIcon } from 'platformicons/svg/astro.svg';
 import { ReactComponent as DefaultIcon } from 'platformicons/svg/default.svg';
 import { ReactComponent as DotNetIcon } from 'platformicons/svg/dotnet.svg';
 import { ReactComponent as JavaScriptIcon } from 'platformicons/svg/javascript.svg';
+import { ReactComponent as PhpLaravelIcon } from 'platformicons/svg/laravel.svg';
 import { ReactComponent as DotNetMauiIcon } from 'platformicons/svg/maui.svg';
 import { ReactComponent as NodeIcon } from 'platformicons/svg/nodejs.svg';
 import { ReactComponent as PhpIcon } from 'platformicons/svg/php.svg';
 import { ReactComponent as PythonIcon } from 'platformicons/svg/python.svg';
 import { ReactComponent as RubyIcon } from 'platformicons/svg/ruby.svg';
+import { ReactComponent as PhpSymfonyIcon } from 'platformicons/svg/symfony.svg';
 
 import { SentryEvent } from '../types';
 
@@ -44,6 +46,10 @@ export default function PlatformIcon({
       return <NodeIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
     case 'php':
       return <PhpIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
+    case 'php.laravel':
+      return <PhpLaravelIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
+    case 'php.symfony':
+      return <PhpSymfonyIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
     case 'dotnet':
     case 'csharp': // event.platform is 'csharp'
       return <DotNetIcon title={title} width={size ?? width} height={size ?? height} {...props} />;
