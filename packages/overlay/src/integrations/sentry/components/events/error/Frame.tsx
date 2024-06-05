@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { renderValue } from '~/utils/values';
 import classNames from '../../../../../lib/classNames';
 import { EventFrame, FrameVars } from '../../../types';
 
@@ -21,7 +22,7 @@ function ContextLocals({ vars }: { vars: FrameVars }) {
                 <div className="w-full truncate">{key}</div>
               </th>
               <td>
-                <pre className="whitespace-nowrap font-mono">{value}</pre>
+                <pre className="whitespace-nowrap font-mono">{renderValue(value)}</pre>
               </td>
             </tr>
           );

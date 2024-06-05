@@ -24,6 +24,7 @@ Spotlight.init({
   showTriggerButton: false,
   integrations: [Spotlight.sentry({ injectIntoSDK: false })],
   showClearEventsButton: false,
+  debug: true,
 });
 
 Spotlight.onSevereEvent(count => {

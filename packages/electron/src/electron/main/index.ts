@@ -133,7 +133,6 @@ const template = [
           try {
             win.webContents.executeJavaScript(`
             try{
-              const spotlightRoot = document.getElementById('sentry-spotlight-root');
               window?.__spotlight?.eventTarget.dispatchEvent(
                 new CustomEvent("clearEvents", {
                   detail: {},
@@ -156,7 +155,6 @@ const template = [
           try {
             win.webContents.executeJavaScript(`
             try{
-              const spotlightRoot = document.getElementById('sentry-spotlight-root');
               window?.__spotlight?.eventTarget.dispatchEvent(
                 new CustomEvent("clearEvents", {
                   detail: {},
@@ -268,12 +266,9 @@ store.onDidChange('sentry-send-envelopes', newValue => {
 
 const showErrorMessage = () => {
   if (win) {
-    win.webContents.executeJavaScript(`      
-      const spotlightRoot = document.getElementById('sentry-spotlight-root');
-      const errorScreen = document.getElementById('error-screen');
-      
-      if (spotlightRoot) spotlightRoot.style.display = 'none';
-      if (errorScreen) errorScreen.style.display = 'block';
+    win.webContents.executeJavaScript(`
+      document.getElementById('sentry-spotlight-root').style.display = 'none';
+      document.getElementById('error-screen').style.display = 'block';
     `);
   }
 };
