@@ -6,6 +6,7 @@ let releases = await response.json();
 
 let assets = [];
 let version = null;
+
 let releaseIndex = 0;
 
 while (assets.length === 0 && releaseIndex < releases.length) {
