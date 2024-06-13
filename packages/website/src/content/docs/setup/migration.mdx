@@ -5,10 +5,10 @@ description: A guide how to update and migrate to the latest version of Spotligh
 
 On this page, you'll learn how to update your Spotlight setup to the latest version.
 
-# Migrating from 1.x to 2.x
+## Migrating from 1.x to 2.x
 
 Version 2.x of Spotlight was introduced to establish compatibility with version 8 of [Sentry's JavaScript SDKs](https://docs.sentry.io/platforms/javascript/).
-Some of the breaking v8 SDK changes required changes in how Spotlight interacts with the SDK. 
+Some of the breaking v8 SDK changes required changes in how Spotlight interacts with the Sentry SDK. 
 
 Affected packages:
 - Spotlight Main Package (`@spotlightjs/spotlight`) 
@@ -16,16 +16,16 @@ Affected packages:
 - Spotlight Overlay (`@spotlightjs/overlay`)
 - Spotlight Electron App* (`@spotlightjs/electron`)
 
-## New minimum Sentry JavaScript SDK versions
+### New minimum Sentry JavaScript SDK versions
 
 Version 2.x of Spotlight is only compatible with versions `>=7.99.0` or `8.x` one of Sentry's JavaScript SDKs like (`@sentry/browser`, `@sentry/react` or `@sentry/nextjs`). 
 Older SDK versions are no longer supported in Spotlight 2.x. 
 
-## Changes for non-JavaScript SDK Users
+### Changes for non-JavaScript SDK Users
 
 If you're using Spotlight without a Sentry JavaScript SDK, for example for mobile (iOS/Android/ReactNative etc.) or server-side (Python/Ruby/etc.) applications, you update directly to version 2.x without any required changes.
 
-## Other Breaking Changes
+### Other Breaking Changes
 
 None! With the exception of ensuring you have the correct the Sentry JavaScript SDK version, there are no other breaking changes in Spotlight 2.x. 
 
