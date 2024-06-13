@@ -1,5 +1,39 @@
 # @spotlightjs/electron
 
+## 1.0.0
+
+### Major Changes
+
+- feat: Drop Support for JS SDK <7.99.0 and add support for JS SDK 8.x
+  ([`b7e5bb22a53bdb650136e01e6d0b57e4435dc279`](https://github.com/getsentry/spotlight/commit/b7e5bb22a53bdb650136e01e6d0b57e4435dc279))
+
+  The Spotlight UI (overlay) was updated to version 2 to ensure compatibility with version 8 of Sentry's JavaScript
+  SDKs.
+
+  Here's what you need to do to update to the new major version:
+
+  - If you're using a Sentry JavaScript SDK on your host app where the spotlight overlay is running, ensure that you use
+    version `8` or `>=7.99.0` of your `@sentry/<sdk>` SDK. Older v7 versions will not work correctly anymore.
+  - Good news: There are **no public API** changes! You don't need to make any changes to your code.
+
+### Minor Changes
+
+- feat: Support versioned Sentry carrier object introduced in 8.6.0+
+  ([`924fa828db2e2bc38045b2b3e6845819c37cf810`](https://github.com/getsentry/spotlight/commit/924fa828db2e2bc38045b2b3e6845819c37cf810))
+
+### Patch Changes
+
+- - fix(electron): Fixed error handling in electron app.
+    ([`076d953f86dd409f2a4b3d4aa07c6b1c2b6f58e5`](https://github.com/getsentry/spotlight/commit/076d953f86dd409f2a4b3d4aa07c6b1c2b6f58e5))
+  - fix(overlay): Fixed parsing of frame vars present in stacktrace in Error Events.
+- Updated dependencies
+  [[`b7e5bb22a53bdb650136e01e6d0b57e4435dc279`](https://github.com/getsentry/spotlight/commit/b7e5bb22a53bdb650136e01e6d0b57e4435dc279),
+  [`9f79f3b166220d8a485bda8999a4d2bf3805fedc`](https://github.com/getsentry/spotlight/commit/9f79f3b166220d8a485bda8999a4d2bf3805fedc),
+  [`924fa828db2e2bc38045b2b3e6845819c37cf810`](https://github.com/getsentry/spotlight/commit/924fa828db2e2bc38045b2b3e6845819c37cf810),
+  [`e80634f364f4145d51b6c6ab221b7e613123dd66`](https://github.com/getsentry/spotlight/commit/e80634f364f4145d51b6c6ab221b7e613123dd66),
+  [`076d953f86dd409f2a4b3d4aa07c6b1c2b6f58e5`](https://github.com/getsentry/spotlight/commit/076d953f86dd409f2a4b3d4aa07c6b1c2b6f58e5)]:
+  - @spotlightjs/overlay@2.0.0
+
 ## 1.0.0-alpha.2
 
 ### Minor Changes
