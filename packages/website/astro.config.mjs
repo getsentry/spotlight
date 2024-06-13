@@ -125,6 +125,10 @@ export default defineConfig({
               label: 'For Other Frameworks',
               link: '/setup/other/',
             },
+            {
+              label: 'Migration Guide',
+              link: '/setup/migration/',
+            },
           ],
         },
         {
