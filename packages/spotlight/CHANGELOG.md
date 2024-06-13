@@ -1,5 +1,51 @@
 # @spotlightjs/spotlight
 
+## 2.0.0-alpha.2
+
+### Minor Changes
+
+- feat: Support versioned Sentry carrier object introduced in 8.6.0+
+  ([#402](https://github.com/getsentry/spotlight/pull/402))
+
+### Patch Changes
+
+- Updated dependencies
+  [[`010162a4672cae3be20379730e18826627a6f01b`](https://github.com/getsentry/spotlight/commit/010162a4672cae3be20379730e18826627a6f01b)]:
+  - @spotlightjs/overlay@2.0.0-alpha.2
+
+## 2.0.0-alpha.1
+
+### Major Changes
+
+- feat: Drop Support for JS SDK <7.99.0 and add support for JS SDK 8.x
+  ([#386](https://github.com/getsentry/spotlight/pull/386))
+
+  The Spotlight UI (overlay) was updated to version 2 to ensure compatibility with version 8 of Sentry's JavaScript
+  SDKs.
+
+  Here's what you need to do to update to the new major version:
+
+  - If you're using a Sentry JavaScript SDK on your host app where the spotlight overlay is running, ensure that you use
+    version `8` or `>=7.99.0` of your `@sentry/<sdk>` SDK. Older v7 versions will not work correctly anymore.
+  - Good news: There are **no public API** changes! You don't need to make any changes to your code.
+
+### Patch Changes
+
+- Updated dependencies
+  [[`eee45321402b1652af64ae48377d7b703aa418ad`](https://github.com/getsentry/spotlight/commit/eee45321402b1652af64ae48377d7b703aa418ad)]:
+  - @spotlightjs/overlay@2.0.0-alpha.1
+
+## 2.0.0-alpha.0
+
+### Major Changes
+
+- feat: Make Spotlight compatible with Sentry SDKs v8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @spotlightjs/overlay@2.0.0-alpha.0
+
 ## 1.2.17
 
 ### Patch Changes
