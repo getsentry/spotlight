@@ -34,13 +34,13 @@ export default function SpanDetails({
   span,
   startTimestamp,
   totalDuration,
-  collapsible = false,
+  totalTransactions,
 }: {
   traceContext: TraceContext;
   span: Span;
+  totalTransactions?: number;
   startTimestamp: number;
   totalDuration: number;
-  collapsible?: boolean;
 }) {
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
 
@@ -213,7 +213,7 @@ export default function SpanDetails({
               tree={[span]}
               startTimestamp={startTimestamp}
               totalDuration={totalDuration}
-              collapsible={collapsible}
+              totalTransactions={totalTransactions}
               spanNodeWidth={spanNodeWidth}
               setSpanNodeWidth={setSpanNodeWidth}
             />

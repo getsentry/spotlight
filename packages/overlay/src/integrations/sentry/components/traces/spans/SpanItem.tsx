@@ -14,7 +14,7 @@ const SpanItem = ({
   totalDuration,
   depth = 1,
   traceContext,
-  collapsible = false,
+  totalTransactions = 0,
   spanNodeWidth,
   setSpanNodeWidth = () => {},
 }: {
@@ -23,13 +23,15 @@ const SpanItem = ({
   totalDuration: number;
   depth?: number;
   traceContext: TraceContext;
-  collapsible?: boolean;
+  totalTransactions?: number;
   spanNodeWidth: number;
   setSpanNodeWidth?: (val: number) => void;
 }) => {
   const { spanId } = useParams();
   const containerRef = useRef<HTMLLIElement>(null);
-  const [renderChildren, setRenderChildren] = useState(!collapsible || depth <= 5);
+  const [isItemCollapsed, setIsItemCollapsed] = useState(
+    (span.transaction && totalTransactions > 1 && depth !== 1) || depth >= 15,
+  );
   const [isResizing, setIsResizing] = useState(false);
 
   const spanDuration = getDuration(span.start_timestamp, span.timestamp);
@@ -64,19 +66,19 @@ const SpanItem = ({
             width: `${spanNodeWidth}%`,
           }}
         >
-          {collapsible && (span.children || []).length > 0 && (
+          {(span.children || []).length > 0 && (
             <div
               className="bg-primary-600 z-10 mr-1 flex items-center gap-1 rounded-lg px-1 text-xs font-bold text-white"
               onClick={e => {
                 e.preventDefault();
-                setRenderChildren(prev => !prev);
+                setIsItemCollapsed(prev => !prev);
               }}
             >
               {(span.children || []).length}
               <ChevronIcon
                 width={12}
                 height={12}
-                className={classNames('transition', renderChildren ? 'rotate-180' : 'rotate-0')}
+                className={classNames('transition', isItemCollapsed ? 'rotate-0' : 'rotate-180')}
               />
             </div>
           )}
@@ -112,14 +114,14 @@ const SpanItem = ({
         </div>
       </Link>
 
-      {renderChildren && (
+      {!isItemCollapsed && (
         <SpanTree
           traceContext={traceContext}
           tree={span.children || []}
           startTimestamp={startTimestamp}
           totalDuration={totalDuration}
           depth={depth + 1}
-          collapsible={collapsible}
+          totalTransactions={totalTransactions}
           spanNodeWidth={spanNodeWidth}
           setSpanNodeWidth={setSpanNodeWidth}
         />
