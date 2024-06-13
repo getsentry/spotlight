@@ -16,6 +16,8 @@
     version `8` or `>=7.99.0` of your `@sentry/<sdk>` SDK. Older v7 versions will not work correctly anymore.
   - Good news: There are **no public API** changes! You don't need to make any changes to your code.
 
+Head over to the [Spotlight Docs](https://spotlightjs.com/setup/migration/#updating-from-1x-to-2x) for more details!
+
 ### Minor Changes
 
 - feat: Support versioned Sentry carrier object introduced in 8.6.0+

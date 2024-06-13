@@ -2,6 +2,10 @@
 
 ## 1.0.0
 
+This Major version does not include any breaking changes the Electron app. It was only updated because it depends on `@spotlightjs/overlay`. You can simply update to the latest version!
+
+Head over to the [Spotlight Docs](https://spotlightjs.com/setup/migration/#updating-from-1x-to-2x) for more details!
+
 ### Major Changes
 
 - feat: Drop Support for JS SDK <7.99.0 and add support for JS SDK 8.x
