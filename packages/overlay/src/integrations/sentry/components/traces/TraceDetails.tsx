@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import dataCache from '../../data/sentryDataCache';
 import { getDuration } from '../../utils/duration';
 import DateTime from '../DateTime';
 import TraceIcon from './TraceIcon';
+import TraceInfo from './TraceInfo';
 import SpanDetails from './spans/SpanDetails';
 import SpanTree from './spans/SpanTree';
 
 export default function TraceDetails() {
   const { traceId, spanId } = useParams();
+  const { pathname } = useLocation();
+
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
 
   if (!traceId) {
@@ -28,7 +31,7 @@ export default function TraceDetails() {
     );
   }
   const span = spanId ? dataCache.getSpanById(trace.trace_id, spanId) : undefined;
-
+  const isTraceInfo = pathname === `/traces/${traceId}/info`;
   const startTimestamp = trace.start_timestamp;
   const totalDuration = trace.timestamp - startTimestamp;
 
@@ -38,7 +41,12 @@ export default function TraceDetails() {
         <TraceIcon trace={trace} />
         <h1 className="max-w-full flex-1 truncate text-2xl">{trace.rootTransactionName}</h1>
         <div className="text-primary-300 font-mono">
-          <div>T: {trace.trace_id}</div>
+          <div>
+            T:{' '}
+            <Link className="underline" to={`/traces/${trace.trace_id}/info`}>
+              {trace.trace_id}
+            </Link>
+          </div>
           <div>
             S:{' '}
             <Link to={`/traces/${trace.trace_id}/${trace.span_id}`} className="underline">
@@ -82,6 +90,8 @@ export default function TraceDetails() {
           totalTransactions={(trace.transactions || []).length}
         />
       ) : null}
+
+      {isTraceInfo && <TraceInfo traceContext={trace} />}
     </>
   );
 }

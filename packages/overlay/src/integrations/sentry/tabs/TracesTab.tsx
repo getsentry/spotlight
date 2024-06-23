@@ -8,6 +8,7 @@ export default function TracesTab() {
     <SentryEventsContextProvider>
       <Routes>
         <Route path="/:traceId/:spanId" element={<TraceDetails />} />
+        <Route path="/:traceId/info" element={<TraceDetails />} />
         <Route path="/:traceId" element={<TraceDetails />} />
         <Route path="/" element={<TraceList />} />
       </Routes>
