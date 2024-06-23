@@ -10,6 +10,7 @@ export default function SpanTree({
   totalTransactions,
   spanNodeWidth,
   setSpanNodeWidth,
+  query,
 }: {
   traceContext: TraceContext;
   tree: Span[];
@@ -19,6 +20,7 @@ export default function SpanTree({
   totalTransactions?: number;
   spanNodeWidth: number;
   setSpanNodeWidth?: (val: number) => void;
+  query?: string;
 }) {
   if (!tree || !tree.length) return null;
 
@@ -36,6 +38,7 @@ export default function SpanTree({
             totalDuration={totalDuration}
             spanNodeWidth={spanNodeWidth}
             setSpanNodeWidth={setSpanNodeWidth}
+            query={query}
           />
         );
       })}

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { FormEvent, MouseEvent, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { ReactComponent as CrossIcon } from '~/assets/cross.svg';
 import dataCache from '../../data/sentryDataCache';
+import useDebounce from '../../hooks/useDebounce';
 import { getDuration } from '../../utils/duration';
 import DateTime from '../DateTime';
 import TraceIcon from './TraceIcon';
@@ -10,6 +12,8 @@ import SpanTree from './spans/SpanTree';
 export default function TraceDetails() {
   const { traceId, spanId } = useParams();
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
+  const [query, setQuery] = useState<string>('');
+  const debouncedQuery = useDebounce(query, 200);
 
   if (!traceId) {
     return <p className="text-primary-300 p-6">Unknown trace id</p>;
@@ -31,6 +35,16 @@ export default function TraceDetails() {
 
   const startTimestamp = trace.start_timestamp;
   const totalDuration = trace.timestamp - startTimestamp;
+
+  function handleSearch(e: FormEvent<HTMLInputElement>) {
+    e.preventDefault();
+    setQuery(e.currentTarget.value);
+  }
+
+  function handleResetSearch(e: MouseEvent<SVGSVGElement>) {
+    e.preventDefault();
+    setQuery('');
+  }
 
   return (
     <>
@@ -62,6 +76,23 @@ export default function TraceDetails() {
           </span>
         </div>
       </div>
+      <div className="bg-primary-950 text-primary-50 border-primary-600 hover:border-primary-500 relative mx-6 mb-4 mt-2 flex h-auto w-auto gap-2 rounded-md border py-1 pl-4 pr-6 outline-none transition-all">
+        <input
+          type="text"
+          className="text-primary-50 h-auto w-full flex-1 bg-transparent outline-none transition-all"
+          onChange={handleSearch}
+          value={query}
+          placeholder="Search in Trace"
+        />
+        {query && query.length > 0 && (
+          <CrossIcon
+            onClick={handleResetSearch}
+            className="fill-primary-50 absolute right-1 top-[5px] cursor-pointer"
+            height={20}
+            width={20}
+          />
+        )}
+      </div>
       <div className="flex-1 px-2 pb-6">
         <SpanTree
           traceContext={trace}
@@ -71,6 +102,7 @@ export default function TraceDetails() {
           totalTransactions={(trace.transactions || []).length}
           spanNodeWidth={spanNodeWidth}
           setSpanNodeWidth={setSpanNodeWidth}
+          query={debouncedQuery}
         />
       </div>
       {span ? (
