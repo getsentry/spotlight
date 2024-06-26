@@ -17,10 +17,16 @@ Ensure the node and pnpm are available:
 volta install node pnpm
 ```
 
-Lastly, install the package requirements:
+Install the package requirements:
 
 ```shell
 pnpm install
+```
+
+And finally, run an initial build:
+
+```shell
+pnpm build
 ```
 
 ## Development
@@ -57,11 +63,11 @@ pnpm link --global @spotlightjs/spotlight
 
 ## Repository Structure
 
-The monorepo is mostly straight forward, but here's a quick summary: 
+The monorepo is mostly straight forward, but here's a quick summary:
 
 ```
 spotlight
-└── packages                
+└── packages
     ├── overlay      // @spotlightjs/overlay   - the main overlay
     ├── sidecar      // @spotlightjs/sidecar   - the sidecar (proxy) for streaming data
     ├── spotlight    // @spotlightjs/spotlight - the main spotlight package, combining overlay and sidecar
