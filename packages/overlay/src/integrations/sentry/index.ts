@@ -1,14 +1,17 @@
 import type { Envelope } from '@sentry/types';
 import { getSpotlightEventTarget } from '../../lib/eventTarget';
-import { log } from '../../lib/logger';
+import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
 import sentryDataCache from './data/sentryDataCache';
 import { Spotlight } from './sentry-integration';
 import DeveloperInfo from './tabs/DeveloperInfo';
 import ErrorsTab from './tabs/ErrorsTab';
+import InfoTab from './tabs/InfoTab';
 import PerformanceTab from './tabs/PerformanceTab';
 import SdksTab from './tabs/SdksTab';
 import TracesTab from './tabs/TracesTab';
+import { LegacyCarrier, WindowWithSentry } from './types';
+import { checkBrowserSDKVersion } from './utils/sdkValidation';
 
 const HEADER = 'application/x-sentry-envelope';
 
@@ -17,7 +20,7 @@ type SentryIntegrationOptions = {
   injectIntoSDK?: boolean;
 };
 
-export default function sentryIntegration(options?: SentryIntegrationOptions) {
+function _sentryIntegration(options?: SentryIntegrationOptions) {
   return {
     name: 'sentry',
     forwardedContentType: [HEADER],
@@ -96,19 +99,36 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
   } satisfies Integration<Envelope>;
 }
 
-type WindowWithSentry = Window & {
-  __SENTRY__?: {
-    hub: {
-      getClient: () =>
-        | {
-            setupIntegrations: (force: boolean) => void;
-            addIntegration(integration: Integration): void;
-            on: (event: string, callback: (envelope: Envelope) => void) => void;
-          }
-        | undefined;
-    };
-  };
-};
+function _fallbackSentryIntegration() {
+  return {
+    name: 'sentry',
+    forwardedContentType: [],
+    setup: () => {},
+    processEvent: () => undefined,
+    tabs: () => {
+      return [
+        {
+          id: 'info',
+          title: 'Info',
+          content: () =>
+            InfoTab({
+              info: 'This version of Spotlight supports Sentry browser SDK version less than 8.x.x. Check out Spotlight v2.x.x',
+            }),
+        },
+      ];
+    },
+    reset: () => {},
+  } satisfies Integration<Envelope>;
+}
+
+export default function sentryIntegration(options?: SentryIntegrationOptions) {
+  if (checkBrowserSDKVersion()) {
+    return _sentryIntegration(options);
+  } else {
+    warn(`This version of Spotlight supports Sentry browser SDK version less than 8.x.x. Check out Spotlight v2.x.x`);
+    return _fallbackSentryIntegration();
+  }
+}
 
 export function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
@@ -150,12 +170,14 @@ function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
   if (options?.injectIntoSDK === false) return;
   // A very hacky way to hook into Sentry's SDK
   // but we love hacks
-  const sentryHub = (window as WindowWithSentry).__SENTRY__?.hub;
-  const sentryClient = sentryHub?.getClient();
-  if (sentryClient) {
-    const spotlightIntegration = new Spotlight({
-      sidecarUrl: options?.sidecarUrl,
-    });
-    sentryClient.addIntegration(spotlightIntegration);
+  const sentryHub = ((window as WindowWithSentry).__SENTRY__ as LegacyCarrier)?.hub;
+  if (sentryHub) {
+    const sentryClient = sentryHub?.getClient();
+    if (sentryClient) {
+      const spotlightIntegration = new Spotlight({
+        sidecarUrl: options?.sidecarUrl,
+      });
+      sentryClient.addIntegration(spotlightIntegration);
+    }
   }
 }

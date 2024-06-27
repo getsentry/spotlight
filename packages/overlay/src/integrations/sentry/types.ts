@@ -1,4 +1,5 @@
-import { Measurements } from '@sentry/types';
+import { Client, Envelope, Measurements } from '@sentry/types';
+import { Integration } from '../integration';
 
 export type FrameVars = {
   [key: string]: string;
@@ -211,4 +212,38 @@ export type MetricWeightsProps = {
   cls: number;
   fid: number;
   ttfb: number;
+};
+
+type V8Carrier = {
+  stack: {
+    getScope?: () => {
+      getClient?: () => Client | undefined;
+    };
+  };
+};
+
+export type LegacyCarrier = {
+  /** pre-v8 way of accessing client (v7 and earlier) */
+  hub: {
+    getClient: () =>
+      | {
+          setupIntegrations: (force: boolean) => void;
+          addIntegration(integration: Integration): void;
+          on: (event: string, callback: (envelope: Envelope) => void) => void;
+          getOptions: () => {
+            _metadata: {
+              sdk: {
+                version: string;
+              };
+            };
+          };
+        }
+      | undefined;
+  };
+};
+
+export type VersionedCarrier = { version: string } & Record<Exclude<string, 'version'>, V8Carrier>;
+
+export type WindowWithSentry = Window & {
+  __SENTRY__?: LegacyCarrier | VersionedCarrier;
 };
