@@ -1,4 +1,4 @@
-import { FormEvent, MouseEvent, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as CrossIcon } from '~/assets/cross.svg';
 import dataCache from '../../data/sentryDataCache';
@@ -13,7 +13,11 @@ export default function TraceDetails() {
   const { traceId, spanId } = useParams();
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
   const [query, setQuery] = useState<string>('');
-  const debouncedQuery = useDebounce(query, 200);
+  const [debouncedQuery, setDebouncedQuery] = useState<string>('');
+
+  const debounceQuery = useDebounce(q => {
+    setDebouncedQuery(q);
+  }, 200);
 
   if (!traceId) {
     return <p className="text-primary-300 p-6">Unknown trace id</p>;
@@ -37,12 +41,11 @@ export default function TraceDetails() {
   const totalDuration = trace.timestamp - startTimestamp;
 
   function handleSearch(e: FormEvent<HTMLInputElement>) {
-    e.preventDefault();
     setQuery(e.currentTarget.value);
+    debounceQuery(e.currentTarget.value);
   }
 
-  function handleResetSearch(e: MouseEvent<SVGSVGElement>) {
-    e.preventDefault();
+  function handleResetSearch() {
     setQuery('');
   }
 
@@ -84,7 +87,7 @@ export default function TraceDetails() {
           value={query}
           placeholder="Search in Trace"
         />
-        {query && query.length > 0 && (
+        {query && (
           <CrossIcon
             onClick={handleResetSearch}
             className="fill-primary-50 absolute right-1 top-[5px] cursor-pointer"

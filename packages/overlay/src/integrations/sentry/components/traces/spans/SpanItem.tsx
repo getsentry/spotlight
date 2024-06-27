@@ -47,7 +47,7 @@ const SpanItem = ({
     }
   };
   const isQueried = query
-    ? span.op?.includes(query) || span.description?.includes(query) || span.span_id.includes(query)
+    ? span.span_id.includes(query) || span.op?.includes(query) || span.description?.includes(query)
     : false;
 
   return (

@@ -1,17 +1,27 @@
-import { useEffect, useState } from 'react';
+// Ref: https://stackoverflow.com/a/78529642/16866418
+import { useLayoutEffect, useMemo, useRef } from 'react';
 
-export default function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
+  const callbackRef = useRef(callback);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
+  useLayoutEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
 
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
+  let timer: number;
 
-  return debouncedValue;
+  const debounceFunction = (func: T, delayMs: number, ...args: Parameters<T>) => {
+    clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      func(...args);
+    }, delayMs);
+  };
+
+  return useMemo(
+    () =>
+      (...args: Parameters<T>) =>
+        debounceFunction(callbackRef.current, delay, ...args),
+    [delay],
+  );
 }
