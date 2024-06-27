@@ -17,7 +17,7 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
           <>
             {header.event_id && (
               <>
-                Event Id: <span className="text-primary-500">&mdash;</span> {header.event_id}
+                Event Id <span className="text-primary-500">&mdash;</span> {header.event_id}
               </>
             )}
           </>
