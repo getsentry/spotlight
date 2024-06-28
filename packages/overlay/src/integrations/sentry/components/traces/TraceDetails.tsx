@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ReactComponent as CrossIcon } from '~/assets/cross.svg';
+import { ReactComponent as CrossIcon } from '../../../../assets/cross.svg';
 import dataCache from '../../data/sentryDataCache';
 import useDebounce from '../../hooks/useDebounce';
 import { getDuration } from '../../utils/duration';
