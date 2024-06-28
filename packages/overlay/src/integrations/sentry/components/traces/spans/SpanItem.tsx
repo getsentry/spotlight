@@ -17,6 +17,7 @@ const SpanItem = ({
   totalTransactions = 0,
   spanNodeWidth,
   setSpanNodeWidth = () => {},
+  query,
 }: {
   span: Span;
   startTimestamp: number;
@@ -26,6 +27,7 @@ const SpanItem = ({
   totalTransactions?: number;
   spanNodeWidth: number;
   setSpanNodeWidth?: (val: number) => void;
+  query?: string;
 }) => {
   const { spanId } = useParams();
   const containerRef = useRef<HTMLLIElement>(null);
@@ -44,12 +46,16 @@ const SpanItem = ({
       setSpanNodeWidth(newLeftWidth);
     }
   };
+  const isQueried = query
+    ? span.span_id.includes(query) || span.op?.includes(query) || span.description?.includes(query)
+    : false;
 
   return (
     <li key={span.span_id} className="pl-4" ref={containerRef}>
       <Link
         className={classNames(
           'hover:bg-primary-900 group flex text-sm',
+          isQueried ? 'bg-primary-200 bg-opacity-20' : '',
           spanId === span.span_id ? 'bg-primary-900' : '',
         )}
         style={{
@@ -60,6 +66,7 @@ const SpanItem = ({
         <div
           className={classNames(
             'node  group-hover:bg-primary-900 bg-primary-950',
+            isQueried ? 'bg-transparent' : '',
             span.status && span.status !== 'ok' ? 'text-red-400' : '',
           )}
           style={{
@@ -94,7 +101,7 @@ const SpanItem = ({
           </span>
         </div>
         <div
-          className="waterfall"
+          className={classNames('waterfall', isQueried ? '!bg-transparent' : '')}
           style={{
             left: `${spanNodeWidth}%`,
           }}
@@ -124,6 +131,7 @@ const SpanItem = ({
           totalTransactions={totalTransactions}
           spanNodeWidth={spanNodeWidth}
           setSpanNodeWidth={setSpanNodeWidth}
+          query={query}
         />
       )}
     </li>
