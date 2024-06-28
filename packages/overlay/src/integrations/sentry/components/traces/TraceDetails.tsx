@@ -12,12 +12,8 @@ import SpanTree from './spans/SpanTree';
 export default function TraceDetails() {
   const { traceId, spanId } = useParams();
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
-  const [query, setQuery] = useState<string>('');
-  const [debouncedQuery, setDebouncedQuery] = useState<string>('');
-
-  const debounceQuery = useDebounce(q => {
-    setDebouncedQuery(q);
-  }, 200);
+  const [query, _setQuery] = useState<string>('');
+  const setQuery = useDebounce(_setQuery, 200);
 
   if (!traceId) {
     return <p className="text-primary-300 p-6">Unknown trace id</p>;
@@ -42,7 +38,6 @@ export default function TraceDetails() {
 
   function handleSearch(e: FormEvent<HTMLInputElement>) {
     setQuery(e.currentTarget.value);
-    debounceQuery(e.currentTarget.value);
   }
 
   function handleResetSearch() {
@@ -84,7 +79,6 @@ export default function TraceDetails() {
           type="text"
           className="text-primary-50 h-auto w-full flex-1 bg-transparent outline-none transition-all"
           onChange={handleSearch}
-          value={query}
           placeholder="Search in Trace"
         />
         {query && (
@@ -105,7 +99,7 @@ export default function TraceDetails() {
           totalTransactions={(trace.transactions || []).length}
           spanNodeWidth={spanNodeWidth}
           setSpanNodeWidth={setSpanNodeWidth}
-          query={debouncedQuery}
+          query={query}
         />
       </div>
       {span ? (
