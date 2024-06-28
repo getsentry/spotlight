@@ -5,7 +5,8 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 // because we cannot just use `useState` and debounce the setter.
 // If you do that, we end up having a new debounced function for
 // every render, defeating the entire purpose.
-export default function useDebounce<T extends (...args: unknown[]) => void>(callback: T, delay: number) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
   const callbackRef = useRef(callback);
 
   useLayoutEffect(() => {

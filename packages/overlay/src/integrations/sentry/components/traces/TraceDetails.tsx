@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { ReactComponent as CrossIcon } from '../../../../assets/cross.svg';
 import dataCache from '../../data/sentryDataCache';
