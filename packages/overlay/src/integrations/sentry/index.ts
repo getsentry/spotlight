@@ -15,6 +15,7 @@ const HEADER = 'application/x-sentry-envelope';
 type SentryIntegrationOptions = {
   sidecarUrl?: string;
   injectIntoSDK?: boolean;
+  showRecentError?: boolean;
 };
 
 export default function sentryIntegration(options?: SentryIntegrationOptions) {
@@ -44,13 +45,25 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
     processEvent: (event: RawEventContext) => processEnvelope(event),
 
     tabs: () => {
-      const errorsCount = sentryDataCache
+      const errors = sentryDataCache
         .getEvents()
         .filter(
           e =>
             e.type != 'transaction' &&
             (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
-        ).length;
+        );
+
+      const errorsCount = errors.length;
+      if (options?.showRecentError && errorsCount) {
+        getSpotlightEventTarget().dispatchEvent(
+          new CustomEvent('sentry:showError', {
+            detail: {
+              eventId: errors[errorsCount - 1].event_id,
+            },
+          }),
+        );
+        options.showRecentError = false;
+      }
 
       const localTraces = sentryDataCache.getTraces().filter(t => sentryDataCache.isTraceLocal(t.trace_id) !== false);
 
