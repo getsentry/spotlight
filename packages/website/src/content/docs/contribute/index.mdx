@@ -17,6 +17,13 @@ Ensure the node and pnpm are available:
 volta install node pnpm
 ```
 
+Make sure you [enable `pnpm` support for `Volta`](https://docs.volta.sh/advanced/pnpm):
+
+```shell
+# Add this to your profile file or startup script
+VOLTA_FEATURE_PNPM=1
+```
+
 Install the package requirements:
 
 ```shell
