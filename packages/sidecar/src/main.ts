@@ -77,6 +77,9 @@ function handleStreamRequest(
         Connection: 'keep-alive',
       });
       res.flushHeaders();
+      // Send something in the body to trigger the `open` event
+      // This is mostly for Firefox -- see #376
+      res.write('\n');
 
       const sub = buffer.subscribe(([payloadType, data]) => {
         logger.debug(`🕊️ sending to Spotlight`);
