@@ -3,9 +3,11 @@ import { Suspense, lazy } from 'react';
 import { RawEventContext } from '~/integrations/integration';
 const LazyReactJson = lazy(() => import('react-json-view'));
 
+const emptyFunc = () => {};
+
 export default function JsonViewer({
   data,
-  onUpdateData = () => {},
+  onUpdateData = emptyFunc,
   editingEnabled = false,
   clipboardEnabled = false,
   displayDataTypes = false,
