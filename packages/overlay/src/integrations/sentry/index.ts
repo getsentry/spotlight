@@ -29,7 +29,6 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
 
       if (options?.openLastError) {
         const unsubscribe = sentryDataCache.subscribe('event', (e: SentryEvent) => {
-          console.log(e);
           if (!(e as SentryErrorEvent).exception) return;
           setTimeout(() => open(`/errors/${e.event_id}`), 0);
           unsubscribe();
