@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'development') {
     if (client && client.on) {
       client.on('beforeSendEvent', event => {
         if (event.exception && event.exception.values && event.exception.values[0].mechanism?.handled === false) {
-          Spotlight.trigger('sentry:showError', { eventId: event.event_id, event });
+          Spotlight.trigger('sentry:showError', { event });
         }
       });
     }

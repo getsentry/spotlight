@@ -7,6 +7,7 @@ export type ClientInitOptions = {
   showTriggerButton?: boolean;
   integrationNames?: SupportedIntegrations[];
   injectImmediately?: boolean;
+  fullPage?: boolean;
 } & SpotlightAstroIntegrationOptions;
 
 const buildClientImport = (importPath: string) => `import * as Spotlight from ${JSON.stringify(importPath)};`;
@@ -17,9 +18,10 @@ const buildClientInit = (options: ClientInitOptions) => {
     injectImmediately: options.injectImmediately,
     debug: options.debug,
     sidecarUrl: options.sidecarUrl,
+    fullPage: options.fullPage,
   });
 
-  const integrationOptions = JSON.stringify({ sidecarUrl: options.sidecarUrl });
+  const integrationOptions = JSON.stringify({ sidecarUrl: options.sidecarUrl, openLastError: options.fullPage });
   const integrations = (options.integrationNames || ['sentry']).map(i => `Spotlight.${i}(${integrationOptions})`);
   initOptions = `{integrations: [${integrations.join(', ')}], ${initOptions.slice(1)}`;
 

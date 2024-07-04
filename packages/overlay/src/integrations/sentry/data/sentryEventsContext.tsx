@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import React, { useEffect, useReducer } from 'react';
-import { SentryEvent } from '../types';
+import type { SentryEvent } from '../types';
 import sentryDataCache from './sentryDataCache';
 
 interface SetEventsAction {
