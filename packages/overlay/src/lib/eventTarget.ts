@@ -31,3 +31,27 @@ export function getSpotlightEventTarget(): EventTarget {
 
   return windowWithSpotlight.__spotlight.eventTarget;
 }
+
+/**
+ * Trigger an event in Spotlight.
+ *
+ * This is primarily useful for handling an uncaught error/crash, and forcing the debugger
+ * to render vs a native error handler.
+ *
+ * e.g. trigger("sentry.showError", {eventId});
+ */
+export async function trigger(eventName: string, payload?: unknown) {
+  getSpotlightEventTarget().dispatchEvent(
+    new CustomEvent(eventName, {
+      detail: payload || {},
+    }),
+  );
+}
+
+export async function on(eventName: string, cb: EventListener) {
+  getSpotlightEventTarget().addEventListener(eventName, cb);
+}
+
+export async function off(eventName: string, cb: EventListener) {
+  getSpotlightEventTarget().removeEventListener(eventName, cb);
+}
