@@ -40,6 +40,9 @@
     "typescript": "^5.0.2",
     "vite": "^4.5.3"
   },
+  "optionalDependencies": {
+    "@sentry/node": "^8.14.0"
+  },
   "volta": {
     "extends": "../../package.json"
   }
