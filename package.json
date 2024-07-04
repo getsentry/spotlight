@@ -5,6 +5,7 @@
     "dev:overlay": "pnpm --filter overlay dev",
     "dev:website": "pnpm --filter website dev",
     "dev:playground": "pnpm --filter astro-playground dev",
+    "dev:electron": "pnpm --filter electron dev",
     "build": "pnpm --filter=!astro-playground -r run build",
     "preview": "pnpm -r run preview",
     "lint": "eslint . --cache --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -24,7 +25,7 @@
     "clean:all": "pnpm run clean && pnpm run clean:deps && pnpm install"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.26.2",
+    "@changesets/cli": "^2.27.1",
     "@svitejs/changesets-changelog-github-compact": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
@@ -55,5 +56,10 @@
   "volta": {
     "node": "20.10.0",
     "pnpm": "8.6.0"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@changesets/assemble-release-plan@6.0.0": "patches/@changesets__assemble-release-plan@6.0.0.patch"
+    }
   }
 }

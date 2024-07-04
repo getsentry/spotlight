@@ -1,3 +1,4 @@
+import { ReactComponent as DeleteIcon } from '~/assets/deleteIcon.svg';
 import { ReactComponent as Logo } from '~/assets/glyph.svg';
 import { Integration, IntegrationData } from '~/integrations/integration';
 import { getSpotlightEventTarget } from '~/lib/eventTarget';
@@ -63,10 +64,10 @@ export default function Debugger({
             </div>
             <div className="text-primary-300 flex items-center gap-x-1 text-sm">
               <span>by</span>
-              <a href="https://sentry.io" target="_blank" className="font-semibold hover:underline">
+              <a rel="noopener" href="https://sentry.io" target="_blank" className="font-semibold hover:underline">
                 Sentry
               </a>
-              <a href="https://github.com/getsentry/spotlight" target="_blank" rel="me" className="sl-flex ml-2">
+              <a href="https://github.com/getsentry/spotlight" target="_blank" rel="noopener" className="sl-flex ml-2">
                 <span className="sr-only">GitHub</span>
                 <svg
                   aria-hidden="true"
@@ -94,7 +95,7 @@ export default function Debugger({
           </h1>
           {showClearEventsButton && (
             <button
-              className="bg-primary-950 text-primary-300 border-primary-300 hover:bg-primary-900 hover:border-primary-900 mr-1 rounded-md border px-2 py-1 hover:transition-colors"
+              className="bg-primary-900 text-primary-300 hover:bg-primary-800 mr-1 flex items-center gap-1 rounded-md px-2 py-1 hover:transition-colors"
               onClick={() => {
                 getSpotlightEventTarget().dispatchEvent(
                   new CustomEvent('clearEvents', {
@@ -103,12 +104,13 @@ export default function Debugger({
                 );
               }}
             >
-              Clear Events
+              <DeleteIcon width={18} height={18} className="fill-red-400 stroke-red-400" />
+              <span className="leading-8">Clear Events</span>
             </button>
           )}
           {!fullPage && (
             <button
-              className="hover:bg-primary-900 -my-1 -mr-3 cursor-pointer rounded px-3 py-1 font-mono text-2xl"
+              className="hover:bg-primary-800 -my-1 -mr-3 cursor-pointer rounded px-3 py-1 font-mono text-2xl"
               onClick={() => {
                 setOpen(false);
               }}

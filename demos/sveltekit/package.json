@@ -13,7 +13,7 @@
 		"clean": "rimraf .svelte-kit"
 	},
 	"dependencies": {
-		"@sentry/sveltekit": "^7.85.0",
+		"@sentry/sveltekit": "7.99.0",
 		"@spotlightjs/spotlight": "workspace:*"
 	},
 	"devDependencies": {
@@ -33,7 +33,7 @@
 		"svelte-check": "^3.6.0",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
-		"vite": "^4.5.2",
+		"vite": "^4.5.3",
 		"vitest": "^0.34.0"
 	},
 	"type": "module",

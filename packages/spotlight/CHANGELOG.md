@@ -1,5 +1,119 @@
 # @spotlightjs/spotlight
 
+## 2.0.0
+
+### Major Changes
+
+- feat: Drop Support for JS SDK <7.99.0 and add support for JS SDK 8.x
+  ([`b7e5bb22a53bdb650136e01e6d0b57e4435dc279`](https://github.com/getsentry/spotlight/commit/b7e5bb22a53bdb650136e01e6d0b57e4435dc279))
+
+  The Spotlight UI (overlay) was updated to version 2 to ensure compatibility with version 8 of Sentry's JavaScript
+  SDKs.
+
+  Here's what you need to do to update to the new major version:
+
+  - If you're using a Sentry JavaScript SDK on your host app where the spotlight overlay is running, ensure that you use
+    version `8` or `>=7.99.0` of your `@sentry/<sdk>` SDK. Older v7 versions will not work correctly anymore.
+  - Good news: There are **no public API** changes! You don't need to make any changes to your code.
+
+Head over to the [Spotlight Docs](https://spotlightjs.com/setup/migration/#updating-from-1x-to-2x) for more details!
+
+### Minor Changes
+
+- feat: Support versioned Sentry carrier object introduced in 8.6.0+
+  ([`924fa828db2e2bc38045b2b3e6845819c37cf810`](https://github.com/getsentry/spotlight/commit/924fa828db2e2bc38045b2b3e6845819c37cf810))
+
+### Patch Changes
+
+- Updated dependencies
+  [[`b7e5bb22a53bdb650136e01e6d0b57e4435dc279`](https://github.com/getsentry/spotlight/commit/b7e5bb22a53bdb650136e01e6d0b57e4435dc279),
+  [`9f79f3b166220d8a485bda8999a4d2bf3805fedc`](https://github.com/getsentry/spotlight/commit/9f79f3b166220d8a485bda8999a4d2bf3805fedc),
+  [`924fa828db2e2bc38045b2b3e6845819c37cf810`](https://github.com/getsentry/spotlight/commit/924fa828db2e2bc38045b2b3e6845819c37cf810),
+  [`e80634f364f4145d51b6c6ab221b7e613123dd66`](https://github.com/getsentry/spotlight/commit/e80634f364f4145d51b6c6ab221b7e613123dd66),
+  [`076d953f86dd409f2a4b3d4aa07c6b1c2b6f58e5`](https://github.com/getsentry/spotlight/commit/076d953f86dd409f2a4b3d4aa07c6b1c2b6f58e5)]:
+  - @spotlightjs/overlay@2.0.0
+
+## 2.0.0-alpha.2
+
+### Minor Changes
+
+- feat: Support versioned Sentry carrier object introduced in 8.6.0+
+  ([#402](https://github.com/getsentry/spotlight/pull/402))
+
+### Patch Changes
+
+- Updated dependencies
+  [[`010162a4672cae3be20379730e18826627a6f01b`](https://github.com/getsentry/spotlight/commit/010162a4672cae3be20379730e18826627a6f01b)]:
+  - @spotlightjs/overlay@2.0.0-alpha.2
+
+## 2.0.0-alpha.1
+
+### Major Changes
+
+- feat: Drop Support for JS SDK <7.99.0 and add support for JS SDK 8.x
+  ([#386](https://github.com/getsentry/spotlight/pull/386))
+
+  The Spotlight UI (overlay) was updated to version 2 to ensure compatibility with version 8 of Sentry's JavaScript
+  SDKs.
+
+  Here's what you need to do to update to the new major version:
+
+  - If you're using a Sentry JavaScript SDK on your host app where the spotlight overlay is running, ensure that you use
+    version `8` or `>=7.99.0` of your `@sentry/<sdk>` SDK. Older v7 versions will not work correctly anymore.
+  - Good news: There are **no public API** changes! You don't need to make any changes to your code.
+
+### Patch Changes
+
+- Updated dependencies
+  [[`eee45321402b1652af64ae48377d7b703aa418ad`](https://github.com/getsentry/spotlight/commit/eee45321402b1652af64ae48377d7b703aa418ad)]:
+  - @spotlightjs/overlay@2.0.0-alpha.1
+
+## 2.0.0-alpha.0
+
+### Major Changes
+
+- feat: Make Spotlight compatible with Sentry SDKs v8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @spotlightjs/overlay@2.0.0-alpha.0
+
+## 1.2.17
+
+### Patch Changes
+
+- Updated dependencies
+  [[`4a8c36a`](https://github.com/getsentry/spotlight/commit/4a8c36a435c3af9ac820be7ee1a6e1d94c377f8e),
+  [`2e0b536`](https://github.com/getsentry/spotlight/commit/2e0b536b0b0ce3a5b92023f2c9c973bd819dd263)]:
+  - @spotlightjs/overlay@1.8.3
+
+## 1.2.16
+
+### Patch Changes
+
+- Updated dependencies
+  [[`1ee2c98`](https://github.com/getsentry/spotlight/commit/1ee2c98a70569d16ab98feef2caddc18e578a114)]:
+  - @spotlightjs/overlay@1.8.2
+
+## 1.2.15
+
+### Patch Changes
+
+- Updated dependencies
+  [[`0d5d677`](https://github.com/getsentry/spotlight/commit/0d5d677a78fecd7f5027792d211b0c18f906b8e1)]:
+  - @spotlightjs/overlay@1.8.1
+
+## 1.2.14
+
+### Patch Changes
+
+- Updated dependencies
+  [[`dc7b649`](https://github.com/getsentry/spotlight/commit/dc7b649a40d22066799ef7df389aa1feb1e61d78),
+  [`70608a5`](https://github.com/getsentry/spotlight/commit/70608a5865ce4421dbe83a78f719890d64fd8e21),
+  [`28a09e9`](https://github.com/getsentry/spotlight/commit/28a09e92a53757cf96c2297b926217659cb94788)]:
+  - @spotlightjs/overlay@1.8.0
+
 ## 1.2.13
 
 ### Patch Changes

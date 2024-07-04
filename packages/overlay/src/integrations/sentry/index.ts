@@ -1,9 +1,10 @@
-import type { Envelope } from '@sentry/types';
+import type { Client, Envelope } from '@sentry/types';
 import { getSpotlightEventTarget } from '../../lib/eventTarget';
-import { log } from '../../lib/logger';
+import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
 import sentryDataCache from './data/sentryDataCache';
-import { Spotlight } from './sentry-integration';
+import { spotlightIntegration } from './sentry-integration';
+import DeveloperInfo from './tabs/DeveloperInfo';
 import ErrorsTab from './tabs/ErrorsTab';
 import PerformanceTab from './tabs/PerformanceTab';
 import SdksTab from './tabs/SdksTab';
@@ -94,6 +95,11 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
           title: 'SDKs',
           content: SdksTab,
         },
+        {
+          id: 'devInfo',
+          title: 'Developer Info',
+          content: DeveloperInfo,
+        },
       ];
     },
 
@@ -103,21 +109,8 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
   } satisfies Integration<Envelope>;
 }
 
-type WindowWithSentry = Window & {
-  __SENTRY__?: {
-    hub: {
-      getClient: () =>
-        | {
-            setupIntegrations: (force: boolean) => void;
-            addIntegration(integration: Integration): void;
-            on: (event: string, callback: (envelope: Envelope) => void) => void;
-          }
-        | undefined;
-    };
-  };
-};
-
-export function processEnvelope({ data }: RawEventContext) {
+export function processEnvelope(rawEvent: RawEventContext) {
+  const { data } = rawEvent;
   const [rawHeader, ...rawEntries] = data.split(/\n/gm);
 
   const header = JSON.parse(rawHeader) as Envelope[0];
@@ -128,36 +121,129 @@ export function processEnvelope({ data }: RawEventContext) {
       continue;
     }
     const header = JSON.parse(rawEntries[i]);
-    if (header.type && header.type == 'statsd') {
-      // skip metric events
-      continue;
+    let payload;
+    try {
+      payload = JSON.parse(rawEntries[i + 1]);
+    } catch (e) {
+      // payload will not be json always, like in metrics events.
+      log(e);
+      payload = rawEntries[i + 1];
     }
-    const payload = JSON.parse(rawEntries[i + 1]);
     // data sanitization
-    if (header.type) {
+    if (header.type && typeof payload === 'object') {
       payload.type = header.type;
     }
     items.push([header, payload]);
   }
 
   const envelope = [header, items] as Envelope;
-  sentryDataCache.pushEnvelope(envelope);
+  sentryDataCache.pushEnvelope({ envelope, rawEnvelope: rawEvent });
 
   return {
     event: envelope,
+    rawEvent: rawEvent,
   };
 }
 
+type V8Carrier = {
+  stack: {
+    getScope?: () => {
+      getClient?: () => Client | undefined;
+    };
+  };
+};
+
+type LegacyCarrier = {
+  /** pre-v8 way of accessing client (v7 and earlier) */
+  hub?: {
+    getClient?: () => Client | undefined;
+  };
+};
+
+type VersionedCarrier = { version: string } & Record<Exclude<string, 'version'>, V8Carrier>;
+
+type WindowWithSentry = Window & {
+  __SENTRY__?: LegacyCarrier & VersionedCarrier;
+};
+
+/**
+ * Takes care of injecting spotlight-specific behavior into the Sentry SDK by
+ * accessing the global __SENTRY__ carrier object.
+ *
+ * This is admittedly extremely hacky but it's the only way to hook into the SDK
+ * without requiring users to manually register a spotlight integration or unnecessarily
+ * increasing production build bundle size.
+ *
+ * Specifically, we:
+ * - Enable SDK integrations if the SDK is configured without a DSN or disabled. This way, we
+ *   can still capture events _only_ for spotlight
+ * - Add a spotlight Sentry integration to the SDK that forwards events to the
+ *   the spotlight sidecar ({@link spotlightIntegration})
+ *
+ * @param options options of the Sentry integration for Spotlight
+ */
 function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
-  if (options?.injectIntoSDK === false) return;
-  // A very hacky way to hook into Sentry's SDK
-  // but we love hacks
-  const sentryHub = (window as WindowWithSentry).__SENTRY__?.hub;
-  const sentryClient = sentryHub?.getClient();
-  if (sentryClient) {
-    const spotlightIntegration = new Spotlight({
+  if (options?.injectIntoSDK === false) {
+    return;
+  }
+
+  const sentryCarrier = (window as WindowWithSentry).__SENTRY__;
+  const sentryClient = sentryCarrier && getSentryClient(sentryCarrier);
+
+  if (!sentryClient) {
+    log("Couldn't find a Sentry SDK client. Make sure you're using a Sentry SDK with version >=7.99.0 or 8.x");
+    return;
+  }
+
+  if (!sentryClient.getDsn()) {
+    log("Sentry SDK doesn't have a valid DSN. Enabling SDK integrations for just Spotlight.");
+    try {
+      const sentryIntegrations = sentryClient.getOptions().integrations;
+      for (const i of sentryIntegrations) {
+        sentryClient.addIntegration(i);
+      }
+    } catch (e) {
+      warn('Failed to enable all SDK integrations for Spotlight', e);
+      log('Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose');
+    }
+  }
+
+  try {
+    const integration = spotlightIntegration({
       sidecarUrl: options?.sidecarUrl,
     });
-    sentryClient.addIntegration(spotlightIntegration);
+    sentryClient.addIntegration(integration);
+  } catch (e) {
+    warn('Failed to add Spotlight integration to Sentry', e);
+    log('Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose');
   }
+
+  log('Added Spotlight integration to Sentry SDK');
+}
+
+/**
+ * Accesses the `window.__SENTRY__` carrier object and tries to get the Sentry client
+ * from it. This function supports all carrier object structures from v7 to all versions
+ * of v8.
+ */
+function getSentryClient(sentryCarrier: LegacyCarrier & VersionedCarrier): Client | undefined {
+  // 8.6.0+ way to get the client
+  if (sentryCarrier.version) {
+    const versionedCarrier = sentryCarrier[sentryCarrier.version];
+    const scope =
+      typeof versionedCarrier?.stack?.getScope === 'function' ? versionedCarrier?.stack?.getScope?.() : undefined;
+    if (typeof scope?.getClient === 'function') {
+      return scope.getClient();
+    }
+  }
+
+  // pre-8.6.0 (+v7) way to get the client
+  if (sentryCarrier.hub) {
+    const hub = sentryCarrier.hub;
+    if (typeof hub.getClient === 'function') {
+      return hub.getClient();
+    }
+  }
+
+  return undefined;
 }

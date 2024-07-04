@@ -1,5 +1,110 @@
 # @spotlightjs/core
 
+## 2.0.0
+
+### Major Changes
+
+- feat: Drop Support for JS SDK <7.99.0 and add support for JS SDK 8.x
+  ([`b7e5bb22a53bdb650136e01e6d0b57e4435dc279`](https://github.com/getsentry/spotlight/commit/b7e5bb22a53bdb650136e01e6d0b57e4435dc279))
+
+  The Spotlight UI (overlay) was updated to version 2 to ensure compatibility with version 8 of Sentry's JavaScript
+  SDKs.
+
+  Here's what you need to do to update to the new major version:
+
+  - If you're using a Sentry JavaScript SDK on your host app where the spotlight overlay is running, ensure that you use
+    version `8` or `>=7.99.0` of your `@sentry/<sdk>` SDK. Older v7 versions will not work correctly anymore.
+  - Good news: There are **no public API** changes! You don't need to make any changes to your code.
+
+Head over to the [Spotlight Docs](https://spotlightjs.com/setup/migration/#updating-from-1x-to-2x) for more details!
+
+### Minor Changes
+
+- Add Laravel and Symfony platform icons ([#396](https://github.com/getsentry/spotlight/pull/396))
+
+- feat: Support versioned Sentry carrier object introduced in 8.6.0+
+  ([`924fa828db2e2bc38045b2b3e6845819c37cf810`](https://github.com/getsentry/spotlight/commit/924fa828db2e2bc38045b2b3e6845819c37cf810))
+
+### Patch Changes
+
+- Fixed collapsing of spans in trace detail
+  ([`e80634f364f4145d51b6c6ab221b7e613123dd66`](https://github.com/getsentry/spotlight/commit/e80634f364f4145d51b6c6ab221b7e613123dd66))
+
+- - fix(electron): Fixed error handling in electron app.
+    ([`076d953f86dd409f2a4b3d4aa07c6b1c2b6f58e5`](https://github.com/getsentry/spotlight/commit/076d953f86dd409f2a4b3d4aa07c6b1c2b6f58e5))
+  - fix(overlay): Fixed parsing of frame vars present in stacktrace in Error Events.
+
+## 2.0.0-alpha.2
+
+### Minor Changes
+
+- feat: Support versioned Sentry carrier object introduced in 8.6.0+
+  ([#402](https://github.com/getsentry/spotlight/pull/402))
+
+## 2.0.0-alpha.1
+
+### Major Changes
+
+- feat: Drop Support for JS SDK <7.99.0 and add support for JS SDK 8.x
+  ([#386](https://github.com/getsentry/spotlight/pull/386))
+
+  The Spotlight UI (overlay) was updated to version 2 to ensure compatibility with version 8 of Sentry's JavaScript
+  SDKs.
+
+  Here's what you need to do to update to the new major version:
+
+  - If you're using a Sentry JavaScript SDK on your host app where the spotlight overlay is running, ensure that you use
+    version `8` or `>=7.99.0` of your `@sentry/<sdk>` SDK. Older v7 versions will not work correctly anymore.
+  - Good news: There are **no public API** changes! You don't need to make any changes to your code.
+
+## 2.0.0-alpha.0
+
+### Major Changes
+
+- feat: Make Spotlight compatible with Sentry SDKs v8
+
+## 1.8.3
+
+### Patch Changes
+
+- - To add tags from event instead of event context for root spans
+    ([#389](https://github.com/getsentry/spotlight/pull/389))
+
+- - To display metrics event as well in event envelopes ([#393](https://github.com/getsentry/spotlight/pull/393))
+
+## 1.8.2
+
+### Patch Changes
+
+- - Moved all ui components to UI folder for better strucutre of files.
+    ([#384](https://github.com/getsentry/spotlight/pull/384))
+  - Updated Trace platform icon to contain all platforms #140
+
+## 1.8.1
+
+### Patch Changes
+
+- - Fixed the scneario when trace_id is not present in envelope ex: metrics event.
+    ([#381](https://github.com/getsentry/spotlight/pull/381))
+  - Added event type and fixed formatting of envelope info.
+
+## 1.8.0
+
+### Minor Changes
+
+- Added Developer Info tab to check the envelopes recived from Sentry
+  ([#378](https://github.com/getsentry/spotlight/pull/378))
+
+### Patch Changes
+
+- - Fixed the empty trace scenario on trace detail page when clear events button is clicked.
+    ([#366](https://github.com/getsentry/spotlight/pull/366))
+  - fixed some semantics and empty state labels
+
+- - Added Span Resizer in traces, which will allow user to resize the span name and waterfall.
+    ([#373](https://github.com/getsentry/spotlight/pull/373))
+  - Added icon for clear events button.
+
 ## 1.7.0
 
 ### Minor Changes

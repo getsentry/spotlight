@@ -26,6 +26,7 @@ export default defineConfig({
   integrations: [
     sentry({
       clientInitPath: 'sentry.client.config.mjs',
+      debug: process.env.NODE_ENV === 'development',
       sourceMapsUploadOptions: {
         project: 'spotlight-website',
         authToken: process.env.SENTRY_AUTH_TOKEN,
@@ -123,6 +124,10 @@ export default defineConfig({
             {
               label: 'For Other Frameworks',
               link: '/setup/other/',
+            },
+            {
+              label: 'Migration Guide',
+              link: '/setup/migration/',
             },
           ],
         },

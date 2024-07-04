@@ -76,11 +76,11 @@ ul.tree li:last-child:before {
 }
 
 .tree .node {
-  @apply flex w-[65%] items-center gap-x-1 overflow-auto py-1 pl-1;
+  @apply flex items-center gap-x-1 overflow-auto py-1 pl-1;
 }
 
 .tree .waterfall {
-  @apply border-l-primary-800 bg-primary-950 absolute left-[45%] right-0 h-7 border-l py-1 pl-1;
+  @apply border-l-primary-800 bg-primary-950 absolute right-0 h-7 border-l-2 py-1 pl-1;
 }
 
 .table-values {
@@ -101,4 +101,18 @@ ul.tree li:last-child:before {
 
 .hydration-error-wrapper td[class^='react-diff'][class$='title-block'] {
   @apply !bg-primary-900;
+}
+
+.react-json-view {
+  @apply !bg-primary-900 rounded-sm !bg-opacity-50 p-2;
+}
+
+.react-json-view .string-value {
+  word-break: break-word;
+}
+input:checked {
+  @apply bg-primary-900;
+}
+input:checked ~ .dot {
+  @apply bg-primary-800 translate-x-full;
 }

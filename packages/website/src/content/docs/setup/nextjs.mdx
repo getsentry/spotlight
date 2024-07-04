@@ -7,20 +7,13 @@ import { Content as InstallCommand } from "../../../components/InstallCommand.md
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-## Prerequisites
+By Adding Spotlight to your Next.js application, you can get deep insights into errors and performance issues across your entire application.
 
-Before integrating Spotlight with Next.js, make sure you have the following prerequisites:
-
-1. **Next.js Project**: Ensure you have a Next.js project set up. If you don't have one, you can create a new Next.js project by following the <a href="https://nextjs.org/docs/getting-started/installation" target="_blank">official documentation</a>.
-
-2. **Sentry Integration**: Sentry should already be integrated into your Next.js project. If you haven't set up Sentry, follow the <a href="https://docs.sentry.io/platforms/javascript/guides/nextjs/" target="_blank">official documentation</a>.
-
-
-## Installation
+## 1. Installation
 
 <InstallCommand />
 
-## Configuration
+## 2. Configuration
 
 :::caution
   Requires `@sentry/nextjs` version `7.82.0` or higher.
@@ -80,14 +73,12 @@ For more options on how to configure Spotlight, see [Configuration](/reference/c
 
 
 
-## Run the Sidecar
+## 3. Run the Sidecar
 
 Spotlight's [architecture](/architecture/) requires a sidecar to be running alongside your service. This is to enable streaming data collection from your backend services into the Spotlight overlay.
-
 
 <CardGrid>
   <LinkCard title="Vite" href="/sidecar/vite/" />
   <LinkCard title="Webpack" href="/sidecar/webpack/" />
   <LinkCard title="Other" href="/sidecar/npx/" />
 </CardGrid>
-
