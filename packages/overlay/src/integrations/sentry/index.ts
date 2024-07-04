@@ -54,7 +54,7 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
         );
 
       const errorsCount = errors.length;
-      if (options?.showRecentError && errorsCount) {
+      if (errorsCount && options?.showRecentError) {
         getSpotlightEventTarget().dispatchEvent(
           new CustomEvent('sentry:showError', {
             detail: {
