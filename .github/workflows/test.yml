@@ -11,13 +11,6 @@ env:
     ${{ github.workspace }}/packages/*/dist
     ${{ github.workspace }}/packages/*/bin
 
-  DEP_CACHE_KEY: ${{ github.event.inputs.commit || github.sha }}
-  CACHED_DEP_PATHS: |
-    ${{ github.workspace }}/packages/*/node_modules
-    ${{ github.workspace }}/e2e-tests/*/node_modules
-    ${{ github.workspace }}/demos/*/node_modules
-    ${{ github.workspace }}/node_modules
-
 jobs:
   build:
     name: Build
@@ -27,26 +20,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-
-      - name: Install deps
-        run: pnpm install
-
-      - name: Update dependency cache
-        uses: actions/cache@v3
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.CACHED_DEP_PATHS }}
-          key: ${{ env.DEP_CACHE_KEY }}
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Setup dependencies
+        run: pnpm install
 
       - name: Build packages
         run: pnpm build
 
       - name: Update build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
@@ -90,20 +80,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-
-      - name: Restore dependency cache
-        uses: actions/cache@v3
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.CACHED_DEP_PATHS }}
-          key: ${{ env.DEP_CACHE_KEY }}
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Setup dependencies
+        run: pnpm install
 
       - name: Restore build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
@@ -131,20 +121,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-
-      - name: Restore dependency cache
-        uses: actions/cache@v3
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.CACHED_DEP_PATHS }}
-          key: ${{ env.DEP_CACHE_KEY }}
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Setup dependencies
+        run: pnpm install
 
       - name: Restore build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
