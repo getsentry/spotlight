@@ -23,7 +23,6 @@ export default function spotlight({ port }: { port?: number } = {}) {
         import.meta.resolve('@spotlightjs/spotlight').slice(FILE_PROTOCOL_PREFIX_LENGTH),
       ).split('?', 1)[0];
       server.config.server.fs.allow.push(spotlightPath);
-      console.log(spotlightPath);
 
       server.middlewares.use((req, res, next) => {
         // The magic value below comes from vite/constants:CLIENT_PUBLIC_PATH
