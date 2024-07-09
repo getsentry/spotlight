@@ -6,40 +6,45 @@ import { setupSidecar } from './sidecar';
 
 const FILE_PROTOCOL_PREFIX_LENGTH = 'file://'.length;
 
+function getClientModulePath(server: ViteDevServer, module: string): string {
+  const modulePath = resolve(
+    server.config.root,
+    // @ts-expect-error
+    import.meta.resolve(module).slice(FILE_PROTOCOL_PREFIX_LENGTH),
+  ).split('?', 1)[0];
+  server.config.server.fs.allow.push(modulePath);
+
+  return modulePath;
+}
+
 export default function spotlight({ port }: { port?: number } = {}) {
   Sentry.init({
     tracesSampleRate: 0,
     spotlight: true,
   });
 
+  let spotlightPath: string;
+
   return {
     name: 'spotlight',
+    apply: 'serve',
+    transform(code: string, id: string /*, _opts = {}*/) {
+      // Only modify Vite's special client script
+      // The magic value below comes from vite/constants:CLIENT_ENTRY
+      if (!id.endsWith('vite/dist/client/client.mjs')) return;
+
+      const initSnippet = [
+        'createErrorOverlay=()=>{}',
+        `import * as Spotlight from '/@fs${spotlightPath}'`,
+        'Spotlight.init({injectImmediately: true, integrations: [Spotlight.sentry({openLastError: true})]})',
+      ].join(';\n');
+
+      return `${code}\n${initSnippet}\n`;
+    },
     configureServer(server: ViteDevServer) {
       setupSidecar({ port });
 
-      const spotlightPath = resolve(
-        server.config.root,
-        // @ts-expect-error
-        import.meta.resolve('@spotlightjs/spotlight').slice(FILE_PROTOCOL_PREFIX_LENGTH),
-      ).split('?', 1)[0];
-      server.config.server.fs.allow.push(spotlightPath);
-
-      server.middlewares.use((req, res, next) => {
-        // The magic value below comes from vite/constants:CLIENT_PUBLIC_PATH
-        if (req.url === '/@vite/client') {
-          const _end = res.end;
-          // @ts-expect-error
-          res.end = function (data, encoding, callback) {
-            data += [
-              'createErrorOverlay=() => {};',
-              `import * as Spotlight from '/@fs${spotlightPath}';`,
-              'Spotlight.init({injectImmediately: true, integrations: [Spotlight.sentry({openLastError: true})]});',
-            ].join('\n');
-            _end.call(res, data, encoding, callback);
-          };
-        }
-        next();
-      });
+      spotlightPath = getClientModulePath(server, '@spotlightjs/spotlight');
 
       // We gotta use the "Injecting Post Middleware" trick from https://vitejs.dev/guide/api-plugin.html#configureserver
       // because error handlers can only come last per https://expressjs.com/en/guide/error-handling.html#writing-error-handlers
