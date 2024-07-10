@@ -1,3 +1,4 @@
+import { sourceContextMiddleware } from '@spotlightjs/spotlight/vite-plugin';
 import { buildSpotlightErrorPageSnippet } from '../snippets';
 
 import type { Plugin } from 'vite';
@@ -9,7 +10,10 @@ type ErrorPagePluginOptions = {
 
 export const errorPageInjectionPlugin: (options: ErrorPagePluginOptions) => Plugin = options => {
   return {
-    name: 'spotlight-vite-client-snippet-plugin',
+    name: 'spotlight-vite-client-error-plugin',
+    configureServer(server) {
+      server.middlewares.use(sourceContextMiddleware);
+    },
     transform(code, id, opts = {}) {
       if (opts.ssr) return;
       if (!id.includes('vite/dist/client/client.mjs')) return;
@@ -23,15 +27,6 @@ export const errorPageInjectionPlugin: (options: ErrorPagePluginOptions) => Plug
         // this already happened before spotlight is initialized
         injectImmediately: true,
       });
-
-      // Checking if there is a ErrorOverlay class added by Astro
-      if (code.includes('class ErrorOverlay extends HTMLElement')) {
-        const modifiedCode = code.replace(/class\s+ErrorOverlay\s+extends\s+HTMLElement\s*{/, match => {
-          return match + '\n\tconnectedCallback() { this.close(); }\n';
-        });
-
-        return `${modifiedCode}\n${initSnippet}\n`;
-      }
 
       return `${code}\n${initSnippet}\n`;
     },

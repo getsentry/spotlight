@@ -40,7 +40,8 @@
   },
   "dependencies": {
     "@spotlightjs/overlay": "workspace:*",
-    "@spotlightjs/sidecar": "workspace:*"
+    "@spotlightjs/sidecar": "workspace:*",
+    "source-map": "^0.7.4"
   },
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",

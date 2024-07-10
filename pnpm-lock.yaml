@@ -302,15 +302,9 @@ importers:
       '@sentry/astro':
         specifier: '>=7.84.0'
         version: 7.84.0(astro@4.0.0-beta.4)
-      '@spotlightjs/overlay':
+      '@spotlightjs/spotlight':
         specifier: workspace:*
-        version: link:../overlay
-      '@spotlightjs/sidecar':
-        specifier: workspace:*
-        version: link:../sidecar
-      source-map:
-        specifier: ^0.7.4
-        version: 0.7.4
+        version: link:../spotlight
     devDependencies:
       astro:
         specifier: ^4.0.0-beta.4
@@ -494,6 +488,9 @@ importers:
       '@spotlightjs/sidecar':
         specifier: workspace:*
         version: link:../sidecar
+      source-map:
+        specifier: ^0.7.4
+        version: 0.7.4
     devDependencies:
       '@spotlightjs/tsconfig':
         specifier: workspace:*

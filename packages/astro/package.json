@@ -31,9 +31,7 @@
     "@sentry/astro": ">=7.84.0"
   },
   "dependencies": {
-    "@spotlightjs/overlay": "workspace:*",
-    "@spotlightjs/sidecar": "workspace:*",
-    "source-map": "^0.7.4"
+    "@spotlightjs/spotlight": "workspace:*"
   },
   "devDependencies": {
     "astro": "^4.0.0-beta.4",
