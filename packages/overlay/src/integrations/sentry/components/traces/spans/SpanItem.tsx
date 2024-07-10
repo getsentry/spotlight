@@ -65,9 +65,10 @@ const SpanItem = ({
       >
         <div
           className={classNames(
-            'node  group-hover:bg-primary-900 bg-primary-950',
+            'node group-hover:bg-primary-900',
             isQueried ? 'bg-transparent' : '',
             span.status && span.status !== 'ok' ? 'text-red-400' : '',
+            spanId === span.span_id ? 'bg-primary-900' : 'bg-primary-950',
           )}
           style={{
             width: `${spanNodeWidth}%`,
