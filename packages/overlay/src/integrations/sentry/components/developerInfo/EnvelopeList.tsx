@@ -2,6 +2,7 @@ import { Envelope, EnvelopeItem } from '@sentry/types';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import TimeSince from '~/components/TimeSince';
+import classNames from '~/lib/classNames';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import Badge from '~/ui/Badge';
 import sentryDataCache from '../../data/sentryDataCache';
@@ -51,7 +52,10 @@ export default function EnvelopeList() {
                   <Link key={envelopeEventId} to={`/devInfo/${header.event_id}`}>
                     <div
                       key={`${header.event_id}`}
-                      className=" hover:bg-primary-900 border-b-primary-900 flex  cursor-pointer items-center gap-4 border-b px-6 py-2 transition-all"
+                      className={classNames(
+                        'hover:bg-primary-900 border-b-primary-900 flex cursor-pointer items-center gap-4 border-b px-6 py-2 transition-all',
+                        eventId === envelopeEventId ? 'bg-primary-900' : '',
+                      )}
                     >
                       <PlatformIcon className="rounded-md" platform={sdkToPlatform(header.sdk?.name || 'unknown')} />
                       <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
