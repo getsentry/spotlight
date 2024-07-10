@@ -1,17 +1,16 @@
-import { sourceContextMiddleware } from '@spotlightjs/spotlight/vite-plugin';
+import { getClientModulePath, sourceContextMiddleware } from '@spotlightjs/spotlight/vite-plugin';
 import { buildSpotlightErrorPageSnippet } from '../snippets';
 
 import type { Plugin } from 'vite';
 import type { SpotlightAstroIntegrationOptions } from '../types';
 
-type ErrorPagePluginOptions = {
-  importPath: string;
-} & SpotlightAstroIntegrationOptions;
-
-export const errorPageInjectionPlugin: (options: ErrorPagePluginOptions) => Plugin = options => {
+export const errorPageInjectionPlugin: (options: SpotlightAstroIntegrationOptions) => Plugin = options => {
+  let spotlightPath: string;
   return {
     name: 'spotlight-vite-client-error-plugin',
     configureServer(server) {
+      spotlightPath = getClientModulePath('@spotlightjs/spotlight', server);
+
       server.middlewares.use(sourceContextMiddleware);
     },
     transform(code, id, opts = {}) {
@@ -20,6 +19,7 @@ export const errorPageInjectionPlugin: (options: ErrorPagePluginOptions) => Plug
 
       const initSnippet = buildSpotlightErrorPageSnippet({
         ...options,
+        importPath: spotlightPath,
         // Astro's toolbar isn't available in the error page
         showTriggerButton: false,
         fullPage: true,

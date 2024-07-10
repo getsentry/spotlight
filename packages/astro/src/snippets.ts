@@ -1,16 +1,21 @@
+import { getClientModulePath } from '@spotlightjs/spotlight/vite-plugin';
+
 import type { SpotlightAstroIntegrationOptions } from './types';
 
 type SupportedIntegrations = 'sentry' | 'console' | 'viteInspect';
 
 export type ClientInitOptions = {
-  importPath: string;
+  importPath?: string;
   showTriggerButton?: boolean;
   integrationNames?: SupportedIntegrations[];
   injectImmediately?: boolean;
   fullPage?: boolean;
 } & SpotlightAstroIntegrationOptions;
 
-const buildClientImport = (importPath: string) => `import * as Spotlight from ${JSON.stringify(importPath)};`;
+const buildClientImport = (importPath?: string) =>
+  `import * as Spotlight from ${JSON.stringify(
+    '/@fs/' + (importPath || getClientModulePath('@spotlightjs/spotlight')),
+  )};`;
 
 const buildClientInit = (options: ClientInitOptions) => {
   let initOptions = JSON.stringify({
@@ -28,10 +33,14 @@ const buildClientInit = (options: ClientInitOptions) => {
   return `Spotlight.init(${initOptions});`;
 };
 
-export const buildClientInitSnippet = (options: ClientInitOptions) => `
+export const buildClientInitSnippet = (options: ClientInitOptions) => {
+  console.log(options);
+
+  return `
 ${buildClientImport(options.importPath)}
 ${buildClientInit(options)}
 `;
+};
 
 /**
  * Hook into Vite's client code to enable Spotlight if an error occurs.
@@ -44,8 +53,7 @@ ${buildClientInit(options)}
  */
 export const buildSpotlightErrorPageSnippet = (options: ClientInitOptions) => `
 ${buildClientImport(options.importPath)}
-
-createErrorOverlay = (err) => {
+createErrorOverlay = function(err) {
   ${buildClientInit(options)}
 };
 `;

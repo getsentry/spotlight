@@ -1,8 +1,9 @@
-import * as Sentry from '@sentry/node';
 import type { ServerResponse } from 'node:http';
 
+import * as Sentry from '@sentry/node';
+// Cannot use import.meta.resolve -- @see https://github.com/vitejs/vite/discussions/15871
+import { resolve } from 'import-meta-resolve';
 import * as os from 'node:os';
-import { resolve } from 'node:path';
 import * as SourceMap from 'source-map';
 import type { Connect, ErrorPayload, Plugin, ViteDevServer } from 'vite';
 import { setupSidecar } from './sidecar';
@@ -27,13 +28,13 @@ type SentryStackTrace = {
 
 const FILE_PROTOCOL_PREFIX_LENGTH = 'file://'.length;
 
-function getClientModulePath(server: ViteDevServer, module: string): string {
-  const modulePath = resolve(
-    server.config.root,
-    // @ts-expect-error
-    import.meta.resolve(module).slice(FILE_PROTOCOL_PREFIX_LENGTH),
-  ).split('?', 1)[0];
-  server.config.server.fs.allow.push(modulePath);
+export function getClientModulePath(module: string, server?: ViteDevServer): string {
+  const modulePath = resolve(module, import.meta.url)
+    .slice(FILE_PROTOCOL_PREFIX_LENGTH)
+    .split('?', 1)[0];
+  if (server) {
+    server.config.server.fs.allow.push(modulePath);
+  }
 
   return modulePath;
 }
@@ -216,7 +217,7 @@ export default function spotlight({ port }: { port?: number } = {}): Plugin {
 
       server.middlewares.use(sourceContextMiddleware);
 
-      spotlightPath = getClientModulePath(server, '@spotlightjs/spotlight');
+      spotlightPath = getClientModulePath('@spotlightjs/spotlight', server);
 
       // We gotta use the "Injecting Post Middleware" trick from https://vitejs.dev/guide/api-plugin.html#configureserver
       // because error handlers can only come last per https://expressjs.com/en/guide/error-handling.html#writing-error-handlers

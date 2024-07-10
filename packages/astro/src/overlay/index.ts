@@ -1,6 +1,6 @@
 import type { DevOverlayPlugin } from 'astro';
 
-import * as Spotlight from '@spotlightjs/overlay';
+import * as Spotlight from '@spotlightjs/spotlight';
 
 const sentryLogo = `<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="256" height="256" fill="none"/>

@@ -7,8 +7,6 @@ import url from 'url';
 import type { SpotlightAstroIntegrationOptions } from './types';
 import { errorPageInjectionPlugin } from './vite/error-page';
 
-const PKG_NAME = '@spotlightjs/astro';
-
 type AstroConfigWithExperimentalDevOverlay = AstroConfig & {
   experimental?: {
     /**
@@ -19,10 +17,8 @@ type AstroConfigWithExperimentalDevOverlay = AstroConfig & {
 };
 
 const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegration => {
-  const thisFilePath = url.fileURLToPath(import.meta.url);
-
   return {
-    name: PKG_NAME,
+    name: '@spotlightjs/astro',
 
     hooks: {
       'astro:config:setup': async ({
@@ -36,15 +32,7 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
         if (command === 'dev') {
           logger.info('[@spotlightjs/astro] Setting up Spotlight');
 
-          // Importing this plugin dynamically because for some reason, the top level import
-          // caused a client error because the source-map library code was bundled into the client
-          const { sourceContextPlugin } = await import('./vite/source-context');
-
-          config.vite.plugins = [
-            errorPageInjectionPlugin({ importPath: thisFilePath }),
-            sourceContextPlugin(),
-            ...(config.vite.plugins || []),
-          ];
+          config.vite.plugins = [errorPageInjectionPlugin(), ...(config.vite.plugins || [])];
 
           // Since Astro 4.0.0-beta.4, `devToolbar` is set and enabled by default.
           // briefly, `devOverlay` was also added to the config but is now deprecated.
@@ -60,7 +48,7 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
 
           const showTriggerButton = !hasToolbarEnabled && !hasExperimentalDevOverlayEnabled;
 
-          injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, showTriggerButton, ...options }));
+          injectScript('page', buildClientInitSnippet({ showTriggerButton, ...options }));
           injectScript('page-ssr', buildServerSnippet(options));
 
           const importPath = path.dirname(url.fileURLToPath(import.meta.url));
@@ -74,7 +62,7 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
             addDevOverlayPlugin(pluginPath);
           }
         } else if (options?.__debugOptions) {
-          injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, ...options }));
+          injectScript('page', buildClientInitSnippet(options));
         }
       },
 
@@ -88,7 +76,7 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
 
         // Importing this dynamically because for some reason, the top level import
         // caused a dev server error because the sidecar code was bundled into the server
-        const { setupSidecar } = await import('@spotlightjs/sidecar');
+        const { setupSidecar } = await import('@spotlightjs/spotlight/sidecar');
         setupSidecar({ logger });
       },
     },
@@ -96,5 +84,3 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
 };
 
 export default createPlugin;
-
-export * from '@spotlightjs/overlay';
