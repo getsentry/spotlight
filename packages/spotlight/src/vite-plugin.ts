@@ -245,6 +245,7 @@ export default function spotlight({ port }: { port?: number } = {}): Plugin {
               const stackLines = err.stack.split('\n');
               stackLines.splice(1, 0, `at ${errorLine}`);
               err.stack = stackLines.join('\n');
+              err.message = err.message.replace(errorLine + ': ', '');
             }
             Sentry.captureException(err);
 
