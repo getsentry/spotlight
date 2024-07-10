@@ -33,14 +33,10 @@ const buildClientInit = (options: ClientInitOptions) => {
   return `Spotlight.init(${initOptions});`;
 };
 
-export const buildClientInitSnippet = (options: ClientInitOptions) => {
-  console.log(options);
-
-  return `
+export const buildClientInitSnippet = (options: ClientInitOptions) => `
 ${buildClientImport(options.importPath)}
 ${buildClientInit(options)}
 `;
-};
 
 /**
  * Hook into Vite's client code to enable Spotlight if an error occurs.
