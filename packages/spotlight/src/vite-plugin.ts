@@ -237,6 +237,10 @@ export default function spotlight({ port }: { port?: number } = {}): Plugin {
             }
 
             if (errorLine) {
+              // If we have an error line available, add it to the top of the stack trace
+              // which will trigger Spotlight to fetch its lines through sourceContextMiddleware
+              // above. This obsoletes Vite's stylized source code visualization and makes the
+              // problematic part appear at the top of the stack trace natively.
               const stackLines = err.stack.split('\n');
               stackLines.splice(1, 0, `at ${errorLine}`);
               err.stack = stackLines.join('\n');
