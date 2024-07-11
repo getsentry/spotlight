@@ -105,29 +105,33 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
 
 export function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
-  const [rawHeader, ...rawEntries] = data.trim().split(/\n/gm);
+  const [rawHeader, ...rawEntries] = data.trim().split('\n');
 
   const header = JSON.parse(rawHeader) as Envelope[0];
   const items: Envelope[1][] = [];
   for (let i = 0; i < rawEntries.length; i += 2) {
+    const [headerLine, payloadLine] = rawEntries.slice(i, i + 2).map(l => l.trim());
     // guard both rawEntries[i] and rawEntries[i + 1] are defined and not empty
-    if (!rawEntries[i] || !rawEntries[i + 1]) {
+    if (!headerLine || !payloadLine) {
       continue;
     }
-    const header = JSON.parse(rawEntries[i]);
-    let payload;
+    const header = JSON.parse(headerLine) as Envelope[0];
+    let payload: Envelope[1][number];
     try {
-      payload = JSON.parse(rawEntries[i + 1]);
+      payload = JSON.parse(payloadLine);
     } catch (e) {
       // payload will not be json always, like in metrics events.
+      payload = payloadLine as unknown as Envelope[1][number];
       log(e);
-      payload = rawEntries[i + 1];
     }
+
     // data sanitization
-    if (header.type && typeof payload === 'object') {
+    if (header.type) {
+      // @ts-expect-error -- .type does not exist on Event. Should probably add?
       payload.type = header.type;
     }
-    items.push([header, payload]);
+
+    items.push([header, payload] as Envelope[1]);
   }
 
   const envelope = [header, items] as Envelope;
