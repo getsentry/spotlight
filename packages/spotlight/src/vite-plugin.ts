@@ -5,7 +5,7 @@ import * as Sentry from '@sentry/node';
 import { resolve } from 'import-meta-resolve';
 import * as os from 'node:os';
 import * as SourceMap from 'source-map';
-import type { Connect, ErrorPayload, Plugin, ViteDevServer } from 'vite';
+import type { Connect, ErrorPayload, PluginOption, ViteDevServer } from 'vite';
 import { setupSidecar } from './sidecar';
 
 type SourceContext = {
@@ -188,7 +188,7 @@ export const sourceContextMiddleware: Connect.NextHandleFunction = function (req
   });
 };
 
-export default function spotlight({ port }: { port?: number } = {}): Plugin {
+export default function spotlight({ port }: { port?: number } = {}): PluginOption {
   Sentry.init({
     tracesSampleRate: 0,
     spotlight: true,

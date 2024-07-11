@@ -1,10 +1,10 @@
 import { getClientModulePath, sourceContextMiddleware } from '@spotlightjs/spotlight/vite-plugin';
 import { buildSpotlightErrorPageSnippet } from '../snippets';
 
-import type { Plugin } from 'vite';
+import type { PluginOption } from 'vite';
 import type { SpotlightAstroIntegrationOptions } from '../types';
 
-export const errorPageInjectionPlugin: (options: SpotlightAstroIntegrationOptions) => Plugin = options => {
+export const errorPageInjectionPlugin: (options: SpotlightAstroIntegrationOptions) => PluginOption = options => {
   let spotlightPath: string;
   return {
     name: 'spotlight-vite-client-error-plugin',
