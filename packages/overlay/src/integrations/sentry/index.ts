@@ -105,7 +105,7 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
 
 export function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
-  const [rawHeader, ...rawEntries] = data.split(/\n/gm);
+  const [rawHeader, ...rawEntries] = data.trim().split(/\n/gm);
 
   const header = JSON.parse(rawHeader) as Envelope[0];
   const items: Envelope[1][] = [];
