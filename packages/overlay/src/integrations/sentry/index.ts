@@ -126,8 +126,8 @@ export function processEnvelope(rawEvent: RawEventContext) {
     }
 
     // data sanitization
-    if (header.type) {
-      // @ts-expect-error -- .type does not exist on Event. Should probably add?
+    if (header.type && typeof payload === 'object') {
+      // @ts-expect-error -- we should fix the types here
       payload.type = header.type;
     }
 
