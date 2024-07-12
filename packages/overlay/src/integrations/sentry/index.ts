@@ -103,6 +103,15 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
   } satisfies Integration<Envelope>;
 }
 
+function getLineEnd(data: string | Buffer, startFrom: number): number {
+  let end = data.indexOf('\n', startFrom);
+  if (end === -1) {
+    end = data.length;
+  }
+
+  return end;
+}
+
 /**
  * Implements parser for
  * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
@@ -112,26 +121,22 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
 export function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
   let prevCursor = 0;
-  let cursor = data.indexOf('\n');
+  let cursor = getLineEnd(data, prevCursor);
   const envelopeHeader = JSON.parse(data.slice(prevCursor, cursor).toString()) as Envelope[0];
 
   const items: EnvelopeItem[] = [];
   while (cursor < data.length - 1) {
     prevCursor = cursor + 1;
-    cursor = data.indexOf('\n', prevCursor);
-    const itemHeaderLine = data.slice(prevCursor, cursor);
-    const itemHeader = JSON.parse(itemHeaderLine.toString()) as EnvelopeItem[0];
+    cursor = getLineEnd(data, prevCursor);
+    const itemHeader = JSON.parse(data.slice(prevCursor, cursor).toString()) as EnvelopeItem[0];
     prevCursor = cursor + 1;
     const payloadLength = itemHeader.length;
     if (payloadLength !== undefined) {
       cursor += payloadLength + 1;
     } else {
-      cursor = data.indexOf('\n', prevCursor) + 1 || data.length;
+      cursor = getLineEnd(data, prevCursor);
     }
     let itemPayload = data.slice(prevCursor, cursor);
-    if (payloadLength !== undefined && payloadLength !== itemPayload.length) {
-      throw new Error(`Payload size mismatch: expected ${payloadLength} got ${itemPayload.length}`);
-    }
 
     try {
       itemPayload = JSON.parse(itemPayload.toString());

@@ -6,6 +6,11 @@ import fs from 'fs';
 import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
 
 describe('Sentry Integration', () => {
+  test('Process Envelope Empty', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_empty.txt', 'utf-8');
+    expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
+  });
+
   test('Process Envelope', () => {
     const envelope = fs.readFileSync('./_fixtures/envelope_javascript.txt', 'utf-8');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
@@ -35,13 +40,13 @@ describe('Sentry Integration', () => {
     const processedNodeEnvelope = processEnvelope({ data: nodeEnvelope, contentType: 'test' });
 
     const browserEnvelope = fs.readFileSync('./_fixtures/envelope_astro_ssr_browser.txt', 'utf-8');
-    const processedBroswerEnvelope = processEnvelope({ data: browserEnvelope, contentType: 'test' });
+    const processedBrowserEnvelope = processEnvelope({ data: browserEnvelope, contentType: 'test' });
 
     expect(processedNodeEnvelope).not.toBe(undefined);
-    expect(processedBroswerEnvelope).not.toBe(undefined);
+    expect(processedBrowserEnvelope).not.toBe(undefined);
 
     const nodeEvent = processedNodeEnvelope.event[1][0][1] as Event;
-    const browserEvent = processedBroswerEnvelope.event[1][0][1] as Event;
+    const browserEvent = processedBrowserEnvelope.event[1][0][1] as Event;
 
     expect(nodeEvent.spans?.length).toEqual(0);
     expect(browserEvent.spans?.length).toEqual(45);

@@ -58,14 +58,14 @@ class SentryDataCache {
   pushEnvelope({ envelope, rawEnvelope }: { envelope: Envelope; rawEnvelope: RawEventContext }) {
     this.envelopes.push({ envelope, rawEnvelope });
     const [header, items] = envelope;
-    let sdk: Sdk;
+    let sdk: Sdk = 'unknown';
     if (header.sdk && header.sdk.name && header.sdk.version) {
       sdk = {
         name: header.sdk.name,
         version: header.sdk.version,
         lastSeen: new Date(header.sent_at as string).getTime(),
       };
-    } else {
+    } else if (items.length > 0) {
       sdk = this.inferSdkFromEvent(items[0][1] as SentryEvent);
     }
 
