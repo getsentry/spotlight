@@ -27,7 +27,7 @@ export default function consoleIntegration() {
     },
 
     processEvent({ data }) {
-      const msgJson = JSON.parse(data.toString()) as ConsoleMessage;
+      const msgJson = JSON.parse(data) as ConsoleMessage;
 
       return {
         event: msgJson,
