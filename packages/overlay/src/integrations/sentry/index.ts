@@ -1,4 +1,4 @@
-import type { Client, Envelope } from '@sentry/types';
+import type { Client, Envelope, EnvelopeItem } from '@sentry/types';
 import { off, on } from '../../lib/eventTarget';
 import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
@@ -103,34 +103,56 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
   } satisfies Integration<Envelope>;
 }
 
-export function processEnvelope(rawEvent: RawEventContext) {
-  const { data } = rawEvent;
-  const [rawHeader, ...rawEntries] = data.trim().split(/\n/gm);
-
-  const header = JSON.parse(rawHeader) as Envelope[0];
-  const items: Envelope[1][] = [];
-  for (let i = 0; i < rawEntries.length; i += 2) {
-    // guard both rawEntries[i] and rawEntries[i + 1] are defined and not empty
-    if (!rawEntries[i] || !rawEntries[i + 1]) {
-      continue;
-    }
-    const header = JSON.parse(rawEntries[i]);
-    let payload;
-    try {
-      payload = JSON.parse(rawEntries[i + 1]);
-    } catch (e) {
-      // payload will not be json always, like in metrics events.
-      log(e);
-      payload = rawEntries[i + 1];
-    }
-    // data sanitization
-    if (header.type && typeof payload === 'object') {
-      payload.type = header.type;
-    }
-    items.push([header, payload]);
+function getLineEnd(data: string | Buffer, startFrom: number): number {
+  let end = data.indexOf('\n', startFrom);
+  if (end === -1) {
+    end = data.length;
   }
 
-  const envelope = [header, items] as Envelope;
+  return end;
+}
+
+/**
+ * Implements parser for
+ * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
+ * @param rawEvent Envelope data
+ * @returns parsed envelope
+ */
+export function processEnvelope(rawEvent: RawEventContext) {
+  const { data } = rawEvent;
+  let prevCursor = 0;
+  let cursor = getLineEnd(data, prevCursor);
+  const envelopeHeader = JSON.parse(data.slice(prevCursor, cursor).toString()) as Envelope[0];
+
+  const items: EnvelopeItem[] = [];
+  while (cursor < data.length - 1) {
+    prevCursor = cursor + 1;
+    cursor = getLineEnd(data, prevCursor);
+    const itemHeader = JSON.parse(data.slice(prevCursor, cursor).toString()) as EnvelopeItem[0];
+    prevCursor = cursor + 1;
+    const payloadLength = itemHeader.length;
+    if (payloadLength !== undefined) {
+      cursor += payloadLength + 1;
+    } else {
+      cursor = getLineEnd(data, prevCursor);
+    }
+    let itemPayload = data.slice(prevCursor, cursor);
+
+    try {
+      itemPayload = JSON.parse(itemPayload.toString());
+    } catch (err) {
+      log(err);
+    }
+
+    // data sanitization
+    if (itemHeader.type && typeof itemPayload === 'object') {
+      // @ts-expect-error -- we should fix the types here
+      itemPayload.type = itemHeader.type;
+    }
+    items.push([itemHeader, itemPayload] as EnvelopeItem);
+  }
+
+  const envelope = [envelopeHeader, items] as Envelope;
   sentryDataCache.pushEnvelope({ envelope, rawEnvelope: rawEvent });
 
   return {
