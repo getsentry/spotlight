@@ -1,6 +1,6 @@
+import { randomBytes } from 'node:crypto';
 import type { ServerResponse } from 'node:http';
 
-import * as Sentry from '@sentry/node';
 // Cannot use import.meta.resolve -- @see https://github.com/vitejs/vite/discussions/15871
 import { resolve } from 'import-meta-resolve';
 import * as os from 'node:os';
@@ -188,12 +188,66 @@ export const sourceContextMiddleware: Connect.NextHandleFunction = function (req
   });
 };
 
-export default function spotlight({ port }: { port?: number } = {}): PluginOption {
-  Sentry.init({
-    tracesSampleRate: 0,
-    spotlight: true,
+async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: string = 'http://localhost:8969/stream') {
+  const error = err.errors[0];
+  const contextLines = err.pluginCode?.split('\n');
+  const errorLine = error.location.lineText;
+  const errorLineInContext = contextLines?.indexOf(errorLine);
+  const event_id = randomBytes(16).toString('hex');
+  const timestamp = new Date();
+  const envelope = [
+    { event_id, sent_at: timestamp.toISOString() },
+    { type: 'event' },
+    {
+      event_id,
+      level: 'error',
+      platform: 'javascript',
+      environment: 'development',
+      tags: { runtime: 'vite' },
+      timestamp: timestamp.getTime(),
+      exception: {
+        values: [
+          {
+            type: 'Error',
+            mechanism: {
+              type: 'instrument',
+              handled: false,
+            },
+            value: error.text,
+            stacktrace: {
+              frames: [
+                error
+                  ? {
+                      filename: error.location.file,
+                      lineno: error.location.line,
+                      colno: error.location.column,
+                      context_line: errorLine,
+                      pre_context: contextLines?.slice(0, errorLineInContext),
+                      post_context:
+                        errorLineInContext != null && errorLineInContext > -1
+                          ? contextLines?.slice(errorLineInContext + 1)
+                          : undefined,
+                    }
+                  : {
+                      filename: err.id,
+                    },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ]
+    .map(p => JSON.stringify(p))
+    .join('\n');
+  return await fetch(spotlightUrl, {
+    method: 'POST',
+    body: envelope,
+    headers: { 'Content-Type': 'application/x-sentry-envelope' },
   });
+}
 
+export default function spotlight({ port }: { port?: number } = {}): PluginOption {
   let spotlightPath: string;
 
   return {
@@ -214,7 +268,6 @@ export default function spotlight({ port }: { port?: number } = {}): PluginOptio
     },
     configureServer(server: ViteDevServer) {
       setupSidecar({ port });
-
       server.middlewares.use(sourceContextMiddleware);
 
       spotlightPath = getClientModulePath('@spotlightjs/spotlight', server);
@@ -222,39 +275,19 @@ export default function spotlight({ port }: { port?: number } = {}): PluginOptio
       // We gotta use the "Injecting Post Middleware" trick from https://vitejs.dev/guide/api-plugin.html#configureserver
       // because error handlers can only come last per https://expressjs.com/en/guide/error-handling.html#writing-error-handlers
       return () =>
-        server.middlewares.use(
-          (
-            err: ErrorPayload['err'],
-            _req: Connect.IncomingMessage,
-            res: ServerResponse,
-            next: Connect.NextFunction,
-          ) => {
-            const [file] = (err.loc?.file || err.id || 'unknown file').split(`?`);
-            let errorLine = '';
-            if (err.loc) {
-              errorLine = `${file}:${err.loc.line}:${err.loc.column}`;
-            } else if (err.id) {
-              errorLine = file;
-            }
+        server.middlewares.use(async function viteErrorToSpotlight(
+          err: ErrorPayload['err'],
+          _req: Connect.IncomingMessage,
+          res: ServerResponse,
+          next: Connect.NextFunction,
+        ) {
+          await sendErrorToSpotlight(err);
 
-            if (errorLine) {
-              // If we have an error line available, add it to the top of the stack trace
-              // which will trigger Spotlight to fetch its lines through sourceContextMiddleware
-              // above. This obsoletes Vite's stylized source code visualization and makes the
-              // problematic part appear at the top of the stack trace natively.
-              const stackLines = err.stack.split('\n');
-              stackLines.splice(1, 0, `at ${errorLine}`);
-              err.stack = stackLines.join('\n');
-              err.message = err.message.replace(errorLine + ': ', '');
-            }
-            Sentry.captureException(err);
-
-            // The following part is per https://expressjs.com/en/guide/error-handling.html#the-default-error-handler
-            if (res.headersSent) {
-              return next(err);
-            }
-          },
-        );
+          // The following part is per https://expressjs.com/en/guide/error-handling.html#the-default-error-handler
+          if (res.headersSent) {
+            return next(err);
+          }
+        });
     },
   };
 }
