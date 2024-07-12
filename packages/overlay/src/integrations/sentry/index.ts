@@ -113,14 +113,14 @@ export function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
   let prevCursor = 0;
   let cursor = data.indexOf('\n');
-  const envelopeHeader = JSON.parse(data.slice(prevCursor, cursor)) as Envelope[0];
+  const envelopeHeader = JSON.parse(data.slice(prevCursor, cursor).toString()) as Envelope[0];
 
   const items: EnvelopeItem[] = [];
   while (cursor < data.length - 1) {
     prevCursor = cursor + 1;
     cursor = data.indexOf('\n', prevCursor);
     const itemHeaderLine = data.slice(prevCursor, cursor);
-    const itemHeader = JSON.parse(itemHeaderLine) as EnvelopeItem[0];
+    const itemHeader = JSON.parse(itemHeaderLine.toString()) as EnvelopeItem[0];
     prevCursor = cursor + 1;
     const payloadLength = itemHeader.length;
     if (payloadLength !== undefined) {
@@ -134,7 +134,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
     }
 
     try {
-      itemPayload = JSON.parse(itemPayload);
+      itemPayload = JSON.parse(itemPayload.toString());
     } catch (err) {
       log(err);
     }
