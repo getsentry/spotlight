@@ -103,6 +103,12 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
   } satisfies Integration<Envelope>;
 }
 
+/**
+ * Implements parser for
+ * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
+ * @param rawEvent Envelope data
+ * @returns parsed envelope
+ */
 export function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
   let prevCursor = 0;
