@@ -114,7 +114,7 @@ export type RawEventContext = {
    *
    * Return the processed object or undefined if the event should be ignored.
    */
-  data: string;
+  data: string | Buffer;
 };
 
 type TeardownFunction = () => void | Promise<() => void>;

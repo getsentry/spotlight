@@ -6,6 +6,11 @@ import fs from 'fs';
 import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
 
 describe('Sentry Integration', () => {
+  test('Process Envelope Empty', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_empty.txt', 'utf-8');
+    expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
+  });
+
   test('Process Envelope', () => {
     const envelope = fs.readFileSync('./_fixtures/envelope_javascript.txt', 'utf-8');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
@@ -35,13 +40,13 @@ describe('Sentry Integration', () => {
     const processedNodeEnvelope = processEnvelope({ data: nodeEnvelope, contentType: 'test' });
 
     const browserEnvelope = fs.readFileSync('./_fixtures/envelope_astro_ssr_browser.txt', 'utf-8');
-    const processedBroswerEnvelope = processEnvelope({ data: browserEnvelope, contentType: 'test' });
+    const processedBrowserEnvelope = processEnvelope({ data: browserEnvelope, contentType: 'test' });
 
     expect(processedNodeEnvelope).not.toBe(undefined);
-    expect(processedBroswerEnvelope).not.toBe(undefined);
+    expect(processedBrowserEnvelope).not.toBe(undefined);
 
     const nodeEvent = processedNodeEnvelope.event[1][0][1] as Event;
-    const browserEvent = processedBroswerEnvelope.event[1][0][1] as Event;
+    const browserEvent = processedBrowserEnvelope.event[1][0][1] as Event;
 
     expect(nodeEvent.spans?.length).toEqual(0);
     expect(browserEvent.spans?.length).toEqual(45);
@@ -68,6 +73,31 @@ describe('Sentry Integration', () => {
 
   test('Process Java Formatted Message Envelope', () => {
     const envelope = fs.readFileSync('./_fixtures/envelope_java_formatted_message.txt', 'utf-8');
+    expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
+  });
+
+  test('Process Envelope w/ Binary Data', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_binary.bin');
+    expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
+  });
+
+  test('Process Envelope w/ Empty Payloads', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_empty_payload.txt', 'utf-8');
+    expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
+  });
+
+  test('Process Envelope w/ implicit length, terminated by newline', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_no_len_w_new_line.txt', 'utf-8');
+    expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
+  });
+
+  test('Process Envelope w/ implicit length, terminated by EOF', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_no_len_w_eof.txt', 'utf-8');
+    expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
+  });
+
+  test('Process Envelope w/ implicit length, terminated by EOF, empty headers', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_no_len_w_eof_empty_headers.txt', 'utf-8');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 });
