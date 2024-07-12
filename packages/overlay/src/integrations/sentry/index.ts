@@ -122,14 +122,19 @@ export function processEnvelope(rawEvent: RawEventContext) {
     const itemHeaderLine = data.slice(prevCursor, cursor);
     const itemHeader = JSON.parse(itemHeaderLine) as EnvelopeItem[0];
     prevCursor = cursor + 1;
-    if (itemHeader.length !== undefined) {
-      cursor += itemHeader.length + 1;
+    const payloadLength = itemHeader.length;
+    if (payloadLength !== undefined) {
+      cursor += payloadLength + 1;
     } else {
       cursor = data.indexOf('\n', prevCursor) + 1 || data.length;
     }
-    let itemPayload = data.slice(prevCursor, cursor + 1) as EnvelopeItem[1];
+    let itemPayload = data.slice(prevCursor, cursor);
+    if (payloadLength !== undefined && payloadLength !== itemPayload.length) {
+      throw new Error(`Payload size mismatch: expected ${payloadLength} got ${itemPayload.length}`);
+    }
+
     try {
-      itemPayload = JSON.parse(itemPayload as string);
+      itemPayload = JSON.parse(itemPayload);
     } catch (err) {
       log(err);
     }
