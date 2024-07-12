@@ -119,10 +119,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
     if (itemHeader.length !== undefined) {
       cursor += itemHeader.length + 1;
     } else {
-      cursor = data.indexOf('\n', prevCursor) + 1;
-      if (cursor === 0) {
-        cursor = data.length;
-      }
+      cursor = data.indexOf('\n', prevCursor) + 1 || data.length;
     }
     let itemPayload = data.slice(prevCursor, cursor + 1) as EnvelopeItem[1];
     try {
