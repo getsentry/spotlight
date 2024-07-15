@@ -17,15 +17,23 @@ export const errorPageInjectionPlugin: (options: ErrorPagePluginOptions) => Plug
       const initSnippet = buildSpotlightErrorPageSnippet({
         ...options,
         // Astro's toolbar isn't available in the error page
-        showTriggerButton: true,
+        showTriggerButton: false,
+        fullPage: true,
         // don't wait for the window.load event to be fired because in the error page,
         // this already happened before spotlight is initialized
         injectImmediately: true,
       });
 
-      const modifiedCode = `${code}\n${initSnippet}\n`;
+      // Checking if there is a ErrorOverlay class added by Astro
+      if (code.includes('class ErrorOverlay extends HTMLElement')) {
+        const modifiedCode = code.replace(/class\s+ErrorOverlay\s+extends\s+HTMLElement\s*{/, match => {
+          return match + '\n\tconnectedCallback() { this.close(); }\n';
+        });
 
-      return modifiedCode;
+        return `${modifiedCode}\n${initSnippet}\n`;
+      }
+
+      return `${code}\n${initSnippet}\n`;
     },
   };
 };

@@ -1,3 +1,4 @@
 {
-    "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "cSpell.words": ["Astro", "Astro's", "pageload", "spotlightjs", "uuidv"]
 }

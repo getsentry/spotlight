@@ -7,26 +7,25 @@ export type ClientInitOptions = {
   showTriggerButton?: boolean;
   integrationNames?: SupportedIntegrations[];
   injectImmediately?: boolean;
+  fullPage?: boolean;
 } & SpotlightAstroIntegrationOptions;
 
 const buildClientImport = (importPath: string) => `import * as Spotlight from ${JSON.stringify(importPath)};`;
 
 const buildClientInit = (options: ClientInitOptions) => {
-  const integrationCalls = options.integrationNames
-    ? options.integrationNames.map(i => `Spotlight.${i}()`).join(', ')
-    : `Spotlight.sentry({sidecarUrl: ${options.sidecarUrl ? `'${options.sidecarUrl}'` : undefined}})`;
+  let initOptions = JSON.stringify({
+    showTriggerButton: options.showTriggerButton !== false,
+    injectImmediately: options.injectImmediately,
+    debug: options.debug,
+    sidecarUrl: options.sidecarUrl,
+    fullPage: options.fullPage,
+  });
 
-  return `
-Spotlight.init({
-  integrations: [
-    ${integrationCalls}
-  ],
-  showTriggerButton: ${options.showTriggerButton === false ? 'false' : 'true'},
-  injectImmediately: ${options.injectImmediately === true ? 'true' : 'false'},
-  debug: ${options.debug === true ? 'true' : 'false'},
-  ${options.sidecarUrl ? `sidecarUrl: '${options.sidecarUrl}'` : ''}
-});
-`;
+  const integrationOptions = JSON.stringify({ sidecarUrl: options.sidecarUrl, openLastError: options.fullPage });
+  const integrations = (options.integrationNames || ['sentry']).map(i => `Spotlight.${i}(${integrationOptions})`);
+  initOptions = `{integrations: [${integrations.join(', ')}], ${initOptions.slice(1)}`;
+
+  return `Spotlight.init(${initOptions});`;
 };
 
 export const buildClientInitSnippet = (options: ClientInitOptions) => `
@@ -40,7 +39,7 @@ ${buildClientInit(options)}
  * Main difference to normal page injection: We only initialize spotlight
  * if an error happens and is transmitted via the websocket. This is to avoid
  * initializing this spotlight instance before the actual app's instance.
- * This should only be  the fallback instance if the app failed to intialize.
+ * This should only be the fallback instance if the app failed to initialize.
  *
  * Used variables from Vite's client code:
  * - `enableOverlay` to check if the overlay should be shown

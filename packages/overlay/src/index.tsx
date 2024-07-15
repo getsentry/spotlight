@@ -6,7 +6,7 @@ import { DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from './cons
 import globalStyles from './index.css?inline';
 import { initIntegrations, type SpotlightContext } from './integrations/integration.ts';
 import { default as sentry } from './integrations/sentry/index.ts';
-import { getSpotlightEventTarget } from './lib/eventTarget.ts';
+import { off, on, trigger } from './lib/eventTarget.ts';
 import { activateLogger, log } from './lib/logger.ts';
 import { SpotlightContextProvider } from './lib/useSpotlightContext.tsx';
 import { React, ReactDOM } from './react-instance.tsx'; // Import specific exports
@@ -16,7 +16,8 @@ export { default as console } from './integrations/console/index.ts';
 export { default as hydrationError } from './integrations/hydration-error/index.ts';
 export { default as sentry } from './integrations/sentry/index.ts';
 export { default as viteInspect } from './integrations/vite-inspect/index.ts';
-export { React, ReactDOM };
+export { React, ReactDOM, off, on, trigger };
+
 function createStyleSheet(styles: string) {
   const sheet = new CSSStyleSheet();
   sheet.replaceSync(styles);
@@ -27,32 +28,28 @@ function createStyleSheet(styles: string) {
  * Open the Spotlight debugger Window
  */
 export async function openSpotlight(path?: string | undefined) {
-  getSpotlightEventTarget().dispatchEvent(
-    new CustomEvent('open', {
-      detail: { path },
-    }),
-  );
+  trigger('open', { path });
 }
 
 /**
  * Close the Spotlight debugger Window
  */
 export async function closeSpotlight() {
-  getSpotlightEventTarget().dispatchEvent(new CustomEvent('close'));
+  trigger('close');
 }
 
 /**
  * Invokes the passed in callback when the Spotlight debugger Window is closed
  */
-export async function onClose(cb: () => void) {
-  getSpotlightEventTarget().addEventListener('closed', cb);
+export async function onClose(cb: EventListener) {
+  on('closed', cb);
 }
 
 /**
  * Invokes the passed in callback when the Spotlight debugger Window is opened
  */
-export async function onOpen(cb: () => void) {
-  getSpotlightEventTarget().addEventListener('opened', cb);
+export async function onOpen(cb: EventListener) {
+  on('opened', cb);
 }
 
 /**
@@ -61,25 +58,9 @@ export async function onOpen(cb: () => void) {
  * A count of the number of collected severe events is passed to the callback.
  */
 export async function onSevereEvent(cb: (count: number) => void) {
-  getSpotlightEventTarget().addEventListener('severeEventCount', e => {
+  on('severeEventCount', e => {
     cb((e as CustomEvent).detail?.count ?? 1);
   });
-}
-
-/**
- * Trigger an event in Spotlight.
- *
- * This is primarily useful for handling an uncaught error/crash, and forcing the debugger
- * to render vs a native error handler.
- *
- * e.g. trigger("sentry.showError", {eventId});
- */
-export async function trigger(eventName: string, payload: unknown) {
-  getSpotlightEventTarget().dispatchEvent(
-    new CustomEvent(eventName, {
-      detail: payload,
-    }),
-  );
 }
 
 function isSpotlightInjected() {
@@ -106,7 +87,7 @@ export async function init({
 
   const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };
 
-  // We only want to intialize and inject spotlight once. If it's already
+  // We only want to initialize and inject spotlight once. If it's already
   // been initialized, we can just bail out.
   if (isSpotlightInjected()) return;
 
