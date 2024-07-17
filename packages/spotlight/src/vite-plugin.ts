@@ -47,9 +47,10 @@ export function getSpotlightClientModulePath({
 
 export type SpotlightIntegration = 'sentry' | 'console' | 'viteInspect';
 
-export type SpotlightClientInitOptions = {
+export type SpotlightInitOptions = {
   importPath?: string;
   integrationNames?: SpotlightIntegration[];
+  port?: number;
   /**
    * Additional debug options.
    * WARNING: These options are not part of the public API and may change at any time.
@@ -57,24 +58,24 @@ export type SpotlightClientInitOptions = {
   __debugOptions?: Record<string, unknown>;
 } & SpotlightOverlayOptions;
 
-export function buildClientInit(options: SpotlightClientInitOptions) {
+export function buildClientInit(options: SpotlightInitOptions) {
   let initOptions = JSON.stringify({
     showTriggerButton: options.showTriggerButton !== false,
-    injectImmediately: options.injectImmediately,
+    injectImmediately: options.injectImmediately !== false,
     debug: options.debug,
     sidecarUrl: options.sidecarUrl,
     fullPage: options.fullPage,
   });
 
-  const integrationOptions = JSON.stringify({ sidecarUrl: options.sidecarUrl, openLastError: options.fullPage });
+  const integrationOptions = JSON.stringify({ sidecarUrl: options.sidecarUrl, openLastError: true });
   const integrations = (options.integrationNames || ['sentry']).map(i => `Spotlight.${i}(${integrationOptions})`);
   initOptions = `{integrations: [${integrations.join(', ')}], ${initOptions.slice(1)}`;
 
   return [
+    ``,
     `import * as Spotlight from ${JSON.stringify('/@fs' + (options.importPath || getSpotlightClientModulePath()))};`,
-    // The undefined document guard is to avoid being initialized in a Worker
-    // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
-    `typeof document !== "undefined" && Spotlight.init(${initOptions});`,
+    `Spotlight.init(${initOptions});`,
+    `if (window.createErrorOverlay) createErrorOverlay=function createErrorOverlay(err) { Spotlight.openSpotlight(); };`,
   ].join('\n');
 }
 
@@ -286,34 +287,21 @@ async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: stri
   });
 }
 
-export default function spotlight({ port }: { port?: number } = {}): PluginOption {
+export default function spotlight(options: SpotlightInitOptions = {}): PluginOption {
   let spotlightPath: string;
 
   return {
     name: 'spotlight',
     apply: 'serve',
-    config(config) {
-      if (!config.server) {
-        config.server = {};
-      }
-      if (config.server.hmr == null) {
-        config.server.hmr = {};
-      }
-      if (config.server.hmr === true) {
-        config.server.hmr = { overlay: false };
-      } else if (config.server.hmr) {
-        config.server.hmr.overlay = false;
-      }
-    },
     transform(code: string, id: string /*, _opts = {}*/) {
       // Only modify Vite's special client script
       // The magic value below comes from vite/constants:CLIENT_ENTRY
       if (!id.endsWith('vite/dist/client/client.mjs')) return;
 
-      return `${code}\n${buildClientInit({ importPath: spotlightPath, injectImmediately: true })}\n`;
+      return `${code}\n${buildClientInit({ ...options, importPath: spotlightPath })}\n`;
     },
     configureServer(server: ViteDevServer) {
-      setupSidecar({ port });
+      setupSidecar({ port: options.port });
       server.middlewares.use(sourceContextMiddleware);
 
       spotlightPath = getSpotlightClientModulePath({ server });

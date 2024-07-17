@@ -84,6 +84,8 @@ export async function init({
   fullPage = false,
   showClearEventsButton = true,
 }: SpotlightOverlayOptions = {}) {
+  // The undefined document guard is to avoid being initialized in a Worker
+  // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
   if (typeof document === 'undefined') return;
 
   const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };

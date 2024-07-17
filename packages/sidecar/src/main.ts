@@ -1,7 +1,7 @@
-import { createWriteStream, readFile } from 'fs';
-import { IncomingMessage, Server, ServerResponse, createServer, get } from 'http';
-import { extname, join } from 'path';
-import { createGunzip, createInflate } from 'zlib';
+import { createWriteStream, readFile } from 'node:fs';
+import { IncomingMessage, Server, ServerResponse, createServer, get } from 'node:http';
+import { extname, join } from 'node:path';
+import { createGunzip, createInflate } from 'node:zlib';
 import { SidecarLogger, activateLogger, enableDebugLogging, logger } from './logger.js';
 import { MessageBuffer } from './messageBuffer.js';
 

@@ -1,4 +1,4 @@
-import type { SpotlightClientInitOptions } from '@spotlightjs/spotlight/vite-plugin';
+import type { SpotlightInitOptions } from '@spotlightjs/spotlight/vite-plugin';
 import type { AstroConfig, AstroIntegration } from 'astro';
 import { buildServerSnippet } from './snippets';
 
@@ -16,7 +16,7 @@ type AstroConfigWithExperimentalDevOverlay = AstroConfig & {
   };
 };
 
-const createPlugin = (options?: SpotlightClientInitOptions): AstroIntegration => {
+const createPlugin = (options?: SpotlightInitOptions): AstroIntegration => {
   return {
     name: '@spotlightjs/astro',
 
@@ -32,7 +32,10 @@ const createPlugin = (options?: SpotlightClientInitOptions): AstroIntegration =>
         if (command === 'dev') {
           logger.info('[@spotlightjs/astro] Setting up Spotlight');
 
-          config.vite.plugins = [spotlight(), ...(config.vite.plugins || [])];
+          config.vite.plugins = [
+            spotlight({ injectImmediately: false, showTriggerButton: false }),
+            ...(config.vite.plugins || []),
+          ];
 
           // Since Astro 4.0.0-beta.4, `devToolbar` is set and enabled by default.
           // briefly, `devOverlay` was also added to the config but is now deprecated.
@@ -41,6 +44,7 @@ const createPlugin = (options?: SpotlightClientInitOptions): AstroIntegration =>
           // Setting one of them to `false` will not set the other one to false.
           // Therefore, both of them have to be `true` that we know that the toolbar is in fact active.
           const hasToolbarEnabled = config.devToolbar?.enabled || config.devOverlay?.enabled;
+          console.log('hasToolbarEnabled', hasToolbarEnabled);
 
           // Before Astro 4, `devOverlay` was disabled by default and under `experimental`
           const hasExperimentalDevOverlayEnabled = !!(config as AstroConfigWithExperimentalDevOverlay).experimental
@@ -64,20 +68,6 @@ const createPlugin = (options?: SpotlightClientInitOptions): AstroIntegration =>
         } else if (options?.__debugOptions) {
           injectScript('page', buildClientInit(options));
         }
-      },
-
-      'astro:server:start': async ({ logger }) => {
-        if (options?.sidecarUrl) {
-          logger.debug('Detected custom sidecar URL. Skipping default sidecar setup.');
-          // If users set a custom sidecar URL, we assume they started the sidecar manually outside of Astro.
-          // So we don't setup the default sidecar instance.
-          return;
-        }
-
-        // Importing this dynamically because for some reason, the top level import
-        // caused a dev server error because the sidecar code was bundled into the server
-        const { setupSidecar } = await import('@spotlightjs/spotlight/sidecar');
-        setupSidecar({ logger });
       },
     },
   };
