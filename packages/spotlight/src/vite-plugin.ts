@@ -2,10 +2,13 @@ import { randomBytes } from 'node:crypto';
 import type { ServerResponse } from 'node:http';
 
 // Cannot use import.meta.resolve -- @see https://github.com/vitejs/vite/discussions/15871
+import type { SpotlightOverlayOptions } from '@spotlightjs/overlay';
 import { resolve } from 'import-meta-resolve';
 import * as os from 'node:os';
 import * as SourceMap from 'source-map';
 import type { Connect, ErrorPayload, PluginOption, ViteDevServer } from 'vite';
+
+import * as packageJson from '../package.json';
 import { setupSidecar } from './sidecar';
 
 type SourceContext = {
@@ -28,7 +31,10 @@ type SentryStackTrace = {
 
 const FILE_PROTOCOL_PREFIX_LENGTH = 'file://'.length;
 
-export function getClientModulePath(module: string, server?: ViteDevServer): string {
+export function getSpotlightClientModulePath({
+  server,
+  module = packageJson.name,
+}: { server?: ViteDevServer; module?: string } = {}): string {
   const modulePath = resolve(module, import.meta.url)
     .slice(FILE_PROTOCOL_PREFIX_LENGTH)
     .split('?', 1)[0];
@@ -37,6 +43,37 @@ export function getClientModulePath(module: string, server?: ViteDevServer): str
   }
 
   return modulePath;
+}
+
+export type SpotlightIntegration = 'sentry' | 'console' | 'viteInspect';
+
+export type SpotlightClientInitOptions = {
+  importPath?: string;
+  integrationNames?: SpotlightIntegration[];
+  /**
+   * Additional debug options.
+   * WARNING: These options are not part of the public API and may change at any time.
+   */
+  __debugOptions?: Record<string, unknown>;
+} & SpotlightOverlayOptions;
+
+export function buildClientInit(options: SpotlightClientInitOptions) {
+  let initOptions = JSON.stringify({
+    showTriggerButton: options.showTriggerButton !== false,
+    injectImmediately: options.injectImmediately,
+    debug: options.debug,
+    sidecarUrl: options.sidecarUrl,
+    fullPage: options.fullPage,
+  });
+
+  const integrationOptions = JSON.stringify({ sidecarUrl: options.sidecarUrl, openLastError: options.fullPage });
+  const integrations = (options.integrationNames || ['sentry']).map(i => `Spotlight.${i}(${integrationOptions})`);
+  initOptions = `{integrations: [${integrations.join(', ')}], ${initOptions.slice(1)}`;
+
+  return [
+    `import * as Spotlight from ${JSON.stringify('/@fs' + (options.importPath || getSpotlightClientModulePath()))};`,
+    `Spotlight.init(${initOptions});`,
+  ].join('\n');
 }
 
 async function getGeneratedCodeFromServer(filename: string): Promise<string | undefined> {
@@ -253,24 +290,31 @@ export default function spotlight({ port }: { port?: number } = {}): PluginOptio
   return {
     name: 'spotlight',
     apply: 'serve',
+    config(config) {
+      if (!config.server) {
+        config.server = {};
+      }
+      if (config.server.hmr == null) {
+        config.server.hmr = {};
+      }
+      if (config.server.hmr === true) {
+        config.server.hmr = { overlay: false };
+      } else if (config.server.hmr) {
+        config.server.hmr.overlay = false;
+      }
+    },
     transform(code: string, id: string /*, _opts = {}*/) {
       // Only modify Vite's special client script
       // The magic value below comes from vite/constants:CLIENT_ENTRY
       if (!id.endsWith('vite/dist/client/client.mjs')) return;
 
-      const initSnippet = [
-        'createErrorOverlay=()=>{}',
-        `import * as Spotlight from '/@fs${spotlightPath}'`,
-        'Spotlight.init({injectImmediately: true, integrations: [Spotlight.sentry({openLastError: enableOverlay})]})',
-      ].join(';\n');
-
-      return `${code}\n${initSnippet}\n`;
+      return `${code}\n${buildClientInit({ importPath: spotlightPath, injectImmediately: true })}\n`;
     },
     configureServer(server: ViteDevServer) {
       setupSidecar({ port });
       server.middlewares.use(sourceContextMiddleware);
 
-      spotlightPath = getClientModulePath('@spotlightjs/spotlight', server);
+      spotlightPath = getSpotlightClientModulePath({ server });
 
       // We gotta use the "Injecting Post Middleware" trick from https://vitejs.dev/guide/api-plugin.html#configureserver
       // because error handlers can only come last per https://expressjs.com/en/guide/error-handling.html#writing-error-handlers

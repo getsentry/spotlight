@@ -1,11 +1,10 @@
 import type { AstroConfig, AstroIntegration } from 'astro';
-import { buildClientInitSnippet, buildServerSnippet } from './snippets';
+import { buildServerSnippet } from './snippets';
 
 import path from 'path';
 import url from 'url';
 
-import type { SpotlightAstroIntegrationOptions } from './types';
-import { errorPageInjectionPlugin } from './vite/error-page';
+import { SpotlightClientInitOptions, buildClientInit, spotlight } from '@spotlightjs/spotlight/vite-plugin';
 
 type AstroConfigWithExperimentalDevOverlay = AstroConfig & {
   experimental?: {
@@ -16,7 +15,7 @@ type AstroConfigWithExperimentalDevOverlay = AstroConfig & {
   };
 };
 
-const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegration => {
+const createPlugin = (options?: SpotlightClientInitOptions): AstroIntegration => {
   return {
     name: '@spotlightjs/astro',
 
@@ -32,7 +31,7 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
         if (command === 'dev') {
           logger.info('[@spotlightjs/astro] Setting up Spotlight');
 
-          config.vite.plugins = [errorPageInjectionPlugin(), ...(config.vite.plugins || [])];
+          config.vite.plugins = [spotlight(), ...(config.vite.plugins || [])];
 
           // Since Astro 4.0.0-beta.4, `devToolbar` is set and enabled by default.
           // briefly, `devOverlay` was also added to the config but is now deprecated.
@@ -48,7 +47,7 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
 
           const showTriggerButton = !hasToolbarEnabled && !hasExperimentalDevOverlayEnabled;
 
-          injectScript('page', buildClientInitSnippet({ showTriggerButton, ...options }));
+          injectScript('page', buildClientInit({ showTriggerButton, ...options }));
           injectScript('page-ssr', buildServerSnippet(options));
 
           const importPath = path.dirname(url.fileURLToPath(import.meta.url));
@@ -62,7 +61,7 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
             addDevOverlayPlugin(pluginPath);
           }
         } else if (options?.__debugOptions) {
-          injectScript('page', buildClientInitSnippet(options));
+          injectScript('page', buildClientInit(options));
         }
       },
 

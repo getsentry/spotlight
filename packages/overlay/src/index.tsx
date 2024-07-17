@@ -16,6 +16,7 @@ export { default as console } from './integrations/console/index.ts';
 export { default as hydrationError } from './integrations/hydration-error/index.ts';
 export { default as sentry } from './integrations/sentry/index.ts';
 export { default as viteInspect } from './integrations/vite-inspect/index.ts';
+export type { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
 export { React, ReactDOM, off, on, trigger };
 
 function createStyleSheet(styles: string) {

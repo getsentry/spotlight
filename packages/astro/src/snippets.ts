@@ -1,60 +1,6 @@
-import { getClientModulePath } from '@spotlightjs/spotlight/vite-plugin';
+import { SpotlightClientInitOptions } from '@spotlightjs/spotlight/vite-plugin';
 
-import type { SpotlightAstroIntegrationOptions } from './types';
-
-type SupportedIntegrations = 'sentry' | 'console' | 'viteInspect';
-
-export type ClientInitOptions = {
-  importPath?: string;
-  showTriggerButton?: boolean;
-  integrationNames?: SupportedIntegrations[];
-  injectImmediately?: boolean;
-  fullPage?: boolean;
-} & SpotlightAstroIntegrationOptions;
-
-const buildClientImport = (importPath?: string) =>
-  `import * as Spotlight from ${JSON.stringify(
-    '/@fs/' + (importPath || getClientModulePath('@spotlightjs/spotlight')),
-  )};`;
-
-const buildClientInit = (options: ClientInitOptions) => {
-  let initOptions = JSON.stringify({
-    showTriggerButton: options.showTriggerButton !== false,
-    injectImmediately: options.injectImmediately,
-    debug: options.debug,
-    sidecarUrl: options.sidecarUrl,
-    fullPage: options.fullPage,
-  });
-
-  const integrationOptions = JSON.stringify({ sidecarUrl: options.sidecarUrl, openLastError: options.fullPage });
-  const integrations = (options.integrationNames || ['sentry']).map(i => `Spotlight.${i}(${integrationOptions})`);
-  initOptions = `{integrations: [${integrations.join(', ')}], ${initOptions.slice(1)}`;
-
-  return `Spotlight.init(${initOptions});`;
-};
-
-export const buildClientInitSnippet = (options: ClientInitOptions) => `
-${buildClientImport(options.importPath)}
-${buildClientInit(options)}
-`;
-
-/**
- * Hook into Vite's client code to enable Spotlight if an error occurs.
- *
- * Main difference to normal page injection: We only initialize spotlight
- * if an error happens.
- *
- * Hacked `createErrorOverlay` from Vite's client code:
- * @see https://github.com/vitejs/vite/blob/b9ee620108819e06023e4303af75a61d3e4e4d76/packages/vite/src/client/client.ts#L291
- */
-export const buildSpotlightErrorPageSnippet = (options: ClientInitOptions) => `
-${buildClientImport(options.importPath)}
-createErrorOverlay = function(err) {
-  ${buildClientInit(options)}
-};
-`;
-
-export const buildServerSnippet: (options: SpotlightAstroIntegrationOptions) => string = options => `
+export const buildServerSnippet: (options: SpotlightClientInitOptions) => string = options => `
 import * as _SentrySDKForSpotlight from '@sentry/astro';
 
 if (_SentrySDKForSpotlight && _SentrySDKForSpotlight.getClient()) {
