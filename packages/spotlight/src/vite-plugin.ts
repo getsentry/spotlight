@@ -72,7 +72,9 @@ export function buildClientInit(options: SpotlightClientInitOptions) {
 
   return [
     `import * as Spotlight from ${JSON.stringify('/@fs' + (options.importPath || getSpotlightClientModulePath()))};`,
-    `Spotlight.init(${initOptions});`,
+    // The undefined document guard is to avoid being initialized in a Worker
+    // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
+    `typeof document !== "undefined" && Spotlight.init(${initOptions});`,
   ].join('\n');
 }
 
