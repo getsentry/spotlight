@@ -28,9 +28,10 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
       addSpotlightIntegrationToSentry(options);
 
       if (options?.openLastError) {
-        sentryDataCache.subscribe('event', (e: SentryEvent) => {
+        const unsubscribe = sentryDataCache.subscribe('event', (e: SentryEvent) => {
           if (!(e as SentryErrorEvent).exception) return;
           setTimeout(() => open(`/errors/${e.event_id}`), 0);
+          unsubscribe();
         });
       }
 

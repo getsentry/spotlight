@@ -58,13 +58,16 @@ export type SpotlightInitOptions = {
   __debugOptions?: Record<string, unknown>;
 } & SpotlightOverlayOptions;
 
+const serverOptions = new Set(['importPath', 'integrationNames', 'port']);
+
 export function buildClientInit(options: SpotlightInitOptions) {
+  const clientOptions = Object.fromEntries(
+    Object.entries(options).filter(([key, _value]) => !key.startsWith('_') && !serverOptions.has(key)),
+  );
   let initOptions = JSON.stringify({
+    ...clientOptions,
     showTriggerButton: options.showTriggerButton !== false,
     injectImmediately: options.injectImmediately !== false,
-    debug: options.debug,
-    sidecarUrl: options.sidecarUrl,
-    fullPage: options.fullPage,
   });
 
   const integrationOptions = JSON.stringify({ sidecarUrl: options.sidecarUrl, openLastError: true });
@@ -72,10 +75,9 @@ export function buildClientInit(options: SpotlightInitOptions) {
   initOptions = `{integrations: [${integrations.join(', ')}], ${initOptions.slice(1)}`;
 
   return [
-    ``,
     `import * as Spotlight from ${JSON.stringify('/@fs' + (options.importPath || getSpotlightClientModulePath()))};`,
     `Spotlight.init(${initOptions});`,
-    `if (window.createErrorOverlay) createErrorOverlay=function createErrorOverlay(err) { Spotlight.openSpotlight(); };`,
+    `createErrorOverlay=function createErrorOverlay(err) { Spotlight.openSpotlight(); };`,
   ].join('\n');
 }
 
@@ -298,7 +300,7 @@ export default function spotlight(options: SpotlightInitOptions = {}): PluginOpt
       // The magic value below comes from vite/constants:CLIENT_ENTRY
       if (!id.endsWith('vite/dist/client/client.mjs')) return;
 
-      return `${code}\n${buildClientInit({ ...options, importPath: spotlightPath })}\n`;
+      return `${buildClientInit({ fullPage: true, ...options, importPath: spotlightPath })}${code}`;
     },
     configureServer(server: ViteDevServer) {
       setupSidecar({ port: options.port });

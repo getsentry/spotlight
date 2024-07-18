@@ -32,10 +32,7 @@ const createPlugin = (options?: SpotlightInitOptions): AstroIntegration => {
         if (command === 'dev') {
           logger.info('[@spotlightjs/astro] Setting up Spotlight');
 
-          config.vite.plugins = [
-            spotlight({ injectImmediately: false, showTriggerButton: false }),
-            ...(config.vite.plugins || []),
-          ];
+          config.vite.plugins = [spotlight({ showTriggerButton: false }), ...(config.vite.plugins || [])];
 
           // Since Astro 4.0.0-beta.4, `devToolbar` is set and enabled by default.
           // briefly, `devOverlay` was also added to the config but is now deprecated.
