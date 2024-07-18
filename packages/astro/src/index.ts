@@ -41,7 +41,6 @@ const createPlugin = (options?: SpotlightInitOptions): AstroIntegration => {
           // Setting one of them to `false` will not set the other one to false.
           // Therefore, both of them have to be `true` that we know that the toolbar is in fact active.
           const hasToolbarEnabled = config.devToolbar?.enabled || config.devOverlay?.enabled;
-          console.log('hasToolbarEnabled', hasToolbarEnabled);
 
           // Before Astro 4, `devOverlay` was disabled by default and under `experimental`
           const hasExperimentalDevOverlayEnabled = !!(config as AstroConfigWithExperimentalDevOverlay).experimental

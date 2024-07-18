@@ -219,7 +219,9 @@ export const sourceContextMiddleware: Connect.NextHandleFunction = function (req
           const sourceMapBase64 = inlineSourceMapMatch[1];
           const sourceMapContent = Buffer.from(sourceMapBase64, 'base64').toString('utf-8');
           await applySourceContextToFrame(sourceMapContent, frame);
-        }
+        }(
+          
+        )
       }
     }
 
