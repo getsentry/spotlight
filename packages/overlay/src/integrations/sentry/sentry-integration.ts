@@ -2,6 +2,7 @@ import { Client, Envelope, Event, Integration } from '@sentry/types';
 import { serializeEnvelope } from '@sentry/utils';
 import { log } from '../../lib/logger';
 import sentryDataCache from './data/sentryDataCache';
+import { getNativeFetchImplementation } from './utils/fetch';
 
 type SpotlightBrowserIntegrationOptions = {
   /**
@@ -55,27 +56,6 @@ export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOption
         return event;
       }
 
-      for (const exception of event.exception.values ?? []) {
-        if (!exception.stacktrace) {
-          continue;
-        }
-        try {
-          const makeFetch = getNativeFetchImplementation();
-          const stackTraceWithContextResponse = await makeFetch('/spotlight/contextlines', {
-            method: 'PUT',
-            body: JSON.stringify(exception.stacktrace),
-          });
-
-          if (!stackTraceWithContextResponse.ok || stackTraceWithContextResponse.status !== 200) {
-            continue;
-          }
-
-          const stackTraceWithContext = await stackTraceWithContextResponse.json();
-          exception.stacktrace = stackTraceWithContext;
-        } catch {
-          // Something went wrong, for now we just ignore it.
-        }
-      }
       return event;
     },
     afterAllSetup: (client: Client) => {
@@ -102,24 +82,6 @@ function sendEnvelopesToSidecar(client: Client, sidecarUrl: string) {
       );
     });
   });
-}
-
-type FetchImpl = typeof fetch;
-type WrappedFetchImpl = FetchImpl & { __sentry_original__: FetchImpl };
-
-/**
- * We want to get an unpatched fetch implementation to avoid capturing our own calls.
- */
-export function getNativeFetchImplementation(): FetchImpl {
-  if (fetchIsWrapped(window.fetch)) {
-    return window.fetch.__sentry_original__;
-  }
-
-  return window.fetch;
-}
-
-function fetchIsWrapped(fetchImpl: FetchImpl): fetchImpl is WrappedFetchImpl {
-  return '__sentry_original__' in fetchImpl;
 }
 
 /**

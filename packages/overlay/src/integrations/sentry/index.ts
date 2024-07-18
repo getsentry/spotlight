@@ -28,18 +28,18 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
       addSpotlightIntegrationToSentry(options);
 
       if (options?.openLastError) {
-        const unsubscribe = sentryDataCache.subscribe('event', (e: SentryEvent) => {
+        sentryDataCache.subscribe('event', (e: SentryEvent) => {
           if (!(e as SentryErrorEvent).exception) return;
           setTimeout(() => open(`/errors/${e.event_id}`), 0);
-          unsubscribe();
         });
       }
 
       const onRenderError = (e: CustomEvent) => {
         log('Sentry Event', e.detail.event_id);
         if (!e.detail.event) return;
-        sentryDataCache.pushEvent(e.detail.event);
-        setTimeout(() => open(`/errors/${e.detail.event.event_id}`), 0);
+        sentryDataCache.pushEvent(e.detail.event).then(() => {
+          open(`/errors/${e.detail.event.event_id}`);
+        });
       };
 
       on('sentry:showError', onRenderError as EventListener);
@@ -118,7 +118,7 @@ function getLineEnd(data: string | Buffer, startFrom: number): number {
  * @param rawEvent Envelope data
  * @returns parsed envelope
  */
-export function processEnvelope(rawEvent: RawEventContext) {
+export async function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
   let prevCursor = 0;
   let cursor = getLineEnd(data, prevCursor);
@@ -153,7 +153,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
   }
 
   const envelope = [envelopeHeader, items] as Envelope;
-  sentryDataCache.pushEnvelope({ envelope, rawEnvelope: rawEvent });
+  await sentryDataCache.pushEnvelope({ envelope, rawEnvelope: rawEvent });
 
   return {
     event: envelope,

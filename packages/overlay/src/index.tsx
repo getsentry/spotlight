@@ -2,7 +2,7 @@ import fontStyles from '@fontsource/raleway/index.css?inline';
 import { MemoryRouter } from 'react-router-dom';
 import colors from 'tailwindcss/colors';
 import App from './App.tsx';
-import { DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from './constants.ts';
+import { CONTEXT_LINES_ENDPOINT, DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from './constants.ts';
 import globalStyles from './index.css?inline';
 import { initIntegrations, type SpotlightContext } from './integrations/integration.ts';
 import { default as sentry } from './integrations/sentry/index.ts';
@@ -17,7 +17,17 @@ export { default as hydrationError } from './integrations/hydration-error/index.
 export { default as sentry } from './integrations/sentry/index.ts';
 export { default as viteInspect } from './integrations/vite-inspect/index.ts';
 export type { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
-export { React, ReactDOM, off, on, trigger };
+export {
+  CONTEXT_LINES_ENDPOINT,
+  DEFAULT_ANCHOR,
+  DEFAULT_EXPERIMENTS,
+  DEFAULT_SIDECAR_URL,
+  React,
+  ReactDOM,
+  off,
+  on,
+  trigger,
+};
 
 function createStyleSheet(styles: string) {
   const sheet = new CSSStyleSheet();

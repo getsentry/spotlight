@@ -1,8 +1,10 @@
 import { randomBytes } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import type { ServerResponse } from 'node:http';
 
 // Cannot use import.meta.resolve -- @see https://github.com/vitejs/vite/discussions/15871
 import type { SpotlightOverlayOptions } from '@spotlightjs/overlay';
+import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/overlay';
 import { resolve } from 'import-meta-resolve';
 import * as os from 'node:os';
 import * as SourceMap from 'source-map';
@@ -180,7 +182,6 @@ function isValidSentryStackFrame(frame: SentryStackFrame): frame is ValidSentryS
   return !!frame.filename && !!frame.lineno && !!frame.colno;
 }
 
-export const CONTEXT_LINES_ENDPOINT = '/spotlight/contextlines';
 export const sourceContextMiddleware: Connect.NextHandleFunction = function (req, res, next) {
   // We're only interested in handling a PUT request to CONTEXT_LINES_ENDPOINT
   if (req.url !== CONTEXT_LINES_ENDPOINT || req.method !== 'PUT') {
@@ -203,10 +204,15 @@ export const sourceContextMiddleware: Connect.NextHandleFunction = function (req
 
     for (const frame of stacktrace.frames ?? []) {
       if (
-        isValidSentryStackFrame(frame) &&
+        !isValidSentryStackFrame(frame) ||
         // let's ignore dependencies for now with this naive check
-        !frame.filename.includes('/node_modules/')
+        frame.filename.includes('/node_modules/')
       ) {
+        continue;
+      }
+      const { filename } = frame;
+      // Dirty check to see if this looks like a regular file path or a URL
+      if (filename.includes('://')) {
         const generatedCode = await getGeneratedCodeFromServer(frame.filename);
         if (!generatedCode) {
           continue;
@@ -219,6 +225,15 @@ export const sourceContextMiddleware: Connect.NextHandleFunction = function (req
           const sourceMapBase64 = inlineSourceMapMatch[1];
           const sourceMapContent = Buffer.from(sourceMapBase64, 'base64').toString('utf-8');
           await applySourceContextToFrame(sourceMapContent, frame);
+        }
+      } else if (!filename.includes(':')) {
+        try {
+          const lines = readFileSync(filename, { encoding: 'utf-8' }).split(/\r?\n/);
+          addContextLinesToFrame(lines, frame);
+        } catch (err) {
+          if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+            throw err;
+          }
         }
       }
     }

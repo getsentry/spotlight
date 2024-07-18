@@ -21,7 +21,7 @@ export default defineConfig({
       //   fileName: 'sentry-spotlight',
     },
     rollupOptions: {
-      external: [...dependencies, 'node:path', 'node:crypto'],
+      external: [...dependencies, 'node:path', 'node:crypto', 'node:fs'],
     },
   },
 });

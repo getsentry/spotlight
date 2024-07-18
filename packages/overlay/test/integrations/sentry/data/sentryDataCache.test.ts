@@ -6,10 +6,11 @@ import fs from 'fs';
 
 describe('SentryDataCache', () => {
   // We need to refactor this to make it actually testable
-  test('Process Envelope', () => {
+  test('Process Envelope', async () => {
     const envelope = fs.readFileSync('./_fixtures/envelope_javascript.txt', 'utf-8');
-    const processedEnvelope = processEnvelope({ data: envelope, contentType: 'test' });
-    sentryDataCache.pushEnvelope({ envelope: processedEnvelope.event, rawEnvelope: processedEnvelope.rawEvent });
-    expect(true).not.toBe(undefined);
+    const processedEnvelope = await processEnvelope({ data: envelope, contentType: 'test' });
+    await expect(() =>
+      sentryDataCache.pushEnvelope({ envelope: processedEnvelope.event, rawEnvelope: processedEnvelope.rawEvent }),
+    ).resolves.toBeTruthy();
   });
 });

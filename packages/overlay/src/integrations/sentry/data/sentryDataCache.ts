@@ -1,7 +1,9 @@
 import { Envelope } from '@sentry/types';
 import { RawEventContext } from '~/integrations/integration';
+import { CONTEXT_LINES_ENDPOINT } from '../../../constants';
 import { generate_uuidv4 } from '../../../lib/uuid';
 import { Sdk, SentryErrorEvent, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
+import { getNativeFetchImplementation } from '../utils/fetch';
 import { sdkToPlatform } from '../utils/sdkToPlatform';
 import { groupSpans } from '../utils/traces';
 
@@ -55,7 +57,7 @@ class SentryDataCache {
     return sdk;
   }
 
-  pushEnvelope({ envelope, rawEnvelope }: { envelope: Envelope; rawEnvelope: RawEventContext }) {
+  async pushEnvelope({ envelope, rawEnvelope }: { envelope: Envelope; rawEnvelope: RawEventContext }) {
     this.envelopes.push({ envelope, rawEnvelope });
     const [header, items] = envelope;
     const lastSeen = new Date(header.sent_at as string).getTime();
@@ -88,15 +90,15 @@ class SentryDataCache {
       });
     }
 
-    items.forEach(([itemHeader, itemData]) => {
+    for (const [itemHeader, itemData] of items) {
       if (itemHeader.type === 'event' || itemHeader.type === 'transaction') {
         (itemData as SentryEvent).platform = sdkToPlatform(sdk.name);
-        this.pushEvent(itemData as SentryEvent);
+        await this.pushEvent(itemData as SentryEvent);
       }
-    });
+    }
   }
 
-  pushEvent(
+  async pushEvent(
     event: SentryEvent & {
       event_id?: string;
     },
@@ -108,7 +110,7 @@ class SentryDataCache {
     if (this.eventIds.has(event.event_id)) return;
 
     if (isErrorEvent(event)) {
-      reverseStackTraces(event);
+      await processStacktrace(event);
     }
 
     event.timestamp = toTimestamp(event.timestamp);
@@ -268,14 +270,43 @@ function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
   return event.type != 'transaction';
 }
 
-function reverseStackTraces(errorEvent: SentryErrorEvent): void {
+/**
+ * Reverses the stack trace and tries to fill missing context lines
+ * @param errorEvent
+ * @returns
+ */
+async function processStacktrace(errorEvent: SentryErrorEvent): Promise<void[]> {
   if (!errorEvent.exception || !errorEvent.exception.values) {
-    return;
+    return [];
   }
 
-  errorEvent.exception.values.forEach(value => {
-    if (value.stacktrace) {
-      value.stacktrace.frames.reverse();
-    }
-  });
+  return Promise.all(
+    (errorEvent.exception.values ?? []).map(async exception => {
+      if (
+        !exception.stacktrace ||
+        exception.stacktrace.frames?.every(frame => frame.post_context && frame.pre_context && frame.context_line)
+      ) {
+        console.log('skipping', exception);
+        return;
+      }
+      exception.stacktrace.frames.reverse();
+
+      try {
+        const makeFetch = getNativeFetchImplementation();
+        const stackTraceWithContextResponse = await makeFetch(CONTEXT_LINES_ENDPOINT, {
+          method: 'PUT',
+          body: JSON.stringify(exception.stacktrace),
+        });
+
+        if (!stackTraceWithContextResponse.ok || stackTraceWithContextResponse.status !== 200) {
+          return;
+        }
+
+        const stackTraceWithContext = await stackTraceWithContextResponse.json();
+        exception.stacktrace = stackTraceWithContext;
+      } catch {
+        // Something went wrong, for now we just ignore it.
+      }
+    }),
+  );
 }
