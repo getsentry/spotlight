@@ -300,7 +300,7 @@ export default function spotlight(options: SpotlightInitOptions = {}): PluginOpt
       // The magic value below comes from vite/constants:CLIENT_ENTRY
       if (!id.endsWith('vite/dist/client/client.mjs')) return;
 
-      return `${buildClientInit({ fullPage: true, ...options, importPath: spotlightPath })}${code}`;
+      return `${buildClientInit({ ...options, importPath: spotlightPath })}${code}`;
     },
     configureServer(server: ViteDevServer) {
       setupSidecar({ port: options.port });
