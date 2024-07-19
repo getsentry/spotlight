@@ -246,6 +246,10 @@ export const sourceContextMiddleware: Connect.NextHandleFunction = function (req
 };
 
 async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: string = 'http://localhost:8969/stream') {
+  if (!err.errors) {
+    console.log(err);
+    return;
+  }
   const error = err.errors[0];
   const contextLines = err.pluginCode?.split('\n');
   const errorLine = error.location.lineText;
