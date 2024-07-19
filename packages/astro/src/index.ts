@@ -70,3 +70,4 @@ const createPlugin = (options?: SpotlightInitOptions): AstroIntegration => {
 };
 
 export default createPlugin;
+export * from '@spotlightjs/spotlight';
