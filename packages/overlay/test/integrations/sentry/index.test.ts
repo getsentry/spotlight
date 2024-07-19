@@ -21,26 +21,26 @@ describe('Sentry Integration', () => {
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
-  test('Process PHP Transaction Envelope', async () => {
+  test('Process PHP Transaction Envelope', () => {
     const envelope = fs.readFileSync('./_fixtures/envelope_php.txt', 'utf-8');
-    const processedEnvelope = await processEnvelope({ data: envelope, contentType: 'test' });
+    const processedEnvelope = processEnvelope({ data: envelope, contentType: 'test' });
     expect(processedEnvelope).not.toBe(undefined);
     expect((processedEnvelope.event[1][0][1] as any).type).toEqual('transaction');
   });
 
-  test('Process Java Transaction Envelope', async () => {
+  test('Process Java Transaction Envelope', () => {
     const envelope = fs.readFileSync('./_fixtures/envelope_java.txt', 'utf-8');
-    const processedEnvelope = await processEnvelope({ data: envelope, contentType: 'test' });
+    const processedEnvelope = processEnvelope({ data: envelope, contentType: 'test' });
     expect(processedEnvelope.event).not.toBe(undefined);
     expect((processedEnvelope.event[1][0][1] as any).type).toEqual('transaction');
   });
 
-  test('Process Astro SSR pageload (BE -> FE) trace', async () => {
+  test('Process Astro SSR pageload (BE -> FE) trace', () => {
     const nodeEnvelope = fs.readFileSync('./_fixtures/envelope_astro_ssr_node.txt', 'utf-8');
-    const processedNodeEnvelope = await processEnvelope({ data: nodeEnvelope, contentType: 'test' });
+    const processedNodeEnvelope = processEnvelope({ data: nodeEnvelope, contentType: 'test' });
 
     const browserEnvelope = fs.readFileSync('./_fixtures/envelope_astro_ssr_browser.txt', 'utf-8');
-    const processedBrowserEnvelope = await processEnvelope({ data: browserEnvelope, contentType: 'test' });
+    const processedBrowserEnvelope = processEnvelope({ data: browserEnvelope, contentType: 'test' });
 
     expect(processedNodeEnvelope).not.toBe(undefined);
     expect(processedBrowserEnvelope).not.toBe(undefined);

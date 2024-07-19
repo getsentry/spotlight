@@ -20,22 +20,19 @@ export function connectToSidecar(
         if (!integration.processEvent) {
           return;
         }
-        integration
-          .processEvent({
-            contentType,
-            data: event.data,
-          })
-          .then(processedEvent => {
-            if (processedEvent) {
-              setIntegrationData(prev => {
-                const integrationName = integration.name;
-                return {
-                  ...prev,
-                  [integrationName]: [...(prev[integrationName] || []), processedEvent],
-                };
-              });
-            }
+        const processedEvent = integration.processEvent({
+          contentType,
+          data: event.data,
+        });
+        if (processedEvent) {
+          setIntegrationData(prev => {
+            const integrationName = integration.name;
+            return {
+              ...prev,
+              [integrationName]: [...(prev[integrationName] || []), processedEvent],
+            };
           });
+        }
       }
     };
 

@@ -57,8 +57,7 @@ class SentryDataCache {
     return sdk;
   }
 
-  async pushEnvelope({ envelope, rawEnvelope }: { envelope: Envelope; rawEnvelope: RawEventContext }) {
-    this.envelopes.push({ envelope, rawEnvelope });
+  pushEnvelope({ envelope, rawEnvelope }: { envelope: Envelope; rawEnvelope: RawEventContext }): number {
     const [header, items] = envelope;
     const lastSeen = new Date(header.sent_at as string).getTime();
     let sdk: Sdk;
@@ -93,9 +92,12 @@ class SentryDataCache {
     for (const [itemHeader, itemData] of items) {
       if (itemHeader.type === 'event' || itemHeader.type === 'transaction') {
         (itemData as SentryEvent).platform = sdkToPlatform(sdk.name);
-        await this.pushEvent(itemData as SentryEvent);
+        // The below is an async function but we really don't need to wait for that
+        this.pushEvent(itemData as SentryEvent);
       }
     }
+
+    return this.envelopes.push({ envelope, rawEnvelope });
   }
 
   async pushEvent(

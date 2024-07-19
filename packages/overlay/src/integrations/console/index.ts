@@ -26,7 +26,7 @@ export default function consoleIntegration() {
       instrumentConsole('error', pageloadId);
     },
 
-    async processEvent({ data }) {
+    processEvent({ data }) {
       const msgJson = JSON.parse(data.toString()) as ConsoleMessage;
 
       return {

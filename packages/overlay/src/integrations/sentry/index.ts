@@ -118,7 +118,7 @@ function getLineEnd(data: string | Buffer, startFrom: number): number {
  * @param rawEvent Envelope data
  * @returns parsed envelope
  */
-export async function processEnvelope(rawEvent: RawEventContext) {
+export function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
   let prevCursor = 0;
   let cursor = getLineEnd(data, prevCursor);
@@ -153,7 +153,7 @@ export async function processEnvelope(rawEvent: RawEventContext) {
   }
 
   const envelope = [envelopeHeader, items] as Envelope;
-  await sentryDataCache.pushEnvelope({ envelope, rawEnvelope: rawEvent });
+  sentryDataCache.pushEnvelope({ envelope, rawEnvelope: rawEvent });
 
   return {
     event: envelope,
