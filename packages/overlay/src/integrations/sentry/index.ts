@@ -125,7 +125,7 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
   if (checkBrowserSDKVersion()) {
     return _sentryIntegration(options);
   } else {
-    warn(`This version of Spotlight supports Sentry browser SDK version less than 8.x.x. Check out Spotlight v2.x.x`);
+    warn(`This version of Spotlight only supports Sentry browser SDK versions below 8.x.x. Check out Spotlight v2.x.x`);
     return _fallbackSentryIntegration();
   }
 }
