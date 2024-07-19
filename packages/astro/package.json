@@ -28,7 +28,7 @@
   },
   "peerDependencies": {
     "astro": ">=4.0.0",
-    "@sentry/astro": ">=8.0.0"
+    "@sentry/astro": ">=7.84.0"
   },
   "dependencies": {
     "@spotlightjs/spotlight": "workspace:*"

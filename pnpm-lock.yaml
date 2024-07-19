@@ -300,11 +300,8 @@ importers:
   packages/astro:
     dependencies:
       '@sentry/astro':
-        specifier: '>=8.0.0'
+        specifier: '>=7.84.0'
         version: 8.9.2(astro@4.0.2)
-      '@spotlightjs/overlay':
-        specifier: workspace:*
-        version: link:../overlay
       '@spotlightjs/spotlight':
         specifier: workspace:*
         version: link:../spotlight
