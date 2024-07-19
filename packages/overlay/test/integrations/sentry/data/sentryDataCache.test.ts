@@ -9,7 +9,7 @@ describe('SentryDataCache', () => {
   test('Process Envelope', async () => {
     const envelope = fs.readFileSync('./_fixtures/envelope_javascript.txt', 'utf-8');
     const processedEnvelope = await processEnvelope({ data: envelope, contentType: 'test' });
-    await expect(() =>
+    await expect(
       sentryDataCache.pushEnvelope({ envelope: processedEnvelope.event, rawEnvelope: processedEnvelope.rawEvent }),
     ).resolves.toBeTruthy();
   });
