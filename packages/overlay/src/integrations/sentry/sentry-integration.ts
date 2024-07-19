@@ -56,6 +56,9 @@ export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOption
       }
 
       for (const exception of event.exception.values ?? []) {
+        if (!exception.stacktrace) {
+          continue;
+        }
         try {
           const makeFetch = getNativeFetchImplementation();
           const stackTraceWithContextResponse = await makeFetch('/spotlight/contextlines', {

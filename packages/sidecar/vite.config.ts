@@ -14,6 +14,9 @@ export default defineConfig({
     ssr: './src/main.ts',
     outDir: './dist',
     sourcemap: true,
+    rollupOptions: {
+      external: [...dependencies, 'node:path', 'node:http', 'node:fs', 'node:zlib'],
+    },
   },
   ssr: {
     noExternal,

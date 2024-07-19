@@ -16,6 +16,7 @@ export { default as console } from './integrations/console/index.ts';
 export { default as hydrationError } from './integrations/hydration-error/index.ts';
 export { default as sentry } from './integrations/sentry/index.ts';
 export { default as viteInspect } from './integrations/vite-inspect/index.ts';
+export type { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
 export { React, ReactDOM, off, on, trigger };
 
 function createStyleSheet(styles: string) {
@@ -83,6 +84,8 @@ export async function init({
   fullPage = false,
   showClearEventsButton = true,
 }: SpotlightOverlayOptions = {}) {
+  // The undefined document guard is to avoid being initialized in a Worker
+  // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
   if (typeof document === 'undefined') return;
 
   const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };

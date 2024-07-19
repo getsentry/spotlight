@@ -1,13 +1,11 @@
+import type { SpotlightInitOptions } from '@spotlightjs/spotlight/vite-plugin';
 import type { AstroConfig, AstroIntegration } from 'astro';
-import { buildClientInitSnippet, buildServerSnippet } from './snippets';
+import { buildServerSnippet } from './snippets';
 
 import path from 'path';
 import url from 'url';
 
-import type { SpotlightAstroIntegrationOptions } from './types';
-import { errorPageInjectionPlugin } from './vite/error-page';
-
-const PKG_NAME = '@spotlightjs/astro';
+import spotlight, { buildClientInit } from '@spotlightjs/spotlight/vite-plugin';
 
 type AstroConfigWithExperimentalDevOverlay = AstroConfig & {
   experimental?: {
@@ -18,11 +16,9 @@ type AstroConfigWithExperimentalDevOverlay = AstroConfig & {
   };
 };
 
-const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegration => {
-  const thisFilePath = url.fileURLToPath(import.meta.url);
-
+const createPlugin = (options?: SpotlightInitOptions): AstroIntegration => {
   return {
-    name: PKG_NAME,
+    name: '@spotlightjs/astro',
 
     hooks: {
       'astro:config:setup': async ({
@@ -36,15 +32,7 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
         if (command === 'dev') {
           logger.info('[@spotlightjs/astro] Setting up Spotlight');
 
-          // Importing this plugin dynamically because for some reason, the top level import
-          // caused a client error because the source-map library code was bundled into the client
-          const { sourceContextPlugin } = await import('./vite/source-context');
-
-          config.vite.plugins = [
-            errorPageInjectionPlugin({ importPath: thisFilePath }),
-            sourceContextPlugin(),
-            ...(config.vite.plugins || []),
-          ];
+          config.vite.plugins = [spotlight({ showTriggerButton: false }), ...(config.vite.plugins || [])];
 
           // Since Astro 4.0.0-beta.4, `devToolbar` is set and enabled by default.
           // briefly, `devOverlay` was also added to the config but is now deprecated.
@@ -60,7 +48,7 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
 
           const showTriggerButton = !hasToolbarEnabled && !hasExperimentalDevOverlayEnabled;
 
-          injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, showTriggerButton, ...options }));
+          injectScript('page', buildClientInit({ showTriggerButton, ...options }));
           injectScript('page-ssr', buildServerSnippet(options));
 
           const importPath = path.dirname(url.fileURLToPath(import.meta.url));
@@ -74,27 +62,12 @@ const createPlugin = (options?: SpotlightAstroIntegrationOptions): AstroIntegrat
             addDevOverlayPlugin(pluginPath);
           }
         } else if (options?.__debugOptions) {
-          injectScript('page', buildClientInitSnippet({ importPath: PKG_NAME, ...options }));
+          injectScript('page', buildClientInit(options));
         }
-      },
-
-      'astro:server:start': async ({ logger }) => {
-        if (options?.sidecarUrl) {
-          logger.debug('Detected custom sidecar URL. Skipping default sidecar setup.');
-          // If users set a custom sidecar URL, we assume they started the sidecar manually outside of Astro.
-          // So we don't setup the default sidecar instance.
-          return;
-        }
-
-        // Importing this dynamically because for some reason, the top level import
-        // caused a dev server error because the sidecar code was bundled into the server
-        const { setupSidecar } = await import('@spotlightjs/sidecar');
-        setupSidecar({ logger });
       },
     },
   };
 };
 
 export default createPlugin;
-
-export * from '@spotlightjs/overlay';
+export * from '@spotlightjs/spotlight';

@@ -31,14 +31,22 @@
       "types": "./dist/sidecar.d.ts",
       "import": "./dist/sidecar.js",
       "require": "./dist/sidecar.cjs"
+    },
+    "./vite-plugin": {
+      "types": "./dist/vite-plugin.d.ts",
+      "import": "./dist/vite-plugin.js",
+      "require": "./dist/vite-plugin.cjs"
     }
   },
   "dependencies": {
     "@spotlightjs/overlay": "workspace:*",
-    "@spotlightjs/sidecar": "workspace:*"
+    "@spotlightjs/sidecar": "workspace:*",
+    "source-map": "^0.7.4",
+    "import-meta-resolve": "^4.1.0"
   },
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
+    "@types/node": "^18",
     "typescript": "^5.0.2",
     "vite": "^4.5.3"
   },
