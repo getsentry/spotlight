@@ -27,8 +27,7 @@ export default defineConfig({
     react({ include: ['**/react/*'] }),
     sentry({
       debug: true,
-      spotlight: true,
     }),
-    spotlight(),
+    spotlight({ debug: true }),
   ],
 });

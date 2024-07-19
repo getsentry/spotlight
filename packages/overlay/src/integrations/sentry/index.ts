@@ -17,14 +17,18 @@ type SentryIntegrationOptions = {
   sidecarUrl?: string;
   injectIntoSDK?: boolean;
   openLastError?: boolean;
+  retries?: number;
 };
 
-export default function sentryIntegration(options?: SentryIntegrationOptions) {
+export default function sentryIntegration(options: SentryIntegrationOptions = {}) {
   return {
     name: 'sentry',
     forwardedContentType: [HEADER],
 
     setup: ({ open }) => {
+      if (options.retries == null) {
+        options.retries = 3;
+      }
       addSpotlightIntegrationToSentry(options);
 
       if (options?.openLastError) {
@@ -146,7 +150,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
 
     // data sanitization
     if (itemHeader.type && typeof itemPayload === 'object') {
-      // @ts-expect-error -- we should fix the types here
+      // @ts-expect-error -- Does not like assigning to `type` on random object
       itemPayload.type = itemHeader.type;
     }
     items.push([itemHeader, itemPayload] as EnvelopeItem);
@@ -198,8 +202,8 @@ type WindowWithSentry = Window & {
  *
  * @param options options of the Sentry integration for Spotlight
  */
-function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
-  if (options?.injectIntoSDK === false) {
+function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions) {
+  if (options.injectIntoSDK === false) {
     return;
   }
 
@@ -208,6 +212,13 @@ function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
 
   if (!sentryClient) {
     log("Couldn't find a Sentry SDK client. Make sure you're using a Sentry SDK with version >=7.99.0 or 8.x");
+    if (options.retries) {
+      log(`Will retry ${options.retries} more time(s) at 100ms intervals...`);
+      options.retries--;
+      setTimeout(() => {
+        addSpotlightIntegrationToSentry(options);
+      }, 100);
+    }
     return;
   }
 

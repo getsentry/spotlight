@@ -6,7 +6,6 @@ import packageJson from './package.json';
 const dependencies = Object.keys({
   ...packageJson.dependencies,
   ...packageJson.devDependencies,
-  ...packageJson.peerDependencies,
 });
 
 export default defineConfig({
