@@ -118,6 +118,10 @@ export default defineConfig({
               link: '/setup/sveltekit/',
             },
             {
+              label: 'For Vite',
+              link: '/setup/vite/',
+            },
+            {
               label: 'Just HTML',
               link: '/setup/html/',
             },
