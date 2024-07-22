@@ -38,8 +38,7 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
       const onRenderError = (e: CustomEvent) => {
         log('Sentry Event', e.detail.event_id);
         if (!e.detail.event) return;
-        sentryDataCache.pushEvent(e.detail.event);
-        setTimeout(() => open(`/errors/${e.detail.event.event_id}`), 0);
+        sentryDataCache.pushEvent(e.detail.event).then(() => open(`/errors/${e.detail.event.event_id}`));
       };
 
       on('sentry:showError', onRenderError as EventListener);

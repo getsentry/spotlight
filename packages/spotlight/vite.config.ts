@@ -6,7 +6,6 @@ import packageJson from './package.json';
 const dependencies = Object.keys({
   ...packageJson.dependencies,
   ...packageJson.devDependencies,
-  ...packageJson.peerDependencies,
 });
 
 export default defineConfig({
@@ -21,7 +20,7 @@ export default defineConfig({
       //   fileName: 'sentry-spotlight',
     },
     rollupOptions: {
-      external: [...dependencies, 'node:path', 'node:crypto'],
+      external: [...dependencies, 'node:path', 'node:crypto', 'node:fs'],
     },
   },
 });

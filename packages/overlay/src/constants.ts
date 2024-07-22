@@ -5,3 +5,5 @@ export const DEFAULT_EXPERIMENTS = {
 };
 
 export const DEFAULT_ANCHOR = 'bottomRight';
+
+export const CONTEXT_LINES_ENDPOINT = '/@spotlight/contextlines';
