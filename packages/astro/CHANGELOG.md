@@ -1,5 +1,24 @@
 # @spotlightjs/astro
 
+## 2.1.0
+
+### Minor Changes
+
+- A new Vite plugin under the main `@spotlightjs/spotlight` package that automatically injects spotlight for dev mode.
+  It ([#434](https://github.com/getsentry/spotlight/pull/434)) also replaces Vite's error page shown on compilation
+  errors with Spotlight.
+
+- 1. Altered the ssr-page vite plugin in @spotlight/astro to run spotlight overlay in fullscreen mode in ssr-error page.
+     ([#364](https://github.com/getsentry/spotlight/pull/364))
+  2. Closed astro erro overlay.
+  3. Added a option in sentry integration to open first error encountered in spotlight automatically.
+
+### Patch Changes
+
+- Updated dependencies
+  [[`a8c09cd8629677ab3eed4bf7000de4c7068538ee`](https://github.com/getsentry/spotlight/commit/a8c09cd8629677ab3eed4bf7000de4c7068538ee)]:
+  - @spotlightjs/spotlight@2.1.0
+
 ## 2.0.0
 
 ### Major Changes

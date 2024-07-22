@@ -1,5 +1,13 @@
 # @spotlightjs/sidecar
 
+## 1.5.0
+
+### Minor Changes
+
+- A new Vite plugin under the main `@spotlightjs/spotlight` package that automatically injects spotlight for dev mode.
+  It ([#434](https://github.com/getsentry/spotlight/pull/434)) also replaces Vite's error page shown on compilation
+  errors with Spotlight.
+
 ## 1.4.0
 
 ### Minor Changes
