@@ -1,5 +1,11 @@
 # @spotlightjs/spotlight
 
+## 2.1.1
+
+### Patch Changes
+
+- Fix TypeScript type locations ([#448](https://github.com/getsentry/spotlight/pull/448))
+
 ## 2.1.0
 
 ### Minor Changes
