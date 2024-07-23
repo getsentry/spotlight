@@ -105,13 +105,17 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
   } satisfies Integration<Envelope>;
 }
 
-function getLineEnd(data: string | Buffer, startFrom: number): number {
-  let end = data.indexOf('\n', startFrom);
+function getLineEnd(data: Uint8Array): number {
+  let end = data.indexOf(0xa);
   if (end === -1) {
     end = data.length;
   }
 
   return end;
+}
+
+function parseJSONFromBuffer(data: Uint8Array) {
+  return JSON.parse(new TextDecoder().decode(data));
 }
 
 /**
@@ -122,26 +126,25 @@ function getLineEnd(data: string | Buffer, startFrom: number): number {
  */
 export function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
-  let prevCursor = 0;
-  let cursor = getLineEnd(data, prevCursor);
-  const envelopeHeader = JSON.parse(data.slice(prevCursor, cursor).toString()) as Envelope[0];
+  let buffer = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+
+  function readLine(length?: number) {
+    const cursor = length ?? getLineEnd(buffer);
+    const line = buffer.subarray(0, cursor);
+    buffer = buffer.subarray(cursor + 1);
+    return line;
+  }
+
+  const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
 
   const items: EnvelopeItem[] = [];
-  while (cursor < data.length - 1) {
-    prevCursor = cursor + 1;
-    cursor = getLineEnd(data, prevCursor);
-    const itemHeader = JSON.parse(data.slice(prevCursor, cursor).toString()) as EnvelopeItem[0];
-    prevCursor = cursor + 1;
+  while (buffer.length) {
+    const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
     const payloadLength = itemHeader.length;
-    if (payloadLength !== undefined) {
-      cursor += payloadLength + 1;
-    } else {
-      cursor = getLineEnd(data, prevCursor);
-    }
-    let itemPayload = data.slice(prevCursor, cursor);
+    let itemPayload = readLine(payloadLength != null ? payloadLength : undefined);
 
     try {
-      itemPayload = JSON.parse(itemPayload.toString());
+      itemPayload = parseJSONFromBuffer(itemPayload);
     } catch (err) {
       log(err);
     }
