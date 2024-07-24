@@ -1,5 +1,6 @@
 import { Client, Envelope, Event, Integration } from '@sentry/types';
 import { serializeEnvelope } from '@sentry/utils';
+import { DEFAULT_SIDECAR_URL } from '~/constants';
 import { log } from '../../lib/logger';
 import sentryDataCache from './data/sentryDataCache';
 import { getNativeFetchImplementation } from './utils/fetch';
@@ -7,9 +8,9 @@ import { getNativeFetchImplementation } from './utils/fetch';
 type SpotlightBrowserIntegrationOptions = {
   /**
    * The URL of the Sidecar instance to connect and forward events to.
-   * If not set, Spotlight will try to connect to the Sidecar running on localhost:8969.
+   * If not set, Spotlight will try to connect to the Sidecar running on DEFAULT_SIDECAR_URL.
    *
-   * @default "http://localhost:8969/stream"
+   * @default DEFAULT_SIDECAR_URL
    */
   sidecarUrl?: string;
 };
@@ -29,7 +30,7 @@ type SpotlightBrowserIntegrationOptions = {
  * @returns Sentry integration for Spotlight.
  */
 export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOptions) => {
-  const _sidecarUrl = options?.sidecarUrl ?? 'http://localhost:8969/stream';
+  const _sidecarUrl = options?.sidecarUrl ?? DEFAULT_SIDECAR_URL;
 
   return {
     name: 'SpotlightBrowser',

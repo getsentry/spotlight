@@ -1,8 +1,9 @@
 import fontStyles from '@fontsource/raleway/index.css?inline';
+import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/sidecar/constants';
 import { MemoryRouter } from 'react-router-dom';
 import colors from 'tailwindcss/colors';
 import App from './App.tsx';
-import { CONTEXT_LINES_ENDPOINT, DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from './constants.ts';
+import { DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from './constants.ts';
 import globalStyles from './index.css?inline';
 import { initIntegrations, type SpotlightContext } from './integrations/integration.ts';
 import { default as sentry } from './integrations/sentry/index.ts';

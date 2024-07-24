@@ -29,9 +29,12 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
       if (options.retries == null) {
         options.retries = 3;
       }
+      if (options.sidecarUrl) {
+        sentryDataCache.setSidecarUrl(options.sidecarUrl);
+      }
       addSpotlightIntegrationToSentry(options);
 
-      if (options?.openLastError) {
+      if (options.openLastError) {
         sentryDataCache.subscribe('event', (e: SentryEvent) => {
           if (!(e as SentryErrorEvent).exception) return;
           setTimeout(() => open(`/errors/${e.event_id}`), 0);
