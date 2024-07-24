@@ -101,7 +101,7 @@ function handleStreamRequest(
     }
     return true;
   } else {
-    if (req.url == '/stream') {
+    if (req.url == '/stream' || (req.url && /^\/api\/\d+\/envelope/.test(req.url))) {
       if (req.method === 'OPTIONS') {
         res.writeHead(204, {
           'Cache-Control': 'no-cache',
