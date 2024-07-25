@@ -16,7 +16,7 @@
     "bin"
   ],
   "bin": {
-    "spotlight-sidecar": "./bin/run.js"
+    "spotlight": "./bin/run.js"
   },
   "main": "./dist/overlay.cjs",
   "module": "./dist/overlay.js",
