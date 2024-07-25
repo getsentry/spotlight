@@ -1,6 +1,8 @@
 import { Envelope } from '@sentry/types';
+import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/sidecar/constants';
+import { DEFAULT_SIDECAR_URL } from '~/constants';
 import { RawEventContext } from '~/integrations/integration';
-import { CONTEXT_LINES_ENDPOINT } from '../../../constants';
+import { log } from '../../../lib/logger';
 import { generate_uuidv4 } from '../../../lib/uuid';
 import { Sdk, SentryErrorEvent, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
 import { getNativeFetchImplementation } from '../utils/fetch';
@@ -32,12 +34,19 @@ class SentryDataCache {
 
   protected subscribers: Map<string, Subscription> = new Map();
 
+  protected contextLinesProvider: string = new URL(DEFAULT_SIDECAR_URL).origin + CONTEXT_LINES_ENDPOINT;
+
   constructor(
     initial: (SentryEvent & {
       event_id?: string;
     })[] = [],
   ) {
     initial.forEach(e => this.pushEvent(e));
+  }
+
+  setSidecarUrl(url: string) {
+    const { origin } = new URL(url);
+    this.contextLinesProvider = origin + CONTEXT_LINES_ENDPOINT;
   }
 
   inferSdkFromEvent(event: SentryEvent) {
@@ -112,7 +121,7 @@ class SentryDataCache {
     if (this.eventIds.has(event.event_id)) return;
 
     if (isErrorEvent(event)) {
-      await processStacktrace(event);
+      await this.processStacktrace(event);
     }
 
     event.timestamp = toTimestamp(event.timestamp);
@@ -264,51 +273,51 @@ class SentryDataCache {
     if (this.localTraceIds.size > 0) return false;
     return null;
   }
+
+  /**
+   * Reverses the stack trace and tries to fill missing context lines
+   * @param errorEvent
+   * @returns
+   */
+  async processStacktrace(errorEvent: SentryErrorEvent): Promise<void[]> {
+    if (!errorEvent.exception || !errorEvent.exception.values) {
+      return [];
+    }
+
+    return Promise.all(
+      (errorEvent.exception.values ?? []).map(async exception => {
+        if (
+          !exception.stacktrace ||
+          exception.stacktrace.frames?.every(frame => frame.post_context && frame.pre_context && frame.context_line)
+        ) {
+          log('Skipping contextlines request for', exception);
+          return;
+        }
+        exception.stacktrace.frames.reverse();
+
+        try {
+          const makeFetch = getNativeFetchImplementation();
+          const stackTraceWithContextResponse = await makeFetch(this.contextLinesProvider, {
+            method: 'PUT',
+            body: JSON.stringify(exception.stacktrace),
+          });
+
+          if (!stackTraceWithContextResponse.ok || stackTraceWithContextResponse.status !== 200) {
+            return;
+          }
+
+          const stackTraceWithContext = await stackTraceWithContextResponse.json();
+          exception.stacktrace = stackTraceWithContext;
+        } catch {
+          // Something went wrong, for now we just ignore it.
+        }
+      }),
+    );
+  }
 }
 
 export default new SentryDataCache();
 
 function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
   return event.type != 'transaction';
-}
-
-/**
- * Reverses the stack trace and tries to fill missing context lines
- * @param errorEvent
- * @returns
- */
-async function processStacktrace(errorEvent: SentryErrorEvent): Promise<void[]> {
-  if (!errorEvent.exception || !errorEvent.exception.values) {
-    return [];
-  }
-
-  return Promise.all(
-    (errorEvent.exception.values ?? []).map(async exception => {
-      if (
-        !exception.stacktrace ||
-        exception.stacktrace.frames?.every(frame => frame.post_context && frame.pre_context && frame.context_line)
-      ) {
-        console.log('skipping', exception);
-        return;
-      }
-      exception.stacktrace.frames.reverse();
-
-      try {
-        const makeFetch = getNativeFetchImplementation();
-        const stackTraceWithContextResponse = await makeFetch(CONTEXT_LINES_ENDPOINT, {
-          method: 'PUT',
-          body: JSON.stringify(exception.stacktrace),
-        });
-
-        if (!stackTraceWithContextResponse.ok || stackTraceWithContextResponse.status !== 200) {
-          return;
-        }
-
-        const stackTraceWithContext = await stackTraceWithContextResponse.json();
-        exception.stacktrace = stackTraceWithContext;
-      } catch {
-        // Something went wrong, for now we just ignore it.
-      }
-    }),
-  );
 }

@@ -2,11 +2,10 @@ import { createWriteStream, readFile } from 'node:fs';
 import { IncomingMessage, Server, ServerResponse, createServer, get } from 'node:http';
 import { extname, join } from 'node:path';
 import { createGunzip, createInflate } from 'node:zlib';
+import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from './constants.js';
+import { contextLinesHandler } from './contextlines.js';
 import { SidecarLogger, activateLogger, enableDebugLogging, logger } from './logger.js';
 import { MessageBuffer } from './messageBuffer.js';
-
-const DEFAULT_PORT = 8969;
-const SERVER_IDENTIFIER = 'spotlight-by-sentry';
 
 type Payload = [string, string];
 
@@ -230,6 +229,7 @@ function startServer(
     [/^\/health$/, handleHealthRequest],
     [/^\/clear$/, handleClearRequest],
     [/^\/stream$|^\/api\/\d+\/envelope$/, streamRequestHandler(buffer, incomingPayload)],
+    [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), contextLinesHandler],
     [/^.+$/, basePath != null ? fileServer(basePath) : error404],
   ];
 

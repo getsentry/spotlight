@@ -41,7 +41,6 @@
   "dependencies": {
     "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
-    "source-map": "^0.7.4",
     "import-meta-resolve": "^4.1.0"
   },
   "devDependencies": {

@@ -28,12 +28,17 @@
     "./vite-plugin": {
       "import": "./src/vite-plugin.js"
     },
+    "./constants": {
+      "import": "./src/constants.js",
+      "types": "./dist/constants.d.ts"
+    },
     "./run": {
       "import": "./src/run.js"
     }
   },
   "dependencies": {},
   "devDependencies": {
+    "source-map": "^0.7.4",
     "kleur": "^4.1.5",
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "^18",

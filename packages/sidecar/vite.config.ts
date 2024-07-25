@@ -15,7 +15,7 @@ export default defineConfig({
     outDir: './dist',
     sourcemap: true,
     rollupOptions: {
-      external: [...dependencies, 'node:path', 'node:http', 'node:fs', 'node:zlib'],
+      external: [...dependencies, 'node:path', 'node:http', 'node:zlib'],
     },
   },
   ssr: {
