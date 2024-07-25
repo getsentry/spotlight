@@ -43,5 +43,8 @@
   },
   "astro": {
     "external": true
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
