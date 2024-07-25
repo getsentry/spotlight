@@ -1,3 +1,4 @@
+import { builtinModules } from 'node:module';
 import { defineConfig } from 'vite';
 
 import packageJson from './package.json';
@@ -15,7 +16,7 @@ export default defineConfig({
     outDir: './dist',
     sourcemap: true,
     rollupOptions: {
-      external: [...dependencies, 'node:path', 'node:http', 'node:zlib'],
+      external: [...dependencies, ...builtinModules.map(x => `node:${x}`)],
     },
   },
   ssr: {

@@ -1,3 +1,4 @@
+import { builtinModules } from 'node:module';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 
@@ -20,7 +21,7 @@ export default defineConfig({
       //   fileName: 'sentry-spotlight',
     },
     rollupOptions: {
-      external: [...dependencies, 'node:path', 'node:crypto', 'node:fs'],
+      external: [...dependencies, ...builtinModules.map(x => `node:${x}`)],
     },
   },
 });
