@@ -33,4 +33,4 @@ jobs:
           commit: 'meta(changelog): Update package versions'
           title: 'meta(changelog): Update package versions'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_RELEASE_PAT }}
