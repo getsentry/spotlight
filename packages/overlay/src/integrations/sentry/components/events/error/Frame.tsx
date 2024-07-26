@@ -1,9 +1,14 @@
 import { useState } from 'react';
+import { ReactComponent as PenIcon } from '~/assets/pen.svg';
 import { renderValue } from '~/utils/values';
 import classNames from '../../../../../lib/classNames';
 import { EventFrame, FrameVars } from '../../../types';
 
 function formatFilename(filename: string) {
+  const queryPos = filename.lastIndexOf('?');
+  if (queryPos > -1) {
+    filename = filename.slice(0, queryPos);
+  }
   if (filename.indexOf('/node_modules/') === -1) return filename;
   return `npm:${filename
     .replace(/\/node_modules\//gi, 'npm:')
@@ -44,6 +49,7 @@ export default function Frame({
   const [isOpen, setOpen] = useState(defaultExpand);
 
   const hasSource = !!frame.context_line;
+  const fileName = platform === 'java' ? frame.module : frame.filename || frame.module;
   return (
     <li className="border-primary-900 bg-primary-900 border-b last:border-b-0">
       <div
@@ -51,19 +57,31 @@ export default function Frame({
           hasSource ? 'hover:bg-primary-800 cursor-pointer' : '',
           'border-primary-950 text-primary-400 border-b px-2 py-1',
         )}
-        onClick={() => setOpen(!isOpen)}
+        onClick={hasSource ? () => setOpen(!isOpen) : undefined}
       >
-        {platform === 'java' ? (
-          frame.module ? (
-            <span className="text-primary-100">{`${formatFilename(frame.module)} in `}</span>
-          ) : frame.filename ? (
-            <span className="text-primary-100">{`${formatFilename(frame.filename)} in `}</span>
-          ) : null
-        ) : frame.filename ? (
-          <span className="text-primary-100">{`${formatFilename(frame.filename)} in `}</span>
-        ) : frame.module ? (
-          <span className="text-primary-100">{`${formatFilename(frame.module)} in `}</span>
+        {fileName ? (
+          <span className="text-primary-100">
+            {formatFilename(fileName)}
+            {isOpen && !frame.filename?.includes(':') ? (
+              <PenIcon
+                width={14}
+                height={14}
+                title="Open in editor"
+                className="inline fill-green-400 stroke-green-400 align-top"
+                onClick={evt => {
+                  fetch('http://localhost:8969/open', {
+                    method: 'POST',
+                    body: `${frame.filename}:${frame.lineno}:${frame.colno}`,
+                    credentials: 'omit',
+                  });
+                  evt.stopPropagation();
+                }}
+              />
+            ) : null}
+            {' in '}
+          </span>
         ) : null}
+
         <span className="text-primary-100">{frame.function}</span>
         {frame.lineno !== undefined && (
           <>

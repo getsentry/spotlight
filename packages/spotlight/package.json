@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
+    "start": "./bin/run.js",
     "dev": "vite build --watch",
     "build": "vite build && vite build --config vite.overlay.config.ts && tsc",
     "build:watch": "vite build --watch",

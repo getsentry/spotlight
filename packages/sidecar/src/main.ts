@@ -1,3 +1,4 @@
+import launchEditor from 'launch-editor';
 import { createWriteStream, readFile } from 'node:fs';
 import { IncomingMessage, Server, ServerResponse, createServer, get } from 'node:http';
 import { extname, join } from 'node:path';
@@ -209,6 +210,34 @@ function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
   }
 }
 
+function openRequestHandler(req: IncomingMessage, res: ServerResponse) {
+  // We're only interested in handling a POST request
+  if (req.method !== 'POST') {
+    res.writeHead(405);
+    res.end();
+    return;
+  }
+
+  let requestBody = '';
+  req.on('data', chunk => {
+    requestBody += chunk;
+  });
+
+  req.on('end', () => {
+    launchEditor(
+      // filename:line:column
+      // both line and column are optional
+      requestBody,
+      // callback if failed to launch (optional)
+      (fileName: string, errorMsg: string) => {
+        logger.error(`Failed to launch editor for ${fileName}: ${errorMsg}`);
+      },
+    );
+    res.writeHead(204);
+    res.end();
+  });
+}
+
 function errorResponse(code: number) {
   return (_req: IncomingMessage, res: ServerResponse) => {
     res.writeHead(code);
@@ -229,6 +258,7 @@ function startServer(
     [/^\/health$/, handleHealthRequest],
     [/^\/clear$/, handleClearRequest],
     [/^\/stream$|^\/api\/\d+\/envelope$/, streamRequestHandler(buffer, incomingPayload)],
+    [/^\/open$/, openRequestHandler],
     [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), contextLinesHandler],
     [/^.+$/, basePath != null ? fileServer(basePath) : error404],
   ];
