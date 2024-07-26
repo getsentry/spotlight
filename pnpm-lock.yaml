@@ -459,10 +459,6 @@ importers:
         version: 0.34.6
 
   packages/sidecar:
-    dependencies:
-      launch-editor:
-        specifier: ^2.8.0
-        version: 2.8.0
     devDependencies:
       '@spotlightjs/tsconfig':
         specifier: workspace:*
@@ -473,6 +469,9 @@ importers:
       kleur:
         specifier: ^4.1.5
         version: 4.1.5
+      launch-editor:
+        specifier: ^2.8.0
+        version: 2.8.0
       source-map:
         specifier: ^0.7.4
         version: 0.7.4
@@ -11019,7 +11018,7 @@ packages:
     dependencies:
       picocolors: 1.0.1
       shell-quote: 1.8.1
-    dev: false
+    dev: true
 
   /lazy-val@1.0.5:
     resolution: {integrity: sha512-0/BnGCCfyUMkBpeDgWihanIAF9JmZhHBgUhEqzvf+adhNGLoP6TaiI5oF8oyb3I45P+PcnrqihSf01M0l0G5+Q==}
@@ -14330,7 +14329,7 @@ packages:
 
   /shell-quote@1.8.1:
     resolution: {integrity: sha512-6j1W9l1iAs/4xYBI1SYOVZyFcCis9b4KCLQ8fgAGG07QvzaRLVVRQvAy85yNmmZSjYjg4MWh4gNvlPujU/5LpA==}
-    dev: false
+    dev: true
 
   /shiki@0.14.5:
     resolution: {integrity: sha512-1gCAYOcmCFONmErGTrS1fjzJLA7MGZmKzrBNX7apqSwhyITJg2O102uFzXUeBxNnEkDA9vHIKLyeKq0V083vIw==}
