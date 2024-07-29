@@ -3,7 +3,7 @@
   "description": "Electron app for Spotlight",
   "author": "Sentry",
   "license": "Apache-2.0",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "main": "./out/main/index.js",
   "files": [
     "src"

@@ -1,5 +1,31 @@
 # @spotlightjs/spotlight
 
+## 2.2.0
+
+### Minor Changes
+
+- Add ability to use sidecar URL in a DSN ([#452](https://github.com/getsentry/spotlight/pull/452))
+
+- Move contextlines provider to sidecar ([#454](https://github.com/getsentry/spotlight/pull/454))
+
+- Add 'open in editor' icon ([#462](https://github.com/getsentry/spotlight/pull/462))
+
+### Patch Changes
+
+- Fix `npx @spotlightjs/spotlight` not running standalone overlay
+  ([#457](https://github.com/getsentry/spotlight/pull/457))
+
+- Fix incompatibility between Spotlight and Storybook's bundling.
+  ([#420](https://github.com/getsentry/spotlight/pull/420))
+
+- Updated dependencies
+  [[`0a6486b14d96a0eafec27a94707e4715b9fc3583`](https://github.com/getsentry/spotlight/commit/0a6486b14d96a0eafec27a94707e4715b9fc3583),
+  [`9a7357f1dedc66d030358176bee777715b09c41b`](https://github.com/getsentry/spotlight/commit/9a7357f1dedc66d030358176bee777715b09c41b),
+  [`06f3070867534641dbb5c394e5513ca9781bbfa8`](https://github.com/getsentry/spotlight/commit/06f3070867534641dbb5c394e5513ca9781bbfa8),
+  [`725cbb5daea8682fdf8fefb952ddce68c97c4d6f`](https://github.com/getsentry/spotlight/commit/725cbb5daea8682fdf8fefb952ddce68c97c4d6f)]:
+  - @spotlightjs/sidecar@1.6.0
+  - @spotlightjs/overlay@2.2.0
+
 ## 2.1.1
 
 ### Patch Changes

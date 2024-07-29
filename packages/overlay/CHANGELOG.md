@@ -1,5 +1,18 @@
 # @spotlightjs/core
 
+## 2.2.0
+
+### Minor Changes
+
+- Move contextlines provider to sidecar ([#454](https://github.com/getsentry/spotlight/pull/454))
+
+- Add 'open in editor' icon ([#462](https://github.com/getsentry/spotlight/pull/462))
+
+### Patch Changes
+
+- Fix incompatibility between Spotlight and Storybook's bundling.
+  ([#420](https://github.com/getsentry/spotlight/pull/420))
+
 ## 2.1.0
 
 ### Minor Changes
