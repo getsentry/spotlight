@@ -44,12 +44,34 @@ type SideCarOptions = {
   incomingPayload?: IncomingPayloadCallback;
 };
 
+type RequestHandler = (req: IncomingMessage, res: ServerResponse) => void;
+
 function getCorsHeader(): { [name: string]: string } {
   return {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Allow-Headers': '*',
     'Access-Control-Allow-Methods': 'GET,POST,PUT,OPTIONS,DELETE,PATCH',
+  };
+}
+
+function enableCORS(handler: RequestHandler): RequestHandler {
+  return function corsMiddleware(req: IncomingMessage, res: ServerResponse) {
+    const headers = {
+      ...getCorsHeader(),
+      ...getSpotlightHeader(),
+    };
+    for (const [header, value] of Object.entries(headers)) {
+      res.setHeader(header, value);
+    }
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Cache-Control': 'no-cache',
+      });
+      res.end();
+      return;
+    }
+    return handler(req, res);
   };
 }
 
@@ -65,8 +87,6 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        ...getCorsHeader(),
-        ...getSpotlightHeader(),
         Connection: 'keep-alive',
       });
       res.flushHeaders();
@@ -88,13 +108,6 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
         buffer.unsubscribe(sub);
         res.end();
       });
-    } else if (req.method === 'OPTIONS') {
-      res.writeHead(204, {
-        'Cache-Control': 'no-cache',
-        ...getCorsHeader(),
-        ...getSpotlightHeader(),
-      });
-      res.end();
     } else if (req.method === 'POST') {
       logger.debug(`📩 Received event`);
       let body: string = '';
@@ -137,8 +150,6 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
         // 204 would be more appropriate but returning 200 to match what /envelope returns
         res.writeHead(200, {
           'Cache-Control': 'no-cache',
-          ...getCorsHeader(),
-          ...getSpotlightHeader(),
           Connection: 'keep-alive',
         });
         res.end();
@@ -190,18 +201,9 @@ function handleHealthRequest(_req: IncomingMessage, res: ServerResponse): void {
 }
 
 function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204, {
-      'Cache-Control': 'no-cache',
-      ...getCorsHeader(),
-      ...getSpotlightHeader(),
-    });
-    res.end();
-  } else if (req.method === 'DELETE') {
+  if (req.method === 'DELETE') {
     res.writeHead(200, {
       'Content-Type': 'text/plain',
-      ...getCorsHeader(),
-      ...getSpotlightHeader(),
     });
     clearBuffer();
     res.end('Cleared');
@@ -256,10 +258,10 @@ function startServer(
 ): Server {
   const ROUTES: [RegExp, (req: IncomingMessage, res: ServerResponse) => void][] = [
     [/^\/health$/, handleHealthRequest],
-    [/^\/clear$/, handleClearRequest],
-    [/^\/stream$|^\/api\/\d+\/envelope$/, streamRequestHandler(buffer, incomingPayload)],
-    [/^\/open$/, openRequestHandler],
-    [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), contextLinesHandler],
+    [/^\/clear$/, enableCORS(handleClearRequest)],
+    [/^\/stream$|^\/api\/\d+\/envelope$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
+    [/^\/open$/, enableCORS(openRequestHandler)],
+    [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), enableCORS(contextLinesHandler)],
     [/^.+$/, basePath != null ? fileServer(basePath) : error404],
   ];
 
