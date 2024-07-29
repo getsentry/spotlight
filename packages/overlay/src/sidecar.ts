@@ -16,23 +16,24 @@ export function connectToSidecar(
   for (const [contentType, integrations] of contentTypeToIntegrations.entries()) {
     const listener = (event: MessageEvent): void => {
       log(`Received new ${contentType} event`);
-      integrations.forEach(integration => {
-        if (integration.processEvent) {
-          const processedEvent = integration.processEvent({
-            contentType,
-            data: event.data,
-          });
-          if (processedEvent) {
-            setIntegrationData(prev => {
-              const integrationName = integration.name;
-              return {
-                ...prev,
-                [integrationName]: [...(prev[integrationName] || []), processedEvent],
-              };
-            });
-          }
+      for (const integration of integrations) {
+        if (!integration.processEvent) {
+          return;
         }
-      });
+        const processedEvent = integration.processEvent({
+          contentType,
+          data: event.data,
+        });
+        if (processedEvent) {
+          setIntegrationData(prev => {
+            const integrationName = integration.name;
+            return {
+              ...prev,
+              [integrationName]: [...(prev[integrationName] || []), processedEvent],
+            };
+          });
+        }
+      }
     };
 
     log('Adding listener for', contentType, 'sum', contentTypeListeners.length);

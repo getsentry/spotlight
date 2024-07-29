@@ -17,29 +17,34 @@ type SentryIntegrationOptions = {
   sidecarUrl?: string;
   injectIntoSDK?: boolean;
   openLastError?: boolean;
+  retries?: number;
 };
 
-export default function sentryIntegration(options?: SentryIntegrationOptions) {
+export default function sentryIntegration(options: SentryIntegrationOptions = {}) {
   return {
     name: 'sentry',
     forwardedContentType: [HEADER],
 
     setup: ({ open }) => {
+      if (options.retries == null) {
+        options.retries = 3;
+      }
+      if (options.sidecarUrl) {
+        sentryDataCache.setSidecarUrl(options.sidecarUrl);
+      }
       addSpotlightIntegrationToSentry(options);
 
-      if (options?.openLastError) {
-        const unsubscribe = sentryDataCache.subscribe('event', (e: SentryEvent) => {
+      if (options.openLastError) {
+        sentryDataCache.subscribe('event', (e: SentryEvent) => {
           if (!(e as SentryErrorEvent).exception) return;
           setTimeout(() => open(`/errors/${e.event_id}`), 0);
-          unsubscribe();
         });
       }
 
       const onRenderError = (e: CustomEvent) => {
         log('Sentry Event', e.detail.event_id);
         if (!e.detail.event) return;
-        sentryDataCache.pushEvent(e.detail.event);
-        setTimeout(() => open(`/errors/${e.detail.event.event_id}`), 0);
+        sentryDataCache.pushEvent(e.detail.event).then(() => open(`/errors/${e.detail.event.event_id}`));
       };
 
       on('sentry:showError', onRenderError as EventListener);
@@ -103,13 +108,17 @@ export default function sentryIntegration(options?: SentryIntegrationOptions) {
   } satisfies Integration<Envelope>;
 }
 
-function getLineEnd(data: string | Buffer, startFrom: number): number {
-  let end = data.indexOf('\n', startFrom);
+function getLineEnd(data: Uint8Array): number {
+  let end = data.indexOf(0xa);
   if (end === -1) {
     end = data.length;
   }
 
   return end;
+}
+
+function parseJSONFromBuffer(data: Uint8Array) {
+  return JSON.parse(new TextDecoder().decode(data));
 }
 
 /**
@@ -120,33 +129,32 @@ function getLineEnd(data: string | Buffer, startFrom: number): number {
  */
 export function processEnvelope(rawEvent: RawEventContext) {
   const { data } = rawEvent;
-  let prevCursor = 0;
-  let cursor = getLineEnd(data, prevCursor);
-  const envelopeHeader = JSON.parse(data.slice(prevCursor, cursor).toString()) as Envelope[0];
+  let buffer = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+
+  function readLine(length?: number) {
+    const cursor = length ?? getLineEnd(buffer);
+    const line = buffer.subarray(0, cursor);
+    buffer = buffer.subarray(cursor + 1);
+    return line;
+  }
+
+  const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
 
   const items: EnvelopeItem[] = [];
-  while (cursor < data.length - 1) {
-    prevCursor = cursor + 1;
-    cursor = getLineEnd(data, prevCursor);
-    const itemHeader = JSON.parse(data.slice(prevCursor, cursor).toString()) as EnvelopeItem[0];
-    prevCursor = cursor + 1;
+  while (buffer.length) {
+    const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
     const payloadLength = itemHeader.length;
-    if (payloadLength !== undefined) {
-      cursor += payloadLength + 1;
-    } else {
-      cursor = getLineEnd(data, prevCursor);
-    }
-    let itemPayload = data.slice(prevCursor, cursor);
+    let itemPayload = readLine(payloadLength != null ? payloadLength : undefined);
 
     try {
-      itemPayload = JSON.parse(itemPayload.toString());
+      itemPayload = parseJSONFromBuffer(itemPayload);
     } catch (err) {
       log(err);
     }
 
     // data sanitization
     if (itemHeader.type && typeof itemPayload === 'object') {
-      // @ts-expect-error -- we should fix the types here
+      // @ts-expect-error -- Does not like assigning to `type` on random object
       itemPayload.type = itemHeader.type;
     }
     items.push([itemHeader, itemPayload] as EnvelopeItem);
@@ -198,8 +206,8 @@ type WindowWithSentry = Window & {
  *
  * @param options options of the Sentry integration for Spotlight
  */
-function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
-  if (options?.injectIntoSDK === false) {
+function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions) {
+  if (options.injectIntoSDK === false) {
     return;
   }
 
@@ -208,6 +216,13 @@ function addSpotlightIntegrationToSentry(options?: SentryIntegrationOptions) {
 
   if (!sentryClient) {
     log("Couldn't find a Sentry SDK client. Make sure you're using a Sentry SDK with version >=7.99.0 or 8.x");
+    if (options.retries) {
+      log(`Will retry ${options.retries} more time(s) at 100ms intervals...`);
+      options.retries--;
+      setTimeout(() => {
+        addSpotlightIntegrationToSentry(options);
+      }, 100);
+    }
     return;
   }
 

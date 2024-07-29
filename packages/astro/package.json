@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/astro",
   "description": "Add spotlight to your Astro toolbar, for better debugging.",
-  "version": "2.0.0",
+  "version": "2.1.1",
   "license": "Apache-2.0",
   "author": "Sentry",
   "repository": "git@github.com:getsentry/spotlight.git",
@@ -27,16 +27,14 @@
     ".": "./src/index.ts"
   },
   "peerDependencies": {
-    "astro": ">=3.4.0 || >=4.0.0-beta",
+    "astro": ">=4.0.0",
     "@sentry/astro": ">=7.84.0"
   },
   "dependencies": {
-    "@spotlightjs/overlay": "workspace:*",
-    "@spotlightjs/sidecar": "workspace:*",
-    "source-map": "^0.7.4"
+    "@spotlightjs/spotlight": "workspace:*"
   },
   "devDependencies": {
-    "astro": "^4.0.0-beta.4",
+    "astro": "^4.0.0",
     "typescript": "^5.0.2",
     "vite": "^4.5.3"
   },
@@ -45,5 +43,8 @@
   },
   "astro": {
     "external": true
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

@@ -1,7 +1,8 @@
+import { readFileSync } from 'node:fs';
+import { IncomingMessage, ServerResponse } from 'node:http';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import * as SourceMap from 'source-map';
-import type { Plugin } from 'vite';
-
-import os from 'os';
 
 type SourceContext = {
   pre_context?: string[];
@@ -20,64 +21,6 @@ type ValidSentryStackFrame = Required<SentryStackFrame>;
 type SentryStackTrace = {
   frames?: SentryStackFrame[];
 };
-
-const CONTEXT_LINES_ENDPOINT = '/spotlight/contextlines';
-
-export const sourceContextPlugin: () => Plugin = () => ({
-  name: 'spotlight-vite-resolve-contextlines-plugin',
-  configureServer(server) {
-    console.log(`[@spotlightjs/astro] Setting up ${CONTEXT_LINES_ENDPOINT} endpoint in Vite dev server`);
-    server.middlewares.use((req, res, next) => {
-      if (req.url === CONTEXT_LINES_ENDPOINT && req.method === 'PUT') {
-        let requestBody = '';
-        req.on('data', chunk => {
-          requestBody += chunk;
-        });
-
-        req.on('end', async () => {
-          const stacktrace = parseStackTrace(requestBody);
-
-          if (!stacktrace) {
-            res.writeHead(500);
-            res.end();
-            return;
-          }
-
-          for (const frame of stacktrace.frames ?? []) {
-            if (
-              isValidSentryStackFrame(frame) &&
-              // let's ignore dependencies for now with this naive check
-              !frame.filename.includes('/node_modules/')
-            ) {
-              const generatedCode = await getGeneratedCodeFromServer(frame.filename);
-              if (!generatedCode) {
-                continue;
-              }
-
-              // Extract the inline source map from the minified code
-              const inlineSourceMapMatch = generatedCode.match(
-                /\/\/# sourceMappingURL=data:application\/json;base64,(.*)/,
-              );
-
-              if (inlineSourceMapMatch && inlineSourceMapMatch[1]) {
-                const sourceMapBase64 = inlineSourceMapMatch[1];
-                const sourceMapContent = Buffer.from(sourceMapBase64, 'base64').toString('utf-8');
-                await applySourceContextToFrame(sourceMapContent, frame);
-              }
-            }
-          }
-
-          const responseJson = JSON.stringify(stacktrace);
-
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(responseJson);
-        });
-      } else {
-        next();
-      }
-    });
-  },
-});
 
 async function getGeneratedCodeFromServer(filename: string): Promise<string | undefined> {
   try {
@@ -108,6 +51,9 @@ async function applySourceContextToFrame(sourceMapContent: string, frame: ValidS
   if (originalPosition.source && originalPosition.line && originalPosition.column) {
     frame.lineno = originalPosition.line;
     frame.colno = originalPosition.column;
+    const filePath = new URL(frame.filename).pathname.slice(1); // slice(1) is to not make it absolute path
+    frame.filename = path.resolve(path.join(path.dirname(filePath), originalPosition.source));
+
     const content = consumer.sourceContentFor(originalPosition.source);
     const lines = content?.split(os.EOL) ?? [];
     addContextLinesToFrame(lines, frame);
@@ -176,4 +122,69 @@ function snipLine(line: string, colno: number): string {
 
 function isValidSentryStackFrame(frame: SentryStackFrame): frame is ValidSentryStackFrame {
   return !!frame.filename && !!frame.lineno && !!frame.colno;
+}
+
+export function contextLinesHandler(req: IncomingMessage, res: ServerResponse) {
+  // We're only interested in handling a PUT request
+  if (req.method !== 'PUT') {
+    res.writeHead(405);
+    res.end();
+    return;
+  }
+
+  let requestBody = '';
+  req.on('data', chunk => {
+    requestBody += chunk;
+  });
+
+  req.on('end', async () => {
+    const stacktrace = parseStackTrace(requestBody);
+
+    if (!stacktrace) {
+      res.writeHead(500);
+      res.end();
+      return;
+    }
+
+    for (const frame of stacktrace.frames ?? []) {
+      if (
+        !isValidSentryStackFrame(frame) ||
+        // let's ignore dependencies for now with this naive check
+        frame.filename.includes('/node_modules/')
+      ) {
+        continue;
+      }
+      const { filename } = frame;
+      // Dirty check to see if this looks like a regular file path or a URL
+      if (filename.includes('://')) {
+        const generatedCode = await getGeneratedCodeFromServer(frame.filename);
+        if (!generatedCode) {
+          continue;
+        }
+
+        // Extract the inline source map from the minified code
+        const inlineSourceMapMatch = generatedCode.match(/\/\/# sourceMappingURL=data:application\/json;base64,(.*)/);
+
+        if (inlineSourceMapMatch && inlineSourceMapMatch[1]) {
+          const sourceMapBase64 = inlineSourceMapMatch[1];
+          const sourceMapContent = Buffer.from(sourceMapBase64, 'base64').toString('utf-8');
+          await applySourceContextToFrame(sourceMapContent, frame);
+        }
+      } else if (!filename.includes(':')) {
+        try {
+          const lines = readFileSync(filename, { encoding: 'utf-8' }).split(/\r?\n/);
+          addContextLinesToFrame(lines, frame);
+        } catch (err) {
+          if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+            throw err;
+          }
+        }
+      }
+    }
+
+    const responseJson = JSON.stringify(stacktrace);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(responseJson);
+  });
 }

@@ -1,10 +1,11 @@
 {
   "name": "@spotlightjs/sidecar",
   "description": "A small proxy server to capture and forward data from backend services to Spotlight.",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
+    "start": "./server.js",
     "dev": "vite build --watch",
     "build": "vite build && tsc",
     "build:watch": "vite build --watch",
@@ -28,19 +29,28 @@
     "./vite-plugin": {
       "import": "./src/vite-plugin.js"
     },
+    "./constants": {
+      "import": "./src/constants.js",
+      "types": "./dist/constants.d.ts"
+    },
     "./run": {
       "import": "./src/run.js"
     }
   },
   "dependencies": {},
   "devDependencies": {
-    "kleur": "^4.1.5",
     "@spotlightjs/tsconfig": "workspace:*",
+    "launch-editor": "^2.8.0",
     "@types/node": "^18",
+    "kleur": "^4.1.5",
+    "source-map": "^0.7.4",
     "typescript": "^5.0.2",
     "vite": "^4.5.3"
   },
   "volta": {
     "extends": "../../package.json"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

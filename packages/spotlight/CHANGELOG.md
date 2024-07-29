@@ -1,5 +1,31 @@
 # @spotlightjs/spotlight
 
+## 2.1.1
+
+### Patch Changes
+
+- Fix TypeScript type locations ([#448](https://github.com/getsentry/spotlight/pull/448))
+
+## 2.1.0
+
+### Minor Changes
+
+- A new Vite plugin under the main `@spotlightjs/spotlight` package that automatically injects spotlight for dev mode.
+  It ([#434](https://github.com/getsentry/spotlight/pull/434)) also replaces Vite's error page shown on compilation
+  errors with Spotlight.
+
+### Patch Changes
+
+- Updated dependencies
+  [[`01321f8824ae133dc02a1d829c25952c884bf631`](https://github.com/getsentry/spotlight/commit/01321f8824ae133dc02a1d829c25952c884bf631),
+  [`a8c09cd8629677ab3eed4bf7000de4c7068538ee`](https://github.com/getsentry/spotlight/commit/a8c09cd8629677ab3eed4bf7000de4c7068538ee),
+  [`3792a5e742b3888a980a0b865fd23be941809040`](https://github.com/getsentry/spotlight/commit/3792a5e742b3888a980a0b865fd23be941809040),
+  [`b5249aa761c783739543dc7bf27cdd8d0fe8cebe`](https://github.com/getsentry/spotlight/commit/b5249aa761c783739543dc7bf27cdd8d0fe8cebe),
+  [`1c7896e02a2b81715c4e5c47cbb2fd6145868ab1`](https://github.com/getsentry/spotlight/commit/1c7896e02a2b81715c4e5c47cbb2fd6145868ab1),
+  [`41d90455fa94df0a01e93fd90574974dfca96764`](https://github.com/getsentry/spotlight/commit/41d90455fa94df0a01e93fd90574974dfca96764)]:
+  - @spotlightjs/overlay@2.1.0
+  - @spotlightjs/sidecar@1.5.0
+
 ## 2.0.0
 
 ### Major Changes

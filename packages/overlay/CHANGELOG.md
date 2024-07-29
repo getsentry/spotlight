@@ -1,5 +1,25 @@
 # @spotlightjs/core
 
+## 2.1.0
+
+### Minor Changes
+
+- 1. Altered the ssr-page vite plugin in @spotlight/astro to run spotlight overlay in fullscreen mode in ssr-error page.
+     ([#364](https://github.com/getsentry/spotlight/pull/364))
+  2. Closed astro erro overlay.
+  3. Added a option in sentry integration to open first error encountered in spotlight automatically.
+
+### Patch Changes
+
+- Added search bar in trace ([#424](https://github.com/getsentry/spotlight/pull/424))
+
+- - Show active span item in trace when span info is opened. ([#437](https://github.com/getsentry/spotlight/pull/437))
+  - Show active event in DeveloperInfo tab when event is info is opened.
+
+- added traceInfo ([#423](https://github.com/getsentry/spotlight/pull/423))
+
+- Overhaul envelope parsing to be spec compliant ([#439](https://github.com/getsentry/spotlight/pull/439))
+
 ## 2.0.0
 
 ### Major Changes

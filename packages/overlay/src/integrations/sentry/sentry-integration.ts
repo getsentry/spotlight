@@ -1,14 +1,16 @@
 import { Client, Envelope, Event, Integration } from '@sentry/types';
 import { serializeEnvelope } from '@sentry/utils';
+import { DEFAULT_SIDECAR_URL } from '~/constants';
 import { log } from '../../lib/logger';
 import sentryDataCache from './data/sentryDataCache';
+import { getNativeFetchImplementation } from './utils/fetch';
 
 type SpotlightBrowserIntegrationOptions = {
   /**
    * The URL of the Sidecar instance to connect and forward events to.
-   * If not set, Spotlight will try to connect to the Sidecar running on localhost:8969.
+   * If not set, Spotlight will try to connect to the Sidecar running on DEFAULT_SIDECAR_URL.
    *
-   * @default "http://localhost:8969/stream"
+   * @default DEFAULT_SIDECAR_URL
    */
   sidecarUrl?: string;
 };
@@ -28,7 +30,7 @@ type SpotlightBrowserIntegrationOptions = {
  * @returns Sentry integration for Spotlight.
  */
 export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOptions) => {
-  const _sidecarUrl = options?.sidecarUrl ?? 'http://localhost:8969/stream';
+  const _sidecarUrl = options?.sidecarUrl ?? DEFAULT_SIDECAR_URL;
 
   return {
     name: 'SpotlightBrowser',
@@ -55,24 +57,6 @@ export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOption
         return event;
       }
 
-      for (const exception of event.exception.values ?? []) {
-        try {
-          const makeFetch = getNativeFetchImplementation();
-          const stackTraceWithContextResponse = await makeFetch('/spotlight/contextlines', {
-            method: 'PUT',
-            body: JSON.stringify(exception.stacktrace),
-          });
-
-          if (!stackTraceWithContextResponse.ok || stackTraceWithContextResponse.status !== 200) {
-            continue;
-          }
-
-          const stackTraceWithContext = await stackTraceWithContextResponse.json();
-          exception.stacktrace = stackTraceWithContext;
-        } catch {
-          // Something went wrong, for now we just ignore it.
-        }
-      }
       return event;
     },
     afterAllSetup: (client: Client) => {
@@ -99,24 +83,6 @@ function sendEnvelopesToSidecar(client: Client, sidecarUrl: string) {
       );
     });
   });
-}
-
-type FetchImpl = typeof fetch;
-type WrappedFetchImpl = FetchImpl & { __sentry_original__: FetchImpl };
-
-/**
- * We want to get an unpatched fetch implementation to avoid capturing our own calls.
- */
-export function getNativeFetchImplementation(): FetchImpl {
-  if (fetchIsWrapped(window.fetch)) {
-    return window.fetch.__sentry_original__;
-  }
-
-  return window.fetch;
-}
-
-function fetchIsWrapped(fetchImpl: FetchImpl): fetchImpl is WrappedFetchImpl {
-  return '__sentry_original__' in fetchImpl;
 }
 
 /**

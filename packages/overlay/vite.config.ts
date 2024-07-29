@@ -2,12 +2,12 @@ import react from '@vitejs/plugin-react';
 import MagicString from 'magic-string';
 import { sep } from 'node:path';
 import { resolve } from 'path';
-import type { Plugin } from 'vite';
+import type { PluginOption } from 'vite';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import svgr from 'vite-plugin-svgr';
 
-const removeReactDevToolsMessagePlugin: () => Plugin = () => ({
+const removeReactDevToolsMessagePlugin: () => PluginOption = () => ({
   name: 'remove-react-devtools-message',
   transform(code, id) {
     if (id.includes(`${sep}react-dom${sep}`) && code.includes('__REACT_DEVTOOLS_GLOBAL_HOOK__')) {
@@ -28,7 +28,11 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
     }),
-    svgr(),
+    svgr({
+      svgrOptions: {
+        titleProp: true,
+      },
+    }),
     removeReactDevToolsMessagePlugin(),
   ],
   define: {

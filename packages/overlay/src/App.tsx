@@ -58,10 +58,8 @@ export default function App({
   const navigate = useNavigate();
 
   const clearEvents = () => {
-    const sidecarUrlObject: URL = new URL(sidecarUrl);
-    const host: string = sidecarUrlObject?.hostname;
-    const port: string = sidecarUrlObject?.port;
-    const clearEventsUrl: string = `http://${host}:${port}/clear`;
+    const { origin } = new URL(sidecarUrl);
+    const clearEventsUrl: string = `${origin}/clear`;
 
     fetch(clearEventsUrl, {
       method: 'DELETE',

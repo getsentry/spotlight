@@ -1,3 +1,4 @@
+import { builtinModules } from 'node:module';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 
@@ -14,12 +15,13 @@ export default defineConfig({
       entry: {
         overlay: resolve(__dirname, 'src/overlay.ts'),
         sidecar: resolve(__dirname, 'src/sidecar.ts'),
+        'vite-plugin': resolve(__dirname, 'src/vite-plugin.ts'),
       },
       // the proper extensions will be added
       //   fileName: 'sentry-spotlight',
     },
     rollupOptions: {
-      external: dependencies,
+      external: [...dependencies, ...builtinModules.map(x => `node:${x}`)],
     },
   },
 });
