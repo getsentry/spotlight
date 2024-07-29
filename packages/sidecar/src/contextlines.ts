@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import * as os from 'node:os';
+import * as path from 'node:path';
 import * as SourceMap from 'source-map';
 
 type SourceContext = {
@@ -50,6 +51,9 @@ async function applySourceContextToFrame(sourceMapContent: string, frame: ValidS
   if (originalPosition.source && originalPosition.line && originalPosition.column) {
     frame.lineno = originalPosition.line;
     frame.colno = originalPosition.column;
+    const filePath = new URL(frame.filename).pathname.slice(1); // slice(1) is to not make it absolute path
+    frame.filename = path.resolve(path.join(path.dirname(filePath), originalPosition.source));
+
     const content = consumer.sourceContentFor(originalPosition.source);
     const lines = content?.split(os.EOL) ?? [];
     addContextLinesToFrame(lines, frame);
@@ -121,7 +125,7 @@ function isValidSentryStackFrame(frame: SentryStackFrame): frame is ValidSentryS
 }
 
 export function contextLinesHandler(req: IncomingMessage, res: ServerResponse) {
-  // We're only interested in handling a PUT request to CONTEXT_LINES_ENDPOINT
+  // We're only interested in handling a PUT request
   if (req.method !== 'PUT') {
     res.writeHead(405);
     res.end();

@@ -1,6 +1,7 @@
+import launchEditor from 'launch-editor';
 import { createWriteStream, readFile } from 'node:fs';
 import { IncomingMessage, Server, ServerResponse, createServer, get } from 'node:http';
-import { extname, join } from 'node:path';
+import { extname, join, resolve } from 'node:path';
 import { createGunzip, createInflate } from 'node:zlib';
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from './constants.js';
 import { contextLinesHandler } from './contextlines.js';
@@ -43,12 +44,34 @@ type SideCarOptions = {
   incomingPayload?: IncomingPayloadCallback;
 };
 
+type RequestHandler = (req: IncomingMessage, res: ServerResponse) => void;
+
 function getCorsHeader(): { [name: string]: string } {
   return {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Allow-Headers': '*',
     'Access-Control-Allow-Methods': 'GET,POST,PUT,OPTIONS,DELETE,PATCH',
+  };
+}
+
+function enableCORS(handler: RequestHandler): RequestHandler {
+  return function corsMiddleware(req: IncomingMessage, res: ServerResponse) {
+    const headers = {
+      ...getCorsHeader(),
+      ...getSpotlightHeader(),
+    };
+    for (const [header, value] of Object.entries(headers)) {
+      res.setHeader(header, value);
+    }
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Cache-Control': 'no-cache',
+      });
+      res.end();
+      return;
+    }
+    return handler(req, res);
   };
 }
 
@@ -64,8 +87,6 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        ...getCorsHeader(),
-        ...getSpotlightHeader(),
         Connection: 'keep-alive',
       });
       res.flushHeaders();
@@ -87,13 +108,6 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
         buffer.unsubscribe(sub);
         res.end();
       });
-    } else if (req.method === 'OPTIONS') {
-      res.writeHead(204, {
-        'Cache-Control': 'no-cache',
-        ...getCorsHeader(),
-        ...getSpotlightHeader(),
-      });
-      res.end();
     } else if (req.method === 'POST') {
       logger.debug(`📩 Received event`);
       let body: string = '';
@@ -136,8 +150,6 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
         // 204 would be more appropriate but returning 200 to match what /envelope returns
         res.writeHead(200, {
           'Cache-Control': 'no-cache',
-          ...getCorsHeader(),
-          ...getSpotlightHeader(),
           Connection: 'keep-alive',
         });
         res.end();
@@ -189,24 +201,46 @@ function handleHealthRequest(_req: IncomingMessage, res: ServerResponse): void {
 }
 
 function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204, {
-      'Cache-Control': 'no-cache',
-      ...getCorsHeader(),
-      ...getSpotlightHeader(),
-    });
-    res.end();
-  } else if (req.method === 'DELETE') {
+  if (req.method === 'DELETE') {
     res.writeHead(200, {
       'Content-Type': 'text/plain',
-      ...getCorsHeader(),
-      ...getSpotlightHeader(),
     });
     clearBuffer();
     res.end('Cleared');
   } else {
     error405(req, res);
   }
+}
+
+function openRequestHandler(basePath: string = process.cwd()) {
+  return function (req: IncomingMessage, res: ServerResponse) {
+    // We're only interested in handling a POST request
+    if (req.method !== 'POST') {
+      res.writeHead(405);
+      res.end();
+      return;
+    }
+
+    let requestBody = '';
+    req.on('data', chunk => {
+      requestBody += chunk;
+    });
+
+    req.on('end', () => {
+      const targetPath = resolve(basePath, requestBody);
+      launchEditor(
+        // filename:line:column
+        // both line and column are optional
+        targetPath,
+        // callback if failed to launch (optional)
+        (fileName: string, errorMsg: string) => {
+          logger.error(`Failed to launch editor for ${fileName}: ${errorMsg}`);
+        },
+      );
+      res.writeHead(204);
+      res.end();
+    });
+  };
 }
 
 function errorResponse(code: number) {
@@ -225,11 +259,12 @@ function startServer(
   basePath?: string,
   incomingPayload?: IncomingPayloadCallback,
 ): Server {
-  const ROUTES: [RegExp, (req: IncomingMessage, res: ServerResponse) => void][] = [
+  const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
-    [/^\/clear$/, handleClearRequest],
-    [/^\/stream$|^\/api\/\d+\/envelope$/, streamRequestHandler(buffer, incomingPayload)],
-    [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), contextLinesHandler],
+    [/^\/clear$/, enableCORS(handleClearRequest)],
+    [/^\/stream$|^\/api\/\d+\/envelope$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
+    [/^\/open$/, enableCORS(openRequestHandler(basePath))],
+    [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), enableCORS(contextLinesHandler)],
     [/^.+$/, basePath != null ? fileServer(basePath) : error404],
   ];
 
