@@ -1,5 +1,21 @@
 # @spotlightjs/electron
 
+## 1.1.0
+
+### Minor Changes
+
+- Add ability to use sidecar URL in a DSN ([#452](https://github.com/getsentry/spotlight/pull/452))
+
+### Patch Changes
+
+- Updated dependencies
+  [[`0a6486b14d96a0eafec27a94707e4715b9fc3583`](https://github.com/getsentry/spotlight/commit/0a6486b14d96a0eafec27a94707e4715b9fc3583),
+  [`9a7357f1dedc66d030358176bee777715b09c41b`](https://github.com/getsentry/spotlight/commit/9a7357f1dedc66d030358176bee777715b09c41b),
+  [`06f3070867534641dbb5c394e5513ca9781bbfa8`](https://github.com/getsentry/spotlight/commit/06f3070867534641dbb5c394e5513ca9781bbfa8),
+  [`725cbb5daea8682fdf8fefb952ddce68c97c4d6f`](https://github.com/getsentry/spotlight/commit/725cbb5daea8682fdf8fefb952ddce68c97c4d6f)]:
+  - @spotlightjs/sidecar@1.6.0
+  - @spotlightjs/overlay@2.2.0
+
 ## 1.0.1
 
 ### Patch Changes

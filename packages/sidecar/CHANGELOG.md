@@ -1,5 +1,15 @@
 # @spotlightjs/sidecar
 
+## 1.6.0
+
+### Minor Changes
+
+- Add ability to use sidecar URL in a DSN ([#452](https://github.com/getsentry/spotlight/pull/452))
+
+- Move contextlines provider to sidecar ([#454](https://github.com/getsentry/spotlight/pull/454))
+
+- Add 'open in editor' icon ([#462](https://github.com/getsentry/spotlight/pull/462))
+
 ## 1.5.0
 
 ### Minor Changes
