@@ -3,6 +3,8 @@ import { Suspense, lazy } from 'react';
 import { RawEventContext } from '~/integrations/integration';
 const LazyReactJson = lazy(() => import('react-json-view'));
 
+// Need this separately to fix Storybook 8 bundling
+// See #419 and #420 for more context
 const noop = () => {};
 
 export default function JsonViewer({
