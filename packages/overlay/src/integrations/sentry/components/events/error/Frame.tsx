@@ -62,22 +62,6 @@ export default function Frame({
         {fileName ? (
           <span className="text-primary-100">
             {formatFilename(fileName)}
-            {isOpen && !frame.filename?.includes(':') ? (
-              <PenIcon
-                width={14}
-                height={14}
-                title="Open in editor"
-                className="inline fill-green-400 stroke-green-400 align-top"
-                onClick={evt => {
-                  fetch('http://localhost:8969/open', {
-                    method: 'POST',
-                    body: `${frame.filename}:${frame.lineno}:${frame.colno}`,
-                    credentials: 'omit',
-                  });
-                  evt.stopPropagation();
-                }}
-              />
-            ) : null}
             {' in '}
           </span>
         ) : null}
@@ -93,6 +77,22 @@ export default function Frame({
             </span>
           </>
         )}
+        {isOpen && !frame.filename?.includes(':') ? (
+          <PenIcon
+            width={18}
+            height={18}
+            title="Open in editor"
+            className="mx-2 inline fill-green-400 stroke-green-400 align-top"
+            onClick={evt => {
+              fetch('http://localhost:8969/open', {
+                method: 'POST',
+                body: `${frame.filename}:${frame.lineno}:${frame.colno}`,
+                credentials: 'omit',
+              });
+              evt.stopPropagation();
+            }}
+          />
+        ) : null}
       </div>
       {isOpen && (
         <div className="bg-primary-950">
