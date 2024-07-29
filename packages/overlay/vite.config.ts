@@ -28,7 +28,11 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
     }),
-    svgr(),
+    svgr({
+      svgrOptions: {
+        titleProp: true,
+      },
+    }),
     removeReactDevToolsMessagePlugin(),
   ],
   define: {
