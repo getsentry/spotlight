@@ -1,7 +1,7 @@
 import launchEditor from 'launch-editor';
 import { createWriteStream, readFile } from 'node:fs';
 import { IncomingMessage, Server, ServerResponse, createServer, get } from 'node:http';
-import { extname, join } from 'node:path';
+import { extname, join, resolve } from 'node:path';
 import { createGunzip, createInflate } from 'node:zlib';
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from './constants.js';
 import { contextLinesHandler } from './contextlines.js';
@@ -212,32 +212,35 @@ function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
   }
 }
 
-function openRequestHandler(req: IncomingMessage, res: ServerResponse) {
-  // We're only interested in handling a POST request
-  if (req.method !== 'POST') {
-    res.writeHead(405);
-    res.end();
-    return;
-  }
+function openRequestHandler(basePath: string = process.cwd()) {
+  return function (req: IncomingMessage, res: ServerResponse) {
+    // We're only interested in handling a POST request
+    if (req.method !== 'POST') {
+      res.writeHead(405);
+      res.end();
+      return;
+    }
 
-  let requestBody = '';
-  req.on('data', chunk => {
-    requestBody += chunk;
-  });
+    let requestBody = '';
+    req.on('data', chunk => {
+      requestBody += chunk;
+    });
 
-  req.on('end', () => {
-    launchEditor(
-      // filename:line:column
-      // both line and column are optional
-      requestBody,
-      // callback if failed to launch (optional)
-      (fileName: string, errorMsg: string) => {
-        logger.error(`Failed to launch editor for ${fileName}: ${errorMsg}`);
-      },
-    );
-    res.writeHead(204);
-    res.end();
-  });
+    req.on('end', () => {
+      const targetPath = resolve(basePath, requestBody);
+      launchEditor(
+        // filename:line:column
+        // both line and column are optional
+        targetPath,
+        // callback if failed to launch (optional)
+        (fileName: string, errorMsg: string) => {
+          logger.error(`Failed to launch editor for ${fileName}: ${errorMsg}`);
+        },
+      );
+      res.writeHead(204);
+      res.end();
+    });
+  };
 }
 
 function errorResponse(code: number) {
@@ -256,11 +259,11 @@ function startServer(
   basePath?: string,
   incomingPayload?: IncomingPayloadCallback,
 ): Server {
-  const ROUTES: [RegExp, (req: IncomingMessage, res: ServerResponse) => void][] = [
+  const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
     [/^\/clear$/, enableCORS(handleClearRequest)],
     [/^\/stream$|^\/api\/\d+\/envelope$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
-    [/^\/open$/, enableCORS(openRequestHandler)],
+    [/^\/open$/, enableCORS(openRequestHandler(basePath))],
     [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), enableCORS(contextLinesHandler)],
     [/^.+$/, basePath != null ? fileServer(basePath) : error404],
   ];
