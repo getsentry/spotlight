@@ -262,7 +262,7 @@ function startServer(
   const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
     [/^\/clear$/, enableCORS(handleClearRequest)],
-    [/^\/stream$|^\/api\/\d+\/envelope$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
+    [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
     [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), enableCORS(contextLinesHandler)],
     [/^.+$/, basePath != null ? fileServer(basePath) : error404],
