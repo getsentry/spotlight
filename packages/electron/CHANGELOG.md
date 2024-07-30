@@ -1,5 +1,16 @@
 # @spotlightjs/electron
 
+## 1.1.2
+
+### Patch Changes
+
+- Allow trailing slash in DSN endpoint ([#466](https://github.com/getsentry/spotlight/pull/466))
+
+- Updated dependencies
+  [[`f890e1b15c8c493916f4d3c68f6f2a259ae21cea`](https://github.com/getsentry/spotlight/commit/f890e1b15c8c493916f4d3c68f6f2a259ae21cea)]:
+  - @spotlightjs/sidecar@1.6.2
+  - @spotlightjs/overlay@2.2.0
+
 ## 1.1.1
 
 ### Patch Changes
