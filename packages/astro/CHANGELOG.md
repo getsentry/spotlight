@@ -1,5 +1,15 @@
 # @spotlightjs/astro
 
+## 2.1.3
+
+### Patch Changes
+
+- Fix dependency issues with sidecar ([#464](https://github.com/getsentry/spotlight/pull/464))
+
+- Updated dependencies
+  [[`9fccaae507324671a16e939d1ed4a38539750827`](https://github.com/getsentry/spotlight/commit/9fccaae507324671a16e939d1ed4a38539750827)]:
+  - @spotlightjs/spotlight@2.2.1
+
 ## 2.1.2
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @spotlightjs/electron
 
+## 1.1.1
+
+### Patch Changes
+
+- Fix dependency issues with sidecar ([#464](https://github.com/getsentry/spotlight/pull/464))
+
+- Updated dependencies
+  [[`9fccaae507324671a16e939d1ed4a38539750827`](https://github.com/getsentry/spotlight/commit/9fccaae507324671a16e939d1ed4a38539750827)]:
+  - @spotlightjs/sidecar@1.6.1
+  - @spotlightjs/overlay@2.2.0
+
 ## 1.1.0
 
 ### Minor Changes
