@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 1.6.1
+
+### Patch Changes
+
+- Fix dependency issues with sidecar ([#464](https://github.com/getsentry/spotlight/pull/464))
+
 ## 1.6.0
 
 ### Minor Changes
