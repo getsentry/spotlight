@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 1.6.2
+
+### Patch Changes
+
+- Allow trailing slash in DSN endpoint ([#466](https://github.com/getsentry/spotlight/pull/466))
+
 ## 1.6.1
 
 ### Patch Changes
