@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 1.7.0
+
+### Minor Changes
+
+- Auto-correct Sentry Browser SDK content type & fix URL matching with query string
+  ([#471](https://github.com/getsentry/spotlight/pull/471))
+
 ## 1.6.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 2.2.1
+
+### Patch Changes
+
+- Fix event processing pipeline for integrations ([#470](https://github.com/getsentry/spotlight/pull/470))
+
 ## 2.2.0
 
 ### Minor Changes
