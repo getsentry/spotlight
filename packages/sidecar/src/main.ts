@@ -44,7 +44,12 @@ type SideCarOptions = {
   incomingPayload?: IncomingPayloadCallback;
 };
 
-type RequestHandler = (req: IncomingMessage, res: ServerResponse) => void;
+type RequestHandler = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  pathname?: string,
+  searchParams?: URLSearchParams,
+) => void;
 
 function getCorsHeader(): { [name: string]: string } {
   return {
@@ -56,7 +61,12 @@ function getCorsHeader(): { [name: string]: string } {
 }
 
 function enableCORS(handler: RequestHandler): RequestHandler {
-  return function corsMiddleware(req: IncomingMessage, res: ServerResponse) {
+  return function corsMiddleware(
+    req: IncomingMessage,
+    res: ServerResponse,
+    pathname?: string,
+    searchParams?: URLSearchParams,
+  ) {
     const headers = {
       ...getCorsHeader(),
       ...getSpotlightHeader(),
@@ -71,7 +81,7 @@ function enableCORS(handler: RequestHandler): RequestHandler {
       res.end();
       return;
     }
-    return handler(req, res);
+    return handler(req, res, pathname, searchParams);
   };
 }
 
@@ -82,8 +92,18 @@ function getSpotlightHeader() {
 }
 
 function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: IncomingPayloadCallback) {
-  return function handleStreamRequest(req: IncomingMessage, res: ServerResponse): void {
-    if (req.method === 'GET' && req.headers.accept && req.headers.accept == 'text/event-stream') {
+  return function handleStreamRequest(
+    req: IncomingMessage,
+    res: ServerResponse,
+    pathname?: string,
+    searchParams?: URLSearchParams,
+  ): void {
+    if (
+      req.method === 'GET' &&
+      req.headers.accept &&
+      req.headers.accept == 'text/event-stream' &&
+      pathname === '/stream'
+    ) {
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -132,12 +152,20 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
       });
 
       stream.on('end', () => {
-        buffer.put([`${req.headers['content-type']}`, body]);
+        let contentType = req.headers['content-type']?.split(';')[0].toLocaleLowerCase();
+        if (searchParams?.get('sentry_client')?.startsWith('sentry.javascript.browser') && req.headers.origin) {
+          // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
+          contentType = 'application/x-sentry-envelope';
+        }
+        if (!contentType) {
+          logger.warn('No content type, skipping payload...');
+        } else {
+          buffer.put([contentType, body]);
+        }
 
         if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
           const timestamp = new Date().getTime();
-          const contentType = `${req.headers['content-type']}`;
-          const filename = `${contentType.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-${timestamp}.txt`;
+          const filename = `${contentType?.replace(/[^a-z0-9]/gi, '_') || 'no_content_type'}-${timestamp}.txt`;
 
           if (incomingPayload) {
             incomingPayload(body);
@@ -160,8 +188,8 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
   };
 }
 function fileServer(basePath: string) {
-  return function serveFile(req: IncomingMessage, res: ServerResponse): void {
-    let filePath = '.' + req.url;
+  return function serveFile(req: IncomingMessage, res: ServerResponse, pathname?: string): void {
+    let filePath = '.' + (pathname || req.url);
     if (filePath == './') {
       filePath = './src/index.html';
     }
@@ -274,11 +302,12 @@ function startServer(
       return error404(req, res);
     }
 
-    const route = ROUTES.find(route => route[0].test(url));
+    const { pathname, searchParams } = new URL(url, 'http://' + (req.headers.host || 'localhost'));
+    const route = ROUTES.find(route => route[0].test(pathname));
     if (!route) {
       return error404(req, res);
     }
-    return route[1](req, res);
+    return route[1](req, res, pathname, searchParams);
   });
 
   server.on('error', handleServerError);
