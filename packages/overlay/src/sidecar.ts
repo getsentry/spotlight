@@ -17,22 +17,23 @@ export function connectToSidecar(
     const listener = (event: MessageEvent): void => {
       log(`Received new ${contentType} event`);
       for (const integration of integrations) {
-        if (!integration.processEvent) {
-          return;
+        const integrationData = integration.processEvent
+          ? integration.processEvent({
+              contentType,
+              data: event.data,
+            })
+          : { event };
+
+        if (!integrationData) {
+          continue;
         }
-        const processedEvent = integration.processEvent({
-          contentType,
-          data: event.data,
+        setIntegrationData(prev => {
+          const integrationName = integration.name;
+          return {
+            ...prev,
+            [integrationName]: [...(prev[integrationName] || []), integrationData],
+          };
         });
-        if (processedEvent) {
-          setIntegrationData(prev => {
-            const integrationName = integration.name;
-            return {
-              ...prev,
-              [integrationName]: [...(prev[integrationName] || []), processedEvent],
-            };
-          });
-        }
       }
     };
 
