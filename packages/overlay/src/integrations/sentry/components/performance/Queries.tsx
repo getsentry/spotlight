@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
@@ -49,49 +49,35 @@ const COMPARATORS: Record<QuerySortTypes, QueryInfoComparator> = {
 
 const Queries = ({ showAll }: { showAll: boolean }) => {
   const [allSpans, localSpans] = useSentrySpans();
-  const [queriesData, setQueriesData] = useState<QueryInfo[]>([]);
   const [sort, setSort] = useState({
     active: QUERIES_SORT_KEYS.timeSpent,
     asc: false,
   });
 
-  const toggleSortOrder = (type: string) => {
-    if (sort.active === type) {
-      setSort(prev => ({
-        active: type,
-        asc: !prev.asc,
-      }));
-    } else {
-      setSort({
-        active: type,
-        asc: false,
-      });
-    }
-  };
+  const toggleSortOrder = (type: string) =>
+    setSort(prev =>
+      prev.active === type
+        ? {
+            active: type,
+            asc: !prev.asc,
+          }
+        : {
+            active: type,
+            asc: false,
+          },
+    );
 
-  const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.timeSpent];
+  const queriesData: QueryInfo[] = useMemo(() => {
+    const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.timeSpent];
 
-  useEffect(() => {
     const onlyDBSpans = filterDBSpans(showAll ? allSpans : localSpans, /db\.[A-Za-z]+/);
-
-    if (onlyDBSpans.length > 0) {
-      const uniqueQueries: string[] = [
-        ...new Set(
-          onlyDBSpans
-            .map(span => span?.description)
-            .map(String)
-            .filter(query => query.trim() !== ''),
-        ),
-      ];
-      setQueriesData(
-        uniqueQueries
-          .map(query => calculateQueryInfo({ query, spanData: onlyDBSpans }))
-          .sort((a, b) => {
-            return sort.asc ? compareQueryInfo(a, b) : compareQueryInfo(b, a);
-          }),
-      );
-    }
-  }, [allSpans, compareQueryInfo, localSpans, showAll, sort]);
+    const uniqueSpansSet = new Set(onlyDBSpans.map(span => String(span?.description).trim()));
+    // CLear out empty ones (they collapse as a single empty string since this is a set)
+    uniqueSpansSet.delete('');
+    return [...uniqueSpansSet]
+      .map(query => calculateQueryInfo({ query, spanData: onlyDBSpans }))
+      .sort((a, b) => (sort.asc ? compareQueryInfo(a, b) : compareQueryInfo(b, a)));
+  }, [allSpans, localSpans, showAll, sort]);
 
   if (queriesData?.length) {
     return (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
@@ -73,123 +73,113 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
     active: RESOURCES_SORT_KEYS.timeSpent,
     asc: false,
   });
-  const [resources, setResources] = useState<ResourceInfo[]>([]);
 
-  const compareResourceInfo = COMPARATORS[sort.active] || COMPARATORS[RESOURCES_SORT_KEYS.timeSpent];
-
-  const toggleSortOrder = (type: string) => {
-    if (sort.active === type) {
-      setSort(prev => ({
-        active: type,
-        asc: !prev.asc,
-      }));
-    } else {
-      setSort({
-        active: type,
-        asc: false,
-      });
-    }
-  };
-
-  useEffect(() => {
-    const filteredResourceSpans = getResourceSpans(showAll ? allSpans : localSpans, { regex: /resource\.[A-Za-z]+/ });
-    if (filteredResourceSpans.length > 0) {
-      const uniqueResourceDescriptions: string[] = [
-        ...new Set(
-          filteredResourceSpans
-            .map(span => span?.description)
-            .map(String)
-            .filter(resource => resource.trim() !== ''),
-        ),
-      ];
-      setResources(
-        uniqueResourceDescriptions
-          .map(resource => calculateResourceInfo({ resource, spanData: filteredResourceSpans }))
-          .sort((a, b) => {
-            return sort.asc ? compareResourceInfo(a, b) : compareResourceInfo(b, a);
-          }),
-      );
-    }
-  }, [sort, showAll, allSpans, localSpans, compareResourceInfo]);
-
-  if (resources?.length) {
-    return (
-      <table className="divide-primary-700 w-full table-fixed divide-y">
-        <thead>
-          <tr>
-            {RESOURCE_HEADERS.map(header => (
-              <th
-                key={header.id}
-                scope="col"
-                className={classNames(
-                  'text-primary-100 px-6 py-3.5 text-sm font-semibold',
-                  header.primary ? 'w-2/5' : 'w-[15%]',
-                )}
-              >
-                <div
-                  className={classNames(
-                    'flex cursor-pointer select-none items-center gap-1',
-                    header.primary ? 'justify-start' : 'justify-end',
-                  )}
-                  onClick={() => toggleSortOrder(header.sortKey)}
-                >
-                  {header.title}
-                  {sort.active === header.sortKey ? (
-                    <SortDown
-                      width={12}
-                      height={12}
-                      className={classNames(
-                        'fill-primary-300',
-                        sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
-                      )}
-                    />
-                  ) : (
-                    <Sort width={12} height={12} className="stroke-primary-300" />
-                  )}
-                </div>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {resources.map((resource: ResourceInfo) => (
-            <tr key={resource.description} className="hover:bg-primary-900">
-              <td className="text-primary-200 relative w-2/5 whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                <Tooltip
-                  position="right"
-                  content={
-                    resource.similarResources[0].op === 'resource.img' &&
-                    resource.description?.indexOf('/') === 0 && (
-                      <div className="bg-primary-800 cursor-pointer rounded-lg p-4 shadow-md">
-                        <h2 className="mb-2 font-bold">Preview</h2>
-                        <img
-                          src={resource.description}
-                          className="inline-block max-h-[150px] max-w-[150px] rounded p-1"
-                          alt="preview"
-                        />
-                      </div>
-                    )
-                  }
-                >
-                  <div className="truncate">{resource.description}</div>
-                </Tooltip>
-              </td>
-              <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                {getFormattedDuration(resource.avgDuration)}
-              </td>
-              <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                {getFormattedDuration(resource.timeSpent)}
-              </td>
-              <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                {formatBytes(resource.avgEncodedSize)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  const toggleSortOrder = (type: string) =>
+    setSort(prev =>
+      prev.active === type
+        ? {
+            active: type,
+            asc: !prev.asc,
+          }
+        : {
+            active: type,
+            asc: false,
+          },
     );
+
+  const resources = useMemo(() => {
+    const filteredResourceSpans = getResourceSpans(showAll ? allSpans : localSpans, { regex: /resource\.[A-Za-z]+/ });
+    const uniqueResourceDescriptionsSet = new Set(filteredResourceSpans.map(span => String(span?.description).trim()));
+    // CLear out empty ones (they collapse as a single empty string since this is a set)
+    uniqueResourceDescriptionsSet.delete('');
+    const uniqueResourceDescriptions: string[] = [...uniqueResourceDescriptionsSet];
+    const compareResourceInfo = COMPARATORS[sort.active] || COMPARATORS[RESOURCES_SORT_KEYS.timeSpent];
+
+    return uniqueResourceDescriptions
+      .map(resource => calculateResourceInfo({ resource, spanData: filteredResourceSpans }))
+      .sort((a, b) => {
+        return sort.asc ? compareResourceInfo(a, b) : compareResourceInfo(b, a);
+      });
+  }, [sort, showAll, allSpans, localSpans]);
+
+  if (!resources?.length) {
+    return <p className="text-primary-300 px-6 py-4">No Resource found.</p>;
   }
-  return <p className="text-primary-300 px-6 py-4">No Resource found.</p>;
+  return (
+    <table className="divide-primary-700 w-full table-fixed divide-y">
+      <thead>
+        <tr>
+          {RESOURCE_HEADERS.map(header => (
+            <th
+              key={header.id}
+              scope="col"
+              className={classNames(
+                'text-primary-100 px-6 py-3.5 text-sm font-semibold',
+                header.primary ? 'w-2/5' : 'w-[15%]',
+              )}
+            >
+              <div
+                className={classNames(
+                  'flex cursor-pointer select-none items-center gap-1',
+                  header.primary ? 'justify-start' : 'justify-end',
+                )}
+                onClick={() => toggleSortOrder(header.sortKey)}
+              >
+                {header.title}
+                {sort.active === header.sortKey ? (
+                  <SortDown
+                    width={12}
+                    height={12}
+                    className={classNames(
+                      'fill-primary-300',
+                      sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
+                    )}
+                  />
+                ) : (
+                  <Sort width={12} height={12} className="stroke-primary-300" />
+                )}
+              </div>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {resources.map((resource: ResourceInfo) => (
+          <tr key={resource.description} className="hover:bg-primary-900">
+            <td className="text-primary-200 relative w-2/5 whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
+              <Tooltip
+                position="right"
+                content={
+                  resource.similarResources[0].op === 'resource.img' &&
+                  resource.description?.indexOf('/') === 0 && (
+                    <div className="bg-primary-800 cursor-pointer rounded-lg p-4 shadow-md">
+                      <h2 className="mb-2 font-bold">Preview</h2>
+                      <img
+                        src={resource.description}
+                        className="inline-block max-h-[150px] max-w-[150px] rounded p-1"
+                        alt="preview"
+                      />
+                    </div>
+                  )
+                }
+              >
+                <div className="truncate">{resource.description}</div>
+              </Tooltip>
+            </td>
+            <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+              {getFormattedDuration(resource.avgDuration)}
+            </td>
+            <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+              {getFormattedDuration(resource.timeSpent)}
+            </td>
+            <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+              {formatBytes(resource.avgEncodedSize)}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 };
 
 export default Resources;
