@@ -26,7 +26,7 @@ function formatValue(name: string, value: unknown): ReactNode {
     if (name.indexOf('size') !== -1 || name.indexOf('length') !== -1) return formatBytes(value);
     return value.toLocaleString();
   }
-  return value as ReactNode;
+  return `${value}` as ReactNode;
 }
 
 export default function SpanDetails({
@@ -91,7 +91,7 @@ export default function SpanDetails({
           </div>
         </div>
 
-        {!!errors.length && (
+        {errors.length && (
           <div className="flex flex-col items-start">
             <h2 className="mb-2 font-bold uppercase">Related Errors</h2>
             {errors.map(event => (
@@ -130,18 +130,16 @@ export default function SpanDetails({
           {span.tags && Object.keys(span.tags).length ? (
             <table className="w-full text-sm">
               <tbody>
-                {Object.entries(span.tags).map(([key, value]) => {
-                  return (
-                    <tr key={key} className="text-primary-300">
-                      <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
-                        <div className="w-full truncate">{key}</div>
-                      </th>
-                      <td className="py-0.5">
-                        <pre className="whitespace-nowrap font-mono">{JSON.stringify(value, undefined, 2)}</pre>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {Object.entries(span.tags).map(([key, value]) => (
+                  <tr key={key} className="text-primary-300">
+                    <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
+                      <div className="w-full truncate">{key}</div>
+                    </th>
+                    <td className="py-0.5">
+                      <pre className="whitespace-nowrap font-mono">{JSON.stringify(value, undefined, 2)}</pre>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           ) : (
@@ -159,7 +157,11 @@ export default function SpanDetails({
                 [
                   'parent',
                   span.parent_span_id ? (
-                    <Link className="underline" to={`/traces/${span.trace_id}/${span.parent_span_id}`}>
+                    <Link
+                      className="underline"
+                      to={`/traces/${span.trace_id}/${span.parent_span_id}`}
+                      key={`link-to-${span.parent_span_id}`}
+                    >
                       {span.parent_span_id}
                     </Link>
                   ) : (
@@ -167,18 +169,16 @@ export default function SpanDetails({
                   ),
                 ],
                 ['op', span.op],
-              ].map(([key, value]) => {
-                return (
-                  <tr key={key as string} className="text-primary-300">
-                    <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
-                      <div className="w-full truncate">{key}</div>
-                    </th>
-                    <td className="py-0.5">
-                      <pre className="whitespace-nowrap font-mono">{value}</pre>
-                    </td>
-                  </tr>
-                );
-              })}
+              ].map(([key, value]) => (
+                <tr key={key as string} className="text-primary-300">
+                  <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
+                    <div className="w-full truncate">{key}</div>
+                  </th>
+                  <td className="py-0.5">
+                    <pre className="whitespace-nowrap font-mono">{value}</pre>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -188,24 +188,22 @@ export default function SpanDetails({
             <h2 className="mb-2 font-bold uppercase">Data</h2>
             <table className="w-full text-sm">
               <tbody>
-                {Object.entries(span.data).map(([key, value]) => {
-                  return (
-                    <tr key={key} className="text-primary-300">
-                      <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
-                        <div className="w-full truncate">{key}</div>
-                      </th>
-                      <td className="py-0.5">
-                        <pre className="whitespace-nowrap font-mono">{formatValue(key, value)}</pre>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {Object.entries(span.data).map(([key, value]) => (
+                  <tr key={key} className="text-primary-300">
+                    <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
+                      <div className="w-full truncate">{key}</div>
+                    </th>
+                    <td className="py-0.5">
+                      <pre className="whitespace-nowrap font-mono">{formatValue(key, value)}</pre>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         )}
 
-        {!!span.children?.length && (
+        {span.children?.length && (
           <div>
             <h2 className="mb-2 font-bold uppercase">Sub-tree</h2>
             <SpanTree

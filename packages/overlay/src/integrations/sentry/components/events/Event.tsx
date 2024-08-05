@@ -1,14 +1,16 @@
-import { SentryEvent } from '../../types';
-import { Error, ErrorSummary, ErrorTitle } from './error/Error';
+import type { SentryEvent } from '../../types';
+import { ErrorItem, ErrorSummary, ErrorTitle } from './error/Error';
 
 function getEventMessage(event: SentryEvent) {
   if (typeof event.message === 'string') {
     return event.message;
-  } else if (event.message !== undefined && typeof event.message.formatted === 'string') {
-    return event.message.formatted;
-  } else {
-    return '';
   }
+
+  if (event.message !== undefined && typeof event.message.formatted === 'string') {
+    return event.message.formatted;
+  }
+
+  return '';
 }
 
 export function EventTitle({ event }: { event: SentryEvent }) {
@@ -16,11 +18,7 @@ export function EventTitle({ event }: { event: SentryEvent }) {
     return <ErrorTitle event={event} />;
   }
 
-  return (
-    <>
-      <strong className="font-bold">{getEventMessage(event)}</strong>
-    </>
-  );
+  return <strong className="font-bold">{getEventMessage(event)}</strong>;
 }
 
 export function EventSummary({ event }: { event: SentryEvent }) {
@@ -38,7 +36,7 @@ export function EventSummary({ event }: { event: SentryEvent }) {
 
 export default function Event({ event }: { event: SentryEvent }) {
   if ('exception' in event) {
-    return <Error event={event} />;
+    return <ErrorItem event={event} />;
   }
 
   return (

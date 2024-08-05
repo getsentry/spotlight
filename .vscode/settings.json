@@ -9,6 +9,8 @@
     "spotlightjs",
     "svgr",
     "tailwindcss",
-    "uuidv"
+    "ttfb",
+    "uuidv",
+    "webvitals"
   ]
 }

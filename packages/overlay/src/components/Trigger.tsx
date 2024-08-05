@@ -16,7 +16,7 @@ function getAnchorClasses(anchor: AnchorConfig) {
       return 'top-4 right-4';
     case 'bottomLeft':
       return 'bottom-4 left-4';
-    case 'bottomRight':
+    // case 'bottomRight':
     default:
       return 'bottom-4 right-4';
   }
@@ -35,7 +35,7 @@ function ToolbarItem({
     <div className="gap-x hover:bg-primary-400 relative flex items-center rounded p-3" {...props}>
       {children}
 
-      {!!count && (
+      {count && (
         <span
           className={classNames(
             severe ? 'bg-red-500' : 'bg-primary-500',

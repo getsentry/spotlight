@@ -5,7 +5,7 @@ import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
 import { QUERIES_HEADERS, QUERIES_SORT_KEYS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
-import { Span } from '../../types';
+import type { Span } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
 
 const filterDBSpans = (spans: Span[], regex?: RegExp) => {
@@ -35,6 +35,18 @@ const calculateQueryInfo = ({ query, spanData }: { query: string; spanData: Span
   };
 };
 
+type QueryInfoComparator = (a: QueryInfo, b: QueryInfo) => number;
+type QuerySortTypes = (typeof QUERIES_SORT_KEYS)[keyof typeof QUERIES_SORT_KEYS];
+const COMPARATORS: Record<QuerySortTypes, QueryInfoComparator> = {
+  [QUERIES_SORT_KEYS.queryDesc]: (a, b) => {
+    if (a.description < b.description) return -1;
+    if (a.description > b.description) return 1;
+    return 0;
+  },
+  [QUERIES_SORT_KEYS.avgDuration]: (a, b) => a.avgDuration - b.avgDuration,
+  [QUERIES_SORT_KEYS.timeSpent]: (a, b) => a.timeSpent - b.timeSpent,
+};
+
 const Queries = ({ showAll }: { showAll: boolean }) => {
   const [allSpans, localSpans] = useSentrySpans();
   const [queriesData, setQueriesData] = useState<QueryInfo[]>([]);
@@ -57,21 +69,7 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
     }
   };
 
-  const compareQueryInfo = (a: QueryInfo, b: QueryInfo) => {
-    switch (sort.active) {
-      case QUERIES_SORT_KEYS.queryDesc: {
-        if (a.description < b.description) return -1;
-        if (a.description > b.description) return 1;
-        return 0;
-      }
-      case QUERIES_SORT_KEYS.avgDuration:
-        return a.avgDuration - b.avgDuration;
-      case QUERIES_SORT_KEYS.timeSpent:
-        return a.timeSpent - b.timeSpent;
-      default:
-        return a.timeSpent - b.timeSpent;
-    }
-  };
+  const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.timeSpent];
 
   useEffect(() => {
     const onlyDBSpans = filterDBSpans(showAll ? allSpans : localSpans, /db\.[A-Za-z]+/);
@@ -93,9 +91,9 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
           }),
       );
     }
-  }, [showAll, sort]);
+  }, [allSpans, compareQueryInfo, localSpans, showAll, sort]);
 
-  if (queriesData && queriesData.length) {
+  if (queriesData?.length) {
     return (
       <table className="divide-primary-700 w-full table-fixed divide-y">
         <thead>

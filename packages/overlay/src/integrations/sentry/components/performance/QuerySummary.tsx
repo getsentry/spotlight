@@ -6,7 +6,7 @@ import classNames from '~/lib/classNames';
 import Breadcrumbs from '~/ui/Breadcrumbs';
 import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
-import { Span } from '../../types';
+import type { Span } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
 
 const filterDBSpans = (spans: Span[], type?: string) => {
@@ -15,6 +15,22 @@ const filterDBSpans = (spans: Span[], type?: string) => {
   }
 
   return [];
+};
+
+type SpanInfoComparator = (a: Span, b: Span) => number;
+type QuerySummarySortTypes = (typeof QUERY_SUMMARY_SORT_KEYS)[keyof typeof QUERY_SUMMARY_SORT_KEYS];
+const COMPARATORS: Record<QuerySummarySortTypes, SpanInfoComparator> = {
+  [QUERY_SUMMARY_SORT_KEYS.foundIn]: (a, b) => {
+    if (a.trace_id < b.trace_id) return -1;
+    if (a.trace_id > b.trace_id) return 1;
+    return 0;
+  },
+  [QUERY_SUMMARY_SORT_KEYS.spanId]: (a, b) => {
+    if (a.span_id < b.span_id) return -1;
+    if (a.span_id > b.span_id) return 1;
+    return 0;
+  },
+  [QUERY_SUMMARY_SORT_KEYS.timeSpent]: (a, b) => a.timestamp - a.start_timestamp - (b.timestamp - b.start_timestamp),
 };
 
 const QuerySummary = ({ showAll }: { showAll: boolean }) => {
@@ -40,30 +56,7 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
     }
   };
 
-  const compareSpanInfo = (a: Span, b: Span) => {
-    switch (sort.active) {
-      case QUERY_SUMMARY_SORT_KEYS.foundIn: {
-        if (a.trace_id < b.trace_id) return -1;
-        if (a.trace_id > b.trace_id) return 1;
-        return 0;
-      }
-      case QUERY_SUMMARY_SORT_KEYS.spanId: {
-        if (a.span_id < b.span_id) return -1;
-        if (a.span_id > b.span_id) return 1;
-        return 0;
-      }
-      case QUERY_SUMMARY_SORT_KEYS.timeSpent: {
-        const aTimeSpent = a.timestamp - a.start_timestamp;
-        const bTimeSpent = b.timestamp - b.start_timestamp;
-        return aTimeSpent - bTimeSpent;
-      }
-      default: {
-        const aTimeSpent = a.timestamp - a.start_timestamp;
-        const bTimeSpent = b.timestamp - b.start_timestamp;
-        return aTimeSpent - bTimeSpent;
-      }
-    }
-  };
+  const compareSpanInfo = COMPARATORS[sort.active] || COMPARATORS[QUERY_SUMMARY_SORT_KEYS.timeSpent];
 
   useEffect(() => {
     setFilteredDBSpans(
@@ -71,7 +64,7 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
         return sort.asc ? compareSpanInfo(a, b) : compareSpanInfo(b, a);
       }),
     );
-  }, [showAll, sort]);
+  }, [allSpans, compareSpanInfo, localSpans, showAll, sort, type]);
 
   if (type && filteredDBSpans && filteredDBSpans.length) {
     return (

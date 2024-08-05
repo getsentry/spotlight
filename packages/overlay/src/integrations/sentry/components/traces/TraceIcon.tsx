@@ -17,23 +17,21 @@ export default function TraceIcon({ trace }: TraceIconProps) {
   }
   if (platformsInTrace.length === 1) {
     return <PlatformIcon className="rounded-md" platform={platformsInTrace[0]} />;
-  } else {
-    return (
-      <div className="bg-primary-900 flex h-[42px] w-[42px] flex-wrap items-center justify-center overflow-hidden rounded-md">
-        {platformsInTrace
-          .slice(0, 4)
-          .map((_platform, ind) =>
-            ind < 3 ? (
-              <PlatformIcon key={_platform} title={_platform} size={21} platform={_platform} />
-            ) : (
-              <div
-                key={(platformsInTrace.slice(3) || []).join(', ')}
-                title={(platformsInTrace.slice(3) || []).join(', ')}
-                className="h-[21px] w-[21px] bg-black p-0.5 text-xs font-bold text-white"
-              >{`+${platformsInTrace.length - 3}`}</div>
-            ),
-          )}
-      </div>
-    );
   }
+
+  const dominantPlatforms = platformsInTrace.slice(0, 3);
+  const remainingPlatforms = platformsInTrace.slice(3);
+  return (
+    <div className="bg-primary-900 flex h-[42px] w-[42px] flex-wrap items-center justify-center overflow-hidden rounded-md">
+      {dominantPlatforms.map(platform => (
+        <PlatformIcon key={platform} title={platform} size={21} platform={platform} />
+      ))}
+      {remainingPlatforms.length && (
+        <div
+          title={remainingPlatforms.join(', ')}
+          className="h-[21px] w-[21px] bg-black p-0.5 text-xs font-bold text-white"
+        >{`+${remainingPlatforms.length}`}</div>
+      )}
+    </div>
+  );
 }

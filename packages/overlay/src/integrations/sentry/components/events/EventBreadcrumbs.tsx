@@ -35,10 +35,10 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
   }
   return (
     <div className="divide-primary-800 grid-cols-2-auto -mx-2 grid space-y-2 divide-y">
-      {breadcrumbs.map((crumb, crumbIdx) => {
-        if (!crumb.message) return null;
-        return (
-          <Fragment key={crumbIdx}>
+      {breadcrumbs
+        .filter(crumb => crumb.message)
+        .map((crumb, crumbIdx) => (
+          <Fragment key={`${crumb.timestamp}-${crumb.category}-${crumb.type}`}>
             <div className="flex flex-none flex-col p-2">
               <div className="text-lg font-semibold">{crumb.category || ' '}</div>
               <div className="text-primary-300 text-xs">
@@ -54,8 +54,7 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
               {crumb.message}
             </pre>
           </Fragment>
-        );
-      })}
+        ))}
     </div>
   );
 }

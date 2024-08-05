@@ -4,12 +4,28 @@ import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import { PERFORMANCE_SCORE_PROFILES, WEB_VITALS_HEADERS, WEB_VITALS_SORT_KEYS } from '~/integrations/sentry/constants';
 import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
-import { SentryEventWithPerformanceData } from '~/integrations/sentry/types';
+import type { SentryEventWithPerformanceData } from '~/integrations/sentry/types';
 import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
 import classNames from '~/lib/classNames';
 import { normalizePerformanceScore } from '../../../utils/webVitals';
 
-const WebVitals = ({ showAll }: { showAll: boolean }) => {
+type SentryEventComparator = (a: SentryEventWithPerformanceData, b: SentryEventWithPerformanceData) => number;
+type WebVitalsSortTypes = (typeof WEB_VITALS_SORT_KEYS)[keyof typeof WEB_VITALS_SORT_KEYS];
+const COMPARATORS: Record<WebVitalsSortTypes, SentryEventComparator> = {
+  [WEB_VITALS_SORT_KEYS.pages]: (a, b) => {
+    if (a.transaction && b.transaction && a.transaction < b.transaction) return -1;
+    if (a.transaction && b.transaction && a.transaction > b.transaction) return 1;
+    return 0;
+  },
+  [WEB_VITALS_SORT_KEYS.lcp]: (a, b) => a.measurements['score.lcp'].value - b.measurements['score.lcp'].value,
+  [WEB_VITALS_SORT_KEYS.fid]: (a, b) => a.measurements['score.fid'].value - b.measurements['score.fid'].value,
+  [WEB_VITALS_SORT_KEYS.fcp]: (a, b) => a.measurements['score.fcp'].value - b.measurements['score.fcp'].value,
+  [WEB_VITALS_SORT_KEYS.cls]: (a, b) => a.measurements['score.cls'].value - b.measurements['score.cls'].value,
+  [WEB_VITALS_SORT_KEYS.ttfb]: (a, b) => a.measurements['score.ttfb'].value - b.measurements['score.ttfb'].value,
+  [WEB_VITALS_SORT_KEYS.score]: (a, b) => a.measurements['score.total'].value - b.measurements['score.total'].value,
+};
+
+const WebVitals = () => {
   const events = useSentryEvents();
   const [measurementEvents, setMeasurementEvents] = useState<SentryEventWithPerformanceData[]>([]);
   const [sort, setSort] = useState({
@@ -31,36 +47,7 @@ const WebVitals = ({ showAll }: { showAll: boolean }) => {
     }
   };
 
-  const compareEvents = (a: SentryEventWithPerformanceData, b: SentryEventWithPerformanceData) => {
-    switch (sort.active) {
-      case WEB_VITALS_SORT_KEYS.pages: {
-        if (a.transaction && b.transaction && a.transaction < b.transaction) return -1;
-        if (a.transaction && b.transaction && a.transaction > b.transaction) return 1;
-        return 0;
-      }
-      case WEB_VITALS_SORT_KEYS.lcp: {
-        return a.measurements['score.lcp'].value - b.measurements['score.lcp'].value;
-      }
-      case WEB_VITALS_SORT_KEYS.fid: {
-        return a.measurements['score.fid'].value - b.measurements['score.fid'].value;
-      }
-      case WEB_VITALS_SORT_KEYS.fcp: {
-        return a.measurements['score.fcp'].value - b.measurements['score.fcp'].value;
-      }
-      case WEB_VITALS_SORT_KEYS.cls: {
-        return a.measurements['score.cls'].value - b.measurements['score.cls'].value;
-      }
-      case WEB_VITALS_SORT_KEYS.ttfb: {
-        return a.measurements['score.ttfb'].value - b.measurements['score.ttfb'].value;
-      }
-      case WEB_VITALS_SORT_KEYS.score: {
-        return a.measurements['score.total'].value - b.measurements['score.total'].value;
-      }
-      default: {
-        return a.measurements['score.total'].value - b.measurements['score.total'].value;
-      }
-    }
-  };
+  const compareEvents = COMPARATORS[sort.active] || COMPARATORS[WEB_VITALS_SORT_KEYS.score];
 
   useEffect(() => {
     const _measurementEvents = [];
@@ -87,9 +74,9 @@ const WebVitals = ({ showAll }: { showAll: boolean }) => {
         return sort.asc ? compareEvents(a, b) : compareEvents(b, a);
       }),
     );
-  }, [showAll, sort]);
+  }, [compareEvents, events, sort]);
 
-  if (measurementEvents && measurementEvents.length) {
+  if (measurementEvents?.length) {
     return (
       <>
         <table className="divide-primary-700 w-full table-fixed divide-y">

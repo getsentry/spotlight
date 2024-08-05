@@ -5,7 +5,7 @@ import classNames from '~/lib/classNames';
 import Tooltip from '~/ui/Tooltip';
 import { RESOURCES_SORT_KEYS, RESOURCE_HEADERS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
-import { Span } from '../../types';
+import type { Span } from '../../types';
 import { formatBytes } from '../../utils/bytes';
 import { getFormattedDuration } from '../../utils/duration';
 
@@ -53,6 +53,19 @@ const getResourceSpans = (spans: Span[], options: { type?: string; regex?: RegEx
   return [];
 };
 
+type ResourceInfoComparator = (a: ResourceInfo, b: ResourceInfo) => number;
+type ResourceSortTypes = (typeof RESOURCES_SORT_KEYS)[keyof typeof RESOURCES_SORT_KEYS];
+const COMPARATORS: Record<ResourceSortTypes, ResourceInfoComparator> = {
+  [RESOURCES_SORT_KEYS.description]: (a, b) => {
+    if (a.description < b.description) return -1;
+    if (a.description > b.description) return 1;
+    return 0;
+  },
+  [RESOURCES_SORT_KEYS.avgEncodedSize]: (a, b) => a.avgEncodedSize - b.avgEncodedSize,
+  [RESOURCES_SORT_KEYS.avgDuration]: (a, b) => a.avgDuration - b.avgDuration,
+  [RESOURCES_SORT_KEYS.timeSpent]: (a, b) => a.timeSpent - b.timeSpent,
+};
+
 const Resources = ({ showAll }: { showAll: boolean }) => {
   const [allSpans, localSpans] = useSentrySpans();
 
@@ -62,23 +75,7 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
   });
   const [resources, setResources] = useState<ResourceInfo[]>([]);
 
-  const compareResourceInfo = (a: ResourceInfo, b: ResourceInfo) => {
-    switch (sort.active) {
-      case RESOURCES_SORT_KEYS.description: {
-        if (a.description < b.description) return -1;
-        if (a.description > b.description) return 1;
-        return 0;
-      }
-      case RESOURCES_SORT_KEYS.avgEncodedSize:
-        return a.avgEncodedSize - b.avgEncodedSize;
-      case RESOURCES_SORT_KEYS.avgDuration:
-        return a.avgDuration - b.avgDuration;
-      case RESOURCES_SORT_KEYS.timeSpent:
-        return a.timeSpent - b.timeSpent;
-      default:
-        return a.timeSpent - b.timeSpent;
-    }
-  };
+  const compareResourceInfo = COMPARATORS[sort.active] || COMPARATORS[RESOURCES_SORT_KEYS.timeSpent];
 
   const toggleSortOrder = (type: string) => {
     if (sort.active === type) {
@@ -113,9 +110,9 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
           }),
       );
     }
-  }, [sort, showAll]);
+  }, [sort, showAll, allSpans, localSpans, compareResourceInfo]);
 
-  if (resources && resources.length) {
+  if (resources?.length) {
     return (
       <table className="divide-primary-700 w-full table-fixed divide-y">
         <thead>

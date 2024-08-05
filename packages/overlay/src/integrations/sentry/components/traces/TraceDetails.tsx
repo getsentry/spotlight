@@ -72,14 +72,14 @@ export default function TraceDetails() {
           onChange={handleSearch}
           placeholder="Search in Trace"
         />
-        {query && (
+        {query ? (
           <CrossIcon
             onClick={handleResetSearch}
             className="fill-primary-50 absolute right-1 top-[5px] cursor-pointer"
             height={20}
             width={20}
           />
-        )}
+        ) : null}
       </div>
       <div className="flex-1 px-2 pb-6">
         <SpanTree

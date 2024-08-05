@@ -1,6 +1,6 @@
 import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
 import dataCache from '../../../data/sentryDataCache';
-import { TraceContext } from '../../../types';
+import type { TraceContext } from '../../../types';
 import TraceGeneralInfo from './TraceGeneralInfo';
 import TraceTags from './TraceTags';
 

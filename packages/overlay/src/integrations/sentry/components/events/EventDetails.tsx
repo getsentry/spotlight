@@ -57,7 +57,7 @@ export default function EventDetails() {
       <div className="bg-primary-950 flex items-center gap-x-2 px-6 py-4">
         <PlatformIcon event={event} className="rounded-md" />
         <h1 className="max-w-full flex-1 truncate text-2xl">{renderEventTitle(event)}</h1>
-        {!!traceCtx && (
+        {traceCtx && (
           <div className="text-primary-300 font-mono">
             <div>
               T:{' '}
