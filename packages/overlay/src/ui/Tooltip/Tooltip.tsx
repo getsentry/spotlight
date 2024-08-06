@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import classNames from '~/lib/classNames';
 
 const getPositionClass = (position: string) => {

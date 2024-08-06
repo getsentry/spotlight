@@ -12,7 +12,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
 
   const tags = event.tags;
 
-  if ((!contexts || !Object.values(contexts).find(v => !!v)) && !tags) {
+  if ((!contexts || !Object.values(contexts).some(v => v)) && !tags) {
     return (
       <div className="space-y-4 px-6">
         <div className="text-primary-300">
@@ -31,32 +31,29 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
         </div>
       )}
       <div className="space-y-6">
-        {Object.entries(contexts).map(([ctxKey, ctxValues]) => {
-          if (!ctxValues) return null;
-          return (
+        {Object.entries(contexts).map(([ctxKey, ctxValues]) =>
+          ctxValues ? (
             <div key={ctxKey}>
               <h2 className="font-bold uppercase">{ctxKey}</h2>
               <table className="w-full">
                 <tbody>
-                  {Object.entries(ctxValues).map(([key, value]) => {
-                    return (
-                      <tr key={key}>
-                        <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
-                          <div className="w-full truncate">{key}</div>
-                        </th>
-                        <td className="py-0.5">
-                          <pre className="text-primary-300 whitespace-nowrap font-mono">
-                            {JSON.stringify(value, undefined, 2)}
-                          </pre>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {Object.entries(ctxValues).map(([key, value]) => (
+                    <tr key={key}>
+                      <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
+                        <div className="w-full truncate">{key}</div>
+                      </th>
+                      <td className="py-0.5">
+                        <pre className="text-primary-300 whitespace-nowrap font-mono">
+                          {JSON.stringify(value, undefined, 2)}
+                        </pre>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
-          );
-        })}
+          ) : null,
+        )}
       </div>
     </>
   );

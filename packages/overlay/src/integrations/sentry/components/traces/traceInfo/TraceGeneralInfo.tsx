@@ -1,4 +1,4 @@
-import { Trace } from '~/integrations/sentry/types';
+import type { Trace } from '~/integrations/sentry/types';
 import { getDuration } from '~/integrations/sentry/utils/duration';
 import DateTime from '../../DateTime';
 
@@ -20,18 +20,16 @@ export default function TraceGeneralInfo({ trace }: TraceGeneralInfoProps) {
             ['Errors', trace.errors || '-'],
             ['Start Timestamp', <DateTime date={trace.start_timestamp} /> || '-'],
             ['Total Duration', `${getDuration(trace.start_timestamp, trace.timestamp).toLocaleString()} ms`],
-          ].map(([key, value]) => {
-            return (
-              <tr key={key as string} className="text-primary-300">
-                <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
-                  <div className="w-full truncate">{key}</div>
-                </th>
-                <td className="py-0.5">
-                  <pre className="whitespace-nowrap font-mono">{value}</pre>
-                </td>
-              </tr>
-            );
-          })}
+          ].map(([key, value]) => (
+            <tr key={key as string} className="text-primary-300">
+              <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
+                <div className="w-full truncate">{key}</div>
+              </th>
+              <td className="py-0.5">
+                <pre className="whitespace-nowrap font-mono">{value}</pre>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

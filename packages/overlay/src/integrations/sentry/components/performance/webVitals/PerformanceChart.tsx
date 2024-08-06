@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
-import { MetricScoreProps, MetricWeightsProps } from '~/integrations/sentry/types';
+import type { MetricScoreProps, MetricWeightsProps } from '~/integrations/sentry/types';
 import { calculateLabelCoordinates } from '~/integrations/sentry/utils/webVitals';
 import classNames from '~/lib/classNames';
 import { RingChart } from '~/ui/Chart';
-import { WebVitals } from '../../../constants';
+import type { WebVitals } from '../../../constants';
 import useMouseTracking from '../../../hooks/useMouseTracking';
 
 type Coordinates = {

@@ -1,4 +1,4 @@
-import { ConsoleMessage } from './types';
+import type { ConsoleMessage } from './types';
 
 type Props = {
   processedEvents?: ConsoleMessage[];

@@ -56,7 +56,7 @@ export default function EventList() {
                   <Badge title="This event is part of your local session.">Local</Badge>
                 ) : null}
               </div>
-              <span></span>
+              <span />
               <TimeSince date={e.timestamp} />
             </div>
             <div className="flex-1">{renderEvent(e)}</div>

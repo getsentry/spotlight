@@ -55,14 +55,14 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
           className="border-primary-800 bg-primary-800 hover:bg-primary-700 hover:border-primary-700 focus:bg-primary-800 text-primary-100 block w-full rounded-md py-2 pl-3 pr-10 focus:outline-none sm:text-sm"
           onChange={e => {
             const activeTab = tabs.find(tab => tab.id === e.target.value);
-            if (activeTab && activeTab.onSelect) {
+            if (activeTab?.onSelect) {
               activeTab.onSelect();
             }
             navigate(`${nested ? '' : '/'}${activeTab?.id || 'not-found'}`);
           }}
         >
-          {tabs.map((tab, tabIdx) => (
-            <option key={tabIdx} value={tab.id}>
+          {tabs.map(tab => (
+            <option key={tab.id} value={tab.id}>
               {tab.title} {tab.notificationCount?.count}
             </option>
           ))}
@@ -83,7 +83,7 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
                   '-m-y -mx-2 flex select-none whitespace-nowrap border-b-2 px-2 py-3 text-sm font-medium',
                 )
               }
-              onClick={() => tab.onSelect && tab.onSelect()}
+              onClick={() => tab.onSelect?.()}
             >
               {tab.title}
               {tab.notificationCount !== undefined ? (

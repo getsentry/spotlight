@@ -51,21 +51,12 @@ export default function Overview({
       <Tabs tabs={tabs} setOpen={setOpen} />
       <div className="flex-1 overflow-auto overflow-x-hidden">
         <Routes>
-          <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={'not-found'}></Route>
-          {tabs.map(tab => {
-            const TabContent = tab.content && tab.content;
-
-            if (TabContent) {
-              return (
-                <Route
-                  path={`/${tab.id}/*`}
-                  key={tab.id}
-                  element={createElement(TabContent, { processedEvents: tab.processedEvents })}
-                ></Route>
-              );
-            }
-            return null;
-          })}
+          <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={'not-found'} />
+          {tabs.map(({ content: TabContent, id, processedEvents }) =>
+            TabContent ? (
+              <Route path={`/${id}/*`} key={id} element={createElement(TabContent, { processedEvents })} />
+            ) : null,
+          )}
         </Routes>
       </div>
     </>

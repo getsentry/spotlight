@@ -1,4 +1,4 @@
-import { MouseEventHandler, useState } from 'react';
+import { useState, type MouseEventHandler } from 'react';
 import classNames from '~/lib/classNames';
 
 type SpanResizerProps = {

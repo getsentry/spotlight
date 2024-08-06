@@ -55,7 +55,7 @@ export default function PerformanceTabDetails() {
         <Routes>
           <Route path="queries/:type" element={<QuerySummary showAll={showAll} />} />
           <Route path="resources" element={<Resources showAll={showAll} />} />
-          <Route path="webvitals" element={<WebVitals showAll={showAll} />} />
+          <Route path="webvitals" element={<WebVitals />} />
           <Route path="webvitals/:page" element={<WebVitalsDetail />} />
           {/* Default tab */}
           <Route path="*" element={<Queries showAll={showAll} />} />

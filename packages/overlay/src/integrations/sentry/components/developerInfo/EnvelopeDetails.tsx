@@ -1,6 +1,6 @@
-import { Envelope } from '@sentry/types';
+import type { Envelope } from '@sentry/types';
 import { useState } from 'react';
-import { RawEventContext } from '~/integrations/integration';
+import type { RawEventContext } from '~/integrations/integration';
 import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
 import JsonViewer from './JsonViewer';
 
@@ -14,13 +14,11 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
       <SidePanelHeader
         title="Envelope Details"
         subtitle={
-          <>
-            {header.event_id && (
-              <>
-                Event Id <span className="text-primary-500">&mdash;</span> {header.event_id}
-              </>
-            )}
-          </>
+          header.event_id ? (
+            <>
+              Event Id <span className="text-primary-500">&mdash;</span> {header.event_id}
+            </>
+          ) : undefined
         }
         backto="/devInfo"
       />
@@ -33,8 +31,8 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
             onChange={() => setShowRawJSON(prev => !prev)}
             checked={showRawJSON}
           />
-          <div className="bg-primary-400 h-4 w-10 rounded-full shadow-inner"></div>
-          <div className="dot absolute -left-1 -top-1 h-6 w-6 rounded-full bg-white shadow transition"></div>
+          <div className="bg-primary-400 h-4 w-10 rounded-full shadow-inner" />
+          <div className="dot absolute -left-1 -top-1 h-6 w-6 rounded-full bg-white shadow transition" />
         </div>
         <span className="ml-2">Show Raw Data</span>
       </label>

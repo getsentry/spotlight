@@ -34,12 +34,9 @@ export const SentryEventsContextProvider: React.FC<{
   const [events, setEvents] = useReducer(eventReducer, sentryDataCache.getEvents());
 
   useEffect(() => {
-    const unsubscribe = sentryDataCache.subscribe('event', (e: SentryEvent) => {
+    return sentryDataCache.subscribe('event', (e: SentryEvent) => {
       setEvents({ action: 'APPEND', e });
     });
-    return () => {
-      unsubscribe();
-    };
   }, []);
 
   const contextValue: SentryEventsContextProps = {
