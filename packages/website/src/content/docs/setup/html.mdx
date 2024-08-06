@@ -5,30 +5,18 @@ description: Use the overlay directly in HTML
 
 To use Spotlight directly, you can load the script from a CDN and initialize it in a separate script tag.
 
-This solution will probably change in the future, as we are working on a better way to load Spotlight.
-
 ## Configuration
 
-```html {7, 10, 14-19}
+```html {6}
 <!doctype html>
 <html>
   <head>
     <title>Spotlight</title>
-    <!-- Set process for development environment -->
-    <script>
-      window.process = { env: { NODE_ENV: 'development' } };
-    </script>
     <!-- Load Spotlight.js from the CDN -->
-    <script type="module" src="https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.js"></script>
+    <script src="https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.iife.js" crossorigin="anonymous"></script>
   </head>
   <body>
-    <!-- Import and initialize Spotlight in a separate script tag -->
-    <script type="module">
-      import * as Spotlight from 'https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.js';
-      Spotlight.init({
-        openOnInit: true,
-      });
-    </script>
+    Your app
   </body>
 </html>
 ```

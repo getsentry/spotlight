@@ -23,10 +23,10 @@ export {
   DEFAULT_ANCHOR,
   DEFAULT_EXPERIMENTS,
   DEFAULT_SIDECAR_URL,
-  off,
-  on,
   React,
   ReactDOM,
+  off,
+  on,
   trigger,
 };
 
@@ -179,7 +179,7 @@ export async function init({
     document.body.append(docRoot);
   }
 
-  if (injectImmediately) {
+  if (document.readyState === 'complete' || injectImmediately) {
     injectSpotlight();
   } else {
     window.addEventListener('load', () => {

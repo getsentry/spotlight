@@ -23,6 +23,21 @@ const removeReactDevToolsMessagePlugin: () => PluginOption = () => ({
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // {
+  //   input: [ 'src/index.bundle.ts' ],
+  //   output: {
+  //     entryFileNames: [Function: entryFileNames],
+  //     dir: 'build',
+  //     sourcemap: true,
+  //     strict: false,
+  //     esModule: false,
+  //     format: 'iife',
+  //     name: 'Sentry',
+  //     intro: [Function: intro]
+  //   },
+  //   treeshake: 'smallest',
+  //   context: 'window'
+  // },
   plugins: [
     react(),
     dts({
@@ -48,9 +63,14 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.tsx'),
-      name: 'sentry-spotlight',
+      name: 'Spotlight',
       // the proper extensions will be added
       fileName: 'sentry-spotlight',
+      formats: ['es', 'iife'],
+    },
+    rollupOptions: {
+      treeshake: 'smallest',
+      output: { footer: 'window.Spotlight && Spotlight.init()' },
     },
     sourcemap: true,
   },

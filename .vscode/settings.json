@@ -6,10 +6,13 @@
     "contextlines",
     "Endcaps",
     "fontsource",
+    "iife",
+    "outro",
     "pageload",
     "spotlightjs",
     "svgr",
     "tailwindcss",
+    "treeshake",
     "ttfb",
     "uuidv",
     "webvitals"
