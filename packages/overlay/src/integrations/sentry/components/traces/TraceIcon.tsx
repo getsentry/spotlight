@@ -1,4 +1,4 @@
-import { Trace } from '../../types';
+import type { Trace } from '../../types';
 import { sdkToPlatform } from '../../utils/sdkToPlatform';
 import PlatformIcon from '../PlatformIcon';
 

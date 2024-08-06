@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, Outlet, Route, Routes, useParams } from 'react-router-dom';
 import Tabs from '../../../../components/Tabs';
 import sentryDataCache from '../../data/sentryDataCache';
-import { SentryEvent } from '../../types';
+import type { SentryEvent } from '../../types';
 import PlatformIcon from '../PlatformIcon';
 import Event, { EventTitle } from './Event';
 import EventBreadcrumbs from './EventBreadcrumbs';

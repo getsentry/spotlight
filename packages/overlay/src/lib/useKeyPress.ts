@@ -14,12 +14,9 @@ export default function useKeyPress(keys: string[], action: () => void, propagat
       }
 
       if (
-        keys.every((key: string) => {
-          if (key in e) {
-            return e[key as keyof KeyboardEvent];
-          }
-          return e.key.toLowerCase() === key.toLowerCase();
-        })
+        keys.every((key: string) =>
+          key in e ? e[key as keyof KeyboardEvent] : e.key.toLowerCase() === key.toLowerCase(),
+        )
       ) {
         action();
       }
@@ -27,8 +24,6 @@ export default function useKeyPress(keys: string[], action: () => void, propagat
 
     window.addEventListener('keyup', onKeyup);
 
-    return () => {
-      window.removeEventListener('keyup', onKeyup);
-    };
+    return () => window.removeEventListener('keyup', onKeyup) as undefined;
   }, [keys, action, propagate]);
 }

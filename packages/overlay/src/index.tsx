@@ -11,7 +11,7 @@ import { off, on, trigger } from './lib/eventTarget.ts';
 import { activateLogger, log } from './lib/logger.ts';
 import { SpotlightContextProvider } from './lib/useSpotlightContext.tsx';
 import { React, ReactDOM } from './react-instance.tsx'; // Import specific exports
-import { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
+import type { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
 
 export { default as console } from './integrations/console/index.ts';
 export { default as hydrationError } from './integrations/hydration-error/index.ts';
@@ -23,10 +23,10 @@ export {
   DEFAULT_ANCHOR,
   DEFAULT_EXPERIMENTS,
   DEFAULT_SIDECAR_URL,
-  React,
-  ReactDOM,
   off,
   on,
+  React,
+  ReactDOM,
   trigger,
 };
 
@@ -146,17 +146,13 @@ export async function init({
     });
   }
 
-  const tabs = initializedIntegrations
-    .map(integration => {
-      if (integration.tabs) {
-        return integration.tabs({ processedEvents: [] }).map(tab => ({
-          ...tab,
-          processedEvents: [],
-        }));
-      }
-      return [];
-    })
-    .flat();
+  const tabs = initializedIntegrations.flatMap(
+    integration =>
+      integration.tabs?.({ processedEvents: [] }).map(tab => ({
+        ...tab,
+        processedEvents: [],
+      })) || [],
+  );
 
   const initialTab = tabs.length ? `/${tabs[0].id}` : '/no-tabs';
 

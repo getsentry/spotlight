@@ -1,8 +1,8 @@
 import { ReactComponent as DeleteIcon } from '~/assets/deleteIcon.svg';
 import { ReactComponent as Logo } from '~/assets/glyph.svg';
-import { Integration, IntegrationData } from '~/integrations/integration';
+import type { Integration, IntegrationData } from '~/integrations/integration';
 import { getSpotlightEventTarget } from '~/lib/eventTarget';
-import { NotificationCount } from '~/types';
+import type { NotificationCount } from '~/types';
 import classNames from '../lib/classNames';
 import Overview from './Overview';
 
