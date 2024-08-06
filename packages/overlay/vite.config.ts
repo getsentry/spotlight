@@ -23,21 +23,6 @@ const removeReactDevToolsMessagePlugin: () => PluginOption = () => ({
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // {
-  //   input: [ 'src/index.bundle.ts' ],
-  //   output: {
-  //     entryFileNames: [Function: entryFileNames],
-  //     dir: 'build',
-  //     sourcemap: true,
-  //     strict: false,
-  //     esModule: false,
-  //     format: 'iife',
-  //     name: 'Sentry',
-  //     intro: [Function: intro]
-  //   },
-  //   treeshake: 'smallest',
-  //   context: 'window'
-  // },
   plugins: [
     react(),
     dts({
