@@ -175,6 +175,10 @@ export async function init({
   );
 
   function injectSpotlight() {
+    if (isSpotlightInjected()) {
+      log('Spotlight already injected, bailing.');
+      return;
+    }
     log('Injecting into application');
     document.body.append(docRoot);
   }
@@ -182,13 +186,7 @@ export async function init({
   if (document.readyState === 'complete' || injectImmediately) {
     injectSpotlight();
   } else {
-    window.addEventListener('load', () => {
-      injectSpotlight();
-    });
+    window.addEventListener('load', injectSpotlight);
   }
-  window.addEventListener('error', () => {
-    if (!isSpotlightInjected()) {
-      injectSpotlight();
-    }
-  });
+  window.addEventListener('error', injectSpotlight);
 }
