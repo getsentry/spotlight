@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Debugger from './components/Debugger';
 import Trigger from './components/Trigger';
@@ -7,7 +7,7 @@ import { getSpotlightEventTarget } from './lib/eventTarget';
 import { log } from './lib/logger';
 import useKeyPress from './lib/useKeyPress';
 import { connectToSidecar } from './sidecar';
-import { NotificationCount, SpotlightOverlayOptions } from './types';
+import type { NotificationCount, SpotlightOverlayOptions } from './types';
 
 type AppProps = Omit<SpotlightOverlayOptions, 'debug' | 'injectImmediately'> &
   Required<Pick<SpotlightOverlayOptions, 'sidecarUrl'>>;
@@ -21,65 +21,69 @@ export default function App({
   fullPage = false,
   showClearEventsButton = true,
 }: AppProps) {
-  log('App rerender');
   const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});
   const [isOnline, setOnline] = useState(false);
   const [triggerButtonCount, setTriggerButtonCount] = useState<NotificationCount>({ count: 0, severe: false });
   const [isOpen, setOpen] = useState(openOnInit);
-  const [reloadSpotlight, setReloadSpotlight] = useState<number>(0);
+  log('App rerender', integrationData, isOnline, triggerButtonCount, isOpen);
 
-  useKeyPress(['ctrlKey', 'F12'], () => {
-    setOpen(prev => !prev);
-  });
+  // Map that holds the information which kind of content type should be dispatched to which integration(s)
+  const contentTypeToIntegrations = useMemo(() => {
+    const result = new Map<string, Integration[]>();
+    for (const integration of integrations) {
+      if (!integration.forwardedContentType) continue;
 
-  useEffect(() => {
-    // Map that holds the information which kind of content type should be dispatched to which integration(s)
-    const contentTypeToIntegrations = new Map<string, Integration[]>();
+      for (const contentType of integration.forwardedContentType) {
+        let integrationsForContentType = result.get(contentType);
+        if (!integrationsForContentType) {
+          integrationsForContentType = [];
+          result.set(contentType, integrationsForContentType);
+        }
+        integrationsForContentType.push(integration);
+      }
+    }
+    return result;
+  }, [integrations]);
 
-    integrations.forEach(
-      integration =>
-        integration.forwardedContentType?.forEach(contentType => {
-          const i = contentTypeToIntegrations.get(contentType) || [];
-          i.push(integration);
-          contentTypeToIntegrations.set(contentType, i);
-        }),
-    );
+  useEffect(
+    () => connectToSidecar(sidecarUrl, contentTypeToIntegrations, setIntegrationData, setOnline) as () => undefined,
+    [sidecarUrl, contentTypeToIntegrations],
+  );
 
-    const cleanupListeners = connectToSidecar(sidecarUrl, contentTypeToIntegrations, setIntegrationData, setOnline);
+  const spotlightEventTarget = useMemo(() => getSpotlightEventTarget(), []);
 
-    return () => {
-      log('useEffect cleanup');
-      cleanupListeners();
-    };
-  }, [integrations, sidecarUrl, reloadSpotlight]);
-
-  const spotlightEventTarget = getSpotlightEventTarget();
-
+  // Note that `useNavigate()` relies on `useLocation()` which
+  // causes a full re-render here every time we change the location
+  // We can fix this by doing `const router = createMemoryRouter()`
+  // and using `router.navigate()` but that requires a larger refactor
+  // as our <Route>s are scattered around a bit
+  // See https://github.com/remix-run/react-router/issues/7634
   const navigate = useNavigate();
+  const eventHandlers = useMemo(() => {
+    log('useMemo: initializing event handlers');
+    const clearEvents = async () => {
+      const { origin } = new URL(sidecarUrl);
+      const clearEventsUrl: string = `${origin}/clear`;
 
-  const clearEvents = () => {
-    const { origin } = new URL(sidecarUrl);
-    const clearEventsUrl: string = `${origin}/clear`;
+      try {
+        await fetch(clearEventsUrl, {
+          method: 'DELETE',
+          mode: 'cors',
+        });
+      } catch (err) {
+        console.error(
+          `Spotlight can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`,
+          err,
+        );
+        return;
+      }
 
-    fetch(clearEventsUrl, {
-      method: 'DELETE',
-      mode: 'cors',
-    }).catch(err => {
-      console.error(`Spotlight can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`, err);
-      return;
-    });
-
-    integrations.forEach(integration => {
-      const IntegrationName = integration.name;
-      if (integration.processEvent) {
-        setIntegrationData(prev => ({ ...prev, [IntegrationName]: [] }));
+      for (const integration of integrations) {
+        setIntegrationData(prev => ({ ...prev, [integration.name]: [] }));
         if (integration.reset) integration.reset();
       }
-    });
-    setReloadSpotlight(prev => prev + 1);
-  };
+    };
 
-  useEffect(() => {
     const onOpen = (
       e: CustomEvent<{
         path: string | undefined;
@@ -95,23 +99,36 @@ export default function App({
       setOpen(false);
     };
 
+    const onToggle = () => {
+      log('Toggle');
+      setOpen(prev => !prev);
+    };
+
     const onNavigate = (e: CustomEvent<string>) => {
       log('Navigate');
       navigate(e.detail);
     };
 
-    spotlightEventTarget.addEventListener('open', onOpen as EventListener);
-    spotlightEventTarget.addEventListener('close', onClose);
-    spotlightEventTarget.addEventListener('navigate', onNavigate as EventListener);
-    spotlightEventTarget.addEventListener('clearEvents', clearEvents as EventListener);
+    return { clearEvents, onOpen, onClose, onNavigate, onToggle };
+  }, [integrations, navigate, sidecarUrl]);
 
-    return () => {
-      spotlightEventTarget.removeEventListener('open', onOpen as EventListener);
-      spotlightEventTarget.removeEventListener('close', onClose);
-      spotlightEventTarget.removeEventListener('navigate', onNavigate as EventListener);
-      spotlightEventTarget.removeEventListener('clearEvents', clearEvents as EventListener);
+  useKeyPress(['ctrlKey', 'F12'], eventHandlers.onToggle);
+
+  useEffect(() => {
+    log('useEffect: Adding event listeners');
+    spotlightEventTarget.addEventListener('open', eventHandlers.onOpen as EventListener);
+    spotlightEventTarget.addEventListener('close', eventHandlers.onClose);
+    spotlightEventTarget.addEventListener('navigate', eventHandlers.onNavigate as EventListener);
+    spotlightEventTarget.addEventListener('clearEvents', eventHandlers.clearEvents as EventListener);
+
+    return (): undefined => {
+      log('useEffect[destructor]: Removing event listeners');
+      spotlightEventTarget.removeEventListener('open', eventHandlers.onOpen as EventListener);
+      spotlightEventTarget.removeEventListener('close', eventHandlers.onClose);
+      spotlightEventTarget.removeEventListener('navigate', eventHandlers.onNavigate as EventListener);
+      spotlightEventTarget.removeEventListener('clearEvents', eventHandlers.clearEvents as EventListener);
     };
-  }, [spotlightEventTarget, navigate]);
+  }, [spotlightEventTarget, eventHandlers]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -130,8 +147,6 @@ export default function App({
       );
     }
   }, [triggerButtonCount, spotlightEventTarget]);
-
-  log('Integration data:', integrationData);
 
   return (
     <>

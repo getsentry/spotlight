@@ -19,10 +19,14 @@ export const SentryEventsContext = React.createContext<SentryEventsContextProps>
 });
 
 function eventReducer(state: SentryEvent[], message: SetEventsAction): SentryEvent[] {
-  if (message.action === 'RESET' && Array.isArray(message.e)) {
-    return message.e;
-  } else if (message.action === 'APPEND' && !Array.isArray(message.e)) {
-    return [message.e, ...state];
+  if (Array.isArray(message.e)) {
+    if (message.action === 'RESET') {
+      return message.e;
+    }
+  } else {
+    if (message.action === 'APPEND') {
+      return [message.e, ...state];
+    }
   }
 
   return state;
@@ -33,11 +37,13 @@ export const SentryEventsContextProvider: React.FC<{
 }> = ({ children }) => {
   const [events, setEvents] = useReducer(eventReducer, sentryDataCache.getEvents());
 
-  useEffect(() => {
-    return sentryDataCache.subscribe('event', (e: SentryEvent) => {
-      setEvents({ action: 'APPEND', e });
-    });
-  }, []);
+  useEffect(
+    () =>
+      sentryDataCache.subscribe('event', (e: SentryEvent) => {
+        setEvents({ action: 'APPEND', e });
+      }) as () => undefined,
+    [],
+  );
 
   const contextValue: SentryEventsContextProps = {
     events,

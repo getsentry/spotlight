@@ -1,7 +1,7 @@
 import { createElement, useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { Integration, IntegrationData } from '~/integrations/integration';
-import { NotificationCount } from '~/types';
+import type { Integration, IntegrationData } from '~/integrations/integration';
+import type { NotificationCount } from '~/types';
 import Tabs from './Tabs';
 
 export default function Overview({
@@ -17,18 +17,16 @@ export default function Overview({
 }) {
   const [notificationCountSum, setNotificationCountSum] = useState<NotificationCount>({ count: 0, severe: false });
 
-  const tabs = integrations
-    .map(integration => {
-      if (integration.tabs) {
-        const processedEvents = integrationData[integration.name]?.map(container => container.event) || [];
-        return integration.tabs({ processedEvents }).map(tab => ({
-          ...tab,
-          processedEvents: processedEvents,
-        }));
-      }
-      return [];
-    })
-    .flat();
+  const tabs = integrations.flatMap(integration => {
+    if (integration.tabs) {
+      const processedEvents = integrationData[integration.name]?.map(container => container.event) || [];
+      return integration.tabs({ processedEvents }).map(tab => ({
+        ...tab,
+        processedEvents: processedEvents,
+      }));
+    }
+    return [];
+  });
 
   const newNotificationSum = tabs.reduce(
     (sum, tab) => ({

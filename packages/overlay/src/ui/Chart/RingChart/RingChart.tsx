@@ -13,7 +13,7 @@ export type RingChartProps = React.HTMLAttributes<SVGSVGElement> & {
    */
   barWidth?: number;
   onHoverActions?: (() => void)[];
-  onUnhover?: () => void;
+  onBlur?: () => void;
   /**
    * Endcaps on the progress bar
    */
@@ -42,7 +42,7 @@ function RingChart({
   backgroundColors,
   progressEndcaps,
   onHoverActions,
-  onUnhover,
+  onBlur,
   ...p
 }: RingChartProps) {
   const foreignObjectSize = size / 2;
@@ -74,7 +74,9 @@ function RingChart({
           cx={cx}
           cy={cx}
           onMouseOver={() => onHoverActions?.[index]()}
-          onMouseLeave={() => onUnhover?.()}
+          onFocus={() => onHoverActions?.[index]()}
+          onMouseLeave={() => onBlur?.()}
+          onBlur={() => onBlur?.()}
           className={classNames(backgroundColors[index])}
           style={{
             fill: 'none',
@@ -82,7 +84,7 @@ function RingChart({
             strokeDasharray: `${circumference} ${circumference}`,
             transform: `rotate(${rotate}deg)`,
             transformOrigin: '50% 50%',
-            transition: `stroke 300ms`,
+            transition: 'stroke 300ms',
           }}
         />,
         <circle
@@ -93,7 +95,9 @@ function RingChart({
           cx={cx}
           cy={cx}
           onMouseOver={() => onHoverActions?.[index]()}
-          onMouseLeave={() => onUnhover?.()}
+          onFocus={() => onHoverActions?.[index]()}
+          onMouseLeave={() => onBlur?.()}
+          onBlur={() => onBlur?.()}
           className={classNames(segmentColors[index])}
           style={{
             fill: 'none',
@@ -101,7 +105,7 @@ function RingChart({
             strokeDasharray: `${circumference} ${circumference}`,
             transform: `rotate(${rotate}deg)`,
             transformOrigin: '50% 50%',
-            transition: `stroke 300ms, stroke-dashoffset 300ms`,
+            transition: 'stroke 300ms, stroke-dashoffset 300ms',
           }}
         />,
       ];
@@ -112,7 +116,7 @@ function RingChart({
     circumference,
     maxValues,
     onHoverActions,
-    onUnhover,
+    onBlur,
     progressEndcaps,
     radius,
     segmentColors,
@@ -121,6 +125,7 @@ function RingChart({
 
   return (
     <svg className="relative" role="img" height={radius * 2 + barWidth} width={radius * 2 + barWidth} {...p}>
+      <title>Web Vitals Breakdown</title>
       {rings}
       <foreignObject
         height={foreignObjectSize}

@@ -184,7 +184,7 @@ const PerformanceChart = ({
             () => setWebVitalTooltip('cls'),
             () => setWebVitalTooltip('ttfb'),
           ]}
-          onUnhover={() => setWebVitalTooltip(null)}
+          onBlur={() => setWebVitalTooltip(null)}
         />
       </svg>
     </div>

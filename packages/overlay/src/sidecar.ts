@@ -1,5 +1,5 @@
-import React from 'react';
-import { Integration, IntegrationData } from './integrations/integration';
+import type React from 'react';
+import type { Integration, IntegrationData } from './integrations/integration';
 import { log } from './lib/logger';
 
 export function connectToSidecar(
@@ -56,9 +56,9 @@ export function connectToSidecar(
 
   return () => {
     log(`Removing ${contentTypeListeners.length} listeners`);
-    contentTypeListeners.forEach(typeAndListener => {
+    for (const typeAndListener of contentTypeListeners) {
       source.removeEventListener(typeAndListener[0], typeAndListener[1]);
       log('Removed listener for type', typeAndListener[0]);
-    });
+    }
   };
 }

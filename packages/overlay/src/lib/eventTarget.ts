@@ -1,4 +1,4 @@
-import { WindowWithSpotlight } from '~/types';
+import type { WindowWithSpotlight } from '~/types';
 
 const fallbackEventTarget = new EventTarget();
 
