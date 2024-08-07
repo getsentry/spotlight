@@ -1,4 +1,4 @@
-import { Client, Envelope, Event, Integration } from '@sentry/types';
+import type { Client, Envelope, Event, Integration } from '@sentry/types';
 import { serializeEnvelope } from '@sentry/utils';
 import { DEFAULT_SIDECAR_URL } from '~/constants';
 import { log } from '../../lib/logger';
@@ -17,10 +17,8 @@ type SpotlightBrowserIntegrationOptions = {
 
 /**
  * A Sentry integration for Spotlight integration that the Overlay will inject automatically.
- * This integration does a couple of things:
+ * This integration does the following:
  *
- *  - Try to enrich stack traces by querying a potentially existing context lines integration
- *    on the server side  (@see packages/astro/src/vite/source-context.ts)
  *  - Drop transactions created from interactions with the Spotlight UI
  *  - Forward Sentry events sent from the browser SDK to the Sidecar instance running on
  *    either on http://localhost:8969/stream or on the supplied `sidecarUrl` option.
@@ -40,7 +38,7 @@ export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOption
     setup: () => {
       log('Using Sidecar URL', _sidecarUrl);
     },
-    processEvent: async (event: Event) => {
+    processEvent: (event: Event) => {
       // We don't want to send interaction transactions/root spans created from
       // clicks within Spotlight to Sentry. Neither do we want them to be sent to
       // spotlight.
@@ -51,10 +49,6 @@ export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOption
       const traceId = event.contexts?.trace?.trace_id;
       if (traceId) {
         sentryDataCache.trackLocalTrace(traceId);
-      }
-
-      if (event.type || !event.exception || !event.exception.values) {
-        return event;
       }
 
       return event;
