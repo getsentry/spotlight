@@ -1,5 +1,17 @@
 # @spotlightjs/astro
 
+## 2.1.6
+
+### Patch Changes
+
+- Various improvements in React code for better stability & performance
+  ([#476](https://github.com/getsentry/spotlight/pull/476))
+
+- Updated dependencies
+  [[`d38c054a47820fe074ad3fd61fe5960e85e0ef49`](https://github.com/getsentry/spotlight/commit/d38c054a47820fe074ad3fd61fe5960e85e0ef49),
+  [`8f42d4e6b97d3503c36447c0ba6ffa1ebea72ccf`](https://github.com/getsentry/spotlight/commit/8f42d4e6b97d3503c36447c0ba6ffa1ebea72ccf)]:
+  - @spotlightjs/spotlight@2.3.1
+
 ## 2.1.5
 
 ### Patch Changes
