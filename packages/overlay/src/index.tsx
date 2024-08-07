@@ -23,10 +23,10 @@ export {
   DEFAULT_ANCHOR,
   DEFAULT_EXPERIMENTS,
   DEFAULT_SIDECAR_URL,
-  off,
-  on,
   React,
   ReactDOM,
+  off,
+  on,
   trigger,
 };
 
@@ -175,20 +175,18 @@ export async function init({
   );
 
   function injectSpotlight() {
+    if (isSpotlightInjected()) {
+      log('Spotlight already injected, bailing.');
+      return;
+    }
     log('Injecting into application');
     document.body.append(docRoot);
   }
 
-  if (injectImmediately) {
+  if (document.readyState === 'complete' || injectImmediately) {
     injectSpotlight();
   } else {
-    window.addEventListener('load', () => {
-      injectSpotlight();
-    });
+    window.addEventListener('load', injectSpotlight);
   }
-  window.addEventListener('error', () => {
-    if (!isSpotlightInjected()) {
-      injectSpotlight();
-    }
-  });
+  window.addEventListener('error', injectSpotlight);
 }

@@ -48,9 +48,14 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.tsx'),
-      name: 'sentry-spotlight',
+      name: 'Spotlight',
       // the proper extensions will be added
       fileName: 'sentry-spotlight',
+      formats: ['es', 'iife'],
+    },
+    rollupOptions: {
+      treeshake: 'smallest',
+      output: { footer: 'window.Spotlight && Spotlight.init()' },
     },
     sourcemap: true,
   },
