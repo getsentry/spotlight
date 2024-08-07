@@ -31,9 +31,7 @@ Sentry.init({
   ],
 });
 
-if (process.env.NODE_ENV === 'development') {
-  Spotlight.init({
-    debug: true,
-    integrations: [customIntegration()],
-  });
-}
+Spotlight.init({
+  debug: true,
+  integrations: [customIntegration()],
+});

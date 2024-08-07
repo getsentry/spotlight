@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 
 // import tsconfigPaths from "vite-tsconfig-paths";
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
@@ -12,7 +12,6 @@ export default defineConfig({
       reporter: ['json'],
     },
     globals: true,
-    // setupFiles: ["./src/test/setup-test-env.ts"],
     include: ['./test/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     watchExclude: ['.*\\/node_modules\\/.*', '.*\\/dist\\/.*'],
   },
