@@ -1,5 +1,20 @@
 # @spotlightjs/core
 
+## 2.3.0
+
+### Minor Changes
+
+- Add IIFE for auto load & init over CDN with a single script include
+  ([#478](https://github.com/getsentry/spotlight/pull/478))
+
+### Patch Changes
+
+- Overhaul React code for multiple fixes and performance improvements
+  ([#473](https://github.com/getsentry/spotlight/pull/473))
+
+- Various improvements in React code for better stability & performance
+  ([#476](https://github.com/getsentry/spotlight/pull/476))
+
 ## 2.2.1
 
 ### Patch Changes
