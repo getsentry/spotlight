@@ -36,9 +36,7 @@ export default defineConfig({
     removeReactDevToolsMessagePlugin(),
   ],
   define: {
-    'process.env.NODE_ENV': "'development'",
-    'process.env.JEST_WORKER_ID': 1,
-    process: {},
+    'process.env.NODE_ENV': "'production'",
   },
   resolve: {
     alias: {

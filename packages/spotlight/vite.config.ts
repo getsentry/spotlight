@@ -17,8 +17,6 @@ export default defineConfig({
         sidecar: resolve(__dirname, 'src/sidecar.ts'),
         'vite-plugin': resolve(__dirname, 'src/vite-plugin.ts'),
       },
-      // the proper extensions will be added
-      //   fileName: 'sentry-spotlight',
     },
     rollupOptions: {
       external: [...dependencies, ...builtinModules.map(x => `node:${x}`)],

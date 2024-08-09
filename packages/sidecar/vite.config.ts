@@ -8,8 +8,6 @@ const dependencies = Object.keys({
   ...packageJson.devDependencies,
 });
 
-const noExternal = process.env.NODE_ENV === 'production' ? dependencies : [];
-
 export default defineConfig({
   build: {
     ssr: './src/main.ts',
@@ -18,8 +16,5 @@ export default defineConfig({
     rollupOptions: {
       external: [...dependencies, ...builtinModules.map(x => `node:${x}`)],
     },
-  },
-  ssr: {
-    noExternal,
   },
 });
