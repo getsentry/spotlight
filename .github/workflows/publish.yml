@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !cancelled()
-      && inputs.docker
+      && inputs.docker != false
       && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
     steps:
       - name: Checkout Repo
@@ -102,7 +102,7 @@ jobs:
     runs-on: macos-latest
     if: |
       !cancelled()
-      && inputs.electron
+      && inputs.electron != false
       && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
     # strategy:
     #   fail-fast: false
