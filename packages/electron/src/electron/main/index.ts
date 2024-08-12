@@ -277,8 +277,9 @@ async function askForPermissionToSendToSentry(event: Sentry.Event, hint?: Sentry
   showErrorMessage();
   if (store.get('sentry-enabled') === false) {
     return null;
-  } else if (store.get('sentry-enabled') === true) {
-    if (hint && hint.attachments && hint.attachments.length > 0) {
+  }
+  if (store.get('sentry-enabled') === true) {
+    if (hint?.attachments && hint.attachments.length > 0) {
       return askToSendEnvelope(event, hint);
     }
     return event;
@@ -295,19 +296,20 @@ async function askForPermissionToSendToSentry(event: Sentry.Event, hint?: Sentry
   if (response === 1) {
     store.set('sentry-enabled', false);
     return null;
-  } else {
-    store.set('sentry-enabled', true);
-    if (hint && hint.attachments && hint.attachments.length > 0) {
-      return askToSendEnvelope(event, hint);
-    }
-    return event;
   }
+
+  store.set('sentry-enabled', true);
+  if (hint?.attachments && hint.attachments.length > 0) {
+    return askToSendEnvelope(event, hint);
+  }
+  return event;
 }
 
 async function askToSendEnvelope(event: Sentry.Event, hint?: Sentry.EventHint) {
   if (store.get('sentry-send-envelopes') === false) {
     return null;
-  } else if (store.get('sentry-send-envelopes') === true) {
+  }
+  if (store.get('sentry-send-envelopes') === true) {
     return event;
   }
 
@@ -316,22 +318,22 @@ async function askToSendEnvelope(event: Sentry.Event, hint?: Sentry.EventHint) {
     buttons: ['Yes', 'No'],
     title: 'Spotlight',
     message: 'Can we also send the payload Spotlight received so we can fully reproduce the error?',
-    detail: 'Again, just makes things eaiser for us. (Can be changed in the settings menu)',
+    detail: 'Again, just makes things easier for us. (Can be changed in the settings menu)',
   });
 
   if (response === 1) {
     Sentry.configureScope(scope => {
       scope.clearAttachments();
     });
-    if (hint && hint.attachments && hint.attachments.length > 0) {
+    if (hint?.attachments && hint.attachments.length > 0) {
       hint.attachments = [];
     }
     store.set('sentry-send-envelopes', false);
     return event;
-  } else {
-    store.set('sentry-send-envelopes', true);
-    return event;
   }
+
+  store.set('sentry-send-envelopes', true);
+  return event;
 }
 
 function storeIncomingPayload(body: string) {
