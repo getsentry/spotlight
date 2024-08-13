@@ -134,7 +134,7 @@ jobs:
           MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-        run: pnpm build && cd packages/electron && pnpm build:mac
+        run: cd packages/electron && pnpm build:mac
 
       - name: Gets latest created release info
         id: latest_release_info
