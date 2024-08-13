@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !cancelled()
-      && inputs.docker != false
+      && (inputs.docker || github.event_name == 'push')
       && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
     steps:
       - name: Checkout Repo
@@ -102,7 +102,7 @@ jobs:
     runs-on: macos-latest
     if: |
       !cancelled()
-      && inputs.electron != false
+      && (inputs.electron || github.event_name == 'push')
       && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
     # strategy:
     #   fail-fast: false
@@ -134,7 +134,7 @@ jobs:
           MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-        run: cd packages/electron && pnpm build:mac
+        run: pnpm build && cd packages/electron && pnpm build:mac
 
       - name: Gets latest created release info
         id: latest_release_info
