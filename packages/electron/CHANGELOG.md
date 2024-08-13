@@ -1,5 +1,11 @@
 # @spotlightjs/electron
 
+## 1.1.5
+
+### Patch Changes
+
+- Upgrade Electron stack for macOS 15 compatibility ([#490](https://github.com/getsentry/spotlight/pull/490))
+
 ## 1.1.4
 
 ### Patch Changes
