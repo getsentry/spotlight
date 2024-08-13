@@ -1,7 +1,6 @@
 import react from '@vitejs/plugin-react';
 import MagicString from 'magic-string';
-import { sep } from 'node:path';
-import { resolve } from 'path';
+import { resolve, sep } from 'node:path';
 import type { PluginOption } from 'vite';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';

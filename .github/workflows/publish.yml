@@ -110,21 +110,18 @@ jobs:
     #     platform: [x64, arm64]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
+          node-version-file: 'package.json'
 
-      - name: Install pnpm
+      - name: Setup pnpm & install dependencies
         uses: pnpm/action-setup@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-
-      - name: Install deps
-        run: pnpm install
-
-      - name: Build packages
-        run: pnpm build
+        with:
+          run_install: true
 
       - name: Build Electron
         env:
