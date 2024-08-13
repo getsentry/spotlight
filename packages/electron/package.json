@@ -15,19 +15,19 @@
     "build:mac": "pnpm build && node electron-builder.js"
   },
   "dependencies": {
-    "@sentry/electron": "4.15.1",
+    "@sentry/electron": "^5.3.0",
     "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
-    "electron-store": "^8.1.0"
+    "electron-store": "^10.0.0"
   },
   "devDependencies": {
-    "@electron/notarize": "^2.2.0",
-    "@sentry/vite-plugin": "2.10.2",
-    "dotenv": "^16.3.1",
-    "electron": "^28.0.0",
-    "electron-builder": "^24.9.1",
-    "electron-vite": "^2.0.0-beta.1",
-    "rollup-plugin-sourcemaps": "^0.6.3"
+    "@electron/notarize": "^2.3.2",
+    "@sentry/vite-plugin": "^2.22.1",
+    "dotenv": "^16.4.5",
+    "electron": "^31.3.1",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.3.0",
+    "rollup-plugin-sourcemaps2": "^0.4.1"
   },
   "volta": {
     "extends": "../../package.json"

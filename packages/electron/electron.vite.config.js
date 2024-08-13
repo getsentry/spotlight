@@ -1,7 +1,7 @@
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { defineConfig, loadEnv } from 'electron-vite';
 import { resolve } from 'path';
-import sourcemaps from 'rollup-plugin-sourcemaps';
+import sourcemaps from 'rollup-plugin-sourcemaps2';
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
