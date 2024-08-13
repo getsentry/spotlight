@@ -2,19 +2,19 @@ import * as Sentry from '@sentry/electron/main';
 import { clearBuffer, setupSidecar } from '@spotlightjs/sidecar';
 import { BrowserWindow, Menu, app, dialog, ipcMain, shell } from 'electron';
 import Store from 'electron-store';
-import path from 'path';
+import path from 'node:path';
 
 const store = new Store();
 
 Sentry.init({
   dsn: 'https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976',
   tracesSampleRate: 1.0,
-  release: 'spotlight@' + process.env.npm_package_version,
+  release: `spotlight@${process.env.npm_package_version}`,
   beforeSend: askForPermissionToSendToSentry,
 });
 
 let alwaysOnTop = false;
-let win;
+let win: BrowserWindow;
 
 const createWindow = () => {
   win = new BrowserWindow({
@@ -44,13 +44,13 @@ const createWindow = () => {
 
   // win.webContents.openDevTools();
 
-  if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
-    win.loadURL(process.env['ELECTRON_RENDERER_URL']);
+  if (!app.isPackaged && process.env.ELECTRON_RENDERER_URL) {
+    win.loadURL(process.env.ELECTRON_RENDERER_URL);
   } else {
     win.loadFile(path.join(__dirname, '../renderer/index.html'));
   }
 
-  win.once('ready-to-show', function () {
+  win.once('ready-to-show', () => {
     win.show();
     win.focus();
   });
@@ -273,13 +273,13 @@ const showErrorMessage = () => {
   }
 };
 
-async function askForPermissionToSendToSentry(event: Sentry.Event, hint?: Sentry.EventHint) {
+async function askForPermissionToSendToSentry(event: Sentry.Event, hint: Sentry.EventHint) {
   showErrorMessage();
   if (store.get('sentry-enabled') === false) {
     return null;
   }
   if (store.get('sentry-enabled') === true) {
-    if (hint?.attachments && hint.attachments.length > 0) {
+    if (hint.attachments && hint.attachments.length > 0) {
       return askToSendEnvelope(event, hint);
     }
     return event;
@@ -322,9 +322,7 @@ async function askToSendEnvelope(event: Sentry.Event, hint?: Sentry.EventHint) {
   });
 
   if (response === 1) {
-    Sentry.configureScope(scope => {
-      scope.clearAttachments();
-    });
+    Sentry.getCurrentScope().clearAttachments();
     if (hint?.attachments && hint.attachments.length > 0) {
       hint.attachments = [];
     }
@@ -338,13 +336,12 @@ async function askToSendEnvelope(event: Sentry.Event, hint?: Sentry.EventHint) {
 
 function storeIncomingPayload(body: string) {
   if (store.get('sentry-send-envelopes') === true || store.get('sentry-send-envelopes') === undefined) {
-    Sentry.configureScope(scope => {
-      scope.clearAttachments();
-      scope.addAttachment({
-        data: body,
-        filename: 'payload.txt',
-        contentType: 'text/plain',
-      });
+    const scope = Sentry.getCurrentScope();
+    scope.clearAttachments();
+    scope.addAttachment({
+      data: body,
+      filename: 'payload.txt',
+      contentType: 'text/plain',
     });
   }
 }

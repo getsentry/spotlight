@@ -1,7 +1,7 @@
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { defineConfig, loadEnv } from 'electron-vite';
-import { resolve } from 'path';
-import sourcemaps from 'rollup-plugin-sourcemaps';
+import { resolve } from 'node:path';
+import sourcemaps from 'rollup-plugin-sourcemaps2';
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
@@ -28,9 +28,6 @@ export default defineConfig(({ mode }) => {
         sourcemap: true,
         rollupOptions: {
           plugins: [sourcemaps()],
-          output: {
-            sourcemap: true,
-          },
           input: {
             index: resolve(__dirname, 'src/electron/main/index.ts'),
           },
@@ -52,9 +49,6 @@ export default defineConfig(({ mode }) => {
         sourcemap: true,
         rollupOptions: {
           plugins: [sourcemaps()],
-          output: {
-            sourcemap: true,
-          },
           input: {
             index: resolve(__dirname, 'src/electron/preload/index.ts'),
           },
@@ -75,9 +69,6 @@ export default defineConfig(({ mode }) => {
         sourcemap: true,
         rollupOptions: {
           plugins: [sourcemaps()],
-          output: {
-            sourcemap: true,
-          },
           input: {
             index: resolve(__dirname, 'index.html'),
           },
