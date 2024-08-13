@@ -52,9 +52,6 @@ export default defineConfig(({ mode }) => {
         sourcemap: true,
         rollupOptions: {
           plugins: [sourcemaps()],
-          output: {
-            sourcemap: true,
-          },
           input: {
             index: resolve(__dirname, 'src/electron/preload/index.ts'),
           },
