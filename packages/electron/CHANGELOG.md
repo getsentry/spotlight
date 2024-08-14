@@ -1,5 +1,11 @@
 # @spotlightjs/electron
 
+## 1.1.6
+
+### Patch Changes
+
+- Fix Sentry init error at startup ([#494](https://github.com/getsentry/spotlight/pull/494))
+
 ## 1.1.5
 
 ### Patch Changes
