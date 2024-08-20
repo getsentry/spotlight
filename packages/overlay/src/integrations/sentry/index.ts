@@ -49,8 +49,19 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
 
       on('sentry:showError', onRenderError as EventListener);
 
+      const onAddEnvelope = (e: CustomEvent) => {
+        if (!e.detail.envelope) return;
+        processEnvelope({
+          contentType: 'application/x-sentry-envelope',
+          data: e.detail.envelope,
+        });
+      };
+
+      on('sentry:addEnvelope', onAddEnvelope as EventListener);
+
       return () => {
         off('sentry:showError', onRenderError as EventListener);
+        off('sentry:addEnvelope', onAddEnvelope as EventListener);
       };
     },
 

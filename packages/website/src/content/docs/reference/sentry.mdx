@@ -16,10 +16,18 @@ init({
 Additionally it includes an event to trigger synchronously rendering an error:
 
 ```js
-import { trigger } as Spotlight from '@spotlightjs/spotlight';
+import { trigger } from '@spotlightjs/spotlight';
 
 trigger("sentry:showError", {
   eventId: string,
   event?: Event,
 });
+```
+
+You can also directly add envelopes to the Sentry integration:
+
+```js
+import { trigger } from '@spotlightjs/spotlight';
+
+trigger("sentry:addEnvelope", sentryEnvelope);
 ```
