@@ -52,7 +52,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
       const onAddEnvelope = (e: CustomEvent) => {
         if (!e.detail.envelope) return;
         processEnvelope({
-          contentType: 'application/x-sentry-envelope',
+          contentType: HEADER,
           data: e.detail.envelope,
         });
       };
