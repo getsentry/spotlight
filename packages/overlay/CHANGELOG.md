@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 2.4.0-next.1
+
+### Minor Changes
+
+- feat(overlay): Allow to skipSidecar to avoid connecting to sidecar
+  ([#501](https://github.com/getsentry/spotlight/pull/501))
+
 ## 2.4.0-next.0
 
 ### Minor Changes
