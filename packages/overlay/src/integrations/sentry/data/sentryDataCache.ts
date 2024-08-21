@@ -34,7 +34,7 @@ class SentryDataCache {
 
   protected subscribers: Map<string, Subscription> = new Map();
 
-  protected contextLinesProvider: string = new URL(DEFAULT_SIDECAR_URL).origin + CONTEXT_LINES_ENDPOINT;
+  protected contextLinesProvider: string | null = new URL(DEFAULT_SIDECAR_URL).origin + CONTEXT_LINES_ENDPOINT;
 
   constructor(
     initial: (SentryEvent & {
@@ -45,6 +45,10 @@ class SentryDataCache {
   }
 
   setSidecarUrl(url: string) {
+    if (!url) {
+      this.contextLinesProvider = null;
+    }
+
     const { origin } = new URL(url);
     this.contextLinesProvider = origin + CONTEXT_LINES_ENDPOINT;
   }
@@ -295,21 +299,23 @@ class SentryDataCache {
         }
         exception.stacktrace.frames.reverse();
 
-        try {
-          const makeFetch = getNativeFetchImplementation();
-          const stackTraceWithContextResponse = await makeFetch(this.contextLinesProvider, {
-            method: 'PUT',
-            body: JSON.stringify(exception.stacktrace),
-          });
+        if (this.contextLinesProvider) {
+          try {
+            const makeFetch = getNativeFetchImplementation();
+            const stackTraceWithContextResponse = await makeFetch(this.contextLinesProvider, {
+              method: 'PUT',
+              body: JSON.stringify(exception.stacktrace),
+            });
 
-          if (!stackTraceWithContextResponse.ok || stackTraceWithContextResponse.status !== 200) {
-            return;
+            if (!stackTraceWithContextResponse.ok || stackTraceWithContextResponse.status !== 200) {
+              return;
+            }
+
+            const stackTraceWithContext = await stackTraceWithContextResponse.json();
+            exception.stacktrace = stackTraceWithContext;
+          } catch {
+            // Something went wrong, for now we just ignore it.
           }
-
-          const stackTraceWithContext = await stackTraceWithContextResponse.json();
-          exception.stacktrace = stackTraceWithContext;
-        } catch {
-          // Something went wrong, for now we just ignore it.
         }
       }),
     );
