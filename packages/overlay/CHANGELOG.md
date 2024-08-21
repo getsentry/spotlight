@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 2.4.0-next.0
+
+### Minor Changes
+
+- feat: Allow to directly add sentry envelopes via trigger ([#498](https://github.com/getsentry/spotlight/pull/498))
+
 ## 2.3.0
 
 ### Minor Changes

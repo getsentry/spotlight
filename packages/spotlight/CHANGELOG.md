@@ -1,5 +1,13 @@
 # @spotlightjs/spotlight
 
+## 2.3.2-next.0
+
+### Patch Changes
+
+- Updated dependencies
+  [[`87ba9ff9bd3e2634c599e123ee2fd11c26ba5ab6`](https://github.com/getsentry/spotlight/commit/87ba9ff9bd3e2634c599e123ee2fd11c26ba5ab6)]:
+  - @spotlightjs/overlay@2.4.0-next.0
+
 ## 2.3.1
 
 ### Patch Changes
