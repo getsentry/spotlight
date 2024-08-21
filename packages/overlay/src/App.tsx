@@ -20,6 +20,7 @@ export default function App({
   anchor,
   fullPage = false,
   showClearEventsButton = true,
+  skipSidecar = false,
 }: AppProps) {
   const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});
   const [isOnline, setOnline] = useState(false);
@@ -46,8 +47,11 @@ export default function App({
   }, [integrations]);
 
   useEffect(
-    () => connectToSidecar(sidecarUrl, contentTypeToIntegrations, setIntegrationData, setOnline) as () => undefined,
-    [sidecarUrl, contentTypeToIntegrations],
+    () =>
+      skipSidecar
+        ? () => {}
+        : (connectToSidecar(sidecarUrl, contentTypeToIntegrations, setIntegrationData, setOnline) as () => undefined),
+    [sidecarUrl, contentTypeToIntegrations, skipSidecar],
   );
 
   const spotlightEventTarget = useMemo(() => getSpotlightEventTarget(), []);
@@ -62,6 +66,10 @@ export default function App({
   const eventHandlers = useMemo(() => {
     log('useMemo: initializing event handlers');
     const clearEvents = async () => {
+      if (skipSidecar) {
+        return;
+      }
+
       const { origin } = new URL(sidecarUrl);
       const clearEventsUrl: string = `${origin}/clear`;
 
@@ -72,7 +80,7 @@ export default function App({
         });
       } catch (err) {
         console.error(
-          `Spotlight can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`,
+          `Spotlight can't connect to Sidecar - is it running? See: https://spotlightjs.com/sidecar/npx/`,
           err,
         );
         return;
@@ -110,7 +118,7 @@ export default function App({
     };
 
     return { clearEvents, onOpen, onClose, onNavigate, onToggle };
-  }, [integrations, navigate, sidecarUrl]);
+  }, [integrations, navigate, sidecarUrl, skipSidecar]);
 
   useKeyPress(['ctrlKey', 'F12'], eventHandlers.onToggle);
 
@@ -161,6 +169,7 @@ export default function App({
         integrationData={integrationData}
         setTriggerButtonCount={setTriggerButtonCount}
         fullPage={fullPage}
+        skipSidecar={skipSidecar}
         showClearEventsButton={showClearEventsButton}
       />
     </>

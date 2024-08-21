@@ -94,6 +94,7 @@ export async function init({
   experiments = DEFAULT_EXPERIMENTS,
   fullPage = false,
   showClearEventsButton = true,
+  skipSidecar = false,
 }: SpotlightOverlayOptions = {}) {
   // The undefined document guard is to avoid being initialized in a Worker
   // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
@@ -168,6 +169,7 @@ export async function init({
           anchor={anchor}
           fullPage={fullPage}
           showClearEventsButton={showClearEventsButton}
+          skipSidecar={skipSidecar}
         />
       </SpotlightContextProvider>
     </MemoryRouter>,

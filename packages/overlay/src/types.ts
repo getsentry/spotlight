@@ -97,6 +97,14 @@ export type SpotlightOverlayOptions = {
    * @default true
    */
   showClearEventsButton?: boolean;
+
+  /**
+   * If set to `true`, the Spotlight overlay will not connect to the sidecar.
+   * This is useful if you want to add data manually to Spotlight.
+   *
+   * @default false
+   */
+  skipSidecar?: boolean;
 };
 
 export type NotificationCount = {
