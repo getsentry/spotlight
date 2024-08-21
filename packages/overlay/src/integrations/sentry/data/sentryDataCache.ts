@@ -47,6 +47,7 @@ class SentryDataCache {
   setSidecarUrl(url: string) {
     if (!url) {
       this.contextLinesProvider = null;
+      return;
     }
 
     const { origin } = new URL(url);
