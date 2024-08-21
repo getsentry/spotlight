@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 2.4.0-next.2
+
+### Patch Changes
+
+- fix(overlay): Skip contextLines lookup if sidecar is empty ([#501](https://github.com/getsentry/spotlight/pull/501))
+
 ## 2.4.0-next.1
 
 ### Minor Changes

@@ -14,5 +14,5 @@
     "@spotlightjs/tsconfig": "1.0.0",
     "@spotlightjs/website": "0.0.1"
   },
-  "changesets": ["blue-trees-repeat", "bright-experts-learn"]
+  "changesets": ["blue-trees-repeat", "bright-experts-learn", "mean-rivers-brush"]
 }
