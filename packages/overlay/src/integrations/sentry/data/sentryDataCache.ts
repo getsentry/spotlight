@@ -44,7 +44,7 @@ class SentryDataCache {
     initial.forEach(e => this.pushEvent(e));
   }
 
-  setSidecarUrl(url: string) {
+  setSidecarUrl(url: string | null) {
     if (!url) {
       this.contextLinesProvider = null;
       return;

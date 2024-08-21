@@ -31,6 +31,8 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
       }
       if (options.sidecarUrl) {
         sentryDataCache.setSidecarUrl(options.sidecarUrl);
+      } else if ('sidecarUrl' in options) {
+        sentryDataCache.setSidecarUrl(null);
       }
       addSpotlightIntegrationToSentry(options);
 
