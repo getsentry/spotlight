@@ -50,7 +50,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
 
       on('sentry:showError', onRenderError as EventListener);
 
-      const onAddEnvelope = (e: CustomEvent<RawEventContext>) => {
+      const onAddEnvelope = (e: CustomEvent<string | Buffer>) => {
         if (!e.detail) return;
         processEnvelope({
           contentType: HEADER,
