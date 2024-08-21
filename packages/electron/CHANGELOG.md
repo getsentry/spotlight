@@ -1,5 +1,13 @@
 # @spotlightjs/electron
 
+## 1.1.7-next.4
+
+### Patch Changes
+
+- Updated dependencies
+  [[`9a57f41ce7fbfafa8d7f2ebdbb4d78e619b6fb2c`](https://github.com/getsentry/spotlight/commit/9a57f41ce7fbfafa8d7f2ebdbb4d78e619b6fb2c)]:
+  - @spotlightjs/overlay@2.4.0-next.4
+
 ## 1.1.7-next.3
 
 ### Patch Changes
