@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 2.4.0-next.3
+
+### Patch Changes
+
+- fix: Fix handling of empty sidecar for contextLinesProvider
+  ([`e75c05c9e19005754fa6af583e79d505fb7a353a`](https://github.com/getsentry/spotlight/commit/e75c05c9e19005754fa6af583e79d505fb7a353a))
+
 ## 2.4.0-next.2
 
 ### Patch Changes
