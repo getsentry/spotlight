@@ -41,19 +41,20 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
         });
       }
 
-      const onRenderError = (e: CustomEvent) => {
-        log('Sentry Event', e.detail.event_id);
-        if (!e.detail.event) return;
-        sentryDataCache.pushEvent(e.detail.event).then(() => open(`/errors/${e.detail.event.event_id}`));
+      const onRenderError = (e: CustomEvent<{ event?: SentryEvent; event_id: string }>) => {
+        const { event_id, event } = e.detail;
+        log('Sentry Event', event_id);
+        if (!event) return;
+        sentryDataCache.pushEvent(event).then(() => open(`/errors/${event.event_id}`));
       };
 
       on('sentry:showError', onRenderError as EventListener);
 
-      const onAddEnvelope = (e: CustomEvent) => {
-        if (!e.detail.envelope) return;
+      const onAddEnvelope = (e: CustomEvent<RawEventContext>) => {
+        if (!e.detail) return;
         processEnvelope({
           contentType: HEADER,
-          data: e.detail.envelope,
+          data: e.detail,
         });
       };
 

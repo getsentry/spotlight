@@ -155,7 +155,7 @@ import { trigger } from '@spotlightjs/spotlight';
 
 trigger('sentry:showError', {
   event: string,
-  eventId: string,
+  event_id: string,
 });
 ```
 
