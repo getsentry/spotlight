@@ -14,5 +14,11 @@
     "@spotlightjs/tsconfig": "1.0.0",
     "@spotlightjs/website": "0.0.1"
   },
-  "changesets": ["blue-trees-repeat", "bright-experts-learn", "loud-ducks-travel", "mean-rivers-brush"]
+  "changesets": [
+    "blue-trees-repeat",
+    "brave-turtles-bow",
+    "bright-experts-learn",
+    "loud-ducks-travel",
+    "mean-rivers-brush"
+  ]
 }
