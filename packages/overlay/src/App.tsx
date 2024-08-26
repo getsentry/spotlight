@@ -44,28 +44,26 @@ export default function App({
     }
 
     const result: [contentType: string, listener: (event: MessageEvent) => void][] = [];
-
     for (const [contentType, integrations] of contentTypeToIntegrations.entries()) {
       const listener = (event: MessageEvent): void => {
         log(`Received new ${contentType} event`);
         for (const integration of integrations) {
-          const integrationData = integration.processEvent
+          const newIntegrationData = integration.processEvent
             ? integration.processEvent({
                 contentType,
                 data: event.data,
               })
             : { event };
 
-          if (!integrationData) {
+          if (!newIntegrationData) {
             continue;
           }
-          setIntegrationData(prev => {
-            const integrationName = integration.name;
-            return {
-              ...prev,
-              [integrationName]: [...(prev[integrationName] || []), integrationData],
-            };
-          });
+
+          const integrationName = integration.name;
+          setIntegrationData(prev => ({
+            ...prev,
+            [integrationName]: [...(prev[integrationName] || []), newIntegrationData],
+          }));
         }
       };
 
