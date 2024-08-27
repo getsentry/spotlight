@@ -58,6 +58,13 @@ export async function onClose(cb: EventListener) {
 }
 
 /**
+ * Send an event to spotlight without the sidecar
+ */
+export async function sendEvent(contentType: string, data: string) {
+  trigger('event', { contentType, data });
+}
+
+/**
  * Invokes the passed in callback when the Spotlight debugger Window is opened
  */
 export async function onOpen(cb: EventListener) {
@@ -70,9 +77,7 @@ export async function onOpen(cb: EventListener) {
  * A count of the number of collected severe events is passed to the callback.
  */
 export async function onSevereEvent(cb: (count: number) => void) {
-  on('severeEventCount', e => {
-    cb((e as CustomEvent).detail?.count ?? 1);
-  });
+  on('severeEventCount', e => cb((e as CustomEvent).detail?.count ?? 1));
 }
 
 function isSpotlightInjected() {

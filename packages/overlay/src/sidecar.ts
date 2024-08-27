@@ -3,13 +3,14 @@ import { log } from './lib/logger';
 
 export function connectToSidecar(
   sidecarUrl: string,
-  contentTypeListeners: [contentType: string, listener: (event: MessageEvent) => void][],
+  // Content Type to listener
+  contentTypeListeners: Record<string, (event: MessageEvent) => void>,
   setOnline: React.Dispatch<React.SetStateAction<boolean>>,
 ): () => void {
   log('Connecting to sidecar at', sidecarUrl);
   const source = new EventSource(sidecarUrl);
 
-  for (const [contentType, listener] of contentTypeListeners) {
+  for (const [contentType, listener] of Object.entries(contentTypeListeners)) {
     source.addEventListener(contentType, listener);
   }
 
@@ -24,10 +25,10 @@ export function connectToSidecar(
   });
 
   return () => {
-    log(`Removing ${contentTypeListeners.length} listeners`);
-    for (const typeAndListener of contentTypeListeners) {
-      source.removeEventListener(typeAndListener[0], typeAndListener[1]);
-      log('Removed listener for type', typeAndListener[0]);
+    log('Removing all content type listeners');
+    for (const [contentType, listener] of Object.entries(contentTypeListeners)) {
+      source.removeEventListener(contentType, listener);
+      log('Removed listener for type', contentType);
     }
   };
 }
