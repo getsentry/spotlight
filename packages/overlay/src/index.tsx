@@ -39,35 +39,35 @@ function createStyleSheet(styles: string) {
 /**
  * Open the Spotlight debugger Window
  */
-export function openSpotlight(path?: string | undefined) {
+export async function openSpotlight(path?: string | undefined) {
   trigger('open', { path });
 }
 
 /**
  * Close the Spotlight debugger Window
  */
-export function closeSpotlight() {
+export async function closeSpotlight() {
   trigger('close');
 }
 
 /**
  * Invokes the passed in callback when the Spotlight debugger Window is closed
  */
-export function onClose(cb: EventListener) {
+export async function onClose(cb: EventListener) {
   on('closed', cb);
 }
 
 /**
  * Send an event to spotlight without the sidecar
  */
-export function sendEvent(contentType: string, data: string) {
+export async function sendEvent(contentType: string, data: string) {
   trigger('event', { contentType, data });
 }
 
 /**
  * Invokes the passed in callback when the Spotlight debugger Window is opened
  */
-export function onOpen(cb: EventListener) {
+export async function onOpen(cb: EventListener) {
   on('opened', cb);
 }
 
@@ -76,7 +76,7 @@ export function onOpen(cb: EventListener) {
  * by a Spotlight integration.
  * A count of the number of collected severe events is passed to the callback.
  */
-export function onSevereEvent(cb: (count: number) => void) {
+export async function onSevereEvent(cb: (count: number) => void) {
   on('severeEventCount', e => cb((e as CustomEvent).detail?.count ?? 1));
 }
 
