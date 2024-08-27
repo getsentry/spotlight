@@ -27,27 +27,57 @@ export default function App({
   const [isOpen, setOpen] = useState(openOnInit);
   log('App rerender', integrationData, isOnline, triggerButtonCount, isOpen);
 
-  // Map that holds the information which kind of content type should be dispatched to which integration(s)
-  const contentTypeToIntegrations = useMemo(() => {
-    const result = new Map<string, Integration[]>();
+  const contentTypeListeners = useMemo(() => {
+    // Map that holds the information which kind of content type should be dispatched to which integration(s)
+    const contentTypeToIntegrations = new Map<string, Integration[]>();
     for (const integration of integrations) {
       if (!integration.forwardedContentType) continue;
 
       for (const contentType of integration.forwardedContentType) {
-        let integrationsForContentType = result.get(contentType);
+        let integrationsForContentType = contentTypeToIntegrations.get(contentType);
         if (!integrationsForContentType) {
           integrationsForContentType = [];
-          result.set(contentType, integrationsForContentType);
+          contentTypeToIntegrations.set(contentType, integrationsForContentType);
         }
         integrationsForContentType.push(integration);
       }
+    }
+
+    const result: [contentType: string, listener: (event: MessageEvent) => void][] = [];
+    for (const [contentType, integrations] of contentTypeToIntegrations.entries()) {
+      const listener = (event: MessageEvent): void => {
+        log(`Received new ${contentType} event`);
+        for (const integration of integrations) {
+          const newIntegrationData = integration.processEvent
+            ? integration.processEvent({
+                contentType,
+                data: event.data,
+              })
+            : { event };
+
+          if (!newIntegrationData) {
+            continue;
+          }
+
+          const integrationName = integration.name;
+          setIntegrationData(prev => ({
+            ...prev,
+            [integrationName]: [...(prev[integrationName] || []), newIntegrationData],
+          }));
+        }
+      };
+
+      log('Adding listener for', contentType, 'sum', result.length);
+
+      // `contentType` could for example be "application/x-sentry-envelope"
+      result.push([contentType, listener]);
     }
     return result;
   }, [integrations]);
 
   useEffect(
-    () => connectToSidecar(sidecarUrl, contentTypeToIntegrations, setIntegrationData, setOnline) as () => undefined,
-    [sidecarUrl, contentTypeToIntegrations],
+    () => connectToSidecar(sidecarUrl, contentTypeListeners, setOnline) as () => undefined,
+    [sidecarUrl, contentTypeListeners],
   );
 
   const spotlightEventTarget = useMemo(() => getSpotlightEventTarget(), []);
