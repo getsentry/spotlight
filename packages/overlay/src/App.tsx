@@ -43,7 +43,7 @@ export default function App({
       }
     }
 
-    const result: [contentType: string, listener: (event: MessageEvent) => void][] = [];
+    const result: Record<string, (event: MessageEvent) => void> = Object.create(null);
     for (const [contentType, integrations] of contentTypeToIntegrations.entries()) {
       const listener = (event: MessageEvent): void => {
         log(`Received new ${contentType} event`);
@@ -67,10 +67,10 @@ export default function App({
         }
       };
 
-      log('Adding listener for', contentType, 'sum', result.length);
+      log('Adding listener for', contentType);
 
       // `contentType` could for example be "application/x-sentry-envelope"
-      result.push([contentType, listener]);
+      result[contentType] = listener;
     }
     return result;
   }, [integrations]);
@@ -139,8 +139,11 @@ export default function App({
       navigate(e.detail);
     };
 
-    return { clearEvents, onOpen, onClose, onNavigate, onToggle };
-  }, [integrations, navigate, sidecarUrl]);
+    const onEvent = ({ detail }: CustomEvent<{ contentType: string; event: MessageEvent }>) =>
+      contentTypeListeners[detail.contentType]?.(detail.event);
+
+    return { clearEvents, onEvent, onOpen, onClose, onNavigate, onToggle };
+  }, [integrations, navigate, sidecarUrl, contentTypeListeners]);
 
   useKeyPress(['ctrlKey', 'F12'], eventHandlers.onToggle);
 
@@ -150,6 +153,7 @@ export default function App({
     spotlightEventTarget.addEventListener('close', eventHandlers.onClose);
     spotlightEventTarget.addEventListener('navigate', eventHandlers.onNavigate as EventListener);
     spotlightEventTarget.addEventListener('clearEvents', eventHandlers.clearEvents as EventListener);
+    spotlightEventTarget.addEventListener('event', eventHandlers.onEvent as EventListener);
 
     return (): undefined => {
       log('useEffect[destructor]: Removing event listeners');
@@ -157,6 +161,7 @@ export default function App({
       spotlightEventTarget.removeEventListener('close', eventHandlers.onClose);
       spotlightEventTarget.removeEventListener('navigate', eventHandlers.onNavigate as EventListener);
       spotlightEventTarget.removeEventListener('clearEvents', eventHandlers.clearEvents as EventListener);
+      spotlightEventTarget.removeEventListener('event', eventHandlers.onEvent as EventListener);
     };
   }, [spotlightEventTarget, eventHandlers]);
 
