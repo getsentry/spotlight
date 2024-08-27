@@ -43,9 +43,9 @@ export default function App({
       }
     }
 
-    const result: Record<string, (event: MessageEvent) => void> = Object.create(null);
+    const result: Record<string, (event: { data: string | Buffer }) => void> = Object.create(null);
     for (const [contentType, integrations] of contentTypeToIntegrations.entries()) {
-      const listener = (event: MessageEvent): void => {
+      const listener = (event: { data: string | Buffer }): void => {
         log(`Received new ${contentType} event`);
         for (const integration of integrations) {
           const newIntegrationData = integration.processEvent
@@ -139,8 +139,15 @@ export default function App({
       navigate(e.detail);
     };
 
-    const onEvent = ({ detail }: CustomEvent<{ contentType: string; event: MessageEvent }>) =>
-      contentTypeListeners[detail.contentType]?.(detail.event);
+    const onEvent = ({ detail }: CustomEvent<{ contentType: string; data: string }>) => {
+      const { contentType, data } = detail;
+      const listener = contentTypeListeners[contentType];
+      if (!listener) {
+        log('Got event for unknown content type:', contentType);
+        return;
+      }
+      listener({ data });
+    };
 
     return { clearEvents, onEvent, onOpen, onClose, onNavigate, onToggle };
   }, [integrations, navigate, sidecarUrl, contentTypeListeners]);

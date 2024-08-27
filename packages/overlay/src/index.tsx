@@ -60,8 +60,8 @@ export function onClose(cb: EventListener) {
 /**
  * Send an event to spotlight without the sidecar
  */
-export function sendEvent(contentType: string, event: MessageEvent) {
-  trigger('event', { contentType, event });
+export function sendEvent(contentType: string, data: string) {
+  trigger('event', { contentType, data });
 }
 
 /**
