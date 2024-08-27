@@ -240,9 +240,7 @@ function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions) {
   }
 
   try {
-    const integration = spotlightIntegration({
-      sidecarUrl: options?.sidecarUrl,
-    });
+    const integration = spotlightIntegration();
     sentryClient.addIntegration(integration);
   } catch (e) {
     warn('Failed to add Spotlight integration to Sentry', e);
