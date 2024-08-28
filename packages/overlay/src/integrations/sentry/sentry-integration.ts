@@ -1,19 +1,8 @@
 import type { Client, Envelope, Event, Integration } from '@sentry/types';
 import { serializeEnvelope } from '@sentry/utils';
-import { DEFAULT_SIDECAR_URL } from '~/constants';
+import { trigger } from '../../lib/eventTarget';
 import { log } from '../../lib/logger';
 import sentryDataCache from './data/sentryDataCache';
-import { getNativeFetchImplementation } from './utils/fetch';
-
-type SpotlightBrowserIntegrationOptions = {
-  /**
-   * The URL of the Sidecar instance to connect and forward events to.
-   * If not set, Spotlight will try to connect to the Sidecar running on DEFAULT_SIDECAR_URL.
-   *
-   * @default DEFAULT_SIDECAR_URL
-   */
-  sidecarUrl?: string;
-};
 
 /**
  * A Sentry integration for Spotlight integration that the Overlay will inject automatically.
@@ -21,22 +10,18 @@ type SpotlightBrowserIntegrationOptions = {
  *
  *  - Drop transactions created from interactions with the Spotlight UI
  *  - Forward Sentry events sent from the browser SDK to the Sidecar instance running on
- *    either on http://localhost:8969/stream or on the supplied `sidecarUrl` option.
- *
- * @param options - Configuration options for the integration ({@link SpotlightBrowserIntegrationOptions})
+ *    the same page via the "direct message" method (w/o a need for the sidecar)
  *
  * @returns Sentry integration for Spotlight.
  */
-export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOptions) => {
-  const _sidecarUrl = options?.sidecarUrl ?? DEFAULT_SIDECAR_URL;
-
+export const spotlightIntegration = () => {
   return {
     name: 'SpotlightBrowser',
     setupOnce: () => {
       /* Empty function to ensure compatibility w/ JS SDK v7 >= 7.99.0 */
     },
     setup: () => {
-      log('Using Sidecar URL', _sidecarUrl);
+      log('Setting up the *direct* Sentry SDK integration for Spotlight');
     },
     processEvent: (event: Event) => {
       // We don't want to send interaction transactions/root spans created from
@@ -53,39 +38,21 @@ export const spotlightIntegration = (options?: SpotlightBrowserIntegrationOption
 
       return event;
     },
-    afterAllSetup: (client: Client) => {
-      sendEnvelopesToSidecar(client, _sidecarUrl);
-    },
+    afterAllSetup: (client: Client) =>
+      client.on('beforeEnvelope', (envelope: Envelope) =>
+        trigger('event', { contentType: 'application/x-sentry-envelope', data: serializeEnvelope(envelope) }),
+      ),
   } satisfies Integration;
 };
-
-function sendEnvelopesToSidecar(client: Client, sidecarUrl: string) {
-  const makeFetch = getNativeFetchImplementation();
-
-  client.on('beforeEnvelope', (envelope: Envelope) => {
-    makeFetch(sidecarUrl, {
-      method: 'POST',
-      body: serializeEnvelope(envelope),
-      headers: {
-        'Content-Type': 'application/x-sentry-envelope',
-      },
-      mode: 'cors',
-    }).catch(err => {
-      console.error(
-        `Sentry SDK can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`,
-        err,
-      );
-    });
-  });
-}
 
 /**
  * Flags if the event is a transaction created from an interaction with the spotlight UI.
  */
 function isSpotlightInteraction(event: Event): boolean {
-  if (event.type === 'transaction' && event.contexts?.trace?.op === 'ui.action.click' && event.spans) {
-    const hasSpotlightDescriptor = event.spans.find(s => s.description?.includes('#sentry-spotlight'));
-    return !!hasSpotlightDescriptor;
-  }
-  return false;
+  return (
+    (event.type === 'transaction' &&
+      event.contexts?.trace?.op === 'ui.action.click' &&
+      event.spans?.some(s => s.description?.includes('#sentry-spotlight'))) ||
+    false
+  );
 }
