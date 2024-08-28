@@ -4,12 +4,13 @@ export const OBJECT_STORE_NAME = 'events';
 export const DB_VERSION = 2;
 
 function promiseWithResolvers<T = unknown>() {
-  let reject: (value: T | PromiseLike<T>) => void;
-  let resolve: (reason?: unknown) => void;
+  let resolve: (value: T | PromiseLike<T>) => void;
+  let reject: (reason?: unknown) => void;
   const promise = new Promise((rs, rj) => {
     resolve = rs;
     reject = rj;
   });
+  // @ts-expect-error ts2454 -- This is not a valid error as the promise constructor callback is executed immediately
   return { resolve, reject, promise };
 }
 
