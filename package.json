@@ -39,7 +39,7 @@
     "prettier-plugin-tailwindcss": "^0.5.6",
     "rimraf": "^5.0.5",
     "simple-git-hooks": "^2.9.0",
-    "typescript": "^5.0.2"
+    "typescript": "^5.4.0"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged --concurrent false"

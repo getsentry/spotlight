@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Debugger from './components/Debugger';
 import Trigger from './components/Trigger';
 import type { Integration, IntegrationData } from './integrations/integration';
+import * as db from './lib/db';
 import { getSpotlightEventTarget } from './lib/eventTarget';
 import { log } from './lib/logger';
 import useKeyPress from './lib/useKeyPress';
@@ -96,6 +97,7 @@ export default function App({
       const clearEventsUrl: string = `${origin}/clear`;
 
       try {
+        await db.reset();
         await fetch(clearEventsUrl, {
           method: 'DELETE',
           mode: 'cors',
@@ -139,8 +141,8 @@ export default function App({
       navigate(e.detail);
     };
 
-    const onEvent = ({ detail }: CustomEvent<{ contentType: string; data: string }>) => {
-      const { contentType, data } = detail;
+    type EventData = { contentType: string; data: string };
+    const dispatchToContentTypeListener = ({ contentType, data }: EventData) => {
       const listener = contentTypeListeners[contentType];
       if (!listener) {
         log('Got event for unknown content type:', contentType);
@@ -148,6 +150,18 @@ export default function App({
       }
       listener({ data });
     };
+
+    const onEvent = ({ detail }: CustomEvent<EventData>) => {
+      dispatchToContentTypeListener(detail);
+      db.add(detail);
+    };
+
+    // Populate from DB
+    db.getEntries().then(entries => {
+      for (const detail of entries as EventData[]) {
+        dispatchToContentTypeListener(detail);
+      }
+    });
 
     return { clearEvents, onEvent, onOpen, onClose, onNavigate, onToggle };
   }, [integrations, navigate, sidecarUrl, contentTypeListeners]);
