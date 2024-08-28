@@ -45,7 +45,7 @@
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "^18",
-    "typescript": "^5.4.0",
+    "typescript": "^5.0.2",
     "vite": "^4.5.3"
   },
   "volta": {

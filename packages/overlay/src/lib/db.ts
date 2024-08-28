@@ -3,6 +3,16 @@ export const DB_NAME = 'SentrySpotlight';
 export const OBJECT_STORE_NAME = 'events';
 export const DB_VERSION = 2;
 
+function promiseWithResolvers<T = unknown>() {
+  let reject: (value: T | PromiseLike<T>) => void;
+  let resolve: (reason?: unknown) => void;
+  const promise = new Promise((rs, rj) => {
+    resolve = rs;
+    reject = rj;
+  });
+  return { resolve, reject, promise };
+}
+
 let _DB: IDBDatabase | null = null;
 
 export function clearDBCache() {
@@ -10,7 +20,7 @@ export function clearDBCache() {
 }
 
 function createDB(): Promise<IDBDatabase> {
-  const { promise, resolve, reject } = Promise.withResolvers();
+  const { promise, resolve, reject } = promiseWithResolvers();
   const rejectFromErrorEvent = (evt: Event) => reject((evt.target as IDBOpenDBRequest).error);
   const openDBRequest = indexedDB.open(DB_NAME, DB_VERSION);
   openDBRequest.onerror = rejectFromErrorEvent;
@@ -55,7 +65,7 @@ async function getDB() {
 }
 
 export async function add(value: unknown) {
-  const { promise, resolve, reject } = Promise.withResolvers();
+  const { promise, resolve, reject } = promiseWithResolvers();
   const rejectFromErrorEvent = (evt: Event) => reject((evt.target as IDBOpenDBRequest).error);
   const db = await getDB();
   const tx = db.transaction([OBJECT_STORE_NAME], 'readwrite');
@@ -71,7 +81,7 @@ export async function add(value: unknown) {
 }
 
 export async function getEntries() {
-  const { promise, resolve, reject } = Promise.withResolvers();
+  const { promise, resolve, reject } = promiseWithResolvers();
   const rejectFromErrorEvent = (evt: Event) => reject((evt.target as IDBOpenDBRequest).error);
   const db = await getDB();
   const tx = db.transaction([OBJECT_STORE_NAME], 'readonly');
@@ -83,7 +93,7 @@ export async function getEntries() {
 }
 
 export async function reset() {
-  const { promise, resolve, reject } = Promise.withResolvers();
+  const { promise, resolve, reject } = promiseWithResolvers();
   const rejectFromErrorEvent = (evt: Event) => reject((evt.target as IDBOpenDBRequest).error);
   const db = await getDB();
   const tx = db.transaction([OBJECT_STORE_NAME], 'readwrite');

@@ -23,6 +23,6 @@
     "@astrojs/check": "^0.3.1",
     "@playwright/test": "^1.40.1",
     "@types/node": "^18",
-    "typescript": "^5.4.0"
+    "typescript": "^5.3.2"
   }
 }
