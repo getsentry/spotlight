@@ -12,7 +12,7 @@ export default defineConfig({
       reporter: ['json'],
     },
     globals: true,
-    include: ['./test/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    include: ['./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     watchExclude: ['.*\\/node_modules\\/.*', '.*\\/dist\\/.*'],
   },
   resolve: {
