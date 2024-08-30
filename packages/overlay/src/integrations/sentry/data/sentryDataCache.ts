@@ -286,14 +286,17 @@ class SentryDataCache {
 
     return Promise.all(
       (errorEvent.exception.values ?? []).map(async exception => {
-        if (
-          !exception.stacktrace ||
-          exception.stacktrace.frames?.every(frame => frame.post_context && frame.pre_context && frame.context_line)
-        ) {
-          log('Skipping contextlines request for', exception);
+        if (!exception.stacktrace) {
           return;
         }
         exception.stacktrace.frames.reverse();
+
+        if (
+          exception.stacktrace.frames?.every(frame => frame.post_context && frame.pre_context && frame.context_line)
+        ) {
+          log('Skipping contextlines request as we have full context for', exception);
+          return;
+        }
 
         try {
           const makeFetch = getNativeFetchImplementation();
