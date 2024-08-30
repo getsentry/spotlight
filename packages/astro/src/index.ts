@@ -2,8 +2,8 @@ import type { SpotlightInitOptions } from '@spotlightjs/spotlight/vite-plugin';
 import type { AstroConfig, AstroIntegration } from 'astro';
 import { buildServerSnippet } from './snippets';
 
-import path from 'path';
-import url from 'url';
+import path from 'node:path';
+import url from 'node:url';
 
 import spotlight, { buildClientInit } from '@spotlightjs/spotlight/vite-plugin';
 
