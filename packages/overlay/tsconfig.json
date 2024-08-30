@@ -8,6 +8,6 @@
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": ["src", "test"],
+  "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
