@@ -3,9 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "skipLibCheck": true,
-    "emitDeclarationOnly": true,
-    "declaration": true,
-    "noEmit": false,
+    /* paths */
     "outDir": "dist",
     "rootDir": "src"
   },

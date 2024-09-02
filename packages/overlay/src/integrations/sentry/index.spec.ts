@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'vitest';
-import { processEnvelope } from '~/integrations/sentry/index';
+import { processEnvelope } from './index';
 
-import { Event } from '@sentry/types';
-import fs from 'fs';
-import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
+import type { Event } from '@sentry/types';
+import fs from 'node:fs';
+import sentryDataCache from './data/sentryDataCache';
 
 describe('Sentry Integration', () => {
   test('Process Envelope Empty', () => {

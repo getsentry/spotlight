@@ -117,7 +117,7 @@ function getLineEnd(data: Uint8Array): number {
   return end;
 }
 
-function parseJSONFromBuffer(data: Uint8Array) {
+function parseJSONFromBuffer(data: Uint8Array): object {
   return JSON.parse(new TextDecoder().decode(data));
 }
 
@@ -144,19 +144,21 @@ export function processEnvelope(rawEvent: RawEventContext) {
   while (buffer.length) {
     const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
     const payloadLength = itemHeader.length;
-    let itemPayload = readLine(payloadLength != null ? payloadLength : undefined);
+    const itemPayloadRaw = readLine(payloadLength != null ? payloadLength : undefined);
 
+    let itemPayload: EnvelopeItem[1];
     try {
-      itemPayload = parseJSONFromBuffer(itemPayload);
+      itemPayload = parseJSONFromBuffer(itemPayloadRaw);
+      // data sanitization
+      if (itemHeader.type) {
+        // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
+        itemPayload.type = itemHeader.type;
+      }
     } catch (err) {
+      itemPayload = itemPayloadRaw;
       log(err);
     }
 
-    // data sanitization
-    if (itemHeader.type && typeof itemPayload === 'object') {
-      // @ts-expect-error -- Does not like assigning to `type` on random object
-      itemPayload.type = itemHeader.type;
-    }
     items.push([itemHeader, itemPayload] as EnvelopeItem);
   }
 

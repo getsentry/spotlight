@@ -44,9 +44,9 @@ export default function App({
       }
     }
 
-    const result: Record<string, (event: { data: string | Buffer }) => void> = Object.create(null);
+    const result: Record<string, (event: { data: string | Uint8Array }) => void> = Object.create(null);
     for (const [contentType, integrations] of contentTypeToIntegrations.entries()) {
-      const listener = (event: { data: string | Buffer }): void => {
+      const listener = (event: { data: string | Uint8Array }): void => {
         log(`Received new ${contentType} event`);
         for (const integration of integrations) {
           const newIntegrationData = integration.processEvent

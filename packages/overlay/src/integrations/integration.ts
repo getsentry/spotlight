@@ -1,5 +1,5 @@
-import { type ComponentType } from 'react';
-import { type ExperimentsConfig, type NotificationCount } from '~/types';
+import type { ComponentType } from 'react';
+import type { ExperimentsConfig, NotificationCount } from '../types';
 
 export type SpotlightContext = {
   open: (path: string | undefined) => void;
@@ -114,7 +114,7 @@ export type RawEventContext = {
    *
    * Return the processed object or undefined if the event should be ignored.
    */
-  data: string | Buffer;
+  data: string | Uint8Array;
 };
 
 type TeardownFunction = () => void | Promise<() => void>;
@@ -122,7 +122,7 @@ type TeardownFunction = () => void | Promise<() => void>;
 // export type IntegrationParameter = Array<Integration<unknown>>;
 
 export async function initIntegrations(
-  integrations: Integration[] = [],
+  integrations: Integration[],
   context: SpotlightContext,
 ): Promise<[Integration[], TeardownFunction[]]> {
   if (!integrations) {

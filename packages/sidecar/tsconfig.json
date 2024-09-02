@@ -9,11 +9,9 @@
     "esModuleInterop": false,
     "target": "esnext",
     "module": "nodenext",
+    /* paths */
     "outDir": "dist",
-    "noEmit": false,
-    "allowImportingTsExtensions": false,
-    "declaration": true,
-    "emitDeclarationOnly": true
+    "rootDir": "src"
   },
   "include": ["src/*"]
 }

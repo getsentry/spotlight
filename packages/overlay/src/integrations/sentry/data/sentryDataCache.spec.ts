@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
-import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
-import { processEnvelope } from '~/integrations/sentry/index';
+import { processEnvelope } from '../index';
+import sentryDataCache from './sentryDataCache';
 
-import fs from 'fs';
+import fs from 'node:fs';
 
 describe('SentryDataCache', () => {
   // We need to refactor this to make it actually testable

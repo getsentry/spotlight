@@ -2,22 +2,22 @@ import fontStyles from '@fontsource/raleway/index.css?inline';
 import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/sidecar/constants';
 import { MemoryRouter } from 'react-router-dom';
 import colors from 'tailwindcss/colors';
-import App from './App.tsx';
-import { DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from './constants.ts';
+import App from './App';
+import { DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from './constants';
 import globalStyles from './index.css?inline';
-import { initIntegrations, type SpotlightContext } from './integrations/integration.ts';
-import { default as sentry } from './integrations/sentry/index.ts';
-import { off, on, trigger } from './lib/eventTarget.ts';
-import { activateLogger, log } from './lib/logger.ts';
-import { SpotlightContextProvider } from './lib/useSpotlightContext.tsx';
-import { React, ReactDOM } from './react-instance.tsx'; // Import specific exports
-import type { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
+import { initIntegrations, type SpotlightContext } from './integrations/integration';
+import { default as sentry } from './integrations/sentry/index';
+import { off, on, trigger } from './lib/eventTarget';
+import { activateLogger, log } from './lib/logger';
+import { SpotlightContextProvider } from './lib/useSpotlightContext';
+import { React, ReactDOM } from './react-instance'; // Import specific exports
+import type { SpotlightOverlayOptions, WindowWithSpotlight } from './types';
 
-export { default as console } from './integrations/console/index.ts';
-export { default as hydrationError } from './integrations/hydration-error/index.ts';
-export { default as sentry } from './integrations/sentry/index.ts';
-export { default as viteInspect } from './integrations/vite-inspect/index.ts';
-export type { SpotlightOverlayOptions, WindowWithSpotlight } from './types.ts';
+export { default as console } from './integrations/console/index';
+export { default as hydrationError } from './integrations/hydration-error/index';
+export { default as sentry } from './integrations/sentry/index';
+export { default as viteInspect } from './integrations/vite-inspect/index';
+export type { SpotlightOverlayOptions, WindowWithSpotlight } from './types';
 export {
   CONTEXT_LINES_ENDPOINT,
   DEFAULT_ANCHOR,

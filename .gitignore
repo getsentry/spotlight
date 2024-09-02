@@ -39,3 +39,4 @@ junit.xml
 
 # Build artifacts
 *.tgz
+tsconfig.tsbuildinfo
