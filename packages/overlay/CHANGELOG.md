@@ -1,5 +1,19 @@
 # @spotlightjs/core
 
+## 2.4.0
+
+### Minor Changes
+
+- Add no-sidecar Sentry SDK integration for Spotlight overlay ([#509](https://github.com/getsentry/spotlight/pull/509))
+
+- Add direct event ingestion through `Spotlight.sendEvent('<content-type>', <event>)` to allow sending events without
+  the ([#508](https://github.com/getsentry/spotlight/pull/508)) sidecar
+
+### Patch Changes
+
+- Fix stacktraces are not reversed sometimes (appearing in wrong order)
+  ([#513](https://github.com/getsentry/spotlight/pull/513))
+
 ## 2.3.0
 
 ### Minor Changes
