@@ -13,6 +13,8 @@ import type { NotificationCount, SpotlightOverlayOptions } from './types';
 type AppProps = Omit<SpotlightOverlayOptions, 'debug' | 'injectImmediately'> &
   Required<Pick<SpotlightOverlayOptions, 'sidecarUrl'>>;
 
+type EventData = { contentType: string; data: string | Uint8Array };
+
 export default function App({
   openOnInit = false,
   showTriggerButton = true,
@@ -21,6 +23,7 @@ export default function App({
   anchor,
   fullPage = false,
   showClearEventsButton = true,
+  initialEvents = {},
 }: AppProps) {
   const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>({});
   const [isOnline, setOnline] = useState(false);
@@ -141,7 +144,6 @@ export default function App({
       navigate(e.detail);
     };
 
-    type EventData = { contentType: string; data: string };
     const dispatchToContentTypeListener = ({ contentType, data }: EventData) => {
       const listener = contentTypeListeners[contentType];
       if (!listener) {
@@ -163,8 +165,16 @@ export default function App({
       }
     });
 
+    // Populate from initial events
+    for (const contentType in initialEvents) {
+      log(`Injecting initial events for ${contentType}`);
+      for (const data of initialEvents[contentType]) {
+        dispatchToContentTypeListener({ contentType, data });
+      }
+    }
+
     return { clearEvents, onEvent, onOpen, onClose, onNavigate, onToggle };
-  }, [integrations, navigate, sidecarUrl, contentTypeListeners]);
+  }, [integrations, navigate, sidecarUrl, contentTypeListeners, initialEvents]);
 
   useKeyPress(['ctrlKey', 'F12'], eventHandlers.onToggle);
 
