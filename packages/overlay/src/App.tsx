@@ -166,7 +166,7 @@ export default function App({
     return { clearEvents, onEvent, onOpen, onClose, onNavigate, onToggle };
   }, [integrations, navigate, sidecarUrl, contentTypeListeners]);
 
-  useKeyPress(['ctrlKey', 'F12'], eventHandlers.onToggle);
+  useKeyPress('F12', ['ctrlKey'], eventHandlers.onToggle);
 
   useEffect(() => {
     log('useEffect: Adding event listeners');
