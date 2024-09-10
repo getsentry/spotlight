@@ -34,7 +34,7 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useKeyPress(['Escape'], () => {
+  useKeyPress('Escape', [], () => {
     if (setOpen && location.pathname.split('/').length === 2) {
       setOpen(false);
     } else {
