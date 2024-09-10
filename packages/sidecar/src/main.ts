@@ -1,11 +1,11 @@
 import launchEditor from 'launch-editor';
 import { createWriteStream, readFile } from 'node:fs';
-import { IncomingMessage, Server, ServerResponse, createServer, get } from 'node:http';
+import { createServer, get, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { extname, join, resolve } from 'node:path';
 import { createGunzip, createInflate } from 'node:zlib';
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from './constants.js';
 import { contextLinesHandler } from './contextlines.js';
-import { SidecarLogger, activateLogger, enableDebugLogging, logger } from './logger.js';
+import { activateLogger, enableDebugLogging, logger, type SidecarLogger } from './logger.js';
 import { MessageBuffer } from './messageBuffer.js';
 
 type Payload = [string, string];
@@ -183,14 +183,16 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
         res.end();
       });
     } else {
-      return error405(req, res);
+      error405(req, res);
+      return;
     }
   };
 }
+
 function fileServer(basePath: string) {
   return function serveFile(req: IncomingMessage, res: ServerResponse, pathname?: string): void {
-    let filePath = '.' + (pathname || req.url);
-    if (filePath == './') {
+    let filePath = `.${pathname || req.url}`;
+    if (filePath === './') {
       filePath = './src/index.html';
     }
 
@@ -208,13 +210,13 @@ function fileServer(basePath: string) {
         break;
     }
 
-    readFile(join(basePath, filePath), function (error, content) {
+    readFile(join(basePath, filePath), (error, content) => {
       if (error) {
         return error404(req, res);
-      } else {
-        res.writeHead(200, { 'Content-Type': contentType });
-        res.end(content, 'utf-8');
       }
+
+      res.writeHead(200, { 'Content-Type': contentType });
+      res.end(content, 'utf-8');
     });
   };
 }
@@ -241,7 +243,7 @@ function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
 }
 
 function openRequestHandler(basePath: string = process.cwd()) {
-  return function (req: IncomingMessage, res: ServerResponse) {
+  return (req: IncomingMessage, res: ServerResponse) => {
     // We're only interested in handling a POST request
     if (req.method !== 'POST') {
       res.writeHead(405);
@@ -293,7 +295,7 @@ function startServer(
     [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
     [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), enableCORS(contextLinesHandler)],
-    [/^.+$/, basePath != null ? fileServer(basePath) : error404],
+    [/^.+$/, basePath != null ? enableCORS(fileServer(basePath)) : error404],
   ];
 
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -302,7 +304,7 @@ function startServer(
       return error404(req, res);
     }
 
-    const { pathname, searchParams } = new URL(url, 'http://' + (req.headers.host || 'localhost'));
+    const { pathname, searchParams } = new URL(url, `http://${req.headers.host || 'localhost'}`);
     const route = ROUTES.find(route => route[0].test(pathname));
     if (!route) {
       return error404(req, res);
