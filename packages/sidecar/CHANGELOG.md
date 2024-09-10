@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 1.8.0
+
+### Minor Changes
+
+- Add CORS headers to static file server -- this allows proxying sidecar assets
+  ([#519](https://github.com/getsentry/spotlight/pull/519))
+
 ## 1.7.0
 
 ### Minor Changes

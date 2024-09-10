@@ -1,5 +1,17 @@
 # @spotlightjs/core
 
+## 2.5.0
+
+### Minor Changes
+
+- Add `__spotlight.initOptions` and initialEvents support allowing providing a list of "initial events" when Spotlight
+  ([#515](https://github.com/getsentry/spotlight/pull/515)) loads, not requiring the sidecar to be working. Mostly going
+  to be used when replacing default error pages in frameworks.
+
+### Patch Changes
+
+- Fix errors on auto complete key presses (#516) ([#518](https://github.com/getsentry/spotlight/pull/518))
+
 ## 2.4.0
 
 ### Minor Changes
