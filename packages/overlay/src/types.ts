@@ -1,4 +1,4 @@
-import { type Integration } from './integrations/integration';
+import type { Integration } from './integrations/integration';
 
 export type ExperimentName = 'sentry:focus-local-events';
 
@@ -86,7 +86,7 @@ export type SpotlightOverlayOptions = {
   /**
    * If set to `true`, the Spotlight overlay will be rendered in full page mode.
    * It can't be closed nor minimized.
-   * This is useful for replaceing error page or in when directly rendered as an html page
+   * This is useful for replacing error page or in when directly rendered as an html page
    */
   fullPage?: boolean;
 
@@ -97,6 +97,13 @@ export type SpotlightOverlayOptions = {
    * @default true
    */
   showClearEventsButton?: boolean;
+
+  /**
+   * Events to be sent into Spotlight (bypassing the sidecar) right after init
+   *
+   * This is useful when replacing error pages of frameworks etc. Implies "injectImmediately".
+   */
+  initialEvents?: Record<string, (string | Uint8Array)[]>;
 };
 
 export type NotificationCount = {
@@ -115,5 +122,6 @@ export type NotificationCount = {
 export type WindowWithSpotlight = Window & {
   __spotlight?: {
     eventTarget?: EventTarget;
+    initOptions?: SpotlightOverlayOptions;
   };
 };

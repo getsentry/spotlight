@@ -60,7 +60,7 @@ export async function onClose(cb: EventListener) {
 /**
  * Send an event to spotlight without the sidecar
  */
-export async function sendEvent(contentType: string, data: string) {
+export async function sendEvent(contentType: string, data: string | Uint8Array) {
   trigger('event', { contentType, data });
 }
 
@@ -88,18 +88,21 @@ function isSpotlightInjected() {
   return false;
 }
 
-export async function init({
-  openOnInit = false,
-  showTriggerButton = true,
-  injectImmediately = false,
-  sidecarUrl = DEFAULT_SIDECAR_URL,
-  anchor = DEFAULT_ANCHOR,
-  debug = false,
-  integrations,
-  experiments = DEFAULT_EXPERIMENTS,
-  fullPage = false,
-  showClearEventsButton = true,
-}: SpotlightOverlayOptions = {}) {
+export async function init(
+  {
+    openOnInit = false,
+    showTriggerButton = true,
+    injectImmediately = false,
+    sidecarUrl = DEFAULT_SIDECAR_URL,
+    anchor = DEFAULT_ANCHOR,
+    debug = false,
+    integrations,
+    experiments = DEFAULT_EXPERIMENTS,
+    fullPage = false,
+    showClearEventsButton = true,
+    initialEvents = undefined,
+  }: SpotlightOverlayOptions = (window as WindowWithSpotlight).__spotlight?.initOptions || {},
+) {
   // The undefined document guard is to avoid being initialized in a Worker
   // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
   if (typeof document === 'undefined') return;
@@ -173,6 +176,7 @@ export async function init({
           anchor={anchor}
           fullPage={fullPage}
           showClearEventsButton={showClearEventsButton}
+          initialEvents={initialEvents}
         />
       </SpotlightContextProvider>
     </MemoryRouter>,
