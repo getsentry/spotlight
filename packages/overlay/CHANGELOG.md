@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 2.5.1
+
+### Patch Changes
+
+- Fixed infinite render loops and optimized rerenders ([#522](https://github.com/getsentry/spotlight/pull/522))
+
 ## 2.5.0
 
 ### Minor Changes

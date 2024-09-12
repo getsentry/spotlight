@@ -1,5 +1,15 @@
 # @spotlightjs/astro
 
+## 2.1.9
+
+### Patch Changes
+
+- Fixed infinite render loops and optimized rerenders ([#522](https://github.com/getsentry/spotlight/pull/522))
+
+- Updated dependencies
+  [[`df9cd954323648d8c22e61643520a1642b8884ca`](https://github.com/getsentry/spotlight/commit/df9cd954323648d8c22e61643520a1642b8884ca)]:
+  - @spotlightjs/spotlight@2.4.1
+
 ## 2.1.8
 
 ### Patch Changes
