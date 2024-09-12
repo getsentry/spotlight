@@ -1,4 +1,5 @@
 export const MAX_AGE = 30 * 60 * 1000; // 30 minutes
+export const MAX_ITEMS = 1000;
 export const DB_NAME = 'SentrySpotlight';
 export const OBJECT_STORE_NAME = 'events';
 export const DB_VERSION = 2;
@@ -85,11 +86,24 @@ export async function getEntries() {
   const { promise, resolve, reject } = promiseWithResolvers();
   const rejectFromErrorEvent = (evt: Event) => reject((evt.target as IDBOpenDBRequest).error);
   const db = await getDB();
-  const tx = db.transaction([OBJECT_STORE_NAME], 'readonly');
+  const tx = db.transaction([OBJECT_STORE_NAME], 'readwrite');
   tx.onerror = rejectFromErrorEvent;
-  const getRequest = tx.objectStore(OBJECT_STORE_NAME).getAll();
-  getRequest.onerror = rejectFromErrorEvent;
-  getRequest.onsuccess = () => resolve(getRequest.result.map(({ value }) => value));
+
+  const items: unknown[] = [];
+  const cursorRequest = tx.objectStore(OBJECT_STORE_NAME).openCursor();
+  cursorRequest.onerror = rejectFromErrorEvent;
+  cursorRequest.onsuccess = () => {
+    const cursor = cursorRequest.result;
+    if (!cursor) resolve(items);
+    else {
+      if (items.length < MAX_ITEMS) {
+        items.push(cursor.value.value);
+      } else {
+        cursor.delete();
+      }
+      cursor.continue();
+    }
+  };
   return promise;
 }
 
