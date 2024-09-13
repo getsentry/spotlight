@@ -123,5 +123,6 @@ export type WindowWithSpotlight = Window & {
   __spotlight?: {
     eventTarget?: EventTarget;
     initOptions?: SpotlightOverlayOptions;
+    console?: Record<string, (...args: unknown[]) => void>;
   };
 };
