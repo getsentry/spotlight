@@ -1,16 +1,24 @@
+import { trigger } from '../../lib/eventTarget';
+import type { WindowWithSpotlight } from '../../types';
 import type { Integration } from '../integration';
 import ConsoleTab from './console-tab';
-import { ConsoleMessage, Level } from './types';
+import type { ConsoleMessage, Level } from './types';
 
-const HEADER = 'application/x-spotlight-console';
-const PORT = 8969;
+const CONTENT_TYPE = 'application/x-spotlight-console';
 
+/**
+ * This integration is meant to run on the same page where
+ * the Spotlight UI is running. For standalone UI cases such
+ * as the Electron app, we should publish a separate version
+ * that takes in the sidecar URL.
+ * @returns Integration Console integration for Spotlight
+ */
 export default function consoleIntegration() {
   const pageloadId = window.crypto.randomUUID();
 
   return {
     name: 'console',
-    forwardedContentType: [HEADER],
+    forwardedContentType: [CONTENT_TYPE],
     tabs: ({ processedEvents }) => [
       {
         id: 'console',
@@ -37,34 +45,33 @@ export default function consoleIntegration() {
 }
 
 function instrumentConsole(level: Level, pageloadId: string) {
-  const originalConsoleLog = window.console[level];
+  const windowWithSpotlight = window as WindowWithSpotlight;
+  if (!windowWithSpotlight.__spotlight) {
+    windowWithSpotlight.__spotlight = {};
+  }
+  if (!windowWithSpotlight.__spotlight.console) {
+    windowWithSpotlight.__spotlight.console = {};
+  }
+  const originalConsole = windowWithSpotlight.__spotlight.console;
+  if (!originalConsole[level]) {
+    originalConsole[level] = window.console[level];
+  }
+  const originalConsoleMethod = originalConsole[level];
 
   window.console[level] = (...args: unknown[]) => {
     const serializedArgs = argsToString(args);
-    // Super dumb way to avoid endless loops (we're gonna regret that)
-    if (serializedArgs.find(a => a.toLowerCase().includes('spotlight'))) {
-      return originalConsoleLog(...args);
-    }
 
-    try {
-      void fetch(`http://localhost:${PORT}/stream`, {
-        method: 'POST',
-        body: JSON.stringify({
-          type: level,
-          args: serializedArgs,
-          msg: serializedArgs.join(' '),
-          sessionId: pageloadId,
-        } satisfies ConsoleMessage),
-        headers: {
-          'Content-Type': HEADER,
-        },
-        mode: 'cors',
-      }).catch(() => {});
-    } catch {
-      // ignore failed fetch requests
-    }
+    trigger('event', {
+      contentType: CONTENT_TYPE,
+      data: JSON.stringify({
+        type: level,
+        args: serializedArgs,
+        msg: serializedArgs.join(' '),
+        sessionId: pageloadId,
+      } satisfies ConsoleMessage),
+    });
 
-    return originalConsoleLog(...args);
+    return originalConsoleMethod.call(window, ...args);
   };
 }
 

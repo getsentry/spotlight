@@ -52,7 +52,9 @@ export default defineConfig({
     },
     rollupOptions: {
       treeshake: 'smallest',
-      output: { footer: 'window.Spotlight && Spotlight.init()' },
+      output: {
+        footer: '(function(S){S && S.init({integrations: [S.sentry(), S.console()]})}(window.Spotlight))',
+      },
     },
     sourcemap: true,
   },
