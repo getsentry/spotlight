@@ -119,6 +119,7 @@ class SentryDataCache {
     }
 
     if (this.eventIds.has(event.event_id)) return;
+    this.eventIds.add(event.event_id);
 
     if (isErrorEvent(event)) {
       await this.processStacktrace(event);
@@ -196,7 +197,6 @@ class SentryDataCache {
       this.subscribers.forEach(([type, cb]) => type === 'trace' && cb(trace));
     }
     this.subscribers.forEach(([type, cb]) => type === 'event' && cb(event));
-    this.eventIds.add(event.event_id);
   }
 
   getEvents() {
