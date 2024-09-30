@@ -1,5 +1,15 @@
 # @spotlightjs/core
 
+## 2.5.2
+
+### Patch Changes
+
+- Overhaul console integration for more performance and stability
+  ([#525](https://github.com/getsentry/spotlight/pull/525))
+
+- Fix race condition on event processing - prevent doubling of events
+  ([#528](https://github.com/getsentry/spotlight/pull/528))
+
 ## 2.5.1
 
 ### Patch Changes

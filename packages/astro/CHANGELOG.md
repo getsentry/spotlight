@@ -1,5 +1,16 @@
 # @spotlightjs/astro
 
+## 2.1.10
+
+### Patch Changes
+
+- Fix race condition on event processing - prevent doubling of events
+  ([#528](https://github.com/getsentry/spotlight/pull/528))
+
+- Updated dependencies
+  [[`f22222717dcf2482892e1cc83c233c83ba03211d`](https://github.com/getsentry/spotlight/commit/f22222717dcf2482892e1cc83c233c83ba03211d)]:
+  - @spotlightjs/spotlight@2.4.2
+
 ## 2.1.9
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # @spotlightjs/electron
 
+## 1.1.10
+
+### Patch Changes
+
+- Fix race condition on event processing - prevent doubling of events
+  ([#528](https://github.com/getsentry/spotlight/pull/528))
+
+- Updated dependencies
+  [[`149e95bd02af41618bc74b365c71ddf99358672f`](https://github.com/getsentry/spotlight/commit/149e95bd02af41618bc74b365c71ddf99358672f),
+  [`f22222717dcf2482892e1cc83c233c83ba03211d`](https://github.com/getsentry/spotlight/commit/f22222717dcf2482892e1cc83c233c83ba03211d)]:
+  - @spotlightjs/overlay@2.5.2
+
 ## 1.1.9
 
 ### Patch Changes
