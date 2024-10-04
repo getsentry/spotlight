@@ -106,8 +106,7 @@ export type SpotlightOverlayOptions = {
   initialEvents?: Record<string, (string | Uint8Array)[]>;
 
   /**
-   * Initial path to navigate to, instead of the main screen. Setting this will
-   * immediately call `open(startFrom)` upon app starting.
+   * Initial path to navigate to, instead of the first tab.
    */
   startFrom?: string;
 };
