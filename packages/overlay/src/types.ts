@@ -104,6 +104,12 @@ export type SpotlightOverlayOptions = {
    * This is useful when replacing error pages of frameworks etc. Implies "injectImmediately".
    */
   initialEvents?: Record<string, (string | Uint8Array)[]>;
+
+  /**
+   * Initial path to navigate to, instead of the main screen. Setting this will
+   * immediately call `open(startFrom)` upon app starting.
+   */
+  startFrom?: string;
 };
 
 export type NotificationCount = {

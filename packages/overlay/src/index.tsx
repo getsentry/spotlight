@@ -88,8 +88,24 @@ function isSpotlightInjected() {
   return false;
 }
 
-export async function init(
-  {
+export async function init(options: SpotlightOverlayOptions = {}) {
+  // The undefined document guard is to avoid being initialized in a Worker
+  // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
+  if (typeof document === 'undefined') return;
+
+  // We only want to initialize and inject spotlight once. If it's already
+  // been initialized, we can just bail out.
+  if (isSpotlightInjected()) return;
+
+  const windowInitOptions = (window as WindowWithSpotlight).__spotlight?.initOptions;
+  if (windowInitOptions) {
+    options = {
+      ...windowInitOptions,
+      ...options,
+    };
+  }
+
+  const {
     openOnInit = false,
     showTriggerButton = true,
     injectImmediately = false,
@@ -101,24 +117,17 @@ export async function init(
     fullPage = false,
     showClearEventsButton = true,
     initialEvents = undefined,
-  }: SpotlightOverlayOptions = (window as WindowWithSpotlight).__spotlight?.initOptions || {},
-) {
-  // The undefined document guard is to avoid being initialized in a Worker
-  // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
-  if (typeof document === 'undefined') return;
-
-  const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };
-
-  // We only want to initialize and inject spotlight once. If it's already
-  // been initialized, we can just bail out.
-  if (isSpotlightInjected()) return;
+    startFrom = undefined,
+  } = options;
 
   if (debug) {
     activateLogger();
   }
 
+  const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };
+
   // Sentry is enabled by default
-  const defaultIntegrations = [sentry({ sidecarUrl })];
+  const defaultIntegrations = () => [sentry({ sidecarUrl })];
 
   const context: SpotlightContext = {
     open: openSpotlight,
@@ -126,7 +135,7 @@ export async function init(
     experiments: finalExperiments,
   };
 
-  const [initializedIntegrations] = await initIntegrations(integrations ?? defaultIntegrations, context);
+  const [initializedIntegrations] = await initIntegrations(integrations ?? defaultIntegrations(), context);
 
   // build shadow dom container to contain styles
   const docRoot = document.createElement('div');
@@ -162,7 +171,8 @@ export async function init(
       })) || [],
   );
 
-  const initialTab = tabs.length ? `/${tabs[0].id}` : '/no-tabs';
+  const initialTab = startFrom || (tabs.length ? `/${tabs[0].id}` : '/no-tabs');
+  log('Starting from', initialTab);
 
   ReactDOM.createRoot(appRoot).render(
     // <React.StrictMode>
