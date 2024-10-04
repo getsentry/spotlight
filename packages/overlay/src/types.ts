@@ -104,6 +104,11 @@ export type SpotlightOverlayOptions = {
    * This is useful when replacing error pages of frameworks etc. Implies "injectImmediately".
    */
   initialEvents?: Record<string, (string | Uint8Array)[]>;
+
+  /**
+   * Initial path to navigate to, instead of the first tab.
+   */
+  startFrom?: string;
 };
 
 export type NotificationCount = {
