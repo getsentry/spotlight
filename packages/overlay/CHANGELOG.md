@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 2.6.0
+
+### Minor Changes
+
+- Adds a `startFrom` init option to control the starting path of Spotlight
+  ([#531](https://github.com/getsentry/spotlight/pull/531))
+
 ## 2.5.2
 
 ### Patch Changes
