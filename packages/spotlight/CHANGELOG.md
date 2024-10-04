@@ -1,5 +1,18 @@
 # @spotlightjs/spotlight
 
+## 2.5.0
+
+### Minor Changes
+
+- Adds a `startFrom` init option to control the starting path of Spotlight
+  ([#531](https://github.com/getsentry/spotlight/pull/531))
+
+### Patch Changes
+
+- Updated dependencies
+  [[`728f62310ac5ead03ba23fb393e2557b4cb944b1`](https://github.com/getsentry/spotlight/commit/728f62310ac5ead03ba23fb393e2557b4cb944b1)]:
+  - @spotlightjs/overlay@2.6.0
+
 ## 2.4.2
 
 ### Patch Changes
