@@ -8,8 +8,8 @@ Sentry.init({
   tracesSampleRate: 1.0,
   integrations: [
     Sentry.replayIntegration({
-      maskAllText: true,
-      blockAllMedia: true,
+      maskAllText: false,
+      blockAllMedia: false,
     }),
   ],
 });
