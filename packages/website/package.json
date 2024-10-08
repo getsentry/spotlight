@@ -13,25 +13,25 @@
     "clean": "rimraf .astro .vercel .vite-inspect"
   },
   "dependencies": {
-    "@astrojs/react": "^3.0.7",
-    "@astrojs/starlight": "^0.13.0",
-    "@astrojs/starlight-tailwind": "^2.0.1",
-    "@astrojs/tailwind": "^5.0.3",
+    "@astrojs/react": "^3.6.2",
+    "@astrojs/starlight": "^0.13.1",
+    "@astrojs/starlight-tailwind": "^2.0.3",
+    "@astrojs/tailwind": "^5.1.1",
     "@astrojs/vercel": "^5.2.0",
-    "@fontsource/raleway": "^5.0.15",
-    "@sentry/astro": "^8.9.2",
+    "@fontsource/raleway": "^5.1.0",
+    "@sentry/astro": "^8.33.1",
     "@spotlightjs/astro": "workspace:*",
-    "@types/react": "^18.2.38",
-    "@types/react-dom": "^18.2.17",
-    "astro": "^4.0.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "astro": "^4.15.12",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "sharp": "^0.32.6",
-    "tailwindcss": "^3.3.5"
+    "tailwindcss": "^3.4.13"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.10",
-    "typescript": "^5.3.2",
+    "@tailwindcss/typography": "^0.5.15",
+    "typescript": "^5.6.2",
     "vite-plugin-inspect": "^0.7.42"
   },
   "volta": {

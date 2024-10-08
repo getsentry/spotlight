@@ -13,19 +13,19 @@
     "clean": "rimraf .astro dist"
   },
   "dependencies": {
-    "@astrojs/check": "^0.3.1",
-    "@astrojs/node": "^6.0.4",
-    "@astrojs/react": "^3.0.5",
+    "@astrojs/check": "^0.3.4",
+    "@astrojs/node": "^6.1.0",
+    "@astrojs/react": "^3.6.2",
     "@astrojs/svelte": "^4.0.4",
-    "@sentry/astro": "^8.7.0",
+    "@sentry/astro": "^8.33.1",
     "@spotlightjs/astro": "workspace:*",
-    "@types/react": "^18.2.37",
-    "@types/react-dom": "^18.2.15",
-    "astro": "^3.5.5",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "svelte": "^5.0.0-next.1",
-    "typescript": "^5.2.2"
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "astro": "^4.15.12",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "svelte": "5.0.0-next.263",
+    "typescript": "^5.6.2"
   },
   "volta": {
     "extends": "../../package.json"
