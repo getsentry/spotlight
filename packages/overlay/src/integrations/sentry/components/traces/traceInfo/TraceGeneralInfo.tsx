@@ -18,7 +18,7 @@ export default function TraceGeneralInfo({ trace }: TraceGeneralInfoProps) {
             ['Spans', trace.spans.length || '-'],
             ['Transactions', trace.transactions.length || '-'],
             ['Errors', trace.errors || '-'],
-            ['Start Timestamp', <DateTime date={trace.start_timestamp} /> || '-'],
+            ['Start Timestamp', trace.start_timestamp ? <DateTime key="Start Timestamp" date={trace.start_timestamp} /> : '-'],
             ['Total Duration', `${getDuration(trace.start_timestamp, trace.timestamp).toLocaleString()} ms`],
           ].map(([key, value]) => (
             <tr key={key as string} className="text-primary-300">

@@ -14,15 +14,15 @@
     "test:e2e:ci": "pnpm test:e2e:prepare && playwright test"
   },
   "dependencies": {
-    "@astrojs/node": "^6.0.4",
-    "@sentry/astro": "8.0.0-alpha.7",
+    "@astrojs/node": "^6.1.0",
+    "@sentry/astro": "^8.33.1",
     "@spotlightjs/astro": "workspace:^",
-    "astro": "^4.0.1"
+    "astro": "^4.15.12"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.3.1",
-    "@playwright/test": "^1.40.1",
-    "@types/node": "^18",
-    "typescript": "^5.3.2"
+    "@astrojs/check": "^0.3.4",
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^18.19.55",
+    "typescript": "^5.6.2"
   }
 }

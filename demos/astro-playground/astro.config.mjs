@@ -9,9 +9,6 @@ import svelte from '@astrojs/svelte';
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  experimental: {
-    devOverlay: true,
-  },
   vite: {
     build: {
       sourcemap: true,

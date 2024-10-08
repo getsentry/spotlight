@@ -15,16 +15,16 @@
     "build:mac": "pnpm --filter '@spotlightjs/electron...' build && node electron-builder.js"
   },
   "dependencies": {
-    "@sentry/electron": "^5.3.0",
+    "@sentry/electron": "^5.6.0",
     "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
     "electron-store": "^10.0.0"
   },
   "devDependencies": {
-    "@electron/notarize": "^2.3.2",
-    "@sentry/vite-plugin": "^2.22.1",
+    "@electron/notarize": "^2.5.0",
+    "@sentry/vite-plugin": "^2.22.5",
     "dotenv": "^16.4.5",
-    "electron": "^31.3.1",
+    "electron": "^31.6.0",
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
     "rollup-plugin-sourcemaps2": "^0.4.1"

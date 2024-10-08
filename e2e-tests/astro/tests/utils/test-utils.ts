@@ -5,5 +5,5 @@ import type { Page } from '@playwright/test';
  * Extracted in case we need to change the selector.
  */
 export async function waitForAstroToolbar(page: Page) {
-  return page.waitForSelector('#dev-overlay');
+  return page.waitForSelector('#dev-bar');
 }
