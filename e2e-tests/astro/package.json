@@ -14,7 +14,7 @@
     "test:e2e:ci": "pnpm test:e2e:prepare && playwright test"
   },
   "dependencies": {
-    "@astrojs/node": "^6.1.0",
+    "@astrojs/node": "^8.3.4",
     "@sentry/astro": "^8.33.1",
     "@spotlightjs/astro": "workspace:^",
     "astro": "^4.15.12"
