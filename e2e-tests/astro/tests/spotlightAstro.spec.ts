@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { waitForAstroToolbar } from './utils/test-utils';
 
-const ASTRO_TOOLBAR_SPOTLIGHT_BTN = 'button[data-plugin-id="spotlight-plugin"]';
+const ASTRO_TOOLBAR_SPOTLIGHT_BTN = 'button[data-app-id="spotlight-plugin"]';
 
 test('has Astro Dev Toolbar', async ({ page }) => {
   await page.goto('http://localhost:4321');
