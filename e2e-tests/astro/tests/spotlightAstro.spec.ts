@@ -10,7 +10,7 @@ test('has Astro Dev Toolbar', async ({ page }) => {
 
   await waitForAstroToolbar(page);
 
-  const toolbarVisible = await page.isVisible('#dev-overlay');
+  const toolbarVisible = await page.isVisible('#dev-bar');
   expect(toolbarVisible).toBe(true);
 });
 
