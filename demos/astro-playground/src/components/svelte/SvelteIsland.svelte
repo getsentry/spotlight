@@ -18,7 +18,7 @@
     reprehenderit enim dolor officia magna. Cupidatat ex culpa eu minim qui
     voluptate ex.
   </p>
-  <button on:click={throwError}>Throw an island error</button>
+  <button onclick={throwError}>Throw an island error</button>
 
   <button onclick={fetchData}>Throw a server endpoint error</button>
 </div>
