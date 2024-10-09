@@ -4,6 +4,11 @@
   "author": "Sentry",
   "license": "Apache-2.0",
   "version": "1.1.11",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/getsentry/spotlight.git",
+    "directory": "packages/electron"
+  },
   "main": "./out/main/index.js",
   "files": [
     "src"
@@ -18,7 +23,8 @@
     "@sentry/electron": "^5.6.0",
     "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
-    "electron-store": "^10.0.0"
+    "electron-store": "^10.0.0",
+    "electron-updater": "^6.3.9"
   },
   "devDependencies": {
     "@electron/notarize": "^2.5.0",
