@@ -17,7 +17,7 @@
     "@astrojs/node": "^8.3.4",
     "@sentry/astro": "^8.33.1",
     "@spotlightjs/astro": "workspace:^",
-    "astro": "^4.15.12"
+    "astro": "^4.16.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.3.4",
