@@ -35,7 +35,7 @@ function ToolbarItem({
     <div className="gap-x hover:bg-primary-400 relative flex items-center rounded p-3" {...props}>
       {children}
 
-      {count && (
+      {count ? (
         <span
           className={classNames(
             severe ? 'bg-red-500' : 'bg-primary-500',
@@ -44,7 +44,7 @@ function ToolbarItem({
         >
           {count}
         </span>
-      )}
+      ) : null}
     </div>
   );
 }
