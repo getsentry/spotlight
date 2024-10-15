@@ -13,8 +13,19 @@ const showSearch = Astro.props.slug !== '';
 ---
 
 <div class="header sl-flex">
-  <div class="sl-flex">
+  <div class="sl-flex items-center gap-x-1">
     <SiteTitle {...Astro.props} />
+    <div class="flex items-center gap-x-1 text-sm leading-5">
+      <span>by</span>
+      <a
+        rel="noopener"
+        href="https://sentry.io"
+        target="_blank"
+        class="no-underline text-inherit focus:outline-none font-medium hover:underline"
+      >
+        Sentry
+      </a>
+    </div>
   </div>
   <div class="sl-flex">
     {showSearch && <Search {...Astro.props} />}
