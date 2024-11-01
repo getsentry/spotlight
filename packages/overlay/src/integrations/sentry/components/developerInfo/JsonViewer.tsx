@@ -1,6 +1,6 @@
-import { Envelope, EnvelopeItem } from '@sentry/types';
+import type { Envelope, EnvelopeItem } from '@sentry/types';
 import { Suspense, lazy } from 'react';
-import { RawEventContext } from '~/integrations/integration';
+import type { RawEventContext } from '~/integrations/integration';
 const LazyReactJson = lazy(() => import('react-json-view'));
 
 // Need this separately to fix Storybook 8 bundling
@@ -34,7 +34,7 @@ export default function JsonViewer({
         onEdit={
           editingEnabled &&
           (e => {
-            if (e.new_value == 'error') {
+            if (e.new_value === 'error') {
               return false;
             }
             onUpdateData(e.updated_src);
@@ -43,7 +43,7 @@ export default function JsonViewer({
         onDelete={
           editingEnabled &&
           (e => {
-            if (e.new_value == 'error') {
+            if (e.new_value === 'error') {
               return false;
             }
             onUpdateData(e.updated_src);
@@ -52,7 +52,7 @@ export default function JsonViewer({
         onAdd={
           editingEnabled &&
           (e => {
-            if (e.new_value == 'error') {
+            if (e.new_value === 'error') {
               return false;
             }
             onUpdateData(e.updated_src);
