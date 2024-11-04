@@ -1,5 +1,5 @@
 import type { Envelope, EnvelopeItem } from '@sentry/types';
-import LazyReactJson from 'react-json-view';
+import ReactJson from 'react-json-view';
 import type { RawEventContext } from '~/integrations/integration';
 
 // Need this separately to fix Storybook 8 bundling
@@ -22,7 +22,7 @@ export default function JsonViewer({
   quotesOnKeys?: boolean;
 }) {
   return (
-    <LazyReactJson
+    <ReactJson
       theme="bright"
       displayDataTypes={displayDataTypes}
       quotesOnKeys={quotesOnKeys}

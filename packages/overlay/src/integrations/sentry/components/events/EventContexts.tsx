@@ -68,6 +68,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
                               quotesOnKeys={false}
                               shouldCollapse={shouldCollapse}
                               src={value}
+                              collapseStringsAfterLength={80}
                             />
                           )}
                         </pre>
