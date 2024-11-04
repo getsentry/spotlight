@@ -8,13 +8,7 @@ import { useSentrySpans } from '../../data/useSentrySpans';
 import type { Span } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
 
-const filterDBSpans = (spans: Span[], regex?: RegExp) => {
-  if (regex) {
-    const _regex = new RegExp(regex);
-    return spans.filter((span: Span) => _regex.test(span.op || ''));
-  }
-  return [];
-};
+const DB_SPAN_REGEX = /^db(\.[A-Za-z]+)?$/;
 
 type QueryInfo = {
   avgDuration: number;
@@ -69,8 +63,8 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
 
   const queriesData: QueryInfo[] = useMemo(() => {
     const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.timeSpent];
-
-    const onlyDBSpans = filterDBSpans(showAll ? allSpans : localSpans, /db\.[A-Za-z]+/);
+    const spans = showAll ? allSpans : localSpans;
+    const onlyDBSpans = spans.filter((span: Span) => DB_SPAN_REGEX.test(span.op || ''));
     const uniqueSpansSet = new Set(onlyDBSpans.map(span => String(span?.description).trim()));
     // CLear out empty ones (they collapse as a single empty string since this is a set)
     uniqueSpansSet.delete('');
