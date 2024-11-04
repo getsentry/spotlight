@@ -9,14 +9,6 @@ import { useSentrySpans } from '../../data/useSentrySpans';
 import type { Span } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
 
-const filterDBSpans = (spans: Span[], type?: string) => {
-  if (type) {
-    return spans.filter((span: Span) => span.description === type);
-  }
-
-  return [];
-};
-
 type SpanInfoComparator = (a: Span, b: Span) => number;
 type QuerySummarySortTypes = (typeof QUERY_SUMMARY_SORT_KEYS)[keyof typeof QUERY_SUMMARY_SORT_KEYS];
 const COMPARATORS: Record<QuerySummarySortTypes, SpanInfoComparator> = {
@@ -55,16 +47,21 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
     );
 
   const filteredDBSpans: Span[] = useMemo(() => {
+    if (!type) {
+      return [];
+    }
+    const spans = showAll ? allSpans : localSpans;
     const compareSpanInfo = COMPARATORS[sort.active] || COMPARATORS[QUERY_SUMMARY_SORT_KEYS.timeSpent];
 
-    return filterDBSpans(showAll ? allSpans : localSpans, type).sort((a, b) =>
-      sort.asc ? compareSpanInfo(a, b) : compareSpanInfo(b, a),
-    );
+    return spans
+      .filter(span => span.description === type)
+      .sort((a, b) => (sort.asc ? compareSpanInfo(a, b) : compareSpanInfo(b, a)));
   }, [allSpans, localSpans, showAll, sort, type]);
 
-  if (!type || !filteredDBSpans || !filteredDBSpans.length) {
+  if (!filteredDBSpans || !filteredDBSpans.length) {
     return <p className="text-primary-300 px-6 py-4">Query not found.</p>;
   }
+
   return (
     <>
       <Breadcrumbs
