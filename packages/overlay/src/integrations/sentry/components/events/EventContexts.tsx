@@ -1,7 +1,6 @@
-import { Suspense, lazy } from 'react';
+import LazyReactJson from 'react-json-view';
 import type { SentryEvent } from '../../types';
 import Tags from '../Tags';
-const LazyReactJson = lazy(() => import('react-json-view'));
 
 const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
   name: "Mighty Fighter",
@@ -46,41 +45,39 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
         </div>
       )}
       <div className="space-y-6">
-        <Suspense fallback={<div>loading...</div>}>
-          {contextEntries.map(([ctxKey, ctxValues]) => (
-            <div key={ctxKey}>
-              <h2 className="font-bold uppercase">{ctxKey}</h2>
-              <table className="w-full">
-                <tbody>
-                  {ctxValues &&
-                    Object.entries(ctxValues).map(([key, value]) => (
-                      <tr key={key}>
-                        <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
-                          <div className="w-full truncate">{key}</div>
-                        </th>
-                        <td className="py-0.5">
-                          <pre className="text-primary-300 whitespace-nowrap font-mono">
-                            {typeof value !== 'object' || !value ? (
-                              value
-                            ) : (
-                              <LazyReactJson
-                                theme="bright"
-                                name={null}
-                                displayDataTypes={false}
-                                quotesOnKeys={false}
-                                shouldCollapse={shouldCollapse}
-                                src={value}
-                              />
-                            )}
-                          </pre>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
-        </Suspense>
+        {contextEntries.map(([ctxKey, ctxValues]) => (
+          <div key={ctxKey}>
+            <h2 className="font-bold uppercase">{ctxKey}</h2>
+            <table className="w-full">
+              <tbody>
+                {ctxValues &&
+                  Object.entries(ctxValues).map(([key, value]) => (
+                    <tr key={key}>
+                      <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
+                        <div className="w-full truncate">{key}</div>
+                      </th>
+                      <td className="py-0.5">
+                        <pre className="text-primary-300 whitespace-nowrap font-mono">
+                          {typeof value !== 'object' || !value ? (
+                            value
+                          ) : (
+                            <LazyReactJson
+                              theme="bright"
+                              name={null}
+                              displayDataTypes={false}
+                              quotesOnKeys={false}
+                              shouldCollapse={shouldCollapse}
+                              src={value}
+                            />
+                          )}
+                        </pre>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
       </div>
     </>
   );
