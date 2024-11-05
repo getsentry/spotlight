@@ -59,7 +59,9 @@ type CommonEventAttrs = {
   start_timestamp?: number;
   contexts?: Contexts;
   tags?: Tags;
-  extra?: { [key: string]: string | number };
+  extra?: Record<string, string | number>;
+  request?: Record<string, Record<string, string> | string>;
+  modules?: Record<string, string>;
   sdk?: Sdk;
   measurements?: Measurements;
 };

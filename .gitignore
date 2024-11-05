@@ -27,6 +27,7 @@ dist-ssr
 *.sln
 *.sw?
 
+.astro
 .yalc
 yalc.lock
 .vite-inspect

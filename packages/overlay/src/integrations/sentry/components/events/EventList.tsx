@@ -6,7 +6,7 @@ import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
-import { SentryEvent } from '../../types';
+import type { SentryEvent } from '../../types';
 import HiddenItemsButton from '../HiddenItemsButton';
 import PlatformIcon from '../PlatformIcon';
 import { EventSummary } from './Event';
