@@ -1,6 +1,4 @@
-import type { Envelope, EnvelopeItem } from '@sentry/types';
 import ReactJson from 'react-json-view';
-import type { RawEventContext } from '~/integrations/integration';
 
 // Need this separately to fix Storybook 8 bundling
 // See #419 and #420 for more context
@@ -22,7 +20,7 @@ export default function JsonViewer({
   name = null,
   collapseStringsAfterLength = 80,
 }: {
-  data: Envelope[0] | EnvelopeItem | RawEventContext;
+  data: object;
   onUpdateData?: (value: unknown) => void;
   editingEnabled?: boolean;
   clipboardEnabled?: boolean;

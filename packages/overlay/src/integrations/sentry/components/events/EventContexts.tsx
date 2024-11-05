@@ -1,3 +1,4 @@
+import { Nullable } from 'vitest';
 import JsonViewer from '../../../../components/JsonViewer';
 import type { SentryEvent } from '../../types';
 import Tags from '../Tags';
@@ -9,14 +10,17 @@ const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
 });`;
 
 export default function EventContexts({ event }: { event: SentryEvent }) {
-  const contextEntries = Object.entries({
+  const contexts: Record<string, Nullable<Record<string, unknown>>> = {
     request: event.request,
-    extra: {
-      modules: event.modules,
-      ...(event.extra || {}),
-    },
     ...event.contexts,
-  }).filter(entry => entry[1]);
+  };
+  if (event.extra) {
+    contexts.extra = event.extra;
+  }
+  if (event.modules) {
+    contexts.extra = Object.assign(contexts.extra || {}, { modules: event.modules });
+  }
+  const contextEntries = Object.entries(contexts).filter(entry => entry[1]) as [string, Record<string, unknown>][];
 
   const { tags } = event;
 
@@ -44,21 +48,20 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
             <h2 className="font-bold uppercase">{ctxKey}</h2>
             <table className="w-full">
               <tbody>
-                {ctxValues &&
-                  Object.entries(ctxValues).map(([key, value]) => (
-                    <tr key={`${ctxKey}-${key}`}>
-                      <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
-                        <div className="w-full truncate">{key}</div>
-                      </th>
-                      <td className="py-0.5">
-                        {typeof value !== 'object' || !value ? (
-                          <pre className="text-primary-300 whitespace-nowrap font-mono">{value}</pre>
-                        ) : (
-                          <JsonViewer key={`${ctxKey}-${key}`} data={value} />
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                {Object.entries(ctxValues).map(([key, value]) => (
+                  <tr key={`${ctxKey}-${key}`}>
+                    <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
+                      <div className="w-full truncate">{key}</div>
+                    </th>
+                    <td className="py-0.5">
+                      {typeof value !== 'object' || !value ? (
+                        <pre className="text-primary-300 whitespace-nowrap font-mono">{JSON.stringify(value)}</pre>
+                      ) : (
+                        <JsonViewer key={`${ctxKey}-${key}`} data={value} />
+                      )}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
