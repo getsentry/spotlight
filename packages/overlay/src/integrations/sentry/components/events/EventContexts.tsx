@@ -46,14 +46,16 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
               <tbody>
                 {ctxValues &&
                   Object.entries(ctxValues).map(([key, value]) => (
-                    <tr key={key}>
+                    <tr key={`${ctxKey}-${key}`}>
                       <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
                         <div className="w-full truncate">{key}</div>
                       </th>
                       <td className="py-0.5">
-                        <pre className="text-primary-300 whitespace-nowrap font-mono">
-                          {typeof value !== 'object' || !value ? value : <JsonViewer data={value} />}
-                        </pre>
+                        {typeof value !== 'object' || !value ? (
+                          <pre className="text-primary-300 whitespace-nowrap font-mono">value</pre>
+                        ) : (
+                          <JsonViewer key={`${ctxKey}-${key}`} data={value} />
+                        )}
                       </td>
                     </tr>
                   ))}
