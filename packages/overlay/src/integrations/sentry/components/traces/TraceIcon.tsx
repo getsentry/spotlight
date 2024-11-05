@@ -26,7 +26,7 @@ export default function TraceIcon({ trace }: TraceIconProps) {
       {dominantPlatforms.map(platform => (
         <PlatformIcon key={platform} title={platform} size={21} platform={platform} />
       ))}
-      {remainingPlatforms.length && (
+      {remainingPlatforms.length > 0 && (
         <div
           title={remainingPlatforms.join(', ')}
           className="h-[21px] w-[21px] bg-black p-0.5 text-xs font-bold text-white"
