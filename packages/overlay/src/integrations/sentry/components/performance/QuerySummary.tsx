@@ -53,7 +53,7 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
     const spans = showAll ? allSpans : localSpans;
     const compareSpanInfo = COMPARATORS[sort.active] || COMPARATORS[QUERY_SUMMARY_SORT_KEYS.timeSpent];
 
-    // https://developer.mozilla.org/en-US/docs/Web/API/Window/atob
+    // Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/atob
     const decodedType: string = atob(type);
 
     return spans
