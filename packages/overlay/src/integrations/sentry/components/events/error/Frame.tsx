@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ReactComponent as PenIcon } from '~/assets/pen.svg';
+import CopyToClipboard from '~/components/CopyToClipboard';
 import { renderValue } from '~/utils/values';
 import classNames from '../../../../../lib/classNames';
 import { EventFrame, FrameVars } from '../../../types';
@@ -51,47 +52,59 @@ export default function Frame({
   const hasSource = !!frame.context_line;
   const fileName = platform === 'java' ? frame.module : frame.filename || frame.module;
   return (
-    <li className="border-primary-900 bg-primary-900 border-b last:border-b-0">
+    <li
+      className={classNames(
+        hasSource ? 'cursor-pointer' : '',
+        !isOpen && hasSource ? 'hover:bg-primary-900' : '',
+        'bg-primary-950 border-primary-900 my-1 overflow-hidden rounded-md border',
+      )}
+    >
       <div
         className={classNames(
-          hasSource ? 'hover:bg-primary-800 cursor-pointer' : '',
-          'border-primary-950 text-primary-400 border-b px-2 py-1',
+          'text-primary-400 flex items-center justify-between px-2 py-1',
+          isOpen ? 'bg-primary-900' : '',
         )}
         onClick={hasSource ? () => setOpen(!isOpen) : undefined}
       >
-        {fileName ? (
-          <span className="text-primary-100">
-            {formatFilename(fileName)}
-            {' in '}
-          </span>
-        ) : null}
-
-        <span className="text-primary-100">{frame.function}</span>
-        {frame.lineno !== undefined && (
-          <>
-            {' '}
-            at line{' '}
+        <div>
+          {fileName ? (
             <span className="text-primary-100">
-              {frame.lineno}
-              {frame.colno !== undefined && `:${frame.colno}`}
+              {formatFilename(fileName)}
+              {' in '}
             </span>
-          </>
-        )}
-        {isOpen && !frame.filename?.includes(':') ? (
-          <PenIcon
-            width={18}
-            height={18}
-            title="Open in editor"
-            className="mx-2 inline fill-green-400 stroke-green-400 align-top"
-            onClick={evt => {
-              fetch('http://localhost:8969/open', {
-                method: 'POST',
-                body: `${frame.filename}:${frame.lineno}:${frame.colno}`,
-                credentials: 'omit',
-              });
-              evt.stopPropagation();
-            }}
-          />
+          ) : null}
+
+          <span className="text-primary-100">{frame.function}</span>
+          {frame.lineno !== undefined && (
+            <>
+              {' '}
+              at line{' '}
+              <span className="text-primary-100">
+                {frame.lineno}
+                {frame.colno !== undefined && `:${frame.colno}`}
+              </span>
+            </>
+          )}
+        </div>
+        {!frame.filename?.includes(':') ? (
+          <div className="flex items-center gap-2">
+            <PenIcon
+              width={18}
+              height={18}
+              title="Open in editor"
+              className="stroke-primary-100"
+              onClick={evt => {
+                fetch('http://localhost:8969/open', {
+                  method: 'POST',
+                  body: `${frame.filename}:${frame.lineno}:${frame.colno}`,
+                  credentials: 'omit',
+                });
+                evt.stopPropagation();
+              }}
+            />
+
+            <CopyToClipboard data={frame.filename!} />
+          </div>
         ) : null}
       </div>
       {isOpen && (
