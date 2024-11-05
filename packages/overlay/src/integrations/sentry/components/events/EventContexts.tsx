@@ -1,4 +1,4 @@
-import LazyReactJson from 'react-json-view';
+import JsonViewer from '../../../../components/JsonViewer';
 import type { SentryEvent } from '../../types';
 import Tags from '../Tags';
 
@@ -7,12 +7,6 @@ const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
   age: 19,
   attack_type: "melee",
 });`;
-
-function shouldCollapse({ src, type }: { src: Array<unknown> | object; type: string }) {
-  if (type === 'object') return Object.keys(src).length > 10;
-  if (type === 'array') return (src as Array<unknown>).length > 10;
-  return false;
-}
 
 export default function EventContexts({ event }: { event: SentryEvent }) {
   const contextEntries = Object.entries({
@@ -58,19 +52,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
                       </th>
                       <td className="py-0.5">
                         <pre className="text-primary-300 whitespace-nowrap font-mono">
-                          {typeof value !== 'object' || !value ? (
-                            value
-                          ) : (
-                            <LazyReactJson
-                              theme="bright"
-                              name={null}
-                              displayDataTypes={false}
-                              quotesOnKeys={false}
-                              shouldCollapse={shouldCollapse}
-                              src={value}
-                              collapseStringsAfterLength={80}
-                            />
-                          )}
+                          {typeof value !== 'object' || !value ? value : <JsonViewer data={value} />}
                         </pre>
                       </td>
                     </tr>
