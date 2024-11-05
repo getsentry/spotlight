@@ -52,7 +52,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
                       </th>
                       <td className="py-0.5">
                         {typeof value !== 'object' || !value ? (
-                          <pre className="text-primary-300 whitespace-nowrap font-mono">value</pre>
+                          <pre className="text-primary-300 whitespace-nowrap font-mono">{value}</pre>
                         ) : (
                           <JsonViewer key={`${ctxKey}-${key}`} data={value} />
                         )}
