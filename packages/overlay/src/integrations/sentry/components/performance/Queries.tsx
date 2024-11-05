@@ -116,7 +116,8 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
           {queriesData.map(query => (
             <tr key={query.description} className="hover:bg-primary-900">
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                <Link className="truncate hover:underline" to={`/performance/queries/${query.description}`}>
+                {/* Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa */}
+                <Link className="truncate hover:underline" to={`/performance/queries/${btoa(query.description)}`}>
                   {query.description}
                 </Link>
               </td>
