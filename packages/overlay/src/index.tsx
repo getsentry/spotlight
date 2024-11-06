@@ -23,10 +23,10 @@ export {
   DEFAULT_ANCHOR,
   DEFAULT_EXPERIMENTS,
   DEFAULT_SIDECAR_URL,
-  React,
-  ReactDOM,
   off,
   on,
+  React,
+  ReactDOM,
   trigger,
 };
 
@@ -107,18 +107,21 @@ export async function init(options: SpotlightOverlayOptions = {}) {
 
   const {
     openOnInit = false,
-    showTriggerButton = true,
-    injectImmediately = false,
     sidecarUrl = DEFAULT_SIDECAR_URL,
     anchor = DEFAULT_ANCHOR,
-    debug = false,
     integrations,
     experiments = DEFAULT_EXPERIMENTS,
-    fullPage = false,
     showClearEventsButton = true,
     initialEvents = undefined,
     startFrom = undefined,
   } = options;
+
+  const isLoadedFromSidecar = new URL(sidecarUrl).origin === document.location.origin;
+
+  const fullPage = options.fullPage ?? isLoadedFromSidecar;
+  const showTriggerButton = options.showTriggerButton ?? !fullPage;
+  const injectImmediately = options.injectImmediately ?? (isLoadedFromSidecar || fullPage);
+  const debug = options.debug ?? document.location.hash.endsWith('debug');
 
   if (debug) {
     activateLogger();

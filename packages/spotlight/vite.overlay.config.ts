@@ -8,6 +8,14 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'src', 'index.html'),
       },
+      // We disable versioned filenames here explicitly
+      // so we can include the script when sidecar is running
+      // for server-side frameworks
+      output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]',
+      },
     },
   },
 });
