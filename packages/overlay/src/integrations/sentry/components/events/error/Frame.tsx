@@ -51,10 +51,9 @@ function FileActions({ frame }: { frame: EventFrame }) {
     return null;
   }
   const resolvedFilename = resolveFilename(frame.filename);
-  const canOpenFileInEditor = !frame.filename?.includes(':');
   return (
     <div className="flex items-center gap-2">
-      {canOpenFileInEditor && <OpenInEditor file={`${resolvedFilename}:${frame.lineno}:${frame.colno}`} />}
+      <OpenInEditor file={`${resolvedFilename}:${frame.lineno}:${frame.colno}`} />
       <CopyToClipboard data={resolvedFilename} />
     </div>
   );
