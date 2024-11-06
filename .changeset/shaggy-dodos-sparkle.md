@@ -1,5 +1,5 @@
 ---
-'@spotlightjs/overlay': patch
+'@spotlightjs/overlay': minor
 ---
 
 - Added copy filename button on error frame.
