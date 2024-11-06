@@ -203,7 +203,7 @@ export default function SpanDetails({
           </div>
         )}
 
-        {span.children?.length && (
+        {(span.children?.length ?? 0) > 0 && (
           <div>
             <h2 className="mb-2 font-bold uppercase">Sub-tree</h2>
             <SpanTree
