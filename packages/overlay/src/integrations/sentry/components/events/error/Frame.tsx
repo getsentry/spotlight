@@ -1,17 +1,25 @@
 import { useState } from 'react';
-import { renderValue } from '~/utils/values';
 import CopyToClipboard from '../../../../../components/CopyToClipboard';
 import OpenInEditor from '../../../../../components/OpenInEditor';
 import classNames from '../../../../../lib/classNames';
+import { renderValue } from '../../../../../utils/values';
 import type { EventFrame, FrameVars } from '../../../types';
 
-function formatFilename(filename: string) {
-  const queryPos = filename.lastIndexOf('?');
-  if (queryPos > -1) {
-    filename = filename.slice(0, queryPos);
+function resolveFilename(filename: string) {
+  try {
+    const url = new URL(filename);
+    filename = url.pathname.slice(1);
+  } catch {
+    // ignore
   }
-  if (filename.indexOf('/node_modules/') === -1) return filename;
-  return `npm:${filename
+
+  return filename;
+}
+
+function formatFilename(filename: string) {
+  const resolvedFilename = resolveFilename(filename);
+  if (resolvedFilename.indexOf('/node_modules/') === -1) return resolvedFilename;
+  return `npm:${resolvedFilename
     .replace(/\/node_modules\//gi, 'npm:')
     .split('npm:')
     .pop()}`;
@@ -38,6 +46,19 @@ function ContextLocals({ vars }: { vars: FrameVars }) {
   );
 }
 
+function FileActions({ frame }: { frame: EventFrame }) {
+  if (!frame.filename) {
+    return null;
+  }
+  const resolvedFilename = resolveFilename(frame.filename);
+  return (
+    <div className="flex items-center gap-2">
+      <OpenInEditor file={`${resolvedFilename}:${frame.lineno}:${frame.colno}`} />
+      <CopyToClipboard data={resolvedFilename} />
+    </div>
+  );
+}
+
 export default function Frame({
   frame,
   defaultExpand = false,
@@ -49,7 +70,7 @@ export default function Frame({
 }) {
   const [isOpen, setOpen] = useState(defaultExpand);
 
-  const hasSource = !!frame.context_line;
+  const hasSource = Boolean(frame.context_line);
   const fileName = platform === 'java' ? frame.module : frame.filename || frame.module;
   return (
     <li
@@ -86,12 +107,7 @@ export default function Frame({
             </>
           )}
         </div>
-        {!frame.filename?.includes(':') ? (
-          <div className="flex items-center gap-2">
-            <OpenInEditor file={`${frame.filename}:${frame.lineno}:${frame.colno}`} />
-            <CopyToClipboard data={frame.filename!} />
-          </div>
-        ) : null}
+        <FileActions frame={frame} />
       </div>
       {isOpen && (
         <div className="bg-primary-950">

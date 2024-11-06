@@ -16,6 +16,12 @@ export default function OpenInEditor({ file }: { file: string }) {
     [file],
   );
   return (
-    <PenIcon width={18} height={18} title="Open in editor" className="stroke-primary-100" onClick={openInEditor} />
+    <PenIcon
+      width={18}
+      height={18}
+      title="Open in editor"
+      className="stroke-primary-100 cursor-pointer"
+      onClick={openInEditor}
+    />
   );
 }

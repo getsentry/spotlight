@@ -27,7 +27,7 @@ export default function CopyToClipboard({ data }: { data: string }) {
       width={18}
       height={18}
       title="Copy filename"
-      className="stroke-primary-50 transition-all"
+      className="stroke-primary-50 cursor-pointer transition-all"
       onClick={handleCopy}
     />
   );
