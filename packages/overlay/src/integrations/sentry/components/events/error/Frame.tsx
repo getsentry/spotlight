@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { ReactComponent as PenIcon } from '~/assets/pen.svg';
-import CopyToClipboard from '~/components/CopyToClipboard';
 import { renderValue } from '~/utils/values';
+import CopyToClipboard from '../../../../../components/CopyToClipboard';
+import OpenInEditor from '../../../../../components/OpenInEditor';
 import classNames from '../../../../../lib/classNames';
-import { EventFrame, FrameVars } from '../../../types';
+import type { EventFrame, FrameVars } from '../../../types';
 
 function formatFilename(filename: string) {
   const queryPos = filename.lastIndexOf('?');
@@ -88,21 +88,7 @@ export default function Frame({
         </div>
         {!frame.filename?.includes(':') ? (
           <div className="flex items-center gap-2">
-            <PenIcon
-              width={18}
-              height={18}
-              title="Open in editor"
-              className="stroke-primary-100"
-              onClick={evt => {
-                fetch('http://localhost:8969/open', {
-                  method: 'POST',
-                  body: `${frame.filename}:${frame.lineno}:${frame.colno}`,
-                  credentials: 'omit',
-                });
-                evt.stopPropagation();
-              }}
-            />
-
+            <OpenInEditor file={`${frame.filename}:${frame.lineno}:${frame.colno}`} />
             <CopyToClipboard data={frame.filename!} />
           </div>
         ) : null}
