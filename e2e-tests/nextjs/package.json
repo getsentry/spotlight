@@ -11,8 +11,8 @@
     "test:e2e:ci": "pnpm test:e2e:prepare && pnpm test:e2e"
   },
   "dependencies": {
-    "@sentry/nextjs": "^8.33.1",
-    "next": "latest",
+    "@sentry/nextjs": "^8.37.1",
+    "next": ">=15.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
