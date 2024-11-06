@@ -258,6 +258,7 @@ function openRequestHandler(basePath: string = process.cwd()) {
 
     req.on('end', () => {
       const targetPath = resolve(basePath, requestBody);
+      logger.debug(`Launching editor for ${targetPath}`);
       launchEditor(
         // filename:line:column
         // both line and column are optional

@@ -36,7 +36,7 @@ export function ErrorItem({ event }: { event: SentryErrorEvent }) {
                 <strong className="text-xl">{value.type}</strong>
                 <pre>{value.value}</pre>
               </h3>
-              <ul className="border-primary-600 border">
+              <ul>
                 {value.stacktrace?.frames.map((frame, frameIdx) => {
                   return (
                     <Frame
