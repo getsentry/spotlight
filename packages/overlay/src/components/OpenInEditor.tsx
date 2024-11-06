@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useCallback } from 'react';
-import { ReactComponent as PenIcon } from '../../assets/pen.svg';
+import { ReactComponent as PenIcon } from '../assets/pen.svg';
 
 export default function OpenInEditor({ file }: { file: string }) {
   const openInEditor = useCallback(
