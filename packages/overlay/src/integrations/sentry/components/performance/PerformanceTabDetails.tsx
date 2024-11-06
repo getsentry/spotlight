@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, Route, Routes } from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import Tabs from '~/components/Tabs';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import { useSentrySpans } from '../../data/useSentrySpans';
@@ -58,7 +58,8 @@ export default function PerformanceTabDetails() {
           <Route path="webvitals" element={<WebVitals />} />
           <Route path="webvitals/:page" element={<WebVitalsDetail />} />
           {/* Default tab */}
-          <Route path="*" element={<Queries showAll={showAll} />} />
+          <Route path="queries" element={<Queries showAll={showAll} />} />
+          <Route path="*" element={<Navigate to="/performance/queries" replace />} />
         </Routes>
         <Outlet />
       </div>
