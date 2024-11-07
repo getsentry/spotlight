@@ -4,7 +4,8 @@ function CustomTabContent() {
   React.useEffect(() => {
     console.log('custom tab content');
   }, []);
-  return <div>Custom Tab Content</div>;
+  // Cannot use JSX syntax here as NextJS React and Spotlight React are different!
+  return React.createElement('div', null, 'Custom Tab Content');
 }
 
 export function customIntegration() {
