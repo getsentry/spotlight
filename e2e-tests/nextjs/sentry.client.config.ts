@@ -7,8 +7,6 @@ import * as Spotlight from '@spotlightjs/spotlight';
 import { customIntegration } from './integrations/spotlight-custom-integration';
 
 Sentry.init({
-  dsn: 'DSN',
-
   // Adjust this value in production, or use tracesSampler for greater control
   tracesSampleRate: 1,
 
