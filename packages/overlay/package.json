@@ -46,7 +46,7 @@
     "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.12",
-    "happy-dom": "^15.7.4",
+    "happy-dom": "^15.10.2",
     "magic-string": "^0.30.11",
     "platformicons": "^5.10.10",
     "postcss": "^8.4.47",
