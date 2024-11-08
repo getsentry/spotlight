@@ -35,6 +35,12 @@ jobs:
       - name: Build packages
         run: pnpm build
 
+      - name: Store standalone spotlight binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotlight-binary
+          path: packages/spotlight/dist/spotlight
+
       - name: Update build cache
         uses: actions/cache@v4
         with:
