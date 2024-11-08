@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
-import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
+import SidePanel, { SidePanelHeader } from '../../../../../ui/SidePanel';
 import dataCache from '../../../data/sentryDataCache';
-import { SentryErrorEvent, Span, TraceContext } from '../../../types';
+import type { SentryErrorEvent, Span, TraceContext } from '../../../types';
 import { formatBytes } from '../../../utils/bytes';
 import { getDuration } from '../../../utils/duration';
 import DateTime from '../../DateTime';
@@ -159,7 +159,7 @@ export default function SpanDetails({
                   span.parent_span_id ? (
                     <Link
                       className="underline"
-                      to={`/traces/${span.trace_id}/${span.parent_span_id}`}
+                      to={`/traces/${span.trace_id}/spans/${span.parent_span_id}`}
                       key={`link-to-${span.parent_span_id}`}
                     >
                       {span.parent_span_id}
