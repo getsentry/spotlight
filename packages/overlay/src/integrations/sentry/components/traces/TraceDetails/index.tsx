@@ -1,5 +1,5 @@
 import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
-import Tabs from '~/components/Tabs';
+import Tabs from '../../../../../components/Tabs';
 import { default as dataCache, default as sentryDataCache } from '../../../data/sentryDataCache';
 import EventList from '../../events/EventList';
 import TraceContext from './components/TraceContext';
@@ -30,7 +30,7 @@ export default function TraceDetails() {
     .getEventsByTrace(traceId)
     .filter(
       e =>
-        e.type != 'transaction' &&
+        e.type !== 'transaction' &&
         (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
     ).length;
 

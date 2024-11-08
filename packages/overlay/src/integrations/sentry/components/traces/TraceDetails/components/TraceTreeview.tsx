@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
-import { getDuration } from '~/integrations/sentry/utils/duration';
+import sentryDataCache from '../../../../data/sentryDataCache';
+import { getDuration } from '../../../../utils/duration';
 import DateTime from '../../../DateTime';
 import SpanDetails from '../../spans/SpanDetails';
 import SpanTree from '../../spans/SpanTree';
 
 type TraceTreeViewProps = { traceId: string };
 
+export const DEFAULT_SPAN_NODE_WIDTH = 50;
+
 export default function TraceTreeview({ traceId }: TraceTreeViewProps) {
   const { spanId } = useParams();
 
-  const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
+  const [spanNodeWidth, setSpanNodeWidth] = useState<number>(DEFAULT_SPAN_NODE_WIDTH);
 
   const trace = sentryDataCache.getTraceById(traceId);
   const span = spanId ? sentryDataCache.getSpanById(traceId, spanId) : undefined;
