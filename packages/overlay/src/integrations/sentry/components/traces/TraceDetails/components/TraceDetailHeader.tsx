@@ -1,4 +1,4 @@
-import { Trace } from '~/integrations/sentry/types';
+import type { Trace } from '../../../../types';
 import TraceIcon from '../../TraceIcon';
 
 type TraceDetailHeaderProps = {
