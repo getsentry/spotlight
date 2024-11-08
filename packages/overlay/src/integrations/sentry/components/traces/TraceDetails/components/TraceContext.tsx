@@ -1,5 +1,5 @@
 import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
-import { Tags as TagsType, Trace } from '~/integrations/sentry/types';
+import type { Tags as TagsType, Trace } from '~/integrations/sentry/types';
 import { getDuration } from '~/integrations/sentry/utils/duration';
 import DateTime from '../../../DateTime';
 import Tags from '../../../Tags';
@@ -46,20 +46,17 @@ type TraceTagsProps = {
 };
 
 function TraceTags({ trace }: TraceTagsProps) {
-  const tags: TagsType | undefined = trace.transactions
-    .map(tsx => tsx.tags)
-    .reduce((prev, current) => {
-      return Object.assign(prev!, current);
-    }, {});
+  const tags: TagsType = trace.transactions
+    .map(tsx => tsx.tags || {})
+    .reduce((prev, current) => Object.assign(prev, current), {} as TagsType);
 
-  if (!tags) {
-    return null;
-  }
   return (
-    <div>
-      <h2 className="mb-2 font-bold uppercase">Tags</h2>
-      <Tags tags={tags} />
-    </div>
+    Object.keys(tags).length > 0 && (
+      <div>
+        <h2 className="mb-2 font-bold uppercase">Tags</h2>
+        <Tags tags={tags} />
+      </div>
+    )
   );
 }
 
