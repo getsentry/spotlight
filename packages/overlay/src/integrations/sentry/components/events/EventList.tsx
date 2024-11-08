@@ -4,7 +4,6 @@ import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import Badge from '~/ui/Badge';
 import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
-import sentryDataCache from '../../data/sentryDataCache';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
 import type { SentryEvent } from '../../types';
@@ -17,13 +16,10 @@ function renderEvent(event: SentryEvent) {
 }
 
 export default function EventList({ traceId }: { traceId?: string }) {
-  let events = useSentryEvents();
+  const events = useSentryEvents(traceId);
   const helpers = useSentryHelpers();
   const context = useSpotlightContext();
 
-  if (traceId) {
-    events = sentryDataCache.getEventsByTrace(traceId);
-  }
   const matchingEvents = events.filter(e => e.type !== 'transaction');
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
