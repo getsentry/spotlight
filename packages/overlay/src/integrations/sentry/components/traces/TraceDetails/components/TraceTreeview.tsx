@@ -1,43 +1,25 @@
 import { useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
-import dataCache from '../../../data/sentryDataCache';
-import { getDuration } from '../../../utils/duration';
-import DateTime from '../../DateTime';
-import SpanDetails from '../spans/SpanDetails';
-import SpanTree from '../spans/SpanTree';
-import TraceInfo from '../traceInfo';
-import TraceDetailHeader from './TraceDetailHeader';
+import { useParams } from 'react-router-dom';
+import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
+import { getDuration } from '~/integrations/sentry/utils/duration';
+import DateTime from '../../../DateTime';
+import SpanDetails from '../../spans/SpanDetails';
+import SpanTree from '../../spans/SpanTree';
 
-export default function TraceDetails() {
-  const { traceId, spanId } = useParams();
-  const { pathname } = useLocation();
+type TraceTreeViewProps = { traceId: string };
+
+export default function TraceTreeview({ traceId }: TraceTreeViewProps) {
+  const { spanId } = useParams();
 
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
 
-  if (!traceId) {
-    return <p className="text-primary-300 p-6">Unknown trace id</p>;
-  }
-
-  const trace = dataCache.getTraceById(traceId);
-
-  if (!trace) {
-    return (
-      <p className="text-primary-300 p-6">
-        Trace not found. Check for more{' '}
-        <Link to="/traces" className="underline">
-          traces
-        </Link>
-      </p>
-    );
-  }
-  const span = spanId ? dataCache.getSpanById(trace.trace_id, spanId) : undefined;
-  const isTraceInfo = pathname === `/traces/${traceId}/info`;
+  const trace = sentryDataCache.getTraceById(traceId);
+  const span = spanId ? sentryDataCache.getSpanById(traceId, spanId) : undefined;
   const startTimestamp = trace.start_timestamp;
   const totalDuration = trace.timestamp - startTimestamp;
 
   return (
     <>
-      <TraceDetailHeader trace={trace} />
       <div className="px-6 py-4">
         <div className="text-primary-300 flex flex-1 items-center gap-x-1">
           <div className="text-primary-200">
@@ -73,8 +55,6 @@ export default function TraceDetails() {
           totalTransactions={(trace.transactions || []).length}
         />
       ) : null}
-
-      {isTraceInfo && <TraceInfo traceContext={trace} />}
     </>
   );
 }

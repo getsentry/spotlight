@@ -4,6 +4,7 @@ import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import Badge from '~/ui/Badge';
 import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
+import sentryDataCache from '../../data/sentryDataCache';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
 import type { SentryEvent } from '../../types';
@@ -15,11 +16,14 @@ function renderEvent(event: SentryEvent) {
   return <EventSummary event={event} />;
 }
 
-export default function EventList() {
-  const events = useSentryEvents();
+export default function EventList({ traceId }: { traceId?: string }) {
+  let events = useSentryEvents();
   const helpers = useSentryHelpers();
   const context = useSpotlightContext();
 
+  if (traceId) {
+    events = sentryDataCache.getEventsByTrace(traceId);
+  }
   const matchingEvents = events.filter(e => e.type !== 'transaction');
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
@@ -46,7 +50,7 @@ export default function EventList() {
           <Link
             className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
             key={e.event_id}
-            to={`${e.event_id}/details`}
+            to={`/errors/${e.event_id}/details`}
           >
             <PlatformIcon event={e} className="text-primary-300 rounded-md" />
             <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">

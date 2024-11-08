@@ -159,7 +159,7 @@ export default function SpanDetails({
                   span.parent_span_id ? (
                     <Link
                       className="underline"
-                      to={`/traces/${span.trace_id}/${span.parent_span_id}`}
+                      to={`/traces/${span.trace_id}/spans/${span.parent_span_id}`}
                       key={`link-to-${span.parent_span_id}`}
                     >
                       {span.parent_span_id}
