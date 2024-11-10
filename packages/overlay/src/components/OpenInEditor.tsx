@@ -1,12 +1,12 @@
 import type React from 'react';
 import { useCallback } from 'react';
+import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
 import { ReactComponent as PenIcon } from '../assets/pen.svg';
 
 export default function OpenInEditor({ file }: { file: string }) {
   const openInEditor = useCallback(
     (evt: React.MouseEvent) => {
-      // TODO: Make this URL dynamic based on sidecarUrl!
-      fetch('http://localhost:8969/open', {
+      fetch(`${sentryDataCache.getSidecarUrl()}/open`, {
         method: 'POST',
         body: file,
         credentials: 'omit',

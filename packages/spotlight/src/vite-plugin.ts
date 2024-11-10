@@ -42,7 +42,7 @@ const serverOptions = new Set(['importPath', 'integrationNames', 'port']);
 
 export function buildClientInit(options: SpotlightInitOptions) {
   const clientOptions = Object.fromEntries(
-    Object.entries(options).filter(([key, _value]) => !key.startsWith('_') && !serverOptions.has(key)),
+    Object.entries(options).filter(([key]) => !key.startsWith('_') && !serverOptions.has(key)),
   );
   let initOptions = JSON.stringify({
     ...clientOptions,
@@ -61,7 +61,7 @@ export function buildClientInit(options: SpotlightInitOptions) {
   ].join('\n');
 }
 
-async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: string = 'http://localhost:8969/stream') {
+async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: string = 'http://localhost:8969') {
   if (!err.errors) {
     console.log(err);
     return;
@@ -72,6 +72,8 @@ async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: stri
   const errorLineInContext = contextLines?.indexOf(errorLine);
   const event_id = randomBytes(16).toString('hex');
   const timestamp = new Date();
+  const { origin } = new URL(spotlightUrl);
+  const spotlightStreamUrl: string = `${origin}/stream`;
   const envelope = [
     { event_id, sent_at: timestamp.toISOString() },
     { type: 'event' },
@@ -117,7 +119,7 @@ async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: stri
   ]
     .map(p => JSON.stringify(p))
     .join('\n');
-  return await fetch(spotlightUrl, {
+  return await fetch(spotlightStreamUrl, {
     method: 'POST',
     body: envelope,
     headers: { 'Content-Type': 'application/x-sentry-envelope' },

@@ -8,7 +8,9 @@ export function connectToSidecar(
   setOnline: React.Dispatch<React.SetStateAction<boolean>>,
 ): () => void {
   log('Connecting to sidecar at', sidecarUrl);
-  const source = new EventSource(sidecarUrl);
+  const { origin } = new URL(sidecarUrl);
+  const sidecarStreamUrl: string = `${origin}/stream`;
+  const source = new EventSource(sidecarStreamUrl);
 
   for (const [contentType, listener] of Object.entries(contentTypeListeners)) {
     source.addEventListener(contentType, listener);

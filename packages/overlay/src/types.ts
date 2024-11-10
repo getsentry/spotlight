@@ -24,7 +24,7 @@ export type SpotlightOverlayOptions = {
    * will use this URL instead of the default URL to connect to the sidecar
    * and to listen to incoming events.
    *
-   * @default "http://localhost:8969/stream"
+   * @default "http://localhost:8969"
    */
   sidecarUrl?: string;
 
