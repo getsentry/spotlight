@@ -38,9 +38,15 @@ jobs:
       - name: Store standalone spotlight binary
         uses: actions/upload-artifact@v4
         with:
-          name: spotlight-binary
+          name: spotlight-linux
           path: |
             packages/spotlight/dist/spotlight
+
+      - name: Store Spotlight CJS
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotlight-cjs
+          path: |
             packages/spotlight/dist/spotlight.cjs
 
       - name: Update build cache
@@ -48,6 +54,58 @@ jobs:
         with:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
+
+  test-macos-binary:
+    name: MacOS Node SEA Test
+    runs-on: macos-11
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Setup dependencies
+        run: pnpm install
+
+      - name: Get CJS file
+        uses: actions/download-artifact@v4
+        with:
+          name: spotlight-cjs
+          path: packages/spotlight/dist
+
+      - name: Create MacOS Binary
+        shell: bash
+        run: |
+          cd packages/spotlight
+          bin/build.js
+
+      - name: Sign binary
+        uses: lando/code-sign-action@v2
+        with:
+          file: packages/spotlight/dist/spotlight
+          certificate-data: ${{ secrets.CSC_LINK }}
+          certificate-password: ${{ secrets.CSC_KEY_PASSWORD }}
+          apple-notary-user: ${{ secrets.APPLEID }}
+          apple-notary-password: ${{ secrets.APPLEIDPASS }}
+          apple-notary-tool: altool
+          apple-team-id: ${{ secrets.TEAMID }}
+          apple-product-id: dev.lando.code-sign-action
+          options: -f
+
+      - name: Store standalone spotlight binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotlight-macos
+          path: |
+            packages/spotlight/dist/spotlight
 
   test-docker:
     name: Docker Test

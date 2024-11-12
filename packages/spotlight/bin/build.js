@@ -28,13 +28,6 @@ const seaConfig = {
 writeFileSync(SEA_CONFIG_PATH, JSON.stringify(seaConfig));
 spawnSync(process.execPath, ['--experimental-sea-config', SEA_CONFIG_PATH], { stdio: 'inherit' });
 copyFileSync(process.execPath, SPOTLIGHT_BIN_PATH);
-if (process.platform === 'darwin') {
-  // todo: remove file signature
-}
 await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PATH), {
   sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
 });
-
-if (process.platform === 'darwin') {
-  // todo: sign the binary
-}
