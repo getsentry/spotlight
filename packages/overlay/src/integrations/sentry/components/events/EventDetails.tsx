@@ -67,7 +67,7 @@ export default function EventDetails() {
             </div>
             <div>
               S:{' '}
-              <Link className="cursor-pointer underline" to={`/traces/${traceCtx.trace_id}/${traceCtx.span_id}`}>
+              <Link className="cursor-pointer underline" to={`/traces/${traceCtx.trace_id}/spans/${traceCtx.span_id}`}>
                 {traceCtx.span_id}
               </Link>
             </div>
