@@ -39,7 +39,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: spotlight-binary
-          path: packages/spotlight/dist/spotlight
+          path: |
+            packages/spotlight/dist/spotlight
+            packages/spotlight/dist/spotlight.cjs
 
       - name: Update build cache
         uses: actions/cache@v4
