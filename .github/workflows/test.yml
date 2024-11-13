@@ -48,6 +48,7 @@ jobs:
           name: spotlight-cjs
           path: |
             packages/spotlight/dist/spotlight.cjs
+            packages/spotlight/dist/overlay
 
       - name: Update build cache
         uses: actions/cache@v4
