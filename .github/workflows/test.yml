@@ -57,7 +57,7 @@ jobs:
 
   test-macos-binary:
     name: MacOS Node SEA Test
-    runs-on: macos-11
+    runs-on: macos-latest
     needs: build
     steps:
       - uses: actions/checkout@v4
