@@ -137,8 +137,7 @@ export default function App({
   const navigate = useNavigate();
   const clearEvents = useCallback(async () => {
     try {
-      const { origin } = new URL(sidecarUrl);
-      const clearEventsUrl: string = `${origin}/clear`;
+      const clearEventsUrl: string = new URL('/clear', sidecarUrl).href;
 
       await db.reset();
       await fetch(clearEventsUrl, {

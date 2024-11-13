@@ -3,7 +3,7 @@ import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/sidecar/constants';
 import { MemoryRouter } from 'react-router-dom';
 import colors from 'tailwindcss/colors';
 import App from './App';
-import { DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from './constants';
+import { DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_STREAM_URL } from './constants';
 import globalStyles from './index.css?inline';
 import { initIntegrations, type SpotlightContext } from './integrations/integration';
 import { default as sentry } from './integrations/sentry/index';
@@ -12,6 +12,7 @@ import { activateLogger, log } from './lib/logger';
 import { SpotlightContextProvider } from './lib/useSpotlightContext';
 import { React, ReactDOM } from './react-instance'; // Import specific exports
 import type { SpotlightOverlayOptions, WindowWithSpotlight } from './types';
+import { removeURLSuffix } from './utils/remvoveURLSuffix';
 
 export { default as console } from './integrations/console/index';
 export { default as hydrationError } from './integrations/hydration-error/index';
@@ -22,7 +23,7 @@ export {
   CONTEXT_LINES_ENDPOINT,
   DEFAULT_ANCHOR,
   DEFAULT_EXPERIMENTS,
-  DEFAULT_SIDECAR_URL,
+  DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL,
   off,
   on,
   React,
@@ -107,7 +108,7 @@ export async function init(options: SpotlightOverlayOptions = {}) {
 
   const {
     openOnInit = false,
-    sidecarUrl = DEFAULT_SIDECAR_URL,
+    sidecarUrl = DEFAULT_SIDECAR_STREAM_URL,
     anchor = DEFAULT_ANCHOR,
     integrations,
     experiments = DEFAULT_EXPERIMENTS,
@@ -117,6 +118,7 @@ export async function init(options: SpotlightOverlayOptions = {}) {
   } = options;
 
   const isLoadedFromSidecar = new URL(sidecarUrl).origin === document.location.origin;
+  const sidecarBaseUrl: string = removeURLSuffix(sidecarUrl, '/stream');
 
   const fullPage = options.fullPage ?? isLoadedFromSidecar;
   const showTriggerButton = options.showTriggerButton ?? !fullPage;
@@ -130,12 +132,13 @@ export async function init(options: SpotlightOverlayOptions = {}) {
   const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };
 
   // Sentry is enabled by default
-  const defaultIntegrations = () => [sentry({ sidecarUrl })];
+  const defaultIntegrations = () => [sentry({ sidecarUrl: sidecarBaseUrl })];
 
   const context: SpotlightContext = {
     open: openSpotlight,
     close: closeSpotlight,
     experiments: finalExperiments,
+    sidecarUrl: sidecarBaseUrl,
   };
 
   const [initializedIntegrations] = await initIntegrations(integrations ?? defaultIntegrations(), context);

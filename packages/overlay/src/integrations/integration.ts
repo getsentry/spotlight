@@ -5,6 +5,7 @@ export type SpotlightContext = {
   open: (path: string | undefined) => void;
   close: () => void;
   experiments: ExperimentsConfig;
+  sidecarUrl: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

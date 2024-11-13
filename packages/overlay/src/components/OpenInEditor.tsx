@@ -1,19 +1,21 @@
 import type React from 'react';
 import { useCallback } from 'react';
-import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
+import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import { ReactComponent as PenIcon } from '../assets/pen.svg';
 
 export default function OpenInEditor({ file }: { file: string }) {
+  const { sidecarUrl } = useSpotlightContext();
+  const sidecarOpenUrl: string = new URL('/open', sidecarUrl).href;
   const openInEditor = useCallback(
     (evt: React.MouseEvent) => {
-      fetch(`${sentryDataCache.getSidecarUrl()}/open`, {
+      fetch(sidecarOpenUrl, {
         method: 'POST',
         body: file,
         credentials: 'omit',
       });
       evt.stopPropagation();
     },
-    [file],
+    [file, sidecarOpenUrl],
   );
   return (
     <PenIcon

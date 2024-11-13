@@ -35,15 +35,15 @@ init({
 
 #### `sidecarUrl`
 
-**type:** `string` **default:** `"http://localhost:8969"`
+**type:** `string` **default:** `"http://localhost:8969/stream"`
 
-The Sidecar event-source endpoint URL.
+The Sidecar event-source stream endpoint URL.
 
 Set this option if you have the sidecar running on another URL than the default one.
 
 ```ts
 init({
-  sidecarUrl: 'http://localhost:8969',
+  sidecarUrl: 'http://localhost:8969/sidecar',
 });
 ```
 

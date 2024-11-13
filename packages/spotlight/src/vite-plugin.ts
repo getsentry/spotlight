@@ -61,7 +61,7 @@ export function buildClientInit(options: SpotlightInitOptions) {
   ].join('\n');
 }
 
-async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: string = 'http://localhost:8969') {
+async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: string = 'http://localhost:8969/stream') {
   if (!err.errors) {
     console.log(err);
     return;
@@ -72,8 +72,13 @@ async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: stri
   const errorLineInContext = contextLines?.indexOf(errorLine);
   const event_id = randomBytes(16).toString('hex');
   const timestamp = new Date();
-  const { origin } = new URL(spotlightUrl);
-  const spotlightStreamUrl: string = `${origin}/stream`;
+
+  const parsedUrl = new URL(spotlightUrl);
+  let spotlightErrorStreamUrl: string = spotlightUrl;
+  if (!parsedUrl.pathname.endsWith('/stream')) {
+    spotlightErrorStreamUrl = new URL('/stream', spotlightUrl).href;
+  }
+
   const envelope = [
     { event_id, sent_at: timestamp.toISOString() },
     { type: 'event' },
@@ -119,7 +124,7 @@ async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: stri
   ]
     .map(p => JSON.stringify(p))
     .join('\n');
-  return await fetch(spotlightStreamUrl, {
+  return await fetch(spotlightErrorStreamUrl, {
     method: 'POST',
     body: envelope,
     headers: { 'Content-Type': 'application/x-sentry-envelope' },
@@ -153,7 +158,7 @@ export default function spotlight(options: SpotlightInitOptions = {}): PluginOpt
           res: ServerResponse,
           next: Connect.NextFunction,
         ) {
-          await sendErrorToSpotlight(err);
+          await sendErrorToSpotlight(err, options.sidecarUrl);
 
           // The following part is per https://expressjs.com/en/guide/error-handling.html#the-default-error-handler
           if (res.headersSent) {

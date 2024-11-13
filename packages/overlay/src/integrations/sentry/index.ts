@@ -1,4 +1,5 @@
 import type { Client, Envelope, EnvelopeItem } from '@sentry/types';
+import { removeURLSuffix } from '~/utils/remvoveURLSuffix';
 import { off, on } from '../../lib/eventTarget';
 import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
@@ -30,7 +31,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
         options.retries = 3;
       }
       if (options.sidecarUrl) {
-        sentryDataCache.setSidecarUrl(options.sidecarUrl);
+        sentryDataCache.setSidecarUrl(removeURLSuffix(options.sidecarUrl, '/stream'));
       }
       addSpotlightIntegrationToSentry(options);
 
