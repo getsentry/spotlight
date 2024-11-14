@@ -18,7 +18,7 @@ const seaConfig = {
   output: SPOTLIGHT_BLOB_PATH,
   disableExperimentalSEAWarning: true,
   useSnapshot: false,
-  useCodeCache: false,
+  useCodeCache: true,
   assets: {
     [MANIFEST_NAME]: MANIFEST_PATH,
     [ENTRY_POINT_NAME]: join(ASSETS_DIR, ENTRY_POINT_NAME),
