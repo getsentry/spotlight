@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
 
+defaults:
+  run:
+    shell: bash
+
+
 env:
   BUILD_CACHE_KEY: ${{ github.event.inputs.commit || github.sha }}
   CACHED_BUILD_PATHS: |
@@ -85,23 +90,53 @@ jobs:
           path: packages/spotlight/dist
 
       - name: Create MacOS Binary
-        shell: bash
         run: |
           cd packages/spotlight
           bin/build.js
 
-      - name: Sign binary
-        uses: lando/code-sign-action@v2
-        with:
-          file: packages/spotlight/dist/spotlight
-          certificate-data: ${{ secrets.CSC_LINK }}
-          certificate-password: ${{ secrets.CSC_KEY_PASSWORD }}
-          apple-notary-user: ${{ secrets.APPLEID }}
-          apple-notary-password: ${{ secrets.APPLEIDPASS }}
-          apple-notary-tool: altool
-          apple-team-id: ${{ secrets.TEAMID }}
-          apple-product-id: dev.lando.code-sign-action
-          options: -f
+      - name: Setup signing keys
+        env:
+          FILE: 'packages/spotlight/dist/spotlight'
+          APPLE_CERT_DATA: ${{ secrets.CSC_LINK }}
+          APPLE_CERT_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.TEAMID }}
+        # Code below lifted from https://github.com/lando/code-sign-action/blob/0779d463b08142ea9cb9bc87dc755670a8675c30/action.yml
+        run: |
+          # Setup
+          SIGNFILE="$(pwd)/$FILE"
+
+          # Export certs
+          echo "$APPLE_CERT_DATA" | base64 --decode > /tmp/certs.p12
+
+          # Create keychain
+          security create-keychain -p actions macos-build.keychain
+          security default-keychain -s macos-build.keychain
+          security unlock-keychain -p actions macos-build.keychain
+          security set-keychain-settings -t 3600 -u macos-build.keychain
+
+          # Import certs to keychain
+          security import /tmp/certs.p12 -k ~/Library/Keychains/macos-build.keychain -P "$APPLE_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/productsign
+
+          # Key signing
+          security set-key-partition-list -S apple-tool:,apple: -s -k actions macos-build.keychain
+
+          # Verify keychain identity
+          security find-identity -v macos-build.keychain | grep "$APPLE_TEAM_ID" | grep "Developer ID Application"
+
+          # Force the codesignature
+          codesign --force $OPTIONS -s "$APPLE_TEAM_ID" "$SIGNFILE"
+
+          # Verify the code signature
+          codesign -v "$SIGNFILE" --verbose
+
+      # - name: Sign binary
+      #   uses: lando/code-sign-action@v2
+      #   with:
+      #     file:
+
+      #     apple-notary-user: ${{ secrets.APPLEID }}
+      #     apple-notary-password: ${{ secrets.APPLEIDPASS }}
+      #     apple-notary-tool: altool
 
       - name: Store standalone spotlight binary
         uses: actions/upload-artifact@v4
