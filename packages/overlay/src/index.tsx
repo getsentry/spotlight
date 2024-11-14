@@ -132,7 +132,7 @@ export async function init(options: SpotlightOverlayOptions = {}) {
   const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };
 
   // Sentry is enabled by default
-  const defaultIntegrations = () => [sentry({ sidecarUrl: sidecarBaseUrl })];
+  const defaultIntegrations = () => [sentry()];
 
   const context: SpotlightContext = {
     open: openSpotlight,

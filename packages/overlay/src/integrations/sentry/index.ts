@@ -15,7 +15,6 @@ import type { SentryErrorEvent, SentryEvent } from './types';
 const HEADER = 'application/x-sentry-envelope';
 
 type SentryIntegrationOptions = {
-  sidecarUrl?: string;
   injectIntoSDK?: boolean;
   openLastError?: boolean;
   retries?: number;
@@ -26,12 +25,12 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
     name: 'sentry',
     forwardedContentType: [HEADER],
 
-    setup: ({ open }) => {
+    setup: ({ open, sidecarUrl }) => {
       if (options.retries == null) {
         options.retries = 3;
       }
-      if (options.sidecarUrl) {
-        sentryDataCache.setSidecarUrl(removeURLSuffix(options.sidecarUrl, '/stream'));
+      if (sidecarUrl) {
+        sentryDataCache.setSidecarUrl(removeURLSuffix(sidecarUrl, '/stream'));
       }
       addSpotlightIntegrationToSentry(options);
 

@@ -50,7 +50,7 @@ export function buildClientInit(options: SpotlightInitOptions) {
     injectImmediately: options.injectImmediately !== false,
   });
 
-  const integrationOptions = JSON.stringify({ sidecarUrl: options.sidecarUrl, openLastError: true });
+  const integrationOptions = JSON.stringify({ openLastError: true });
   const integrations = (options.integrationNames || ['sentry']).map(i => `Spotlight.${i}(${integrationOptions})`);
   initOptions = `{integrations: [${integrations.join(', ')}], ${initOptions.slice(1)}`;
 
