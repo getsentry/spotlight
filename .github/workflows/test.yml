@@ -119,7 +119,7 @@ jobs:
           cd packages/spotlight
           bin/build.js
 
-          notarytool submit dist/spotlight --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --wait
+          xcrun notarytool submit dist/spotlight --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --wait
 
           codesign -vvvv -R="notarized" --check-notarization dist/spotlight
 
