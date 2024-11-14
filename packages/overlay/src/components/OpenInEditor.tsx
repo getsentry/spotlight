@@ -1,19 +1,22 @@
 import type React from 'react';
 import { useCallback } from 'react';
+import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import { ReactComponent as PenIcon } from '../assets/pen.svg';
 
 export default function OpenInEditor({ file }: { file: string }) {
+  const { getSidecarUrl } = useSpotlightContext();
+  const sidecarOpenUrl: string = getSidecarUrl('/open');
+
   const openInEditor = useCallback(
     (evt: React.MouseEvent) => {
-      // TODO: Make this URL dynamic based on sidecarUrl!
-      fetch('http://localhost:8969/open', {
+      fetch(sidecarOpenUrl, {
         method: 'POST',
         body: file,
         credentials: 'omit',
       });
       evt.stopPropagation();
     },
-    [file],
+    [file, sidecarOpenUrl],
   );
   return (
     <PenIcon

@@ -42,7 +42,7 @@ const serverOptions = new Set(['importPath', 'integrationNames', 'port']);
 
 export function buildClientInit(options: SpotlightInitOptions) {
   const clientOptions = Object.fromEntries(
-    Object.entries(options).filter(([key, _value]) => !key.startsWith('_') && !serverOptions.has(key)),
+    Object.entries(options).filter(([key]) => !key.startsWith('_') && !serverOptions.has(key)),
   );
   let initOptions = JSON.stringify({
     ...clientOptions,
@@ -50,7 +50,7 @@ export function buildClientInit(options: SpotlightInitOptions) {
     injectImmediately: options.injectImmediately !== false,
   });
 
-  const integrationOptions = JSON.stringify({ sidecarUrl: options.sidecarUrl, openLastError: true });
+  const integrationOptions = JSON.stringify({ openLastError: true });
   const integrations = (options.integrationNames || ['sentry']).map(i => `Spotlight.${i}(${integrationOptions})`);
   initOptions = `{integrations: [${integrations.join(', ')}], ${initOptions.slice(1)}`;
 
@@ -72,6 +72,13 @@ async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: stri
   const errorLineInContext = contextLines?.indexOf(errorLine);
   const event_id = randomBytes(16).toString('hex');
   const timestamp = new Date();
+
+  const parsedUrl = new URL(spotlightUrl);
+  let spotlightErrorStreamUrl: string = spotlightUrl;
+  if (!parsedUrl.pathname.endsWith('/stream')) {
+    spotlightErrorStreamUrl = new URL('/stream', spotlightUrl).href;
+  }
+
   const envelope = [
     { event_id, sent_at: timestamp.toISOString() },
     { type: 'event' },
@@ -117,7 +124,7 @@ async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: stri
   ]
     .map(p => JSON.stringify(p))
     .join('\n');
-  return await fetch(spotlightUrl, {
+  return await fetch(spotlightErrorStreamUrl, {
     method: 'POST',
     body: envelope,
     headers: { 'Content-Type': 'application/x-sentry-envelope' },
@@ -151,7 +158,7 @@ export default function spotlight(options: SpotlightInitOptions = {}): PluginOpt
           res: ServerResponse,
           next: Connect.NextFunction,
         ) {
-          await sendErrorToSpotlight(err);
+          await sendErrorToSpotlight(err, options.sidecarUrl);
 
           // The following part is per https://expressjs.com/en/guide/error-handling.html#the-default-error-handler
           if (res.headersSent) {
