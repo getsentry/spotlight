@@ -52,9 +52,9 @@
       "eslint --cache --fix"
     ]
   },
-  "packageManager": "pnpm@9.7.0",
+  "packageManager": "pnpm@9.13.0",
   "volta": {
     "node": "20.10.0",
-    "pnpm": "9.7.0"
+    "pnpm": "9.13.0"
   }
 }
