@@ -125,7 +125,7 @@ jobs:
 
           chmod +x dist/spotlight
           ./dist/spotlight &
-          curl --retry 10 'http://localhost:8969/'
+          curl --retry 12 --retry-all-errors 'http://localhost:8969/'
 
       - name: Store standalone spotlight binary
         uses: actions/upload-artifact@v4
