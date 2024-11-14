@@ -27,7 +27,19 @@ const seaConfig = {
 };
 writeFileSync(SEA_CONFIG_PATH, JSON.stringify(seaConfig));
 spawnSync(process.execPath, ['--experimental-sea-config', SEA_CONFIG_PATH], { stdio: 'inherit' });
+console.log(`Copying node executable from ${process.execPath} to ${SPOTLIGHT_BIN_PATH}`);
 copyFileSync(process.execPath, SPOTLIGHT_BIN_PATH);
+if (process.platform == 'darwin') {
+  console.log('Detected MacOS, removing signature from node executable first');
+  spawnSync('codesign', ['--remove-signature', SPOTLIGHT_BIN_PATH], { stdio: 'inherit' });
+}
 await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PATH), {
   sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
 });
+if (process.platform == 'darwin') {
+  console.log('Signing the generated executable...');
+  spawnSync('codesign', ['--force', '-s', process.env.APPLE_TEAM_ID, SPOTLIGHT_BIN_PATH], { stdio: 'inherit' });
+  console.log('Verifying signature...');
+  spawnSync('codesign', ['-v', SPOTLIGHT_BIN_PATH, '--verbose'], { stdio: 'inherit' });
+  console.log('Signature verified.');
+}

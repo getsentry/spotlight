@@ -90,21 +90,12 @@ jobs:
           path: packages/spotlight/dist
 
       - name: Create MacOS Binary
-        run: |
-          cd packages/spotlight
-          bin/build.js
-
-      - name: Setup signing keys
         env:
-          FILE: 'packages/spotlight/dist/spotlight'
           APPLE_CERT_DATA: ${{ secrets.CSC_LINK }}
           APPLE_CERT_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.TEAMID }}
         # Code below lifted from https://github.com/lando/code-sign-action/blob/0779d463b08142ea9cb9bc87dc755670a8675c30/action.yml
         run: |
-          # Setup
-          SIGNFILE="$(pwd)/$FILE"
-
           # Export certs
           echo "$APPLE_CERT_DATA" | base64 --decode > /tmp/certs.p12
 
@@ -123,11 +114,10 @@ jobs:
           # Verify keychain identity
           security find-identity -v macos-build.keychain | grep "$APPLE_TEAM_ID" | grep "Developer ID Application"
 
-          # Force the codesignature
-          codesign --force $OPTIONS -s "$APPLE_TEAM_ID" "$SIGNFILE"
+          cd packages/spotlight
+          bin/build.js
 
-          # Verify the code signature
-          codesign -v "$SIGNFILE" --verbose
+          # TODO: Notarize
 
       # - name: Sign binary
       #   uses: lando/code-sign-action@v2
