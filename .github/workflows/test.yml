@@ -62,8 +62,8 @@ jobs:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
 
-  test-macos-binary:
-    name: MacOS Node SEA Test
+  build-macos-binary:
+    name: MacOS Single Executable Node App
     runs-on: macos-latest
     needs: build
     steps:
