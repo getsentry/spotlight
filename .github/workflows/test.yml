@@ -114,8 +114,15 @@ jobs:
           # Verify keychain identity
           security find-identity -v macos-build.keychain | grep "$APPLE_TEAM_ID" | grep "Developer ID Application"
 
+          curl https://nodejs.org/dist/v22.11.0/node-v22.11.0-darwin-arm64.tar.gz -o /tmp/node-original.tar.gz
+          mkdir /tmp/node
+          pushd
+          cd /tmp/node
+          tar --strip-components=1 -xzf ../node-original.tar.gz
+          popd
+
           cd packages/spotlight
-          bin/build.js
+          /tmp/node/bin/node bin/build.js
 
           # TODO: Notarize
 
