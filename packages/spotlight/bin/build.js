@@ -35,9 +35,9 @@ if (process.platform == 'darwin') {
 }
 await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PATH), {
   sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
-  machoSegmentName: process.platform == 'darwin' ? 'NODE_JS' : undefined,
+  machoSegmentName: process.platform === 'darwin' ? 'NODE_SEA' : undefined,
 });
-if (process.platform == 'darwin') {
+if (process.platform === 'darwin') {
   console.log('Signing the generated executable...');
   spawnSync('codesign', ['--force', '-s', process.env.APPLE_TEAM_ID, SPOTLIGHT_BIN_PATH], { stdio: 'inherit' });
   console.log('Verifying signature...');
