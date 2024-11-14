@@ -117,6 +117,9 @@ jobs:
           cd packages/spotlight
           bin/build.js
 
+          ./dist/spotlight &
+          curl 'http://localhost:8969/'
+
           # TODO: Notarize
 
       # - name: Sign binary
