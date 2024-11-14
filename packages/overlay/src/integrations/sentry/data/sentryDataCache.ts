@@ -34,7 +34,7 @@ class SentryDataCache {
 
   protected subscribers: Map<string, Subscription> = new Map();
 
-  protected contextLinesProvider: string = new URL(DEFAULT_SIDECAR_URL).origin + CONTEXT_LINES_ENDPOINT;
+  protected contextLinesProvider: string = new URL(CONTEXT_LINES_ENDPOINT, DEFAULT_SIDECAR_URL).href;
 
   constructor(
     initial: (SentryEvent & {
@@ -45,8 +45,8 @@ class SentryDataCache {
   }
 
   setSidecarUrl(url: string) {
-    const { origin } = new URL(url);
-    this.contextLinesProvider = origin + CONTEXT_LINES_ENDPOINT;
+    const { href: contextLinesProviderUrl } = new URL(CONTEXT_LINES_ENDPOINT, url);
+    this.contextLinesProvider = contextLinesProviderUrl;
   }
 
   inferSdkFromEvent(event: SentryEvent) {

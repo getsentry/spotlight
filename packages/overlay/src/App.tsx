@@ -136,10 +136,9 @@ export default function App({
   // See https://github.com/remix-run/react-router/issues/7634
   const navigate = useNavigate();
   const clearEvents = useCallback(async () => {
-    const { origin } = new URL(sidecarUrl);
-    const clearEventsUrl: string = `${origin}/clear`;
-
     try {
+      const clearEventsUrl: string = new URL('/clear', sidecarUrl).href;
+
       await db.reset();
       await fetch(clearEventsUrl, {
         method: 'DELETE',
