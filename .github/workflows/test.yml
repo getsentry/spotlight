@@ -94,6 +94,8 @@ jobs:
           APPLE_CERT_DATA: ${{ secrets.CSC_LINK }}
           APPLE_CERT_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.TEAMID }}
+          APPLE_ID:  ${{ secrets.APPLEID }}
+          APPLE_ID_PASS:  ${{ secrets.APPLEIDPASS }}
         # Code below lifted from https://github.com/lando/code-sign-action/blob/0779d463b08142ea9cb9bc87dc755670a8675c30/action.yml
         run: |
           # Export certs
@@ -117,19 +119,13 @@ jobs:
           cd packages/spotlight
           bin/build.js
 
+          notarytool submit dist/spotlight --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --wait
+
+          codesign -vvvv -R="notarized" --check-notarization dist/spotlight
+
+          chmod +x dist/spotlight
           ./dist/spotlight &
           curl 'http://localhost:8969/'
-
-          # TODO: Notarize
-
-      # - name: Sign binary
-      #   uses: lando/code-sign-action@v2
-      #   with:
-      #     file:
-
-      #     apple-notary-user: ${{ secrets.APPLEID }}
-      #     apple-notary-password: ${{ secrets.APPLEIDPASS }}
-      #     apple-notary-tool: altool
 
       - name: Store standalone spotlight binary
         uses: actions/upload-artifact@v4
