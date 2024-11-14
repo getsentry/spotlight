@@ -4,8 +4,9 @@ import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import { ReactComponent as PenIcon } from '../assets/pen.svg';
 
 export default function OpenInEditor({ file }: { file: string }) {
-  const { sidecarUrl } = useSpotlightContext();
-  const sidecarOpenUrl: string = new URL('/open', sidecarUrl).href;
+  const { getSidecarUrl } = useSpotlightContext();
+  const sidecarOpenUrl: string = getSidecarUrl('/open');
+
   const openInEditor = useCallback(
     (evt: React.MouseEvent) => {
       fetch(sidecarOpenUrl, {

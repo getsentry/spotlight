@@ -17,5 +17,9 @@ export const SpotlightContextProvider: React.FC<{
 };
 
 export const useSpotlightContext = () => {
-  return useContext(Context);
+  const context = useContext(Context);
+  const getSidecarUrl = (path = '') => {
+    return new URL(path, context.sidecarUrl).href;
+  };
+  return { ...context, getSidecarUrl };
 };
