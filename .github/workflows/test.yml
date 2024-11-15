@@ -118,20 +118,20 @@ jobs:
 
           cd packages/spotlight
           bin/build.js
-
-          xcrun notarytool submit --force dist/spotlight --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --wait
-          codesign -vvvv -R="notarized" --check-notarization dist/spotlight
-
           chmod +x dist/spotlight
           ./dist/spotlight &
           curl --retry 12 --retry-all-errors 'http://localhost:8969/'
+
+          pigz -9 --zip dist/spotlight
+          xcrun notarytool submit dist/spotlight.zip --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --wait
+          codesign -vvvv -R="notarized" --check-notarization dist/spotlight
 
       - name: Store standalone spotlight binary
         uses: actions/upload-artifact@v4
         with:
           name: spotlight-macos
           path: |
-            packages/spotlight/dist/spotlight
+            packages/spotlight/dist/spotlight.zip
 
   test-docker:
     name: Docker Test
