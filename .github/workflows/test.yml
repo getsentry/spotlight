@@ -123,7 +123,7 @@ jobs:
           curl -f --retry 12 --retry-all-errors -o /dev/null 'http://localhost:8969/'
 
           # Notarize
-          not_id=$(xcrun notarytool submit --force dist/spotlight --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --output-format json --wait | jq .id -r)
+          not_id=$(xcrun notarytool submit --force dist/spotlight --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --no-progress -f json --wait | jq .id -r)
           xcrun notarytool log --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" $not_id
           codesign -vvvv -R="notarized" --check-notarization dist/spotlight
 
