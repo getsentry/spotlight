@@ -120,7 +120,7 @@ jobs:
           bin/build.js
           chmod +x dist/spotlight
           ./dist/spotlight &
-          curl --retry 12 --retry-all-errors -o /dev/null 'http://localhost:8969/'
+          curl -f --retry 12 --retry-all-errors -o /dev/null 'http://localhost:8969/'
 
           # Notarize
           xcrun notarytool submit --force --verbose dist/spotlight.zip --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --output-format json --wait
