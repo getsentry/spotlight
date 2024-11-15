@@ -123,7 +123,7 @@ jobs:
           curl -sf --retry 12 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
 
           # Notarize
-          ditto -c -k –sequesterRsrc –keepParent dist/spotlight dist/spotlight.zip
+          ditto -c -k -–sequesterRsrc dist/spotlight dist/spotlight.zip
           echo "Notarizing..."
           codesign --options runtime -s "$APPLE_TEAM_ID" dist/spotlight.zip
           not_id=$(xcrun notarytool submit --force dist/spotlight.zip --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --no-progress -f json --wait | jq .id -r)
