@@ -119,9 +119,8 @@ jobs:
           cd packages/spotlight
           bin/build.js
 
-          # TODO: Notarization only works on zip files etc, figure this out
-          # xcrun notarytool submit dist/spotlight --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --wait
-          # codesign -vvvv -R="notarized" --check-notarization dist/spotlight
+          xcrun notarytool submit --force dist/spotlight --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --wait
+          codesign -vvvv -R="notarized" --check-notarization dist/spotlight
 
           chmod +x dist/spotlight
           ./dist/spotlight &
