@@ -39,7 +39,9 @@ await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PA
 });
 if (process.platform === 'darwin') {
   console.log('Signing the generated executable...');
-  spawnSync('codesign', ['--force', '-s', process.env.APPLE_TEAM_ID, SPOTLIGHT_BIN_PATH], { stdio: 'inherit' });
+  spawnSync('codesign', ['--force', '--options', 'runtime', '-s', process.env.APPLE_TEAM_ID, SPOTLIGHT_BIN_PATH], {
+    stdio: 'inherit',
+  });
   console.log('Verifying signature...');
   spawnSync('codesign', ['-v', SPOTLIGHT_BIN_PATH, '--verbose'], { stdio: 'inherit' });
   console.log('Signature verified.');
