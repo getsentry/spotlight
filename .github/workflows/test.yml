@@ -122,7 +122,7 @@ jobs:
           ./dist/spotlight &
           curl --retry 12 --retry-all-errors 'http://localhost:8969/'
 
-          pigz -9 --zip dist/spotlight
+          zip dist/spotlight.zip dist/spotlight
           xcrun notarytool submit dist/spotlight.zip --apple-id "$APPLE_ID" --password "$APPLE_ID_PASS" --team-id "$APPLE_TEAM_ID" --wait
           codesign -vvvv -R="notarized" --check-notarization dist/spotlight
 
