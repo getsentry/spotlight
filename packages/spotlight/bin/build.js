@@ -50,7 +50,7 @@ if (process.platform === 'darwin') {
       '-s',
       process.env.APPLE_TEAM_ID,
       '--entitlements',
-      join(__dirname, 'entitlements.plist'),
+      join(import.meta.dirname, 'entitlements.plist'),
       SPOTLIGHT_BIN_PATH,
     ],
     {
