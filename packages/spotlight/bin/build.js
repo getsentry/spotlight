@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { inject } from 'postject';
@@ -26,12 +26,12 @@ const seaConfig = {
   },
 };
 writeFileSync(SEA_CONFIG_PATH, JSON.stringify(seaConfig));
-execSync(process.execPath, ['--experimental-sea-config', SEA_CONFIG_PATH], { stdio: 'inherit' });
+execFileSync(process.execPath, ['--experimental-sea-config', SEA_CONFIG_PATH], { stdio: 'inherit' });
 console.log(`Copying node executable from ${process.execPath} to ${SPOTLIGHT_BIN_PATH}`);
 copyFileSync(process.execPath, SPOTLIGHT_BIN_PATH);
 if (process.platform == 'darwin') {
   console.log('Detected MacOS, removing signature from node executable first');
-  execSync('codesign', ['--remove-signature', SPOTLIGHT_BIN_PATH], { stdio: 'inherit' });
+  execFileSync('codesign', ['--remove-signature', SPOTLIGHT_BIN_PATH], { stdio: 'inherit' });
 }
 await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PATH), {
   sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
@@ -40,7 +40,7 @@ await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PA
 if (process.platform === 'darwin') {
   console.log('Signing the generated executable...');
   // Command yanked from https://github.com/nodejs/node/blob/main/tools/osx-codesign.sh
-  execSync(
+  execFileSync(
     'codesign',
     [
       '-s',
@@ -57,6 +57,6 @@ if (process.platform === 'darwin') {
     },
   );
   console.log('Verifying signature...');
-  execSync('codesign', ['-v', SPOTLIGHT_BIN_PATH, '--verbose'], { stdio: 'inherit' });
+  execFileSync('codesign', ['-v', SPOTLIGHT_BIN_PATH, '--verbose'], { stdio: 'inherit' });
   console.log('Signature verified.');
 }
