@@ -9,16 +9,28 @@ import { getDuration } from '../../../utils/duration';
 import DateTime from '../../DateTime';
 import { ErrorTitle } from '../../events/error/Error';
 import SpanTree from './SpanTree';
+import JsonViewer from '../../../../../components/JsonViewer';
+import { DB_SPAN_REGEX } from '../../../constants';
 
-function formatSpanDescription(desc: string) {
+function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) {
+  if (desc.startsWith('{') || dbType === 'mongodb') {
+    // looks like JSON?
+    try {
+      return <JsonViewer data={JSON.parse(desc)} />;
+    } catch (_err) {
+      // pass
+    }
+  }
+
   if (desc.match(/^(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|ALTER) /i)) {
     try {
-      return formatSQL(desc.replace(/([\s,(])(%[a-z])([\s,)])/gim, '$1?$3'));
+      desc = formatSQL(desc.replace(/([\s,(])(%[a-z])([\s,)])/gim, '$1?$3'), { language: dbType || 'sql' });
     } catch (err) {
       console.error(err);
     }
   }
-  return desc;
+
+  return <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">{desc}</pre>;
 }
 
 function formatValue(name: string, value: unknown): ReactNode {
@@ -27,6 +39,36 @@ function formatValue(name: string, value: unknown): ReactNode {
     return value.toLocaleString();
   }
   return `${value}` as ReactNode;
+}
+
+function SpanDescription({ span }: { span: Span }) {
+  let body = null;
+  let headerText = null;
+  if (span.op && DB_SPAN_REGEX.test(span.op) && span.description) {
+    headerText = 'Query';
+    body = <DBSpanDescription desc={span.description} dbType={span.data?.['db.system'] as string} />;
+  } else if (span.op === 'resource.img' && span.description?.indexOf('/') === 0) {
+    headerText = 'Preview';
+    body = (
+      <a
+        href={span.description}
+        className="border-primary-950 hover:border-primary-700 -m-2 inline-block max-w-sm cursor-pointer rounded border p-1"
+      >
+        <img src={span.description} alt="preview" style={{ maxHeight: 300 }} />
+      </a>
+    );
+  } else if (span.description) {
+    headerText = 'Description';
+    body = <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">{span.description}</pre>;
+  } else {
+    body = <div className="text-primary-300">No description recorded for this span.</div>;
+  }
+  return (
+    <div>
+      {headerText && <h2 className="mb-2 font-bold uppercase">{headerText}</h2>}
+      {body}
+    </div>
+  );
 }
 
 export default function SpanDetails({
@@ -102,28 +144,7 @@ export default function SpanDetails({
           </div>
         )}
 
-        <div>
-          <h2 className="mb-2 font-bold uppercase">Description</h2>
-          {span.description ? (
-            <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">
-              {formatSpanDescription(span.description)}
-            </pre>
-          ) : (
-            <div className="text-primary-300">No description recorded for this span.</div>
-          )}
-        </div>
-
-        {span.op === 'resource.img' && span.description?.indexOf('/') === 0 && (
-          <div>
-            <h2 className="mb-2 font-bold uppercase">Preview</h2>
-            <a
-              href={span.description}
-              className="border-primary-950 hover:border-primary-700 -m-2 inline-block max-w-sm cursor-pointer rounded border p-1"
-            >
-              <img src={span.description} alt="preview" style={{ maxHeight: 300 }} />
-            </a>
-          </div>
-        )}
+        <SpanDescription span={span} />
 
         <div>
           <h2 className="mb-2 font-bold uppercase">Tags</h2>
