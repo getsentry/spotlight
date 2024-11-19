@@ -40,12 +40,10 @@ jobs:
       - name: Build packages
         run: pnpm build
 
-      - name: Store standalone spotlight binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: spotlight-linux
-          path: |
-            packages/spotlight/dist/spotlight
+      - name: Smoke test
+        run: |
+          ./dist/spotlight 2>&1 > /dev/null &
+          curl -sf --retry 12 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
 
       - name: Store Spotlight CJS
         uses: actions/upload-artifact@v4
@@ -55,6 +53,14 @@ jobs:
           path: |
             packages/spotlight/dist/spotlight.cjs
             packages/spotlight/dist/overlay/
+
+      - name: Store standalone spotlight binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotlight-linux
+          if-no-files-found: error
+          path: |
+            packages/spotlight/dist/spotlight
 
       - name: Update build cache
         uses: actions/cache@v4
@@ -148,11 +154,11 @@ jobs:
               - Dockerfile
               - .github/workflows/test.yml
 
-      - name: Get CJS file
+      - name: Get Spotlight binary
         uses: actions/download-artifact@v4
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.docker_any_changed == 'true' }}
         with:
-          name: spotlight-cjs
+          name: spotlight-linux
           path: packages/spotlight/dist
 
       - name: Configure Docker Context
