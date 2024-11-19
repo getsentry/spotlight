@@ -37,6 +37,7 @@ await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PA
   sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
   machoSegmentName: process.platform === 'darwin' ? 'NODE_SEA' : undefined,
 });
+execFileSync('chmod', ['+x', SPOTLIGHT_BIN_PATH]);
 if (process.platform === 'darwin') {
   console.log('Signing the generated executable...');
   // Command yanked from https://github.com/nodejs/node/blob/main/tools/osx-codesign.sh
