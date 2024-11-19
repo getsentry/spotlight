@@ -44,8 +44,8 @@ jobs:
         env:
           SPOTLIGHT_BINARY: ${{ github.workspace }}/packages/spotlight/dist/spotlight
         run: |
-          [ -f "$SPOTLIGHT_BINARY" ] && "$SPOTLIGHT_BINARY" & || { echo "File does not exist or is not a regular file."; exit 1; }
-          curl -sf --retry 12 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
+          [ -f "$SPOTLIGHT_BINARY" ] && "$SPOTLIGHT_BINARY" 2>&1 > /dev/null &
+          curl -sf --retry 3 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
 
       - name: Store Spotlight CJS
         uses: actions/upload-artifact@v4
