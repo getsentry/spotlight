@@ -41,8 +41,10 @@ jobs:
         run: pnpm build
 
       - name: Smoke test
+        env:
+          SPOTLIGHT_BINARY: ${{ github.workspace }}/packages/spotlight/dist/spotlight
         run: |
-          ./dist/spotlight 2>&1 > /dev/null &
+          [ -f "$SPOTLIGHT_BINARY" ] && "$SPOTLIGHT_BINARY" & || { echo "File does not exist or is not a regular file."; exit 1; }
           curl -sf --retry 12 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
 
       - name: Store Spotlight CJS
