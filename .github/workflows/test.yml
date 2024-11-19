@@ -146,6 +146,14 @@ jobs:
           files_yaml: |
             docker:
               - Dockerfile
+              - .github/workflows/test.yml
+
+      - name: Get CJS file
+        uses: actions/download-artifact@v4
+        if: ${{ inputs.force || steps.changed-files-yaml.outputs.docker_any_changed == 'true' }}
+        with:
+          name: spotlight-cjs
+          path: packages/spotlight/dist
 
       - name: Configure Docker Context
         if: ${{ inputs.force || steps.changed-files-yaml.outputs.docker_any_changed == 'true' }}
