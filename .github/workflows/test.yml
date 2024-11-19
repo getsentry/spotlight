@@ -175,6 +175,13 @@ jobs:
           cache-from: type=gha,scope=prod
           cache-to: type=gha,mode=max,scope=prod
           no-cache: ${{ inputs.nocache == 'true' }}
+          tags: ghcr.io/getsentry/spotlight:${{ github.sha }}
+
+      - name: Test Docker Image
+        run: |
+          docker run --rm -d -p 8969:8969 ghcr.io/getsentry/spotlight:${{ github.sha }}
+          curl -sf --retry 3 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
+
 
   test-unit:
     name: Unit Tests
