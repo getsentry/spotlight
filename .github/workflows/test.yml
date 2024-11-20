@@ -135,7 +135,7 @@ jobs:
         with:
           if-no-files-found: error
           name: spotlight-macos
-          path: packages/spotlight/dist/spotlight.zip
+          path: packages/spotlight/dist/spotlight
 
   test-docker:
     name: Docker Test

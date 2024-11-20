@@ -74,43 +74,4 @@ console.log('Created executable.');
 run('chmod', '+x', SPOTLIGHT_BIN_PATH);
 if (process.platform === 'darwin') {
   sign(SPOTLIGHT_BIN_PATH);
-  const zip_path = `${SPOTLIGHT_BIN_PATH}.zip`;
-  run('ditto', '-c', '-k', '--sequesterRsrc', '--keepParent', SPOTLIGHT_BIN_PATH, zip_path);
-  sign(zip_path);
-  console.log('Notarizing...');
-  const notarization_id = JSON.parse(
-    run(
-      'xcrun',
-      'notarytool',
-      'submit',
-      zip_path,
-      '--apple-id',
-      process.env.APPLE_ID,
-      '--password',
-      process.env.APPLE_ID_PASS,
-      '--team-id',
-      process.env.APPLE_TEAM_ID,
-      '--no-progress',
-      '-f',
-      'json',
-      '--wait',
-    ),
-  ).id;
-  const notarization_logs = JSON.parse(
-    run(
-      'xcrun',
-      'notarytool',
-      'log',
-      '--apple-id',
-      process.env.APPLE_ID,
-      '--password',
-      process.env.APPLE_ID_PASS,
-      '--team-id',
-      process.env.APPLE_TEAM_ID,
-      notarization_id,
-    ),
-  );
-  assert(notarization_logs.status === 'Accepted', `Notarization failed: \n${JSON.stringify(notarization_logs)}`);
-  unlinkSync(SPOTLIGHT_BIN_PATH);
-  run('ditto', '-xk', zip_path, '.');
 }
