@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { inject } from 'postject';
+import assert from 'node:assert';
 
 const DIST_DIR = './dist';
 const ASSETS_DIR = join(DIST_DIR, 'overlay');
@@ -25,39 +26,78 @@ const seaConfig = {
     ...Object.fromEntries(Object.values(manifest).map(entry => [entry.file, join(ASSETS_DIR, entry.file)])),
   },
 };
+
+function run(cmd, ...args) {
+  return execFileSync(cmd, args, { stdio: 'inherit' });
+}
+
 writeFileSync(SEA_CONFIG_PATH, JSON.stringify(seaConfig));
-execFileSync(process.execPath, ['--experimental-sea-config', SEA_CONFIG_PATH], { stdio: 'inherit' });
+run(process.execPath, '--experimental-sea-config', SEA_CONFIG_PATH);
 console.log(`Copying node executable from ${process.execPath} to ${SPOTLIGHT_BIN_PATH}`);
 copyFileSync(process.execPath, SPOTLIGHT_BIN_PATH);
-if (process.platform == 'darwin') {
+if (process.platform === 'darwin') {
   console.log('Detected MacOS, removing signature from node executable first');
-  execFileSync('codesign', ['--remove-signature', SPOTLIGHT_BIN_PATH], { stdio: 'inherit' });
+  run('codesign', '--remove-signature', SPOTLIGHT_BIN_PATH);
 }
 await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PATH), {
   sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
   machoSegmentName: process.platform === 'darwin' ? 'NODE_SEA' : undefined,
 });
-execFileSync('chmod', ['+x', SPOTLIGHT_BIN_PATH]);
+run('chmod', '+x', SPOTLIGHT_BIN_PATH);
 if (process.platform === 'darwin') {
+  const zip_path = `${SPOTLIGHT_BIN_PATH}.zip`;
+  run('ditto', '-c', '-k', '--sequesterRsrc', '--keepParent', SPOTLIGHT_BIN_PATH, zip_path);
   console.log('Signing the generated executable...');
   // Command yanked from https://github.com/nodejs/node/blob/main/tools/osx-codesign.sh
-  execFileSync(
+  run(
     'codesign',
-    [
-      '-s',
-      process.env.APPLE_TEAM_ID,
-      '--timestamp',
-      '--options',
-      'runtime',
-      '--entitlements',
-      join(import.meta.dirname, 'entitlements.plist'),
-      SPOTLIGHT_BIN_PATH,
-    ],
-    {
-      stdio: 'inherit',
-    },
+    '--deep',
+    '-s',
+    process.env.APPLE_TEAM_ID,
+    '--timestamp',
+    '--options',
+    'runtime',
+    '--entitlements',
+    join(import.meta.dirname, 'entitlements.plist'),
+    zip_path,
   );
+  console.log('Notarizing...');
+  const notarization_id = JSON.parse(
+    run(
+      'xcrun',
+      'notarytool',
+      'submit',
+      zip_path,
+      '--apple-id',
+      process.env.APPLE_ID,
+      '--password',
+      process.env.APPLE_ID_PASS,
+      '--team-id',
+      process.env.APPLE_TEAM_ID,
+      '--no-progress',
+      '-f',
+      'json',
+      '--wait',
+    ),
+  ).id;
+  const notarization_logs = JSON.parse(
+    run(
+      'xcrun',
+      'notarytool',
+      'log',
+      '--apple-id',
+      process.env.APPLE_ID,
+      '--password',
+      process.env.APPLE_ID_PASS,
+      '--team-id',
+      process.env.APPLE_TEAM_ID,
+      notarization_id,
+    ),
+  );
+  assert(notarization_logs.status === 'Accepted', `Notarization failed: \n${JSON.stringify(notarization_logs)}`);
   console.log('Verifying signature...');
-  execFileSync('codesign', ['-v', SPOTLIGHT_BIN_PATH, '--verbose'], { stdio: 'inherit' });
+  run('codesign', '-vvvv', '-R="notarized"', '--check-notarization', zip_path);
   console.log('Signature verified.');
+  unlinkSync(SPOTLIGHT_BIN_PATH);
+  run('ditto', '-xk', zip_path, '.');
 }

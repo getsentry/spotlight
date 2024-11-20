@@ -126,7 +126,6 @@ jobs:
 
           cd packages/spotlight
           bin/build.js
-          chmod +x dist/spotlight
 
           ./dist/spotlight 2>&1 > /dev/null &
           curl -sf --retry 12 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
@@ -136,7 +135,7 @@ jobs:
         with:
           if-no-files-found: error
           name: spotlight-macos
-          path: packages/spotlight/dist/spotlight
+          path: packages/spotlight/dist/spotlight.zip
 
   test-docker:
     name: Docker Test
