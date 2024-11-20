@@ -22,15 +22,16 @@ function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) 
     }
   }
 
+  let description = desc;
   if (desc.match(/^(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|ALTER) /i)) {
     try {
-      desc = formatSQL(desc.replace(/([\s,(])(%[a-z])([\s,)])/gim, '$1?$3'), { language: dbType || 'sql' });
+      description = formatSQL(desc.replace(/([\s,(])(%[a-z])([\s,)])/gim, '$1?$3'), { language: dbType || 'sql' });
     } catch (err) {
       console.error(err);
     }
   }
 
-  return <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">{desc}</pre>;
+  return <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">{description}</pre>;
 }
 
 function formatValue(name: string, value: unknown): ReactNode {
