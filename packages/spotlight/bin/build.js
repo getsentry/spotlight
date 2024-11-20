@@ -111,9 +111,6 @@ if (process.platform === 'darwin') {
     ),
   );
   assert(notarization_logs.status === 'Accepted', `Notarization failed: \n${JSON.stringify(notarization_logs)}`);
-  console.log('Stapling...');
-  run('xcrun', 'stapler', 'staple', zip_path);
-  console.log('Stapled');
   unlinkSync(SPOTLIGHT_BIN_PATH);
   run('ditto', '-xk', zip_path, '.');
 }
