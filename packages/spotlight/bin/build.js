@@ -117,7 +117,7 @@ if (process.platform === 'darwin') {
     'spctl',
     '--assess',
     '--type',
-    'execute',
+    'install',
     '--context',
     'context:primary-signature',
     '--ignore-cache',
