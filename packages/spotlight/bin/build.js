@@ -76,7 +76,6 @@ if (process.platform === 'darwin') {
   sign(SPOTLIGHT_BIN_PATH);
   const zip_path = `${SPOTLIGHT_BIN_PATH}.zip`;
   run('ditto', '-c', '-k', '--sequesterRsrc', SPOTLIGHT_BIN_PATH, zip_path);
-  sign(zip_path);
   console.log('Notarizing...');
   const notarization_id = JSON.parse(
     run(
