@@ -28,7 +28,15 @@ const seaConfig = {
 };
 
 function run(cmd, ...args) {
-  const output = execFileSync(cmd, args, { encoding: 'utf8' });
+  let output;
+  try {
+    output = execFileSync(cmd, args, { encoding: 'utf8' });
+  } catch (err) {
+    console.error(err.stdout);
+    console.error(err.stderr);
+    process.exit(1);
+    return;
+  }
   console.log(output);
   return output;
 }
@@ -108,6 +116,8 @@ if (process.platform === 'darwin') {
     'xcrun',
     'spctl',
     '--assess',
+    '--type',
+    'open',
     '--context',
     'context:primary-signature',
     '--ignore-cache',
