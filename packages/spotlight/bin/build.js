@@ -41,10 +41,12 @@ if (process.platform === 'darwin') {
   console.log('Detected MacOS, removing signature from node executable first');
   run('codesign', '--remove-signature', SPOTLIGHT_BIN_PATH);
 }
+console.log('Injecting spotlight blob into node executable...');
 await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PATH), {
   sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
   machoSegmentName: process.platform === 'darwin' ? 'NODE_SEA' : undefined,
 });
+console.log('Created executable.');
 run('chmod', '+x', SPOTLIGHT_BIN_PATH);
 if (process.platform === 'darwin') {
   console.log('Signing the generated executable...');
