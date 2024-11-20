@@ -33,6 +33,22 @@ function run(cmd, ...args) {
   return output;
 }
 
+function sign(path) {
+  console.log(`Signing ${path}...`);
+  // Command yanked from https://github.com/nodejs/node/blob/main/tools/osx-codesign.sh
+  return run(
+    'codesign',
+    '-s',
+    process.env.APPLE_TEAM_ID,
+    '--timestamp',
+    '--options',
+    'runtime',
+    '--entitlements',
+    join(import.meta.dirname, 'entitlements.plist'),
+    path,
+  );
+}
+
 writeFileSync(SEA_CONFIG_PATH, JSON.stringify(seaConfig));
 run(process.execPath, '--experimental-sea-config', SEA_CONFIG_PATH);
 console.log(`Copying node executable from ${process.execPath} to ${SPOTLIGHT_BIN_PATH}`);
@@ -49,21 +65,10 @@ await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PA
 console.log('Created executable.');
 run('chmod', '+x', SPOTLIGHT_BIN_PATH);
 if (process.platform === 'darwin') {
-  console.log('Signing the generated executable...');
-  // Command yanked from https://github.com/nodejs/node/blob/main/tools/osx-codesign.sh
-  run(
-    'codesign',
-    '-s',
-    process.env.APPLE_TEAM_ID,
-    '--timestamp',
-    '--options',
-    'runtime',
-    '--entitlements',
-    join(import.meta.dirname, 'entitlements.plist'),
-    SPOTLIGHT_BIN_PATH,
-  );
+  sign(SPOTLIGHT_BIN_PATH);
   const zip_path = `${SPOTLIGHT_BIN_PATH}.zip`;
   run('ditto', '-c', '-k', '--sequesterRsrc', '--keepParent', SPOTLIGHT_BIN_PATH, zip_path);
+  sign(zip_path);
   console.log('Notarizing...');
   const notarization_id = JSON.parse(
     run(

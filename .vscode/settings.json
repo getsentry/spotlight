@@ -11,6 +11,7 @@
     "getsentry",
     "iife",
     "nextjs",
+    "notarytool",
     "outro",
     "pageload",
     "postject",
@@ -20,6 +21,7 @@
     "treeshake",
     "ttfb",
     "uuidv",
-    "webvitals"
+    "webvitals",
+    "xcrun"
   ]
 }
