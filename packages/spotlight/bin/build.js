@@ -51,7 +51,6 @@ if (process.platform === 'darwin') {
   // Command yanked from https://github.com/nodejs/node/blob/main/tools/osx-codesign.sh
   run(
     'codesign',
-    '--deep',
     '-s',
     process.env.APPLE_TEAM_ID,
     '--timestamp',
