@@ -96,9 +96,18 @@ if (process.platform === 'darwin') {
     ),
   );
   assert(notarization_logs.status === 'Accepted', `Notarization failed: \n${JSON.stringify(notarization_logs)}`);
-  console.log('Verifying signature...');
-  run('codesign', '-vvvv', '-R="notarized"', '--check-notarization', zip_path);
-  console.log('Signature verified.');
+  console.log('Verifying notarization...');
+  run(
+    'xcrun',
+    'spctl',
+    '--assess',
+    '--context',
+    'context:primary-signature',
+    '--ignore-cache',
+    '--verbose=2',
+    zip_path,
+  );
+  console.log('Notarization verified.');
   console.log('Stapling...');
   run('xcrun', 'stapler', 'staple', zip_path);
   console.log('Stapled');
