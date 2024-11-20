@@ -111,6 +111,7 @@ if (process.platform === 'darwin') {
   );
   assert(notarization_logs.status === 'Accepted', `Notarization failed: \n${JSON.stringify(notarization_logs)}`);
   console.log('Stapling...');
+  run('chmod', '777', SPOTLIGHT_BIN_PATH);
   run('xcrun', 'stapler', 'staple', SPOTLIGHT_BIN_PATH);
   console.log('Stapled');
   console.log('Verifying notarization...');
