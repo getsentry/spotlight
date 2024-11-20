@@ -28,7 +28,9 @@ const seaConfig = {
 };
 
 function run(cmd, ...args) {
-  return execFileSync(cmd, args, { stdio: 'inherit' });
+  const output = execFileSync(cmd, args, { encoding: 'utf8' });
+  console.log(output);
+  return output;
 }
 
 writeFileSync(SEA_CONFIG_PATH, JSON.stringify(seaConfig));
@@ -45,8 +47,6 @@ await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PA
 });
 run('chmod', '+x', SPOTLIGHT_BIN_PATH);
 if (process.platform === 'darwin') {
-  const zip_path = `${SPOTLIGHT_BIN_PATH}.zip`;
-  run('ditto', '-c', '-k', '--sequesterRsrc', '--keepParent', SPOTLIGHT_BIN_PATH, zip_path);
   console.log('Signing the generated executable...');
   // Command yanked from https://github.com/nodejs/node/blob/main/tools/osx-codesign.sh
   run(
@@ -59,8 +59,10 @@ if (process.platform === 'darwin') {
     'runtime',
     '--entitlements',
     join(import.meta.dirname, 'entitlements.plist'),
-    zip_path,
+    SPOTLIGHT_BIN_PATH,
   );
+  const zip_path = `${SPOTLIGHT_BIN_PATH}.zip`;
+  run('ditto', '-c', '-k', '--sequesterRsrc', '--keepParent', SPOTLIGHT_BIN_PATH, zip_path);
   console.log('Notarizing...');
   const notarization_id = JSON.parse(
     run(
@@ -98,6 +100,9 @@ if (process.platform === 'darwin') {
   console.log('Verifying signature...');
   run('codesign', '-vvvv', '-R="notarized"', '--check-notarization', zip_path);
   console.log('Signature verified.');
+  console.log('Stapling...');
+  run('xcrun', 'stapler', 'staple', zip_path);
+  console.log('Stapled');
   unlinkSync(SPOTLIGHT_BIN_PATH);
   run('ditto', '-xk', zip_path, '.');
 }

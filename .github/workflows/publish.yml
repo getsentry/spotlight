@@ -171,7 +171,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: packages/spotlight/dist/spotlight
+          file: packages/spotlight/dist/spotlight.zip
           file_name: spotlight-macos-arm64
           tag: ${{ steps.latest_release_info.outputs.tag_name }}
           make_latest: false
