@@ -238,6 +238,9 @@ jobs:
     name: E2E Tests
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node_version: [18, 20, 22]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -249,7 +252,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: 'package.json'
+          node-version: ${{ matrix.version }}
           cache: 'pnpm'
 
       - name: Setup dependencies
