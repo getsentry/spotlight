@@ -3,8 +3,6 @@ name: MacOS Single Executable Node App
 on:
   workflow_call:
     secrets:
-      GITHUB_TOKEN:
-        required: true
       CSC_LINK:
         required: true
       CSC_KEY_PASSWORD:
