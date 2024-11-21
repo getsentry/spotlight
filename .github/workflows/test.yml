@@ -71,71 +71,9 @@ jobs:
           key: ${{ env.BUILD_CACHE_KEY }}
 
   build-macos-binary:
-    name: MacOS Single Executable Node App
-    runs-on: macos-latest
     needs: build
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: 'package.json'
-          cache: 'pnpm'
-
-      - name: Setup dependencies
-        run: pnpm install
-
-      - name: Get CJS file
-        uses: actions/download-artifact@v4
-        with:
-          name: spotlight-cjs
-          path: packages/spotlight/dist
-
-      - name: Create MacOS Binary
-        env:
-          APPLE_CERT_DATA: ${{ secrets.CSC_LINK }}
-          APPLE_CERT_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.TEAMID }}
-          APPLE_ID:  ${{ secrets.APPLEID }}
-          APPLE_ID_PASS:  ${{ secrets.APPLEIDPASS }}
-        # Code below lifted from https://github.com/lando/code-sign-action/blob/0779d463b08142ea9cb9bc87dc755670a8675c30/action.yml
-        run: |
-          # Export certs
-          echo "$APPLE_CERT_DATA" | base64 --decode > /tmp/certs.p12
-
-          # Create keychain
-          security create-keychain -p actions macos-build.keychain
-          security default-keychain -s macos-build.keychain
-          security unlock-keychain -p actions macos-build.keychain
-          security set-keychain-settings -t 3600 -u macos-build.keychain
-
-          # Import certs to keychain
-          security import /tmp/certs.p12 -k ~/Library/Keychains/macos-build.keychain -P "$APPLE_CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/productsign
-
-          # Key signing
-          security set-key-partition-list -S apple-tool:,apple: -s -k actions macos-build.keychain
-
-          # Verify keychain identity
-          security find-identity -v macos-build.keychain | grep "$APPLE_TEAM_ID" | grep "Developer ID Application"
-
-          cd packages/spotlight
-          bin/build.js
-
-          ./dist/spotlight 2>&1 > /dev/null &
-          curl -sf --retry 12 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
-
-      - name: Store standalone spotlight binary
-        uses: actions/upload-artifact@v4
-        with:
-          if-no-files-found: error
-          name: spotlight-macos
-          path: packages/spotlight/dist/spotlight
+    uses: ./.github/workflows/macos-binary.yml
+    secrets: inherit
 
   test-docker:
     name: Docker Test

@@ -1,6 +1,8 @@
 {
   "editor.formatOnSave": true,
   "cSpell.words": [
+    "APPLEID",
+    "APPLEIDPASS",
     "Astro",
     "Astro's",
     "astrojs",
@@ -18,6 +20,7 @@
     "spotlightjs",
     "svgr",
     "tailwindcss",
+    "TEAMID",
     "treeshake",
     "ttfb",
     "uuidv",
