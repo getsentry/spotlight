@@ -47,7 +47,7 @@ jobs:
           mv rcodesign /usr/local/bin/rcodesign
           # Export certs
           echo "$APPLE_CERT_DATA" | base64 --decode > /tmp/certs.p12
-          echo '/tmp/certs.p12' >> $GITHUB_ENV
+          echo 'APPLE_CERT_PATH=/tmp/certs.p12' >> $GITHUB_ENV
 
       - name: Build packages
         env:
