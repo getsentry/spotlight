@@ -68,7 +68,7 @@ async function getNodeBinary(platform, targetPath = DIST_DIR) {
     sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'node.exe');
     targetFile = join(targetPath, `spotlight-${platform}.exe`);
   } else {
-    await run('tar', '-xf', stream.path, '-C', tmpDir);
+    await run('tar', '-xzf', stream.path, '-C', tmpDir);
     sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'bin', 'node');
     targetFile = join(targetPath, `spotlight-${platform}`);
   }
@@ -79,15 +79,17 @@ async function getNodeBinary(platform, targetPath = DIST_DIR) {
 
 async function sign(path) {
   console.log(`Signing ${path}...`);
-  // Command yanked from https://github.com/nodejs/node/blob/main/tools/osx-codesign.sh
   return await run(
-    'codesign',
-    '-s',
+    'rcodesign',
+    'sign',
+    '--team-name',
     process.env.APPLE_TEAM_ID,
-    '--timestamp',
-    '--options',
-    'runtime',
-    '--entitlements',
+    '--p12-file',
+    process.env.APPLE_CERT_PATH,
+    '--p12-password',
+    process.env.APPLE_CERT_PASSWORD,
+    '--for-notarization',
+    '-e',
     join(import.meta.dirname, 'entitlements.plist'),
     path,
   );
@@ -98,11 +100,6 @@ await run(process.execPath, '--experimental-sea-config', SEA_CONFIG_PATH);
 await Promise.all(
   PLATFORMS.map(async platform => {
     const nodeBinary = await getNodeBinary(platform);
-    if (platform.startsWith('darwin')) {
-      console.log('Detected MacOS, removing signature from node executable first');
-      // TODO: Replace below with a unix version
-      await run('codesign', '--remove-signature', nodeBinary);
-    }
     console.log('Injecting spotlight blob into node executable...');
     await inject(nodeBinary, 'NODE_SEA_BLOB', await readFile(SPOTLIGHT_BLOB_PATH), {
       sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
