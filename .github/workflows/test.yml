@@ -85,21 +85,6 @@ jobs:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
 
-  test-docker:
-    name: Docker Test
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get Spotlight binary
-        uses: actions/download-artifact@v4
-        with:
-          name: spotlight
-          path: packages/spotlight/dist
-
       - name: Rename x64 to amd64
         # This is because Node ecosystem uses x64, but Docker uses amd64 :shrug:
         run: mv packages/spotlight/dist/spotlight-linux-x64 packages/spotlight/dist/spotlight-linux-amd64
