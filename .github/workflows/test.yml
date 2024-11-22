@@ -39,9 +39,7 @@ jobs:
 
       - name: Setup Apple Codesign
         env:
-          APPLE_TEAM_ID: ${{ secrets.TEAMID }}
           APPLE_CERT_DATA: ${{ secrets.CSC_LINK }}
-          APPLE_CERT_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: |
           curl -L 'https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.28.0/apple-codesign-0.28.0-x86_64-unknown-linux-musl.tar.gz' | tar -xz --strip-components=1
           mv rcodesign /usr/local/bin/rcodesign
@@ -52,6 +50,8 @@ jobs:
       - name: Build packages
         env:
           BUILD_PLATFORMS: 'linux-x64,linux-arm64,win-x64,darwin-x64,darwin-arm64'
+          APPLE_CERT_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.TEAMID }}
         run: pnpm build
 
       - name: Smoke test
