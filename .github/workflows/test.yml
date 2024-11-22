@@ -64,7 +64,7 @@ jobs:
           $SPOTLIGHT_BINARY &
           SPOTLIGHT_PID=$!
           curl -sf --retry 3 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
-          kill -9 $SPOTLIGHT_PID
+          kill -2 $SPOTLIGHT_PID
 
       - name: Store Spotlight CJS
         uses: actions/upload-artifact@v4
