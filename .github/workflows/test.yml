@@ -60,10 +60,11 @@ jobs:
         run: |
           # Lowercase the binary name because `runner.os` and `runner.arch` are uppercase :facepalm:
           SPOTLIGHT_BINARY=$(echo "$SPOTLIGHT_BINARY" | tr '[:upper:]' '[:lower:]')
-          [ -f "$SPOTLIGHT_BINARY" ] && "$SPOTLIGHT_BINARY" 2>&1 > /dev/null &
+          [ -f "$SPOTLIGHT_BINARY" ]
+          $SPOTLIGHT_BINARY &
           SPOTLIGHT_PID=$!
           curl -sf --retry 3 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
-          kill -9 "$SPOTLIGHT_PID"
+          kill -9 $SPOTLIGHT_PID
 
       - name: Store Spotlight CJS
         uses: actions/upload-artifact@v4

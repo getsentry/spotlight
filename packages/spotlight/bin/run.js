@@ -29,7 +29,7 @@ for (const entry of entries) {
 }
 
 const exit = () => {
-  console.log('Exiting...');
+  console.log('[spotlight] Exiting...');
   process.exit();
 };
 process.on('SIGTERM', exit);
