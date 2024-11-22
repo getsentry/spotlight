@@ -73,10 +73,9 @@ jobs:
       - name: Store standalone spotlight binary
         uses: actions/upload-artifact@v4
         with:
-          name: spotlight-linux
+          name: spotlight
           if-no-files-found: error
-          path: |
-            packages/spotlight/dist/spotlight
+          path: packages/spotlight/dist/spotlight-*
 
       - name: Gets latest created release info
         id: latest_release_info
@@ -88,8 +87,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: packages/spotlight/dist/spotlight
-          file_name: spotlight-linux-x64
+          file_glob: true
+          file: packages/spotlight/dist/spotlight-*
           tag: ${{ steps.latest_release_info.outputs.tag_name }}
           make_latest: false
 
@@ -192,7 +191,7 @@ jobs:
       - name: Get Spotlight binary
         uses: actions/download-artifact@v4
         with:
-          name: spotlight-linux
+          name: spotlight
           path: packages/spotlight/dist
 
       - name: Login to GHCR
