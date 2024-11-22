@@ -67,12 +67,13 @@ async function getNodeBinary(platform, targetPath = DIST_DIR) {
     await run('unzip', '-qq', stream.path, '-d', tmpDir);
     sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'node.exe');
     targetFile = join(targetPath, `spotlight-${platform}.exe`);
+    await run('osslsigncode', 'remove-signature', '-in', sourceFile, '-out', targetFile);
   } else {
     await run('tar', '-xf', stream.path, '-C', tmpDir);
     sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'bin', 'node');
     targetFile = join(targetPath, `spotlight-${platform}`);
+    await copyFile(sourceFile, targetFile);
   }
-  await copyFile(sourceFile, targetFile);
   await rm(tmpDir, { recursive: true });
   return targetFile;
 }
