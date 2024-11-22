@@ -3,4 +3,5 @@
 '@spotlightjs/sidecar': minor
 ---
 
-Create a self-contained executable for Linux x64 and macOS arm64 for Spotlight
+Create a self-contained executable for Linux, macOS, and Windows for Spotlight.
+Docker images now use these binaries instead of a Node build in the image.
