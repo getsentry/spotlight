@@ -89,8 +89,8 @@ await Promise.all(
     });
     console.log('Created executable.');
     await run('chmod', '+x', nodeBinary);
-    if (platform === 'darwin') {
-      console.log(`Signing ${path}...`);
+    if (platform.startsWith('darwin')) {
+      console.log(`Signing ${nodeBinary}...`);
       await run(
         'rcodesign',
         'sign',
