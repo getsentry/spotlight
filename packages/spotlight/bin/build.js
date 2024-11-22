@@ -64,7 +64,7 @@ async function getNodeBinary(platform, targetPath = DIST_DIR) {
   let sourceFile;
   let targetFile;
   if (platform.startsWith('win')) {
-    await run('unzip', stream.path, '-d', tmpDir);
+    await run('unzip', '-qq', stream.path, '-d', tmpDir);
     sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'node.exe');
     targetFile = join(targetPath, `spotlight-${platform}.exe`);
   } else {
