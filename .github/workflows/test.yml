@@ -87,6 +87,10 @@ jobs:
           name: spotlight
           path: packages/spotlight/dist
 
+      - name: Rename x64 to amd64
+        # This is because Node ecosystem uses x64, but Docker uses amd64 :shrug:
+        run: mv packages/spotlight/dist/spotlight-linux-x64 packages/spotlight/dist/spotlight-linux-amd64
+
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
