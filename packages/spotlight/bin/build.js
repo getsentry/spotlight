@@ -77,24 +77,6 @@ async function getNodeBinary(platform, targetPath = DIST_DIR) {
   return targetFile;
 }
 
-async function sign(path) {
-  console.log(`Signing ${path}...`);
-  return await run(
-    'rcodesign',
-    'sign',
-    '--team-name',
-    process.env.APPLE_TEAM_ID,
-    '--p12-file',
-    process.env.APPLE_CERT_PATH,
-    '--p12-password',
-    process.env.APPLE_CERT_PASSWORD,
-    '--for-notarization',
-    '-e',
-    join(import.meta.dirname, 'entitlements.plist'),
-    path,
-  );
-}
-
 await writeFile(SEA_CONFIG_PATH, JSON.stringify(seaConfig));
 await run(process.execPath, '--experimental-sea-config', SEA_CONFIG_PATH);
 await Promise.all(
@@ -107,8 +89,22 @@ await Promise.all(
     });
     console.log('Created executable.');
     await run('chmod', '+x', nodeBinary);
-    if (process.platform === 'darwin') {
-      await sign(nodeBinary);
+    if (platform === 'darwin') {
+      console.log(`Signing ${path}...`);
+      await run(
+        'rcodesign',
+        'sign',
+        '--team-name',
+        process.env.APPLE_TEAM_ID,
+        '--p12-file',
+        process.env.APPLE_CERT_PATH,
+        '--p12-password',
+        process.env.APPLE_CERT_PASSWORD,
+        '--for-notarization',
+        '-e',
+        join(import.meta.dirname, 'entitlements.plist'),
+        nodeBinary,
+      );
     }
   }),
 );
