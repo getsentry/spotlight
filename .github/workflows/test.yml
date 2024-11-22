@@ -82,7 +82,6 @@ jobs:
 
       - name: Get Spotlight binary
         uses: actions/download-artifact@v4
-        if: ${{ inputs.force || steps.changed-files-yaml.outputs.docker_any_changed == 'true' }}
         with:
           name: spotlight
           path: packages/spotlight/dist
