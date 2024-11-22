@@ -1,9 +1,15 @@
 #!/usr/bin/env node
-import { execFileSync } from 'node:child_process';
-import { copyFileSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { promisify } from 'node:util';
+import { execFile as execFileCb } from 'node:child_process';
+import { createWriteStream } from 'node:fs';
+import { Readable } from 'node:stream';
+import { finished } from 'node:stream/promises';
 import { join } from 'node:path';
+import { mkdtemp, copyFile, readFile, writeFile, rm } from 'node:fs/promises';
+import { platform, tmpdir } from 'node:os';
 import { inject } from 'postject';
-import assert from 'node:assert';
+
+const execFile = promisify(execFileCb);
 
 const DIST_DIR = './dist';
 const ASSETS_DIR = join(DIST_DIR, 'overlay');
@@ -12,14 +18,15 @@ const MANIFEST_PATH = join(ASSETS_DIR, MANIFEST_NAME);
 const ENTRY_POINT_NAME = 'src/index.html';
 const SEA_CONFIG_PATH = join(DIST_DIR, 'sea-config.json');
 const SPOTLIGHT_BLOB_PATH = join(DIST_DIR, 'spotlight.blob');
-const SPOTLIGHT_BIN_PATH = join(DIST_DIR, 'spotlight');
-const manifest = JSON.parse(readFileSync(MANIFEST_PATH));
+const NODE_VERSION = '22.11.0';
+const PLATFORMS = (process.env.BUILD_PLATFORMS || 'linux-x64,linux-arm64,win-x64').split(',').map(p => p.trim());
+const manifest = JSON.parse(await readFile(MANIFEST_PATH));
 const seaConfig = {
   main: join(DIST_DIR, 'spotlight.cjs'),
   output: SPOTLIGHT_BLOB_PATH,
   disableExperimentalSEAWarning: true,
   useSnapshot: false,
-  useCodeCache: true,
+  useCodeCache: false, // We do cross-compiling so disable this
   assets: {
     [MANIFEST_NAME]: MANIFEST_PATH,
     [ENTRY_POINT_NAME]: join(ASSETS_DIR, ENTRY_POINT_NAME),
@@ -27,24 +34,53 @@ const seaConfig = {
   },
 };
 
-function run(cmd, ...args) {
+async function run(cmd, ...args) {
   let output;
   try {
-    output = execFileSync(cmd, args, { encoding: 'utf8' });
+    output = await execFile(cmd, args, { encoding: 'utf8' });
   } catch (err) {
+    console.error(`Failed to \`run ${cmd} ${args.join(' ')}\``);
     console.error(err.stdout);
     console.error(err.stderr);
     process.exit(1);
-    return;
   }
-  console.log(output);
-  return output;
+  if (output.stdout.trim()) {
+    console.log(output.stdout);
+  } else {
+    console.log(`> ${[cmd, ...args].join(' ')}`);
+  }
+  return output.stdout;
 }
 
-function sign(path) {
+async function getNodeBinary(platform, targetPath = DIST_DIR) {
+  const suffix = platform.startsWith('win') ? 'zip' : 'tar.xz';
+  const remoteArchiveName = `node-v${NODE_VERSION}-${platform}.${suffix}`;
+  const url = `https://nodejs.org/dist/v${NODE_VERSION}/${remoteArchiveName}`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`Failed to fetch ${url}`);
+  const tmpDir = await mkdtemp(join(tmpdir(), remoteArchiveName));
+  const stream = createWriteStream(join(tmpDir, remoteArchiveName));
+  await finished(Readable.fromWeb(resp.body).pipe(stream));
+  let sourceFile;
+  let targetFile;
+  if (platform.startsWith('win')) {
+    await run('unzip', stream.path, '-d', tmpDir);
+    sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'node.exe');
+    targetFile = join(targetPath, `spotlight-${platform}.exe`);
+  } else {
+    await run('tar', '-xf', stream.path, '-C', tmpDir);
+    sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'bin', 'node');
+    targetFile = join(targetPath, `spotlight-${platform}`);
+  }
+  await copyFile(sourceFile, targetFile);
+  await rm(tmpDir, { recursive: true });
+  return targetFile;
+}
+
+async function sign(path) {
   console.log(`Signing ${path}...`);
   // Command yanked from https://github.com/nodejs/node/blob/main/tools/osx-codesign.sh
-  return run(
+  return await run(
     'codesign',
     '-s',
     process.env.APPLE_TEAM_ID,
@@ -57,58 +93,25 @@ function sign(path) {
   );
 }
 
-writeFileSync(SEA_CONFIG_PATH, JSON.stringify(seaConfig));
-run(process.execPath, '--experimental-sea-config', SEA_CONFIG_PATH);
-console.log(`Copying node executable from ${process.execPath} to ${SPOTLIGHT_BIN_PATH}`);
-copyFileSync(process.execPath, SPOTLIGHT_BIN_PATH);
-if (process.platform === 'darwin') {
-  console.log('Detected MacOS, removing signature from node executable first');
-  run('codesign', '--remove-signature', SPOTLIGHT_BIN_PATH);
-}
-console.log('Injecting spotlight blob into node executable...');
-await inject(SPOTLIGHT_BIN_PATH, 'NODE_SEA_BLOB', readFileSync(SPOTLIGHT_BLOB_PATH), {
-  sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
-  machoSegmentName: process.platform === 'darwin' ? 'NODE_SEA' : undefined,
-});
-console.log('Created executable.');
-run('chmod', '+x', SPOTLIGHT_BIN_PATH);
-if (process.platform === 'darwin') {
-  sign(SPOTLIGHT_BIN_PATH);
-  const zip_path = `${SPOTLIGHT_BIN_PATH}.zip`;
-  run('ditto', '-c', '-k', '--sequesterRsrc', SPOTLIGHT_BIN_PATH, zip_path);
-  console.log('Notarizing...');
-  const notarization_id = JSON.parse(
-    run(
-      'xcrun',
-      'notarytool',
-      'submit',
-      zip_path,
-      '--apple-id',
-      process.env.APPLE_ID,
-      '--password',
-      process.env.APPLE_ID_PASS,
-      '--team-id',
-      process.env.APPLE_TEAM_ID,
-      '--no-progress',
-      '-f',
-      'json',
-      '--wait',
-    ),
-  ).id;
-  const notarization_logs = JSON.parse(
-    run(
-      'xcrun',
-      'notarytool',
-      'log',
-      '--apple-id',
-      process.env.APPLE_ID,
-      '--password',
-      process.env.APPLE_ID_PASS,
-      '--team-id',
-      process.env.APPLE_TEAM_ID,
-      notarization_id,
-    ),
-  );
-  assert(notarization_logs.status === 'Accepted', `Notarization failed: \n${JSON.stringify(notarization_logs)}`);
-  unlinkSync(zip_path);
-}
+await writeFile(SEA_CONFIG_PATH, JSON.stringify(seaConfig));
+await run(process.execPath, '--experimental-sea-config', SEA_CONFIG_PATH);
+await Promise.all(
+  PLATFORMS.map(async platform => {
+    const nodeBinary = await getNodeBinary(platform);
+    if (platform.startsWith('darwin')) {
+      console.log('Detected MacOS, removing signature from node executable first');
+      // TODO: Replace below with a unix version
+      await run('codesign', '--remove-signature', nodeBinary);
+    }
+    console.log('Injecting spotlight blob into node executable...');
+    await inject(nodeBinary, 'NODE_SEA_BLOB', await readFile(SPOTLIGHT_BLOB_PATH), {
+      sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
+      machoSegmentName: process.platform === 'darwin' ? 'NODE_SEA' : undefined,
+    });
+    console.log('Created executable.');
+    await run('chmod', '+x', nodeBinary);
+    if (process.platform === 'darwin') {
+      await sign(nodeBinary);
+    }
+  }),
+);
