@@ -8,7 +8,6 @@ import { join } from 'node:path';
 import { mkdtemp, copyFile, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { inject } from 'postject';
-import { unsign } from 'macho-unsign';
 
 const execFile = promisify(execFileCb);
 
@@ -73,13 +72,7 @@ async function getNodeBinary(platform, targetPath = DIST_DIR) {
     sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'bin', 'node');
     targetFile = join(targetPath, `spotlight-${platform}`);
   }
-  if (platform.startsWith('darwin')) {
-    const unsigned = unsign(await readFile(sourceFile));
-    await writeFile(targetFile, Buffer.from(unsigned));
-    console.log('Signature removed from macOS binary', targetFile);
-  } else {
-    await copyFile(sourceFile, targetFile);
-  }
+  await copyFile(sourceFile, targetFile);
   await rm(tmpDir, { recursive: true });
   return targetFile;
 }
