@@ -28,4 +28,10 @@ for (const entry of entries) {
   filesToServe[entry.file] = readAsset(entry.file);
 }
 
+const exit = () => {
+  console.log('Exiting...');
+  process.exit();
+};
+process.on('SIGTERM', exit);
+process.on('SIGINT', exit);
 setupSidecar({ port, basePath, filesToServe });
