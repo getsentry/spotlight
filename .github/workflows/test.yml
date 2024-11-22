@@ -42,7 +42,7 @@ jobs:
 
       - name: Smoke test
         env:
-          SPOTLIGHT_BINARY: ${{ github.workspace }}/packages/spotlight/dist/spotlight
+          SPOTLIGHT_BINARY: ${{ github.workspace }}/packages/spotlight/dist/spotlight-${{ runner.os }}-${{ runner.arch }}
         run: |
           [ -f "$SPOTLIGHT_BINARY" ] && "$SPOTLIGHT_BINARY" 2>&1 > /dev/null &
           curl -sf --retry 3 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
