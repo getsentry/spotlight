@@ -92,7 +92,7 @@ await Promise.all(
     console.log('Injecting spotlight blob into node executable...');
     await inject(nodeBinary, 'NODE_SEA_BLOB', await readFile(SPOTLIGHT_BLOB_PATH), {
       sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
-      machoSegmentName: process.platform === 'darwin' ? 'NODE_SEA' : undefined,
+      machoSegmentName: platform.startsWith('darwin') ? 'NODE_SEA' : undefined,
     });
     console.log('Created executable', nodeBinary);
     await run('chmod', '+x', nodeBinary);
