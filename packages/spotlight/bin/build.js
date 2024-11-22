@@ -68,7 +68,7 @@ async function getNodeBinary(platform, targetPath = DIST_DIR) {
     sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'node.exe');
     targetFile = join(targetPath, `spotlight-${platform}.exe`);
   } else {
-    await run('tar', '-xzf', stream.path, '-C', tmpDir);
+    await run('tar', '-xf', stream.path, '-C', tmpDir);
     sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'bin', 'node');
     targetFile = join(targetPath, `spotlight-${platform}`);
   }
