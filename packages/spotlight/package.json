@@ -43,6 +43,7 @@
     "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
     "import-meta-resolve": "^4.1.0",
+    "macho-unsign": "^2.0.6",
     "postject": "1.0.0-alpha.6"
   },
   "devDependencies": {
