@@ -41,15 +41,11 @@ jobs:
         env:
           APPLE_CERT_DATA: ${{ secrets.CSC_LINK }}
         run: |
-          # This is for Apple code signing
           curl -L 'https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.28.0/apple-codesign-0.28.0-x86_64-unknown-linux-musl.tar.gz' | tar -xz --strip-components=1
           mv rcodesign /usr/local/bin/rcodesign
           # Export certs
           echo "$APPLE_CERT_DATA" | base64 --decode > /tmp/certs.p12
           echo 'APPLE_CERT_PATH=/tmp/certs.p12' >> $GITHUB_ENV
-
-          # This is for Windows
-          sudo apt-get install -y osslsigncode
 
       - name: Build packages
         env:

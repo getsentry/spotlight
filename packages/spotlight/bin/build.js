@@ -1,12 +1,15 @@
 #!/usr/bin/env node
-import { promisify } from 'node:util';
 import { execFile as execFileCb } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
+import { copyFile, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { Readable } from 'node:stream';
 import { finished } from 'node:stream/promises';
-import { join } from 'node:path';
-import { mkdtemp, copyFile, readFile, writeFile, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { promisify } from 'node:util';
+
+import { unsign } from 'macho-unsign';
+import { signatureSet } from 'portable-executable-signature';
 import { inject } from 'postject';
 
 const execFile = promisify(execFileCb);
@@ -67,13 +70,24 @@ async function getNodeBinary(platform, targetPath = DIST_DIR) {
     await run('unzip', '-qq', stream.path, '-d', tmpDir);
     sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'node.exe');
     targetFile = join(targetPath, `spotlight-${platform}.exe`);
-    await run('osslsigncode', 'remove-signature', '-in', sourceFile, '-out', targetFile);
+    const data = await readFile(sourceFile);
+    const unsigned = signatureSet(data, null);
+    await writeFile(targetFile, Buffer.from(unsigned));
+    console.log('Signature removed from Win PE binary', targetFile);
   } else {
     await run('tar', '-xf', stream.path, '-C', tmpDir);
     sourceFile = join(tmpDir, `node-v${NODE_VERSION}-${platform}`, 'bin', 'node');
     targetFile = join(targetPath, `spotlight-${platform}`);
+  }
+
+  if (platform.startsWith('darwin')) {
+    const unsigned = unsign(await readFile(sourceFile));
+    await writeFile(targetFile, Buffer.from(unsigned));
+    console.log('Signature removed from macOS binary', targetFile);
+  } else {
     await copyFile(sourceFile, targetFile);
   }
+
   await rm(tmpDir, { recursive: true });
   return targetFile;
 }
