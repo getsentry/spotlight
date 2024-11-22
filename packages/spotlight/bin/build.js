@@ -76,7 +76,7 @@ async function getNodeBinary(platform, targetPath = DIST_DIR) {
   if (platform.startsWith('darwin')) {
     const unsigned = unsign(await readFile(sourceFile));
     await writeFile(targetFile, Buffer.from(unsigned));
-    console.log('Signature removed from macOS binary.');
+    console.log('Signature removed from macOS binary', targetFile);
   } else {
     await copyFile(sourceFile, targetFile);
   }
@@ -94,7 +94,7 @@ await Promise.all(
       sentinelFuse: 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2',
       machoSegmentName: process.platform === 'darwin' ? 'NODE_SEA' : undefined,
     });
-    console.log('Created executable.');
+    console.log('Created executable', nodeBinary);
     await run('chmod', '+x', nodeBinary);
     if (platform.startsWith('darwin')) {
       console.log(`Signing ${nodeBinary}...`);
