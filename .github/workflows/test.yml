@@ -38,6 +38,8 @@ jobs:
         run: pnpm install
 
       - name: Build packages
+        env:
+          BUILD_PLATFORMS: 'linux-x64,linux-arm64,win-x64,darwin-x64,darwin-arm64'
         run: pnpm build
 
       - name: Smoke test

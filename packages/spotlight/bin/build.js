@@ -6,7 +6,7 @@ import { Readable } from 'node:stream';
 import { finished } from 'node:stream/promises';
 import { join } from 'node:path';
 import { mkdtemp, copyFile, readFile, writeFile, rm } from 'node:fs/promises';
-import { platform, tmpdir } from 'node:os';
+import { tmpdir } from 'node:os';
 import { inject } from 'postject';
 
 const execFile = promisify(execFileCb);
@@ -19,7 +19,7 @@ const ENTRY_POINT_NAME = 'src/index.html';
 const SEA_CONFIG_PATH = join(DIST_DIR, 'sea-config.json');
 const SPOTLIGHT_BLOB_PATH = join(DIST_DIR, 'spotlight.blob');
 const NODE_VERSION = '22.11.0';
-const PLATFORMS = (process.env.BUILD_PLATFORMS || 'linux-x64,linux-arm64,win-x64').split(',').map(p => p.trim());
+const PLATFORMS = (process.env.BUILD_PLATFORMS || `${process.platform}-${process.arch}`).split(',').map(p => p.trim());
 const manifest = JSON.parse(await readFile(MANIFEST_PATH));
 const seaConfig = {
   main: join(DIST_DIR, 'spotlight.cjs'),
@@ -42,7 +42,7 @@ async function run(cmd, ...args) {
     console.error(`Failed to \`run ${cmd} ${args.join(' ')}\``);
     console.error(err.stdout);
     console.error(err.stderr);
-    process.exit(1);
+    process.exit(err.code);
   }
   if (output.stdout.trim()) {
     console.log(output.stdout);
