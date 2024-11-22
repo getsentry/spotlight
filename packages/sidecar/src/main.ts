@@ -424,11 +424,10 @@ export function clearBuffer(): void {
 
 export function shutdown() {
   if (serverInstance) {
-    logger.info('Shutting down Server');
+    logger.info('Shutting down server...');
     serverInstance.close();
   }
 }
 
-process.on('SIGTERM', () => {
-  shutdown();
-});
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
