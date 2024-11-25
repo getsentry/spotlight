@@ -46,6 +46,8 @@ jobs:
           # Export certs
           echo "$APPLE_CERT_DATA" | base64 --decode > /tmp/certs.p12
           echo 'APPLE_CERT_PATH=/tmp/certs.p12' >> $GITHUB_ENV
+          echo "$APPLE_API_KEY" | base64 -d > /tmp/apple_key.json
+          echo 'APPLE_API_KEY_PATH=/tmp/apple_key.json' >> $GITHUB_ENV
 
       - name: Build packages
         env:

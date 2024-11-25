@@ -105,21 +105,40 @@ await Promise.all(
     console.log('Created executable', nodeBinary);
     await run('chmod', '+x', nodeBinary);
     if (platform.startsWith('darwin')) {
+      const { APPLE_TEAM_ID, APPLE_CERT_PATH, APPLE_CERT_PASSWORD, APPLE_API_KEY_PATH } = process.env;
+      if (!APPLE_TEAM_ID || !APPLE_CERT_PATH || !APPLE_CERT_PASSWORD) {
+        console.warn(
+          "Missing required environment variables for macOS signing, you won't be able to use this binary until you sign it yourself.",
+        );
+        console.info({ APPLE_TEAM_ID, APPLE_CERT_PATH, APPLE_CERT_PASSWORD });
+        return;
+      }
       console.log(`Signing ${nodeBinary}...`);
       await run(
         'rcodesign',
         'sign',
         '--team-name',
-        process.env.APPLE_TEAM_ID,
+        APPLE_TEAM_ID,
         '--p12-file',
-        process.env.APPLE_CERT_PATH,
+        APPLE_CERT_PATH,
         '--p12-password',
-        process.env.APPLE_CERT_PASSWORD,
+        APPLE_CERT_PASSWORD,
         '--for-notarization',
         '-e',
         join(import.meta.dirname, 'entitlements.plist'),
         nodeBinary,
       );
+      if (!APPLE_API_KEY_PATH) {
+        console.warn(
+          "Missing required environment variable for macOS notarization, you won't be able to notarize this binary which will annoy people trying to run it.",
+        );
+        console.info({ APPLE_API_KEY_PATH });
+        return;
+      }
+      const zipFile = `${nodeBinary}.zip`;
+      await run('zip', zipFile, nodeBinary);
+      await run('rcodesign', 'notary-submit', '--api-key-file', APPLE_API_KEY_PATH, '--wait', zipFile);
+      await rm(zipFile);
     }
   }),
 );
