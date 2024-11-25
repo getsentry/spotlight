@@ -24,7 +24,7 @@
 		"@playwright/test": "^1.48.0",
 		"@spotlightjs/spotlight": "workspace:*",
 		"@sveltejs/adapter-auto": "^2.1.1",
-		"@sveltejs/kit": "^1.30.4",
+		"@sveltejs/kit": "^2.8.3",
 		"@types/cookie": "^0.5.4",
 		"@types/node": "20.10.4",
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
