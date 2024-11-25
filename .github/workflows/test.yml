@@ -40,6 +40,7 @@ jobs:
       - name: Setup Codesign Dependencies
         env:
           APPLE_CERT_DATA: ${{ secrets.CSC_LINK }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
         run: |
           curl -L 'https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.28.0/apple-codesign-0.28.0-x86_64-unknown-linux-musl.tar.gz' | tar -xz --strip-components=1
           mv rcodesign /usr/local/bin/rcodesign
