@@ -1,5 +1,5 @@
 import launchEditor from 'launch-editor';
-import { createWriteStream, readFile } from 'node:fs';
+import { createWriteStream, readFileSync } from 'node:fs';
 import { createServer, get, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { extname, join, resolve } from 'node:path';
 import { createGunzip, createInflate } from 'node:zlib';
@@ -31,6 +31,8 @@ type SideCarOptions = {
    * The base path from where the static files should be served.
    */
   basePath?: string;
+
+  filesToServe?: Record<string, Buffer>;
 
   /**
    * More verbose logging.
@@ -101,7 +103,7 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
     if (
       req.method === 'GET' &&
       req.headers.accept &&
-      req.headers.accept == 'text/event-stream' &&
+      req.headers.accept === 'text/event-stream' &&
       pathname === '/stream'
     ) {
       res.writeHead(200, {
@@ -115,12 +117,12 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
       res.write('\n');
 
       const sub = buffer.subscribe(([payloadType, data]) => {
-        logger.debug(`🕊️ sending to Spotlight`);
+        logger.debug('🕊️ sending to Spotlight');
         res.write(`event:${payloadType}\n`);
         // This is very important - SSE events are delimited by two newlines
-        data.split('\n').forEach(line => {
+        for (const line of data.split('\n')) {
           res.write(`data:${line}\n`);
-        });
+        }
         res.write('\n');
       });
 
@@ -189,12 +191,13 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
   };
 }
 
-function fileServer(basePath: string) {
+function fileServer(filesToServe: Record<string, Buffer>) {
   return function serveFile(req: IncomingMessage, res: ServerResponse, pathname?: string): void {
-    let filePath = `.${pathname || req.url}`;
-    if (filePath === './') {
-      filePath = './src/index.html';
+    let filePath = `${pathname || req.url}`;
+    if (filePath === '/') {
+      filePath = '/src/index.html';
     }
+    filePath = filePath.slice(1);
 
     const extName = extname(filePath);
     let contentType = 'text/html';
@@ -210,14 +213,12 @@ function fileServer(basePath: string) {
         break;
     }
 
-    readFile(join(basePath, filePath), (error, content) => {
-      if (error) {
-        return error404(req, res);
-      }
-
+    if (!Object.prototype.hasOwnProperty.call(filesToServe, filePath)) {
+      error404(req, res);
+    } else {
       res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content, 'utf-8');
-    });
+      res.end(filesToServe[filePath]);
+    }
   };
 }
 
@@ -288,15 +289,22 @@ function startServer(
   buffer: MessageBuffer<Payload>,
   port: number,
   basePath?: string,
+  filesToServe?: Record<string, Buffer>,
   incomingPayload?: IncomingPayloadCallback,
 ): Server {
+  if (basePath && !filesToServe) {
+    filesToServe = {
+      '/src/index.html': readFileSync(join(basePath, 'src/index.html')),
+      '/assets/main.js': readFileSync(join(basePath, 'assets/main.js')),
+    };
+  }
   const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
     [/^\/clear$/, enableCORS(handleClearRequest)],
     [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
     [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), enableCORS(contextLinesHandler)],
-    [/^.+$/, basePath != null ? enableCORS(fileServer(basePath)) : error404],
+    [/^.+$/, filesToServe != null ? enableCORS(fileServer(filesToServe)) : error404],
   ];
 
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -379,6 +387,7 @@ export function setupSidecar({
   port,
   logger: customLogger,
   basePath,
+  filesToServe,
   debug,
   incomingPayload,
 }: SideCarOptions = {}): void {
@@ -403,7 +412,7 @@ export function setupSidecar({
       logger.info(`Sidecar is already running on port ${sidecarPort}`);
     } else {
       if (!serverInstance) {
-        serverInstance = startServer(buffer, sidecarPort, basePath, incomingPayload);
+        serverInstance = startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
       }
     }
   });
@@ -415,11 +424,10 @@ export function clearBuffer(): void {
 
 export function shutdown() {
   if (serverInstance) {
-    logger.info('Shutting down Server');
+    logger.info('Shutting down server...');
     serverInstance.close();
   }
 }
 
-process.on('SIGTERM', () => {
-  shutdown();
-});
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);

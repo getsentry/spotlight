@@ -1,23 +1,31 @@
 {
   "editor.formatOnSave": true,
   "cSpell.words": [
+    "APPLEID",
+    "APPLEIDPASS",
     "Astro",
     "Astro's",
     "astrojs",
+    "codesign",
     "contextlines",
     "Endcaps",
     "fontsource",
     "getsentry",
     "iife",
     "nextjs",
+    "notarytool",
     "outro",
     "pageload",
+    "postject",
     "spotlightjs",
     "svgr",
     "tailwindcss",
+    "TEAMID",
     "treeshake",
     "ttfb",
+    "unsign",
     "uuidv",
-    "webvitals"
+    "webvitals",
+    "xcrun"
   ]
 }
