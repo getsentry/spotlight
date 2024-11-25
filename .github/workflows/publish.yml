@@ -30,13 +30,17 @@ jobs:
     runs-on: ubuntu-latest
     # For whatever reason, yaml does not like the full "meta(changelog): Update package versions" string
     # So we check this in two parts
-    if: |
-      (contains(github.event.head_commit.message, 'meta(changelog)')
-        && contains(github.event.head_commit.message, 'Update package versions'))
-      || inputs.npm
+    if: >-
+      (
+        contains(github.event.head_commit.message, 'meta(changelog)')
+        &&
+        contains(github.event.head_commit.message, 'Update package versions')
+      ) || inputs.npm
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -57,6 +61,28 @@ jobs:
           publish: pnpm changeset:publish
           createGithubReleases: true
 
+      - name: Store standalone spotlight binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotlight
+          if-no-files-found: error
+          path: packages/spotlight/dist/spotlight-*
+
+      - name: Gets latest created release info
+        id: latest_release_info
+        uses: gregziegan/fetch-latest-release@v2.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          file: packages/spotlight/dist/spotlight-*
+          tag: ${{ steps.latest_release_info.outputs.tag_name }}
+          make_latest: false
+
   docker:
     name: Docker Image
     needs: npm
@@ -66,9 +92,6 @@ jobs:
       && (inputs.docker || github.event_name == 'push')
       && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -76,21 +99,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-qemu-action@v3
-
       - uses: docker/setup-buildx-action@v3
 
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          cache-from: type=gha,scope=prod
-          no-cache: ${{ inputs.nocache == true }}
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: |
-            ghcr.io/getsentry/spotlight:latest
-            ghcr.io/getsentry/spotlight:${{ github.sha }}
+      - name: Push Docker Image as latest
+        run: >-
+          docker buildx imagetools create
+          --tag ghcr.io/getsentry/spotlight:latest
+          ghcr.io/getsentry/spotlight:${{ github.sha }}
 
       - name: Summarize
         run: |
@@ -104,14 +119,12 @@ jobs:
       !cancelled()
       && (inputs.electron || github.event_name == 'push')
       && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
-    # strategy:
-    #   fail-fast: false
-    #   matrix:
-    #     platform: [x64, arm64]
 
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node
         uses: actions/setup-node@v4
