@@ -3,12 +3,10 @@ import { Link } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
-import { QUERIES_HEADERS, QUERIES_SORT_KEYS } from '../../constants';
+import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
 import type { Span } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
-
-const DB_SPAN_REGEX = /^db(\.[A-Za-z]+)?$/;
 
 type QueryInfo = {
   avgDuration: number;
