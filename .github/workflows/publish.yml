@@ -57,6 +57,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          BUILD_PLATFORMS: 'linux-x64,linux-arm64,win-x64,darwin-x64,darwin-arm64'
         with:
           publish: pnpm changeset:publish
           createGithubReleases: true
