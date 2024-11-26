@@ -6,7 +6,8 @@ import { join } from 'node:path';
 import * as sea from 'node:sea';
 import { fileURLToPath } from 'node:url';
 
-if (process.stdout.isTTY) {
+const MAX_COLS = process.stdout.columns;
+if (process.stdout.isTTY && MAX_COLS > 34) {
   const data = Uint8Array.from(
     inflateRawSync(
       Buffer.from(
@@ -38,7 +39,7 @@ if (process.stdout.isTTY) {
       lim = Math.round(lim * (1 + factor));
       r = Math.round(Math.random() * 18);
     } else {
-      while (p-- >= 0) {
+      while (p-- >= 0 && col < MAX_COLS) {
         if (col < lim - 1) {
           process.stdout.write(M_COL);
         } else if (col === lim - 1) {
