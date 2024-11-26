@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 1.9.1
+
+### Patch Changes
+
+- No change, just to fix a broken release ([#576](https://github.com/getsentry/spotlight/pull/576))
+
 ## 1.9.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @spotlightjs/electron
 
+## 1.1.13
+
+### Patch Changes
+
+- No change, just to fix a broken release ([#576](https://github.com/getsentry/spotlight/pull/576))
+
+- Updated dependencies
+  [[`df760b525843e53af891626e96d8e8086bb1473f`](https://github.com/getsentry/spotlight/commit/df760b525843e53af891626e96d8e8086bb1473f)]:
+  - @spotlightjs/overlay@2.7.1
+  - @spotlightjs/sidecar@1.9.1
+
 ## 1.1.12
 
 ### Patch Changes
