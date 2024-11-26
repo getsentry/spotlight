@@ -3,7 +3,7 @@
   "description": "Electron app for Spotlight",
   "author": "Sentry",
   "license": "Apache-2.0",
-  "version": "1.1.12",
+  "version": "1.1.13",
   "repository": {
     "type": "git",
     "url": "https://github.com/getsentry/spotlight.git",

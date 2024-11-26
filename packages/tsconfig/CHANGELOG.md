@@ -1,5 +1,11 @@
 # @spotlightjs/tsconfig
 
+## 1.0.1
+
+### Patch Changes
+
+- No change, just to fix a broken release ([#576](https://github.com/getsentry/spotlight/pull/576))
+
 ## 1.0.0
 
 ### Major Changes
