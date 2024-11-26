@@ -14,14 +14,15 @@ const data = Uint8Array.from(
     ),
   ),
 );
-const M_COL = '\x1b[38;5;96m';
-const F_COL = '\x1b[38;5;61m';
-const CHARS = [' ', 'S'];
-const BOLD = '\x1B[1m';
-const RESET = '\x1B[0m';
+const E = '\x1b[';
+const C = `${E}38;5;`;
+const M_COL = `${C}96m`;
+const F_COL = `${C}61m`;
+const BOLD = `${E}1m`;
+const RESET = `${E}0m`;
 const NL = `${RESET}\n`;
 let factor = 0.1;
-let code = 0;
+let c = 0;
 let col = 0;
 let line = 0;
 let lim = 23;
@@ -29,8 +30,7 @@ let r = 0;
 for (let p of data) {
   if (p === 255) {
     process.stdout.write(NL);
-    code &= 2;
-    col = 0;
+    c = col = 0;
     if (line++ === 8) {
       factor = -factor;
     }
@@ -45,10 +45,10 @@ for (let p of data) {
       } else if (col === lim + r) {
         process.stdout.write(`${RESET}${BOLD}`);
       }
-      process.stdout.write(CHARS[code & 1]);
+      process.stdout.write(c ? 'S' : ' ');
       col++;
     }
-    code ^= 1;
+    c = !c;
   }
 }
 process.stdout.write(NL);
