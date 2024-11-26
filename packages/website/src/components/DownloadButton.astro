@@ -31,7 +31,7 @@ const links = assets.map(asset => {
       url: asset.browser_download_url,
     };
   }
-});
+}).filter(Boolean);
 ---
 
 <style>
