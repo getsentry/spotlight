@@ -22,21 +22,21 @@ if (process.stdout.isTTY) {
   const BOLD = `${E}1m`;
   const RESET = `${E}0m`;
   const NL = `${RESET}\n`;
-  let factor = 0.1;
+  let factor = 0.22;
   let c = 0;
   let col = 0;
   let line = 0;
-  let lim = 23;
+  let lim = 26;
   let r = 0;
   for (let p of data) {
     if (p === 255) {
       process.stdout.write(NL);
       c = col = 0;
-      if (line++ === 8) {
-        factor = -factor;
+      if (line++ === 5) {
+        factor = factor / -3;
       }
       lim = Math.round(lim * (1 + factor));
-      r = Math.round(Math.random() * 10);
+      r = Math.round(Math.random() * 18);
     } else {
       while (p-- >= 0) {
         if (col < lim - 1) {
@@ -46,7 +46,7 @@ if (process.stdout.isTTY) {
         } else if (col === lim + r) {
           process.stdout.write(`${RESET}${BOLD}`);
         }
-        process.stdout.write(c ? 'S' : ' ');
+        process.stdout.write(c ? (col >= 35 ? '#' : 's') : ' ');
         col++;
       }
       c = !c;
