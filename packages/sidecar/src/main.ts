@@ -366,7 +366,8 @@ function isSidecarRunning(port: string | number | undefined) {
       port: port,
       path: '/health',
       method: 'GET',
-      timeout: 5000,
+      timeout: 2000,
+      headers: { Connection: 'close' },
     };
 
     const healthReq = get(options, res => {
@@ -380,6 +381,7 @@ function isSidecarRunning(port: string | number | undefined) {
     healthReq.on('error', () => {
       resolve(false);
     });
+    healthReq.end();
   });
 }
 
