@@ -11,7 +11,7 @@ const magic =
 
 const data = Uint8Array.from(inflateRawSync(Buffer.from(magic, 'base64')));
 const colors = ['\x1b[38;5;56m', '\x1b[38;5;54m'];
-const chars = [' ', '#'];
+const chars = [' ', 'S'];
 let code = 0;
 process.stdout.write('\x1b[1m'); // embolden
 for (let p of data) {
