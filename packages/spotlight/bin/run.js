@@ -6,27 +6,52 @@ import { join } from 'node:path';
 import * as sea from 'node:sea';
 import { fileURLToPath } from 'node:url';
 
-const magic =
-  'bY7LCgMxFEK9L5MwDDSL9P//1DJMKGXowoUcUaFZOk8dU2Op9+qZVkYQoFsaEqA6PZxxma1AoMG+TiONTgcfAd741YxxVf8gCzCgWcYB7OSj9sjW7t2/eKxKAxkIYv8NqL3FpVY25CmjrBSuDw==';
-
-const data = Uint8Array.from(inflateRawSync(Buffer.from(magic, 'base64')));
-const colors = ['\x1b[38;5;56m', '\x1b[38;5;54m'];
-const chars = [' ', 'S'];
+const data = Uint8Array.from(
+  inflateRawSync(
+    Buffer.from(
+      'bY7LCgMxFEK9L5MwDDSL9P//1DJMKGXowoUcUaFZOk8dU2Op9+qZVkYQoFsaEqA6PZxxma1AoMG+TiONTgcfAd741YxxVf8gCzCgWcYB7OSj9sjW7t2/eKxKAxkIYv8NqL3FpVY25CmjrBSuDw==',
+      'base64',
+    ),
+  ),
+);
+const M_COL = '\x1b[38;5;96m';
+const F_COL = '\x1b[38;5;61m';
+const CHARS = [' ', 'S'];
+const BOLD = '\x1B[1m';
+const RESET = '\x1B[0m';
+const NL = `${RESET}\n`;
+let factor = 0.1;
 let code = 0;
-process.stdout.write('\x1b[1m'); // embolden
+let col = 0;
+let line = 0;
+let lim = 23;
+let r = 0;
 for (let p of data) {
   if (p === 255) {
-    process.stdout.write('\n');
+    process.stdout.write(NL);
     code &= 2;
+    col = 0;
+    if (line++ === 8) {
+      factor = -factor;
+    }
+    lim = Math.round(lim * (1 + factor));
+    r = Math.round(Math.random() * 10);
   } else {
     while (p-- >= 0) {
-      process.stdout.write(colors[(code & 2) >> 1] + chars[code & 1]);
-      code ^= 2;
+      if (col < lim - 1) {
+        process.stdout.write(M_COL);
+      } else if (col === lim - 1) {
+        process.stdout.write(F_COL);
+      } else if (col === lim + r) {
+        process.stdout.write(`${RESET}${BOLD}`);
+      }
+      process.stdout.write(CHARS[code & 1]);
+      col++;
     }
     code ^= 1;
   }
 }
-process.stdout.write('\x1B[0m\n');
+process.stdout.write(NL);
 
 const readAsset = sea.isSea()
   ? name => Buffer.from(sea.getRawAsset(name))
