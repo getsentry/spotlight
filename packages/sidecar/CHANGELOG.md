@@ -1,5 +1,21 @@
 # @spotlightjs/sidecar
 
+## 1.9.0
+
+### Minor Changes
+
+- - Sidecar url made generic to support all sidecar server routes.
+    ([#558](https://github.com/getsentry/spotlight/pull/558))
+  - No use of static sidecar url.
+
+- Create a self-contained executable for Linux, macOS, and Windows for Spotlight.
+  ([#559](https://github.com/getsentry/spotlight/pull/559)) Docker images now use these binaries instead of a Node build
+  in the image.
+
+### Patch Changes
+
+- Fix hanging when another Spotlight server is running ([#571](https://github.com/getsentry/spotlight/pull/571))
+
 ## 1.8.0
 
 ### Minor Changes

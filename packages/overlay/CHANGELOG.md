@@ -1,5 +1,37 @@
 # @spotlightjs/core
 
+## 2.7.0
+
+### Minor Changes
+
+- Add request and module details to context with JSONViewer ([#544](https://github.com/getsentry/spotlight/pull/544))
+
+- Add support for JSON-like queries (MongoDB) while improving span details page a bit
+  ([#563](https://github.com/getsentry/spotlight/pull/563))
+
+- - Added copy filename button on error frame. ([#550](https://github.com/getsentry/spotlight/pull/550))
+  - changed styling of error frames.
+
+- - Added subtabs in trace detail page ([#557](https://github.com/getsentry/spotlight/pull/557))
+
+- - Sidecar url made generic to support all sidecar server routes.
+    ([#558](https://github.com/getsentry/spotlight/pull/558))
+  - No use of static sidecar url.
+
+### Patch Changes
+
+- - changed route and added navigation in performance tab to make queries tab default active.
+    ([#555](https://github.com/getsentry/spotlight/pull/555))
+  - Fixed showing of 0 in false condition in span details.
+
+- Fixed minor overlay trigger count issue ([#542](https://github.com/getsentry/spotlight/pull/542))
+
+- - Fixed some conditional rendering in TraceIcon and SpanDetails which was showing 0 on UI.
+    ([#549](https://github.com/getsentry/spotlight/pull/549))
+  - Fixed routing for query summary page by encoding the query description which can be a long text.
+
+- Fix DB queries missing for some Sentry SDKs ([#547](https://github.com/getsentry/spotlight/pull/547))
+
 ## 2.6.0
 
 ### Minor Changes

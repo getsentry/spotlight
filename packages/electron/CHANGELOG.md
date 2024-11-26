@@ -1,5 +1,24 @@
 # @spotlightjs/electron
 
+## 1.1.12
+
+### Patch Changes
+
+- Updated dependencies
+  [[`4d1e07eda8e5ab04db2d1e6bb14aa823e2f5d4e0`](https://github.com/getsentry/spotlight/commit/4d1e07eda8e5ab04db2d1e6bb14aa823e2f5d4e0),
+  [`3ec99001202fd66a81486cc49a47452eb9e3e34b`](https://github.com/getsentry/spotlight/commit/3ec99001202fd66a81486cc49a47452eb9e3e34b),
+  [`2e4d90c369c6345b38c085cea89142647c4b6be2`](https://github.com/getsentry/spotlight/commit/2e4d90c369c6345b38c085cea89142647c4b6be2),
+  [`84f029db0e76f9295b38349f659457878df6924d`](https://github.com/getsentry/spotlight/commit/84f029db0e76f9295b38349f659457878df6924d),
+  [`ab5181c645bcee3ab42a4f28db4daab47b5852a5`](https://github.com/getsentry/spotlight/commit/ab5181c645bcee3ab42a4f28db4daab47b5852a5),
+  [`7b9329c8c59a25cfe4cec7cbd9c6f231cf099220`](https://github.com/getsentry/spotlight/commit/7b9329c8c59a25cfe4cec7cbd9c6f231cf099220),
+  [`6bd2937adfcd8721af6ccd5f031860691ce6e46f`](https://github.com/getsentry/spotlight/commit/6bd2937adfcd8721af6ccd5f031860691ce6e46f),
+  [`aba5c072c59f3777c47832d1532d732237b1b9dd`](https://github.com/getsentry/spotlight/commit/aba5c072c59f3777c47832d1532d732237b1b9dd),
+  [`1749cb3a06576a0d94f77f0831cd088045a762fb`](https://github.com/getsentry/spotlight/commit/1749cb3a06576a0d94f77f0831cd088045a762fb),
+  [`5c0b1624bac267554d93bc81d17414159f0b9fe0`](https://github.com/getsentry/spotlight/commit/5c0b1624bac267554d93bc81d17414159f0b9fe0),
+  [`c88e50edd07c56c7368ff6788bbaa938e3f9f6b8`](https://github.com/getsentry/spotlight/commit/c88e50edd07c56c7368ff6788bbaa938e3f9f6b8)]:
+  - @spotlightjs/overlay@2.7.0
+  - @spotlightjs/sidecar@1.9.0
+
 ## 1.1.11
 
 ### Patch Changes
