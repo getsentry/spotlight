@@ -1,5 +1,11 @@
 # @spotlightjs/spotlight
 
+## 2.6.3
+
+### Patch Changes
+
+- Re-release for Docker, Electron, and GH Releases ([#585](https://github.com/getsentry/spotlight/pull/585))
+
 ## 2.6.2
 
 ### Patch Changes
