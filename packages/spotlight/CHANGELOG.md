@@ -1,5 +1,13 @@
 # @spotlightjs/spotlight
 
+## 2.6.2
+
+### Patch Changes
+
+- Fix compatibility issues with Node 20.11- ([#579](https://github.com/getsentry/spotlight/pull/579))
+
+- Don't overflow terminal with ascii art ([#578](https://github.com/getsentry/spotlight/pull/578))
+
 ## 2.6.1
 
 ### Patch Changes
