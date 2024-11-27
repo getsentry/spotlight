@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 require('dotenv').config();
 const builder = require('electron-builder');
 
