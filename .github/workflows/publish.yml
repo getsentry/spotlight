@@ -122,15 +122,24 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version-file: 'package.json'
+          cache: 'pnpm'
 
-      - name: Setup pnpm & install dependencies
-        uses: pnpm/action-setup@v4
+      - name: Setup dependencies
+        run: pnpm install
+
+      - name: Restore build cache
+        uses: actions/cache/restore@v4
         with:
-          run_install: true
+          fail-on-cache-miss: true
+          path: ${{ env.CACHED_BUILD_PATHS }}
+          key: ${{ env.BUILD_CACHE_KEY }}
 
       - name: Build Electron
         env:
