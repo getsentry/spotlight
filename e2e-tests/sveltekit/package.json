@@ -11,9 +11,8 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"clean": "rimraf .svelte-kit",
-		"test:e2e:prepare": "playwright install --with-deps",
-		"test:e2e": "playwright test",
-		"test:e2e:ci": "pnpm test:e2e:prepare && pnpm test:e2e"
+		"pretest:e2e": "playwright install --with-deps",
+		"test:e2e": "playwright test"
 	},
 	"dependencies": {
 		"@sentry/sveltekit": "8.7.0"

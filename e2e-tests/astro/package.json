@@ -8,10 +8,8 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test:e2e:prepare": "playwright install --with-deps",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:ci": "pnpm test:e2e:prepare && playwright test"
+    "pretest:e2e": "playwright install --with-deps",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@astrojs/node": "^8.3.4",

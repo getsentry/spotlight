@@ -1,29 +1,21 @@
 name: Publish
 on:
-  push:
+  workflow_run:
+    workflows:
+      - Build & Test
+    types:
+      - completed
     branches:
       - main
-    paths:
-      - '**/CHANGELOG.md'
-  workflow_dispatch:
-    inputs:
-      nocache:
-        description: 'Do not rely on existing Docker layer cache'
-        default: false
-        type: boolean
-      docker:
-        description: 'Publish Docker package'
-        default: true
-        type: boolean
-      npm:
-        description: 'Publish NPM package (immutable)'
-        default: true
-        type: boolean
-      electron:
-        description: 'Publish Electron package'
-        default: true
-        type: boolean
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+concurrency: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch }}
+
+env:
+  BUILD_CACHE_KEY: ${{ github.event.workflow_run.head_sha }}
+  CACHED_BUILD_PATHS: |
+    ${{ github.workspace }}/packages/*/dist
+    ${{ github.workspace }}/packages/*/bin
+
 jobs:
   npm:
     name: NPM Package
@@ -32,10 +24,12 @@ jobs:
     # So we check this in two parts
     if: >-
       (
-        contains(github.event.head_commit.message, 'meta(changelog)')
+        github.event.workflow_run.conclusion == 'success'
         &&
-        contains(github.event.head_commit.message, 'Update package versions')
-      ) || inputs.npm
+        contains(github.event.workflow_run.head_commit.message, 'meta(changelog)')
+        &&
+        contains(github.event.workflow_run.head_commit.message, 'Update package versions')
+      )
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -47,10 +41,13 @@ jobs:
         with:
           node-version-file: 'package.json'
 
-      - name: Setup pnpm & install dependencies
-        uses: pnpm/action-setup@v4
+      - name: Restore build cache
+        uses: actions/cache/restore@v4
         with:
-          run_install: true
+          fail-on-cache-miss: true
+          path: ${{ env.CACHED_BUILD_PATHS }}
+          key: ${{ env.BUILD_CACHE_KEY }}
+
 
       - name: Publish to NPM
         uses: changesets/action@v1
@@ -90,8 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !cancelled()
-      && (inputs.docker || github.event_name == 'push')
-      && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
+      && needs.npm.result == 'success'
     steps:
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -118,8 +114,7 @@ jobs:
     runs-on: macos-latest
     if: |
       !cancelled()
-      && (inputs.electron || github.event_name == 'push')
-      && (needs.npm.result == 'success' || needs.npm.result == 'skipped')
+      && needs.npm.result == 'success'
 
     steps:
       - name: Checkout Repo
@@ -127,15 +122,24 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version-file: 'package.json'
+          cache: 'pnpm'
 
-      - name: Setup pnpm & install dependencies
-        uses: pnpm/action-setup@v4
+      - name: Setup dependencies
+        run: pnpm install
+
+      - name: Restore build cache
+        uses: actions/cache/restore@v4
         with:
-          run_install: true
+          fail-on-cache-miss: true
+          path: ${{ env.CACHED_BUILD_PATHS }}
+          key: ${{ env.BUILD_CACHE_KEY }}
 
       - name: Build Electron
         env:
