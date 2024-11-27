@@ -55,34 +55,36 @@ if (process.stdout.isTTY && MAX_COLS > 34) {
   process.stdout.write(NL);
 }
 
-let sea = null;
-try {
-  // This is to maintain compatibility with Node 20.11- as
-  // the `node:sea` module is added in Node 20.12+
-  sea = await import('node:sea');
-} catch {
-  sea = { isSea: () => false };
-}
-
-const readAsset = sea.isSea()
-  ? name => Buffer.from(sea.getRawAsset(name))
-  : (() => {
-      const ASSET_DIR = join(fileURLToPath(import.meta.url), '../../dist/overlay/');
-
-      return name => readFileSync(join(ASSET_DIR, name));
-    })();
-
 const port = process.argv.length >= 3 ? Number(process.argv[2]) : undefined;
 const MANIFEST_NAME = 'manifest.json';
 const ENTRY_POINT_NAME = 'src/index.html';
 const basePath = process.cwd();
 const filesToServe = Object.create(null);
 
-    // Following the guide here: https://vite.dev/guide/backend-integration.html
-const manifest = JSON.parse(readAsset(MANIFEST_NAME));
-filesToServe[ENTRY_POINT_NAME] = readAsset(ENTRY_POINT_NAME);
-const entries = Object.values(manifest);
-for (const entry of entries) {
-  filesToServe[entry.file] = readAsset(entry.file);
+async function main() {
+  let sea = null;
+  try {
+    // This is to maintain compatibility with Node 20.11- as
+    // the `node:sea` module is added in Node 20.12+
+    sea = await import('node:sea');
+  } catch {
+    sea = { isSea: () => false };
+  }
+
+  const readAsset = sea.isSea()
+    ? name => Buffer.from(sea.getRawAsset(name))
+    : (() => {
+        const ASSET_DIR = join(fileURLToPath(import.meta.url), '../../dist/overlay/');
+
+        return name => readFileSync(join(ASSET_DIR, name));
+      })();
+  // Following the guide here: https://vite.dev/guide/backend-integration.html
+  const manifest = JSON.parse(readAsset(MANIFEST_NAME));
+  filesToServe[ENTRY_POINT_NAME] = readAsset(ENTRY_POINT_NAME);
+  const entries = Object.values(manifest);
+  for (const entry of entries) {
+    filesToServe[entry.file] = readAsset(entry.file);
+  }
+  setupSidecar({ port, basePath, filesToServe });
 }
-setupSidecar({ port, basePath, filesToServe });
+main();
