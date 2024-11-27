@@ -6,12 +6,14 @@
     "Astro",
     "Astro's",
     "astrojs",
+    "buildx",
     "codesign",
     "contextlines",
     "Endcaps",
     "fontsource",
     "getsentry",
     "iife",
+    "imagetools",
     "nextjs",
     "notarytool",
     "outro",
@@ -26,6 +28,7 @@
     "ttfb",
     "unsign",
     "uuidv",
+    "VITE",
     "webvitals",
     "xcrun"
   ]
