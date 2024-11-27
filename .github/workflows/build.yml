@@ -171,6 +171,10 @@ jobs:
     if: |
       !cancelled()
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Restore build cache
         uses: actions/cache/restore@v4
         with:
