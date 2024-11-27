@@ -93,11 +93,7 @@ jobs:
 
   docker:
     name: Docker Image
-    needs: npm
     runs-on: ubuntu-latest
-    if: |
-      !cancelled()
-      && needs.npm.result == 'success'
     steps:
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -120,11 +116,7 @@ jobs:
 
   electron:
     name: Electron Build
-    needs: npm
     runs-on: macos-latest
-    if: |
-      !cancelled()
-      && needs.npm.result == 'success'
 
     steps:
       - name: Checkout Repo
