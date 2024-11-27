@@ -18,7 +18,7 @@
     "yalc:publish": "yalc publish --push --sig --private",
     "changeset:add": "pnpm changeset",
     "changeset:consume": "pnpm changeset version",
-    "changeset:publish": "pnpm run build && pnpm changeset publish",
+    "changeset:publish": "pnpm changeset publish",
     "clean": "pnpm -r run clean",
     "clean:deps": "rimraf ./packages/*/node_modules demos/*/node_modules node_modules",
     "clean:all": "pnpm run clean && pnpm run clean:deps && pnpm install"
