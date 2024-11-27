@@ -6,9 +6,8 @@
     "build": "next build",
     "start": "next start",
     "preview": "next dev",
-    "test:e2e:prepare": "playwright install --with-deps",
-    "test:e2e": "playwright test",
-    "test:e2e:ci": "pnpm test:e2e:prepare && pnpm test:e2e"
+    "pretest:e2e": "playwright install --with-deps",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@sentry/nextjs": "^8.37.1",

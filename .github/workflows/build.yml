@@ -127,7 +127,6 @@ jobs:
 
   test-unit:
     name: Unit Tests
-    needs: build
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -156,7 +155,7 @@ jobs:
           key: ${{ env.BUILD_CACHE_KEY }}
 
       - name: Run tests
-        run: pnpm test:ci
+        run: pnpm test
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v4
@@ -171,7 +170,6 @@ jobs:
 
   test-e2e:
     name: E2E Tests
-    needs: build
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -200,4 +198,4 @@ jobs:
           key: ${{ env.BUILD_CACHE_KEY }}
 
       - name: Run tests
-        run: pnpm test:e2e:ci
+        run: pnpm test:e2e
