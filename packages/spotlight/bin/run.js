@@ -57,6 +57,8 @@ if (process.stdout.isTTY && MAX_COLS > 34) {
 
 let sea = null;
 try {
+  // This is to maintain compatibility with Node 20.11- as
+  // the `node:sea` module is added in Node 20.12+
   sea = await import('node:sea');
 } catch {
   sea = { isSea: () => false };
