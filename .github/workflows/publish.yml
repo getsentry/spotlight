@@ -1,4 +1,5 @@
 name: Publish
+permissions: write-all
 on:
   workflow_run:
     workflows:
