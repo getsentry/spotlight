@@ -14,6 +14,16 @@ on:
         description: 'SHA to release from'
         required: true
         type: string
+      target:
+        description: 'Which targets to release'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - npm
+          - docker
+          - electron
 
 concurrency: ${{ github.workflow }}-${{ github.event.workflow_run.head_sha || inputs.sha }}
 
@@ -28,16 +38,11 @@ jobs:
   npm:
     name: NPM Package
     runs-on: ubuntu-latest
-    # For whatever reason, yaml does not like the full "meta(changelog): Update package versions" string
-    # So we check this in two parts
     if: >-
-      (
-        github.event.workflow_run.conclusion == 'success'
-        &&
-        contains(github.event.workflow_run.head_commit.message, 'meta(changelog)')
-        &&
-        contains(github.event.workflow_run.head_commit.message, 'Update package versions')
-      ) || inputs.sha
+      (github.event.workflow_run.conclusion == 'success'
+      &&
+      contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
+      ) || inputs.target == 'electron' || inputs.target == 'all'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -64,7 +69,6 @@ jobs:
           fail-on-cache-miss: true
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
-
 
       - name: Publish to NPM
         uses: changesets/action@v1
@@ -94,6 +98,11 @@ jobs:
   docker:
     name: Docker Image
     runs-on: ubuntu-latest
+    if: >-
+      (github.event.workflow_run.conclusion == 'success'
+      &&
+      contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
+      ) || inputs.target == 'electron' || inputs.target == 'all'
     steps:
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -117,7 +126,11 @@ jobs:
   electron:
     name: Electron Build
     runs-on: macos-latest
-
+    if: >-
+      (github.event.workflow_run.conclusion == 'success'
+      &&
+      contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
+      ) || inputs.target == 'electron' || inputs.target == 'all'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -138,12 +151,16 @@ jobs:
         run: pnpm install
 
       - name: Restore build cache
+        id: cache
         uses: actions/cache/restore@v4
         with:
-          fail-on-cache-miss: true
           enableCrossOsArchive: true
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
+
+      - name: Build
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: pnpm --filter '@spotlightjs/electron...' build
 
       - name: Build Electron
         env:
