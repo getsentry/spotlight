@@ -3,7 +3,6 @@ import { setupSidecar } from '@spotlightjs/sidecar';
 import { inflateRawSync } from 'node:zlib';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import * as sea from 'node:sea';
 import { fileURLToPath } from 'node:url';
 
 const MAX_COLS = process.stdout.columns;
@@ -54,6 +53,13 @@ if (process.stdout.isTTY && MAX_COLS > 34) {
     }
   }
   process.stdout.write(NL);
+}
+
+let sea = null;
+try {
+  sea = await import('node:sea');
+} catch {
+  sea = { isSea: () => false };
 }
 
 const readAsset = sea.isSea()
