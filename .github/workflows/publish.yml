@@ -7,11 +7,18 @@ on:
       - completed
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: 'SHA to release from'
+        required: true
+        type: string
 
-concurrency: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch }}
+concurrency: ${{ github.workflow }}-${{ github.event.workflow_run.head_sha || inputs.sha }}
 
 env:
-  BUILD_CACHE_KEY: ${{ github.event.workflow_run.head_sha }}
+  SHA: ${{ github.event.workflow_run.head_sha || inputs.sha }}
+  BUILD_CACHE_KEY: ${{ github.event.workflow_run.head_sha || inputs.sha }}
   CACHED_BUILD_PATHS: |
     ${{ github.workspace }}/packages/*/dist
     ${{ github.workspace }}/packages/*/bin
@@ -29,17 +36,25 @@ jobs:
         contains(github.event.workflow_run.head_commit.message, 'meta(changelog)')
         &&
         contains(github.event.workflow_run.head_commit.message, 'Update package versions')
-      )
+      ) || inputs.sha
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
+          ref: ${{ env.SHA }}
           fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version-file: 'package.json'
+          cache: 'pnpm'
+
+      - name: Setup NPM dependencies
+        run: pnpm install
 
       - name: Restore build cache
         uses: actions/cache/restore@v4
@@ -102,11 +117,11 @@ jobs:
         run: >-
           docker buildx imagetools create
           --tag ghcr.io/getsentry/spotlight:latest
-          ghcr.io/getsentry/spotlight:${{ github.sha }}
+          ghcr.io/getsentry/spotlight:$SHA
 
       - name: Summarize
         run: |
-          echo "**Tag:** ``ghcr.io/getsentry/spotlight:${{ github.sha }}``" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** ``ghcr.io/getsentry/spotlight:$SHA``" >> $GITHUB_STEP_SUMMARY
 
   electron:
     name: Electron Build
@@ -120,6 +135,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
+          ref: ${{ env.SHA }}
           fetch-depth: 0
 
       - name: Setup pnpm
