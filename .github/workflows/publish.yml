@@ -60,6 +60,7 @@ jobs:
       - name: Restore build cache
         uses: actions/cache/restore@v4
         with:
+          enableCrossOsArchive: true
           fail-on-cache-miss: true
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
@@ -74,13 +75,6 @@ jobs:
         with:
           publish: pnpm changeset:publish
           createGithubReleases: true
-
-      - name: Store standalone spotlight binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: spotlight
-          if-no-files-found: error
-          path: packages/spotlight/dist/spotlight-*
 
       - name: Gets latest created release info
         id: latest_release_info
@@ -155,6 +149,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           fail-on-cache-miss: true
+          enableCrossOsArchive: true
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
 

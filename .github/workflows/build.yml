@@ -91,6 +91,7 @@ jobs:
       - name: Update build cache
         uses: actions/cache/save@v4
         with:
+          enableCrossOsArchive: true
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
 
@@ -158,6 +159,7 @@ jobs:
       - name: Restore build cache
         uses: actions/cache/restore@v4
         with:
+          enableCrossOsArchive: true
           fail-on-cache-miss: true
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
@@ -181,6 +183,7 @@ jobs:
       - name: Restore build cache
         uses: actions/cache/restore@v4
         with:
+          enableCrossOsArchive: true
           fail-on-cache-miss: true
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
