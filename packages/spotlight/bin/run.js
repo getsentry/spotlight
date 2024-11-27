@@ -3,8 +3,25 @@ import { setupSidecar } from '@spotlightjs/sidecar';
 import { inflateRawSync } from 'node:zlib';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import * as sea from 'node:sea';
 import { fileURLToPath } from 'node:url';
+import Module from 'node:module';
+const require = Module.createRequire(import.meta.url);
+let sea = null;
+try {
+  // This is to maintain compatibility with Node 20.11- as
+  // the `node:sea` module is added in Node 20.12+
+  sea = require('node:sea');
+} catch {
+  sea = { isSea: () => false };
+}
+
+const readAsset = sea.isSea()
+  ? name => Buffer.from(sea.getRawAsset(name))
+  : (() => {
+      const ASSET_DIR = join(fileURLToPath(import.meta.url), '../../dist/overlay/');
+
+      return name => readFileSync(join(ASSET_DIR, name));
+    })();
 
 const MAX_COLS = process.stdout.columns;
 if (process.stdout.isTTY && MAX_COLS > 34) {
@@ -56,21 +73,13 @@ if (process.stdout.isTTY && MAX_COLS > 34) {
   process.stdout.write(NL);
 }
 
-const readAsset = sea.isSea()
-  ? name => Buffer.from(sea.getRawAsset(name))
-  : (() => {
-      const ASSET_DIR = join(fileURLToPath(import.meta.url), '../../dist/overlay/');
-
-      return name => readFileSync(join(ASSET_DIR, name));
-    })();
-
 const port = process.argv.length >= 3 ? Number(process.argv[2]) : undefined;
 const MANIFEST_NAME = 'manifest.json';
 const ENTRY_POINT_NAME = 'src/index.html';
 const basePath = process.cwd();
 const filesToServe = Object.create(null);
 
-    // Following the guide here: https://vite.dev/guide/backend-integration.html
+// Following the guide here: https://vite.dev/guide/backend-integration.html
 const manifest = JSON.parse(readAsset(MANIFEST_NAME));
 filesToServe[ENTRY_POINT_NAME] = readAsset(ENTRY_POINT_NAME);
 const entries = Object.values(manifest);
