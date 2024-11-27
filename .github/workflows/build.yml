@@ -5,13 +5,16 @@ on:
     branches: [main]
   pull_request:
 
+concurrency:
+  group: ${{ github.ref_name || github.sha }}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: bash
 
-
 env:
-  BUILD_CACHE_KEY: ${{ github.event.inputs.commit || github.sha }}
+  BUILD_CACHE_KEY: ${{ github.sha }}
   CACHED_BUILD_PATHS: |
     ${{ github.workspace }}/packages/*/dist
     ${{ github.workspace }}/packages/*/bin
@@ -108,7 +111,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.version }}
+          node-version: ${{ matrix.node_version }}
           cache: 'pnpm'
 
       - name: Setup dependencies
@@ -146,7 +149,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.version }}
+          node-version: ${{ matrix.node_version }}
           cache: 'pnpm'
 
       - name: Setup dependencies
