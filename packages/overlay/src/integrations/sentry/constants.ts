@@ -56,6 +56,51 @@ export const QUERIES_HEADERS = [
   },
 ];
 
+export const TRANSACTIONS_SORT_KEYS = {
+  transaction: 'TRANSACTION',
+  traces: 'TRACES',
+  // TODO:
+  // profiles: 'PROFILES',
+};
+
+export const TRANSACTIONS_TABLE_HEADERS = [
+  {
+    id: 'transaction',
+    title: 'Transaction',
+    sortKey: TRANSACTIONS_SORT_KEYS.transaction,
+    primary: true,
+  },
+  {
+    id: 'traces',
+    title: 'Total Traces',
+    sortKey: TRANSACTIONS_SORT_KEYS.traces,
+  },
+  // TODO:
+  // {
+  //   id: 'profiles',
+  //   title: 'Total Profiles',
+  //   sortKey: TRANSACTIONS_SORT_KEYS.profiles,
+  // },
+];
+
+export const TRANSACTION_SUMMARY_SORT_KEYS = {
+  transaction: 'TRANSACTION_ID',
+  traces: 'TRACE_ID',
+};
+
+export const TRANSACTION_SUMMARY_TABLE_HEADERS = [
+  {
+    id: 'transactionId',
+    title: 'Transaction Id',
+    sortKey: TRANSACTIONS_SORT_KEYS.transaction,
+    primary: true,
+  },
+  {
+    id: 'traceId',
+    title: 'Trace Id',
+    sortKey: TRANSACTIONS_SORT_KEYS.traces,
+  },
+];
 export const QUERY_SUMMARY_SORT_KEYS = {
   foundIn: 'FOUND_IN',
   spanId: 'SPAN_ID',

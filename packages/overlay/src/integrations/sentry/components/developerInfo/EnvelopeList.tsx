@@ -17,7 +17,7 @@ export default function EnvelopeList() {
   const { eventId } = useParams();
   const context = useSpotlightContext();
   const helpers = useSentryHelpers();
-  const [allEnvelopes, localEnvelopes] = useSentryEnvelopes();
+  const { allEnvelopes, localEnvelopes } = useSentryEnvelopes();
   const hiddenItemCount = allEnvelopes.length - localEnvelopes.length;
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);

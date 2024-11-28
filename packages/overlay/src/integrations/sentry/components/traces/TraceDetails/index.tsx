@@ -64,7 +64,7 @@ export default function TraceDetails() {
         <Route path="context" element={<TraceContext traceId={traceId} />} />
         <Route path="errors" element={<EventList traceId={traceId} />} />
         {/* Default tab */}
-        <Route path="*" element={<Navigate to={`/traces/${traceId}/details`} replace />} />
+        <Route path="*" element={<Navigate to={`/explore/traces/${traceId}/details`} replace />} />
       </Routes>
     </>
   );

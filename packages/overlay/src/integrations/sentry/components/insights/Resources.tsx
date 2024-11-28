@@ -67,7 +67,7 @@ const COMPARATORS: Record<ResourceSortTypes, ResourceInfoComparator> = {
 };
 
 const Resources = ({ showAll }: { showAll: boolean }) => {
-  const [allSpans, localSpans] = useSentrySpans();
+  const { allSpans, localSpans } = useSentrySpans();
 
   const [sort, setSort] = useState({
     active: RESOURCES_SORT_KEYS.timeSpent,

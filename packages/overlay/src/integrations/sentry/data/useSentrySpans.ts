@@ -12,5 +12,5 @@ export const useSentrySpans = () => {
 
   const allSpans: Span[] = allTraces.reduce((acc: Span[], trace: Trace) => [...acc, ...trace.spans], []);
   const localSpans: Span[] = localTraces.reduce((acc: Span[], trace: Trace) => [...acc, ...trace.spans], []);
-  return [allSpans, localSpans];
+  return { allSpans, localSpans };
 };

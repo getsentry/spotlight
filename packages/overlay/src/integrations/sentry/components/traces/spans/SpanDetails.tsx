@@ -1,7 +1,9 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
+import JsonViewer from '../../../../../components/JsonViewer';
 import SidePanel, { SidePanelHeader } from '../../../../../ui/SidePanel';
+import { DB_SPAN_REGEX } from '../../../constants';
 import dataCache from '../../../data/sentryDataCache';
 import type { SentryErrorEvent, Span, TraceContext } from '../../../types';
 import { formatBytes } from '../../../utils/bytes';
@@ -9,8 +11,6 @@ import { getDuration } from '../../../utils/duration';
 import DateTime from '../../DateTime';
 import { ErrorTitle } from '../../events/error/Error';
 import SpanTree from './SpanTree';
-import JsonViewer from '../../../../../components/JsonViewer';
-import { DB_SPAN_REGEX } from '../../../constants';
 
 function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) {
   if (desc.startsWith('{') || dbType === 'mongodb') {
@@ -92,7 +92,7 @@ export default function SpanDetails({
   const errors = dataCache.getEventsByTrace(span.trace_id).filter(e => e.type !== 'transaction' && 'exception' in e);
 
   return (
-    <SidePanel backto={`/traces/${span.trace_id}`}>
+    <SidePanel backto={`/explore/traces/${span.trace_id}`}>
       <SidePanelHeader
         title="Span Details"
         subtitle={
@@ -105,7 +105,7 @@ export default function SpanDetails({
             {span.span_id}
           </>
         }
-        backto={`/traces/${span.trace_id}`}
+        backto={`/explore/traces/${span.trace_id}`}
       />
 
       <div className="space-y-6">
@@ -181,7 +181,7 @@ export default function SpanDetails({
                   span.parent_span_id ? (
                     <Link
                       className="underline"
-                      to={`/traces/${span.trace_id}/spans/${span.parent_span_id}`}
+                      to={`/explore/traces/${span.trace_id}/spans/${span.parent_span_id}`}
                       key={`link-to-${span.parent_span_id}`}
                     >
                       {span.parent_span_id}

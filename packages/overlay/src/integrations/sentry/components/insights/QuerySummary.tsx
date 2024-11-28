@@ -26,7 +26,7 @@ const COMPARATORS: Record<QuerySummarySortTypes, SpanInfoComparator> = {
 };
 
 const QuerySummary = ({ showAll }: { showAll: boolean }) => {
-  const [allSpans, localSpans] = useSentrySpans();
+  const { allSpans, localSpans } = useSentrySpans();
   const { type } = useParams();
   const [sort, setSort] = useState({
     active: QUERY_SUMMARY_SORT_KEYS.timeSpent,
@@ -73,7 +73,7 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
             id: 'queries',
             label: 'Queries',
             link: true,
-            to: '/performance/queries',
+            to: '/insights/queries',
           },
           {
             id: 'querySummary',
@@ -123,12 +123,15 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
           {filteredDBSpans.map(span => (
             <tr key={span.span_id} className="hover:bg-primary-900">
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                <Link className="truncate hover:underline" to={`/traces/${span.trace_id}`}>
+                <Link className="truncate hover:underline" to={`/explore/traces/${span.trace_id}`}>
                   {span.trace_id}
                 </Link>
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                <Link className="truncate hover:underline" to={`/traces/${span.trace_id}/spans/${span.span_id}`}>
+                <Link
+                  className="truncate hover:underline"
+                  to={`/explore/traces/${span.trace_id}/spans/${span.span_id}`}
+                >
                   {span.span_id}
                 </Link>
               </td>

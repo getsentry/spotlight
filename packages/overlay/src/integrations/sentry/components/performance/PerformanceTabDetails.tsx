@@ -1,48 +1,31 @@
 import { useState } from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
-import Tabs from '~/components/Tabs';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
-import { useSentrySpans } from '../../data/useSentrySpans';
+import { useSentryEvents } from '../../data/useSentryEvents';
+import { useSentryHelpers } from '../../data/useSentryHelpers';
 import HiddenItemsButton from '../HiddenItemsButton';
-import Queries from './Queries';
-import QuerySummary from './QuerySummary';
-import Resources from './Resources';
-import WebVitals from './webVitals';
-import WebVitalsDetail from './webVitals/WebVitalsDetail';
+import TransactionDetail from './TransactionDetail';
+import TransactionsList from './TransactionsList';
 
 export default function PerformanceTabDetails() {
+  const events = useSentryEvents();
+  const helpers = useSentryHelpers();
   const context = useSpotlightContext();
-  const [allSpans, localSpans] = useSentrySpans();
 
-  const [activeTab, setActiveTab] = useState('');
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
 
-  const hiddenItemCount = allSpans.length - localSpans.length;
+  const allTransactions = events.filter(e => e.type === 'transaction');
+  const filteredTransactions = showAll
+    ? allTransactions
+    : allTransactions.filter(
+        e => (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
+      );
 
-  const tabs = [
-    {
-      id: 'queries',
-      title: 'Queries',
-      active: activeTab === 'queries',
-      onSelect: () => setActiveTab('queries'),
-    },
-    {
-      id: 'webvitals',
-      title: 'Web Vitals',
-      active: activeTab === 'webvitals',
-      onSelect: () => setActiveTab('webvitals'),
-    },
-    {
-      id: 'resources',
-      title: 'Resources',
-      active: activeTab === 'resources',
-      onSelect: () => setActiveTab('resources'),
-    },
-  ];
+  const hiddenItemCount = allTransactions.length - filteredTransactions.length;
 
   return (
-    <>
-      {!showAll && hiddenItemCount > 0 && (
+    <div className="flex-1">
+      {hiddenItemCount > 0 && (
         <HiddenItemsButton
           itemCount={hiddenItemCount}
           onClick={() => {
@@ -50,19 +33,12 @@ export default function PerformanceTabDetails() {
           }}
         />
       )}
-      <Tabs tabs={tabs} nested />
-      <div className="flex-1">
-        <Routes>
-          <Route path="queries/:type" element={<QuerySummary showAll={showAll} />} />
-          <Route path="resources" element={<Resources showAll={showAll} />} />
-          <Route path="webvitals" element={<WebVitals />} />
-          <Route path="webvitals/:page" element={<WebVitalsDetail />} />
-          {/* Default tab */}
-          <Route path="queries" element={<Queries showAll={showAll} />} />
-          <Route path="*" element={<Navigate to="/performance/queries" replace />} />
-        </Routes>
-        <Outlet />
-      </div>
-    </>
+      <Routes>
+        <Route path="transactions" element={<TransactionsList showAll={showAll} />} />
+        <Route path="transactions/:name" element={<TransactionDetail showAll={showAll} />} />
+        <Route path="*" element={<Navigate to="/performance/transactions" replace />} />
+      </Routes>
+      <Outlet />
+    </div>
   );
 }

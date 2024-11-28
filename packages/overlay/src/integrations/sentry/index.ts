@@ -7,9 +7,10 @@ import sentryDataCache from './data/sentryDataCache';
 import { spotlightIntegration } from './sentry-integration';
 import DeveloperInfo from './tabs/DeveloperInfo';
 import ErrorsTab from './tabs/ErrorsTab';
+import ExploreTab from './tabs/ExploreTab';
+import InsightsTab from './tabs/InsightsTab';
 import PerformanceTab from './tabs/PerformanceTab';
 import SdksTab from './tabs/SdksTab';
-import TracesTab from './tabs/TracesTab';
 import type { SentryErrorEvent, SentryEvent } from './types';
 
 const HEADER = 'application/x-sentry-envelope';
@@ -64,7 +65,6 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
             e.type != 'transaction' &&
             (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
         ).length;
-      const localTraces = sentryDataCache.getTraces().filter(t => sentryDataCache.isTraceLocal(t.trace_id) !== false);
 
       return [
         {
@@ -77,12 +77,14 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
           content: ErrorsTab,
         },
         {
-          id: 'traces',
-          title: 'Traces',
-          notificationCount: {
-            count: localTraces.length,
-          },
-          content: TracesTab,
+          id: 'explore',
+          title: 'Explore',
+          content: ExploreTab,
+        },
+        {
+          id: 'insights',
+          title: 'Insights',
+          content: InsightsTab,
         },
         {
           id: 'performance',

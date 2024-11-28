@@ -90,7 +90,7 @@ const WebVitalsDetail = () => {
               id: 'webVitals',
               label: 'Web Vitals',
               link: true,
-              to: '/performance/webvitals',
+              to: '/insights/webvitals',
             },
             {
               id: 'performanceSummary',

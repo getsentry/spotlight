@@ -114,7 +114,7 @@ const WebVitals = () => {
           {measurementEvents.map(event => (
             <tr key={event.event_id} className="hover:bg-primary-900">
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                <Link className="truncate hover:underline" to={`/performance/webvitals/${event.event_id}`}>
+                <Link className="truncate hover:underline" to={`/insights/webvitals/${event.event_id}`}>
                   {event.transaction}
                 </Link>
               </td>
