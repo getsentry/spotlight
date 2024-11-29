@@ -40,9 +40,11 @@ export default function Event({ event }: { event: SentryEvent }) {
   }
 
   return (
-    <h3 className="bg-primary-950 flex flex-col">
-      <strong className="text-xl">Message:</strong>
-      <pre>{getEventMessage(event)}</pre>
-    </h3>
+    <div className="flex-1 px-6 py-4">
+      <h3 className="bg-primary-950 flex flex-col">
+        <strong className="text-xl">Message:</strong>
+        <pre>{getEventMessage(event)}</pre>
+      </h3>
+    </div>
   );
 }

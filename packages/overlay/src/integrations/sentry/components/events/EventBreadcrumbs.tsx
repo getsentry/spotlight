@@ -25,7 +25,7 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
   const breadcrumbs = extractBreadcrumbs(event);
   if (!breadcrumbs || !breadcrumbs.length || breadcrumbs.every(crumb => !crumb.message)) {
     return (
-      <div className="space-y-4">
+      <div className="flex-1 space-y-4 px-6 py-4">
         <div className="text-primary-300">
           No breadcrumbs available for this event. Try adding some to make debugging easier.
         </div>
@@ -34,27 +34,29 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
     );
   }
   return (
-    <div className="divide-primary-800 grid-cols-2-auto -mx-2 grid space-y-2 divide-y">
-      {breadcrumbs
-        .filter(crumb => crumb.message)
-        .map((crumb, crumbIdx) => (
-          <Fragment key={`${crumb.timestamp}-${crumb.category}-${crumb.type}`}>
-            <div className="flex flex-none flex-col p-2">
-              <div className="text-lg font-semibold">{crumb.category || ' '}</div>
-              <div className="text-primary-300 text-xs">
-                <Time date={crumb.timestamp} format="HH:mm:ss" />
+    <div className="flex-1 px-6 py-4">
+      <div className="divide-primary-800 grid-cols-2-auto -mx-2 grid space-y-2 divide-y">
+        {breadcrumbs
+          .filter(crumb => crumb.message)
+          .map((crumb, crumbIdx) => (
+            <Fragment key={`${crumb.timestamp}-${crumb.category}-${crumb.type}`}>
+              <div className="flex flex-none flex-col p-2">
+                <div className="text-lg font-semibold">{crumb.category || ' '}</div>
+                <div className="text-primary-300 text-xs">
+                  <Time date={crumb.timestamp} format="HH:mm:ss" />
+                </div>
               </div>
-            </div>
-            <pre
-              className={classNames(
-                'flex grow items-center whitespace-pre-line p-2 !font-mono',
-                crumbIdx === 0 ? '!border-t-0' : '',
-              )}
-            >
-              {crumb.message}
-            </pre>
-          </Fragment>
-        ))}
+              <pre
+                className={classNames(
+                  'flex grow items-center whitespace-pre-line p-2 !font-mono',
+                  crumbIdx === 0 ? '!border-t-0' : '',
+                )}
+              >
+                {crumb.message}
+              </pre>
+            </Fragment>
+          ))}
+      </div>
     </div>
   );
 }
