@@ -5,12 +5,10 @@ import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
 import sentryDataCache from './data/sentryDataCache';
 import { spotlightIntegration } from './sentry-integration';
-import DeveloperInfo from './tabs/DeveloperInfo';
 import ErrorsTab from './tabs/ErrorsTab';
 import ExploreTab from './tabs/ExploreTab';
 import InsightsTab from './tabs/InsightsTab';
 import PerformanceTab from './tabs/PerformanceTab';
-import SdksTab from './tabs/SdksTab';
 import type { SentryErrorEvent, SentryEvent } from './types';
 
 const HEADER = 'application/x-sentry-envelope';
@@ -90,16 +88,6 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
           id: 'performance',
           title: 'Performance',
           content: PerformanceTab,
-        },
-        {
-          id: 'sdks',
-          title: 'SDKs',
-          content: SdksTab,
-        },
-        {
-          id: 'devInfo',
-          title: 'Developer Info',
-          content: DeveloperInfo,
         },
       ];
     },

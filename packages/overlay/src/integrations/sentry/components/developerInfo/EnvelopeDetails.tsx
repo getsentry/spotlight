@@ -10,7 +10,7 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
   const header = envelope[0];
   const items = envelope[1];
   return (
-    <SidePanel backto="/devInfo">
+    <SidePanel backto="/explore/devInfo">
       <SidePanelHeader
         title="Envelope Details"
         subtitle={
@@ -20,7 +20,7 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
             </>
           ) : undefined
         }
-        backto="/devInfo"
+        backto="/explore/devInfo"
       />
       <label htmlFor="json-toggle" className="mb-8 flex cursor-pointer items-center">
         <div className="relative flex h-4 items-center gap-2">

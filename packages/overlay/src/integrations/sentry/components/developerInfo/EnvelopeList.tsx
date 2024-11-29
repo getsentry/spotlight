@@ -51,7 +51,7 @@ export default function EnvelopeList() {
                 return null;
               }
               return (
-                <Link key={envelopeEventId} to={`/devInfo/${header.event_id}`}>
+                <Link key={envelopeEventId} to={`/explore/devInfo/${header.event_id}`}>
                   <div
                     className={classNames(
                       'hover:bg-primary-900 border-b-primary-900 flex cursor-pointer items-center gap-4 border-b px-6 py-2 transition-all',

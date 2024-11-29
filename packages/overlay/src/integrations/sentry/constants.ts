@@ -58,7 +58,6 @@ export const QUERIES_HEADERS = [
 
 export const TRANSACTIONS_SORT_KEYS = {
   transaction: 'TRANSACTION',
-  traces: 'TRACES',
   // TODO:
   // profiles: 'PROFILES',
 };
@@ -67,13 +66,12 @@ export const TRANSACTIONS_TABLE_HEADERS = [
   {
     id: 'transaction',
     title: 'Transaction',
-    sortKey: TRANSACTIONS_SORT_KEYS.transaction,
     primary: true,
   },
   {
-    id: 'traces',
-    title: 'Total Traces',
-    sortKey: TRANSACTIONS_SORT_KEYS.traces,
+    id: 'totalTransactions',
+    title: 'Total Transactions',
+    sortKey: TRANSACTIONS_SORT_KEYS.transaction,
   },
   // TODO:
   // {
@@ -84,21 +82,29 @@ export const TRANSACTIONS_TABLE_HEADERS = [
 ];
 
 export const TRANSACTION_SUMMARY_SORT_KEYS = {
-  transaction: 'TRANSACTION_ID',
-  traces: 'TRACE_ID',
+  timestamp: 'timestamp',
+  duration: 'duration',
 };
 
 export const TRANSACTION_SUMMARY_TABLE_HEADERS = [
   {
     id: 'transactionId',
     title: 'Transaction Id',
-    sortKey: TRANSACTIONS_SORT_KEYS.transaction,
     primary: true,
+  },
+  {
+    id: 'toalDuration',
+    title: 'Total Duration',
+    sortKey: TRANSACTION_SUMMARY_SORT_KEYS.duration,
+  },
+  {
+    id: 'timestamp',
+    title: 'Timestamp',
+    sortKey: TRANSACTION_SUMMARY_SORT_KEYS.timestamp,
   },
   {
     id: 'traceId',
     title: 'Trace Id',
-    sortKey: TRANSACTIONS_SORT_KEYS.traces,
   },
 ];
 export const QUERY_SUMMARY_SORT_KEYS = {

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
@@ -11,6 +11,7 @@ import { SentryTransactionEvent } from '../../types';
 export default function TransactionsList({ showAll }: { showAll: boolean }) {
   const events = useSentryEvents();
   const helpers = useSentryHelpers();
+  const navigate = useNavigate();
 
   const [sort, setSort] = useState({
     active: TRANSACTIONS_SORT_KEYS.transaction,
@@ -42,11 +43,6 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
       [TRANSACTIONS_SORT_KEYS.transaction]: (a, b) => {
         if (a[0] < b[0]) return -1;
         if (a[0] > b[0]) return 1;
-        return 0;
-      },
-      [TRANSACTIONS_SORT_KEYS.traces]: (a, b) => {
-        if (a[1].length < b[1].length) return -1;
-        if (a[1].length > b[1].length) return 1;
         return 0;
       },
     };
@@ -93,21 +89,22 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
                         'flex cursor-pointer items-center gap-1',
                         header.primary ? 'justify-start' : 'justify-end',
                       )}
-                      onClick={() => toggleSortOrder(header.sortKey)}
+                      onClick={() => header.sortKey && toggleSortOrder(header.sortKey)}
                     >
                       {header.title}
-                      {sort.active === header.sortKey ? (
-                        <SortDown
-                          width={12}
-                          height={12}
-                          className={classNames(
-                            'fill-primary-300',
-                            sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
-                          )}
-                        />
-                      ) : (
-                        <Sort width={12} height={12} className="stroke-primary-300" />
-                      )}
+                      {header.sortKey &&
+                        (sort.active === header.sortKey ? (
+                          <SortDown
+                            width={12}
+                            height={12}
+                            className={classNames(
+                              'fill-primary-300',
+                              sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
+                            )}
+                          />
+                        ) : (
+                          <Sort width={12} height={12} className="stroke-primary-300" />
+                        ))}
                     </div>
                   </th>
                 ))}
@@ -116,12 +113,15 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
 
             <tbody>
               {transactionsList.map(([key, value]: [string, SentryTransactionEvent[]]) => (
-                <tr key={key} className="hover:bg-primary-900">
-                  <td className="text-primary-200 w-3/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                    {/* Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa */}
-                    <Link className="truncate hover:underline" to={`/performance/transactions/${btoa(key)}`}>
-                      {key}
-                    </Link>
+                <tr
+                  key={key}
+                  className="hover:bg-primary-900 cursor-pointer"
+                  onClick={() => {
+                    navigate(`/performance/transactions/${btoa(key)}`);
+                  }}
+                >
+                  <td className="text-primary-200 w-4/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
+                    {key}
                   </td>
                   <td className="text-primary-200 w-1/5 whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                     {value.length}
