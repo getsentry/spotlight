@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
@@ -17,26 +17,6 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
     asc: false,
   });
 
-  const allTransactions = events.filter(e => e.type === 'transaction');
-  const filteredTransactions = showAll
-    ? allTransactions
-    : allTransactions.filter(
-        e => (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
-      );
-  const groupedTransactions: Record<string, SentryTransactionEvent[]> = filteredTransactions.reduce(
-    (acc, curr) => {
-      if (curr.transaction) {
-        if ((curr.transaction as string) in acc) {
-          acc[curr.transaction].push(curr);
-        } else {
-          acc[curr.transaction] = [curr];
-        }
-      }
-      return acc;
-    },
-    {} as Record<string, SentryTransactionEvent[]>,
-  );
-
   const toggleSortOrder = (type: string) =>
     setSort(prev =>
       prev.active === type
@@ -50,9 +30,51 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
           },
     );
 
+  type GroupedTransactions = Record<string, SentryTransactionEvent[]>;
+  type TransactionsInfoComparator = (
+    a: [string, SentryTransactionEvent[]],
+    b: [string, SentryTransactionEvent[]],
+  ) => number;
+  type TransactionsSortTypes = (typeof TRANSACTIONS_SORT_KEYS)[keyof typeof TRANSACTIONS_SORT_KEYS];
+
+  const transactionsList: [string, SentryTransactionEvent[]][] = useMemo(() => {
+    const COMPARATORS: Record<TransactionsSortTypes, TransactionsInfoComparator> = {
+      [TRANSACTIONS_SORT_KEYS.transaction]: (a, b) => {
+        if (a[0] < b[0]) return -1;
+        if (a[0] > b[0]) return 1;
+        return 0;
+      },
+      [TRANSACTIONS_SORT_KEYS.traces]: (a, b) => {
+        if (a[1].length < b[1].length) return -1;
+        if (a[1].length > b[1].length) return 1;
+        return 0;
+      },
+    };
+    const compareTransactions = COMPARATORS[sort.active] || COMPARATORS[TRANSACTIONS_SORT_KEYS.transaction];
+    const allTransactions = events.filter(e => e.type === 'transaction');
+    const filteredTransactions = showAll
+      ? allTransactions
+      : allTransactions.filter(
+          e => (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
+        );
+    const groupedTransactions: GroupedTransactions = filteredTransactions.reduce((acc, curr) => {
+      if (curr.transaction) {
+        if ((curr.transaction as string) in acc) {
+          acc[curr.transaction].push(curr);
+        } else {
+          acc[curr.transaction] = [curr];
+        }
+      }
+      return acc;
+    }, {} as GroupedTransactions);
+    return Object.entries(groupedTransactions).sort((a, b) =>
+      sort.asc ? compareTransactions(a, b) : compareTransactions(b, a),
+    );
+  }, [sort, showAll, events, helpers]);
+
   return (
     <>
-      {allTransactions.length !== 0 ? (
+      {transactionsList.length !== 0 ? (
         <div>
           <table className="divide-primary-700 w-full table-fixed divide-y">
             <thead>
@@ -93,7 +115,7 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
             </thead>
 
             <tbody>
-              {Object.entries(groupedTransactions).map(([key, value]: [string, SentryTransactionEvent[]]) => (
+              {transactionsList.map(([key, value]: [string, SentryTransactionEvent[]]) => (
                 <tr key={key} className="hover:bg-primary-900">
                   <td className="text-primary-200 w-3/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
                     {/* Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa */}

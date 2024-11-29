@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
@@ -7,6 +7,7 @@ import Breadcrumbs from '~/ui/Breadcrumbs';
 import { TRANSACTION_SUMMARY_SORT_KEYS, TRANSACTION_SUMMARY_TABLE_HEADERS } from '../../constants';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
+import { SentryTransactionEvent } from '../../types';
 
 export default function TransactionDetail({ showAll }: { showAll: boolean }) {
   const { name } = useParams();
@@ -18,15 +19,6 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
     active: TRANSACTION_SUMMARY_SORT_KEYS.transaction,
     asc: false,
   });
-
-  // Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/atob
-  const decodedTxnName: string = atob(name!);
-  const allTransactions = events.filter(e => e.type === 'transaction' && e.transaction === decodedTxnName);
-  const filteredTransactions = showAll
-    ? allTransactions
-    : allTransactions.filter(
-        e => (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
-      );
 
   const toggleSortOrder = (type: string) =>
     setSort(prev =>
@@ -41,9 +33,47 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
           },
     );
 
+  type TransactionsInfoComparator = (a: SentryTransactionEvent, b: SentryTransactionEvent) => number;
+  type TransactionsSortTypes = (typeof TRANSACTION_SUMMARY_SORT_KEYS)[keyof typeof TRANSACTION_SUMMARY_SORT_KEYS];
+
+  const transactionsList: SentryTransactionEvent[] = useMemo(() => {
+    if (!name) {
+      return [];
+    }
+    const COMPARATORS: Record<TransactionsSortTypes, TransactionsInfoComparator> = {
+      [TRANSACTION_SUMMARY_SORT_KEYS.transaction]: (a, b) => {
+        if (a.event_id! < b.event_id!) return -1;
+        if (a.event_id! > b.event_id!) return 1;
+        return 0;
+      },
+      [TRANSACTION_SUMMARY_SORT_KEYS.traces]: (a, b) => {
+        if (a?.contexts?.trace?.trace_id < b?.contexts?.trace?.trace_id) return -1;
+        if (a?.contexts?.trace?.trace_id > b?.contexts?.trace?.trace_id) return 1;
+        return 0;
+      },
+    };
+
+    // Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/atob
+    const decodedTxnName: string = atob(name!);
+    const allTransactions: SentryTransactionEvent[] = events
+      .filter(e => e.type === 'transaction')
+      .filter(e => e.transaction === decodedTxnName);
+    const filteredTransactions: SentryTransactionEvent[] = showAll
+      ? allTransactions
+      : allTransactions.filter(
+          e => (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
+        );
+    const compareTransactions = COMPARATORS[sort.active] || COMPARATORS[TRANSACTION_SUMMARY_SORT_KEYS.transaction];
+
+    const sortedTransactions: SentryTransactionEvent[] = filteredTransactions.sort((a, b) =>
+      sort.asc ? compareTransactions(a, b) : compareTransactions(b, a),
+    );
+    return sortedTransactions;
+  }, [sort, showAll, events, helpers, name]);
+
   return (
     <>
-      {allTransactions.length !== 0 ? (
+      {transactionsList.length !== 0 ? (
         <div>
           <Breadcrumbs
             crumbs={[
@@ -99,7 +129,7 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
             </thead>
 
             <tbody>
-              {filteredTransactions.map(txn => (
+              {transactionsList.map(txn => (
                 <tr key={txn.event_id} className="hover:bg-primary-900">
                   <td className="text-primary-200 w-3/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
                     {/* Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa */}
