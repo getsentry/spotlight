@@ -427,7 +427,7 @@ export function clearBuffer(): void {
 export function shutdown() {
   if (serverInstance) {
     logger.info('Shutting down server...');
-    serverInstance.close();
+    serverInstance.closeAllConnections();
   }
 }
 
