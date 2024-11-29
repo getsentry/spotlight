@@ -8,10 +8,6 @@ import Event, { EventTitle } from './Event';
 import EventBreadcrumbs from './EventBreadcrumbs';
 import EventContexts from './EventContexts';
 
-function renderEvent(event: SentryEvent) {
-  return <Event event={event} />;
-}
-
 function renderEventTitle(event: SentryEvent) {
   return <EventTitle event={event} />;
 }
@@ -75,15 +71,13 @@ export default function EventDetails() {
         )}
       </div>
       <Tabs tabs={tabs} nested={true} />
-      <div className="flex-1 px-6 py-4">
-        <Routes>
-          <Route path="breadcrumbs" element={<EventBreadcrumbs event={event} />} />
-          <Route path="contexts" element={<EventContexts event={event} />} />
-          {/* Default tab */}
-          <Route path="*" element={renderEvent(event)} />
-        </Routes>
-        <Outlet />
-      </div>
+      <Routes>
+        <Route path="breadcrumbs" element={<EventBreadcrumbs event={event} />} />
+        <Route path="contexts" element={<EventContexts event={event} />} />
+        {/* Default tab */}
+        <Route path="*" element={<Event event={event} />} />
+      </Routes>
+      <Outlet />
     </>
   );
 }
