@@ -146,7 +146,7 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
                       className="truncate hover:underline"
                       to={`/explore/traces/${txn.contexts?.trace?.trace_id}/spans/${txn.contexts?.trace?.span_id}`}
                     >
-                      {txn.event_id}
+                      {txn.event_id.substring(0, 8)}
                     </Link>
                   </td>
                   <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
@@ -160,7 +160,7 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
                   <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                     {/* Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa */}
                     <Link className="truncate hover:underline" to={`/explore/traces/${txn.contexts?.trace?.trace_id}`}>
-                      {txn.contexts?.trace?.trace_id}
+                      {txn.contexts?.trace?.trace_id?.substring(0, 8)}
                     </Link>
                   </td>
                 </tr>
