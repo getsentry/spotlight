@@ -57,7 +57,8 @@ export const QUERIES_HEADERS = [
 ];
 
 export const TRANSACTIONS_SORT_KEYS = {
-  transaction: 'TRANSACTION',
+  count: 'count',
+  lastSeen: 'lastSeen',
   // TODO:
   // profiles: 'PROFILES',
 };
@@ -69,9 +70,14 @@ export const TRANSACTIONS_TABLE_HEADERS = [
     primary: true,
   },
   {
-    id: 'totalTransactions',
-    title: 'Total Transactions',
-    sortKey: TRANSACTIONS_SORT_KEYS.transaction,
+    id: 'lastSeen',
+    title: 'Last Seen',
+    sortKey: TRANSACTIONS_SORT_KEYS.lastSeen,
+  },
+  {
+    id: 'count',
+    title: 'Count',
+    sortKey: TRANSACTIONS_SORT_KEYS.count,
   },
   // TODO:
   // {

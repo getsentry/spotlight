@@ -7,6 +7,7 @@ import { TRANSACTIONS_SORT_KEYS, TRANSACTIONS_TABLE_HEADERS } from '../../consta
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
 import { SentryTransactionEvent } from '../../types';
+import DateTime from '../DateTime';
 
 export default function TransactionsList({ showAll }: { showAll: boolean }) {
   const events = useSentryEvents();
@@ -14,7 +15,7 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
   const navigate = useNavigate();
 
   const [sort, setSort] = useState({
-    active: TRANSACTIONS_SORT_KEYS.transaction,
+    active: '',
     asc: false,
   });
 
@@ -31,34 +32,48 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
           },
     );
 
-  type GroupedTransactions = Record<string, SentryTransactionEvent[]>;
+  type GroupedTransactionsValue = {
+    transactions: SentryTransactionEvent[];
+    lastSeen: number;
+  };
+  type GroupedTransactions = Record<string, GroupedTransactionsValue>;
+
   type TransactionsInfoComparator = (
-    a: [string, SentryTransactionEvent[]],
-    b: [string, SentryTransactionEvent[]],
+    a: [string, GroupedTransactionsValue],
+    b: [string, GroupedTransactionsValue],
   ) => number;
   type TransactionsSortTypes = (typeof TRANSACTIONS_SORT_KEYS)[keyof typeof TRANSACTIONS_SORT_KEYS];
 
-  const transactionsList: [string, SentryTransactionEvent[]][] = useMemo(() => {
+  const transactionsList: [string, GroupedTransactionsValue][] = useMemo(() => {
     const COMPARATORS: Record<TransactionsSortTypes, TransactionsInfoComparator> = {
-      [TRANSACTIONS_SORT_KEYS.transaction]: (a, b) => {
-        if (a[0] < b[0]) return -1;
-        if (a[0] > b[0]) return 1;
+      [TRANSACTIONS_SORT_KEYS.count]: (a, b) => {
+        if (a[1].transactions.length < b[1].transactions.length) return -1;
+        if (a[1].transactions.length > b[1].transactions.length) return 1;
+        return 0;
+      },
+
+      [TRANSACTIONS_SORT_KEYS.count]: (a, b) => {
+        if (a[1].lastSeen < b[1].lastSeen) return -1;
+        if (a[1].lastSeen < b[1].lastSeen) return 1;
         return 0;
       },
     };
-    const compareTransactions = COMPARATORS[sort.active] || COMPARATORS[TRANSACTIONS_SORT_KEYS.transaction];
+    const compareTransactions = COMPARATORS[sort.active] || COMPARATORS[TRANSACTIONS_SORT_KEYS.count];
     const allTransactions = events.filter(e => e.type === 'transaction');
     const filteredTransactions = showAll
       ? allTransactions
       : allTransactions.filter(
           e => (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
         );
-    const groupedTransactions: GroupedTransactions = filteredTransactions.reduce((acc, curr) => {
+
+    const sortedTransactions = filteredTransactions.sort((a, b) => a.start_timestamp - b.start_timestamp);
+    const groupedTransactions: GroupedTransactions = sortedTransactions.reduce((acc, curr) => {
       if (curr.transaction) {
         if ((curr.transaction as string) in acc) {
-          acc[curr.transaction].push(curr);
+          acc[curr.transaction].transactions.push(curr);
+          if (curr.start_timestamp) acc[curr.transaction].lastSeen = curr.start_timestamp;
         } else {
-          acc[curr.transaction] = [curr];
+          acc[curr.transaction] = { transactions: [curr], lastSeen: curr.start_timestamp };
         }
       }
       return acc;
@@ -81,7 +96,7 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
                     scope="col"
                     className={classNames(
                       'text-primary-100 select-none px-6 py-3.5 text-sm font-semibold',
-                      header.primary ? 'w-2/5' : 'w-[15%]',
+                      header.primary ? 'w-3/5' : 'w-1/5',
                     )}
                   >
                     <div
@@ -112,7 +127,7 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
             </thead>
 
             <tbody>
-              {transactionsList.map(([key, value]: [string, SentryTransactionEvent[]]) => (
+              {transactionsList.map(([key, value]: [string, GroupedTransactionsValue]) => (
                 <tr
                   key={key}
                   className="hover:bg-primary-900 cursor-pointer"
@@ -120,11 +135,14 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
                     navigate(`/performance/transactions/${btoa(key)}`);
                   }}
                 >
-                  <td className="text-primary-200 w-4/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
+                  <td className="text-primary-200 w-3/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
                     {key}
                   </td>
                   <td className="text-primary-200 w-1/5 whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                    {value.length}
+                    {<DateTime date={value.lastSeen} />}
+                  </td>
+                  <td className="text-primary-200 w-1/5 whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                    {value.transactions.length}
                   </td>
                 </tr>
               ))}

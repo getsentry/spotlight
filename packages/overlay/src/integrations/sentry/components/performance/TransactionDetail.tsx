@@ -18,7 +18,7 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
   const helpers = useSentryHelpers();
 
   const [sort, setSort] = useState({
-    active: TRANSACTION_SUMMARY_SORT_KEYS.timestamp,
+    active: '',
     asc: false,
   });
 
