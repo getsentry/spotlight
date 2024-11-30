@@ -94,8 +94,8 @@ export const TRANSACTION_SUMMARY_SORT_KEYS = {
 
 export const TRANSACTION_SUMMARY_TABLE_HEADERS = [
   {
-    id: 'transactionId',
-    title: 'Transaction Id',
+    id: 'eventId',
+    title: 'Event Id',
     primary: true,
   },
   {
