@@ -8,6 +8,7 @@ import { useSpotlightContext } from '../../../../lib/useSpotlightContext';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
 import { useSentryTraces } from '../../data/useSentryTraces';
 import { getDuration } from '../../utils/duration';
+import { truncateId } from '../../utils/misc';
 import HiddenItemsButton from '../HiddenItemsButton';
 import TraceIcon from './TraceIcon';
 
@@ -43,7 +44,7 @@ export default function TraceList() {
                 <TraceIcon trace={trace} />
                 <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
                   <div className="flex items-center gap-x-2">
-                    <div>{trace.trace_id.substring(0, 8)}</div>
+                    <div>{truncateId(trace.trace_id)}</div>
                     {helpers.isLocalToSession(trace.trace_id) ? (
                       <Badge title="This trace is part of your local session.">Local</Badge>
                     ) : null}

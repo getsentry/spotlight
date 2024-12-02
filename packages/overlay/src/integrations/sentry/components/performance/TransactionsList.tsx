@@ -46,18 +46,10 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
 
   const transactionsList: [string, GroupedTransactionsValue][] = useMemo(() => {
     const COMPARATORS: Record<TransactionsSortTypes, TransactionsInfoComparator> = {
-      [TRANSACTIONS_SORT_KEYS.count]: (a, b) => {
-        if (a[1].transactions.length < b[1].transactions.length) return -1;
-        if (a[1].transactions.length > b[1].transactions.length) return 1;
-        return 0;
-      },
-
-      [TRANSACTIONS_SORT_KEYS.count]: (a, b) => {
-        if (a[1].lastSeen < b[1].lastSeen) return -1;
-        if (a[1].lastSeen < b[1].lastSeen) return 1;
-        return 0;
-      },
+      [TRANSACTIONS_SORT_KEYS.count]: (a, b) => a[1].transactions.length - b[1].transactions.length,
+      [TRANSACTIONS_SORT_KEYS.count]: (a, b) => a[1].lastSeen - b[1].lastSeen,
     };
+
     const compareTransactions = COMPARATORS[sort.active] || COMPARATORS[TRANSACTIONS_SORT_KEYS.count];
     const allTransactions = events.filter(e => e.type === 'transaction');
     const filteredTransactions = showAll

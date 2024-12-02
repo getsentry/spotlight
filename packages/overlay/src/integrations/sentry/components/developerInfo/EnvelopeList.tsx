@@ -8,6 +8,7 @@ import Badge from '~/ui/Badge';
 import sentryDataCache from '../../data/sentryDataCache';
 import { useSentryEnvelopes } from '../../data/useSentryEnvelopes';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
+import { truncateId } from '../../utils/misc';
 import { sdkToPlatform } from '../../utils/sdkToPlatform';
 import HiddenItemsButton from '../HiddenItemsButton';
 import PlatformIcon from '../PlatformIcon';
@@ -62,7 +63,7 @@ export default function EnvelopeList() {
                     <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
                       <h2 className="text-primary-50 text-xs">Event Id</h2>
                       <div className="flex items-center gap-x-2">
-                        <div>{envelopeEventId.substring(0, 8)}</div>
+                        <div>{truncateId(envelopeEventId)}</div>
                         {trace_id && helpers.isLocalToSession(trace_id) ? (
                           <Badge title="This trace is part of your local session.">Local</Badge>
                         ) : null}

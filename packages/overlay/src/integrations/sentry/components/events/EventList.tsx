@@ -7,6 +7,7 @@ import TimeSince from '../../../../components/TimeSince';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
 import type { SentryEvent } from '../../types';
+import { truncateId } from '../../utils/misc';
 import HiddenItemsButton from '../HiddenItemsButton';
 import PlatformIcon from '../PlatformIcon';
 import { EventSummary } from './Event';
@@ -51,7 +52,7 @@ export default function EventList({ traceId }: { traceId?: string }) {
             <PlatformIcon event={e} className="text-primary-300 rounded-md" />
             <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
               <div className="flex items-center gap-x-2">
-                <div>{(e.event_id || '').substring(0, 8)}</div>
+                <div>{truncateId(e.event_id)}</div>
                 {traceId && helpers.isLocalToSession(traceId) ? (
                   <Badge title="This event is part of your local session.">Local</Badge>
                 ) : null}

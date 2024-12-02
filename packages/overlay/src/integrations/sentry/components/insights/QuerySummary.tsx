@@ -8,6 +8,7 @@ import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from '../../constants'
 import { useSentrySpans } from '../../data/useSentrySpans';
 import type { Span } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
+import { truncateId } from '../../utils/misc';
 
 type SpanInfoComparator = (a: Span, b: Span) => number;
 type QuerySummarySortTypes = (typeof QUERY_SUMMARY_SORT_KEYS)[keyof typeof QUERY_SUMMARY_SORT_KEYS];
@@ -124,7 +125,7 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
             <tr key={span.span_id} className="hover:bg-primary-900">
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
                 <Link className="truncate hover:underline" to={`/explore/traces/${span.trace_id}`}>
-                  {span.trace_id.substring(0, 8)}
+                  {truncateId(span.trace_id)}
                 </Link>
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
@@ -132,7 +133,7 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
                   className="truncate hover:underline"
                   to={`/explore/traces/${span.trace_id}/spans/${span.span_id}`}
                 >
-                  {span.span_id.substring(0, 8)}
+                  {truncateId(span.span_id)}
                 </Link>
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">

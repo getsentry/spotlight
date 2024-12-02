@@ -9,6 +9,7 @@ import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
 import { SentryTransactionEvent } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
+import { truncateId } from '../../utils/misc';
 import DateTime from '../DateTime';
 
 export default function TransactionDetail({ showAll }: { showAll: boolean }) {
@@ -18,7 +19,7 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
   const helpers = useSentryHelpers();
 
   const [sort, setSort] = useState({
-    active: '',
+    active: TRANSACTION_SUMMARY_SORT_KEYS.timestamp,
     asc: false,
   });
 
@@ -43,18 +44,9 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
       return [];
     }
     const COMPARATORS: Record<TransactionsSortTypes, TransactionsInfoComparator> = {
-      [TRANSACTION_SUMMARY_SORT_KEYS.timestamp]: (a, b) => {
-        if (a.start_timestamp < b.start_timestamp) return -1;
-        if (a.start_timestamp > b.start_timestamp) return 1;
-        return 0;
-      },
-      [TRANSACTION_SUMMARY_SORT_KEYS.duration]: (a, b) => {
-        const aDuration = a.timestamp - a.start_timestamp;
-        const bDuration = b.timestamp - b.start_timestamp;
-        if (aDuration < bDuration) return -1;
-        if (aDuration > bDuration) return 1;
-        return 0;
-      },
+      [TRANSACTION_SUMMARY_SORT_KEYS.timestamp]: (a, b) => a.start_timestamp - b.start_timestamp,
+      [TRANSACTION_SUMMARY_SORT_KEYS.duration]: (a, b) =>
+        a.timestamp + b.start_timestamp - a.start_timestamp - b.timestamp,
     };
 
     // Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/atob
@@ -146,7 +138,7 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
                       className="truncate hover:underline"
                       to={`/explore/traces/${txn.contexts?.trace?.trace_id}/spans/${txn.contexts?.trace?.span_id}`}
                     >
-                      {txn.event_id.substring(0, 8)}
+                      {truncateId(txn.event_id)}
                     </Link>
                   </td>
                   <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
@@ -160,7 +152,7 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
                   <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                     {/* Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa */}
                     <Link className="truncate hover:underline" to={`/explore/traces/${txn.contexts?.trace?.trace_id}`}>
-                      {txn.contexts?.trace?.trace_id?.substring(0, 8)}
+                      {truncateId(txn.contexts?.trace?.trace_id)}
                     </Link>
                   </td>
                 </tr>
