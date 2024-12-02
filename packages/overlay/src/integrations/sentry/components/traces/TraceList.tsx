@@ -1,30 +1,27 @@
 import { useState } from 'react';
 import type { Trace } from '../../types';
 import { Link } from 'react-router-dom';
-import Badge from '~/ui/Badge';
 import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
 import classNames from '../../../../lib/classNames';
 import { useSpotlightContext } from '../../../../lib/useSpotlightContext';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
 import { useSentryTraces } from '../../data/useSentryTraces';
+import Badge from '../../../../ui/Badge';
+import Tag from '../../../../ui/Tag';
 import { getDuration } from '../../utils/duration';
 import HiddenItemsButton from '../HiddenItemsButton';
 import TraceIcon from './TraceIcon';
 
 function TransactionName({ trace }: { trace: Trace }) {
   const method = String(
-    trace.rootTransaction?.contexts?.trace.data?.method || trace.rootTransaction?.request?.method || '(GET)',
+    trace.rootTransaction?.contexts?.trace.data?.method || trace.rootTransaction?.request?.method || '',
   );
-  const name = trace.rootTransactionName.startsWith(method)
-    ? trace.rootTransactionName.slice(method.length + 1)
-    : trace.rootTransactionName;
-  return (
-    <div className="border-primary-300 bg-primary-900 divide-x-primary-300 text-smflex inline-flex divide-x whitespace-nowrap rounded-full border font-mono">
-      <div className="px-2 py-1 font-semibold">{method}</div>
-      <div className="bg-primary-800 rounded-r-full px-2 py-1">{name}</div>
-    </div>
-  );
+  const name =
+    method && trace.rootTransactionName.startsWith(method)
+      ? trace.rootTransactionName.slice(method.length + 1)
+      : trace.rootTransactionName;
+  return <Tag tagKey={method} value={name} />;
 }
 
 export default function TraceList() {
