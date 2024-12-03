@@ -241,6 +241,12 @@ function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions) {
     }
   }
 
+  // HACK: Force enable transactions for this session and disable the existing DSN
+  // @ts-ignore
+  sentryClient._dsn = undefined;
+  // @ts-ignore
+  sentryClient._options.tracesSampler = () => 1;
+
   try {
     const integration = spotlightIntegration();
     sentryClient.addIntegration(integration);
