@@ -1,5 +1,22 @@
 # @spotlightjs/core
 
+## 2.8.0
+
+### Minor Changes
+
+- Traces now use the same context tab with errors ([#596](https://github.com/getsentry/spotlight/pull/596))
+
+- Add method name to trace list ([#599](https://github.com/getsentry/spotlight/pull/599))
+
+- - Restructured sentry integration tabs ([#592](https://github.com/getsentry/spotlight/pull/592))
+
+### Patch Changes
+
+- Force-enable tracing with FE spotlight injection ([#602](https://github.com/getsentry/spotlight/pull/602))
+
+- - Fixed trace context page in case of no transaction events. ([#600](https://github.com/getsentry/spotlight/pull/600))
+  - Fixed import of vitePreprocess in astro-playground
+
 ## 2.7.1
 
 ### Patch Changes

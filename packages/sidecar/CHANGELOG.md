@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 1.9.2
+
+### Patch Changes
+
+- Fix hang at SIGINT termination ([#597](https://github.com/getsentry/spotlight/pull/597))
+
 ## 1.9.1
 
 ### Patch Changes

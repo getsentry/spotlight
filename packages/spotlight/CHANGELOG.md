@@ -1,5 +1,29 @@
 # @spotlightjs/spotlight
 
+## 2.7.0
+
+### Minor Changes
+
+- Traces now use the same context tab with errors ([#596](https://github.com/getsentry/spotlight/pull/596))
+
+- Add method name to trace list ([#599](https://github.com/getsentry/spotlight/pull/599))
+
+### Patch Changes
+
+- Don't upload platform binaries to npm :facepalm: ([#604](https://github.com/getsentry/spotlight/pull/604))
+
+- Fix hang at SIGINT termination ([#597](https://github.com/getsentry/spotlight/pull/597))
+
+- Updated dependencies
+  [[`0ce5ee3206c0ce2e10a523fb3dbe6bff05ef2e01`](https://github.com/getsentry/spotlight/commit/0ce5ee3206c0ce2e10a523fb3dbe6bff05ef2e01),
+  [`678dbf7240b7b97fe191356e1ec35d20875e132b`](https://github.com/getsentry/spotlight/commit/678dbf7240b7b97fe191356e1ec35d20875e132b),
+  [`a41abc5685fe05025edbd04e90dae10b96b99516`](https://github.com/getsentry/spotlight/commit/a41abc5685fe05025edbd04e90dae10b96b99516),
+  [`12ab0a765325030fa4d1405cd172329e1ecfc817`](https://github.com/getsentry/spotlight/commit/12ab0a765325030fa4d1405cd172329e1ecfc817),
+  [`630b83b5631d366eaa7fbdd1bb8756c591a506f3`](https://github.com/getsentry/spotlight/commit/630b83b5631d366eaa7fbdd1bb8756c591a506f3),
+  [`19cbcbf58db52eadef927a0e25426381071be3fc`](https://github.com/getsentry/spotlight/commit/19cbcbf58db52eadef927a0e25426381071be3fc)]:
+  - @spotlightjs/overlay@2.8.0
+  - @spotlightjs/sidecar@1.9.2
+
 ## 2.6.3
 
 ### Patch Changes
