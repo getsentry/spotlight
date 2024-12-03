@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
-import TraceDetails from '../components/traces/TraceDetails';
-import TraceList from '../components/traces/TraceList';
+import TraceDetails from './TraceDetails';
+import TraceList from './TraceList';
 
 export default function TracesTab() {
   return (

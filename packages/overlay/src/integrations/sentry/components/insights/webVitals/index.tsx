@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import { PERFORMANCE_SCORE_PROFILES, WEB_VITALS_HEADERS, WEB_VITALS_SORT_KEYS } from '~/integrations/sentry/constants';
 import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
+import useSort from '~/integrations/sentry/hooks/useSort';
 import type { SentryEventWithPerformanceData } from '~/integrations/sentry/types';
 import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
 import classNames from '~/lib/classNames';
@@ -27,23 +28,7 @@ const COMPARATORS: Record<WebVitalsSortTypes, SentryEventComparator> = {
 
 const WebVitals = () => {
   const events = useSentryEvents();
-  const [sort, setSort] = useState({
-    active: WEB_VITALS_SORT_KEYS.score,
-    asc: false,
-  });
-
-  const toggleSortOrder = (type: string) =>
-    setSort(prev =>
-      prev.active === type
-        ? {
-            active: type,
-            asc: !prev.asc,
-          }
-        : {
-            active: type,
-            asc: false,
-          },
-    );
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: WEB_VITALS_SORT_KEYS.score });
 
   const measurementEvents: SentryEventWithPerformanceData[] = useMemo(() => {
     const compareEvents = COMPARATORS[sort.active] || COMPARATORS[WEB_VITALS_SORT_KEYS.score];

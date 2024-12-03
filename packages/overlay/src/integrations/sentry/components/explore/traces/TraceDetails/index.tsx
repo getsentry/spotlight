@@ -1,7 +1,7 @@
 import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
-import Tabs from '../../../../../components/Tabs';
-import { default as dataCache, default as sentryDataCache } from '../../../data/sentryDataCache';
-import EventList from '../../events/EventList';
+import Tabs from '../../../../../../components/Tabs';
+import { default as dataCache, default as sentryDataCache } from '../../../../data/sentryDataCache';
+import EventList from '../../../events/EventList';
 import TraceContext from './components/TraceContext';
 import TraceDetailHeader from './components/TraceDetailHeader';
 import TraceTreeview from './components/TraceTreeview';

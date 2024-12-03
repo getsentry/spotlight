@@ -17,9 +17,10 @@ export default function PerformanceTabDetails() {
   const allTransactions = events.filter(e => e.type === 'transaction');
   const filteredTransactions = showAll
     ? allTransactions
-    : allTransactions.filter(
-        e => (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
-      );
+    : allTransactions.filter(t => {
+        const traceId = t.contexts?.trace?.trace_id;
+        return !traceId || helpers.isLocalToSession(traceId);
+      });
 
   const hiddenItemCount = allTransactions.length - filteredTransactions.length;
 

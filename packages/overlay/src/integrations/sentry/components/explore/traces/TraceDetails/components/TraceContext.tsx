@@ -1,8 +1,8 @@
 import sentryDataCache from '~/integrations/sentry/data/sentryDataCache';
 import type { Tags as TagsType, Trace } from '~/integrations/sentry/types';
 import { getDuration } from '~/integrations/sentry/utils/duration';
-import DateTime from '../../../DateTime';
-import Tags from '../../../Tags';
+import DateTime from '../../../../DateTime';
+import Tags from '../../../../Tags';
 
 type TraceGeneralInfoProps = {
   trace: Trace;

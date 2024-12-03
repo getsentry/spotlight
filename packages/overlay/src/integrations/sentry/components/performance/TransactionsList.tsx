@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
@@ -6,6 +6,7 @@ import classNames from '~/lib/classNames';
 import { TRANSACTIONS_SORT_KEYS, TRANSACTIONS_TABLE_HEADERS } from '../../constants';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
+import useSort from '../../hooks/useSort';
 import { SentryTransactionEvent } from '../../types';
 import DateTime from '../DateTime';
 
@@ -14,23 +15,7 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
   const helpers = useSentryHelpers();
   const navigate = useNavigate();
 
-  const [sort, setSort] = useState({
-    active: '',
-    asc: false,
-  });
-
-  const toggleSortOrder = (type: string) =>
-    setSort(prev =>
-      prev.active === type
-        ? {
-            active: type,
-            asc: !prev.asc,
-          }
-        : {
-            active: type,
-            asc: false,
-          },
-    );
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: TRANSACTIONS_SORT_KEYS.lastSeen });
 
   type GroupedTransactionsValue = {
     transactions: SentryTransactionEvent[];
@@ -47,19 +32,19 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
   const transactionsList: [string, GroupedTransactionsValue][] = useMemo(() => {
     const COMPARATORS: Record<TransactionsSortTypes, TransactionsInfoComparator> = {
       [TRANSACTIONS_SORT_KEYS.count]: (a, b) => a[1].transactions.length - b[1].transactions.length,
-      [TRANSACTIONS_SORT_KEYS.count]: (a, b) => a[1].lastSeen - b[1].lastSeen,
+      [TRANSACTIONS_SORT_KEYS.lastSeen]: (a, b) => a[1].lastSeen - b[1].lastSeen,
     };
 
-    const compareTransactions = COMPARATORS[sort.active] || COMPARATORS[TRANSACTIONS_SORT_KEYS.count];
+    const compareTransactions = COMPARATORS[sort.active] || COMPARATORS[TRANSACTIONS_SORT_KEYS.lastSeen];
     const allTransactions = events.filter(e => e.type === 'transaction');
     const filteredTransactions = showAll
       ? allTransactions
-      : allTransactions.filter(
-          e => (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
-        );
+      : allTransactions.filter(t => {
+          const traceId = t.contexts?.trace?.trace_id;
+          return !traceId || helpers.isLocalToSession(traceId);
+        });
 
-    const sortedTransactions = filteredTransactions.sort((a, b) => a.start_timestamp - b.start_timestamp);
-    const groupedTransactions: GroupedTransactions = sortedTransactions.reduce((acc, curr) => {
+    const groupedTransactions: GroupedTransactions = filteredTransactions.reduce((acc, curr) => {
       if (curr.transaction) {
         if ((curr.transaction as string) in acc) {
           acc[curr.transaction].transactions.push(curr);

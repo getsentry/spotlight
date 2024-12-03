@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Badge from '~/ui/Badge';
-import CardList from '../../../../components/CardList';
-import TimeSince from '../../../../components/TimeSince';
-import classNames from '../../../../lib/classNames';
-import { useSpotlightContext } from '../../../../lib/useSpotlightContext';
-import { useSentryHelpers } from '../../data/useSentryHelpers';
-import { useSentryTraces } from '../../data/useSentryTraces';
-import { getDuration } from '../../utils/duration';
-import { truncateId } from '../../utils/misc';
-import HiddenItemsButton from '../HiddenItemsButton';
+import CardList from '../../../../../components/CardList';
+import TimeSince from '../../../../../components/TimeSince';
+import classNames from '../../../../../lib/classNames';
+import { useSpotlightContext } from '../../../../../lib/useSpotlightContext';
+import { useSentryHelpers } from '../../../data/useSentryHelpers';
+import { useSentryTraces } from '../../../data/useSentryTraces';
+import { getDuration } from '../../../utils/duration';
+import { truncateId } from '../../../utils/text';
+import HiddenItemsButton from '../../HiddenItemsButton';
 import TraceIcon from './TraceIcon';
 
 export default function TraceList() {

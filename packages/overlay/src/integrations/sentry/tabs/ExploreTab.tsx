@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import ExploreTabDetails from '../components/explore/ExploreTabDetails';
+import ExploreTabDetails from '../components/explore';
 import { SentryEventsContextProvider } from '../data/sentryEventsContext';
 
 export default function ExploreTab() {

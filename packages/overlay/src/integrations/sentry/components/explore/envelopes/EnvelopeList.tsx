@@ -5,13 +5,13 @@ import TimeSince from '~/components/TimeSince';
 import classNames from '~/lib/classNames';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import Badge from '~/ui/Badge';
-import sentryDataCache from '../../data/sentryDataCache';
-import { useSentryEnvelopes } from '../../data/useSentryEnvelopes';
-import { useSentryHelpers } from '../../data/useSentryHelpers';
-import { truncateId } from '../../utils/misc';
-import { sdkToPlatform } from '../../utils/sdkToPlatform';
-import HiddenItemsButton from '../HiddenItemsButton';
-import PlatformIcon from '../PlatformIcon';
+import sentryDataCache from '../../../data/sentryDataCache';
+import { useSentryEnvelopes } from '../../../data/useSentryEnvelopes';
+import { useSentryHelpers } from '../../../data/useSentryHelpers';
+import { sdkToPlatform } from '../../../utils/sdkToPlatform';
+import { truncateId } from '../../../utils/text';
+import HiddenItemsButton from '../../HiddenItemsButton';
+import PlatformIcon from '../../PlatformIcon';
 import EnvelopeDetails from './EnvelopeDetails';
 
 export default function EnvelopeList() {
@@ -52,7 +52,7 @@ export default function EnvelopeList() {
                 return null;
               }
               return (
-                <Link key={envelopeEventId} to={`/explore/devInfo/${header.event_id}`}>
+                <Link key={envelopeEventId} to={`/explore/envelopes/${header.event_id}`}>
                   <div
                     className={classNames(
                       'hover:bg-primary-900 border-b-primary-900 flex cursor-pointer items-center gap-4 border-b px-6 py-2 transition-all',

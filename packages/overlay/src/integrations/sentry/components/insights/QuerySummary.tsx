@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
@@ -6,9 +6,10 @@ import classNames from '~/lib/classNames';
 import Breadcrumbs from '~/ui/Breadcrumbs';
 import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
+import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
-import { truncateId } from '../../utils/misc';
+import { truncateId } from '../../utils/text';
 
 type SpanInfoComparator = (a: Span, b: Span) => number;
 type QuerySummarySortTypes = (typeof QUERY_SUMMARY_SORT_KEYS)[keyof typeof QUERY_SUMMARY_SORT_KEYS];
@@ -29,23 +30,7 @@ const COMPARATORS: Record<QuerySummarySortTypes, SpanInfoComparator> = {
 const QuerySummary = ({ showAll }: { showAll: boolean }) => {
   const { allSpans, localSpans } = useSentrySpans();
   const { type } = useParams();
-  const [sort, setSort] = useState({
-    active: QUERY_SUMMARY_SORT_KEYS.timeSpent,
-    asc: false,
-  });
-
-  const toggleSortOrder = (type: string) =>
-    setSort(prev =>
-      prev.active === type
-        ? {
-            active: type,
-            asc: !prev.asc,
-          }
-        : {
-            active: type,
-            asc: false,
-          },
-    );
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERY_SUMMARY_SORT_KEYS.timeSpent });
 
   const filteredDBSpans: Span[] = useMemo(() => {
     if (!type) {

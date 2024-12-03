@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
-import SdkList from '../components/SdkList';
-import { SentryEventsContextProvider } from '../data/sentryEventsContext';
+import { SentryEventsContextProvider } from '../../../data/sentryEventsContext';
+import SdkList from './SdkList';
 
 export default function SdksTab() {
   return (

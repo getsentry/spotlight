@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
@@ -7,9 +7,10 @@ import Breadcrumbs from '~/ui/Breadcrumbs';
 import { TRANSACTION_SUMMARY_SORT_KEYS, TRANSACTION_SUMMARY_TABLE_HEADERS } from '../../constants';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
+import useSort from '../../hooks/useSort';
 import { SentryTransactionEvent } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
-import { truncateId } from '../../utils/misc';
+import { truncateId } from '../../utils/text';
 import DateTime from '../DateTime';
 
 export default function TransactionDetail({ showAll }: { showAll: boolean }) {
@@ -17,24 +18,7 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
 
   const events = useSentryEvents();
   const helpers = useSentryHelpers();
-
-  const [sort, setSort] = useState({
-    active: TRANSACTION_SUMMARY_SORT_KEYS.timestamp,
-    asc: false,
-  });
-
-  const toggleSortOrder = (type: string) =>
-    setSort(prev =>
-      prev.active === type
-        ? {
-            active: type,
-            asc: !prev.asc,
-          }
-        : {
-            active: type,
-            asc: false,
-          },
-    );
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: TRANSACTION_SUMMARY_SORT_KEYS.timestamp });
 
   type TransactionsInfoComparator = (a: SentryTransactionEvent, b: SentryTransactionEvent) => number;
   type TransactionsSortTypes = (typeof TRANSACTION_SUMMARY_SORT_KEYS)[keyof typeof TRANSACTION_SUMMARY_SORT_KEYS];
@@ -56,9 +40,10 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
       .filter(e => e.transaction === decodedTxnName);
     const filteredTransactions: SentryTransactionEvent[] = showAll
       ? allTransactions
-      : allTransactions.filter(
-          e => (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
-        );
+      : allTransactions.filter(t => {
+          const traceId = t.contexts?.trace?.trace_id;
+          return !traceId || helpers.isLocalToSession(traceId);
+        });
     const compareTransactions = COMPARATORS[sort.active] || COMPARATORS[TRANSACTION_SUMMARY_SORT_KEYS.timestamp];
 
     const sortedTransactions: SentryTransactionEvent[] = filteredTransactions.sort((a, b) =>

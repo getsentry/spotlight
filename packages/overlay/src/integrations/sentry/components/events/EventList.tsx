@@ -7,7 +7,7 @@ import TimeSince from '../../../../components/TimeSince';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
 import type { SentryEvent } from '../../types';
-import { truncateId } from '../../utils/misc';
+import { truncateId } from '../../utils/text';
 import HiddenItemsButton from '../HiddenItemsButton';
 import PlatformIcon from '../PlatformIcon';
 import { EventSummary } from './Event';

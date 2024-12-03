@@ -1,15 +1,15 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
-import JsonViewer from '../../../../../components/JsonViewer';
-import SidePanel, { SidePanelHeader } from '../../../../../ui/SidePanel';
-import { DB_SPAN_REGEX } from '../../../constants';
-import dataCache from '../../../data/sentryDataCache';
-import type { SentryErrorEvent, Span, TraceContext } from '../../../types';
-import { formatBytes } from '../../../utils/bytes';
-import { getDuration } from '../../../utils/duration';
-import DateTime from '../../DateTime';
-import { ErrorTitle } from '../../events/error/Error';
+import JsonViewer from '../../../../../../components/JsonViewer';
+import SidePanel, { SidePanelHeader } from '../../../../../../ui/SidePanel';
+import { DB_SPAN_REGEX } from '../../../../constants';
+import dataCache from '../../../../data/sentryDataCache';
+import type { SentryErrorEvent, Span, TraceContext } from '../../../../types';
+import { formatBytes } from '../../../../utils/bytes';
+import { getDuration } from '../../../../utils/duration';
+import DateTime from '../../../DateTime';
+import { ErrorTitle } from '../../../events/error/Error';
 import SpanTree from './SpanTree';
 
 function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) {
