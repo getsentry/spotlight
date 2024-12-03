@@ -1,5 +1,20 @@
 # @spotlightjs/astro
 
+## 2.2.0
+
+### Minor Changes
+
+- Add method name to trace list ([#599](https://github.com/getsentry/spotlight/pull/599))
+
+### Patch Changes
+
+- Updated dependencies
+  [[`0ce5ee3206c0ce2e10a523fb3dbe6bff05ef2e01`](https://github.com/getsentry/spotlight/commit/0ce5ee3206c0ce2e10a523fb3dbe6bff05ef2e01),
+  [`2e5bc8c3aad37e140be7be850ffc7c75a87f4dfe`](https://github.com/getsentry/spotlight/commit/2e5bc8c3aad37e140be7be850ffc7c75a87f4dfe),
+  [`678dbf7240b7b97fe191356e1ec35d20875e132b`](https://github.com/getsentry/spotlight/commit/678dbf7240b7b97fe191356e1ec35d20875e132b),
+  [`630b83b5631d366eaa7fbdd1bb8756c591a506f3`](https://github.com/getsentry/spotlight/commit/630b83b5631d366eaa7fbdd1bb8756c591a506f3)]:
+  - @spotlightjs/spotlight@2.7.0
+
 ## 2.1.15
 
 ### Patch Changes
