@@ -45,6 +45,8 @@ export type Breadcrumb = {
   type: string | 'default';
 };
 
+export type Context = Record<string, string | number>;
+
 type CommonEventAttrs = {
   // not always present, but we are forcing it in EventCache
   event_id: string;
@@ -59,15 +61,11 @@ type CommonEventAttrs = {
   start_timestamp?: number;
   contexts?: Contexts;
   tags?: Tags;
-  extra?: Record<string, string | number>;
+  extra?: Context;
   request?: Record<string, Record<string, string> | string>;
   modules?: Record<string, string>;
   sdk?: Sdk;
   measurements?: Measurements;
-};
-
-export type Context = {
-  [key: string]: string | number;
 };
 
 export type TraceContext = {
@@ -77,6 +75,7 @@ export type TraceContext = {
   op: string;
   description?: string | null;
   status: 'ok' | string;
+  data?: Context;
 };
 
 export type Contexts = {

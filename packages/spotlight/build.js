@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execFile as execFileCb } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
-import { copyFile, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Readable } from 'node:stream';
@@ -14,13 +14,14 @@ import { inject } from 'postject';
 
 const execFile = promisify(execFileCb);
 
+const OUT_DIR = './dist-bin';
 const DIST_DIR = './dist';
 const ASSETS_DIR = join(DIST_DIR, 'overlay');
 const MANIFEST_NAME = 'manifest.json';
 const MANIFEST_PATH = join(ASSETS_DIR, MANIFEST_NAME);
 const ENTRY_POINT_NAME = 'src/index.html';
-const SEA_CONFIG_PATH = join(DIST_DIR, 'sea-config.json');
-const SPOTLIGHT_BLOB_PATH = join(DIST_DIR, 'spotlight.blob');
+const SEA_CONFIG_PATH = join(OUT_DIR, 'sea-config.json');
+const SPOTLIGHT_BLOB_PATH = join(OUT_DIR, 'spotlight.blob');
 const NODE_VERSION = '22.11.0';
 const PLATFORMS = (process.env.BUILD_PLATFORMS || `${process.platform}-${process.arch}`).split(',').map(p => p.trim());
 const manifest = JSON.parse(await readFile(MANIFEST_PATH));
@@ -55,12 +56,13 @@ async function run(cmd, ...args) {
   return output.stdout;
 }
 
-async function getNodeBinary(platform, targetPath = DIST_DIR) {
+async function getNodeBinary(platform, targetPath = OUT_DIR) {
   const suffix = platform.startsWith('win') ? 'zip' : 'tar.xz';
   const remoteArchiveName = `node-v${NODE_VERSION}-${platform}.${suffix}`;
   const url = `https://nodejs.org/dist/v${NODE_VERSION}/${remoteArchiveName}`;
   const resp = await fetch(url);
   if (!resp.ok) throw new Error(`Failed to fetch ${url}`);
+  // TODO: Instead of a random tmp dir, use a deterministic cache for this!
   const tmpDir = await mkdtemp(join(tmpdir(), remoteArchiveName));
   const stream = createWriteStream(join(tmpDir, remoteArchiveName));
   await finished(Readable.fromWeb(resp.body).pipe(stream));
@@ -92,6 +94,9 @@ async function getNodeBinary(platform, targetPath = DIST_DIR) {
   return targetFile;
 }
 
+await rm(OUT_DIR, { recursive: true })
+  .catch(() => {})
+  .finally(() => mkdir(OUT_DIR, { recursive: true }));
 await writeFile(SEA_CONFIG_PATH, JSON.stringify(seaConfig));
 await run(process.execPath, '--experimental-sea-config', SEA_CONFIG_PATH);
 await Promise.all(
@@ -142,3 +147,4 @@ await Promise.all(
     }
   }),
 );
+await Promise.all([rm(SEA_CONFIG_PATH), rm(SPOTLIGHT_BLOB_PATH)]);

@@ -6,15 +6,10 @@ import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
-import type { SentryEvent } from '../../types';
 import { truncateId } from '../../utils/text';
 import HiddenItemsButton from '../HiddenItemsButton';
 import PlatformIcon from '../PlatformIcon';
 import { EventSummary } from './Event';
-
-function renderEvent(event: SentryEvent) {
-  return <EventSummary event={event} />;
-}
 
 export default function EventList({ traceId }: { traceId?: string }) {
   const events = useSentryEvents(traceId);
@@ -60,7 +55,9 @@ export default function EventList({ traceId }: { traceId?: string }) {
               <span />
               <TimeSince date={e.timestamp} />
             </div>
-            <div className="flex-1">{renderEvent(e)}</div>
+            <div className="flex-1">
+              <EventSummary event={e} />
+            </div>
           </Link>
         );
       })}

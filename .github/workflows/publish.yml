@@ -32,17 +32,15 @@ env:
   BUILD_CACHE_KEY: ${{ github.event.workflow_run.head_sha || inputs.sha }}
   CACHED_BUILD_PATHS: |
     ${{ github.workspace }}/packages/*/dist
-    ${{ github.workspace }}/packages/*/bin
+    ${{ github.workspace }}/packages/*/dist-bin
 
 jobs:
   npm:
     name: NPM Package
     runs-on: ubuntu-latest
     if: >-
-      (github.event.workflow_run.conclusion == 'success'
-      &&
-      contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
-      ) || inputs.target == 'npm' || inputs.target == 'all'
+      (github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_commit.message,
+      'meta(changelog): Update package versions') ) || inputs.target == 'npm' || inputs.target == 'all'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -91,7 +89,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: packages/spotlight/dist/spotlight-*
+          file: packages/spotlight/dist-bin/spotlight-*
           tag: ${{ steps.latest_release_info.outputs.tag_name }}
           make_latest: false
 
@@ -99,10 +97,8 @@ jobs:
     name: Docker Image
     runs-on: ubuntu-latest
     if: >-
-      (github.event.workflow_run.conclusion == 'success'
-      &&
-      contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
-      ) || inputs.target == 'docker' || inputs.target == 'all'
+      (github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_commit.message,
+      'meta(changelog): Update package versions') ) || inputs.target == 'docker' || inputs.target == 'all'
     steps:
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -115,9 +111,7 @@ jobs:
 
       - name: Push Docker Image as latest
         run: >-
-          docker buildx imagetools create
-          --tag ghcr.io/getsentry/spotlight:latest
-          ghcr.io/getsentry/spotlight:$SHA
+          docker buildx imagetools create --tag ghcr.io/getsentry/spotlight:latest ghcr.io/getsentry/spotlight:$SHA
 
       - name: Summarize
         run: |
@@ -127,10 +121,8 @@ jobs:
     name: Electron Build
     runs-on: macos-latest
     if: >-
-      (github.event.workflow_run.conclusion == 'success'
-      &&
-      contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
-      ) || inputs.target == 'electron' || inputs.target == 'all'
+      (github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_commit.message,
+      'meta(changelog): Update package versions') ) || inputs.target == 'electron' || inputs.target == 'all'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
