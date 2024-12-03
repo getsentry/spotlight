@@ -62,8 +62,7 @@ jobs:
 
       - name: Smoke test
         env:
-          SPOTLIGHT_BINARY:
-            ${{ github.workspace }}/packages/spotlight/dist-bin/spotlight-${{ runner.os }}-${{ runner.arch }}
+          SPOTLIGHT_BINARY: ${{ github.workspace }}/packages/spotlight/dist-bin/spotlight-${{ runner.os }}-${{ runner.arch }}
         run: |
           # Lowercase the binary name because `runner.os` and `runner.arch` are uppercase :facepalm:
           SPOTLIGHT_BINARY=$(echo "$SPOTLIGHT_BINARY" | tr '[:upper:]' '[:lower:]')
