@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import { PERFORMANCE_SCORE_PROFILES, WEB_VITALS_HEADERS, WEB_VITALS_SORT_KEYS } from '~/integrations/sentry/constants';
@@ -28,6 +28,7 @@ const COMPARATORS: Record<WebVitalsSortTypes, SentryEventComparator> = {
 
 const WebVitals = () => {
   const events = useSentryEvents();
+  const navigate = useNavigate();
   const { sort, toggleSortOrder } = useSort({ defaultSortType: WEB_VITALS_SORT_KEYS.score });
 
   const measurementEvents: SentryEventWithPerformanceData[] = useMemo(() => {
@@ -97,11 +98,15 @@ const WebVitals = () => {
         </thead>
         <tbody>
           {measurementEvents.map(event => (
-            <tr key={event.event_id} className="hover:bg-primary-900">
+            <tr
+              key={event.event_id}
+              className="hover:bg-primary-900 cursor-pointer"
+              onClick={() => {
+                navigate(`/insights/webvitals/${event.event_id}`);
+              }}
+            >
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                <Link className="truncate hover:underline" to={`/insights/webvitals/${event.event_id}`}>
-                  {event.transaction}
-                </Link>
+                {event.transaction}
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                 {event.measurements?.lcp ? getFormattedDuration(event.measurements.lcp.value) : '-'}

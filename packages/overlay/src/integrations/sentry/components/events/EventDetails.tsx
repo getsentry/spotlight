@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { Link, Outlet, Route, Routes, useParams } from 'react-router-dom';
 import Tabs from '../../../../components/Tabs';
 import sentryDataCache from '../../data/sentryDataCache';
 import type { SentryEvent } from '../../types';
+import { createTab } from '../../utils/tabs';
 import PlatformIcon from '../PlatformIcon';
 import Event, { EventTitle } from './Event';
 import EventBreadcrumbs from './EventBreadcrumbs';
@@ -14,7 +14,6 @@ function renderEventTitle(event: SentryEvent) {
 
 export default function EventDetails() {
   const { eventId } = useParams();
-  const [activeTab, setActiveTab] = useState('details');
 
   if (!eventId) {
     return <p className="text-primary-300 p-6">Unknown event id</p>;
@@ -27,24 +26,9 @@ export default function EventDetails() {
   }
 
   const tabs = [
-    {
-      id: 'details',
-      title: 'Details',
-      active: activeTab === 'details',
-      onSelect: () => setActiveTab('details'),
-    },
-    {
-      id: 'breadcrumbs',
-      title: 'Breadcrumbs',
-      active: activeTab === 'breadcrumbs',
-      onSelect: () => setActiveTab('breadcrumbs'),
-    },
-    {
-      id: 'contexts',
-      title: 'Context',
-      active: activeTab === 'contexts',
-      onSelect: () => setActiveTab('contexts'),
-    },
+    createTab('details', 'Details'),
+    createTab('breadcrumbs', 'Breadcrumbs'),
+    createTab('contexts', 'Context'),
   ];
 
   const traceCtx = event.contexts?.trace;
