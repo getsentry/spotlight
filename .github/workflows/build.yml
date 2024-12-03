@@ -17,7 +17,7 @@ env:
   BUILD_CACHE_KEY: ${{ github.sha }}
   CACHED_BUILD_PATHS: |
     ${{ github.workspace }}/packages/*/dist
-    ${{ github.workspace }}/packages/*/bin
+    ${{ github.workspace }}/packages/*/dist-bin
 
 jobs:
   build:
@@ -62,7 +62,7 @@ jobs:
 
       - name: Smoke test
         env:
-          SPOTLIGHT_BINARY: ${{ github.workspace }}/packages/spotlight/dist/spotlight-${{ runner.os }}-${{ runner.arch }}
+          SPOTLIGHT_BINARY: ${{ github.workspace }}/packages/spotlight/dist-bin/spotlight-${{ runner.os }}-${{ runner.arch }}
         run: |
           # Lowercase the binary name because `runner.os` and `runner.arch` are uppercase :facepalm:
           SPOTLIGHT_BINARY=$(echo "$SPOTLIGHT_BINARY" | tr '[:upper:]' '[:lower:]')
@@ -81,12 +81,12 @@ jobs:
             packages/spotlight/dist/spotlight.cjs
             packages/spotlight/dist/overlay/
 
-      - name: Store standalone spotlight binary
+      - name: Store standalone spotlight binaries
         uses: actions/upload-artifact@v4
         with:
           name: spotlight
           if-no-files-found: error
-          path: packages/spotlight/dist/spotlight-*
+          path: packages/spotlight/dist-bin/spotlight-*
 
       - name: Update build cache
         uses: actions/cache/save@v4
@@ -190,7 +190,7 @@ jobs:
 
       - name: Rename x64 to amd64
         # This is because Node ecosystem uses x64, but Docker uses amd64 :shrug:
-        run: mv packages/spotlight/dist/spotlight-linux-x64 packages/spotlight/dist/spotlight-linux-amd64
+        run: mv packages/spotlight/dist-bin/spotlight-linux-x64 packages/spotlight/dist-bin/spotlight-linux-amd64
 
       - name: Login to GHCR
         uses: docker/login-action@v3

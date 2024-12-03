@@ -14,7 +14,7 @@ import { inject } from 'postject';
 
 const execFile = promisify(execFileCb);
 
-const DIST_DIR = './dist';
+const DIST_DIR = './dist-bin';
 const ASSETS_DIR = join(DIST_DIR, 'overlay');
 const MANIFEST_NAME = 'manifest.json';
 const MANIFEST_PATH = join(ASSETS_DIR, MANIFEST_NAME);

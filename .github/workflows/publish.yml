@@ -32,7 +32,7 @@ env:
   BUILD_CACHE_KEY: ${{ github.event.workflow_run.head_sha || inputs.sha }}
   CACHED_BUILD_PATHS: |
     ${{ github.workspace }}/packages/*/dist
-    ${{ github.workspace }}/packages/*/bin
+    ${{ github.workspace }}/packages/*/dist-bin
 
 jobs:
   npm:
@@ -91,7 +91,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: packages/spotlight/dist/spotlight-*
+          file: packages/spotlight/dist-bin/spotlight-*
           tag: ${{ steps.latest_release_info.outputs.tag_name }}
           make_latest: false
 
