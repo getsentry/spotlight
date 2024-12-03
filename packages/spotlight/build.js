@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import * as esbuild from 'esbuild';
+
 import { execFile as execFileCb } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
 import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
@@ -16,6 +18,7 @@ const execFile = promisify(execFileCb);
 
 const OUT_DIR = './dist-bin';
 const DIST_DIR = './dist';
+const SPOTLIGHT_BUNDLE_PATH = join(DIST_DIR, 'spotlight.cjs');
 const ASSETS_DIR = join(DIST_DIR, 'overlay');
 const MANIFEST_NAME = 'manifest.json';
 const MANIFEST_PATH = join(ASSETS_DIR, MANIFEST_NAME);
@@ -26,7 +29,7 @@ const NODE_VERSION = '22.11.0';
 const PLATFORMS = (process.env.BUILD_PLATFORMS || `${process.platform}-${process.arch}`).split(',').map(p => p.trim());
 const manifest = JSON.parse(await readFile(MANIFEST_PATH));
 const seaConfig = {
-  main: join(DIST_DIR, 'spotlight.cjs'),
+  main: SPOTLIGHT_BUNDLE_PATH,
   output: SPOTLIGHT_BLOB_PATH,
   disableExperimentalSEAWarning: true,
   useSnapshot: false,
@@ -94,6 +97,28 @@ async function getNodeBinary(platform, targetPath = OUT_DIR) {
   return targetFile;
 }
 
+console.log('Building Spotlight CLI bundle...');
+const result = await esbuild.build({
+  logLevel: 'info',
+  entryPoints: ['bin/run.js'],
+  bundle: true,
+  minify: true,
+  platform: 'node',
+  target: 'node22',
+  format: 'cjs',
+  treeShaking: true,
+  inject: ['./import-meta-url.js'],
+  define: {
+    'import.meta.url': 'import_meta_url',
+    'process.env.npm_package_version': JSON.stringify(JSON.parse(await readFile('./package.json')).version),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+  },
+  outfile: SPOTLIGHT_BUNDLE_PATH,
+  allowOverwrite: true,
+});
+if (result.errors.length) {
+  throw new Error(result.errors.map(e => e.text).join('\n'));
+}
 await rm(OUT_DIR, { recursive: true })
   .catch(() => {})
   .finally(() => mkdir(OUT_DIR, { recursive: true }));

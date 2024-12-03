@@ -1,6 +1,7 @@
 {
   "extends": "@spotlightjs/tsconfig/tsconfig.json",
   "compilerOptions": {
+    "lib": ["ES2023"],
     "baseUrl": ".",
     "paths": {
       "~/*": ["src/*"]

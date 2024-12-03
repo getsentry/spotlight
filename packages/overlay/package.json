@@ -65,5 +65,8 @@
   },
   "volta": {
     "extends": "../../package.json"
+  },
+  "dependencies": {
+    "@sentry/react": "^8.43.0"
   }
 }

@@ -15,9 +15,10 @@ import { default as sentry } from './integrations/sentry/index';
 import { off, on, trigger } from './lib/eventTarget';
 import { activateLogger, log } from './lib/logger';
 import { SpotlightContextProvider } from './lib/useSpotlightContext';
-import { React, ReactDOM } from './react-instance'; // Import specific exports
+import { React, ReactDOM } from './react-instance';
 import type { SpotlightOverlayOptions, WindowWithSpotlight } from './types';
 import { removeURLSuffix } from './utils/removeURLSuffix';
+import initSentry from './utils/instrumentation';
 
 export { default as console } from './integrations/console/index';
 export { default as hydrationError } from './integrations/hydration-error/index';
@@ -137,7 +138,7 @@ export async function init(options: SpotlightOverlayOptions = {}) {
   const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };
 
   // Sentry is enabled by default
-  const defaultIntegrations = () => [sentry()];
+  const defaultIntegrations = () => [sentry({ injectIntoSDK: !isLoadedFromSidecar })];
 
   const context: SpotlightContext = {
     open: openSpotlight,
@@ -184,6 +185,10 @@ export async function init(options: SpotlightOverlayOptions = {}) {
 
   const initialTab = startFrom || (tabs.length ? `/${tabs[0].id}` : '/no-tabs');
   log('Starting from', initialTab);
+
+  if (isLoadedFromSidecar) {
+    initSentry(initialTab, { debug });
+  }
 
   ReactDOM.createRoot(appRoot).render(
     // <React.StrictMode>
