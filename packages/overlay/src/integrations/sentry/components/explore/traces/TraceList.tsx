@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import type { Trace } from '../../types';
 import { Link } from 'react-router-dom';
-import CardList from '../../../../components/CardList';
-import TimeSince from '../../../../components/TimeSince';
-import classNames from '../../../../lib/classNames';
-import { useSpotlightContext } from '../../../../lib/useSpotlightContext';
-import { useSentryHelpers } from '../../data/useSentryHelpers';
-import { useSentryTraces } from '../../data/useSentryTraces';
-import Badge from '../../../../ui/Badge';
-import Tag from '../../../../ui/Tag';
-import { getDuration } from '../../utils/duration';
-import HiddenItemsButton from '../HiddenItemsButton';
+import Badge from '~/ui/Badge';
+import Tag from '~/ui/Tag';
+import CardList from '../../../../../components/CardList';
+import TimeSince from '../../../../../components/TimeSince';
+import classNames from '../../../../../lib/classNames';
+import { useSpotlightContext } from '../../../../../lib/useSpotlightContext';
+import { useSentryHelpers } from '../../../data/useSentryHelpers';
+import { useSentryTraces } from '../../../data/useSentryTraces';
+import type { Trace } from '../../../types';
+import { getDuration } from '../../../utils/duration';
+import { truncateId } from '../../../utils/text';
+import HiddenItemsButton from '../../HiddenItemsButton';
 import TraceIcon from './TraceIcon';
 
 function TransactionName({ trace }: { trace: Trace }) {
@@ -56,7 +57,7 @@ export default function TraceList() {
                 <TraceIcon trace={trace} />
                 <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
                   <div className="flex items-center gap-x-2">
-                    <div>{trace.trace_id.substring(0, 8)}</div>
+                    <div>{truncateId(trace.trace_id)}</div>
                     {helpers.isLocalToSession(trace.trace_id) ? (
                       <Badge title="This trace is part of your local session.">Local</Badge>
                     ) : null}

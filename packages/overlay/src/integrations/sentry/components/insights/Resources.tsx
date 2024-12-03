@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
 import Tooltip from '~/ui/Tooltip';
 import { RESOURCES_SORT_KEYS, RESOURCE_HEADERS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
+import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
 import { formatBytes } from '../../utils/bytes';
 import { getFormattedDuration } from '../../utils/duration';
@@ -67,25 +68,8 @@ const COMPARATORS: Record<ResourceSortTypes, ResourceInfoComparator> = {
 };
 
 const Resources = ({ showAll }: { showAll: boolean }) => {
-  const [allSpans, localSpans] = useSentrySpans();
-
-  const [sort, setSort] = useState({
-    active: RESOURCES_SORT_KEYS.timeSpent,
-    asc: false,
-  });
-
-  const toggleSortOrder = (type: string) =>
-    setSort(prev =>
-      prev.active === type
-        ? {
-            active: type,
-            asc: !prev.asc,
-          }
-        : {
-            active: type,
-            asc: false,
-          },
-    );
+  const { allSpans, localSpans } = useSentrySpans();
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: RESOURCES_SORT_KEYS.timeSpent });
 
   const resources = useMemo(() => {
     const filteredResourceSpans = getResourceSpans(showAll ? allSpans : localSpans, { regex: /resource\.[A-Za-z]+/ });

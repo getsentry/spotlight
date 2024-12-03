@@ -1,14 +1,13 @@
-import EnvelopeList from '../components/developerInfo/EnvelopeList';
+import InsightsTabDetails from '../components/insights';
 import { SentryEventsContextProvider } from '../data/sentryEventsContext';
 
 import { Route, Routes } from 'react-router-dom';
 
-export default function DeveloperInfoTab() {
+export default function InsightsTab() {
   return (
     <SentryEventsContextProvider>
       <Routes>
-        <Route path="/:eventId" element={<EnvelopeList />} />
-        <Route path="/" element={<EnvelopeList />} />
+        <Route path="/*" element={<InsightsTabDetails />} />
       </Routes>
     </SentryEventsContextProvider>
   );

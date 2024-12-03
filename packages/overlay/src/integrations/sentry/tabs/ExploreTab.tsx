@@ -1,12 +1,12 @@
 import { Route, Routes } from 'react-router-dom';
-import SdkList from '../components/SdkList';
+import ExploreTabDetails from '../components/explore';
 import { SentryEventsContextProvider } from '../data/sentryEventsContext';
 
-export default function SdksTab() {
+export default function ExploreTab() {
   return (
     <SentryEventsContextProvider>
       <Routes>
-        <Route path="/" element={<SdkList />} />
+        <Route path="/*" element={<ExploreTabDetails />} />
       </Routes>
     </SentryEventsContextProvider>
   );

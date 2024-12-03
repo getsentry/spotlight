@@ -1,4 +1,4 @@
-import PerformanceTabDetails from '../components/performance/PerformanceTabDetails';
+import PerformanceTabDetails from '../components/performance';
 import { SentryEventsContextProvider } from '../data/sentryEventsContext';
 
 import { Route, Routes } from 'react-router-dom';

@@ -10,9 +10,9 @@ import Resources from './Resources';
 import WebVitals from './webVitals';
 import WebVitalsDetail from './webVitals/WebVitalsDetail';
 
-export default function PerformanceTabDetails() {
+export default function InsightsTabDetails() {
   const context = useSpotlightContext();
-  const [allSpans, localSpans] = useSentrySpans();
+  const { allSpans, localSpans } = useSentrySpans();
 
   const [activeTab, setActiveTab] = useState('');
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
@@ -59,7 +59,7 @@ export default function PerformanceTabDetails() {
           <Route path="webvitals/:page" element={<WebVitalsDetail />} />
           {/* Default tab */}
           <Route path="queries" element={<Queries showAll={showAll} />} />
-          <Route path="*" element={<Navigate to="/performance/queries" replace />} />
+          <Route path="*" element={<Navigate to="/insights/queries" replace />} />
         </Routes>
         <Outlet />
       </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
@@ -6,8 +6,10 @@ import classNames from '~/lib/classNames';
 import Breadcrumbs from '~/ui/Breadcrumbs';
 import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
+import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
+import { truncateId } from '../../utils/text';
 
 type SpanInfoComparator = (a: Span, b: Span) => number;
 type QuerySummarySortTypes = (typeof QUERY_SUMMARY_SORT_KEYS)[keyof typeof QUERY_SUMMARY_SORT_KEYS];
@@ -26,25 +28,9 @@ const COMPARATORS: Record<QuerySummarySortTypes, SpanInfoComparator> = {
 };
 
 const QuerySummary = ({ showAll }: { showAll: boolean }) => {
-  const [allSpans, localSpans] = useSentrySpans();
+  const { allSpans, localSpans } = useSentrySpans();
   const { type } = useParams();
-  const [sort, setSort] = useState({
-    active: QUERY_SUMMARY_SORT_KEYS.timeSpent,
-    asc: false,
-  });
-
-  const toggleSortOrder = (type: string) =>
-    setSort(prev =>
-      prev.active === type
-        ? {
-            active: type,
-            asc: !prev.asc,
-          }
-        : {
-            active: type,
-            asc: false,
-          },
-    );
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERY_SUMMARY_SORT_KEYS.timeSpent });
 
   const filteredDBSpans: Span[] = useMemo(() => {
     if (!type) {
@@ -73,7 +59,7 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
             id: 'queries',
             label: 'Queries',
             link: true,
-            to: '/performance/queries',
+            to: '/insights/queries',
           },
           {
             id: 'querySummary',
@@ -123,13 +109,16 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
           {filteredDBSpans.map(span => (
             <tr key={span.span_id} className="hover:bg-primary-900">
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                <Link className="truncate hover:underline" to={`/traces/${span.trace_id}`}>
-                  {span.trace_id}
+                <Link className="truncate hover:underline" to={`/explore/traces/${span.trace_id}`}>
+                  {truncateId(span.trace_id)}
                 </Link>
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                <Link className="truncate hover:underline" to={`/traces/${span.trace_id}/spans/${span.span_id}`}>
-                  {span.span_id}
+                <Link
+                  className="truncate hover:underline"
+                  to={`/explore/traces/${span.trace_id}/spans/${span.span_id}`}
+                >
+                  {truncateId(span.span_id)}
                 </Link>
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">

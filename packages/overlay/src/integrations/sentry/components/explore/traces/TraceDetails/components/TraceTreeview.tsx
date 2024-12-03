@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import sentryDataCache from '../../../../data/sentryDataCache';
-import { getDuration } from '../../../../utils/duration';
-import DateTime from '../../../DateTime';
+import sentryDataCache from '../../../../../data/sentryDataCache';
+import { getDuration } from '../../../../../utils/duration';
+import DateTime from '../../../../DateTime';
 import SpanDetails from '../../spans/SpanDetails';
 import SpanTree from '../../spans/SpanTree';
 

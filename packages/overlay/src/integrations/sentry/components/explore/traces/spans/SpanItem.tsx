@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
-import classNames from '../../../../../lib/classNames';
-import type { Span, TraceContext } from '../../../types';
-import { getDuration, getSpanDurationClassName } from '../../../utils/duration';
-import PlatformIcon from '../../PlatformIcon';
-import SpanResizer from '../../SpanResizer';
+import classNames from '../../../../../../lib/classNames';
+import type { Span, TraceContext } from '../../../../types';
+import { getDuration, getSpanDurationClassName } from '../../../../utils/duration';
+import PlatformIcon from '../../../PlatformIcon';
+import SpanResizer from '../../../SpanResizer';
 import SpanTree from './SpanTree';
 
 const SpanItem = ({
@@ -61,7 +61,7 @@ const SpanItem = ({
         style={{
           pointerEvents: isResizing ? 'none' : 'auto',
         }}
-        to={`/traces/${span.trace_id}/spans/${span.span_id}`}
+        to={`/explore/traces/${span.trace_id}/spans/${span.span_id}`}
       >
         <div
           className={classNames(

@@ -1,4 +1,4 @@
-import { Span, TraceContext } from '../../../types';
+import { Span, TraceContext } from '../../../../types';
 import SpanItem from './SpanItem';
 
 export default function SpanTree({

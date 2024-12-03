@@ -1,10 +1,10 @@
 import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
-import Tabs from '../../../../../components/Tabs';
-import { default as dataCache, default as sentryDataCache } from '../../../data/sentryDataCache';
-import EventList from '../../events/EventList';
+import Tabs from '../../../../../../components/Tabs';
+import { default as dataCache, default as sentryDataCache } from '../../../../data/sentryDataCache';
+import EventContexts from '../../../events/EventContexts';
+import EventList from '../../../events/EventList';
 import TraceDetailHeader from './components/TraceDetailHeader';
 import TraceTreeview from './components/TraceTreeview';
-import EventContexts from '../../events/EventContexts';
 
 export default function TraceDetails() {
   const { traceId } = useParams();
@@ -64,7 +64,7 @@ export default function TraceDetails() {
         <Route path="context" element={<EventContexts event={trace.rootTransaction || trace.transactions[0]} />} />
         <Route path="errors" element={<EventList traceId={traceId} />} />
         {/* Default tab */}
-        <Route path="*" element={<Navigate to={`/traces/${traceId}/details`} replace />} />
+        <Route path="*" element={<Navigate to={`/explore/traces/${traceId}/details`} replace />} />
       </Routes>
     </>
   );

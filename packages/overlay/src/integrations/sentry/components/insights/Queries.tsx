@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
 import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
+import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
 
@@ -40,24 +41,8 @@ const COMPARATORS: Record<QuerySortTypes, QueryInfoComparator> = {
 };
 
 const Queries = ({ showAll }: { showAll: boolean }) => {
-  const [allSpans, localSpans] = useSentrySpans();
-  const [sort, setSort] = useState({
-    active: QUERIES_SORT_KEYS.timeSpent,
-    asc: false,
-  });
-
-  const toggleSortOrder = (type: string) =>
-    setSort(prev =>
-      prev.active === type
-        ? {
-            active: type,
-            asc: !prev.asc,
-          }
-        : {
-            active: type,
-            asc: false,
-          },
-    );
+  const { allSpans, localSpans } = useSentrySpans();
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERIES_SORT_KEYS.timeSpent });
 
   const queriesData: QueryInfo[] = useMemo(() => {
     const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.timeSpent];
@@ -115,7 +100,7 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
             <tr key={query.description} className="hover:bg-primary-900">
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
                 {/* Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa */}
-                <Link className="truncate hover:underline" to={`/performance/queries/${btoa(query.description)}`}>
+                <Link className="truncate hover:underline" to={`/insights/queries/${btoa(query.description)}`}>
                   {query.description}
                 </Link>
               </td>

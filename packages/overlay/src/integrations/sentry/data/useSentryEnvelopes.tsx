@@ -13,5 +13,5 @@ export const useSentryEnvelopes = () => {
     if (trace_id) return helpers.isLocalToSession(trace_id) !== false;
     return false;
   });
-  return [allEnvelopes, localEnvelopes];
+  return { allEnvelopes, localEnvelopes };
 };
