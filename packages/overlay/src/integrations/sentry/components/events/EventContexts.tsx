@@ -9,7 +9,20 @@ const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
   attack_type: "melee",
 });`;
 
+const exampleContext = (
+  <div className="space-y-4 px-6 py-4">
+    <div className="text-primary-300">
+      No context available for this event. Try adding some to make debugging easier.
+    </div>
+    <pre className="whitespace-pre-wrap">{EXAMPLE_CONTEXT}</pre>
+  </div>
+);
+
 export default function EventContexts({ event }: { event: SentryEvent }) {
+  if (!event) {
+    return exampleContext;
+  }
+
   const contexts: Record<string, Nullable<Record<string, unknown>>> = {
     request: event.request,
     ...event.contexts,
@@ -25,17 +38,11 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
   const { tags } = event;
 
   if (contextEntries.length === 0 && !tags) {
-    return (
-      <div className="space-y-4 px-6">
-        <div className="text-primary-300">
-          No context available for this event. Try adding some to make debugging easier.
-        </div>
-        <pre className="whitespace-pre-wrap ">{EXAMPLE_CONTEXT}</pre>
-      </div>
-    );
+    return exampleContext;
   }
+
   return (
-    <>
+    <div className="space-y-4 px-6 py-4">
       {tags && (
         <div className="pb-4">
           <h2 className="font-bold uppercase">Tags</h2>
@@ -67,6 +74,6 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 }

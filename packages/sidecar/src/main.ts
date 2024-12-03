@@ -424,10 +424,17 @@ export function clearBuffer(): void {
   buffer.clear();
 }
 
+let forceShutdown = false;
 export function shutdown() {
+  if (forceShutdown || !serverInstance) {
+    logger.info('Bye.');
+    process.exit(0);
+  }
   if (serverInstance) {
-    logger.info('Shutting down server...');
+    forceShutdown = true;
+    logger.info('Shutting down server gracefully...');
     serverInstance.close();
+    serverInstance.closeAllConnections();
   }
 }
 

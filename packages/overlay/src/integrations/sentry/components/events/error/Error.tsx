@@ -27,7 +27,7 @@ export function ErrorItem({ event }: { event: SentryErrorEvent }) {
   const values = valuesToArray(event.exception);
 
   return (
-    <>
+    <div className="flex-1 px-6 py-4">
       <ol className="space-y-4">
         {values.map((value, valueIdx) => {
           return (
@@ -52,7 +52,7 @@ export function ErrorItem({ event }: { event: SentryErrorEvent }) {
           );
         })}
       </ol>
-    </>
+    </div>
   );
 }
 
