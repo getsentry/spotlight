@@ -3,6 +3,7 @@ import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import Tabs from '~/components/Tabs';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import { useSentrySpans } from '../../data/useSentrySpans';
+import { createTab } from '../../utils/tabs';
 import HiddenItemsButton from '../HiddenItemsButton';
 import Queries from './Queries';
 import QuerySummary from './QuerySummary';
@@ -14,30 +15,14 @@ export default function InsightsTabDetails() {
   const context = useSpotlightContext();
   const { allSpans, localSpans } = useSentrySpans();
 
-  const [activeTab, setActiveTab] = useState('');
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
 
   const hiddenItemCount = allSpans.length - localSpans.length;
 
   const tabs = [
-    {
-      id: 'queries',
-      title: 'Queries',
-      active: activeTab === 'queries',
-      onSelect: () => setActiveTab('queries'),
-    },
-    {
-      id: 'webvitals',
-      title: 'Web Vitals',
-      active: activeTab === 'webvitals',
-      onSelect: () => setActiveTab('webvitals'),
-    },
-    {
-      id: 'resources',
-      title: 'Resources',
-      active: activeTab === 'resources',
-      onSelect: () => setActiveTab('resources'),
-    },
+    createTab('queries', 'Queries'),
+    createTab('webvitals', 'Web Vitals'),
+    createTab('resources', 'Resources'),
   ];
 
   return (

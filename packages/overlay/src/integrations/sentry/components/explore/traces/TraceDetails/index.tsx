@@ -1,4 +1,5 @@
 import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { createTab } from '~/integrations/sentry/utils/tabs';
 import Tabs from '../../../../../../components/Tabs';
 import { default as dataCache, default as sentryDataCache } from '../../../../data/sentryDataCache';
 import EventContexts from '../../../events/EventContexts';
@@ -31,26 +32,18 @@ export default function TraceDetails() {
     .filter(
       e =>
         e.type !== 'transaction' &&
-        (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
+        (!e.contexts?.trace?.trace_id || sentryDataCache.isTraceLocal(e.contexts.trace.trace_id)),
     ).length;
 
   const tabs = [
-    {
-      id: 'details',
-      title: 'Details',
-    },
-    {
-      id: 'context',
-      title: 'Context',
-    },
-    {
-      id: 'errors',
-      title: 'Errors',
+    createTab('details', 'Details'),
+    createTab('context', 'Context'),
+    createTab('errors', 'Errors', {
       notificationCount: {
         count: errorCount,
         severe: errorCount > 0,
       },
-    },
+    }),
   ];
 
   return (

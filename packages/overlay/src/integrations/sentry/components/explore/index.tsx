@@ -1,38 +1,22 @@
-import { useState } from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import Tabs from '~/components/Tabs';
 import sentryDataCache from '../../data/sentryDataCache';
+import { createTab } from '../../utils/tabs';
 import EnvelopesTab from './envelopes';
 import SdksTab from './sdks';
 import TracesTab from './traces';
 
 export default function ExploreTabDetails() {
-  const [activeTab, setActiveTab] = useState('');
-
   const localTraces = sentryDataCache.getTraces().filter(t => sentryDataCache.isTraceLocal(t.trace_id) !== false);
 
   const tabs = [
-    {
-      id: 'traces',
-      title: 'Traces',
-      active: activeTab === 'traces',
-      onSelect: () => setActiveTab('traces'),
+    createTab('traces', 'Traces', {
       notificationCount: {
         count: localTraces.length,
       },
-    },
-    {
-      id: 'sdks',
-      title: 'SDKs',
-      active: activeTab === 'sdks',
-      onSelect: () => setActiveTab('sdks'),
-    },
-    {
-      id: 'envelopes',
-      title: 'Envelopes',
-      active: activeTab === 'envelopes',
-      onSelect: () => setActiveTab('envelopes'),
-    },
+    }),
+    createTab('sdks', 'SDKs'),
+    createTab('envelopes', 'Envelopes'),
   ];
 
   return (
