@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execFile as execFileCb } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
-import { copyFile, mkdtemp, readFile, rm, writeFile, mkdir } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Readable } from 'node:stream';
@@ -94,7 +94,9 @@ async function getNodeBinary(platform, targetPath = OUT_DIR) {
   return targetFile;
 }
 
-await rm(OUT_DIR, { recursive: true }).finally(() => mkdir(OUT_DIR, { recursive: true }));
+await rm(OUT_DIR, { recursive: true })
+  .catch(() => {})
+  .finally(() => mkdir(OUT_DIR, { recursive: true }));
 await writeFile(SEA_CONFIG_PATH, JSON.stringify(seaConfig));
 await run(process.execPath, '--experimental-sea-config', SEA_CONFIG_PATH);
 await Promise.all(
