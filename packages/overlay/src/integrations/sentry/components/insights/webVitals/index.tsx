@@ -101,9 +101,7 @@ const WebVitals = () => {
             <tr
               key={event.event_id}
               className="hover:bg-primary-900 cursor-pointer"
-              onClick={() => {
-                navigate(`/insights/webvitals/${event.event_id}`);
-              }}
+              onClick={() => navigate(`/insights/webvitals/${event.event_id}`)}
             >
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
                 {event.transaction}
