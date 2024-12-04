@@ -1,4 +1,4 @@
-import ReactJson from 'react-json-view';
+import ReactJson from '@microlink/react-json-view';
 
 // Need this separately to fix Storybook 8 bundling
 // See #419 and #420 for more context
