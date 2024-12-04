@@ -1,12 +1,12 @@
-import { captureException, getTraceData, startSpan } from '@sentry/node';
+import { addEventProcessor, captureException, getTraceData, startSpan } from '@sentry/node';
 import launchEditor from 'launch-editor';
 import { createWriteStream, readFileSync } from 'node:fs';
-import { createServer, get, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
+import { type IncomingMessage, type Server, type ServerResponse, createServer, get } from 'node:http';
 import { extname, join, resolve } from 'node:path';
 import { createGunzip, createInflate } from 'node:zlib';
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from './constants.js';
 import { contextLinesHandler } from './contextlines.js';
-import { activateLogger, enableDebugLogging, logger, type SidecarLogger } from './logger.js';
+import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from './logger.js';
 import { MessageBuffer } from './messageBuffer.js';
 
 type Payload = [string, Buffer];
@@ -45,6 +45,8 @@ type SideCarOptions = {
    * Helpful for debugging.
    */
   incomingPayload?: IncomingPayloadCallback;
+
+  isStandalone?: boolean;
 };
 
 type RequestHandler = (
@@ -454,7 +456,11 @@ export function setupSidecar({
   filesToServe,
   debug,
   incomingPayload,
+  isStandalone,
 }: SideCarOptions = {}): void {
+  if (!isStandalone) {
+    addEventProcessor(event => (event.spans?.some(span => span.op?.startsWith('sidecar.')) ? null : event));
+  }
   let sidecarPort = DEFAULT_PORT;
 
   if (customLogger) {

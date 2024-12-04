@@ -55,13 +55,13 @@ export function buildClientInit(options: SpotlightInitOptions) {
   initOptions = `{integrations: [${integrations.join(', ')}], ${initOptions.slice(1)}`;
 
   return [
-    `import * as Spotlight from ${JSON.stringify('/@fs' + (options.importPath || getSpotlightClientModulePath()))};`,
+    `import * as Spotlight from ${JSON.stringify(`/@fs${options.importPath || getSpotlightClientModulePath()}`)};`,
     `Spotlight.init(${initOptions});`,
     `window.createErrorOverlay=function createErrorOverlay(err) { Spotlight.openSpotlight(); };`,
   ].join('\n');
 }
 
-async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl: string = 'http://localhost:8969/stream') {
+async function sendErrorToSpotlight(err: ErrorPayload['err'], spotlightUrl = 'http://localhost:8969/stream') {
   if (!err.errors) {
     console.log(err);
     return;

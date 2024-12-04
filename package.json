@@ -41,6 +41,9 @@
     "simple-git-hooks": "^2.11.1",
     "typescript": "^5.6.2"
   },
+  "resolutions": {
+    "path-to-regexp": "^6.3.0"
+  },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged --concurrent false"
   },

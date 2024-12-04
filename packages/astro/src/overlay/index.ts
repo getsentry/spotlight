@@ -13,59 +13,40 @@ export default {
   id: 'spotlight-plugin',
   name: 'Spotlight by Sentry',
   icon: sentryLogo,
-  init(_canvas, eventTarget) {
-    eventTarget.dispatchEvent(
-      new CustomEvent('plugin-notification', {
-        detail: {
-          state: true,
-        },
-      }),
-    );
+  init(_canvas, app) {
+    // When there is an error already on the page, Spotlight will pop open
+    // before the app is initialized so update the state for the button
+    if (document.body.classList.contains(Spotlight.SPOTLIGHT_OPEN_CLASS_NAME)) {
+      app.toggleState({ state: true });
+      app.toggleNotification({ state: false });
+    }
 
-    eventTarget.addEventListener('plugin-toggled', e => {
-      // e.detail.state exists, see https://docs.astro.build/en/reference/dev-overlay-plugin-reference/#plugin-toggled
-      const shouldOpen = (e as CustomEvent).detail.state;
-      shouldOpen ? Spotlight.openSpotlight() : Spotlight.closeSpotlight();
+    const clearNotification = () =>
+      setTimeout(() => {
+        app.toggleNotification({ state: false });
+      }, 500);
+
+    app.onToggled(({ state }) => {
+      clearNotification();
+      if (state) {
+        Spotlight.openSpotlight();
+      } else {
+        Spotlight.closeSpotlight();
+      }
     });
 
     Spotlight.onClose(() => {
-      eventTarget.dispatchEvent(
-        new CustomEvent('toggle-plugin', {
-          detail: {
-            state: false,
-          },
-        }),
-      );
+      app.toggleState({ state: false });
+      clearNotification();
     });
 
     Spotlight.onOpen(() => {
-      setTimeout(() => {
-        eventTarget.dispatchEvent(
-          new CustomEvent('toggle-notification', {
-            detail: {
-              state: false,
-            },
-          }),
-        );
-      }, 500);
-
-      eventTarget.dispatchEvent(
-        new CustomEvent('toggle-plugin', {
-          detail: {
-            state: true,
-          },
-        }),
-      );
+      app.toggleState({ state: true });
+      clearNotification();
     });
 
     Spotlight.onSevereEvent(() => {
-      eventTarget.dispatchEvent(
-        new CustomEvent('toggle-notification', {
-          detail: {
-            state: true,
-          },
-        }),
-      );
+      app.toggleNotification({ state: true, level: 'error' });
     });
   },
 } satisfies DevOverlayPlugin;
