@@ -1,29 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Badge from '~/ui/Badge';
-import Tag from '~/ui/Tag';
 import CardList from '../../../../../components/CardList';
 import TimeSince from '../../../../../components/TimeSince';
 import classNames from '../../../../../lib/classNames';
 import { useSpotlightContext } from '../../../../../lib/useSpotlightContext';
 import { useSentryHelpers } from '../../../data/useSentryHelpers';
 import { useSentryTraces } from '../../../data/useSentryTraces';
-import type { Trace } from '../../../types';
 import { getDuration } from '../../../utils/duration';
 import { truncateId } from '../../../utils/text';
 import HiddenItemsButton from '../../HiddenItemsButton';
+import { TraceRootTxnName } from './TraceDetails/components/TraceRootTxnName';
 import TraceIcon from './TraceIcon';
-
-function TransactionName({ trace }: { trace: Trace }) {
-  const method = String(
-    trace.rootTransaction?.contexts?.trace.data?.method || trace.rootTransaction?.request?.method || '',
-  );
-  const name =
-    method && trace.rootTransactionName.startsWith(method)
-      ? trace.rootTransactionName.slice(method.length + 1)
-      : trace.rootTransactionName;
-  return <Tag tagKey={method} value={name} />;
-}
 
 export default function TraceList() {
   const traceList = useSentryTraces();
@@ -64,7 +52,7 @@ export default function TraceList() {
                   </div>
                   <TimeSince date={trace.start_timestamp} />
                 </div>
-                <TransactionName trace={trace} />
+                <TraceRootTxnName trace={trace} />
                 <div className="flex flex-col truncate font-mono">
                   <div className="text-primary-300 flex space-x-2 text-sm">
                     <div
