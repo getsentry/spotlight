@@ -12,11 +12,10 @@
     "clean": "rimraf dist"
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "bin": {
-    "spotlight-sidecar": "./server.js"
+    "spotlight-sidecar": "dist/server.js"
   },
   "main": "dist/main.js",
   "module": "dist/main.js",
@@ -27,14 +26,12 @@
       "types": "./dist/main.d.ts"
     },
     "./vite-plugin": {
-      "import": "./src/vite-plugin.js"
+      "import": "./dist/vite-plugin.js",
+      "types": "./dist/vite-plugin.d.ts"
     },
     "./constants": {
       "import": "./src/constants.js",
       "types": "./dist/constants.d.ts"
-    },
-    "./run": {
-      "import": "./src/run.js"
     }
   },
   "dependencies": {
