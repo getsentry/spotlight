@@ -26,7 +26,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
 
     setup: ({ open, sidecarUrl }) => {
       if (options.retries == null) {
-        options.retries = 3;
+        options.retries = 10;
       }
       if (sidecarUrl) {
         sentryDataCache.setSidecarUrl(removeURLSuffix(sidecarUrl, '/stream'));
@@ -213,7 +213,7 @@ function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions) {
       options.retries--;
       setTimeout(() => {
         addSpotlightIntegrationToSentry(options);
-      }, 100);
+      }, 500);
     }
     return;
   }
