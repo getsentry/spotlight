@@ -10,7 +10,15 @@ const dependencies = Object.keys({
 
 export default defineConfig({
   build: {
-    ssr: './src/main.ts',
+    lib: {
+      entry: {
+        main: './src/main.ts',
+        'vite-plugin': './src/vite-plugin.ts',
+        constants: './src/constants.ts',
+        server: './server.ts',
+      },
+      formats: ['es'],
+    },
     outDir: './dist',
     sourcemap: true,
     rollupOptions: {
