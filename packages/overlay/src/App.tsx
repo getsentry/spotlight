@@ -9,6 +9,7 @@ import { log } from './lib/logger';
 import useKeyPress from './lib/useKeyPress';
 import { connectToSidecar } from './sidecar';
 import type { NotificationCount, SpotlightOverlayOptions } from './types';
+import { SPOTLIGHT_OPEN_CLASS_NAME } from './constants';
 
 type AppProps = Omit<SpotlightOverlayOptions, 'debug' | 'injectImmediately'> &
   Required<Pick<SpotlightOverlayOptions, 'sidecarUrl'>>;
@@ -217,10 +218,10 @@ export default function App({
   useEffect(() => {
     if (!isOpen) {
       spotlightEventTarget.dispatchEvent(new CustomEvent('closed'));
-      document.body.style.overflow = 'auto';
+      document.body.classList.remove(SPOTLIGHT_OPEN_CLASS_NAME);
     } else {
       spotlightEventTarget.dispatchEvent(new CustomEvent('opened'));
-      document.body.style.overflow = 'hidden';
+      document.body.classList.add(SPOTLIGHT_OPEN_CLASS_NAME);
     }
   }, [isOpen, spotlightEventTarget]);
 
