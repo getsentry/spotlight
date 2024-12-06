@@ -3,7 +3,12 @@ import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/sidecar/constants';
 import { MemoryRouter } from 'react-router-dom';
 import colors from 'tailwindcss/colors';
 import App from './App';
-import { DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_STREAM_URL } from './constants';
+import {
+  DEFAULT_ANCHOR,
+  DEFAULT_EXPERIMENTS,
+  DEFAULT_SIDECAR_STREAM_URL,
+  SPOTLIGHT_OPEN_CLASS_NAME,
+} from './constants';
 import globalStyles from './index.css?inline';
 import { initIntegrations, type SpotlightContext } from './integrations/integration';
 import { default as sentry } from './integrations/sentry/index';
@@ -205,6 +210,12 @@ export async function init(options: SpotlightOverlayOptions = {}) {
       return;
     }
     log('Injecting into application');
+
+    const extraSheet = new CSSStyleSheet();
+    extraSheet.replaceSync(`body.${SPOTLIGHT_OPEN_CLASS_NAME} { overflow: hidden!important; }`);
+    // Combine the existing sheets and new one
+    document.adoptedStyleSheets = [...document.adoptedStyleSheets, extraSheet];
+
     document.body.append(docRoot);
   }
 
