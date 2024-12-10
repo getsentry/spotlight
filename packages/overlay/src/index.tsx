@@ -17,7 +17,7 @@ import { activateLogger, log } from './lib/logger';
 import { SpotlightContextProvider } from './lib/useSpotlightContext';
 import { React, ReactDOM } from './react-instance'; // Import specific exports
 import type { SpotlightOverlayOptions, WindowWithSpotlight } from './types';
-import { removeURLSuffix } from './utils/remvoveURLSuffix';
+import { removeURLSuffix } from './utils/removeURLSuffix';
 
 export { default as console } from './integrations/console/index';
 export { default as hydrationError } from './integrations/hydration-error/index';
