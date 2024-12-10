@@ -10,8 +10,7 @@ export function removeURLSuffix(url: string, suffix: string): string {
   } catch (error: unknown) {
     if (error instanceof TypeError) {
       throw new Error(`Invalid URL provided: ${url}. Error: ${error.message}`);
-    } else {
-      throw new Error(`An unexpected error occurred: ${String(error)}`);
     }
+    throw error;
   }
 }

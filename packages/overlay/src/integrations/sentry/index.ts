@@ -1,5 +1,5 @@
 import type { Client, Envelope, EnvelopeItem } from '@sentry/types';
-import { removeURLSuffix } from '~/utils/remvoveURLSuffix';
+import { removeURLSuffix } from '~/utils/removeURLSuffix';
 import { off, on } from '../../lib/eventTarget';
 import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
