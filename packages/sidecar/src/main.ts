@@ -1,3 +1,4 @@
+import { captureException, getTraceData, startSpan } from '@sentry/node';
 import launchEditor from 'launch-editor';
 import { createWriteStream, readFileSync } from 'node:fs';
 import { createServer, get, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
@@ -53,47 +54,44 @@ type RequestHandler = (
   searchParams?: URLSearchParams,
 ) => void;
 
-function getCorsHeader(): { [name: string]: string } {
-  return {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Headers': '*',
-    'Access-Control-Allow-Methods': 'GET,POST,PUT,OPTIONS,DELETE,PATCH',
-  };
-}
+const withTracing =
+  (fn: CallableFunction, spanArgs = {}) =>
+  (...args: unknown[]) =>
+    startSpan({ name: fn.name, ...spanArgs }, () => fn(...args));
 
-function enableCORS(handler: RequestHandler): RequestHandler {
-  return function corsMiddleware(
-    req: IncomingMessage,
-    res: ServerResponse,
-    pathname?: string,
-    searchParams?: URLSearchParams,
-  ) {
-    const headers = {
-      ...getCorsHeader(),
-      ...getSpotlightHeader(),
-    };
-    for (const [header, value] of Object.entries(headers)) {
-      res.setHeader(header, value);
-    }
-    if (req.method === 'OPTIONS') {
-      res.writeHead(204, {
-        'Cache-Control': 'no-cache',
-      });
-      res.end();
-      return;
-    }
-    return handler(req, res, pathname, searchParams);
-  };
-}
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Credentials': 'true',
+  'Access-Control-Allow-Headers': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,PUT,OPTIONS,DELETE,PATCH',
+} as const;
 
-function getSpotlightHeader() {
-  return {
-    'X-Powered-by': SERVER_IDENTIFIER,
-  };
-}
+const SPOTLIGHT_HEADERS = {
+  'X-Powered-by': SERVER_IDENTIFIER,
+} as const;
 
-function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: IncomingPayloadCallback) {
+const enableCORS = (handler: RequestHandler): RequestHandler =>
+  withTracing(
+    (req: IncomingMessage, res: ServerResponse, pathname?: string, searchParams?: URLSearchParams) => {
+      const headers = {
+        ...CORS_HEADERS,
+        ...SPOTLIGHT_HEADERS,
+      };
+      for (const [header, value] of Object.entries(headers)) {
+        res.setHeader(header, value);
+      }
+      if (req.method === 'OPTIONS') {
+        res.writeHead(204, {
+          'Cache-Control': 'no-cache',
+        });
+        res.end();
+        return;
+      }
+      return handler(req, res, pathname, searchParams);
+    },
+    { name: 'enableCORS', op: 'sidecar.http.middleware.cors' },
+  );
+const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: IncomingPayloadCallback) => {
   return function handleStreamRequest(
     req: IncomingMessage,
     res: ServerResponse,
@@ -132,7 +130,7 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
       });
     } else if (req.method === 'POST') {
       logger.debug(`📩 Received event`);
-      let body: string = '';
+      let body = '';
       let stream = req;
 
       // Check for gzip or deflate encoding and create appropriate stream
@@ -189,9 +187,9 @@ function streamRequestHandler(buffer: MessageBuffer<Payload>, incomingPayload?: 
       return;
     }
   };
-}
+};
 
-function fileServer(filesToServe: Record<string, Buffer>) {
+const fileServer = (filesToServe: Record<string, Buffer>) => {
   return function serveFile(req: IncomingMessage, res: ServerResponse, pathname?: string): void {
     let filePath = `${pathname || req.url}`;
     if (filePath === '/') {
@@ -213,20 +211,20 @@ function fileServer(filesToServe: Record<string, Buffer>) {
         break;
     }
 
-    if (!Object.prototype.hasOwnProperty.call(filesToServe, filePath)) {
+    if (!Object.hasOwn(filesToServe, filePath)) {
       error404(req, res);
     } else {
       res.writeHead(200, { 'Content-Type': contentType });
       res.end(filesToServe[filePath]);
     }
   };
-}
+};
 
 function handleHealthRequest(_req: IncomingMessage, res: ServerResponse): void {
   res.writeHead(200, {
     'Content-Type': 'text/plain',
-    ...getCorsHeader(),
-    ...getSpotlightHeader(),
+    ...CORS_HEADERS,
+    ...SPOTLIGHT_HEADERS,
   });
   res.end('OK');
 }
@@ -276,10 +274,13 @@ function openRequestHandler(basePath: string = process.cwd()) {
 }
 
 function errorResponse(code: number) {
-  return (_req: IncomingMessage, res: ServerResponse) => {
-    res.writeHead(code);
-    res.end();
-  };
+  return withTracing(
+    (_req: IncomingMessage, res: ServerResponse) => {
+      res.writeHead(code);
+      res.end();
+    },
+    { name: `HTTP ${code}`, op: `sidecar.http.error.${code}`, attributes: { 'http.response.status_code': code } },
+  );
 }
 
 const error404 = errorResponse(404);
@@ -313,12 +314,36 @@ function startServer(
       return error404(req, res);
     }
 
-    const { pathname, searchParams } = new URL(url, `http://${req.headers.host || 'localhost'}`);
+    const host = req.headers.host || 'localhost';
+    const { pathname, searchParams } = new URL(url, `http://${host}`);
     const route = ROUTES.find(route => route[0].test(pathname));
     if (!route) {
       return error404(req, res);
     }
-    return route[1](req, res, pathname, searchParams);
+    return startSpan(
+      {
+        name: `HTTP ${req.method} ${pathname}`,
+        op: `sidecar.http.${req.method?.toLowerCase()}`,
+        forceTransaction: true,
+        attributes: {
+          'http.request.method': req.method,
+          'http.request.url': url,
+          'http.request.query': searchParams.toString(),
+          'server.address': host,
+          'server.port': req.socket.localPort,
+        },
+      },
+      span => {
+        const traceData = getTraceData();
+        res.appendHeader(
+          'server-timing',
+          `sentryTrace;desc="${traceData['sentry-trace']}", baggage;desc="${traceData.baggage}"`,
+        );
+        const result = route[1](req, res, pathname, searchParams);
+        span.setAttribute('http.response.status_code', res.statusCode);
+        return result;
+      },
+    );
   });
 
   server.on('error', handleServerError);
@@ -337,6 +362,8 @@ function startServer(
         server.listen(port);
         logger.info(`Port ${port} in use, retrying...`);
       }, 5000);
+    } else {
+      captureException(e);
     }
   }
 
@@ -351,39 +378,45 @@ function startServer(
 let serverInstance: Server;
 const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
 
-const isValidPort = (value: string | number) => {
-  if (typeof value === 'string') {
-    const portNumber = Number(value);
-    return /^\d+$/.test(value) && portNumber > 0 && portNumber <= 65535;
-  }
-  return value > 0 && value <= 65535;
-};
+const isValidPort = withTracing(
+  (value: string | number) => {
+    if (typeof value === 'string') {
+      const portNumber = Number(value);
+      return /^\d+$/.test(value) && portNumber > 0 && portNumber <= 65535;
+    }
+    return value > 0 && value <= 65535;
+  },
+  { name: 'isValidPort', op: 'sidecar.server.portCheck' },
+);
 
-function isSidecarRunning(port: string | number | undefined) {
-  return new Promise(resolve => {
-    const options = {
-      hostname: 'localhost',
-      port: port,
-      path: '/health',
-      method: 'GET',
-      timeout: 2000,
-      headers: { Connection: 'close' },
-    };
+const isSidecarRunning = withTracing(
+  (port: string | number | undefined) => {
+    return new Promise(resolve => {
+      const options = {
+        hostname: 'localhost',
+        port: port,
+        path: '/health',
+        method: 'GET',
+        timeout: 2000,
+        headers: { Connection: 'close' },
+      };
 
-    const healthReq = get(options, res => {
-      const serverIdentifier = res.headers['x-powered-by'];
-      if (serverIdentifier === 'spotlight-by-sentry') {
-        resolve(true);
-      } else {
+      const healthReq = get(options, res => {
+        const serverIdentifier = res.headers['x-powered-by'];
+        if (serverIdentifier === 'spotlight-by-sentry') {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
+      healthReq.on('error', () => {
         resolve(false);
-      }
+      });
+      healthReq.end();
     });
-    healthReq.on('error', () => {
-      resolve(false);
-    });
-    healthReq.end();
-  });
-}
+  },
+  { name: 'isSidecarRunning', op: 'sidecar.server.collideCheck' },
+);
 
 export function setupSidecar({
   port,
@@ -409,13 +442,12 @@ export function setupSidecar({
   } else if (port) {
     sidecarPort = typeof port === 'string' ? Number(port) : port;
   }
-  isSidecarRunning(sidecarPort).then(isRunning => {
+
+  isSidecarRunning(sidecarPort).then((isRunning: boolean) => {
     if (isRunning) {
       logger.info(`Sidecar is already running on port ${sidecarPort}`);
-    } else {
-      if (!serverInstance) {
-        serverInstance = startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
-      }
+    } else if (!serverInstance) {
+      serverInstance = startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
     }
   });
 }
@@ -425,7 +457,7 @@ export function clearBuffer(): void {
 }
 
 let forceShutdown = false;
-export function shutdown() {
+export const shutdown = () => {
   if (forceShutdown || !serverInstance) {
     logger.info('Bye.');
     process.exit(0);
@@ -436,7 +468,7 @@ export function shutdown() {
     serverInstance.close();
     serverInstance.closeAllConnections();
   }
-}
+};
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);

@@ -7,7 +7,7 @@
   "scripts": {
     "start": "./bin/run.js",
     "dev": "vite build --watch",
-    "build": "vite build && vite build --config vite.overlay.config.ts && vite build --config vite.binary.config.ts && ./build.js && tsc",
+    "build": "vite build && vite build --config vite.overlay.config.ts && ./build.js && tsc",
     "build:watch": "vite build --watch",
     "yalc:publish": "yalc publish --push --sig --private",
     "clean": "rimraf dist"
@@ -40,6 +40,7 @@
     }
   },
   "dependencies": {
+    "@sentry/node": "^8.42.0",
     "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
     "import-meta-resolve": "^4.1.0",
@@ -50,6 +51,7 @@
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "^18.19.55",
+    "esbuild": "^0.24.0",
     "typescript": "^5.6.2",
     "vite": "^5.4.11"
   },
