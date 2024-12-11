@@ -186,6 +186,7 @@ export async function init(options: SpotlightOverlayOptions = {}) {
   const initialTab = startFrom || (tabs.length ? `/${tabs[0].id}` : '/no-tabs');
   log('Starting from', initialTab);
 
+  // TODO: Shall we enable this for other cases too such as when we use it through Django SDK?
   if (isLoadedFromSidecar) {
     initSentry(initialTab, { debug });
   }
