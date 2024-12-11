@@ -7,4 +7,32 @@ init({
   debug: Boolean(process.env.SENTRY_DEBUG),
 
   tracesSampleRate: 1,
+
+  beforeSendTransaction: event => {
+    event.server_name = undefined; // Server name might contain PII
+    return event;
+  },
+
+  beforeSend: event => {
+    const exceptions = event.exception?.values;
+    if (!exceptions) {
+      return event;
+    }
+    for (const exception of exceptions) {
+      if (!exception.stacktrace) {
+        continue;
+      }
+
+      for (const frame of exception.stacktrace.frames) {
+        if (!frame.filename) {
+          continue;
+        }
+
+        frame.filename = frame.filename?.replace(process.env.HOME, '~');
+      }
+    }
+
+    event.server_name = undefined; // Server name might contain PII
+    return event;
+  },
 });
