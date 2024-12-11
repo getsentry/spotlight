@@ -1,5 +1,20 @@
 # @spotlightjs/core
 
+## 2.8.1
+
+### Patch Changes
+
+- Use a maintained version of ReactJsonViewer ([#611](https://github.com/getsentry/spotlight/pull/611))
+
+- - Added a createTab helper function ([#606](https://github.com/getsentry/spotlight/pull/606))
+
+- Added Trace root transaction name in Trace detail header ([#612](https://github.com/getsentry/spotlight/pull/612))
+
+- Don't alter body styles at all ([#615](https://github.com/getsentry/spotlight/pull/615))
+
+- Make in-browser direct Sentry SDK link more graceful at the start
+  ([#614](https://github.com/getsentry/spotlight/pull/614))
+
 ## 2.8.0
 
 ### Minor Changes

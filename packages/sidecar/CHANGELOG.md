@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 1.9.3
+
+### Patch Changes
+
+- Fix sidecar package build, export all from dist with types ([#616](https://github.com/getsentry/spotlight/pull/616))
+
 ## 1.9.2
 
 ### Patch Changes
