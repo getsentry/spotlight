@@ -29,6 +29,7 @@
   "devDependencies": {
     "@fontsource/raleway": "^5.1.0",
     "@microlink/react-json-view": "^1.23.4",
+    "@sentry/react": "^8.43.0",
     "@sentry/types": "^8.33.1",
     "@sentry/utils": "^8.33.1",
     "@spotlightjs/sidecar": "workspace:*",
@@ -65,8 +66,5 @@
   },
   "volta": {
     "extends": "../../package.json"
-  },
-  "dependencies": {
-    "@sentry/react": "^8.43.0"
   }
 }
