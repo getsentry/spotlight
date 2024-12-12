@@ -337,7 +337,11 @@ function startServer(
         const traceData = getTraceData();
         res.appendHeader(
           'server-timing',
-          `sentryTrace;desc="${traceData['sentry-trace']}", baggage;desc="${traceData.baggage}"`,
+          [
+            `sentryTrace;desc="${traceData['sentry-trace']}"`,
+            `baggage;desc="${traceData.baggage}"`,
+            `sentrySpotlightPort;desc=${port}`,
+          ].join(', '),
         );
         const result = route[1](req, res, pathname, searchParams);
         span.setAttribute('http.response.status_code', res.statusCode);
