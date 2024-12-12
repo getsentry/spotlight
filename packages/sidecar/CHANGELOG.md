@@ -1,5 +1,12 @@
 # @spotlightjs/sidecar
 
+## 1.9.4
+
+### Patch Changes
+
+- Better custom sidecar port detection in main Spotlight module
+  ([#623](https://github.com/getsentry/spotlight/pull/623))
+
 ## 1.9.3
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # @spotlightjs/spotlight
 
+## 2.8.1
+
+### Patch Changes
+
+- Better custom sidecar port detection in main Spotlight module
+  ([#623](https://github.com/getsentry/spotlight/pull/623))
+
+- Updated dependencies
+  [[`d9a91975334e213c59692fb087aab47799149888`](https://github.com/getsentry/spotlight/commit/d9a91975334e213c59692fb087aab47799149888)]:
+  - @spotlightjs/sidecar@1.9.4
+  - @spotlightjs/overlay@2.8.1
+
 ## 2.8.0
 
 ### Minor Changes
