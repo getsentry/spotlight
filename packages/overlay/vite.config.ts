@@ -3,6 +3,7 @@ import MagicString from 'magic-string';
 import { resolve, sep } from 'node:path';
 import type { PluginOption } from 'vite';
 import { defineConfig } from 'vite';
+import type { RenderedChunk } from 'rollup';
 import dts from 'vite-plugin-dts';
 import svgr from 'vite-plugin-svgr';
 
@@ -49,12 +50,17 @@ export default defineConfig({
       name: 'Spotlight',
       // the proper extensions will be added
       fileName: 'sentry-spotlight',
-      formats: ['es', 'iife'],
+      formats: ['es', 'iife', 'umd'],
     },
     rollupOptions: {
       treeshake: 'smallest',
       output: {
-        footer: '(function(S){S && S.init({integrations: [S.sentry(), S.console()]})}(window.Spotlight))',
+        footer(chunk: RenderedChunk) {
+          if (chunk.fileName.endsWith('.iife.js')) {
+            return '(function(S){S && S.init({integrations: [S.sentry(), S.console()]})}(window.Spotlight))';
+          }
+          return '';
+        },
       },
     },
     sourcemap: true,
