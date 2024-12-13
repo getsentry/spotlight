@@ -132,9 +132,15 @@ export function processEnvelope(rawEvent: RawEventContext) {
 
   const items: EnvelopeItem[] = [];
   while (buffer.length) {
-    const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
+    let itemHeader: EnvelopeItem[0];
+    try {
+      itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
+    } catch (err) {
+      log('Bad item header, skipping rest of the envelope:', err);
+      break;
+    }
     const payloadLength = itemHeader.length;
-    const itemPayloadRaw = readLine(payloadLength != null ? payloadLength : undefined);
+    const itemPayloadRaw = readLine(payloadLength);
 
     let itemPayload: EnvelopeItem[1];
     try {
