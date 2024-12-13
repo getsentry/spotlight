@@ -100,4 +100,9 @@ describe('Sentry Integration', () => {
     const envelope = fs.readFileSync('./_fixtures/envelope_no_len_w_eof_empty_headers.txt', 'utf-8');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
+
+  test('Process Envelope w/ flutter replay video having bad payload size', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_flutter_replay_bad_size.txt', 'utf-8');
+    expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
+  });
 });
