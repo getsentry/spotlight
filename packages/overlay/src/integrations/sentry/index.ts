@@ -118,8 +118,15 @@ function parseJSONFromBuffer(data: Uint8Array): object {
  * @returns parsed envelope
  */
 export function processEnvelope(rawEvent: RawEventContext) {
-  const { data } = rawEvent;
-  let buffer = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+  // Use this weird way of converting to Uint8Array as we use SSE
+  // which always uses utf-8 encoding but we can have envelopes with
+  // binary data such as screenshots or videos.
+  // Ideally we'd use base64 encoding for binary data but that requires
+  // a breaking change in the sidecar so skipping that for now.
+  let buffer =
+    typeof rawEvent.data === 'string'
+      ? Uint8Array.from(Array.from(rawEvent.data, c => c.charCodeAt(0)))
+      : rawEvent.data;
 
   function readLine(length?: number) {
     const cursor = length ?? getLineEnd(buffer);
@@ -132,13 +139,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
 
   const items: EnvelopeItem[] = [];
   while (buffer.length) {
-    let itemHeader: EnvelopeItem[0];
-    try {
-      itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
-    } catch (err) {
-      log('Bad item header, skipping rest of the envelope:', err);
-      break;
-    }
+    const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
     const payloadLength = itemHeader.length;
     const itemPayloadRaw = readLine(payloadLength);
 

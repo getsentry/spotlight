@@ -77,7 +77,7 @@ describe('Sentry Integration', () => {
   });
 
   test('Process Envelope w/ Binary Data', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_binary.bin');
+    const envelope = fs.readFileSync('./_fixtures/envelope_binary.bin', 'utf-8');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
@@ -101,8 +101,8 @@ describe('Sentry Integration', () => {
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
-  test('Process Envelope w/ flutter replay video having bad payload size', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_flutter_replay_bad_size.txt', 'utf-8');
+  test('Process Envelope w/ flutter replay video', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_flutter_replay.bin', 'utf-8');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 });

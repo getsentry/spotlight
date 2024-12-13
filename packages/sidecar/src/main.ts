@@ -130,9 +130,7 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
       });
     } else if (req.method === 'POST') {
       logger.debug(`📩 Received event`);
-      let body = '';
       let stream = req;
-
       // Check for gzip or deflate encoding and create appropriate stream
       const encoding = req.headers['content-encoding'];
       if (encoding === 'gzip') {
@@ -142,16 +140,19 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
         // @ts-ignore
         stream = req.pipe(createInflate());
       }
+      // TODO: Add brotli and zstd support!
 
       // Read the (potentially decompressed) stream
+      const buffers: Buffer[] = [];
       stream.on('readable', () => {
-        let chunk;
+        let chunk: Buffer | null;
         while ((chunk = stream.read()) !== null) {
-          body += chunk;
+          buffers.push(chunk);
         }
       });
 
       stream.on('end', () => {
+        const body = Buffer.concat(buffers);
         let contentType = req.headers['content-type']?.split(';')[0].toLocaleLowerCase();
         if (searchParams?.get('sentry_client')?.startsWith('sentry.javascript.browser') && req.headers.origin) {
           // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
@@ -160,7 +161,11 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
         if (!contentType) {
           logger.warn('No content type, skipping payload...');
         } else {
-          buffer.put([contentType, body]);
+          // The utf-8 encoding here is wrong and is a hack as we are
+          // sending binary data as utf-8 over SSE which enforces utf-8
+          // encoding. Ideally we'd use base64 encoding for binary data
+          // but that means a breaking change so leaving this as is for now
+          buffer.put([contentType, body.toString('utf-8')]);
         }
 
         if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
@@ -168,7 +173,7 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
           const filename = `${contentType?.replace(/[^a-z0-9]/gi, '_') || 'no_content_type'}-${timestamp}.txt`;
 
           if (incomingPayload) {
-            incomingPayload(body);
+            incomingPayload(body.toString('binary'));
           } else {
             createWriteStream(filename).write(body);
             logger.info(`🗃️ Saved data to ${filename}`);
