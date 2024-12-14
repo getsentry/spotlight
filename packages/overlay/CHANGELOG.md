@@ -1,5 +1,20 @@
 # @spotlightjs/core
 
+## 2.9.0
+
+### Minor Changes
+
+- Add support for rich breadcrumbs ([#632](https://github.com/getsentry/spotlight/pull/632))
+
+### Patch Changes
+
+- More resillient envelope parsing to prevent crashes on bad data
+  ([#629](https://github.com/getsentry/spotlight/pull/629))
+
+- Add missing UMD bundle ([#626](https://github.com/getsentry/spotlight/pull/626))
+
+- Fix encoding related corruption on binary envelope payloads ([#631](https://github.com/getsentry/spotlight/pull/631))
+
 ## 2.8.1
 
 ### Patch Changes

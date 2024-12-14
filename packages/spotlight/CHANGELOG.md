@@ -1,5 +1,29 @@
 # @spotlightjs/spotlight
 
+## 2.9.0
+
+### Minor Changes
+
+- Add support for rich breadcrumbs ([#632](https://github.com/getsentry/spotlight/pull/632))
+
+### Patch Changes
+
+- More resillient envelope parsing to prevent crashes on bad data
+  ([#629](https://github.com/getsentry/spotlight/pull/629))
+
+- Fix timeout mechanism on is sidecar running check ([#634](https://github.com/getsentry/spotlight/pull/634))
+
+- Fix encoding related corruption on binary envelope payloads ([#631](https://github.com/getsentry/spotlight/pull/631))
+
+- Updated dependencies
+  [[`09d3179ccadb61a1fbb119d3a2a8d9315921442e`](https://github.com/getsentry/spotlight/commit/09d3179ccadb61a1fbb119d3a2a8d9315921442e),
+  [`319fef8422dea9425b7f230eab9b7294fbeb5a72`](https://github.com/getsentry/spotlight/commit/319fef8422dea9425b7f230eab9b7294fbeb5a72),
+  [`9759da2d2951e77b1aabd408769b89066d91425e`](https://github.com/getsentry/spotlight/commit/9759da2d2951e77b1aabd408769b89066d91425e),
+  [`0c2ade8e5699e855a31a603067aa575d7580894e`](https://github.com/getsentry/spotlight/commit/0c2ade8e5699e855a31a603067aa575d7580894e),
+  [`12c9552909f8b54f4106e2a2f955475955c0413a`](https://github.com/getsentry/spotlight/commit/12c9552909f8b54f4106e2a2f955475955c0413a)]:
+  - @spotlightjs/overlay@2.9.0
+  - @spotlightjs/sidecar@1.10.0
+
 ## 2.8.1
 
 ### Patch Changes
