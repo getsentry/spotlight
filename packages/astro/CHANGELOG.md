@@ -1,5 +1,20 @@
 # @spotlightjs/astro
 
+## 2.3.0
+
+### Minor Changes
+
+- Add support for rich breadcrumbs ([#632](https://github.com/getsentry/spotlight/pull/632))
+
+### Patch Changes
+
+- Updated dependencies
+  [[`09d3179ccadb61a1fbb119d3a2a8d9315921442e`](https://github.com/getsentry/spotlight/commit/09d3179ccadb61a1fbb119d3a2a8d9315921442e),
+  [`319fef8422dea9425b7f230eab9b7294fbeb5a72`](https://github.com/getsentry/spotlight/commit/319fef8422dea9425b7f230eab9b7294fbeb5a72),
+  [`0c2ade8e5699e855a31a603067aa575d7580894e`](https://github.com/getsentry/spotlight/commit/0c2ade8e5699e855a31a603067aa575d7580894e),
+  [`12c9552909f8b54f4106e2a2f955475955c0413a`](https://github.com/getsentry/spotlight/commit/12c9552909f8b54f4106e2a2f955475955c0413a)]:
+  - @spotlightjs/spotlight@2.9.0
+
 ## 2.2.2
 
 ### Patch Changes

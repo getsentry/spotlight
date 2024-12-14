@@ -1,5 +1,17 @@
 # @spotlightjs/sidecar
 
+## 1.10.0
+
+### Minor Changes
+
+- Add support for rich breadcrumbs ([#632](https://github.com/getsentry/spotlight/pull/632))
+
+### Patch Changes
+
+- Fix timeout mechanism on is sidecar running check ([#634](https://github.com/getsentry/spotlight/pull/634))
+
+- Fix encoding related corruption on binary envelope payloads ([#631](https://github.com/getsentry/spotlight/pull/631))
+
 ## 1.9.4
 
 ### Patch Changes
