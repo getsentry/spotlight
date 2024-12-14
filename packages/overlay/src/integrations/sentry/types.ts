@@ -39,7 +39,8 @@ export type EventException =
     };
 
 export type Breadcrumb = {
-  message: string;
+  data?: Record<string, unknown>;
+  message?: string;
   category: string;
   timestamp: string;
   type: string | 'default';
