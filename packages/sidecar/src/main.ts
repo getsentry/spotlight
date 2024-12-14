@@ -366,10 +366,9 @@ function startServer(
   function handleServerError(e: { code?: string }): void {
     if ('code' in e && e.code === 'EADDRINUSE') {
       logger.info(`Port ${port} in use, retrying...`);
-      setTimeout(() => {
-        server.close();
+      server.close();
+      portInUseRetryTimeout = setTimeout(() => {
         server.listen(port);
-        logger.info(`Port ${port} in use, retrying...`);
       }, 5000);
     } else {
       captureException(e);
@@ -385,6 +384,7 @@ function startServer(
 }
 
 let serverInstance: Server;
+let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
 
 const isValidPort = withTracing(
@@ -399,17 +399,22 @@ const isValidPort = withTracing(
 );
 
 const isSidecarRunning = withTracing(
-  (port: string | number | undefined) => {
-    return new Promise(resolve => {
+  (port: string | number | undefined) =>
+    new Promise(_resolve => {
+      logger.info(`Checking if we are already running on port ${port}`);
       const options = {
         hostname: 'localhost',
         port: port,
         path: '/health',
         method: 'GET',
-        timeout: 2000,
+        // This is only the socket timeout so set up
+        // a connection timeout below manually
+        timeout: 1000,
         headers: { Connection: 'close' },
       };
 
+      // eslint-disable-next-line prefer-const
+      let timeoutId: NodeJS.Timeout;
       const healthReq = get(options, res => {
         const serverIdentifier = res.headers['x-powered-by'];
         if (serverIdentifier === 'spotlight-by-sentry') {
@@ -418,12 +423,19 @@ const isSidecarRunning = withTracing(
           resolve(false);
         }
       });
+      const destroyHealthReq = () => !healthReq.destroyed && healthReq.destroy(new Error('Request timed out.'));
+      function resolve(value: boolean) {
+        process.off('SIGINT', destroyHealthReq);
+        clearTimeout(timeoutId);
+        _resolve(value);
+      }
+      process.on('SIGINT', destroyHealthReq);
+      timeoutId = setTimeout(destroyHealthReq, 2000);
       healthReq.on('error', () => {
         resolve(false);
       });
       healthReq.end();
-    });
-  },
+    }),
   { name: 'isSidecarRunning', op: 'sidecar.server.collideCheck' },
 );
 
@@ -467,6 +479,9 @@ export function clearBuffer(): void {
 
 let forceShutdown = false;
 export const shutdown = () => {
+  if (portInUseRetryTimeout) {
+    clearTimeout(portInUseRetryTimeout);
+  }
   if (forceShutdown || !serverInstance) {
     logger.info('Bye.');
     process.exit(0);
@@ -476,6 +491,7 @@ export const shutdown = () => {
     logger.info('Shutting down server gracefully...');
     serverInstance.close();
     serverInstance.closeAllConnections();
+    serverInstance.unref();
   }
 };
 
