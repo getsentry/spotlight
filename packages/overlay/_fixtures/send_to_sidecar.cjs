@@ -1,82 +1,86 @@
 #!/usr/bin/env node
-const fs = require('fs');
-const http = require('http');
-const path = require('path');
-const zlib = require('zlib');
-
-// Directory where the script is running
-const directoryPath = path.join(__dirname);
+const fs = require('node:fs').promises;
+const http = require('node:http');
+const path = require('node:path');
+const zlib = require('node:zlib');
 
 // Function to read files and send data
-function sendData(filePath) {
-  fs.readFile(filePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error(`Error reading file ${filePath}: ${err}`);
-      return;
-    }
+async function sendData(filePath) {
+  let data;
+  try {
+    data = await fs.readFile(filePath, 'binary');
+  } catch (err) {
+    console.error(`Error reading file ${filePath}: ${err}`);
+    return;
+  }
+  console.log(`[ ${filePath}] size: ${data.length}`);
 
-    const headers = {
-      'Content-Type': 'application/x-sentry-envelope',
-    };
+  const headers = {
+    'Content-Type': 'application/x-sentry-envelope',
+  };
 
-    if (process.env.GZIP === '1') {
-      headers['Content-Encoding'] = 'gzip';
-    }
+  if (process.env.GZIP === '1') {
+    headers['Content-Encoding'] = 'gzip';
+  }
 
-    const options = {
-      hostname: 'localhost',
-      port: process.env.PORT_NUMBER || 8969,
-      path: '/stream',
-      method: 'POST',
-      headers: headers,
-    };
+  const options = {
+    hostname: 'localhost',
+    port: process.env.PORT_NUMBER || 8969,
+    path: '/stream',
+    method: 'POST',
+    headers: headers,
+  };
 
-    const req = http.request(options, res => {
-      console.log(`Status: ${res.statusCode}`);
-    });
+  const req = http.request(options, res => {
+    console.log(`[${filePath}] Status: ${res.statusCode}`);
+  });
 
-    req.on('error', error => {
-      console.error(`Problem with request: ${error.message}`);
-    });
+  req.on('error', error => {
+    console.error(`Problem with request: ${error.message}`);
+  });
 
-    // Check if GZIP environment variable is set to 1
-    if (process.env.GZIP === '1') {
-      zlib.gzip(data, (_error, compressedData) => {
-        // Send the compressed data
-        req.write(compressedData);
-        req.end();
-      });
-    } else {
-      // Send the data without compression
-      req.write(data);
+  // Check if GZIP environment variable is set to 1
+  if (process.env.GZIP === '1') {
+    zlib.gzip(data, (_error, compressedData) => {
+      // Send the compressed data
+      req.write(compressedData);
       req.end();
-    }
-  });
-}
-
-function readDir(directoryPath) {
-  fs.readdir(directoryPath, (err, files) => {
-    if (err) {
-      console.log('Unable to scan directory: ' + err);
-      return;
-    }
-
-    files.forEach(file => {
-      const filePath = path.join(directoryPath, file);
-      fs.stat(filePath, (err, stats) => {
-        if (err) {
-          console.log('Error retrieving file stats: ' + err);
-          return;
-        }
-
-        if (stats.isDirectory()) {
-          readDir(filePath); // Recursive call to readDir for directories
-        } else if (path.extname(file) === '.txt') {
-          sendData(filePath);
-        }
-      });
     });
-  });
+  } else {
+    // Send the data without compression
+    req.write(data);
+    req.end();
+  }
 }
 
-readDir(directoryPath);
+async function readDir(directoryPath) {
+  console.log(`Reading directory: ${directoryPath}`);
+  let entries;
+  try {
+    entries = await fs.readdir(directoryPath, { withFileTypes: true });
+  } catch (err) {
+    console.log(`Unable to scan directory: ${err}`);
+    return;
+  }
+
+  for (const entry of entries) {
+    const entryPath = path.join(directoryPath, entry.name);
+    if (entry.isDirectory()) {
+      readDir(entryPath); // Recursive call to readDir for directories
+    } else if (entry.isFile() && (entry.name.endsWith('.txt') || entry.name.endsWith('.bin'))) {
+      sendData(entryPath);
+    }
+  }
+}
+
+async function main() {
+  const arg = process.argv[2] || __dirname;
+  const stats = await fs.stat(arg);
+  if (stats.isFile()) {
+    sendData(arg);
+  } else if (stats.isDirectory()) {
+    readDir(arg);
+  }
+}
+
+main();
