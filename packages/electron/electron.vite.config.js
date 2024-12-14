@@ -13,6 +13,10 @@ export default defineConfig(({ mode }) => {
     env = loadEnv(mode);
   }
   return {
+    define: {
+      'process.env.NODE_ENV': '"production"',
+      'process.env.npm_package_version': JSON.stringify(process.env.npm_package_version),
+    },
     main: {
       plugins: [
         sentryVitePlugin({
@@ -20,7 +24,7 @@ export default defineConfig(({ mode }) => {
           project: env.MAIN_VITE_SENTRY_PROJECT,
           authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
           release: {
-            name: `spotlight@${process.env.npm_package_version}`,
+            name: process.env.npm_package_version,
           },
         }),
       ],
@@ -41,7 +45,7 @@ export default defineConfig(({ mode }) => {
           project: env.MAIN_VITE_SENTRY_PROJECT,
           authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
           release: {
-            name: `spotlight@${process.env.npm_package_version}`,
+            name: process.env.npm_package_version,
           },
         }),
       ],

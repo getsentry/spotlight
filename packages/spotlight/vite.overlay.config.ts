@@ -3,7 +3,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   define: {
-    'process.env.NODE_ENV': "'production'",
+    'process.env.NODE_ENV': '"production"',
     'process.env.npm_package_version': JSON.stringify(process.env.npm_package_version),
   },
   build: {
