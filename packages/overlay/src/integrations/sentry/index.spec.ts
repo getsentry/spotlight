@@ -77,7 +77,7 @@ describe('Sentry Integration', () => {
   });
 
   test('Process Envelope w/ Binary Data', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_binary.bin', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_binary.bin', 'binary');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
@@ -102,7 +102,12 @@ describe('Sentry Integration', () => {
   });
 
   test('Process Envelope w/ flutter replay video', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_flutter_replay.bin', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_flutter_replay.bin', 'binary');
+    expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
+  });
+
+  test('Process Envelope w/ PNG screenshot', () => {
+    const envelope = fs.readFileSync('./_fixtures/envelope_with_screenshot.bin', 'binary');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 });
