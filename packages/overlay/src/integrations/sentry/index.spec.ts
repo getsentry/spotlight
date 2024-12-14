@@ -7,39 +7,39 @@ import sentryDataCache from './data/sentryDataCache';
 
 describe('Sentry Integration', () => {
   test('Process Envelope Empty', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_empty.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_empty.txt', 'binary');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
   test('Process Envelope', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_javascript.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_javascript.txt', 'binary');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
   test('Process Python Transaction Envelope', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_python.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_python.txt', 'binary');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
   test('Process PHP Transaction Envelope', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_php.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_php.txt', 'binary');
     const processedEnvelope = processEnvelope({ data: envelope, contentType: 'test' });
     expect(processedEnvelope).not.toBe(undefined);
     expect((processedEnvelope.event[1][0][1] as any).type).toEqual('transaction');
   });
 
   test('Process Java Transaction Envelope', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_java.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_java.txt', 'binary');
     const processedEnvelope = processEnvelope({ data: envelope, contentType: 'test' });
     expect(processedEnvelope.event).not.toBe(undefined);
     expect((processedEnvelope.event[1][0][1] as any).type).toEqual('transaction');
   });
 
   test('Process Astro SSR pageload (BE -> FE) trace', () => {
-    const nodeEnvelope = fs.readFileSync('./_fixtures/envelope_astro_ssr_node.txt', 'utf-8');
+    const nodeEnvelope = fs.readFileSync('./_fixtures/envelope_astro_ssr_node.txt', 'binary');
     const processedNodeEnvelope = processEnvelope({ data: nodeEnvelope, contentType: 'test' });
 
-    const browserEnvelope = fs.readFileSync('./_fixtures/envelope_astro_ssr_browser.txt', 'utf-8');
+    const browserEnvelope = fs.readFileSync('./_fixtures/envelope_astro_ssr_browser.txt', 'binary');
     const processedBrowserEnvelope = processEnvelope({ data: browserEnvelope, contentType: 'test' });
 
     expect(processedNodeEnvelope).not.toBe(undefined);
@@ -67,12 +67,12 @@ describe('Sentry Integration', () => {
   });
 
   test('Process Angular Envelope', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_angular.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_angular.txt', 'binary');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
   test('Process Java Formatted Message Envelope', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_java_formatted_message.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_java_formatted_message.txt', 'binary');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
@@ -82,22 +82,22 @@ describe('Sentry Integration', () => {
   });
 
   test('Process Envelope w/ Empty Payloads', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_empty_payload.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_empty_payload.txt', 'binary');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
   test('Process Envelope w/ implicit length, terminated by newline', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_no_len_w_new_line.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_no_len_w_new_line.txt', 'binary');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
   test('Process Envelope w/ implicit length, terminated by EOF', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_no_len_w_eof.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_no_len_w_eof.txt', 'binary');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
   test('Process Envelope w/ implicit length, terminated by EOF, empty headers', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_no_len_w_eof_empty_headers.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_no_len_w_eof_empty_headers.txt', 'binary');
     expect(processEnvelope({ data: envelope, contentType: 'test' })).not.toBe(undefined);
   });
 
