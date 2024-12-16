@@ -115,7 +115,7 @@ only the button is visible.
 
 ```ts
 init({
-  opneOnInit: true,
+  openOnInit: true,
 });
 ```
 
