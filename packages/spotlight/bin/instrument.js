@@ -28,7 +28,8 @@ init({
           continue;
         }
 
-        frame.filename = frame.filename?.replace(process.env.HOME, '~');
+        const homeDir = process.env.HOME || process.env.USERPROFILE;
+        frame.filename = frame.filename?.replace(homeDir, '~');
       }
     }
 

@@ -17,10 +17,11 @@ try {
   sea = { isSea: () => false };
 }
 
+const homeDir = process.env.HOME || process.env.USERPROFILE;
 setContext('CLI', {
   sea: sea.isSea(),
   // TODO: Be less naive with path obscuring
-  argv: process.argv.map(arg => arg.replace(process.env.HOME, '~')),
+  argv: process.argv.map(arg => arg.replace(homeDir, '~')),
 });
 
 const withTracing =
