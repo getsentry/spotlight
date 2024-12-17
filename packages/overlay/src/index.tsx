@@ -187,7 +187,7 @@ export async function init(options: SpotlightOverlayOptions = {}) {
   log('Starting from', initialTab);
 
   // TODO: Shall we enable this for other cases too such as when we use it through Django SDK?
-  if (isLoadedFromSidecar) {
+  if (isLoadedFromSidecar && fullPage) {
     initSentry(initialTab, { debug });
   }
 
