@@ -118,11 +118,6 @@ function parseJSONFromBuffer(data: Uint8Array): object {
  * @returns parsed envelope
  */
 export function processEnvelope(rawEvent: RawEventContext) {
-  // Use this weird way of converting to Uint8Array as we use SSE
-  // which always uses utf-8 encoding but we can have envelopes with
-  // binary data such as screenshots or videos.
-  // Ideally we'd use base64 encoding for binary data but that requires
-  // a breaking change in the sidecar so skipping that for now.
   let buffer =
     typeof rawEvent.data === 'string'
       ? Uint8Array.from(Array.from(rawEvent.data, c => c.charCodeAt(0)))
@@ -243,8 +238,18 @@ function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions) {
   sentryClient._dsn = undefined;
   // @ts-ignore
   sentryClient._options.tracesSampler = () => 1;
+  // @ts-ignore
+  sentryClient._options.sampleRate = 1;
 
   try {
+    // @ts-expect-error ts(2339) -- We're accessing a private property here
+    const existingIntegration = Object.keys(sentryClient._integrations).find(i => /spotlight/i.test(i));
+    if (existingIntegration) {
+      log(
+        `Skipping direct integration as there's already a Spotlight integration enabled in Sentry SDK: ${existingIntegration}`,
+      );
+      return;
+    }
     const integration = spotlightIntegration();
     sentryClient.addIntegration(integration);
   } catch (e) {
