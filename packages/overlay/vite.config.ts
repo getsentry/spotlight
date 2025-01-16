@@ -1,4 +1,5 @@
 import react from '@vitejs/plugin-react';
+import spotlightSidecar from '@spotlightjs/sidecar/vite-plugin';
 import MagicString from 'magic-string';
 import { resolve, sep } from 'node:path';
 import type { PluginOption } from 'vite';
@@ -24,6 +25,7 @@ const removeReactDevToolsMessagePlugin: () => PluginOption = () => ({
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    spotlightSidecar(),
     react(),
     dts({
       insertTypesEntry: true,
