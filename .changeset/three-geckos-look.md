@@ -1,10 +1,8 @@
 ---
-'@spotlightjs/spotlight': major
-'@spotlightjs/electron': major
-'@spotlightjs/tsconfig': major
-'@spotlightjs/overlay': major
-'@spotlightjs/sidecar': major
-'@spotlightjs/astro': major
+'@spotlightjs/spotlight': minor
+'@spotlightjs/electron': minor
+'@spotlightjs/overlay': minor
+'@spotlightjs/astro': minor
 ---
 
 Render placeholders when missing known attributes in Sentry events
