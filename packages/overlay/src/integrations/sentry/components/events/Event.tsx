@@ -18,7 +18,7 @@ export function EventTitle({ event }: { event: SentryEvent }) {
     return <ErrorTitle event={event} />;
   }
 
-  return <strong className="font-bold">{getEventMessage(event)}</strong>;
+  return <strong className="font-bold">{getEventMessage(event) || <em>Unknown Event</em>}</strong>;
 }
 
 export function EventSummary({ event }: { event: SentryEvent }) {
@@ -28,7 +28,7 @@ export function EventSummary({ event }: { event: SentryEvent }) {
   return (
     <div className="space-y-4 font-mono">
       <h3 className="flex flex-col">
-        <strong className="text-xl">{getEventMessage(event)}</strong>
+        <strong className="text-xl">{getEventMessage(event) || <em>Unknown Event</em>}</strong>
       </h3>
     </div>
   );
@@ -43,7 +43,7 @@ export default function Event({ event }: { event: SentryEvent }) {
     <div className="flex-1 px-6 py-4">
       <h3 className="bg-primary-950 flex flex-col">
         <strong className="text-xl">Message:</strong>
-        <pre>{getEventMessage(event)}</pre>
+        <pre>{getEventMessage(event) || <em>No message</em>}</pre>
       </h3>
     </div>
   );
