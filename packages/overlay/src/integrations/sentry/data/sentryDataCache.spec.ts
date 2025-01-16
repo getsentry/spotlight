@@ -7,7 +7,7 @@ import fs from 'node:fs';
 describe('SentryDataCache', () => {
   // We need to refactor this to make it actually testable
   test('Process Envelope', () => {
-    const envelope = fs.readFileSync('./_fixtures/envelope_javascript.txt', 'utf-8');
+    const envelope = fs.readFileSync('./_fixtures/envelope_javascript.txt');
     const processedEnvelope = processEnvelope({ data: envelope, contentType: 'test' });
     expect(
       sentryDataCache.pushEnvelope({ envelope: processedEnvelope.event, rawEnvelope: processedEnvelope.rawEvent }),

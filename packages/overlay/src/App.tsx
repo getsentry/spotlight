@@ -10,6 +10,7 @@ import useKeyPress from './lib/useKeyPress';
 import { connectToSidecar } from './sidecar';
 import type { NotificationCount, SpotlightOverlayOptions } from './types';
 import { SPOTLIGHT_OPEN_CLASS_NAME } from './constants';
+import { base64Decode } from './lib/base64';
 
 type AppProps = Omit<SpotlightOverlayOptions, 'debug' | 'injectImmediately'> &
   Required<Pick<SpotlightOverlayOptions, 'sidecarUrl'>>;
@@ -40,11 +41,18 @@ export default function App({
     for (const integration of integrations) {
       result[integration.name] = [];
       for (const contentType in initialEvents) {
-        if (!integration.forwardedContentType?.includes(contentType)) {
+        const contentTypeBits = contentType.split(';');
+        const contentTypeWithoutEncoding = contentTypeBits[0];
+        if (!integration.forwardedContentType?.includes(contentTypeWithoutEncoding)) {
           continue;
         }
-        for (const data of initialEvents[contentType]) {
-          const processedEvent = processEvent(contentType, { data }, integration);
+        const shouldUseBase64 = contentTypeBits[contentTypeBits.length - 1] === 'base64';
+        for (const data of initialEvents[contentTypeWithoutEncoding]) {
+          const processedEvent = processEvent(
+            contentTypeWithoutEncoding,
+            { data: shouldUseBase64 ? base64Decode(data as string) : data },
+            integration,
+          );
           if (processedEvent) {
             result[integration.name].push(processedEvent);
           }
@@ -97,6 +105,7 @@ export default function App({
 
       // `contentType` could for example be "application/x-sentry-envelope"
       result[contentType] = listener;
+      result[`${contentType};base64`] = ({ data }) => listener({ data: base64Decode(data as string) });
     }
     return result;
   }, [integrations]);
@@ -110,12 +119,19 @@ export default function App({
 
   const dispatchToContentTypeListener = useCallback(
     ({ contentType, data }: EventData) => {
-      const listener = contentTypeListeners[contentType];
+      const contentTypeBits = contentType.split(';');
+      const contentTypeWithoutEncoding = contentTypeBits[0];
+
+      const listener = contentTypeListeners[contentTypeWithoutEncoding];
       if (!listener) {
-        log('Got event for unknown content type:', contentType);
+        log('Got event for unknown content type:', contentTypeWithoutEncoding);
         return;
       }
-      listener({ data });
+      if (contentTypeBits[contentTypeBits.length - 1] === 'base64') {
+        listener({ data: base64Decode(data as string) });
+      } else {
+        listener({ data });
+      }
     },
     [contentTypeListeners],
   );

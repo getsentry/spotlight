@@ -1,4 +1,4 @@
-export function generate_uuidv4() {
+export function generateUuidv4() {
   let dt = new Date().getTime();
   return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     let rnd = Math.random() * 16; //random number in range 0 to 16

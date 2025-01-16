@@ -9,7 +9,7 @@ import { contextLinesHandler } from './contextlines.js';
 import { activateLogger, enableDebugLogging, logger, type SidecarLogger } from './logger.js';
 import { MessageBuffer } from './messageBuffer.js';
 
-type Payload = [string, string];
+type Payload = [string, Buffer];
 
 type IncomingPayloadCallback = (body: string) => void;
 
@@ -91,6 +91,7 @@ const enableCORS = (handler: RequestHandler): RequestHandler =>
     },
     { name: 'enableCORS', op: 'sidecar.http.middleware.cors' },
   );
+
 const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: IncomingPayloadCallback) => {
   return function handleStreamRequest(
     req: IncomingMessage,
@@ -111,16 +112,27 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
       });
       res.flushHeaders();
       // Send something in the body to trigger the `open` event
-      // This is mostly for Firefox -- see #376
+      // This is mostly for Firefox -- see getsentry/spotlight#376
       res.write('\n');
 
+      const useBase64 = searchParams?.get('base64') != null;
+      const base64Indicator = useBase64 ? ';base64' : '';
+      const dataWriter = useBase64
+        ? (data: Buffer) => res.write(`data:${data.toString('base64')}\n`)
+        : (data: Buffer) => {
+            // The utf-8 encoding here is wrong and is a hack as we are
+            // sending binary data as utf-8 over SSE which enforces utf-8
+            // encoding. This is only for backwards compatibility
+            for (const line of data.toString('utf-8').split('\n')) {
+              // This is very important - SSE events are delimited by two newlines
+              res.write(`data:${line}\n`);
+            }
+          };
       const sub = buffer.subscribe(([payloadType, data]) => {
         logger.debug('🕊️ sending to Spotlight');
-        res.write(`event:${payloadType}\n`);
-        // This is very important - SSE events are delimited by two newlines
-        for (const line of data.split('\n')) {
-          res.write(`data:${line}\n`);
-        }
+        res.write(`event:${payloadType}${base64Indicator}\n`);
+        dataWriter(data);
+        // This last \n is important as every message ends with an empty line in SSE
         res.write('\n');
       });
 
@@ -129,7 +141,7 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
         res.end();
       });
     } else if (req.method === 'POST') {
-      logger.debug(`📩 Received event`);
+      logger.debug('📩 Received event');
       let stream = req;
       // Check for gzip or deflate encoding and create appropriate stream
       const encoding = req.headers['content-encoding'];
@@ -161,11 +173,7 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
         if (!contentType) {
           logger.warn('No content type, skipping payload...');
         } else {
-          // The utf-8 encoding here is wrong and is a hack as we are
-          // sending binary data as utf-8 over SSE which enforces utf-8
-          // encoding. Ideally we'd use base64 encoding for binary data
-          // but that means a breaking change so leaving this as is for now
-          buffer.put([contentType, body.toString('utf-8')]);
+          buffer.put([contentType, body]);
         }
 
         if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {

@@ -1,5 +1,5 @@
 import type { Client, Envelope, EnvelopeItem } from '@sentry/types';
-import { removeURLSuffix } from '~/utils/removeURLSuffix';
+import { removeURLSuffix } from '~/lib/removeURLSuffix';
 import { off, on } from '../../lib/eventTarget';
 import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
@@ -60,7 +60,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
         .getEvents()
         .filter(
           e =>
-            e.type != 'transaction' &&
+            e.type !== 'transaction' &&
             (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
         ).length;
 
@@ -118,10 +118,7 @@ function parseJSONFromBuffer(data: Uint8Array): object {
  * @returns parsed envelope
  */
 export function processEnvelope(rawEvent: RawEventContext) {
-  let buffer =
-    typeof rawEvent.data === 'string'
-      ? Uint8Array.from(Array.from(rawEvent.data, c => c.charCodeAt(0)))
-      : rawEvent.data;
+  let buffer = typeof rawEvent.data === 'string' ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
 
   function readLine(length?: number) {
     const cursor = length ?? getLineEnd(buffer);

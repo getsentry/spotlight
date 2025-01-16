@@ -8,7 +8,7 @@ const zlib = require('node:zlib');
 async function sendData(filePath) {
   let data;
   try {
-    data = await fs.readFile(filePath, 'binary');
+    data = await fs.readFile(filePath);
   } catch (err) {
     console.error(`Error reading file ${filePath}: ${err}`);
     return;

@@ -4,15 +4,16 @@ import { log } from './lib/logger';
 export function connectToSidecar(
   sidecarUrl: string,
   // Content Type to listener
-  contentTypeListeners: Record<string, (event: MessageEvent) => void>,
+  contentTypeListeners: Record<string, (event: { data: string | Uint8Array }) => void>,
   setOnline: React.Dispatch<React.SetStateAction<boolean>>,
 ): () => void {
   log('Connecting to sidecar at', sidecarUrl);
-  const sidecarStreamUrl: string = new URL('/stream', sidecarUrl).href;
-  const source = new EventSource(sidecarStreamUrl);
+  const sidecarStreamUrl = new URL('/stream', sidecarUrl);
+  sidecarStreamUrl.searchParams.append('base64', '1');
+  const source = new EventSource(sidecarStreamUrl.href);
 
   for (const [contentType, listener] of Object.entries(contentTypeListeners)) {
-    source.addEventListener(contentType, listener);
+    source.addEventListener(`${contentType}`, listener);
   }
 
   source.addEventListener('open', () => {
