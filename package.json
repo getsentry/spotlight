@@ -2,6 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "pnpm dev:overlay",
     "dev:overlay": "pnpm --filter overlay dev",
     "dev:website": "pnpm --filter website dev",
     "dev:playground": "pnpm --filter astro-playground dev",
