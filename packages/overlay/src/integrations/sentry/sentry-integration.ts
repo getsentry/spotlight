@@ -16,7 +16,7 @@ import sentryDataCache from './data/sentryDataCache';
  */
 export const spotlightIntegration = () => {
   return {
-    name: 'SpotlightBrowser',
+    name: 'SpotlightBrowserDirect',
     setupOnce: () => {
       /* Empty function to ensure compatibility w/ JS SDK v7 >= 7.99.0 */
     },
