@@ -40,7 +40,7 @@ export default function initSentry(initialTab: string, options: Sentry.BrowserOp
     transport: Sentry.makeBrowserOfflineTransport(Sentry.makeFetchTransport),
     dsn: 'https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713',
     environment: process.env.NODE_ENV || 'development',
-    release: process.env.npm_package_version,
+    release: `spotlight@${process.env.npm_package_version}`,
 
     integrations,
 
