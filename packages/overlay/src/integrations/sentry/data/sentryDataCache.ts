@@ -3,7 +3,7 @@ import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/sidecar/constants';
 import { DEFAULT_SIDECAR_URL } from '~/constants';
 import { RawEventContext } from '~/integrations/integration';
 import { log } from '../../../lib/logger';
-import { generate_uuidv4 } from '../../../lib/uuid';
+import { generateUuidv4 } from '../../../lib/uuid';
 import { Sdk, SentryErrorEvent, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
 import { getNativeFetchImplementation } from '../utils/fetch';
 import { sdkToPlatform } from '../utils/sdkToPlatform';
@@ -115,7 +115,7 @@ class SentryDataCache {
     },
   ) {
     if (!event.event_id) {
-      event.event_id = generate_uuidv4();
+      event.event_id = generateUuidv4();
     }
 
     if (this.eventIds.has(event.event_id)) return;
@@ -245,7 +245,7 @@ class SentryDataCache {
   }
 
   subscribe(...args: Subscription) {
-    const id = generate_uuidv4();
+    const id = generateUuidv4();
     this.subscribers.set(id, args);
 
     return () => {

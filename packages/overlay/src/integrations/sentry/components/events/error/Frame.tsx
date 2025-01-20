@@ -2,7 +2,7 @@ import { useState } from 'react';
 import CopyToClipboard from '../../../../../components/CopyToClipboard';
 import OpenInEditor from '../../../../../components/OpenInEditor';
 import classNames from '../../../../../lib/classNames';
-import { renderValue } from '../../../../../utils/values';
+import { renderValue } from '../../../../../lib/values';
 import type { EventFrame, FrameVars } from '../../../types';
 
 function resolveFilename(filename: string) {
