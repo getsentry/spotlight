@@ -8,11 +8,26 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 We provide a Docker container which runs the Sidecar (including the overlay).
 
-```
+```shell
 docker run --rm \
     --pull always \
     --name spotlight \
     --detach \
     -p 8969:8969/tcp \
     ghcr.io/getsentry/spotlight:latest
+```
+
+If you're already using Docker Compose, we recommend adding Spotlight to your `docker-compose.yml` file:
+
+
+```yaml
+version: "3.7"
+services:
+  # ...
+  spotlight:
+    image: ghcr.io/getsentry/spotlight:latest
+    restart: on-failure
+    pull_policy: always
+    ports:
+      - "8969:8969"
 ```
