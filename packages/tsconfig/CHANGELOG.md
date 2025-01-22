@@ -1,5 +1,12 @@
 # @spotlightjs/tsconfig
 
+## 2.0.0
+
+### Major Changes
+
+- Render placeholders when missing known attributes in Sentry events
+  ([#656](https://github.com/getsentry/spotlight/pull/656))
+
 ## 1.0.1
 
 ### Patch Changes

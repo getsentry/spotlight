@@ -1,5 +1,34 @@
 # @spotlightjs/core
 
+## 3.0.0
+
+### Major Changes
+
+- Render placeholders when missing known attributes in Sentry events
+  ([#656](https://github.com/getsentry/spotlight/pull/656))
+
+### Minor Changes
+
+- Add base64 encoding for envelope passing ([#659](https://github.com/getsentry/spotlight/pull/659))
+
+  This fixes the issue certain characters getting lost or changed during the implicit and forced UTF-8 encoding, namely
+  certain ANSI-escape characters when we capture them as breadcrumbs. This was breaking NextJS recently.
+
+  The mechanism is opt-in from Sidecar side and the new overlay automatically opts in to fix the issue. The new overlay
+  is also capable of processing messages w/o base64 encoding so this change is both backwards and forwards compatible
+  meaning a new version of overlay can work with an old sidecar and a new version of sidecar can work with an older
+  overlay. That said to get the fix, both should be on the new version, opting into base64 encoding.
+
+### Patch Changes
+
+- Fix direct transport init when sidecar transport is already enabled
+  ([#658](https://github.com/getsentry/spotlight/pull/658))
+
+- Add auto-reload dev mode for Overlay ([#657](https://github.com/getsentry/spotlight/pull/657))
+
+- Add `spotlight@` prefix to Sentry releases to distinguish them
+  ([#660](https://github.com/getsentry/spotlight/pull/660))
+
 ## 2.9.0
 
 ### Minor Changes

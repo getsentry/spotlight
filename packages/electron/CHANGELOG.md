@@ -1,5 +1,27 @@
 # @spotlightjs/electron
 
+## 2.0.0
+
+### Major Changes
+
+- Render placeholders when missing known attributes in Sentry events
+  ([#656](https://github.com/getsentry/spotlight/pull/656))
+
+### Patch Changes
+
+- Add `spotlight@` prefix to Sentry releases to distinguish them
+  ([#660](https://github.com/getsentry/spotlight/pull/660))
+
+- Updated dependencies
+  [[`8bed105e28f11c139c00f6b4a63717b1fb99d396`](https://github.com/getsentry/spotlight/commit/8bed105e28f11c139c00f6b4a63717b1fb99d396),
+  [`4c1b619079d4a1ca0e280dedef89bb8e1bf3f069`](https://github.com/getsentry/spotlight/commit/4c1b619079d4a1ca0e280dedef89bb8e1bf3f069),
+  [`9606eb25434468bb9377569667f4071a177b85ab`](https://github.com/getsentry/spotlight/commit/9606eb25434468bb9377569667f4071a177b85ab),
+  [`cfa9cc967da8aa862f55c3880aab44f7d5b5eeb4`](https://github.com/getsentry/spotlight/commit/cfa9cc967da8aa862f55c3880aab44f7d5b5eeb4),
+  [`277bd766aead9a6eabf043cc2490f59d0e1729b6`](https://github.com/getsentry/spotlight/commit/277bd766aead9a6eabf043cc2490f59d0e1729b6),
+  [`356890c6faf4ef3d9ebf85615e3f43f34fca0439`](https://github.com/getsentry/spotlight/commit/356890c6faf4ef3d9ebf85615e3f43f34fca0439)]:
+  - @spotlightjs/overlay@3.0.0
+  - @spotlightjs/sidecar@2.0.0
+
 ## 1.3.0
 
 ### Minor Changes
