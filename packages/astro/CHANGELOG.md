@@ -1,5 +1,20 @@
 # @spotlightjs/astro
 
+## 2.4.0
+
+### Minor Changes
+
+- Render placeholders when missing known attributes in Sentry events
+  ([#656](https://github.com/getsentry/spotlight/pull/656))
+
+### Patch Changes
+
+- Updated dependencies
+  [[`5d8c7058300b349cd17d543874cfb810ff7db8d9`](https://github.com/getsentry/spotlight/commit/5d8c7058300b349cd17d543874cfb810ff7db8d9),
+  [`cfa9cc967da8aa862f55c3880aab44f7d5b5eeb4`](https://github.com/getsentry/spotlight/commit/cfa9cc967da8aa862f55c3880aab44f7d5b5eeb4),
+  [`356890c6faf4ef3d9ebf85615e3f43f34fca0439`](https://github.com/getsentry/spotlight/commit/356890c6faf4ef3d9ebf85615e3f43f34fca0439)]:
+  - @spotlightjs/spotlight@2.10.0
+
 ## 2.3.0
 
 ### Minor Changes
