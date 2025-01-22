@@ -46,22 +46,18 @@ const links = assets.map(asset => {
   }
 </style>
 
-<div class="p-4">
-  <div class="group relative text-center">
-    or download for<br />
-    {
-      links.map(link => (
-        <a
-          href={link.url}
-          class="downloadButton inline-flex items-center justify-center px-2 py-2 mx-2 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
-        >
-          {link.name}
-        </a>
-      ))
-    }
-    <br />
-    <span class="text-xs text-gray-400">latest version: {version}</span>
-  </div>
+<div class="group relative text-center text-sm">
+  <div>{
+    links.map(link => (
+      <a
+        href={link.url}
+        class="downloadButton inline-flex items-center justify-center px-2 py-2 mx-2 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
+      >
+        {link.name}
+      </a>
+    ))
+  }</div>
+  <div class="text-xs text-gray-400 mt-2">latest version: {version}</div>
 </div>
 
 <script>

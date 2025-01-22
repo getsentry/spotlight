@@ -63,7 +63,6 @@ import DownloadButton from './DownloadButton.astro';
     text-align: center;
     max-width: 80%;
     opacity: 0;
-    margin-bottom: 3rem;
     animation: fade-in 1s ease-in-out 1s forwards;
   }
 
@@ -75,14 +74,6 @@ import DownloadButton from './DownloadButton.astro';
     animation: fade-in 1s ease-in-out 1s forwards;
   }
 
-  .actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-top: 1rem;
-    gap: 2rem;
-  }
-
   @media (min-width: 768px) {
     .sub-heading {
       letter-spacing: 3px;
@@ -92,10 +83,11 @@ import DownloadButton from './DownloadButton.astro';
 
 <div class="wrapper">
   <h1 class="neon-header">Sentry for Development</h1>
-  <div class="sub-heading">Spotlight is a highly customizable debug tool embedded in your web app.</div>
-  <img src="/images/trace.png" alt="Spotlight Hero" class="hero-image" />
-  <p class="actions">
+  <div class="sub-heading mb-4">Spotlight is a highly customizable debug tool embedded in your web app.</div>
+  <div class="flex flex-col items-center justify-center gap-2 py-4 mb-4">
     <ButtonLink href="/about/">Get Started</ButtonLink>
+    <div class="text-xs uppercase">or download for</div>
     <DownloadButton>Download for Mac</DownloadButton>
-  </p>
+  </div>
+  <img src="/images/trace.png" alt="Spotlight Hero" class="hero-image" />
 </div>
