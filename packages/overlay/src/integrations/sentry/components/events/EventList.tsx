@@ -16,7 +16,7 @@ export default function EventList({ traceId }: { traceId?: string }) {
   const helpers = useSentryHelpers();
   const context = useSpotlightContext();
 
-  const matchingEvents = events.filter(e => e.type !== 'transaction');
+  const matchingEvents = events.filter(e => e.type !== 'transaction' && e.type !== 'profile');
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
   const filteredEvents = showAll
