@@ -169,6 +169,13 @@ jobs:
 
       - name: Run tests
         run: pnpm test:e2e
+
+      - name: Test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: e2e-tests/**/test-results/**
   docker:
     name: Docker Image
     needs: build

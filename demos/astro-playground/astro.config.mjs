@@ -19,6 +19,11 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
+  server: {
+    headers: {
+      'Document-Policy': 'js-profiling',
+    },
+  },
   integrations: [
     svelte({ include: ['**/svelte/*'] }),
     react({ include: ['**/react/*'] }),

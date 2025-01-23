@@ -1,4 +1,4 @@
-import { Measurements } from '@sentry/types';
+import type { Measurements } from '@sentry/core';
 
 export type FrameVars = {
   [key: string]: string;
@@ -15,6 +15,7 @@ export type EventFrame = {
   post_context?: string[];
   context_line?: string;
   vars?: FrameVars;
+  instruction_addr?: string;
   in_app?: boolean;
 };
 
@@ -125,7 +126,70 @@ export type SentryTransactionEvent = CommonEventAttrs & {
   };
 };
 
-export type SentryEvent = SentryErrorEvent | SentryTransactionEvent;
+export type ProfileSample = {
+  elapsed_since_start_ns: string;
+  stack_id: number;
+  thread_id: string;
+};
+
+export type ProcessedProfileSample = {
+  start_timestamp: number;
+  stack_id: number;
+  thread_id: string;
+};
+
+export type SentryProfile = {
+  samples: ProfileSample[];
+  stacks: number[][];
+  frames: EventFrame[];
+  platform?: string;
+  thread_metadata: Record<
+    string,
+    {
+      name?: string;
+      priority?: number;
+    }
+  >;
+};
+
+export type SentryProcessedProfile = SentryProfile & {
+  samples: ProcessedProfileSample[];
+};
+
+export type SentryDeviceInfo = {
+  architecture: string;
+  is_emulator?: boolean;
+  locale?: string;
+  manufacturer?: string;
+  model?: string;
+};
+
+export type SentryOSInfo = {
+  name: string;
+  version: string;
+  build_number?: string;
+};
+
+export type SentryProfileTransactionInfo = {
+  name: string;
+  id: string;
+  trace_id: string;
+  active_thread_id: string;
+  relative_start_ns?: string;
+  relative_end_ns?: string;
+};
+
+export type SentryProfileV1Event = CommonEventAttrs & {
+  type: 'profile';
+  device: SentryDeviceInfo;
+  os: SentryOSInfo;
+  transactions?: Array<SentryProfileTransactionInfo>;
+  transaction?: SentryProfileTransactionInfo;
+  version: '1';
+  profile: SentryProfile;
+};
+
+export type SentryEvent = SentryErrorEvent | SentryTransactionEvent | SentryProfileV1Event;
 
 export type Trace = TraceContext & {
   transactions: SentryTransactionEvent[];
@@ -137,6 +201,7 @@ export type Trace = TraceContext & {
   rootTransactionName: string;
   spans: Map<string, Span>;
   spanTree: Span[];
+  profileGrafted: boolean;
 };
 
 export type Sdk = {

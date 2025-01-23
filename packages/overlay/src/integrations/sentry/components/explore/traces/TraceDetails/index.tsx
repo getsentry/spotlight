@@ -35,6 +35,7 @@ export default function TraceDetails() {
   const errorCount = events.filter(
     e =>
       e.type !== 'transaction' &&
+      e.type !== 'profile' &&
       (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
   ).length;
 
