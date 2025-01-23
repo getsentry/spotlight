@@ -7,7 +7,7 @@ import { DB_SPAN_REGEX } from '../../../../constants';
 import dataCache from '../../../../data/sentryDataCache';
 import type { SentryErrorEvent, Span, TraceContext } from '../../../../types';
 import { formatBytes } from '../../../../utils/bytes';
-import { getDuration } from '../../../../utils/duration';
+import { getFormattedDuration } from '../../../../utils/duration';
 import DateTime from '../../../DateTime';
 import { ErrorTitle } from '../../../events/error/Error';
 import SpanTree from './SpanTree';
@@ -87,7 +87,7 @@ export default function SpanDetails({
 }) {
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
 
-  const spanDuration = getDuration(span.start_timestamp, span.timestamp);
+  const spanDuration = span.timestamp - span.start_timestamp;
 
   const errors = dataCache.getEventsByTrace(span.trace_id).filter(e => e.type !== 'transaction' && 'exception' in e);
 
@@ -115,7 +115,7 @@ export default function SpanDetails({
               <DateTime date={span.start_timestamp} />
               <span>&mdash;</span>
               <span>
-                <strong>{getDuration(startTimestamp, span.start_timestamp)} ms</strong> into trace
+                <strong>{getFormattedDuration(spanDuration)}</strong> into trace
               </span>
             </div>
             <div className="flex-1">
@@ -123,11 +123,11 @@ export default function SpanDetails({
                 <div
                   className="bg-primary-800 absolute bottom-0 top-0 -m-0.5 flex w-full items-center p-0.5"
                   style={{
-                    left: `min(${((span.start_timestamp - startTimestamp) / totalDuration) * 100}%, 100% - 1px)`,
+                    left: `min(${(spanDuration / totalDuration) * 100}%, 100% - 1px)`,
                     width: `max(1px, ${(spanDuration / totalDuration) * 100}%)`,
                   }}
                 >
-                  <span className="whitespace-nowrap">{spanDuration} ms</span>
+                  <span className="whitespace-nowrap">{getFormattedDuration(spanDuration)}</span>
                 </div>
               </div>
             </div>

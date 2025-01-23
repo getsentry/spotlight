@@ -7,7 +7,7 @@ import classNames from '../../../../../lib/classNames';
 import { useSpotlightContext } from '../../../../../lib/useSpotlightContext';
 import { useSentryHelpers } from '../../../data/useSentryHelpers';
 import { useSentryTraces } from '../../../data/useSentryTraces';
-import { getDuration } from '../../../utils/duration';
+import { getFormattedSpanDuration } from '../../../utils/duration';
 import { truncateId } from '../../../utils/text';
 import HiddenItemsButton from '../../HiddenItemsButton';
 import { TraceRootTxnName } from './TraceDetails/components/TraceRootTxnName';
@@ -35,7 +35,6 @@ export default function TraceList() {
             />
           )}
           {filteredTraces.map(trace => {
-            const duration = getDuration(trace.start_timestamp, trace.timestamp);
             return (
               <Link
                 className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
@@ -63,7 +62,7 @@ export default function TraceList() {
                       {trace.status || ''}
                     </div>
                     <div>&mdash;</div>
-                    <div>{duration} ms</div>
+                    <div>{getFormattedSpanDuration(trace)}</div>
                     <div>&mdash;</div>
                     <div>
                       {trace.spans.length.toLocaleString()} spans, {trace.transactions.length.toLocaleString()} txns
