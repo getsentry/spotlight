@@ -212,7 +212,7 @@ jobs:
           cache-from: type=gha,scope=prod
           cache-to: type=gha,mode=max,scope=prod
           platforms: linux/amd64,linux/arm64
-          push: true
+          push: ${{ github.repository_owner == 'getsentry' && 'true' || 'false' }}
           tags: ghcr.io/getsentry/spotlight:${{ github.sha }}
 
       - name: Test Docker Image
