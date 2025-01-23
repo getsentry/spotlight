@@ -211,8 +211,9 @@ jobs:
           context: .
           cache-from: type=gha,scope=prod
           cache-to: type=gha,mode=max,scope=prod
-          platforms: linux/amd64,linux/arm64
-          push: true
+          platforms: ${{ github.event.pull_request.head.repo.full_name == github.repository && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
+          push: ${{ github.event.pull_request.head.repo.full_name == github.repository && 'true' || 'false' }}
+          load: ${{ github.event.pull_request.head.repo.full_name == github.repository && 'false' || 'true' }}
           tags: ghcr.io/getsentry/spotlight:${{ github.sha }}
 
       - name: Test Docker Image
