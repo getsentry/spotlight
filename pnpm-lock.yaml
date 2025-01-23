@@ -195,10 +195,10 @@ importers:
     dependencies:
       '@sentry/nextjs':
         specifier: ^8.37.1
-        version: 8.37.1(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.54.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.91.0)
+        version: 8.37.1(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.54.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.91.0)
       next:
         specifier: '>=15.1.2'
-        version: 15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -480,7 +480,7 @@ importers:
         specifier: ^2.9.1
         version: 2.9.1
       source-map:
-        specifier: '>=0.8.0-beta && <1.0.0'
+        specifier: '>=0.8.0-beta.0 <0.9.0'
         version: 0.8.0-beta.0
     devDependencies:
       '@spotlightjs/tsconfig':
@@ -554,7 +554,7 @@ importers:
         version: 5.1.3(astro@4.16.18(@types/node@22.7.5)(rollup@4.31.0)(terser@5.37.0)(typescript@5.6.2))(tailwindcss@3.4.13)
       '@astrojs/vercel':
         specifier: ^7.8.1
-        version: 7.8.2(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(astro@4.16.18(@types/node@22.7.5)(rollup@4.31.0)(terser@5.37.0)(typescript@5.6.2))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.31.0)(svelte@4.2.19)
+        version: 7.8.2(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(astro@4.16.18(@types/node@22.7.5)(rollup@4.31.0)(terser@5.37.0)(typescript@5.6.2))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.31.0)(svelte@4.2.19)
       '@fontsource/raleway':
         specifier: ^5.1.0
         version: 5.1.0
@@ -8198,10 +8198,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/vercel@7.8.2(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(astro@4.16.18(@types/node@22.7.5)(rollup@4.31.0)(terser@5.37.0)(typescript@5.6.2))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.31.0)(svelte@4.2.19)':
+  '@astrojs/vercel@7.8.2(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(astro@4.16.18(@types/node@22.7.5)(rollup@4.31.0)(terser@5.37.0)(typescript@5.6.2))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.31.0)(svelte@4.2.19)':
     dependencies:
       '@astrojs/internal-helpers': 0.4.2
-      '@vercel/analytics': 1.4.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)
+      '@vercel/analytics': 1.4.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)
       '@vercel/edge': 1.1.2
       '@vercel/nft': 0.27.7(rollup@4.31.0)
       astro: 4.16.18(@types/node@22.7.5)(rollup@4.31.0)(terser@5.37.0)(typescript@5.6.2)
@@ -10431,7 +10431,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@sentry/nextjs@8.37.1(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.54.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.91.0)':
+  '@sentry/nextjs@8.37.1(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.54.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.91.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/instrumentation-http': 0.53.0(@opentelemetry/api@1.9.0)
@@ -10447,7 +10447,7 @@ snapshots:
       '@sentry/vercel-edge': 8.37.1
       '@sentry/webpack-plugin': 2.22.6(webpack@5.91.0)
       chalk: 3.0.0
-      next: 15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       resolve: 1.22.8
       rollup: 3.29.5
       stacktrace-parser: 0.1.10
@@ -11478,10 +11478,10 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vercel/analytics@1.4.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)':
+  '@vercel/analytics@1.4.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)':
     optionalDependencies:
       '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.0.2(@types/node@22.7.5)(jiti@1.21.6)(terser@5.37.0)(yaml@2.5.1))
-      next: 15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       svelte: 4.2.19
 
@@ -14921,7 +14921,7 @@ snapshots:
 
   neotraverse@0.6.18: {}
 
-  next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 15.1.2
       '@swc/counter': 0.1.3
@@ -14931,7 +14931,7 @@ snapshots:
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.6(react@18.3.1)
+      styled-jsx: 5.1.6(@babel/core@7.25.7)(react@18.3.1)
     optionalDependencies:
       '@next/swc-darwin-arm64': 15.1.2
       '@next/swc-darwin-x64': 15.1.2
@@ -16203,10 +16203,12 @@ snapshots:
     dependencies:
       inline-style-parser: 0.2.4
 
-  styled-jsx@5.1.6(react@18.3.1):
+  styled-jsx@5.1.6(@babel/core@7.25.7)(react@18.3.1):
     dependencies:
       client-only: 0.0.1
       react: 18.3.1
+    optionalDependencies:
+      '@babel/core': 7.25.7
 
   stylis@4.2.0: {}
 
