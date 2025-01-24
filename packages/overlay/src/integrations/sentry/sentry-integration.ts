@@ -1,5 +1,5 @@
-import type { Client, Envelope, Event, Integration } from '@sentry/types';
 import { serializeEnvelope } from '@sentry/core';
+import type { Client, Envelope, Event, Integration } from '@sentry/types';
 import { trigger } from '../../lib/eventTarget';
 import { log } from '../../lib/logger';
 import sentryDataCache from './data/sentryDataCache';
