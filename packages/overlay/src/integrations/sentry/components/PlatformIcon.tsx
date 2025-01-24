@@ -17,7 +17,7 @@ import { ReactComponent as SafariIcon } from 'platformicons/svg/safari.svg';
 import { ReactComponent as PhpSymfonyIcon } from 'platformicons/svg/symfony.svg';
 import type { SentryEvent } from '../types';
 
-import type { ComponentPropsWithoutRef, ReactComponentElement } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 
 type Platform = 'python' | 'javascript' | 'node' | 'ruby' | 'csharp' | string;
 
