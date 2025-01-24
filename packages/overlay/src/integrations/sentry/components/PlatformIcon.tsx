@@ -17,7 +17,7 @@ import { ReactComponent as SafariIcon } from 'platformicons/svg/safari.svg';
 import { ReactComponent as PhpSymfonyIcon } from 'platformicons/svg/symfony.svg';
 import type { SentryEvent } from '../types';
 
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef, ReactComponentElement } from 'react';
 
 type Platform = 'python' | 'javascript' | 'node' | 'ruby' | 'csharp' | string;
 
@@ -30,17 +30,37 @@ type PlatformIconProps = ComponentPropsWithoutRef<'svg'> & {
   title?: string;
 };
 
-const BROWSER_ICON_MAP = {
+type IconMap = Record<
+  string,
+  React.FunctionComponent<
+    React.SVGProps<SVGSVGElement> & {
+      title?: string;
+    }
+  >
+>;
+
+const BROWSER_ICON_MAP: IconMap = {
   Safari: SafariIcon,
   Chrome: ChromeIcon,
   Firefox: FirefoxIcon,
 } as const;
 
-const SDK_ICON_MAP = {
+const DefaultSDKIcon = DefaultIcon;
+const SDK_ICON_MAP: IconMap = {
   'sentry.javascript.nextjs': NextJsIcon,
   'sentry.javascript.astro': AstroIcon,
   'sentry.javascript.remix': RemixIcon,
   'sentry.javascript.nestjs': NestJsIcon,
+  ruby: RubyIcon,
+  python: PythonIcon,
+  javascript: JavaScriptIcon,
+  node: NodeIcon,
+  php: PhpIcon,
+  'php.laravel': PhpLaravelIcon,
+  'php.symfony': PhpSymfonyIcon,
+  dotnet: DotNetIcon,
+  'dotnet.maui': DotNetMauiIcon,
+  csharp: DotNetIcon,
 } as const;
 
 export default function PlatformIcon({ platform, event, size = 42, title, ...props }: PlatformIconProps) {
@@ -93,9 +113,7 @@ function RuntimeIcon({
   const browserName = `${event?.contexts?.browser?.name || ''}`;
   const browserTitle = `${browserName} ${event?.contexts?.browser?.version}`;
 
-  const iconKey = Object.keys(BROWSER_ICON_MAP).find(browser => browserName.includes(browser)) as
-    | keyof typeof BROWSER_ICON_MAP
-    | undefined;
+  const iconKey = Object.keys(BROWSER_ICON_MAP).find(browser => browserName.includes(browser));
   if (iconKey) {
     const Icon = BROWSER_ICON_MAP[iconKey];
     return <Icon title={browserTitle} width={size} height={size} {...props} />;
@@ -118,27 +136,6 @@ function CorePlatformIcon({ platform, event, size = 42, title, ...props }: Platf
     return <Icon title={newTitle} width={size} height={size} {...props} />;
   }
 
-  switch (name) {
-    case 'ruby':
-      return <RubyIcon title={newTitle} width={size} height={size} {...props} />;
-    case 'python':
-      return <PythonIcon title={newTitle} width={size} height={size} {...props} />;
-    case 'javascript':
-      return <JavaScriptIcon title={newTitle} width={size} height={size} {...props} />;
-    case 'node':
-      return <NodeIcon title={newTitle} width={size} height={size} {...props} />;
-    case 'php':
-      return <PhpIcon title={newTitle} width={size} height={size} {...props} />;
-    case 'php.laravel':
-      return <PhpLaravelIcon title={newTitle} width={size} height={size} {...props} />;
-    case 'php.symfony':
-      return <PhpSymfonyIcon title={newTitle} width={size} height={size} {...props} />;
-    case 'dotnet':
-    case 'csharp': // event.platform is 'csharp'
-      return <DotNetIcon title={newTitle} width={size} height={size} {...props} />;
-    case 'dotnet.maui':
-      return <DotNetMauiIcon title={newTitle} width={size} height={size} {...props} />;
-    default:
-      return <DefaultIcon title={newTitle} width={size} height={size} {...props} />;
-  }
+  const Icon = SDK_ICON_MAP[name] ?? DefaultSDKIcon;
+  return <Icon title={newTitle} width={size} height={size} {...props} />;
 }
