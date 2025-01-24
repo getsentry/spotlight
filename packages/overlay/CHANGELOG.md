@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 2.11.0
+
+### Minor Changes
+
+- Add more platform icons and some browser icons ([#670](https://github.com/getsentry/spotlight/pull/670))
+
 ## 2.10.1
 
 ### Patch Changes
