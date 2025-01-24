@@ -62,8 +62,7 @@ jobs:
 
       - name: Smoke test
         env:
-          SPOTLIGHT_BINARY:
-            ${{ github.workspace }}/packages/spotlight/dist-bin/spotlight-${{ runner.os }}-${{ runner.arch }}
+          SPOTLIGHT_BINARY: ${{ github.workspace }}/packages/spotlight/dist-bin/spotlight-${{ runner.os }}-${{ runner.arch }}
         run: |
           # Lowercase the binary name because `runner.os` and `runner.arch` are uppercase :facepalm:
           SPOTLIGHT_BINARY=$(echo "$SPOTLIGHT_BINARY" | tr '[:upper:]' '[:lower:]')
@@ -212,15 +211,9 @@ jobs:
           context: .
           cache-from: type=gha,scope=prod
           cache-to: type=gha,mode=max,scope=prod
-          platforms:
-            ${{ (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') &&
-            'linux/amd64,linux/arm64' || 'linux/amd64' }}
-          push:
-            ${{ (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') &&
-            'true' || 'false' }}
-          load:
-            ${{ (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') &&
-            'false' || 'true' }}
+          platforms: ${{ (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
+          push: ${{ (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') && 'true' || 'false' }}
+          load: ${{ (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') && 'false' || 'true' }}
           tags: ghcr.io/getsentry/spotlight:${{ github.sha }}
 
       - name: Test Docker Image
