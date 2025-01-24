@@ -1,11 +1,10 @@
-import type React from 'react';
 import { log } from './lib/logger';
 
 export function connectToSidecar(
   sidecarUrl: string,
   // Content Type to listener
   contentTypeListeners: Record<string, (event: { data: string | Uint8Array }) => void>,
-  setOnline: React.Dispatch<React.SetStateAction<boolean>>,
+  setOnline: (online: boolean) => void,
 ): () => void {
   log('Connecting to sidecar at', sidecarUrl);
   const sidecarStreamUrl = new URL('/stream', sidecarUrl);
@@ -18,12 +17,12 @@ export function connectToSidecar(
 
   source.addEventListener('open', () => {
     setOnline(true);
-    log('Open');
+    log('Sidecar connected.');
   });
 
   source.addEventListener('error', err => {
     setOnline(false);
-    console.error('EventSource failed:', err);
+    console.error('Sidecar connection error:', err);
   });
 
   return () => {

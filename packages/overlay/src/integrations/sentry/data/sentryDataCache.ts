@@ -1,10 +1,10 @@
-import { Envelope } from '@sentry/types';
+import type { Envelope } from '@sentry/types';
 import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/sidecar/constants';
 import { DEFAULT_SIDECAR_URL } from '~/constants';
-import { RawEventContext } from '~/integrations/integration';
+import type { RawEventContext } from '~/integrations/integration';
 import { log } from '../../../lib/logger';
 import { generateUuidv4 } from '../../../lib/uuid';
-import { Sdk, SentryErrorEvent, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
+import type { Sdk, SentryErrorEvent, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
 import { getNativeFetchImplementation } from '../utils/fetch';
 import { sdkToPlatform } from '../utils/sdkToPlatform';
 import { groupSpans } from '../utils/traces';
