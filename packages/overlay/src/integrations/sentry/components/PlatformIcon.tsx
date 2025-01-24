@@ -15,9 +15,9 @@ import { ReactComponent as RemixIcon } from 'platformicons/svg/remix.svg';
 import { ReactComponent as RubyIcon } from 'platformicons/svg/ruby.svg';
 import { ReactComponent as SafariIcon } from 'platformicons/svg/safari.svg';
 import { ReactComponent as PhpSymfonyIcon } from 'platformicons/svg/symfony.svg';
-import { SentryEvent } from '../types';
+import type { SentryEvent } from '../types';
 
-import { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 
 type Platform = 'python' | 'javascript' | 'node' | 'ruby' | 'csharp' | string;
 
@@ -29,6 +29,19 @@ type PlatformIconProps = ComponentPropsWithoutRef<'svg'> & {
   width?: number;
   title?: string;
 };
+
+const BROWSER_ICON_MAP = {
+  Safari: SafariIcon,
+  Chrome: ChromeIcon,
+  Firefox: FirefoxIcon,
+} as const;
+
+const SDK_ICON_MAP = {
+  'sentry.javascript.nextjs': NextJsIcon,
+  'sentry.javascript.astro': AstroIcon,
+  'sentry.javascript.remix': RemixIcon,
+  'sentry.javascript.nestjs': NestJsIcon,
+} as const;
 
 export default function PlatformIcon({ platform, event, size = 42, title, ...props }: PlatformIconProps) {
   return (
@@ -80,14 +93,12 @@ function RuntimeIcon({
   const browserName = `${event?.contexts?.browser?.name || ''}`;
   const browserTitle = `${browserName} ${event?.contexts?.browser?.version}`;
 
-  if (browserName.includes('Safari')) {
-    return <SafariIcon title={browserTitle} width={size} height={size} {...props} />;
-  }
-  if (browserName.includes('Chrome')) {
-    return <ChromeIcon title={browserTitle} width={size} height={size} {...props} />;
-  }
-  if (browserName.includes('Firefox')) {
-    return <FirefoxIcon title={browserTitle} width={size} height={size} {...props} />;
+  const iconKey = Object.keys(BROWSER_ICON_MAP).find(browser => browserName.includes(browser)) as
+    | keyof typeof BROWSER_ICON_MAP
+    | undefined;
+  if (iconKey) {
+    const Icon = BROWSER_ICON_MAP[iconKey];
+    return <Icon title={browserTitle} width={size} height={size} {...props} />;
   }
 
   return null;
@@ -97,14 +108,14 @@ function CorePlatformIcon({ platform, event, size = 42, title, ...props }: Platf
   const name = platform || event?.platform || 'unknown';
   const sdk = event?.sdk?.name || '';
   const newTitle = title ?? name;
-  if (sdk.startsWith('sentry.javascript.nextjs')) {
-    return <NextJsIcon title={newTitle} width={size} height={size} {...props} />;
-  } else if (sdk.startsWith('sentry.javascript.astro')) {
-    return <AstroIcon title={newTitle} width={size} height={size} {...props} />;
-  } else if (sdk.startsWith('sentry.javascript.remix')) {
-    return <RemixIcon title={newTitle} width={size} height={size} {...props} />;
-  } else if (sdk.startsWith('sentry.javascript.nestjs')) {
-    return <NestJsIcon title={newTitle} width={size} height={size} {...props} />;
+
+  const iconName = Object.keys(SDK_ICON_MAP).find(name => sdk.startsWith(name)) as
+    | keyof typeof SDK_ICON_MAP
+    | undefined;
+
+  if (iconName) {
+    const Icon = SDK_ICON_MAP[iconName];
+    return <Icon title={newTitle} width={size} height={size} {...props} />;
   }
 
   switch (name) {
