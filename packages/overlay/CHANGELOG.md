@@ -1,5 +1,12 @@
 # @spotlightjs/core
 
+## 2.10.1
+
+### Patch Changes
+
+- fix: Always try to use sidecar along with direct SDK transport
+  ([#672](https://github.com/getsentry/spotlight/pull/672))
+
 ## 2.10.0
 
 ### Minor Changes
