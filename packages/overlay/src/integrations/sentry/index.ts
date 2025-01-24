@@ -11,6 +11,8 @@ import InsightsTab from './tabs/InsightsTab';
 import PerformanceTab from './tabs/PerformanceTab';
 import type { SentryErrorEvent, SentryEvent } from './types';
 
+import { spotlightBrowserIntegration } from '@sentry/browser';
+
 const HEADER = 'application/x-sentry-envelope';
 
 type SentryIntegrationOptions = {
@@ -28,10 +30,13 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
       if (options.retries == null) {
         options.retries = 10;
       }
+      let baseSidecarUrl: string | undefined = undefined;
       if (sidecarUrl) {
-        sentryDataCache.setSidecarUrl(removeURLSuffix(sidecarUrl, '/stream'));
+        baseSidecarUrl = removeURLSuffix(sidecarUrl, '/stream');
+        sentryDataCache.setSidecarUrl(baseSidecarUrl);
       }
-      addSpotlightIntegrationToSentry(options);
+      log('Setting up Sentry integration for Spotlight');
+      addSpotlightIntegrationToSentry(options, baseSidecarUrl && new URL('/stream', baseSidecarUrl).href);
 
       if (options.openLastError) {
         sentryDataCache.subscribe('event', (e: SentryEvent) => {
@@ -197,7 +202,7 @@ type WindowWithSentry = Window & {
  *
  * @param options options of the Sentry integration for Spotlight
  */
-function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions) {
+function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions, sidecarUrl?: string) {
   if (options.injectIntoSDK === false) {
     return;
   }
@@ -211,7 +216,7 @@ function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions) {
       log(`Will retry ${options.retries} more time(s) at 100ms intervals...`);
       options.retries--;
       setTimeout(() => {
-        addSpotlightIntegrationToSentry(options);
+        addSpotlightIntegrationToSentry(options, sidecarUrl);
       }, 500);
     }
     return;
@@ -243,12 +248,12 @@ function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions) {
     const existingIntegration = Object.keys(sentryClient._integrations).find(i => /spotlight/i.test(i));
     if (existingIntegration) {
       log(
-        `Skipping direct integration as there's already a Spotlight integration enabled in Sentry SDK: ${existingIntegration}`,
+        `Skipping adding integration as there's already a Spotlight integration enabled in Sentry SDK: ${existingIntegration}`,
       );
       return;
     }
-    const integration = spotlightIntegration();
-    sentryClient.addIntegration(integration);
+    sentryClient.addIntegration(spotlightIntegration());
+    sentryClient.addIntegration(spotlightBrowserIntegration({ sidecarUrl }));
   } catch (e) {
     warn('Failed to add Spotlight integration to Sentry', e);
     log('Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose');

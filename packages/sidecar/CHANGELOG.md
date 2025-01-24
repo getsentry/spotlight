@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 1.11.1
+
+### Patch Changes
+
+- Fix invalid semver range for source-map dependency ([#667](https://github.com/getsentry/spotlight/pull/667))
+
 ## 1.11.0
 
 ### Minor Changes

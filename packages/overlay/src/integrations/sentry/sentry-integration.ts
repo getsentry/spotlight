@@ -1,5 +1,5 @@
+import { serializeEnvelope } from '@sentry/core';
 import type { Client, Envelope, Event, Integration } from '@sentry/types';
-import { serializeEnvelope } from '@sentry/utils';
 import { trigger } from '../../lib/eventTarget';
 import { log } from '../../lib/logger';
 import sentryDataCache from './data/sentryDataCache';
@@ -20,14 +20,13 @@ export const spotlightIntegration = () => {
     setupOnce: () => {
       /* Empty function to ensure compatibility w/ JS SDK v7 >= 7.99.0 */
     },
-    setup: () => {
-      log('Setting up the *direct* Sentry SDK integration for Spotlight');
-    },
+    setup: () => {},
     processEvent: (event: Event) => {
       // We don't want to send interaction transactions/root spans created from
       // clicks within Spotlight to Sentry. Neither do we want them to be sent to
       // spotlight.
       if (isSpotlightInteraction(event)) {
+        log('Dropping transaction created from Spotlight interaction');
         return null;
       }
 
