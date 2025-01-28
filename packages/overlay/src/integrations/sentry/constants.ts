@@ -1,4 +1,4 @@
-export const DB_SPAN_REGEX = /^db(\.[A-Za-z]+)?$/;
+export const DB_SPAN_REGEX = /^db(?:\.[A-Za-z]+)*$/;
 
 export const RESOURCES_SORT_KEYS = {
   avgDuration: 'AVG_DURATION',
