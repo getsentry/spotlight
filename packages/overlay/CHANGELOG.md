@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 2.11.1
+
+### Patch Changes
+
+- Ensure queries from all db ops are shown ([#677](https://github.com/getsentry/spotlight/pull/677))
+
 ## 2.11.0
 
 ### Minor Changes

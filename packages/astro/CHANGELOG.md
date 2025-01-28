@@ -1,5 +1,12 @@
 # @spotlightjs/astro
 
+## 2.4.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @spotlightjs/spotlight@2.10.3
+
 ## 2.4.2
 
 ### Patch Changes
