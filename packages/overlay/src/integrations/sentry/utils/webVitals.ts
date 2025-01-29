@@ -1,5 +1,5 @@
-import { SentryEvent } from '~/integrations/sentry/types';
-import { WebVitals } from '../constants';
+import type { SentryEvent } from '~/integrations/sentry/types';
+import type { WebVitals } from '../constants';
 
 const SQRT_2 = Math.sqrt(2);
 
@@ -155,7 +155,7 @@ export function normalizePerformanceScore(
         };
       }
 
-      if (shouldAddTotal) {
+      if (shouldAddTotal && !Object.prototype.hasOwnProperty.call(measurements, 'score.total')) {
         measurements['score.total'] = {
           value: scoreTotal,
           unit: 'ratio',
