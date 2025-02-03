@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@astrojs/node": "^8.3.4",
-    "@sentry/astro": "^8.33.1",
+    "@sentry/astro": "^8.49.0",
     "@spotlightjs/astro": "workspace:^",
     "astro": "^4.16.18"
   },
