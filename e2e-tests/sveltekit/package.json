@@ -15,7 +15,7 @@
 		"test:e2e": "playwright test"
 	},
 	"dependencies": {
-		"@sentry/sveltekit": "8.7.0"
+		"@sentry/sveltekit": "8.8.0"
 	},
 	"devDependencies": {
 		"@fontsource/fira-mono": "^4.5.10",
