@@ -40,7 +40,7 @@
     }
   },
   "dependencies": {
-    "@sentry/node": "^8.42.0",
+    "@sentry/node": "^8.49.0",
     "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
     "import-meta-resolve": "^4.1.0",
