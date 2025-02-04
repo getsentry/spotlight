@@ -86,6 +86,7 @@ export default function SpanDetails({
   totalDuration: number;
 }) {
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
+  const spanRelativeStart = span.start_timestamp - startTimestamp;
 
   const spanDuration = span.timestamp - span.start_timestamp;
 
@@ -115,7 +116,7 @@ export default function SpanDetails({
               <DateTime date={span.start_timestamp} />
               <span>&mdash;</span>
               <span>
-                <strong>{getFormattedDuration(spanDuration)}</strong> into trace
+                <strong>{getFormattedDuration(spanRelativeStart)}</strong> into trace
               </span>
             </div>
             <div className="flex-1">
@@ -123,7 +124,7 @@ export default function SpanDetails({
                 <div
                   className="bg-primary-800 absolute bottom-0 top-0 -m-0.5 flex w-full items-center p-0.5"
                   style={{
-                    left: `min(${(spanDuration / totalDuration) * 100}%, 100% - 1px)`,
+                    left: `min(${(spanRelativeStart / totalDuration) * 100}%, 100% - 1px)`,
                     width: `max(1px, ${(spanDuration / totalDuration) * 100}%)`,
                   }}
                 >
