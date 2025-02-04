@@ -1,4 +1,4 @@
-import type { Envelope } from '@sentry/types';
+import type { Envelope } from '@sentry/core';
 import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/sidecar/constants';
 import { DEFAULT_SIDECAR_URL } from '~/constants';
 import type { RawEventContext } from '~/integrations/integration';
@@ -73,7 +73,7 @@ class SentryDataCache {
     const lastSeen = new Date(header.sent_at as string).getTime();
     let sdk: Sdk;
 
-    if (header.sdk && header.sdk.name && header.sdk.version) {
+    if (header.sdk?.name && header.sdk.version) {
       sdk = {
         name: header.sdk.name,
         version: header.sdk.version,
@@ -139,7 +139,7 @@ class SentryDataCache {
       const startTs = event.start_timestamp ? event.start_timestamp : new Date().getTime();
       const trace = existingTrace ?? {
         ...traceCtx,
-        spans: [] as Span[],
+        spans: new Map(),
         transactions: [] as SentryTransactionEvent[],
         errors: 0,
         timestamp: event.timestamp,
@@ -324,5 +324,5 @@ class SentryDataCache {
 export default new SentryDataCache();
 
 function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
-  return event.type != 'transaction';
+  return event.type !== 'transaction';
 }
