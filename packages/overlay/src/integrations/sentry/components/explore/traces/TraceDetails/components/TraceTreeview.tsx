@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import sentryDataCache from '../../../../../data/sentryDataCache';
-import { getDuration } from '../../../../../utils/duration';
 import DateTime from '../../../../DateTime';
 import SpanDetails from '../../spans/SpanDetails';
 import SpanTree from '../../spans/SpanTree';
+import { getFormattedSpanDuration } from '../../../../../utils/duration';
 
 type TraceTreeViewProps = { traceId: string };
 
@@ -29,10 +29,7 @@ export default function TraceTreeview({ traceId }: TraceTreeViewProps) {
           </div>
           <span>&mdash;</span>
           <span>
-            <strong className="text-primary-200 font-bold">
-              {getDuration(trace.start_timestamp, trace.timestamp).toLocaleString()} ms
-            </strong>{' '}
-            recorded in{' '}
+            <strong className="text-primary-200 font-bold">{getFormattedSpanDuration(trace)}</strong> recorded in{' '}
             <strong className="text-primary-200 font-bold">{trace.spans.length.toLocaleString()} spans</strong>
           </span>
         </div>

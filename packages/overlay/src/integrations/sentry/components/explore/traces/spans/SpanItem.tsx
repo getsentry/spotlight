@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
 import classNames from '../../../../../../lib/classNames';
 import type { Span, TraceContext } from '../../../../types';
-import { getDuration, getSpanDurationClassName } from '../../../../utils/duration';
+import { getSpanDurationClassName, getFormattedDuration } from '../../../../utils/duration';
 import PlatformIcon from '../../../PlatformIcon';
 import SpanResizer from '../../../SpanResizer';
 import SpanTree from './SpanTree';
@@ -37,7 +37,7 @@ const SpanItem = ({
   );
   const [isResizing, setIsResizing] = useState(false);
 
-  const spanDuration = getDuration(span.start_timestamp, span.timestamp);
+  const spanDuration = span.timestamp - span.start_timestamp;
 
   const handleResize = (e: MouseEvent) => {
     if (containerRef.current) {
@@ -117,7 +117,7 @@ const SpanItem = ({
             }}
           >
             <span className={classNames('whitespace-nowrap', getSpanDurationClassName(spanDuration))}>
-              {spanDuration.toLocaleString()} ms
+              {getFormattedDuration(spanDuration)}
             </span>
           </div>
         </div>
