@@ -27,7 +27,7 @@ const calculateResourceInfo = ({ resource, spanData }: { resource: string; spanD
   const avgDuration = totalTimeInMs / specificResources.length;
   const avgEncodedSize =
     specificResources.reduce((acc: number, span: Span) => {
-      const contentLength = span.data && span.data['http.response_content_length'];
+      const contentLength = span.data?.['http.response_content_length'];
       if (typeof contentLength === 'number') {
         return acc + contentLength;
       }

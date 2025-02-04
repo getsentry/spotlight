@@ -135,7 +135,7 @@ export type Trace = TraceContext & {
   status: string;
   rootTransaction: SentryTransactionEvent | null;
   rootTransactionName: string;
-  spans: Span[];
+  spans: Map<string, Span>;
   spanTree: Span[];
 };
 
