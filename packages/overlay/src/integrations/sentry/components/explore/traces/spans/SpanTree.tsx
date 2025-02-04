@@ -1,3 +1,4 @@
+import classNames from '../../../../../../lib/classNames';
 import { Span, TraceContext } from '../../../../types';
 import SpanItem from './SpanItem';
 
@@ -25,7 +26,7 @@ export default function SpanTree({
   if (!tree || !tree.length) return null;
 
   return (
-    <ul className="tree">
+    <ul className={classNames(tree.length > 1 && 'deep', 'tree')}>
       {tree.map(span => {
         return (
           <SpanItem

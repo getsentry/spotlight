@@ -44,11 +44,13 @@ ul.tree ul {
   margin: 0;
   padding: 0;
 }
-ul.tree ul {
+ul.tree.deep > li > ul {
   margin-left: 8px;
 }
-ul.tree li {
+ul.tree.deep > li {
   @apply border-primary-400 border-l;
+  padding-left: 1rem;
+  margin-left: 1rem;
 }
 
 ul.tree li:last-child {
@@ -59,11 +61,10 @@ ul.tree > li:first-child:before {
   display: none;
 }
 
-ul.tree > li:before,
+ul.tree.deep > li:before,
 ul.tree ul.tree > li:before {
   @apply border-primary-400 border-b;
   position: absolute;
-  margin-top: -2px;
   height: 15px;
   width: 12px;
   content: '';

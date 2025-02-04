@@ -31,8 +31,9 @@ const SpanItem = ({
 }) => {
   const { spanId } = useParams();
   const containerRef = useRef<HTMLLIElement>(null);
+  const childrenCount = span.children ? span.children.length : 0;
   const [isItemCollapsed, setIsItemCollapsed] = useState(
-    (span.transaction && totalTransactions > 1 && depth !== 1) || depth >= 15,
+    (span.transaction && totalTransactions > 1 && depth !== 1) || depth >= 15 || childrenCount > 10,
   );
   const [isResizing, setIsResizing] = useState(false);
 
@@ -51,7 +52,7 @@ const SpanItem = ({
     : false;
 
   return (
-    <li key={span.span_id} className="pl-4" ref={containerRef}>
+    <li key={span.span_id} ref={containerRef}>
       <Link
         className={classNames(
           'hover:bg-primary-900 group flex text-sm',
@@ -74,7 +75,7 @@ const SpanItem = ({
             width: `${spanNodeWidth}%`,
           }}
         >
-          {(span.children || []).length > 0 && (
+          {childrenCount > 0 && (
             <div
               className="bg-primary-600 z-10 mr-1 flex items-center gap-1 rounded-lg px-1 text-xs font-bold text-white"
               onClick={e => {
@@ -82,7 +83,7 @@ const SpanItem = ({
                 setIsItemCollapsed(prev => !prev);
               }}
             >
-              {(span.children || []).length}
+              {childrenCount}
               <ChevronIcon
                 width={12}
                 height={12}
@@ -128,7 +129,7 @@ const SpanItem = ({
           tree={span.children || []}
           startTimestamp={startTimestamp}
           totalDuration={totalDuration}
-          depth={depth + 1}
+          depth={childrenCount > 1 ? depth + 1 : depth}
           totalTransactions={totalTransactions}
           spanNodeWidth={spanNodeWidth}
           setSpanNodeWidth={setSpanNodeWidth}
