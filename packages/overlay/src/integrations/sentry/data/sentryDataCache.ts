@@ -41,7 +41,9 @@ class SentryDataCache {
       event_id?: string;
     })[] = [],
   ) {
-    initial.forEach(e => this.pushEvent(e));
+    for (const evt of initial) {
+      this.pushEvent(evt);
+    }
   }
 
   setSidecarUrl(url: string) {
@@ -153,9 +155,9 @@ class SentryDataCache {
 
         // recompute tree as we might have txn out of order
         // XXX: we're trusting timestamps, which are not trustworthy
-        const allSpans: Span[] = [];
-        trace.transactions.forEach(txn => {
-          allSpans.push({
+        const spanMap: Map<string, Span> = new Map();
+        for (const txn of trace.transactions) {
+          spanMap.set(txn.contexts.trace.span_id, {
             ...txn.contexts.trace,
             tags: txn?.tags,
             start_timestamp: txn.start_timestamp,
@@ -165,16 +167,16 @@ class SentryDataCache {
           });
 
           if (txn.spans) {
-            allSpans.push(
-              ...txn.spans.map(s => ({
-                ...s,
-                timestamp: toTimestamp(s.timestamp),
-                start_timestamp: toTimestamp(s.start_timestamp),
-              })),
-            );
+            for (const span of txn.spans) {
+              spanMap.set(span.span_id, {
+                ...span,
+                timestamp: toTimestamp(span.timestamp),
+                start_timestamp: toTimestamp(span.start_timestamp),
+              });
+            }
           }
-        });
-        trace.spans = allSpans;
+        }
+        trace.spans = spanMap;
         trace.spanTree = groupSpans(trace.spans);
       } else {
         trace.errors += 1;
@@ -232,7 +234,7 @@ class SentryDataCache {
   getSpanById(traceId: string, spanId: string) {
     const trace = this.tracesById[traceId];
     if (!trace) return undefined;
-    return trace.spans.find(s => s.span_id === spanId);
+    return trace.spans.get(spanId);
   }
 
   resetData() {

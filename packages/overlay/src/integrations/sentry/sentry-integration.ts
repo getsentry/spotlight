@@ -48,10 +48,13 @@ export const spotlightIntegration = () => {
  * Flags if the event is a transaction created from an interaction with the spotlight UI.
  */
 function isSpotlightInteraction(event: Event): boolean {
-  return (
-    (event.type === 'transaction' &&
-      event.contexts?.trace?.op === 'ui.action.click' &&
-      event.spans?.some(s => s.description?.includes('#sentry-spotlight'))) ||
-    false
-  );
+  if (event.type === 'transaction' && event.contexts?.trace?.op === 'ui.action.click' && event.spans) {
+    for (const span of event.spans.values()) {
+      if (span.description?.includes('#sentry-spotlight')) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }

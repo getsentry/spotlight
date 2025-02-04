@@ -30,7 +30,7 @@ export default function TraceTreeview({ traceId }: TraceTreeViewProps) {
           <span>&mdash;</span>
           <span>
             <strong className="text-primary-200 font-bold">{getFormattedSpanDuration(trace)}</strong> recorded in{' '}
-            <strong className="text-primary-200 font-bold">{trace.spans.length.toLocaleString()} spans</strong>
+            <strong className="text-primary-200 font-bold">{trace.spans.size.toLocaleString()} spans</strong>
           </span>
         </div>
       </div>

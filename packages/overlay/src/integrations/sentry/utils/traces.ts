@@ -2,17 +2,17 @@ import { log } from '../../../lib/logger';
 import { Span } from '../types';
 
 // mutates spans in place and adds children, as well as returns the top level tree
-export function groupSpans(spans: Span[]) {
+export function groupSpans(spans: Map<string, Span>) {
   // ordered
   const tree: Span[] = [];
-  // hash with pointers
-  const idLookup = new Map<string, Span>();
 
   // need to sort root(s) first
-  const sortedSpans = [...spans].sort((a, b) => (a.parent_span_id ? 1 : 0) - (b.parent_span_id ? 1 : 0));
+  const sortedSpans = Array.from(spans.values()).sort(
+    (a, b) => (a.parent_span_id ? 1 : 0) - (b.parent_span_id ? 1 : 0),
+  );
 
   sortedSpans.forEach(span => {
-    let parent = getParentOfSpan(span, idLookup, sortedSpans);
+    let parent = getParentOfSpan(span, spans, sortedSpans);
     span.children ||= [];
     if (parent) {
       if (!parent.children) {
@@ -37,7 +37,7 @@ export function groupSpans(spans: Span[]) {
         timestamp: span.timestamp,
         status: 'unknown',
       };
-      idLookup.set(parent.span_id, parent);
+      spans.set(parent.span_id, parent);
       // sortedSpans.splice(spanIdx, 0, parent);
       if (parentParent) {
         parentParent.children ||= [];
@@ -48,7 +48,7 @@ export function groupSpans(spans: Span[]) {
     } else {
       tree.push(span);
     }
-    idLookup.set(span.span_id, span);
+    spans.set(span.span_id, span);
   });
 
   return tree;

@@ -18,7 +18,7 @@ function mockSpan({ duration, ...span }: Partial<Span> & { duration?: number } =
 
 describe('groupSpans', () => {
   test('empty span list', () => {
-    expect(groupSpans([])).toEqual([]);
+    expect(groupSpans(new Map())).toEqual([]);
   });
 
   test('simple parent and child relationship', () => {
@@ -31,7 +31,13 @@ describe('groupSpans', () => {
       parent_span_id: parent1.span_id,
       trace_id: parent1.trace_id,
     });
-    const result = groupSpans([parent1, span1, span2]);
+    const result = groupSpans(
+      new Map<string, Span>([
+        [parent1.span_id, parent1],
+        [span1.span_id, span1],
+        [span2.span_id, span2],
+      ]),
+    );
     console.debug(result);
     expect(result.length).toEqual(1);
     expect(result[0].span_id).toEqual(parent1.span_id);
@@ -63,7 +69,16 @@ describe('groupSpans', () => {
       parent_span_id: parent2.span_id,
       trace_id: parent2.trace_id,
     });
-    const result = groupSpans([parent1, span1, span2, parent2, span3, span4]);
+    const result = groupSpans(
+      new Map<string, Span>([
+        [parent1.span_id, parent1],
+        [span1.span_id, span1],
+        [span2.span_id, span2],
+        [parent2.span_id, parent2],
+        [span3.span_id, span3],
+        [span4.span_id, span4],
+      ]),
+    );
     console.debug(result);
     expect(result.length).toEqual(2);
     expect(result[0].span_id).toEqual(parent1.span_id);
@@ -85,7 +100,12 @@ describe('groupSpans', () => {
       parent_span_id,
       trace_id: span1.trace_id,
     });
-    const result = groupSpans([span1, span2]);
+    const result = groupSpans(
+      new Map<string, Span>([
+        [span1.span_id, span1],
+        [span2.span_id, span2],
+      ]),
+    );
     console.debug(result);
     expect(result.length).toEqual(1);
     expect(result[0].op).toEqual('orphan');
@@ -106,7 +126,12 @@ describe('groupSpans', () => {
       parent_span_id: generateUuidv4(),
       trace_id: span1.trace_id,
     });
-    const result = groupSpans([span1, span2]);
+    const result = groupSpans(
+      new Map<string, Span>([
+        [span1.span_id, span1],
+        [span2.span_id, span2],
+      ]),
+    );
     console.debug(result);
     expect(result.length).toEqual(2);
     expect(result[0].span_id).toEqual(span1.parent_span_id);
