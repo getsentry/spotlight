@@ -58,6 +58,7 @@ const SpanItem = ({
           'hover:bg-primary-900 group flex text-sm',
           isQueried ? 'bg-primary-200 bg-opacity-20' : '',
           spanId === span.span_id ? 'bg-primary-900' : '',
+          span.tags?.source === 'profile' ? 'text-lime-500' : '',
         )}
         style={{
           pointerEvents: isResizing ? 'none' : 'auto',

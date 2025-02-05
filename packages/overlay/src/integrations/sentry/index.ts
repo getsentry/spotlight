@@ -66,6 +66,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
         .filter(
           e =>
             e.type !== 'transaction' &&
+            e.type !== 'profile' &&
             (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
         ).length;
 

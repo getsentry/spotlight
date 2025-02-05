@@ -14,6 +14,7 @@ dist-bin
 node
 dist-ssr
 *.local
+test-results
 
 .eslintcache
 
