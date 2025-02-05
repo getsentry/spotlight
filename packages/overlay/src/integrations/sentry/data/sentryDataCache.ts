@@ -313,12 +313,6 @@ class SentryDataCache {
     return this.events.filter(filterFunc);
   }
 
-  getSpanById(traceId: string, spanId: string) {
-    const trace = this.tracesById.get(traceId);
-    if (!trace) return undefined;
-    return trace.spans.get(spanId);
-  }
-
   resetData() {
     this.envelopes = [];
     this.events = [];

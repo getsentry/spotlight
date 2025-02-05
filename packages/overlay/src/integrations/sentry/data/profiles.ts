@@ -34,7 +34,7 @@ function consolidateSpans(trace: Trace, spans: Span[]): Span[] {
     } else {
       // Discard very short spans
       if (lastSpan.timestamp - lastSpan.start_timestamp > 0) {
-        if (lastSpan.children && lastSpan.children.length > 1) {
+        if (lastSpan.children) {
           lastSpan.children = consolidateSpans(trace, lastSpan.children);
         }
         consolidatedSpans.push(lastSpan);
