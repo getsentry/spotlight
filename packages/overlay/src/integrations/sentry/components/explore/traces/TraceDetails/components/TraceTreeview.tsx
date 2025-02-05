@@ -16,7 +16,7 @@ export default function TraceTreeview({ traceId }: TraceTreeViewProps) {
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(DEFAULT_SPAN_NODE_WIDTH);
 
   const trace = sentryDataCache.getTraceById(traceId)!;
-  const span = spanId ? sentryDataCache.getSpanById(traceId, spanId) : undefined;
+  const span = spanId ? trace.spans.get(spanId) : undefined;
   const startTimestamp = trace.start_timestamp;
   const totalDuration = trace.timestamp - startTimestamp;
 
