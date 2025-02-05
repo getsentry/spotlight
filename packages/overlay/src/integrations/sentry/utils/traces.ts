@@ -1,23 +1,22 @@
 import { log } from '../../../lib/logger';
-import { Span } from '../types';
+import type { Span } from '../types';
 
 // mutates spans in place and adds children, as well as returns the top level tree
-export function groupSpans(spans: Map<string, Span>) {
-  // ordered
+export function groupSpans(spans: Map<string, Span>): Span[] {
   const tree: Span[] = [];
 
   // need to sort root(s) first
-  const sortedSpans = Array.from(spans.values()).sort(
-    (a, b) => (a.parent_span_id ? 1 : 0) - (b.parent_span_id ? 1 : 0),
-  );
+  const sortedSpans = Array.from(spans.values()).sort((a, b) => {
+    const parentComp = (a.parent_span_id ? 1 : 0) - (b.parent_span_id ? 1 : 0);
+    return parentComp === 0 ? compareSpans(a, b) : parentComp;
+  });
 
-  sortedSpans.forEach(span => {
-    let parent = getParentOfSpan(span, spans, sortedSpans);
-    span.children ||= [];
+  for (const span of sortedSpans) {
+    let parent = span && getParentOfSpan(span, spans, sortedSpans);
+
+    span.children ??= [];
     if (parent) {
-      if (!parent.children) {
-        parent.children = [];
-      }
+      parent.children ??= [];
       parent.children.push(span);
     } else if (span.parent_span_id) {
       const parentParent = sortedSpans.find(s => !s.parent_span_id);
@@ -40,7 +39,7 @@ export function groupSpans(spans: Map<string, Span>) {
       spans.set(parent.span_id, parent);
       // sortedSpans.splice(spanIdx, 0, parent);
       if (parentParent) {
-        parentParent.children ||= [];
+        parentParent.children ??= [];
         parentParent.children.push(parent);
       } else {
         tree.push(parent);
@@ -49,7 +48,7 @@ export function groupSpans(spans: Map<string, Span>) {
       tree.push(span);
     }
     spans.set(span.span_id, span);
-  });
+  }
 
   return tree;
 }
@@ -58,8 +57,10 @@ function getParentOfSpan(span: Span, idLookup: Map<string, Span>, allSpans: Span
   if (!span.parent_span_id) {
     return undefined;
   }
-  if (idLookup.has(span.parent_span_id)) {
-    return idLookup.get(span.parent_span_id);
-  }
-  return allSpans.find(s => s.span_id === span.parent_span_id);
+
+  return idLookup.get(span.parent_span_id) || allSpans.find(s => s.span_id === span.parent_span_id);
+}
+
+export function compareSpans(a: { start_timestamp: number }, b: { start_timestamp: number }): number {
+  return a.start_timestamp - b.start_timestamp;
 }

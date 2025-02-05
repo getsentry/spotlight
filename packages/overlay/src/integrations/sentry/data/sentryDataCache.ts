@@ -1,18 +1,40 @@
 import type { Envelope } from '@sentry/core';
 import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/sidecar/constants';
-import { DEFAULT_SIDECAR_URL } from '~/constants';
-import type { RawEventContext } from '~/integrations/integration';
+import { DEFAULT_SIDECAR_URL } from '../../../constants';
 import { log } from '../../../lib/logger';
 import { generateUuidv4 } from '../../../lib/uuid';
-import type { Sdk, SentryErrorEvent, SentryEvent, SentryTransactionEvent, Span, Trace } from '../types';
+import type { RawEventContext } from '../../integration';
+import type {
+  Sdk,
+  SentryErrorEvent,
+  SentryEvent,
+  SentryProcessedProfile,
+  SentryProfileV1Event,
+  SentryTransactionEvent,
+  Span,
+  Trace,
+} from '../types';
 import { getNativeFetchImplementation } from '../utils/fetch';
 import { sdkToPlatform } from '../utils/sdkToPlatform';
-import { groupSpans } from '../utils/traces';
+import { compareSpans, groupSpans } from '../utils/traces';
+import { graftProfileSpans } from './profiles';
 
 function toTimestamp(date: string | number) {
   if (typeof date === 'string') return new Date(date).getTime();
   return date * 1000;
 }
+
+function relativeNsToTimestamp(startTs: number, ns: number | string) {
+  const nsStr = ns.toString();
+  return nsStr.length > 3 ? startTs + Number.parseInt(nsStr.slice(0, -3), 10) / 1000 : startTs;
+}
+
+// 'event' really is 'error' here but ＼（〇_ｏ）／
+
+const ERROR_EVENT_TYPES = new Set(['event', 'error']);
+const TRACE_EVENT_TYPES = new Set(['transaction', 'span']);
+const PROFILE_EVENT_TYPES = new Set(['profile']);
+const SUPPORTED_EVENT_TYPES = new Set([...ERROR_EVENT_TYPES, ...TRACE_EVENT_TYPES, ...PROFILE_EVENT_TYPES]);
 
 type OnlineSubscription = ['online', (status: boolean) => void];
 type EventSubscription = ['event', (event: SentryEvent) => void];
@@ -20,12 +42,18 @@ type TraceSubscription = ['trace', (trace: Trace) => void];
 
 type Subscription = OnlineSubscription | EventSubscription | TraceSubscription;
 
+export type SentryProfileWithTraceMeta = SentryProcessedProfile & {
+  timestamp: number;
+  active_thread_id: string;
+};
+
 class SentryDataCache {
   protected events: SentryEvent[] = [];
   protected eventIds: Set<string> = new Set<string>();
   protected sdks: Sdk[] = [];
   protected traces: Trace[] = [];
-  protected tracesById: { [id: string]: Trace } = {};
+  protected tracesById: Map<string, Trace> = new Map();
+  protected profilesByTraceId: Map<string, SentryProfileWithTraceMeta> = new Map();
   protected localTraceIds: Set<string> = new Set<string>();
   protected envelopes: {
     envelope: Envelope;
@@ -101,7 +129,7 @@ class SentryDataCache {
     }
 
     for (const [itemHeader, itemData] of items) {
-      if (itemHeader.type === 'event' || itemHeader.type === 'transaction') {
+      if (SUPPORTED_EVENT_TYPES.has(itemHeader.type)) {
         (itemData as SentryEvent).platform = sdkToPlatform(sdk.name);
         // The below is an async function but we really don't need to wait for that
         this.pushEvent(itemData as SentryEvent);
@@ -128,18 +156,21 @@ class SentryDataCache {
     }
 
     event.timestamp = toTimestamp(event.timestamp);
-    if (event.start_timestamp) event.start_timestamp = toTimestamp(event.start_timestamp);
+    if (event.start_timestamp) {
+      event.start_timestamp = toTimestamp(event.start_timestamp);
+    }
 
     const traceCtx = event.contexts?.trace;
 
     this.events.push(event);
 
     if (traceCtx) {
-      const existingTrace = this.tracesById[traceCtx.trace_id];
+      const existingTrace = this.tracesById.get(traceCtx.trace_id);
       const startTs = event.start_timestamp ? event.start_timestamp : new Date().getTime();
       const trace = existingTrace ?? {
         ...traceCtx,
         spans: new Map(),
+        spanTree: [] as Span[],
         transactions: [] as SentryTransactionEvent[],
         errors: 0,
         timestamp: event.timestamp,
@@ -147,14 +178,15 @@ class SentryDataCache {
         status: traceCtx.status,
         rootTransactionName: event.transaction || '(unknown transaction)',
         rootTransaction: null,
+        profileGrafted: false,
       };
 
-      if (event.type === 'transaction') {
+      if (isTraceEvent(event)) {
         trace.transactions.push(event);
-        trace.transactions.sort((a, b) => a.start_timestamp - b.start_timestamp);
+        trace.transactions.sort(compareSpans);
 
         // recompute tree as we might have txn out of order
-        // XXX: we're trusting timestamps, which are not trustworthy
+        // XXX: we're trusting timestamps, which may not be as reliable as we'd like
         const spanMap: Map<string, Span> = new Map();
         for (const txn of trace.transactions) {
           spanMap.set(txn.contexts.trace.span_id, {
@@ -178,7 +210,8 @@ class SentryDataCache {
         }
         trace.spans = spanMap;
         trace.spanTree = groupSpans(trace.spans);
-      } else {
+        graftProfileSpans(trace);
+      } else if (isErrorEvent(event)) {
         trace.errors += 1;
       }
       trace.start_timestamp = Math.min(startTs, trace.start_timestamp);
@@ -194,11 +227,52 @@ class SentryDataCache {
 
       if (!existingTrace) {
         this.traces.unshift(trace);
-        this.tracesById[trace.trace_id] = trace;
+        this.tracesById.set(trace.trace_id, trace);
       }
-      this.subscribers.forEach(([type, cb]) => type === 'trace' && cb(trace));
+
+      for (const [type, cb] of this.subscribers.values()) {
+        if (type === 'trace') {
+          cb(trace);
+        }
+      }
     }
-    this.subscribers.forEach(([type, cb]) => type === 'event' && cb(event));
+
+    if (isProfileEvent(event)) {
+      if (!event.transactions) {
+        event.transactions = event.transaction ? [event.transaction] : [];
+      }
+      for (const txn of event.transactions) {
+        // TODO: Defer if trace is missing!
+        const trace = this.tracesById.get(txn.trace_id);
+        const timestamp =
+          trace && txn.relative_start_ns != null
+            ? relativeNsToTimestamp(trace.start_timestamp, txn.relative_start_ns)
+            : event.timestamp;
+        this.profilesByTraceId.set(txn.trace_id, {
+          platform: event.platform,
+          thread_metadata: event.profile.thread_metadata,
+          samples: event.profile.samples.map(s => ({
+            stack_id: s.stack_id,
+            thread_id: s.thread_id,
+            elapsed_since_start_ns: s.elapsed_since_start_ns,
+            start_timestamp: relativeNsToTimestamp(timestamp, s.elapsed_since_start_ns),
+          })),
+          frames: event.profile.frames,
+          stacks: event.profile.stacks.map(s => Array.from(s).reverse()),
+          timestamp,
+          active_thread_id: txn.active_thread_id,
+        });
+        if (trace) {
+          graftProfileSpans(trace);
+        }
+      }
+    }
+
+    for (const [type, cb] of this.subscribers.values()) {
+      if (type === 'event') {
+        cb(event);
+      }
+    }
   }
 
   getEvents() {
@@ -222,17 +296,25 @@ class SentryDataCache {
   }
 
   getTraceById(id: string) {
-    return this.tracesById[id];
+    return this.tracesById.get(id);
+  }
+
+  getProfileByTraceId(id: string) {
+    return this.profilesByTraceId.get(id);
   }
 
   getEventsByTrace(traceId: string, spanId?: string | null) {
-    return this.events.filter(
-      e => e.contexts?.trace?.trace_id === traceId && (!spanId || e.contexts?.trace?.span_id === spanId),
-    );
+    const filterFunc: (evt: SentryEvent) => boolean | undefined = !spanId
+      ? evt => {
+          const trace = evt.contexts?.trace;
+          return trace && trace.trace_id === traceId && trace.span_id === spanId;
+        }
+      : evt => evt.contexts?.trace?.trace_id === traceId;
+    return this.events.filter(filterFunc);
   }
 
   getSpanById(traceId: string, spanId: string) {
-    const trace = this.tracesById[traceId];
+    const trace = this.tracesById.get(traceId);
     if (!trace) return undefined;
     return trace.spans.get(spanId);
   }
@@ -242,7 +324,8 @@ class SentryDataCache {
     this.events = [];
     this.eventIds = new Set<string>();
     this.traces = [];
-    this.tracesById = {};
+    this.tracesById = new Map();
+    this.profilesByTraceId = new Map();
     this.localTraceIds = new Set<string>();
   }
 
@@ -324,5 +407,13 @@ class SentryDataCache {
 export default new SentryDataCache();
 
 function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
-  return event.type !== 'transaction';
+  return (!event.type || ERROR_EVENT_TYPES.has(event.type)) && Boolean((event as SentryErrorEvent).exception);
+}
+
+function isProfileEvent(event: SentryEvent): event is SentryProfileV1Event {
+  return !!event.type && PROFILE_EVENT_TYPES.has(event.type) && (event as SentryProfileV1Event).version === '1';
+}
+
+function isTraceEvent(event: SentryEvent): event is SentryTransactionEvent {
+  return !!event.type && TRACE_EVENT_TYPES.has(event.type);
 }

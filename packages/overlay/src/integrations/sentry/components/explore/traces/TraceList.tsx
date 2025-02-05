@@ -6,7 +6,7 @@ import TimeSince from '../../../../../components/TimeSince';
 import classNames from '../../../../../lib/classNames';
 import { useSpotlightContext } from '../../../../../lib/useSpotlightContext';
 import { useSentryHelpers } from '../../../data/useSentryHelpers';
-import { useSentryTraces } from '../../../data/useSentryTraces';
+import { useSentryTraces } from '../../../data/useSentrySpans';
 import { getFormattedSpanDuration } from '../../../utils/duration';
 import { truncateId } from '../../../utils/text';
 import HiddenItemsButton from '../../HiddenItemsButton';
@@ -14,17 +14,17 @@ import { TraceRootTxnName } from './TraceDetails/components/TraceRootTxnName';
 import TraceIcon from './TraceIcon';
 
 export default function TraceList() {
-  const traceList = useSentryTraces();
+  const { allTraces, localTraces } = useSentryTraces();
   const helpers = useSentryHelpers();
   const context = useSpotlightContext();
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
-  const filteredTraces = showAll ? traceList : traceList.filter(t => helpers.isLocalToSession(t.trace_id) !== false);
-  const hiddenItemCount = traceList.length - filteredTraces.length;
+  const filteredTraces = showAll ? allTraces : localTraces;
+  const hiddenItemCount = allTraces.length - filteredTraces.length;
 
   return (
     <>
-      {traceList.length !== 0 ? (
+      {allTraces.length !== 0 ? (
         <CardList>
           {hiddenItemCount > 0 && (
             <HiddenItemsButton
