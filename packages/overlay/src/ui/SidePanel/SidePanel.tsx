@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, type ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 export type SidePanelProps = Omit<ComponentPropsWithoutRef<'div'>, 'className'> & {
@@ -34,7 +34,7 @@ export default function SidePanel(props: SidePanelProps) {
   const navigateTo = useNavigate();
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 top-0 z-10 bg-black  bg-opacity-30"
+      className="fixed bottom-0 left-0 right-0 top-0 z-10 bg-black bg-opacity-30"
       onClick={() => navigateTo(props.backto)}
     >
       <div
