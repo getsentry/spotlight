@@ -182,6 +182,8 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       !cancelled()
+    env:
+      MULTI_ARCH_BUILD: ${{ ((github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') && github.actor != 'dependabot[bot]') && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -218,9 +220,9 @@ jobs:
           context: .
           cache-from: type=gha,scope=prod
           cache-to: type=gha,mode=max,scope=prod
-          platforms: ${{ (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
-          push: ${{ (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') && 'true' || 'false' }}
-          load: ${{ (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') && 'false' || 'true' }}
+          platforms: ${{ env.MULTI_ARCH_BUILD == 'true' && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
+          push: ${{ env.MULTI_ARCH_BUILD }}
+          load: ${{ !env.MULTI_ARCH_BUILD }}
           tags: ghcr.io/getsentry/spotlight:${{ github.sha }}
 
       - name: Test Docker Image
