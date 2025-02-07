@@ -35,7 +35,7 @@
     }
   },
   "dependencies": {
-    "@sentry/node": "^8.42.0",
+    "@sentry/node": "^8.49.0",
     "kleur": "^4.1.5",
     "launch-editor": "^2.9.1",
     "source-map": ">=0.8.0-beta.0 <0.9.0"
