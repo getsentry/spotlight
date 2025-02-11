@@ -2,7 +2,6 @@ import starlight from '@astrojs/starlight';
 import tailwind from '@astrojs/tailwind';
 import vercelStatic from '@astrojs/vercel/static';
 import sentry from '@sentry/astro';
-import spotlight from '@spotlightjs/astro';
 import { defineConfig } from 'astro/config';
 import Inspect from 'vite-plugin-inspect';
 
@@ -31,9 +30,6 @@ export default defineConfig({
         project: 'spotlight-website',
         authToken: process.env.SENTRY_AUTH_TOKEN,
       },
-    }),
-    spotlight({
-      debug: true,
     }),
     starlight({
       title: 'Spotlight',

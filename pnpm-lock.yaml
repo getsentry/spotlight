@@ -564,9 +564,6 @@ importers:
       '@sentry/astro':
         specifier: ^8.49.0
         version: 8.49.0(astro@4.16.18(@types/node@22.13.1)(rollup@4.34.5)(terser@5.38.1)(typescript@5.6.2))
-      '@spotlightjs/astro':
-        specifier: workspace:*
-        version: link:../astro
       '@types/react':
         specifier: ^18.3.11
         version: 18.3.11
