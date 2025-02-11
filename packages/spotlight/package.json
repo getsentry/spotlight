@@ -7,7 +7,8 @@
   "scripts": {
     "start": "./bin/run.js",
     "dev": "vite build --watch",
-    "build": "vite build && vite build --config vite.overlay.config.ts && fossilize --sign -p linux-x64 -p linux-arm64 -p win-x64 -p darwin-x64 -p darwin-arm64 && tsc",
+    "build:sea": "fossilize --sign -m dist/overlay/manifest.json -p linux-x64 -p linux-arm64 -p win-x64 -p darwin-x64 -p darwin-arm64",
+    "build": "vite build && vite build --config vite.overlay.config.ts && npm run build:sea && tsc",
     "build:watch": "vite build --watch",
     "yalc:publish": "yalc publish --push --sig --private",
     "clean": "rimraf dist"
