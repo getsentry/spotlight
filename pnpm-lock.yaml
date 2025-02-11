@@ -530,8 +530,8 @@ importers:
         specifier: ^18.19.55
         version: 18.19.55
       fossilize:
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: ^0.2.2
+        version: 0.2.2
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -5018,8 +5018,8 @@ packages:
   forwarded-parse@2.1.2:
     resolution: {integrity: sha512-alTFZZQDKMporBH77856pXgzhEzaUVmLCDk+egLgIgHst3Tpndzz8MnKe+GzRJRfvVdn69HhpW7cmXzvtLvJAw==}
 
-  fossilize@0.2.1:
-    resolution: {integrity: sha512-fgZsLSek9yUpDl5jMgejqYjB/bd2TQqCaY3ah2w6h+QDSBi9AvO9INwUGlL6AhSqPLJl9rgMGpHZExCXE7lf/A==}
+  fossilize@0.2.2:
+    resolution: {integrity: sha512-ydTBGMGuqP63JUkdWBGnp/89ZVv+ZSHh1cS9ZbgWFJR88cKyYJc0q5qZ//qCs0XCOuQ3eab0dsIZ0YVReXWugQ==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -14036,7 +14036,7 @@ snapshots:
 
   forwarded-parse@2.1.2: {}
 
-  fossilize@0.2.1:
+  fossilize@0.2.2:
     dependencies:
       '@stricli/auto-complete': 1.1.1
       '@stricli/core': 1.1.1
