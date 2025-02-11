@@ -100,7 +100,7 @@ importers:
     dependencies:
       '@sentry/sveltekit':
         specifier: ^8.8.0
-        version: 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1)))(svelte@4.2.19)
+        version: 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1)))(svelte@4.2.19)
       '@spotlightjs/spotlight':
         specifier: workspace:*
         version: link:../../packages/spotlight
@@ -149,7 +149,7 @@ importers:
         version: 4.2.19
       svelte-check:
         specifier: ^3.8.6
-        version: 3.8.6(@babel/core@7.26.7)(postcss-load-config@4.0.2(postcss@8.5.1))(postcss@8.5.1)(svelte@4.2.19)
+        version: 3.8.6(@babel/core@7.26.7)(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(svelte@4.2.19)
       tslib:
         specifier: ^2.7.0
         version: 2.7.0
@@ -229,7 +229,7 @@ importers:
     dependencies:
       '@sentry/sveltekit':
         specifier: 8.8.0
-        version: 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1)))(svelte@4.2.19)
+        version: 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1)))(svelte@4.2.19)
     devDependencies:
       '@fontsource/fira-mono':
         specifier: ^4.5.10
@@ -284,7 +284,7 @@ importers:
         version: 4.2.19
       svelte-check:
         specifier: ^3.8.6
-        version: 3.8.6(@babel/core@7.26.7)(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(svelte@4.2.19)
+        version: 3.8.6(@babel/core@7.26.7)(postcss-load-config@4.0.2(postcss@8.5.1))(postcss@8.5.1)(svelte@4.2.19)
       tslib:
         specifier: ^2.7.0
         version: 2.7.0
@@ -530,8 +530,8 @@ importers:
         specifier: ^18.19.55
         version: 18.19.55
       fossilize:
-        specifier: ^0.1.1
-        version: 0.1.1
+        specifier: ^0.2.0
+        version: 0.2.0
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -5018,8 +5018,8 @@ packages:
   forwarded-parse@2.1.2:
     resolution: {integrity: sha512-alTFZZQDKMporBH77856pXgzhEzaUVmLCDk+egLgIgHst3Tpndzz8MnKe+GzRJRfvVdn69HhpW7cmXzvtLvJAw==}
 
-  fossilize@0.1.1:
-    resolution: {integrity: sha512-4EjZyiNsSU7iOYfrWOBszxFofKMImFvVocBTIW4qy4RqnmmkLx6hsMSEOaXpTRv9dWpTNFHkoGVqn/mREUzAAA==}
+  fossilize@0.2.0:
+    resolution: {integrity: sha512-gzFQp6AjL61KfCmx18LWw6opK6wYbixTfd8jSATvTTxY25Tu1q5A3h21ydzDWEpP8NsuPBP9+ukPMMsIyMWa4A==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -6354,6 +6354,10 @@ packages:
 
   p-limit@6.1.0:
     resolution: {integrity: sha512-H0jc0q1vOzlEk0TqAKXKZxdl7kX3OFUzCnNVUnq5Pc3DGo0kpeaMuPqxQn235HibwBEb0/pm9dgKTjXy66fBkg==}
+    engines: {node: '>=18'}
+
+  p-limit@6.2.0:
+    resolution: {integrity: sha512-kuUqqHNUqoIWp/c467RI4X6mmyuojY5jGutNU0wVTmEOOfcuwLqyMVoAi9MKi2Ak+5i9+nhmrK4ufZE8069kHA==}
     engines: {node: '>=18'}
 
   p-locate@4.1.0:
@@ -11340,7 +11344,7 @@ snapshots:
       magic-string: 0.30.17
       svelte: 4.2.19
 
-  '@sentry/sveltekit@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1)))(svelte@4.2.19)':
+  '@sentry/sveltekit@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1)))(svelte@4.2.19)':
     dependencies:
       '@sentry/core': 8.8.0
       '@sentry/node': 8.8.0
@@ -11349,7 +11353,7 @@ snapshots:
       '@sentry/types': 8.8.0
       '@sentry/utils': 8.8.0
       '@sentry/vite-plugin': 2.18.0
-      '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1))
+      '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1))
       magic-string: 0.30.7
       magicast: 0.2.8
       sorcery: 0.11.0
@@ -11363,7 +11367,7 @@ snapshots:
       - supports-color
       - svelte
 
-  '@sentry/sveltekit@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1)))(svelte@4.2.19)':
+  '@sentry/sveltekit@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1)))(svelte@4.2.19)':
     dependencies:
       '@sentry/core': 8.8.0
       '@sentry/node': 8.8.0
@@ -11372,7 +11376,7 @@ snapshots:
       '@sentry/types': 8.8.0
       '@sentry/utils': 8.8.0
       '@sentry/vite-plugin': 2.18.0
-      '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@22.13.1)(terser@5.38.1))
+      '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1)))(svelte@4.2.19)(vite@5.4.12(@types/node@20.10.4)(terser@5.38.1))
       magic-string: 0.30.7
       magicast: 0.2.8
       sorcery: 0.11.0
@@ -14032,12 +14036,13 @@ snapshots:
 
   forwarded-parse@2.1.2: {}
 
-  fossilize@0.1.1:
+  fossilize@0.2.0:
     dependencies:
       '@stricli/auto-complete': 1.1.1
       '@stricli/core': 1.1.1
       esbuild: 0.25.0
       macho-unsign: 2.0.6
+      p-limit: 6.2.0
       portable-executable-signature: 2.0.6
       postject: 1.0.0-alpha.6
       tar-stream: 3.1.7
@@ -15793,6 +15798,10 @@ snapshots:
       yocto-queue: 1.1.1
 
   p-limit@6.1.0:
+    dependencies:
+      yocto-queue: 1.1.1
+
+  p-limit@6.2.0:
     dependencies:
       yocto-queue: 1.1.1
 

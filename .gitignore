@@ -17,6 +17,7 @@ dist-ssr
 test-results
 
 .eslintcache
+.node-cache
 
 # Editor directories and files
 .vscode/*
