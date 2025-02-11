@@ -37,6 +37,14 @@ jobs:
           node-version-file: 'package.json'
           cache: 'pnpm'
 
+      - name: Fossilize Cache
+        uses: actions/cache@v4
+        with:
+          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-
+          path: |
+            ${{ github.workspace }}/packages/spotlight/.node-cache
+
       - name: Setup NPM dependencies
         run: pnpm install
 
@@ -55,7 +63,6 @@ jobs:
 
       - name: Build packages
         env:
-          BUILD_PLATFORMS: 'linux-x64,linux-arm64,win-x64,darwin-x64,darwin-arm64'
           APPLE_CERT_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.TEAMID }}
         run: pnpm build
