@@ -359,5 +359,6 @@ app.whenReady().then(() => {
   setupSidecar({
     port: 8969,
     incomingPayload: storeIncomingPayload,
+    isStandalone: true,
   });
 });

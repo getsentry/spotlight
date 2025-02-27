@@ -10,15 +10,15 @@ import {
   SPOTLIGHT_OPEN_CLASS_NAME,
 } from './constants';
 import globalStyles from './index.css?inline';
-import { initIntegrations, type SpotlightContext } from './integrations/integration';
+import { type SpotlightContext, initIntegrations } from './integrations/integration';
 import { default as sentry } from './integrations/sentry/index';
 import { off, on, trigger } from './lib/eventTarget';
+import initSentry from './lib/instrumentation';
 import { activateLogger, log } from './lib/logger';
+import { removeURLSuffix } from './lib/removeURLSuffix';
 import { SpotlightContextProvider } from './lib/useSpotlightContext';
 import { React, ReactDOM } from './react-instance';
 import type { SpotlightOverlayOptions, WindowWithSpotlight } from './types';
-import { removeURLSuffix } from './lib/removeURLSuffix';
-import initSentry from './lib/instrumentation';
 
 export { default as console } from './integrations/console/index';
 export { default as hydrationError } from './integrations/hydration-error/index';
@@ -26,6 +26,7 @@ export { default as sentry } from './integrations/sentry/index';
 export { default as viteInspect } from './integrations/vite-inspect/index';
 export type { SpotlightOverlayOptions, WindowWithSpotlight } from './types';
 export {
+  SPOTLIGHT_OPEN_CLASS_NAME,
   CONTEXT_LINES_ENDPOINT,
   DEFAULT_ANCHOR,
   DEFAULT_EXPERIMENTS,

@@ -114,6 +114,6 @@ startSpan({ name: 'Spotlight CLI', op: 'cli' }, () => {
       }
     });
 
-    setupSidecar({ port, basePath, filesToServe });
+    setupSidecar({ port, basePath, filesToServe, isStandalone: true });
   });
 });

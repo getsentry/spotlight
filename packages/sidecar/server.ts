@@ -2,4 +2,4 @@
 import { setupSidecar } from './src/main.js';
 
 const port = process.argv.length >= 3 ? Number(process.argv[2]) : undefined;
-setupSidecar({ port });
+setupSidecar({ port, isStandalone: true });
