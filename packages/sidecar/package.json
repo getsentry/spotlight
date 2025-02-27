@@ -44,7 +44,7 @@
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "^18.19.55",
     "typescript": "^5.6.2",
-    "vite": "^5.4.13"
+    "vite": "^5.4.14"
   },
   "volta": {
     "extends": "../../package.json"
