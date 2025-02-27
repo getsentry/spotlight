@@ -7,7 +7,7 @@
   "scripts": {
     "start": "./bin/run.js",
     "dev": "vite build --watch",
-    "build:sea": "fossilize --sign -m dist/overlay/manifest.json -p linux-x64 -p linux-arm64 -p win-x64 -p darwin-x64 -p darwin-arm64",
+    "build:sea": "fossilize -m dist/overlay/manifest.json",
     "build": "vite build && vite build --config vite.overlay.config.ts && npm run build:sea && tsc",
     "build:watch": "vite build --watch",
     "yalc:publish": "yalc publish --push --sig --private",
@@ -52,7 +52,7 @@
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "^18.19.55",
-    "fossilize": "^0.2.2",
+    "fossilize": "^0.4.1",
     "typescript": "^5.6.2",
     "vite": "^5.4.12"
   },
