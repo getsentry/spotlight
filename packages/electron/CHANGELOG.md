@@ -1,5 +1,69 @@
 # @spotlightjs/electron
 
+## 1.5.0
+
+### Minor Changes
+
+- # Add profile grafting into traces ([#692](https://github.com/getsentry/spotlight/pull/692))
+
+  With this change, Spotlight can now ingest v1 profiles and graft profiling data into the trace view to fill in the
+  gaps where span/trace instrumentation falls short.
+
+  This feature is experimental.
+
+  Breaking change for `tsconfig`: It now targets ES2023 as we needed `Array.findLastIndex()`
+
+- Flatter tree view for deeply nested traces with 1 child at each level
+  ([#686](https://github.com/getsentry/spotlight/pull/686))
+
+### Patch Changes
+
+- Sort envelopes from most recent to oldest ([#697](https://github.com/getsentry/spotlight/pull/697))
+
+- Fix some typing issues in sentryDataCache ([#691](https://github.com/getsentry/spotlight/pull/691))
+
+- Fix span details modal resetting trace view tree state on close
+  ([#701](https://github.com/getsentry/spotlight/pull/701))
+
+- Fix some profile samples were not grouped and added to trace span list for detail view
+  ([#698](https://github.com/getsentry/spotlight/pull/698))
+
+- Fix span details showing incorrect span start time ([#689](https://github.com/getsentry/spotlight/pull/689))
+
+- Fix rare error when `score.total` is missing from `measurements`
+  ([#682](https://github.com/getsentry/spotlight/pull/682))
+
+- Fix Astro v5 compatibility ([#706](https://github.com/getsentry/spotlight/pull/706))
+
+  Upgraded all Astro dependencies to v5+. This required suppressing Sentry instrumentation on the sidecar when used
+  programmatically (unless explicitly passed `isStandalone: true`) to prevent Spotlight spamming itself with
+  transactions from the very sidecar instance that it is running.
+
+  BREAKING: We had to bump minimum required Astro version for the Astro plugin to 4.7+ as we needed the new dev toolbar
+  app APIs.
+
+- Make things snappy by using Map() for trace span look ups ([#690](https://github.com/getsentry/spotlight/pull/690))
+
+- Better auto collapsing logic for large or deep span trees ([#699](https://github.com/getsentry/spotlight/pull/699))
+
+- Unify and simplify duration calculations and representations ([#688](https://github.com/getsentry/spotlight/pull/688))
+
+- Updated dependencies
+  [[`4cde1351151520d576fa173485993f30a29a594a`](https://github.com/getsentry/spotlight/commit/4cde1351151520d576fa173485993f30a29a594a),
+  [`1ffe90f973618b8775753c257d3efc7c688de522`](https://github.com/getsentry/spotlight/commit/1ffe90f973618b8775753c257d3efc7c688de522),
+  [`dab431eccdeb751b0eecdd3a41bbb790011f0c52`](https://github.com/getsentry/spotlight/commit/dab431eccdeb751b0eecdd3a41bbb790011f0c52),
+  [`05e03c749892af0042f3cc4e3e15b85fd5dcdaac`](https://github.com/getsentry/spotlight/commit/05e03c749892af0042f3cc4e3e15b85fd5dcdaac),
+  [`18bee4d0a3c8ea7021866ed09855b3feee40c4c4`](https://github.com/getsentry/spotlight/commit/18bee4d0a3c8ea7021866ed09855b3feee40c4c4),
+  [`289a040d9cdfdf1a4ca65ed0e80aadb7adc36830`](https://github.com/getsentry/spotlight/commit/289a040d9cdfdf1a4ca65ed0e80aadb7adc36830),
+  [`9c498dd3e358e6337ea0d8725bb6bf1b41a66233`](https://github.com/getsentry/spotlight/commit/9c498dd3e358e6337ea0d8725bb6bf1b41a66233),
+  [`52ceec528c4e293d92afc6567886b9ee9dcffc7a`](https://github.com/getsentry/spotlight/commit/52ceec528c4e293d92afc6567886b9ee9dcffc7a),
+  [`002a1873dab737ffbe647dd608bb00b7bf6ab1a6`](https://github.com/getsentry/spotlight/commit/002a1873dab737ffbe647dd608bb00b7bf6ab1a6),
+  [`a6dee826c983fb1671930f8187ba98e033f291ff`](https://github.com/getsentry/spotlight/commit/a6dee826c983fb1671930f8187ba98e033f291ff),
+  [`e31e3da656d4c675845d4f736e93f350d6f8f687`](https://github.com/getsentry/spotlight/commit/e31e3da656d4c675845d4f736e93f350d6f8f687),
+  [`0fcb37d5878568018038d237956426219bf64fc3`](https://github.com/getsentry/spotlight/commit/0fcb37d5878568018038d237956426219bf64fc3)]:
+  - @spotlightjs/overlay@2.12.0
+  - @spotlightjs/sidecar@1.11.2
+
 ## 1.4.3
 
 ### Patch Changes

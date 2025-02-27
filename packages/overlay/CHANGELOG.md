@@ -1,5 +1,53 @@
 # @spotlightjs/core
 
+## 2.12.0
+
+### Minor Changes
+
+- # Add profile grafting into traces ([#692](https://github.com/getsentry/spotlight/pull/692))
+
+  With this change, Spotlight can now ingest v1 profiles and graft profiling data into the trace view to fill in the
+  gaps where span/trace instrumentation falls short.
+
+  This feature is experimental.
+
+  Breaking change for `tsconfig`: It now targets ES2023 as we needed `Array.findLastIndex()`
+
+- Flatter tree view for deeply nested traces with 1 child at each level
+  ([#686](https://github.com/getsentry/spotlight/pull/686))
+
+### Patch Changes
+
+- Sort envelopes from most recent to oldest ([#697](https://github.com/getsentry/spotlight/pull/697))
+
+- Fix some typing issues in sentryDataCache ([#691](https://github.com/getsentry/spotlight/pull/691))
+
+- Fix span details modal resetting trace view tree state on close
+  ([#701](https://github.com/getsentry/spotlight/pull/701))
+
+- Fix some profile samples were not grouped and added to trace span list for detail view
+  ([#698](https://github.com/getsentry/spotlight/pull/698))
+
+- Fix span details showing incorrect span start time ([#689](https://github.com/getsentry/spotlight/pull/689))
+
+- Fix rare error when `score.total` is missing from `measurements`
+  ([#682](https://github.com/getsentry/spotlight/pull/682))
+
+- Fix Astro v5 compatibility ([#706](https://github.com/getsentry/spotlight/pull/706))
+
+  Upgraded all Astro dependencies to v5+. This required suppressing Sentry instrumentation on the sidecar when used
+  programmatically (unless explicitly passed `isStandalone: true`) to prevent Spotlight spamming itself with
+  transactions from the very sidecar instance that it is running.
+
+  BREAKING: We had to bump minimum required Astro version for the Astro plugin to 4.7+ as we needed the new dev toolbar
+  app APIs.
+
+- Make things snappy by using Map() for trace span look ups ([#690](https://github.com/getsentry/spotlight/pull/690))
+
+- Better auto collapsing logic for large or deep span trees ([#699](https://github.com/getsentry/spotlight/pull/699))
+
+- Unify and simplify duration calculations and representations ([#688](https://github.com/getsentry/spotlight/pull/688))
+
 ## 2.11.1
 
 ### Patch Changes
