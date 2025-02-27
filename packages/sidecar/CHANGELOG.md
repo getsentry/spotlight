@@ -1,5 +1,18 @@
 # @spotlightjs/sidecar
 
+## 1.11.2
+
+### Patch Changes
+
+- Fix Astro v5 compatibility ([#706](https://github.com/getsentry/spotlight/pull/706))
+
+  Upgraded all Astro dependencies to v5+. This required suppressing Sentry instrumentation on the sidecar when used
+  programmatically (unless explicitly passed `isStandalone: true`) to prevent Spotlight spamming itself with
+  transactions from the very sidecar instance that it is running.
+
+  BREAKING: We had to bump minimum required Astro version for the Astro plugin to 4.7+ as we needed the new dev toolbar
+  app APIs.
+
 ## 1.11.1
 
 ### Patch Changes
