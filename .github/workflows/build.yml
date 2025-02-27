@@ -231,7 +231,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=prod
           platforms: ${{ env.MULTI_ARCH_BUILD == 'true' && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
           push: ${{ env.MULTI_ARCH_BUILD }}
-          load: ${{ !env.MULTI_ARCH_BUILD }}
+          load: ${{ env.MULTI_ARCH_BUILD == 'false' }}
           tags: ghcr.io/getsentry/spotlight:${{ github.sha }}
 
       - name: Test Docker Image
