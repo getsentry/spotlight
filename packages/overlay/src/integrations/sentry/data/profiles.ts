@@ -63,7 +63,8 @@ const SENTRY_FRAME_FILTER_PER_PLATFORM: Record<
     if (module) {
       return module.startsWith('@sentry') || module.startsWith('@opentelemetry.instrumentation');
     }
-    return frame.abs_path?.includes('node_modules/@sentry');
+    // This one below is to match things like `http://localhost:3000/node_modules/.vite/deps/@sentry_react.js?v=6942e78f` etc.
+    return frame.abs_path ? /\/node_modules\/.*\/@(sentry|opentelemetry)[^a-z0-9]/.test(frame.abs_path) : false;
   },
 };
 
