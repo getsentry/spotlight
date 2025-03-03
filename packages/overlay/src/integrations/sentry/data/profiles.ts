@@ -103,7 +103,7 @@ export function getSpansFromProfile(
       tags: { source: 'profile' },
       data: {
         'thread.id': sample.thread_id,
-        'thread.name': profile.thread_metadata[sample.thread_id as keyof typeof profile.thread_metadata]?.name,
+        'thread.name': profile.thread_metadata?.[sample.thread_id as keyof typeof profile.thread_metadata]?.name,
       },
     };
     const sampleSpan: Span = {
@@ -112,7 +112,7 @@ export function getSpansFromProfile(
       ...commonAttributes,
       op: 'Thread',
       description:
-        profile.thread_metadata[sample.thread_id as keyof typeof profile.thread_metadata]?.name ||
+        profile.thread_metadata?.[sample.thread_id as keyof typeof profile.thread_metadata]?.name ||
         `Thread ${sample.thread_id}`,
       data: {
         thread_id: sample.thread_id,

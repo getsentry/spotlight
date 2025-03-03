@@ -143,7 +143,7 @@ export type SentryProfile = {
   stacks: number[][];
   frames: EventFrame[];
   platform?: string;
-  thread_metadata: Record<
+  thread_metadata?: Record<
     string,
     {
       name?: string;
