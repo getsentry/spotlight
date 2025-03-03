@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 2.12.1
+
+### Patch Changes
+
+- Process profiles without thread metadata correctly ([#714](https://github.com/getsentry/spotlight/pull/714))
+
 ## 2.12.0
 
 ### Minor Changes
