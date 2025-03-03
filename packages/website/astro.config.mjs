@@ -122,6 +122,10 @@ export default defineConfig({
               link: '/setup/html/',
             },
             {
+              label: 'For Headless Environments',
+              link: '/setup/headless/',
+            },
+            {
               label: 'For Other Frameworks',
               link: '/setup/other/',
             },
