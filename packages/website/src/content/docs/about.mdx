@@ -6,6 +6,7 @@ sidebar:
   label: What is Spotlight?
   order: 0
 ---
+import DownloadButton from '../../components/DownloadButton.astro';
 
 Spotlight started out as a [Hackweek project](https://syntax.fm/show/666/hackweek-projects-realtime-markdown-editor-and-a-hardware-recording-button) at Sentry:
 
@@ -49,5 +50,8 @@ npx @spotlightjs/spotlight
 The overlay itself behaves a little differently from Sentry. That's intentional both because this is for local
 development, but also because the project is completely independent of Sentry (other than our guaranteed support).
 
-Spotlight can show you errors, traces, configurations settings, installed dependencies, you name it. Spotlight is developed with customizablity in mind, so you can add your own integrations to it.
+Alternatively, we provide an Electron-based application that can be used to run the Sidecar as well as a dedicated instance of the overlay. There are some limitations to this method, but it is particularly useful [for headless or mobile environments](/setup/headless/).
 
+<DownloadButton>Download for Mac</DownloadButton>
+
+Spotlight can show you errors, traces, configurations settings, installed dependencies, you name it. Spotlight is developed with customizablity in mind, so you can add your own integrations to it.
