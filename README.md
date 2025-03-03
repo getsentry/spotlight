@@ -12,7 +12,7 @@ overlay into development environments, and it does it by leveraging the existing
 ## Links
 
 - [![Documentation](https://img.shields.io/badge/documentation-spotlight-indigo.svg)](https://spotlightjs.com/about/)
-- [![Discord](https://img.shields.io/discord/621778831602221064)](https://discord.gg/Ww9hbqr)
+- [![Discord](https://img.shields.io/discord/621778831602221064)](https://discord.gg/EJjqM3XtXQ)
 - [![Stack Overflow](https://img.shields.io/badge/stack%20overflow-sentry-green.svg)](http://stackoverflow.com/questions/tagged/sentry)
 - [![Twitter Follow](https://img.shields.io/twitter/follow/getsentry?label=getsentry&style=social)](https://twitter.com/intent/follow?screen_name=getsentry)
 
