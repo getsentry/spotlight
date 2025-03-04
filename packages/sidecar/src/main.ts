@@ -229,7 +229,11 @@ const fileServer = (filesToServe: Record<string, Buffer>) => {
     if (!Object.hasOwn(filesToServe, filePath)) {
       error404(req, res);
     } else {
-      res.writeHead(200, { 'Content-Type': contentType });
+      res.writeHead(200, {
+        // Enable profiling in browser
+        'Document-Policy': 'js-profiling,',
+        'Content-Type': contentType,
+      });
       res.end(filesToServe[filePath]);
     }
   };

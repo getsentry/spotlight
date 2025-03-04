@@ -28,6 +28,7 @@ export default function initSentry(initialTab: string, options: Sentry.BrowserOp
       matchRoutes,
     }),
     Sentry.replayIntegration(),
+    Sentry.browserProfilingIntegration(),
   ];
   const hash = document.location.hash.slice(1);
   if (hash.startsWith('spotlight')) {
