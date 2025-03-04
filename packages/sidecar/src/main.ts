@@ -231,7 +231,7 @@ const fileServer = (filesToServe: Record<string, Buffer>) => {
     } else {
       res.writeHead(200, {
         // Enable profiling in browser
-        'Document-Policy': 'js-profiling,',
+        'Document-Policy': 'js-profiling',
         'Content-Type': contentType,
       });
       res.end(filesToServe[filePath]);

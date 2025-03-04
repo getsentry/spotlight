@@ -28,6 +28,11 @@ export default defineConfig({
       '~': resolve(__dirname, 'src'),
     },
   },
+  server: {
+    headers: {
+      'Document-Policy': 'js-profiling',
+    },
+  },
   build: {
     outDir: resolve(__dirname, 'dist', 'overlay'),
     manifest: 'manifest.json',
