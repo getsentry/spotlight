@@ -1,4 +1,4 @@
-import type { Measurements } from '@sentry/core';
+import type { EventEnvelopeHeaders, Measurements } from '@sentry/core';
 
 export type FrameVars = {
   [key: string]: string;
@@ -70,14 +70,16 @@ type CommonEventAttrs = {
   measurements?: Measurements;
 };
 
-export type TraceContext = {
-  trace_id: string;
-  span_id: string;
-  parent_span_id?: string | null;
-  op: string;
-  description?: string | null;
-  status: 'ok' | string;
-  data?: Context;
+// Note: For some reason the `sentry/core` module doesn't have these additional properties
+// in `EventEnvelopeHeaders['trace']` but they are present in the actual events.
+// Follow up?
+export type TraceContext = EventEnvelopeHeaders['trace'] & {
+  span_id?: string;
+  status?: 'ok' | string;
+  description?: string;
+  parent_span_id?: string;
+  data?: Record<string, string>;
+  op?: string;
 };
 
 export type Contexts = {
@@ -103,7 +105,7 @@ export type SentryErrorEvent = CommonEventAttrs & {
 };
 
 export type Span = {
-  trace_id: string;
+  trace_id?: string;
   span_id: string;
   parent_span_id?: string | null;
   op?: string | null;
@@ -111,7 +113,7 @@ export type Span = {
   start_timestamp: number;
   tags?: Tags | null;
   timestamp: number;
-  status: 'ok' | string;
+  status?: 'ok' | string;
   transaction?: SentryTransactionEvent;
   children?: Span[];
   data?: Record<string, unknown>;
@@ -192,11 +194,12 @@ export type SentryProfileV1Event = CommonEventAttrs & {
 export type SentryEvent = SentryErrorEvent | SentryTransactionEvent | SentryProfileV1Event;
 
 export type Trace = TraceContext & {
+  trace_id: string;
   transactions: SentryTransactionEvent[];
   errors: number;
   start_timestamp: number;
   timestamp: number;
-  status: string;
+  status?: 'ok' | string;
   rootTransaction: SentryTransactionEvent | null;
   rootTransactionName: string;
   spans: Map<string, Span>;

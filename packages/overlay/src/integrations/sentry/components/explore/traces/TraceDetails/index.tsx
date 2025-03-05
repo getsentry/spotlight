@@ -1,7 +1,7 @@
 import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { createTab } from '~/integrations/sentry/utils/tabs';
 import Tabs from '../../../../../../components/Tabs';
-import { default as dataCache } from '../../../../data/sentryDataCache';
+import { default as dataCache, isErrorEvent } from '../../../../data/sentryDataCache';
 import { useSentryEvents } from '../../../../data/useSentryEvents';
 import { useSentryHelpers } from '../../../../data/useSentryHelpers';
 import EventContexts from '../../../events/EventContexts';
@@ -34,8 +34,7 @@ export default function TraceDetails() {
 
   const errorCount = events.filter(
     e =>
-      e.type !== 'transaction' &&
-      e.type !== 'profile' &&
+      isErrorEvent(e) &&
       (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
   ).length;
 

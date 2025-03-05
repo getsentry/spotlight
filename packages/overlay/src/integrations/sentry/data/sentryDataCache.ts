@@ -32,7 +32,8 @@ function relativeNsToTimestamp(startTs: number, ns: number | string) {
 // 'event' really is 'error' here but ＼（〇_ｏ）／
 
 const ERROR_EVENT_TYPES = new Set(['event', 'error']);
-const TRACE_EVENT_TYPES = new Set(['transaction', 'span']);
+// Enable 'span' type  later on. See https://github.com/getsentry/spotlight/issues/721
+const TRACE_EVENT_TYPES = new Set(['transaction'/*, 'span'*/]);
 const PROFILE_EVENT_TYPES = new Set(['profile']);
 const SUPPORTED_EVENT_TYPES = new Set([...ERROR_EVENT_TYPES, ...TRACE_EVENT_TYPES, ...PROFILE_EVENT_TYPES]);
 
@@ -128,9 +129,18 @@ class SentryDataCache {
       });
     }
 
+    const traceContext = header.trace;
+
     for (const [itemHeader, itemData] of items) {
       if (SUPPORTED_EVENT_TYPES.has(itemHeader.type)) {
-        (itemData as SentryEvent).platform = sdkToPlatform(sdk.name);
+        const item = itemData as SentryEvent;
+        item.platform = sdkToPlatform(sdk.name);
+        if (traceContext) {
+          if (!item.contexts) {
+            item.contexts = {};
+          }
+          item.contexts.trace ??= traceContext;
+        }
         // The below is an async function but we really don't need to wait for that
         this.pushEvent(itemData as SentryEvent);
       }
@@ -164,11 +174,12 @@ class SentryDataCache {
 
     this.events.push(event);
 
-    if (traceCtx) {
+    if (traceCtx?.trace_id) {
       const existingTrace = this.tracesById.get(traceCtx.trace_id);
       const startTs = event.start_timestamp ? event.start_timestamp : new Date().getTime();
       const trace = existingTrace ?? {
         ...traceCtx,
+        trace_id: traceCtx.trace_id,
         spans: new Map(),
         spanTree: [] as Span[],
         transactions: [] as SentryTransactionEvent[],
@@ -189,8 +200,18 @@ class SentryDataCache {
         // XXX: we're trusting timestamps, which may not be as reliable as we'd like
         const spanMap: Map<string, Span> = new Map();
         for (const txn of trace.transactions) {
-          spanMap.set(txn.contexts.trace.span_id, {
-            ...txn.contexts.trace,
+          const trace = txn.contexts.trace;
+          if (!trace || !trace.span_id || !trace.trace_id) {
+            continue;
+          }
+
+          spanMap.set(trace.span_id, {
+            ...trace,
+            // TypeScript is not smart enough to compose the assertion above
+            // with the spread syntax above, hence the need for these explicit
+            // `span_id` and `trace_id` assignments
+            span_id: trace.span_id,
+            trace_id: trace.trace_id,
             tags: txn?.tags,
             start_timestamp: txn.start_timestamp,
             timestamp: txn.timestamp,
@@ -400,14 +421,14 @@ class SentryDataCache {
 
 export default new SentryDataCache();
 
-function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
+export function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
   return (!event.type || ERROR_EVENT_TYPES.has(event.type)) && Boolean((event as SentryErrorEvent).exception);
 }
 
-function isProfileEvent(event: SentryEvent): event is SentryProfileV1Event {
+export function isProfileEvent(event: SentryEvent): event is SentryProfileV1Event {
   return !!event.type && PROFILE_EVENT_TYPES.has(event.type) && (event as SentryProfileV1Event).version === '1';
 }
 
-function isTraceEvent(event: SentryEvent): event is SentryTransactionEvent {
+export function isTraceEvent(event: SentryEvent): event is SentryTransactionEvent {
   return !!event.type && TRACE_EVENT_TYPES.has(event.type);
 }
