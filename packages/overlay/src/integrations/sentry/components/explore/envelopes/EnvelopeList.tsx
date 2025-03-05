@@ -1,4 +1,4 @@
-import { Envelope, EnvelopeItem } from '@sentry/types';
+import type { Envelope, EnvelopeItem } from '@sentry/core';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import TimeSince from '~/components/TimeSince';
