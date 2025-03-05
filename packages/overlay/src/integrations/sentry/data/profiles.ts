@@ -126,7 +126,7 @@ export function getSpansFromProfile(
       const frame = profile.frames[currentStack[frameIdxIdx]];
       // XXX: We may wanna skip frames that doesn't have `in_app` set to true
       //      that said it's better to have this as a dynamic filter
-      const spanFromFrame = {
+      const spanFromFrame: Span = {
         span_id: generateUuidv4(),
         parent_span_id: currentSpan.span_id,
         ...commonAttributes,
@@ -168,7 +168,7 @@ export function graftProfileSpans(
     return;
   }
   if (!profile) {
-    profile = sentryDataCache.getProfileByTraceId(trace.trace_id);
+    profile = trace.trace_id ? sentryDataCache.getProfileByTraceId(trace.trace_id) : undefined;
     if (!profile) {
       log(`Profile not found for trace ${trace.trace_id}`);
       return;

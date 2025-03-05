@@ -15,8 +15,10 @@ type SpanInfoComparator = (a: Span, b: Span) => number;
 type QuerySummarySortTypes = (typeof QUERY_SUMMARY_SORT_KEYS)[keyof typeof QUERY_SUMMARY_SORT_KEYS];
 const COMPARATORS: Record<QuerySummarySortTypes, SpanInfoComparator> = {
   [QUERY_SUMMARY_SORT_KEYS.foundIn]: (a, b) => {
-    if (a.trace_id < b.trace_id) return -1;
-    if (a.trace_id > b.trace_id) return 1;
+    const aTrace = a.trace_id || '';
+    const bTrace = b.trace_id || '';
+    if (aTrace < bTrace) return -1;
+    if (aTrace > bTrace) return 1;
     return 0;
   },
   [QUERY_SUMMARY_SORT_KEYS.spanId]: (a, b) => {

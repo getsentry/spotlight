@@ -1,9 +1,9 @@
-import type { Client, Envelope, EnvelopeItem } from '@sentry/types';
+import type { Client, Envelope, EnvelopeItem } from '@sentry/core';
 import { removeURLSuffix } from '~/lib/removeURLSuffix';
 import { off, on } from '../../lib/eventTarget';
 import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
-import sentryDataCache from './data/sentryDataCache';
+import { isErrorEvent, default as sentryDataCache } from './data/sentryDataCache';
 import { spotlightIntegration } from './sentry-integration';
 import ErrorsTab from './tabs/ErrorsTab';
 import ExploreTab from './tabs/ExploreTab';
@@ -65,8 +65,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
         .getEvents()
         .filter(
           e =>
-            e.type !== 'transaction' &&
-            e.type !== 'profile' &&
+            isErrorEvent(e) &&
             (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
         ).length;
 

@@ -1,10 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
 import JsonViewer from '../../../../../../components/JsonViewer';
 import SidePanel, { SidePanelHeader } from '../../../../../../ui/SidePanel';
 import { DB_SPAN_REGEX } from '../../../../constants';
-import dataCache from '../../../../data/sentryDataCache';
+import dataCache, { isErrorEvent } from '../../../../data/sentryDataCache';
 import type { SentryErrorEvent, Span, TraceContext } from '../../../../types';
 import { formatBytes } from '../../../../utils/bytes';
 import { getFormattedDuration } from '../../../../utils/duration';
@@ -90,7 +90,7 @@ export default function SpanDetails({
 
   const spanDuration = span.timestamp - span.start_timestamp;
 
-  const errors = dataCache.getEventsByTrace(span.trace_id).filter(e => e.type !== 'transaction' && 'exception' in e);
+  const errors = span.trace_id ? dataCache.getEventsByTrace(span.trace_id).filter(isErrorEvent) : [];
 
   return (
     <SidePanel backto={`/explore/traces/${span.trace_id}`}>
