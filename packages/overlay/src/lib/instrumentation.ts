@@ -47,6 +47,7 @@ export default function initSentry(initialTab: string, options: Sentry.BrowserOp
 
     tracesSampleRate: 1,
     tracePropagationTargets: [/^\//, document.location.origin],
+    profilesSampleRate: 1,
 
     // Capture Replay for 1% of all sessions,
     // plus for 100% of sessions with an error
