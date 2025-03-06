@@ -10,7 +10,7 @@ export type SidePanelProps = Omit<ComponentPropsWithoutRef<'div'>, 'className'> 
 export function useGoBackWithFallback(fallback: string) {
   const navigateTo = useNavigate();
   const loc = useLocation();
-  return () => (loc.key === 'default' ? navigateTo(-1) : navigateTo(fallback, { replace: true }));
+  return () => (loc.key === 'default' ? navigateTo(fallback, { replace: true }) : navigateTo(-1));
 }
 
 export function SidePanelHeader({
