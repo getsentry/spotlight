@@ -1,4 +1,4 @@
-import type { Envelope } from '@sentry/types';
+import type { Envelope } from '@sentry/core';
 import { useState } from 'react';
 import type { RawEventContext } from '~/integrations/integration';
 import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
@@ -9,16 +9,19 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
   const { envelope, rawEnvelope } = data;
   const header = envelope[0];
   const items = envelope[1];
+  const downloadUrl = URL.createObjectURL(new Blob([rawEnvelope.data], { type: rawEnvelope.contentType }));
+  const downloadName = `${header.event_id}-${rawEnvelope.contentType}.bin`;
   return (
     <SidePanel backto="/explore/envelopes">
       <SidePanelHeader
         title="Envelope Details"
         subtitle={
-          header.event_id ? (
-            <>
-              Event Id <span className="text-primary-500">&mdash;</span> {header.event_id}
-            </>
-          ) : undefined
+          <>
+            Event Id <span className="text-primary-500">&mdash;</span>{' '}
+            <a href={downloadUrl} download={downloadName}>
+              {String(header.event_id)}
+            </a>
+          </>
         }
         backto="/explore/envelopes"
       />
