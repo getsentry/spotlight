@@ -8,24 +8,23 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
   const callbackRef = useRef(callback);
+  const timerRef = useRef<number | null>(null);
 
   useLayoutEffect(() => {
     callbackRef.current = callback;
   }, [callback]);
 
-  let timer: number;
-
-  const debounceFunction = (func: T, delayMs: number, ...args: Parameters<T>) => {
-    clearTimeout(timer);
-    timer = window.setTimeout(() => {
-      func(...args);
-    }, delayMs);
-  };
-
   return useMemo(
     () =>
-      (...args: Parameters<T>) =>
-        debounceFunction(callbackRef.current, delay, ...args),
+      (...args: Parameters<T>) => {
+        if (timerRef.current !== null) {
+          clearTimeout(timerRef.current);
+        }
+        timerRef.current = window.setTimeout(() => {
+          callbackRef.current(...args);
+          timerRef.current = null;
+        }, delay);
+      },
     [delay],
   );
 }

@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
+import { useSearch } from '~/integrations/sentry/context/SearchContext';
 import classNames from '../../../../../../lib/classNames';
 import type { Span, TraceContext } from '../../../../types';
-import { getSpanDurationClassName, getFormattedDuration } from '../../../../utils/duration';
+import { getFormattedDuration, getSpanDurationClassName } from '../../../../utils/duration';
 import PlatformIcon from '../../../PlatformIcon';
 import SpanResizer from '../../../SpanResizer';
 import SpanTree from './SpanTree';
@@ -17,7 +18,6 @@ const SpanItem = ({
   totalTransactions = 0,
   spanNodeWidth,
   setSpanNodeWidth = () => {},
-  query,
 }: {
   span: Span;
   startTimestamp: number;
@@ -27,9 +27,9 @@ const SpanItem = ({
   totalTransactions?: number;
   spanNodeWidth: number;
   setSpanNodeWidth?: (val: number) => void;
-  query?: string;
 }) => {
   const { spanId } = useParams();
+  const { query } = useSearch();
   const containerRef = useRef<HTMLLIElement>(null);
   const childrenCount = span.children ? span.children.length : 0;
   const [isItemCollapsed, setIsItemCollapsed] = useState(
@@ -47,9 +47,10 @@ const SpanItem = ({
       setSpanNodeWidth(newLeftWidth);
     }
   };
-  const isQueried = query
-    ? span.span_id.includes(query) || span.op?.includes(query) || span.description?.includes(query)
-    : false;
+  const isQueried = useMemo(() => {
+    if (!query) return false;
+    return span.span_id.includes(query) || span.op?.includes(query) || span.description?.includes(query);
+  }, [query, span.span_id, span.op, span.description]);
 
   return (
     <li key={span.span_id} ref={containerRef}>
@@ -134,7 +135,6 @@ const SpanItem = ({
           totalTransactions={totalTransactions}
           spanNodeWidth={spanNodeWidth}
           setSpanNodeWidth={setSpanNodeWidth}
-          query={query}
         />
       )}
     </li>
