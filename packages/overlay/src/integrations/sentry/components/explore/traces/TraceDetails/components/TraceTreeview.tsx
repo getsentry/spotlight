@@ -1,17 +1,24 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { SearchProvider, useSearch } from '~/integrations/sentry/context/SearchContext';
+import useSearchInput from '~/integrations/sentry/hooks/useSearchInput';
+import { ReactComponent as CrossIcon } from '../../../../../../../assets/cross.svg';
 import sentryDataCache from '../../../../../data/sentryDataCache';
+import { getFormattedSpanDuration } from '../../../../../utils/duration';
 import DateTime from '../../../../DateTime';
 import SpanDetails from '../../spans/SpanDetails';
 import SpanTree from '../../spans/SpanTree';
-import { getFormattedSpanDuration } from '../../../../../utils/duration';
 
 type TraceTreeViewProps = { traceId: string };
 
 export const DEFAULT_SPAN_NODE_WIDTH = 50;
 
-export default function TraceTreeview({ traceId }: TraceTreeViewProps) {
+function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
   const { spanId } = useParams();
+
+  const { setQuery } = useSearch();
+
+  const { inputValue, showReset, handleChange, handleReset } = useSearchInput(setQuery, 500);
 
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(DEFAULT_SPAN_NODE_WIDTH);
 
@@ -34,6 +41,24 @@ export default function TraceTreeview({ traceId }: TraceTreeViewProps) {
           </span>
         </div>
       </div>
+      {trace.spans.size > 0 && (
+        <div className="bg-primary-950 text-primary-50 border-primary-600 hover:border-primary-500 relative mx-6 mb-4 mt-2 flex h-auto w-auto gap-2 rounded-md border py-1 pl-4 pr-6 outline-none transition-all">
+          <input
+            className="text-primary-50 h-auto w-full flex-1 bg-transparent outline-none transition-all"
+            onChange={handleChange}
+            value={inputValue}
+            placeholder="Search in Trace"
+          />
+          {showReset ? (
+            <CrossIcon
+              onClick={handleReset}
+              className="fill-primary-50 absolute right-1 top-[5px] cursor-pointer"
+              height={20}
+              width={20}
+            />
+          ) : null}
+        </div>
+      )}
       <div className="flex-1 px-2 pb-6">
         <SpanTree
           traceContext={trace}
@@ -55,5 +80,13 @@ export default function TraceTreeview({ traceId }: TraceTreeViewProps) {
         />
       ) : null}
     </>
+  );
+}
+
+export default function TraceTreeview(props: TraceTreeViewProps) {
+  return (
+    <SearchProvider>
+      <TraceTreeviewContent {...props} />
+    </SearchProvider>
   );
 }
