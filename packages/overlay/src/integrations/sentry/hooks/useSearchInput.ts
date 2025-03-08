@@ -14,7 +14,7 @@ export default function useSearchInput(onSearch: (value: string) => void, delay 
   const handleChange = (e: FormEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
     setInputValue(value);
-    setShowReset(!!value);
+    setShowReset(Boolean(value));
   };
 
   const handleReset = () => {
