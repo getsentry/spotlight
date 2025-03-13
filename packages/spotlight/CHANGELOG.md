@@ -1,5 +1,32 @@
 # @spotlightjs/spotlight
 
+## 2.12.0
+
+### Minor Changes
+
+- Make event id a link to raw envelope on envelope details page
+  ([#729](https://github.com/getsentry/spotlight/pull/729))
+
+### Patch Changes
+
+- Fix envelope sorting and local classification ([#727](https://github.com/getsentry/spotlight/pull/727))
+
+- Fix UI issues when we get a bare span envelope ([#726](https://github.com/getsentry/spotlight/pull/726))
+
+- Fix span details modal resetting trace view tree state on close (for reals this time)
+  ([#728](https://github.com/getsentry/spotlight/pull/728))
+
+- Fixes detection of Sentry SDK frames in Vite projects ([#718](https://github.com/getsentry/spotlight/pull/718))
+
+- Updated dependencies
+  [[`9ca9ed1b97119757d8b1ec6de24d781aefe8b76c`](https://github.com/getsentry/spotlight/commit/9ca9ed1b97119757d8b1ec6de24d781aefe8b76c),
+  [`c39cfb3622fe19ccc5df822d30d16298f254cb17`](https://github.com/getsentry/spotlight/commit/c39cfb3622fe19ccc5df822d30d16298f254cb17),
+  [`f731d9171ead5aea21152f1d3bfa89e473a7272c`](https://github.com/getsentry/spotlight/commit/f731d9171ead5aea21152f1d3bfa89e473a7272c),
+  [`97dfa768846c76da47521f551b1bb45c683a23d9`](https://github.com/getsentry/spotlight/commit/97dfa768846c76da47521f551b1bb45c683a23d9),
+  [`448062fd45799832fc3240656d543696d438d5ab`](https://github.com/getsentry/spotlight/commit/448062fd45799832fc3240656d543696d438d5ab),
+  [`79506149f545487e67cdff7eab7393c619c8afd9`](https://github.com/getsentry/spotlight/commit/79506149f545487e67cdff7eab7393c619c8afd9)]:
+  - @spotlightjs/overlay@2.13.0
+
 ## 2.11.1
 
 ### Patch Changes
