@@ -1,5 +1,25 @@
 # @spotlightjs/core
 
+## 2.13.0
+
+### Minor Changes
+
+- Make event id a link to raw envelope on envelope details page
+  ([#729](https://github.com/getsentry/spotlight/pull/729))
+
+- Added Search support in Trace details ([#730](https://github.com/getsentry/spotlight/pull/730))
+
+### Patch Changes
+
+- Fix envelope sorting and local classification ([#727](https://github.com/getsentry/spotlight/pull/727))
+
+- Fix UI issues when we get a bare span envelope ([#726](https://github.com/getsentry/spotlight/pull/726))
+
+- Fix span details modal resetting trace view tree state on close (for reals this time)
+  ([#728](https://github.com/getsentry/spotlight/pull/728))
+
+- Fixes detection of Sentry SDK frames in Vite projects ([#718](https://github.com/getsentry/spotlight/pull/718))
+
 ## 2.12.1
 
 ### Patch Changes
