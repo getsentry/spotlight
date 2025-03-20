@@ -33,7 +33,11 @@ const SpanItem = ({
   const containerRef = useRef<HTMLLIElement>(null);
   const childrenCount = span.children ? span.children.length : 0;
   const [isItemCollapsed, setIsItemCollapsed] = useState(
-    ((span.transaction && totalTransactions > 1) || depth >= 10 || childrenCount > 10) && depth !== 1,
+    ((span.transaction && totalTransactions > 1) ||
+      depth >= 10 ||
+      childrenCount > 10 ||
+      span.tags?.source === 'profile') &&
+      depth !== 1,
   );
   const [isResizing, setIsResizing] = useState(false);
 
