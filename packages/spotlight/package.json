@@ -52,7 +52,7 @@
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "^18.19.55",
-    "fossilize": "^0.4.1",
+    "fossilize": "^0.4.2",
     "typescript": "^5.6.2",
     "vite": "^5.4.14"
   },
