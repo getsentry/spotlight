@@ -239,9 +239,15 @@ function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions, side
   // @ts-ignore
   sentryClient._dsn = undefined;
   // @ts-ignore
+  if (!sentryClient._options) {
+    // @ts-ignore
+    sentryClient._options = {};
+  }
+  // @ts-ignore
   sentryClient._options.tracesSampler = () => 1;
   // @ts-ignore
   sentryClient._options.sampleRate = 1;
+  // TODO:  Enable profiling and set sample rate to 1 for that too
 
   try {
     // @ts-expect-error ts(2339) -- We're accessing a private property here
