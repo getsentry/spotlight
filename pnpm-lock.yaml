@@ -198,10 +198,10 @@ importers:
     dependencies:
       '@sentry/nextjs':
         specifier: ^8.49.0
-        version: 8.49.0(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.91.0)
+        version: 8.49.0(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.91.0)
       next:
         specifier: '>=15.1.2'
-        version: 15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -533,8 +533,8 @@ importers:
         specifier: ^18.19.55
         version: 18.19.55
       fossilize:
-        specifier: ^0.4.1
-        version: 0.4.1
+        specifier: ^0.4.2
+        version: 0.4.2
       typescript:
         specifier: ^5.6.2
         version: 5.6.2
@@ -560,7 +560,7 @@ importers:
         version: 6.0.0(astro@5.3.1(@types/node@22.13.1)(jiti@1.21.6)(rollup@4.34.8)(terser@5.39.0)(typescript@5.6.2)(yaml@2.5.1))(tailwindcss@3.4.13)
       '@astrojs/vercel':
         specifier: ^8.0.8
-        version: 8.0.8(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(astro@5.3.1(@types/node@22.13.1)(jiti@1.21.6)(rollup@4.34.8)(terser@5.39.0)(typescript@5.6.2)(yaml@2.5.1))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.34.8)(svelte@4.2.19)
+        version: 8.0.8(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(astro@5.3.1(@types/node@22.13.1)(jiti@1.21.6)(rollup@4.34.8)(terser@5.39.0)(typescript@5.6.2)(yaml@2.5.1))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.34.8)(svelte@4.2.19)
       '@fontsource/raleway':
         specifier: ^5.1.0
         version: 5.1.0
@@ -5133,8 +5133,8 @@ packages:
   forwarded-parse@2.1.2:
     resolution: {integrity: sha512-alTFZZQDKMporBH77856pXgzhEzaUVmLCDk+egLgIgHst3Tpndzz8MnKe+GzRJRfvVdn69HhpW7cmXzvtLvJAw==}
 
-  fossilize@0.4.1:
-    resolution: {integrity: sha512-1qCk2VEUHY6HFQobh9oNpj0TLB1Q/U6muhmbDzSaXO9TxjMyMbHp/RA+LPHXhxf0e+P15EokwJb7bUp1LegwyQ==}
+  fossilize@0.4.2:
+    resolution: {integrity: sha512-EynYCtVu/PocAGDnr1T0TlbJBKOtgUkZC5zvrPwWpd80a52mEoDaAdNGSMWE+wOJBtC7aNDjaAamuKsvNpQNnA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -8908,10 +8908,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/vercel@8.0.8(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(astro@5.3.1(@types/node@22.13.1)(jiti@1.21.6)(rollup@4.34.8)(terser@5.39.0)(typescript@5.6.2)(yaml@2.5.1))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.34.8)(svelte@4.2.19)':
+  '@astrojs/vercel@8.0.8(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(astro@5.3.1(@types/node@22.13.1)(jiti@1.21.6)(rollup@4.34.8)(terser@5.39.0)(typescript@5.6.2)(yaml@2.5.1))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.34.8)(svelte@4.2.19)':
     dependencies:
       '@astrojs/internal-helpers': 0.5.1
-      '@vercel/analytics': 1.4.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)
+      '@vercel/analytics': 1.4.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)
       '@vercel/edge': 1.2.1
       '@vercel/nft': 0.29.2(rollup@4.34.8)
       '@vercel/routing-utils': 5.0.4
@@ -11495,7 +11495,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@sentry/nextjs@8.49.0(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.91.0)':
+  '@sentry/nextjs@8.49.0(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(webpack@5.91.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.29.0
@@ -11508,7 +11508,7 @@ snapshots:
       '@sentry/vercel-edge': 8.49.0
       '@sentry/webpack-plugin': 2.22.7(webpack@5.91.0)
       chalk: 3.0.0
-      next: 15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       resolve: 1.22.8
       rollup: 3.29.5
       stacktrace-parser: 0.1.10
@@ -12509,10 +12509,10 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vercel/analytics@1.4.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)':
+  '@vercel/analytics@1.4.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)':
     optionalDependencies:
       '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1))
-      next: 15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       svelte: 4.2.19
 
@@ -14558,7 +14558,7 @@ snapshots:
 
   forwarded-parse@2.1.2: {}
 
-  fossilize@0.4.1:
+  fossilize@0.4.2:
     dependencies:
       '@stricli/auto-complete': 1.1.1
       '@stricli/core': 1.1.1
@@ -16141,7 +16141,7 @@ snapshots:
 
   neotraverse@0.6.18: {}
 
-  next@15.1.2(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@15.1.2(@babel/core@7.25.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 15.1.2
       '@swc/counter': 0.1.3
@@ -16151,7 +16151,7 @@ snapshots:
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      styled-jsx: 5.1.6(react@18.3.1)
+      styled-jsx: 5.1.6(@babel/core@7.25.7)(react@18.3.1)
     optionalDependencies:
       '@next/swc-darwin-arm64': 15.1.2
       '@next/swc-darwin-x64': 15.1.2
@@ -17564,10 +17564,12 @@ snapshots:
     dependencies:
       inline-style-parser: 0.2.4
 
-  styled-jsx@5.1.6(react@18.3.1):
+  styled-jsx@5.1.6(@babel/core@7.25.7)(react@18.3.1):
     dependencies:
       client-only: 0.0.1
       react: 18.3.1
+    optionalDependencies:
+      '@babel/core': 7.25.7
 
   stylis@4.2.0: {}
 
