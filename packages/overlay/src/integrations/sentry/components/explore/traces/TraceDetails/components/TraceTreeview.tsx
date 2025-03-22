@@ -41,9 +41,7 @@ function RenderTraceTree({
 
   useEffect(() => {
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setIsRendering(false);
-      });
+      setIsRendering(false);
     });
   }, []);
 

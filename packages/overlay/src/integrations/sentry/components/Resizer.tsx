@@ -19,9 +19,7 @@ export default function Resizer({
   style,
   ...props
 }: ResizerProps) {
-  // Use a ref to store the last update time for throttling
   const lastUpdateTimeRef = useRef<number>(0);
-  // Use a ref to store the last position for detecting actual movement
   const lastPositionRef = useRef<{ x: number; y: number } | null>(null);
 
   const handleResizeWrapper = (e: MouseEvent) => {
@@ -32,27 +30,21 @@ export default function Resizer({
     const now = Date.now();
     const throttleInterval = 16; // Approximately 60fps
 
-    // Check if enough time has passed since the last update (throttling)
     if (now - lastUpdateTimeRef.current <= throttleInterval) {
       return;
     }
 
-    // Initialize last position if it's null
     if (lastPositionRef.current === null) {
       lastPositionRef.current = { x: e.clientX, y: e.clientY };
       return;
     }
 
-    // Calculate actual movement
     const deltaX = e.clientX - lastPositionRef.current.x;
     const deltaY = e.clientY - lastPositionRef.current.y;
 
-    // Only process if there's actual movement
     if (deltaX !== 0 || deltaY !== 0) {
-      // Update last position
       lastPositionRef.current = { x: e.clientX, y: e.clientY };
 
-      // Update last update time
       lastUpdateTimeRef.current = now;
 
       // Use requestAnimationFrame to batch updates
@@ -65,7 +57,6 @@ export default function Resizer({
   const handleMouseDown: MouseEventHandler<HTMLDivElement> = e => {
     e.preventDefault();
 
-    // Reset the last position
     lastPositionRef.current = { x: e.clientX, y: e.clientY };
 
     setIsResizing(true);
@@ -74,7 +65,6 @@ export default function Resizer({
   };
 
   const handleMouseUp = () => {
-    // Reset the last position
     lastPositionRef.current = null;
 
     setIsResizing(false);
