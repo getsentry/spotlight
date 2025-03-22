@@ -4,7 +4,6 @@ import Tabs from '../../../../../../components/Tabs';
 import { default as dataCache, isErrorEvent } from '../../../../data/sentryDataCache';
 import { useSentryEvents } from '../../../../data/useSentryEvents';
 import { useSentryHelpers } from '../../../../data/useSentryHelpers';
-import EventContexts from '../../../events/EventContexts';
 import EventList from '../../../events/EventList';
 import TraceDetailHeader from './components/TraceDetailHeader';
 import TraceTreeview from './components/TraceTreeview';
@@ -40,7 +39,6 @@ export default function TraceDetails() {
 
   const tabs = [
     createTab('details', 'Details'),
-    createTab('context', 'Context'),
     createTab('errors', 'Errors', {
       notificationCount: {
         count: errorCount,
@@ -52,16 +50,16 @@ export default function TraceDetails() {
   return (
     <>
       <TraceDetailHeader trace={trace} />
-      <Tabs tabs={tabs} nested={true} />
-
-      <Routes>
-        <Route path="details" element={<TraceTreeview traceId={traceId} />} />
-        <Route path="spans/:spanId" element={<TraceTreeview traceId={traceId} />} />
-        <Route path="context" element={<EventContexts event={trace.rootTransaction || trace.transactions[0]} />} />
-        <Route path="errors" element={<EventList traceId={traceId} />} />
-        {/* Default tab */}
-        <Route path="*" element={<Navigate to={`/explore/traces/${traceId}/details`} replace />} />
-      </Routes>
+      <Tabs tabs={tabs} nested />
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        <Routes>
+          <Route path="details" element={<TraceTreeview traceId={traceId} />} />
+          <Route path="spans/:spanId" element={<TraceTreeview traceId={traceId} />} />
+          <Route path="errors" element={<EventList traceId={traceId} />} />
+          {/* Default tab */}
+          <Route path="*" element={<Navigate to={`/explore/traces/${traceId}/details`} replace />} />
+        </Routes>
+      </div>
     </>
   );
 }

@@ -1,5 +1,6 @@
-import { useState, type MouseEventHandler } from 'react';
+import { useState } from 'react';
 import classNames from '~/lib/classNames';
+import Resizer from './Resizer';
 
 type SpanResizerProps = {
   handleResize: (e: MouseEvent) => void;
@@ -8,38 +9,22 @@ type SpanResizerProps = {
 };
 
 export default function SpanResizer({ handleResize, isResizing, setIsResizing, ...props }: SpanResizerProps) {
-  const [isResizerHovered, setIsResizerHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const handleResizeWrapper = (e: MouseEvent) => {
-    if (e.target instanceof HTMLDivElement) {
-      handleResize(e);
-    }
-  };
-  const handleMouseDown: MouseEventHandler<HTMLDivElement> = e => {
-    e.preventDefault();
-    setIsResizerHovered(true);
-    setIsResizing(true);
-    document.addEventListener('mousemove', handleResizeWrapper);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  const handleMouseUp = () => {
-    setIsResizing(false);
-    document.removeEventListener('mousemove', handleResizeWrapper);
-    document.removeEventListener('mouseup', handleMouseUp);
-  };
   return (
-    <div
+    <Resizer
+      handleResize={handleResize}
+      isResizing={isResizing}
+      setIsResizing={setIsResizing}
       className={classNames(
-        'resizer',
-        'absolute left-0 top-0 h-full w-1 cursor-col-resize rounded-sm p-0.5 transition-colors',
-        isResizerHovered || isResizing ? 'bg-primary-600 translate-x-[-2px] transform' : '',
+        'span-resizer absolute left-0 top-0 h-full w-2 cursor-col-resize',
+        isResizing || isHovered ? 'bg-primary-500' : 'bg-transparent',
       )}
-      onClick={e => e.preventDefault()}
-      onMouseEnter={() => setIsResizerHovered(true)}
-      onMouseLeave={() => setIsResizerHovered(false)}
-      onMouseOver={() => setIsResizerHovered(true)}
-      onMouseDown={handleMouseDown}
+      style={{
+        transform: isResizing || isHovered ? 'translateX(-2px)' : 'none',
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       {...props}
     />
   );

@@ -65,7 +65,7 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
       {transactionsList.length !== 0 ? (
         <div>
           <table className="divide-primary-700 w-full table-fixed divide-y">
-            <thead>
+            <thead className="bg-primary-950 sticky top-0 z-20">
               <tr>
                 {TRANSACTIONS_TABLE_HEADERS.map(header => (
                   <th

@@ -22,7 +22,7 @@ export default function ExploreTabDetails() {
   return (
     <>
       <Tabs tabs={tabs} nested />
-      <div className="flex-1">
+      <div className="flex min-h-0 flex-1 flex-col">
         <Routes>
           <Route path="/envelopes/*" element={<EnvelopesTab />} />
           <Route path="/sdks/*" element={<SdksTab />} />

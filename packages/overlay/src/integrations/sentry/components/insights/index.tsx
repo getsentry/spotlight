@@ -36,7 +36,7 @@ export default function InsightsTabDetails() {
         />
       )}
       <Tabs tabs={tabs} nested />
-      <div className="flex-1">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
           <Route path="queries/:type" element={<QuerySummary showAll={showAll} />} />
           <Route path="resources" element={<Resources showAll={showAll} />} />
