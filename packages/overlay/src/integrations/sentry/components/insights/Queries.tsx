@@ -59,7 +59,7 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
   if (queriesData?.length) {
     return (
       <table className="divide-primary-700 w-full table-fixed divide-y">
-        <thead>
+        <thead className="bg-primary-950 sticky top-0 z-20">
           <tr>
             {QUERIES_HEADERS.map(header => (
               <th

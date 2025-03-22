@@ -91,7 +91,7 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
   }
   return (
     <table className="divide-primary-700 w-full table-fixed divide-y">
-      <thead>
+      <thead className="bg-primary-950 sticky top-0 z-20">
         <tr>
           {RESOURCE_HEADERS.map(header => (
             <th

@@ -57,14 +57,16 @@ export default function EventDetails() {
           </div>
         )}
       </div>
-      <Tabs tabs={tabs} nested={true} />
-      <Routes>
-        <Route path="breadcrumbs" element={<EventBreadcrumbs event={event} />} />
-        <Route path="contexts" element={<EventContexts event={event} />} />
-        {/* Default tab */}
-        <Route path="*" element={<Event event={event} />} />
-      </Routes>
-      <Outlet />
+      <Tabs tabs={tabs} nested />
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        <Routes>
+          <Route path="breadcrumbs" element={<EventBreadcrumbs event={event} />} />
+          <Route path="contexts" element={<EventContexts event={event} />} />
+          {/* Default tab */}
+          <Route path="*" element={<Event event={event} />} />
+        </Routes>
+        <Outlet />
+      </div>
     </>
   );
 }

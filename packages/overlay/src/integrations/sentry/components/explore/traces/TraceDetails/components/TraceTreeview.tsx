@@ -59,7 +59,7 @@ function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
           ) : null}
         </div>
       )}
-      <div className="flex-1 px-2 pb-6">
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2 pb-6">
         <SpanTree
           traceContext={trace}
           tree={trace.spanTree}
