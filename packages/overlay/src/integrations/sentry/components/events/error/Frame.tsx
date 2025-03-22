@@ -17,6 +17,7 @@ function resolveFilename(filename: string) {
 }
 
 function formatFilename(filename: string) {
+  if (filename.startsWith('node:')) return filename;
   const resolvedFilename = resolveFilename(filename);
   if (resolvedFilename.indexOf('/node_modules/') === -1) return resolvedFilename;
   return `npm:${resolvedFilename
