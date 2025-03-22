@@ -1,5 +1,5 @@
 ---
-'@spotlightjs/overlay': major
+'@spotlightjs/overlay': patch
 ---
 
 format node internals correctly in stacktrace
