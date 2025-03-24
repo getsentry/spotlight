@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@astrojs/react": "^4.2.0",
-    "@astrojs/starlight": "^0.32.1",
-    "@astrojs/starlight-tailwind": "^3.0.0",
+    "@astrojs/starlight": "^0.32.4",
+    "@astrojs/starlight-tailwind": "^3.0.1",
     "@astrojs/tailwind": "^6.0.0",
     "@astrojs/vercel": "^8.0.8",
     "@fontsource/raleway": "^5.1.0",
