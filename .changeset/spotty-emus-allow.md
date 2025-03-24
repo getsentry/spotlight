@@ -2,7 +2,6 @@
 '@spotlightjs/overlay': minor
 ---
 
-- #738: Fixed color while hovering spans.
 - #731: Search Bar sticky and fixed overflow across the overlay.
-- Added 2 sections(Tree and Context) in Trace detail page
-- Removed Tracce Context page.
+
+- Made Resizer a generic component and extended in SpanResizer.

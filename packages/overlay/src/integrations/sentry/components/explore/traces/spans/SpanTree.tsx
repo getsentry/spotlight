@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import classNames from '../../../../../../lib/classNames';
 import type { Span, TraceContext } from '../../../../types';
 import SpanItem from './SpanItem';
@@ -43,34 +42,3 @@ export default function SpanTree({
     </ul>
   );
 }
-
-SpanTree.Loader = () => (
-  <div className="animate-pulse pt-2">
-    <ul className="tree space-y-2">
-      <li>
-        <ul className="deep">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <li key={index}>
-              <div className="mb-2 h-3 w-1/2 rounded bg-zinc-400"></div>
-              <ul className="deep">
-                {Array.from({ length: 2 }).map((_, subIndex) => (
-                  <Fragment key={subIndex}>
-                    <li>
-                      <div className="mb-2 ml-4 h-3 w-1/3 rounded bg-zinc-400"></div>
-                    </li>
-                    <li>
-                      <div className="mb-2 ml-8 h-3 w-1/4 rounded bg-zinc-400"></div>
-                    </li>
-                    <li>
-                      <div className="mb-2 ml-8 h-3 w-1/4 rounded bg-zinc-400"></div>
-                    </li>
-                  </Fragment>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </li>
-    </ul>
-  </div>
-);
