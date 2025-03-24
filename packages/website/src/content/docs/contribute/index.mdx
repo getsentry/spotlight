@@ -3,25 +3,29 @@ title: Get Started
 description: A guide how to contribute to Spotlight.
 ---
 
-Spotlight relies on a [pnpm](https://pnpm.io) monorepo. You'll need to install pnpm to get things going, which can be done with [Volta](https://volta.sh).
-
 Pull down the repo (or your fork):
 
 ```shell
 git clone https://github.com/getsentry/spotlight.git
 ```
 
-Ensure the node and pnpm are available:
+Spotlight relies on a [pnpm](https://pnpm.io) monorepo. You'll need to install pnpm to get things going, which can be done with [Volta](https://volta.sh).
 
-```shell
-volta install node pnpm
-```
+:::note[Volta & PNPM]
 
 Make sure you [enable `pnpm` support for `Volta`](https://docs.volta.sh/advanced/pnpm):
 
 ```shell
 # Add this to your profile file or startup script
 VOLTA_FEATURE_PNPM=1
+```
+
+:::
+
+Ensure the node and pnpm are available:
+
+```shell
+volta install node pnpm
 ```
 
 Install the package requirements:
@@ -38,19 +42,37 @@ pnpm build
 
 ## Development
 
-From there you can spin up the Spotlight repo into watch mode:
-
-```shell
-pnpm dev:overlay
-```
-
 Depending on what you're doing there's two paths to develop against the overlay.
+
+### Against the example "Playground" application
 
 If you simply want to run Spotlight against the example application, you can spin that up using:
 
 ```shell
 pnpm dev:playground
 ```
+
+### With existing data
+
+If you just want to test things out with some example traces and errors you can spin up the Spotlight repo into watch mode:
+
+```shell
+pnpm dev
+```
+
+Then head over to `packages/overlay/_fixtures` and run:
+
+```shell
+./send_to_sidecar.cjs
+```
+
+This will send all the sample data to Spotlight. You can also pick a specific file and pass that as an argument to the script instead:
+
+```shell
+./send_to_sidecar.cjs envelope_php_error.txt
+```
+
+### Linking against an existing project
 
 Additionally you may want to link it into an existing project. This is a little brittle, and we're not experts here, so your mileage may vary.
 
