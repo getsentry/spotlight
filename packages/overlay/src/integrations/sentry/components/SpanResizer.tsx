@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import classNames from '~/lib/classNames';
-import Resizer from './Resizer';
+import Resizer, { ResizeDirection } from './Resizer';
 
 type SpanResizerProps = {
   handleResize: (e: MouseEvent) => void;
   setIsResizing: (val: boolean) => void;
   isResizing: boolean;
+  direction?: ResizeDirection;
 };
 
-export default function SpanResizer({ handleResize, isResizing, setIsResizing, ...props }: SpanResizerProps) {
+export default function SpanResizer({
+  handleResize,
+  isResizing,
+  setIsResizing,
+  direction = 'column',
+  ...props
+}: SpanResizerProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -16,8 +23,10 @@ export default function SpanResizer({ handleResize, isResizing, setIsResizing, .
       handleResize={handleResize}
       isResizing={isResizing}
       setIsResizing={setIsResizing}
+      direction={direction}
       className={classNames(
-        'span-resizer absolute left-0 top-0 h-full w-2 cursor-col-resize',
+        'span-resizer absolute left-0 top-0 h-full w-1',
+        direction === 'column' ? 'cursor-col-resize' : 'cursor-row-resize',
         isResizing || isHovered ? 'bg-primary-500' : 'bg-transparent',
       )}
       style={{
