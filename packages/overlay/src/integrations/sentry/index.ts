@@ -12,6 +12,7 @@ import PerformanceTab from './tabs/PerformanceTab';
 import type { SentryErrorEvent, SentryEvent } from './types';
 
 import { spotlightBrowserIntegration } from '@sentry/browser';
+import { parseJSONFromBuffer } from './utils/bufferParsers';
 
 const HEADER = 'application/x-sentry-envelope';
 
@@ -110,10 +111,6 @@ function getLineEnd(data: Uint8Array): number {
   }
 
   return end;
-}
-
-function parseJSONFromBuffer(data: Uint8Array): object {
-  return JSON.parse(new TextDecoder().decode(data));
 }
 
 /**
