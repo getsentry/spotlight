@@ -1,11 +1,11 @@
 import { log } from '~/lib/logger';
 
-export function parseJSONFromBuffer<T = unknown>(data: Uint8Array): T | null {
+export function parseJSONFromBuffer<T = unknown>(data: Uint8Array): T {
   try {
     return JSON.parse(new TextDecoder().decode(data)) as T;
   } catch (err) {
     log(err);
-    return null;
+    return {} as T;
   }
 }
 
