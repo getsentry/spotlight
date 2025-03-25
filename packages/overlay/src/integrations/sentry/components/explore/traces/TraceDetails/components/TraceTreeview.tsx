@@ -15,7 +15,7 @@ type TraceTreeViewProps = { traceId: string };
 
 export const DEFAULT_SPAN_NODE_WIDTH = 50;
 
-function RenderTraceTree({
+function TraceTreeWithSearch({
   trace,
   startTimestamp,
   totalDuration,
@@ -90,7 +90,7 @@ function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
         </div>
       </div>
 
-      <RenderTraceTree trace={trace} startTimestamp={startTimestamp} totalDuration={totalDuration} />
+      <TraceTreeWithSearch trace={trace} startTimestamp={startTimestamp} totalDuration={totalDuration} />
       {span ? (
         <SpanDetails
           traceContext={trace}

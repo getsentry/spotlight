@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Table from '~/ui/Table';
 import CopyToClipboard from '../../../../../components/CopyToClipboard';
 import OpenInEditor from '../../../../../components/OpenInEditor';
 import classNames from '../../../../../lib/classNames';
@@ -28,8 +29,8 @@ function formatFilename(filename: string) {
 
 function ContextLocals({ vars }: { vars: FrameVars }) {
   return (
-    <table className="table-values w-full">
-      <tbody>
+    <Table className="table-values w-full">
+      <Table.Body>
         {Object.entries(vars).map(([key, value]) => {
           return (
             <tr key={key}>
@@ -42,8 +43,8 @@ function ContextLocals({ vars }: { vars: FrameVars }) {
             </tr>
           );
         })}
-      </tbody>
-    </table>
+      </Table.Body>
+    </Table>
   );
 }
 

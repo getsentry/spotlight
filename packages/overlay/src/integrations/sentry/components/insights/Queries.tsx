@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
+import Table from '~/ui/Table';
 import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
 import useSort from '../../hooks/useSort';
@@ -58,8 +59,8 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
 
   if (queriesData?.length) {
     return (
-      <table className="divide-primary-700 w-full table-fixed divide-y">
-        <thead className="bg-primary-950 sticky top-0 z-20">
+      <Table variant="detail">
+        <Table.Header>
           <tr>
             {QUERIES_HEADERS.map(header => (
               <th
@@ -94,8 +95,8 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
               </th>
             ))}
           </tr>
-        </thead>
-        <tbody>
+        </Table.Header>
+        <Table.Body>
           {queriesData.map(query => (
             <tr key={query.description} className="hover:bg-primary-900">
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
@@ -112,8 +113,8 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
               </td>
             </tr>
           ))}
-        </tbody>
-      </table>
+        </Table.Body>
+      </Table>
     );
   }
   return (

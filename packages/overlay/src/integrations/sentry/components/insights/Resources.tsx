@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
+import Table from '~/ui/Table';
 import Tooltip from '~/ui/Tooltip';
 import { RESOURCES_SORT_KEYS, RESOURCE_HEADERS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
@@ -90,8 +91,8 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
     return <p className="text-primary-300 px-6 py-4">No Resource found.</p>;
   }
   return (
-    <table className="divide-primary-700 w-full table-fixed divide-y">
-      <thead className="bg-primary-950 sticky top-0 z-20">
+    <Table variant="detail">
+      <Table.Header>
         <tr>
           {RESOURCE_HEADERS.map(header => (
             <th
@@ -126,8 +127,8 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
             </th>
           ))}
         </tr>
-      </thead>
-      <tbody>
+      </Table.Header>
+      <Table.Body>
         {resources.map((resource: ResourceInfo) => (
           <tr key={resource.description} className="hover:bg-primary-900">
             <td className="text-primary-200 relative w-2/5 whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
@@ -161,8 +162,8 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
             </td>
           </tr>
         ))}
-      </tbody>
-    </table>
+      </Table.Body>
+    </Table>
   );
 };
 

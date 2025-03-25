@@ -8,6 +8,7 @@ import useSort from '~/integrations/sentry/hooks/useSort';
 import type { SentryEventWithPerformanceData } from '~/integrations/sentry/types';
 import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
 import classNames from '~/lib/classNames';
+import Table from '~/ui/Table';
 import { normalizePerformanceScore } from '../../../utils/webVitals';
 
 type SentryEventComparator = (a: SentryEventWithPerformanceData, b: SentryEventWithPerformanceData) => number;
@@ -59,8 +60,8 @@ const WebVitals = () => {
   }
   return (
     <>
-      <table className="divide-primary-700 w-full table-fixed divide-y">
-        <thead className="bg-primary-950 sticky top-0 z-20">
+      <Table variant="detail">
+        <Table.Header>
           <tr>
             {WEB_VITALS_HEADERS.map(header => (
               <th
@@ -95,8 +96,8 @@ const WebVitals = () => {
               </th>
             ))}
           </tr>
-        </thead>
-        <tbody>
+        </Table.Header>
+        <Table.Body>
           {measurementEvents.map(event => (
             <tr
               key={event.event_id}
@@ -128,8 +129,8 @@ const WebVitals = () => {
               </td>
             </tr>
           ))}
-        </tbody>
-      </table>
+        </Table.Body>
+      </Table>
     </>
   );
 };
