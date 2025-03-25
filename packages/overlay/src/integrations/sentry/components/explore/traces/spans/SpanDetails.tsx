@@ -1,6 +1,7 @@
 import { type ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
+import Table from '~/ui/Table';
 import JsonViewer from '../../../../../../components/JsonViewer';
 import SidePanel, { SidePanelHeader } from '../../../../../../ui/SidePanel';
 import { DB_SPAN_REGEX } from '../../../../constants';
@@ -151,8 +152,8 @@ export default function SpanDetails({
         <div>
           <h2 className="mb-2 font-bold uppercase">Tags</h2>
           {span.tags && Object.keys(span.tags).length ? (
-            <table className="w-full text-sm">
-              <tbody>
+            <Table className="w-full text-sm">
+              <Table.Body>
                 {Object.entries(span.tags).map(([key, value]) => (
                   <tr key={key} className="text-primary-300">
                     <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
@@ -163,16 +164,16 @@ export default function SpanDetails({
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
+              </Table.Body>
+            </Table>
           ) : (
             <div className="text-primary-300">No tags recorded for this span.</div>
           )}
         </div>
         <div>
           <h2 className="mb-2 font-bold uppercase">Context</h2>
-          <table className="w-full text-sm">
-            <tbody>
+          <Table className="w-full text-sm">
+            <Table.Body>
               {[
                 ['status', span.status || ''],
                 ['trace', span.trace_id],
@@ -202,15 +203,15 @@ export default function SpanDetails({
                   </td>
                 </tr>
               ))}
-            </tbody>
-          </table>
+            </Table.Body>
+          </Table>
         </div>
 
         {span.data && (
           <div>
             <h2 className="mb-2 font-bold uppercase">Data</h2>
-            <table className="w-full text-sm">
-              <tbody>
+            <Table className="w-full text-sm">
+              <Table.Body>
                 {Object.entries(span.data).map(([key, value]) => (
                   <tr key={key} className="text-primary-300">
                     <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
@@ -221,8 +222,8 @@ export default function SpanDetails({
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
+              </Table.Body>
+            </Table>
           </div>
         )}
 

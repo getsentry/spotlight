@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
+import Table from '~/ui/Table';
 import { TRANSACTIONS_SORT_KEYS, TRANSACTIONS_TABLE_HEADERS } from '../../constants';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
@@ -64,8 +65,8 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
     <>
       {transactionsList.length !== 0 ? (
         <div>
-          <table className="divide-primary-700 w-full table-fixed divide-y">
-            <thead>
+          <Table>
+            <Table.Header className="bg-primary-950 sticky top-0 z-20">
               <tr>
                 {TRANSACTIONS_TABLE_HEADERS.map(header => (
                   <th
@@ -101,9 +102,9 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
                   </th>
                 ))}
               </tr>
-            </thead>
+            </Table.Header>
 
-            <tbody>
+            <Table.Body>
               {transactionsList.map(([key, value]: [string, GroupedTransactionsValue]) => (
                 <tr
                   key={key}
@@ -123,8 +124,8 @@ export default function TransactionsList({ showAll }: { showAll: boolean }) {
                   </td>
                 </tr>
               ))}
-            </tbody>
-          </table>
+            </Table.Body>
+          </Table>
         </div>
       ) : (
         <div className="text-primary-300 p-6">Looks like there's no transactions recorded matching this query. 🤔</div>

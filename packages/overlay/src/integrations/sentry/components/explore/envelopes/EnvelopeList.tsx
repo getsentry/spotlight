@@ -1,6 +1,7 @@
 import type { Envelope, EnvelopeItem } from '@sentry/core';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import CardList from '~/components/CardList';
 import TimeSince from '~/components/TimeSince';
 import classNames from '~/lib/classNames';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
@@ -38,10 +39,7 @@ export default function EnvelopeList() {
             }}
           />
         )}
-        <div>
-          <div className="border-b-primary-700 flex w-full items-center justify-between border-b px-6 py-4">
-            <h1 className="text-2xl font-bold">Event Envelopes</h1>
-          </div>
+        <CardList>
           <div className="flex flex-col">
             {(showAll ? allEnvelopes : localEnvelopes).map(({ envelope }: { envelope: Envelope }) => {
               const header: Envelope[0] = envelope[0];
@@ -87,7 +85,7 @@ export default function EnvelopeList() {
               );
             })}
           </div>
-        </div>
+        </CardList>
         {selectedEnvelope && <EnvelopeDetails data={selectedEnvelope} />}
       </>
     );
