@@ -305,6 +305,10 @@ function errorResponse(code: number) {
 const error404 = errorResponse(404);
 const error405 = errorResponse(405);
 
+function logSpotlightUrl(port: number): void {
+  logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
+}
+
 function startServer(
   buffer: MessageBuffer<Payload>,
   port: number,
@@ -392,7 +396,7 @@ function startServer(
   function handleServerListen(port: number, basePath?: string): void {
     logger.info(`Sidecar listening on ${port}`);
     if (basePath) {
-      logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
+      logSpotlightUrl(port);
     }
   }
 }
@@ -485,6 +489,10 @@ export function setupSidecar({
   isSidecarRunning(sidecarPort).then((isRunning: boolean) => {
     if (isRunning) {
       logger.info(`Sidecar is already running on port ${sidecarPort}`);
+      const hasSpotlightUI = (filesToServe && '/src/index.html' in filesToServe) || (!filesToServe && basePath);
+      if (hasSpotlightUI) {
+        logSpotlightUrl(sidecarPort);
+      }
     } else if (!serverInstance) {
       serverInstance = startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
     }
