@@ -489,7 +489,10 @@ export function setupSidecar({
   isSidecarRunning(sidecarPort).then((isRunning: boolean) => {
     if (isRunning) {
       logger.info(`Sidecar is already running on port ${sidecarPort}`);
-      logSpotlightUrl(sidecarPort);
+      const hasSpotlightUI = (filesToServe && '/src/index.html' in filesToServe) || (!filesToServe && basePath);
+      if (hasSpotlightUI) {
+        logSpotlightUrl(sidecarPort);
+      }
     } else if (!serverInstance) {
       serverInstance = startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
     }
