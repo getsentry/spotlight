@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
-import { IncomingMessage, ServerResponse } from 'node:http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import * as SourceMap from 'source-map';
+import { TraceMap, originalPositionFor, sourceContentFor, LEAST_UPPER_BOUND } from '@jridgewell/trace-mapping';
 
 type SourceContext = {
   pre_context?: string[];
@@ -39,13 +39,13 @@ function parseStackTrace(requestBody: string): SentryStackTrace | undefined {
   }
 }
 
-async function applySourceContextToFrame(sourceMapContent: string, frame: ValidSentryStackFrame) {
-  const consumer = await new SourceMap.SourceMapConsumer(sourceMapContent);
+function applySourceContextToFrame(sourceMapContent: string, frame: ValidSentryStackFrame) {
+  const tracer = new TraceMap(JSON.parse(sourceMapContent));
 
-  const originalPosition = consumer.originalPositionFor({
+  const originalPosition = originalPositionFor(tracer, {
     line: frame.lineno,
     column: frame.colno,
-    bias: SourceMap.SourceMapConsumer.LEAST_UPPER_BOUND,
+    bias: LEAST_UPPER_BOUND,
   });
 
   if (originalPosition.source && originalPosition.line && originalPosition.column) {
@@ -54,7 +54,7 @@ async function applySourceContextToFrame(sourceMapContent: string, frame: ValidS
     const filePath = new URL(frame.filename).pathname.slice(1); // slice(1) is to not make it absolute path
     frame.filename = path.resolve(path.join(path.dirname(filePath), originalPosition.source));
 
-    const content = consumer.sourceContentFor(originalPosition.source);
+    const content = sourceContentFor(tracer, originalPosition.source);
     const lines = content?.split(os.EOL) ?? [];
     addContextLinesToFrame(lines, frame);
   }
@@ -62,7 +62,7 @@ async function applySourceContextToFrame(sourceMapContent: string, frame: ValidS
   return originalPosition;
 }
 
-function addContextLinesToFrame(lines: string[], frame: ValidSentryStackFrame, linesOfContext: number = 5): void {
+function addContextLinesToFrame(lines: string[], frame: ValidSentryStackFrame, linesOfContext = 5): void {
   const maxLines = lines.length;
   const sourceLine = Math.max(Math.min(maxLines - 1, frame.lineno - 1), 0);
 
@@ -165,10 +165,10 @@ export function contextLinesHandler(req: IncomingMessage, res: ServerResponse) {
         // Extract the inline source map from the minified code
         const inlineSourceMapMatch = generatedCode.match(/\/\/# sourceMappingURL=data:application\/json;base64,(.*)/);
 
-        if (inlineSourceMapMatch && inlineSourceMapMatch[1]) {
+        if (inlineSourceMapMatch?.[1]) {
           const sourceMapBase64 = inlineSourceMapMatch[1];
           const sourceMapContent = Buffer.from(sourceMapBase64, 'base64').toString('utf-8');
-          await applySourceContextToFrame(sourceMapContent, frame);
+          applySourceContextToFrame(sourceMapContent, frame);
         }
       } else if (!filename.includes(':')) {
         try {
