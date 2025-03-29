@@ -5,6 +5,7 @@ import { log } from '../../../lib/logger';
 import { generateUuidv4 } from '../../../lib/uuid';
 import type { RawEventContext } from '../../integration';
 import type {
+  FunctionProfile,
   Sdk,
   SentryErrorEvent,
   SentryEvent,
@@ -33,7 +34,7 @@ function relativeNsToTimestamp(startTs: number, ns: number | string) {
 
 const ERROR_EVENT_TYPES = new Set(['event', 'error']);
 // Enable 'span' type  later on. See https://github.com/getsentry/spotlight/issues/721
-const TRACE_EVENT_TYPES = new Set(['transaction'/*, 'span'*/]);
+const TRACE_EVENT_TYPES = new Set(['transaction' /*, 'span'*/]);
 const PROFILE_EVENT_TYPES = new Set(['profile']);
 const SUPPORTED_EVENT_TYPES = new Set([...ERROR_EVENT_TYPES, ...TRACE_EVENT_TYPES, ...PROFILE_EVENT_TYPES]);
 
@@ -416,6 +417,60 @@ class SentryDataCache {
         }
       }),
     );
+  }
+
+  getFunctionProfiles(): FunctionProfile[] {
+    // separate profiles
+    const allProfiles: FunctionProfile[] = [];
+
+    for (const [traceId, profile] of this.profilesByTraceId) {
+      const functionProfiles = new Map<string, FunctionProfile>();
+
+      // Go over each profile sample
+      for (let sampleIdx = 0; sampleIdx < profile.samples.length - 1; sampleIdx++) {
+        const sample = profile.samples[sampleIdx];
+        const nextSample = profile.samples[sampleIdx + 1];
+        const duration = nextSample.start_timestamp - sample.start_timestamp;
+
+        const stackId = sample.stack_id;
+        const frameIndices = profile.stacks[stackId];
+        if (!frameIndices?.length) continue;
+
+        // go over each stack frame (frame = 1 func/meth call)
+        for (const frameIdx of frameIndices) {
+          const frame = profile.frames[frameIdx];
+          if (!frame) continue;
+
+          const funcName =
+            frame.function ||
+            (frame.module
+              ? `${frame.module}:<anonymous>`
+              : frame.filename
+                ? `${frame.filename}:${frame.lineno || '?'}`
+                : '<unknown>');
+
+          const existing = functionProfiles.get(funcName) || {
+            name: funcName,
+            totalTime: 0,
+            samples: 0,
+            frames: [],
+            traceId, //
+          };
+
+          existing.totalTime += duration;
+          existing.samples += 1;
+          if (!existing.frames.includes(frame)) {
+            existing.frames.push(frame);
+          }
+
+          functionProfiles.set(funcName, existing);
+        }
+      }
+
+      allProfiles.push(...functionProfiles.values());
+    }
+
+    return allProfiles;
   }
 }
 
