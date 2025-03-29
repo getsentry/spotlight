@@ -158,6 +158,14 @@ export type SentryProcessedProfile = SentryProfile & {
   samples: ProcessedProfileSample[];
 };
 
+export type FunctionProfile = {
+  name: string;
+  totalTime: number;
+  samples: number;
+  frames: EventFrame[];
+  traceId: string;
+};
+
 export type SentryDeviceInfo = {
   architecture: string;
   is_emulator?: boolean;
