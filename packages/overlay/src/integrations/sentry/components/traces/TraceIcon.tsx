@@ -1,6 +1,6 @@
-import type { Trace } from '../../../types';
-import { sdkToPlatform } from '../../../utils/sdkToPlatform';
-import PlatformIcon from '../../PlatformIcon';
+import type { Trace } from '../../types';
+import { sdkToPlatform } from '../../utils/sdkToPlatform';
+import PlatformIcon from '../shared/PlatformIcon';
 
 export type TraceIconProps = {
   trace: Trace;

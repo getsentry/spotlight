@@ -1,11 +1,12 @@
 import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { createTab } from '~/integrations/sentry/utils/tabs';
-import Tabs from '../../../../../../components/Tabs';
-import { default as dataCache, isErrorEvent } from '../../../../data/sentryDataCache';
-import { useSentryEvents } from '../../../../data/useSentryEvents';
-import { useSentryHelpers } from '../../../../data/useSentryHelpers';
-import EventContexts from '../../../events/EventContexts';
-import EventList from '../../../events/EventList';
+
+import Tabs from '~/components/Tabs';
+import sentryDataCache, { isErrorEvent } from '~/integrations/sentry/data/sentryDataCache';
+import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
+import { useSentryHelpers } from '~/integrations/sentry/data/useSentryHelpers';
+import EventContexts from '../../events/EventContexts';
+import EventList from '../../events/EventList';
 import TraceDetailHeader from './components/TraceDetailHeader';
 import TraceTreeview from './components/TraceTreeview';
 
@@ -19,7 +20,7 @@ export default function TraceDetails() {
   }
 
   // TODO: Don't use dataCache directly, use a helper like useSentryEvents
-  const trace = dataCache.getTraceById(traceId);
+  const trace = sentryDataCache.getTraceById(traceId);
 
   if (!trace) {
     return (
@@ -60,7 +61,7 @@ export default function TraceDetails() {
           <Route path="context" element={<EventContexts event={trace.rootTransaction || trace.transactions[0]} />} />
           <Route path="errors" element={<EventList traceId={traceId} />} />
           {/* Default tab */}
-          <Route path="*" element={<Navigate to={`/explore/traces/${traceId}/details`} replace />} />
+          <Route path="*" element={<Navigate to={`/traces/${traceId}/details`} replace />} />
         </Routes>
       </div>
     </>

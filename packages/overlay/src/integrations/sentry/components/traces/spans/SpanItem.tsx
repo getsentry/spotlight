@@ -2,11 +2,11 @@ import { useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
 import { useSearch } from '~/integrations/sentry/context/SearchContext';
-import classNames from '../../../../../../lib/classNames';
-import type { Span, TraceContext } from '../../../../types';
-import { getFormattedDuration, getSpanDurationClassName } from '../../../../utils/duration';
-import PlatformIcon from '../../../shared/PlatformIcon';
-import SpanResizer from '../../../shared/SpanResizer';
+import classNames from '../../../../../lib/classNames';
+import type { Span, TraceContext } from '../../../types';
+import { getFormattedDuration, getSpanDurationClassName } from '../../../utils/duration';
+import PlatformIcon from '../../shared/PlatformIcon';
+import SpanResizer from '../../shared/SpanResizer';
 import SpanTree from './SpanTree';
 
 const SpanItem = ({
