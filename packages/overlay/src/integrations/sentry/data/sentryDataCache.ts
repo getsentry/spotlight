@@ -96,7 +96,9 @@ class SentryDataCache {
   }
 
   private finishUpdate() {
-    this.pendingUpdates--;
+    if (this.pendingUpdates > 0) {
+      this.pendingUpdates--;
+    }
     if (this.pendingUpdates === 0) {
       while (this.updateResolvers.length > 0) {
         const resolve = this.updateResolvers.shift();
