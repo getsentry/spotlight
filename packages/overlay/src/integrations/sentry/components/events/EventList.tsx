@@ -8,8 +8,8 @@ import { isErrorEvent } from '../../data/sentryDataCache';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
 import { truncateId } from '../../utils/text';
-import HiddenItemsButton from '../HiddenItemsButton';
-import PlatformIcon from '../PlatformIcon';
+import HiddenItemsButton from '../shared/HiddenItemsButton';
+import PlatformIcon from '../shared/PlatformIcon';
 import { EventSummary } from './Event';
 
 export default function EventList({ traceId }: { traceId?: string }) {

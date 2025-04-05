@@ -2,7 +2,7 @@ import { Nullable } from 'vitest';
 import Table from '~/ui/Table';
 import JsonViewer from '../../../../components/JsonViewer';
 import type { SentryEvent } from '../../types';
-import Tags from '../Tags';
+import Tags from '../shared/Tags';
 
 const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
   name: "Mighty Fighter",

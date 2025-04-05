@@ -4,10 +4,12 @@ import Tabs from '~/components/Tabs';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import { useSentrySpanCounts } from '../../data/useSentrySpans';
 import { createTab } from '../../utils/tabs';
-import HiddenItemsButton from '../HiddenItemsButton';
+import HiddenItemsButton from '../shared/HiddenItemsButton';
+import EnvelopesTab from './envelopes';
 import Queries from './Queries';
 import QuerySummary from './QuerySummary';
 import Resources from './Resources';
+import SdksTab from './sdks';
 import WebVitals from './webVitals';
 import WebVitalsDetail from './webVitals/WebVitalsDetail';
 
@@ -23,6 +25,8 @@ export default function InsightsTabDetails() {
     createTab('queries', 'Queries'),
     createTab('webvitals', 'Web Vitals'),
     createTab('resources', 'Resources'),
+    createTab('envelopes', 'Envelopes'),
+    createTab('sdks', 'SDKs'),
   ];
 
   return (
@@ -42,6 +46,8 @@ export default function InsightsTabDetails() {
           <Route path="resources" element={<Resources showAll={showAll} />} />
           <Route path="webvitals" element={<WebVitals />} />
           <Route path="webvitals/:page" element={<WebVitalsDetail />} />
+          <Route path="envelopes/*" element={<EnvelopesTab />} />
+          <Route path="sdks/*" element={<SdksTab />} />
           {/* Default tab */}
           <Route path="queries" element={<Queries showAll={showAll} />} />
           <Route path="*" element={<Navigate to="/insights/queries" replace />} />

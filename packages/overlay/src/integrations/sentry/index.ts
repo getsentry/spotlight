@@ -6,13 +6,13 @@ import type { Integration, RawEventContext } from '../integration';
 import { isErrorEvent, default as sentryDataCache } from './data/sentryDataCache';
 import { spotlightIntegration } from './sentry-integration';
 import ErrorsTab from './tabs/ErrorsTab';
-import ExploreTab from './tabs/ExploreTab';
 import InsightsTab from './tabs/InsightsTab';
-import PerformanceTab from './tabs/PerformanceTab';
 import type { SentryErrorEvent, SentryEvent } from './types';
 
 import { spotlightBrowserIntegration } from '@sentry/browser';
+import TracesTab from './tabs/TracesTab';
 import { parseJSONFromBuffer } from './utils/bufferParsers';
+import { createTab } from './utils/tabs';
 
 const HEADER = 'application/x-sentry-envelope';
 
@@ -80,33 +80,22 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
         .reduce((sum, t) => sum + Number(sentryDataCache.isTraceLocal(t.trace_id) !== false), 0);
 
       return [
-        {
-          id: 'explore',
-          title: 'Explore',
+        createTab('traces', 'Traces', {
           notificationCount: {
             count: localTraceCount,
           },
-          content: ExploreTab,
-        },
-        {
-          id: 'errors',
-          title: 'Errors',
+          content: TracesTab,
+        }),
+        createTab('errors', 'Errors', {
           notificationCount: {
             count: errorCount,
             severe: errorCount > 0,
           },
           content: ErrorsTab,
-        },
-        {
-          id: 'insights',
-          title: 'Insights',
+        }),
+        createTab('insights', 'Insights', {
           content: InsightsTab,
-        },
-        {
-          id: 'performance',
-          title: 'Performance',
-          content: PerformanceTab,
-        },
+        }),
       ];
     },
 

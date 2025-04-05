@@ -2,15 +2,15 @@ import { type ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
 import Table from '~/ui/Table';
-import JsonViewer from '../../../../../../components/JsonViewer';
-import SidePanel, { SidePanelHeader } from '../../../../../../ui/SidePanel';
-import { DB_SPAN_REGEX } from '../../../../constants';
-import dataCache, { isErrorEvent } from '../../../../data/sentryDataCache';
-import type { SentryErrorEvent, Span, TraceContext } from '../../../../types';
-import { formatBytes } from '../../../../utils/bytes';
-import { getFormattedDuration } from '../../../../utils/duration';
-import DateTime from '../../../DateTime';
-import { ErrorTitle } from '../../../events/error/Error';
+import JsonViewer from '../../../../../components/JsonViewer';
+import SidePanel, { SidePanelHeader } from '../../../../../ui/SidePanel';
+import { DB_SPAN_REGEX } from '../../../constants';
+import dataCache, { isErrorEvent } from '../../../data/sentryDataCache';
+import type { SentryErrorEvent, Span, TraceContext } from '../../../types';
+import { formatBytes } from '../../../utils/bytes';
+import { getFormattedDuration } from '../../../utils/duration';
+import { ErrorTitle } from '../../events/error/Error';
+import DateTime from '../../shared/DateTime';
 import SpanTree from './SpanTree';
 
 function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) {
@@ -94,7 +94,7 @@ export default function SpanDetails({
   const errors = span.trace_id ? dataCache.getEventsByTrace(span.trace_id).filter(isErrorEvent) : [];
 
   return (
-    <SidePanel backto={`/explore/traces/${span.trace_id}`}>
+    <SidePanel backto={`/traces/${span.trace_id}`}>
       <SidePanelHeader
         title="Span Details"
         subtitle={
@@ -107,7 +107,7 @@ export default function SpanDetails({
             {span.span_id}
           </>
         }
-        backto={`/explore/traces/${span.trace_id}`}
+        backto={`/traces/${span.trace_id}`}
       />
 
       <div className="space-y-6">
@@ -183,7 +183,7 @@ export default function SpanDetails({
                   span.parent_span_id ? (
                     <Link
                       className="underline"
-                      to={`/explore/traces/${span.trace_id}/spans/${span.parent_span_id}`}
+                      to={`/traces/${span.trace_id}/spans/${span.parent_span_id}`}
                       key={`link-to-${span.parent_span_id}`}
                     >
                       {span.parent_span_id}

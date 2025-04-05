@@ -2,7 +2,7 @@ import CardList from '~/components/CardList';
 import TimeSince from '~/components/TimeSince';
 import { useSentrySdks } from '~/integrations/sentry/data/useSentrySdks';
 import { sdkToPlatform } from '~/integrations/sentry/utils/sdkToPlatform';
-import PlatformIcon from '../../PlatformIcon';
+import PlatformIcon from '../../shared/PlatformIcon';
 
 export default function SdkList() {
   const sdkList = useSentrySdks();
@@ -24,7 +24,7 @@ export default function SdkList() {
           ))}
         </CardList>
       ) : (
-        <div className="text-primary-300 p-6">Looks like there's no SDKs that have reported yet. 🤔</div>
+        <div className="text-primary-300 px-6 py-4">Looks like there's no SDKs that have reported yet. 🤔</div>
       )}
     </>
   );
