@@ -82,7 +82,6 @@ class SentryDataCache {
    * Wait for all pending updates to complete.
    */
   async waitForUpdates(): Promise<void> {
-    console.log({ pn: this.pendingUpdates });
     if (this.pendingUpdates === 0) {
       return Promise.resolve();
     }
