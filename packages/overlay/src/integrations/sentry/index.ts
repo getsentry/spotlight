@@ -59,6 +59,10 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
       };
     },
 
+    waitForUpdates: async () => {
+      await sentryDataCache.waitForUpdates();
+    },
+
     processEvent: (event: RawEventContext) => processEnvelope(event),
 
     tabs: () => {

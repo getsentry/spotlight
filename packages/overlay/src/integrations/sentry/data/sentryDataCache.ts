@@ -33,7 +33,7 @@ function relativeNsToTimestamp(startTs: number, ns: number | string) {
 
 const ERROR_EVENT_TYPES = new Set(['event', 'error']);
 // Enable 'span' type  later on. See https://github.com/getsentry/spotlight/issues/721
-const TRACE_EVENT_TYPES = new Set(['transaction'/*, 'span'*/]);
+const TRACE_EVENT_TYPES = new Set(['transaction' /*, 'span'*/]);
 const PROFILE_EVENT_TYPES = new Set(['profile']);
 const SUPPORTED_EVENT_TYPES = new Set([...ERROR_EVENT_TYPES, ...TRACE_EVENT_TYPES, ...PROFILE_EVENT_TYPES]);
 
@@ -65,6 +65,9 @@ class SentryDataCache {
 
   protected contextLinesProvider: string = new URL(CONTEXT_LINES_ENDPOINT, DEFAULT_SIDECAR_URL).href;
 
+  private pendingUpdates = 0;
+  private updateResolvers: (() => void)[] = [];
+
   constructor(
     initial: (SentryEvent & {
       event_id?: string;
@@ -72,6 +75,34 @@ class SentryDataCache {
   ) {
     for (const evt of initial) {
       this.pushEvent(evt);
+    }
+  }
+
+  /**
+   * Wait for all pending updates to complete.
+   */
+  async waitForUpdates(): Promise<void> {
+    console.log({ pn: this.pendingUpdates });
+    if (this.pendingUpdates === 0) {
+      return Promise.resolve();
+    }
+
+    return new Promise(resolve => {
+      this.updateResolvers.push(resolve);
+    });
+  }
+
+  private startUpdate() {
+    this.pendingUpdates++;
+  }
+
+  private finishUpdate() {
+    this.pendingUpdates--;
+    if (this.pendingUpdates === 0) {
+      while (this.updateResolvers.length > 0) {
+        const resolve = this.updateResolvers.shift();
+        resolve?.();
+      }
     }
   }
 
@@ -154,145 +185,150 @@ class SentryDataCache {
       event_id?: string;
     },
   ) {
-    if (!event.event_id) {
-      event.event_id = generateUuidv4();
-    }
+    this.startUpdate();
+    try {
+      if (!event.event_id) {
+        event.event_id = generateUuidv4();
+      }
 
-    if (this.eventIds.has(event.event_id)) return;
-    this.eventIds.add(event.event_id);
+      if (this.eventIds.has(event.event_id)) return;
+      this.eventIds.add(event.event_id);
 
-    if (isErrorEvent(event)) {
-      await this.processStacktrace(event);
-    }
+      if (isErrorEvent(event)) {
+        await this.processStacktrace(event);
+      }
 
-    event.timestamp = toTimestamp(event.timestamp);
-    if (event.start_timestamp) {
-      event.start_timestamp = toTimestamp(event.start_timestamp);
-    }
+      event.timestamp = toTimestamp(event.timestamp);
+      if (event.start_timestamp) {
+        event.start_timestamp = toTimestamp(event.start_timestamp);
+      }
 
-    const traceCtx = event.contexts?.trace;
+      const traceCtx = event.contexts?.trace;
 
-    this.events.push(event);
+      this.events.push(event);
 
-    if (traceCtx?.trace_id) {
-      const existingTrace = this.tracesById.get(traceCtx.trace_id);
-      const startTs = event.start_timestamp ? event.start_timestamp : new Date().getTime();
-      const trace = existingTrace ?? {
-        ...traceCtx,
-        trace_id: traceCtx.trace_id,
-        spans: new Map(),
-        spanTree: [] as Span[],
-        transactions: [] as SentryTransactionEvent[],
-        errors: 0,
-        timestamp: event.timestamp,
-        start_timestamp: startTs,
-        status: traceCtx.status,
-        rootTransactionName: event.transaction || '(unknown transaction)',
-        rootTransaction: null,
-        profileGrafted: false,
-      };
+      if (traceCtx?.trace_id) {
+        const existingTrace = this.tracesById.get(traceCtx.trace_id);
+        const startTs = event.start_timestamp ? event.start_timestamp : new Date().getTime();
+        const trace = existingTrace ?? {
+          ...traceCtx,
+          trace_id: traceCtx.trace_id,
+          spans: new Map(),
+          spanTree: [] as Span[],
+          transactions: [] as SentryTransactionEvent[],
+          errors: 0,
+          timestamp: event.timestamp,
+          start_timestamp: startTs,
+          status: traceCtx.status,
+          rootTransactionName: event.transaction || '(unknown transaction)',
+          rootTransaction: null,
+          profileGrafted: false,
+        };
 
-      if (isTraceEvent(event)) {
-        trace.transactions.push(event);
-        trace.transactions.sort(compareSpans);
+        if (isTraceEvent(event)) {
+          trace.transactions.push(event);
+          trace.transactions.sort(compareSpans);
 
-        // recompute tree as we might have txn out of order
-        // XXX: we're trusting timestamps, which may not be as reliable as we'd like
-        const spanMap: Map<string, Span> = new Map();
-        for (const txn of trace.transactions) {
-          const trace = txn.contexts.trace;
-          if (!trace || !trace.span_id || !trace.trace_id) {
-            continue;
-          }
+          // recompute tree as we might have txn out of order
+          // XXX: we're trusting timestamps, which may not be as reliable as we'd like
+          const spanMap: Map<string, Span> = new Map();
+          for (const txn of trace.transactions) {
+            const trace = txn.contexts.trace;
+            if (!trace || !trace.span_id || !trace.trace_id) {
+              continue;
+            }
 
-          spanMap.set(trace.span_id, {
-            ...trace,
-            // TypeScript is not smart enough to compose the assertion above
-            // with the spread syntax above, hence the need for these explicit
-            // `span_id` and `trace_id` assignments
-            span_id: trace.span_id,
-            trace_id: trace.trace_id,
-            tags: txn?.tags,
-            start_timestamp: txn.start_timestamp,
-            timestamp: txn.timestamp,
-            description: traceCtx.description || txn.transaction,
-            transaction: txn,
-          });
+            spanMap.set(trace.span_id, {
+              ...trace,
+              // TypeScript is not smart enough to compose the assertion above
+              // with the spread syntax above, hence the need for these explicit
+              // `span_id` and `trace_id` assignments
+              span_id: trace.span_id,
+              trace_id: trace.trace_id,
+              tags: txn?.tags,
+              start_timestamp: txn.start_timestamp,
+              timestamp: txn.timestamp,
+              description: traceCtx.description || txn.transaction,
+              transaction: txn,
+            });
 
-          if (txn.spans) {
-            for (const span of txn.spans) {
-              spanMap.set(span.span_id, {
-                ...span,
-                timestamp: toTimestamp(span.timestamp),
-                start_timestamp: toTimestamp(span.start_timestamp),
-              });
+            if (txn.spans) {
+              for (const span of txn.spans) {
+                spanMap.set(span.span_id, {
+                  ...span,
+                  timestamp: toTimestamp(span.timestamp),
+                  start_timestamp: toTimestamp(span.start_timestamp),
+                });
+              }
             }
           }
+          trace.spans = spanMap;
+          trace.spanTree = groupSpans(trace.spans);
+          graftProfileSpans(trace);
+        } else if (isErrorEvent(event)) {
+          trace.errors += 1;
         }
-        trace.spans = spanMap;
-        trace.spanTree = groupSpans(trace.spans);
-        graftProfileSpans(trace);
-      } else if (isErrorEvent(event)) {
-        trace.errors += 1;
+        trace.start_timestamp = Math.min(startTs, trace.start_timestamp);
+        trace.timestamp = Math.max(event.timestamp, trace.timestamp);
+        if (traceCtx.status !== 'ok') trace.status = traceCtx.status;
+
+        const roots = trace.transactions.filter(e => !e.contexts.trace.parent_span_id);
+        if (roots.length === 1) {
+          trace.rootTransaction = roots[0];
+          trace.rootTransactionName = roots[0].transaction || '(unknown transaction)';
+        } else if (roots.length > 1) trace.rootTransactionName = '(multiple root transactions)';
+        else trace.rootTransactionName = '(missing root transaction)';
+
+        if (!existingTrace) {
+          this.traces.unshift(trace);
+          this.tracesById.set(trace.trace_id, trace);
+        }
+
+        for (const [type, cb] of this.subscribers.values()) {
+          if (type === 'trace') {
+            cb(trace);
+          }
+        }
       }
-      trace.start_timestamp = Math.min(startTs, trace.start_timestamp);
-      trace.timestamp = Math.max(event.timestamp, trace.timestamp);
-      if (traceCtx.status !== 'ok') trace.status = traceCtx.status;
 
-      const roots = trace.transactions.filter(e => !e.contexts.trace.parent_span_id);
-      if (roots.length === 1) {
-        trace.rootTransaction = roots[0];
-        trace.rootTransactionName = roots[0].transaction || '(unknown transaction)';
-      } else if (roots.length > 1) trace.rootTransactionName = '(multiple root transactions)';
-      else trace.rootTransactionName = '(missing root transaction)';
-
-      if (!existingTrace) {
-        this.traces.unshift(trace);
-        this.tracesById.set(trace.trace_id, trace);
+      if (isProfileEvent(event)) {
+        if (!event.transactions) {
+          event.transactions = event.transaction ? [event.transaction] : [];
+        }
+        for (const txn of event.transactions) {
+          // TODO: Defer if trace is missing!
+          const trace = this.tracesById.get(txn.trace_id);
+          const timestamp =
+            trace && txn.relative_start_ns != null
+              ? relativeNsToTimestamp(trace.start_timestamp, txn.relative_start_ns)
+              : event.timestamp;
+          this.profilesByTraceId.set(txn.trace_id, {
+            platform: event.platform,
+            thread_metadata: event.profile.thread_metadata,
+            samples: event.profile.samples.map(s => ({
+              stack_id: s.stack_id,
+              thread_id: s.thread_id,
+              elapsed_since_start_ns: s.elapsed_since_start_ns,
+              start_timestamp: relativeNsToTimestamp(timestamp, s.elapsed_since_start_ns),
+            })),
+            frames: event.profile.frames,
+            stacks: event.profile.stacks.map(s => Array.from(s).reverse()),
+            timestamp,
+            active_thread_id: txn.active_thread_id,
+          });
+          if (trace) {
+            graftProfileSpans(trace);
+          }
+        }
       }
 
       for (const [type, cb] of this.subscribers.values()) {
-        if (type === 'trace') {
-          cb(trace);
+        if (type === 'event') {
+          cb(event);
         }
       }
-    }
-
-    if (isProfileEvent(event)) {
-      if (!event.transactions) {
-        event.transactions = event.transaction ? [event.transaction] : [];
-      }
-      for (const txn of event.transactions) {
-        // TODO: Defer if trace is missing!
-        const trace = this.tracesById.get(txn.trace_id);
-        const timestamp =
-          trace && txn.relative_start_ns != null
-            ? relativeNsToTimestamp(trace.start_timestamp, txn.relative_start_ns)
-            : event.timestamp;
-        this.profilesByTraceId.set(txn.trace_id, {
-          platform: event.platform,
-          thread_metadata: event.profile.thread_metadata,
-          samples: event.profile.samples.map(s => ({
-            stack_id: s.stack_id,
-            thread_id: s.thread_id,
-            elapsed_since_start_ns: s.elapsed_since_start_ns,
-            start_timestamp: relativeNsToTimestamp(timestamp, s.elapsed_since_start_ns),
-          })),
-          frames: event.profile.frames,
-          stacks: event.profile.stacks.map(s => Array.from(s).reverse()),
-          timestamp,
-          active_thread_id: txn.active_thread_id,
-        });
-        if (trace) {
-          graftProfileSpans(trace);
-        }
-      }
-    }
-
-    for (const [type, cb] of this.subscribers.values()) {
-      if (type === 'event') {
-        cb(event);
-      }
+    } finally {
+      this.finishUpdate();
     }
   }
 

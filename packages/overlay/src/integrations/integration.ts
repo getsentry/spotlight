@@ -56,6 +56,19 @@ export type Integration<T = any> = {
    * @returns void
    */
   reset?: () => void;
+
+  /**
+   * Wait for the integration to be ready before displaying the UI.
+   * This is useful if you need to load some data before displaying the UI.
+   *
+   * For example, if you need to load some data from the server or
+   * if you need to wait for some other async operation to complete.
+   *
+   * This function will be called after the setup function and before the UI is displayed.
+   * If this function returns a promise, the UI will not be displayed until the promise is resolved.
+   * @returns void | Promise<void>
+   */
+  waitForUpdates?: () => void | Promise<void>;
 };
 
 export type IntegrationTab<T> = {
