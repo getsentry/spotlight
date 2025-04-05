@@ -1,4 +1,4 @@
-import { createElement, useEffect, useState } from 'react';
+import { createElement, useEffect, useMemo, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import type { Integration, IntegrationData, IntegrationTab } from '~/integrations/integration';
 import type { NotificationCount } from '~/types';
@@ -19,11 +19,10 @@ export default function Overview({
   setTriggerButtonCount: (count: NotificationCount) => void;
   setOpen: (value: boolean) => void;
 }) {
-  const [notificationCountSum, setNotificationCountSum] = useState<NotificationCount>({ count: 0, severe: false });
   const [tabs, setTabs] = useState<ExtendedIntegrationTab<unknown>[]>([]);
 
   useEffect(() => {
-    const initializeTabs = async () => {
+    const calculateTabs = async () => {
       await Promise.all(integrations.map(integration => integration.waitForUpdates?.()));
 
       const calculatedTabs = integrations.flatMap(integration => {
@@ -40,22 +39,18 @@ export default function Overview({
       setTabs(calculatedTabs);
     };
 
-    initializeTabs();
+    calculateTabs();
   }, [integrations, integrationData]);
 
-  useEffect(() => {
-    const newNotificationSum = tabs.reduce(
+  const notificationCountSum = useMemo(() => {
+    return tabs.reduce(
       (sum, tab) => ({
         count: sum.count + (tab.notificationCount?.count || 0),
         severe: sum.severe || tab.notificationCount?.severe || false,
       }),
       { count: 0, severe: false },
     );
-
-    if (newNotificationSum.count !== notificationCountSum.count) {
-      setNotificationCountSum(newNotificationSum);
-    }
-  }, [tabs, notificationCountSum]);
+  }, [tabs]);
 
   useEffect(() => {
     setTriggerButtonCount(notificationCountSum);
