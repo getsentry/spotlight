@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
+import { useSearch } from '~/integrations/sentry/context/SearchContext';
 import classNames from '../../../../../../lib/classNames';
 import type { Span, TraceContext } from '../../../../types';
 import { getFormattedDuration, getSpanDurationClassName } from '../../../../utils/duration';
@@ -28,6 +29,7 @@ const SpanItem = ({
   setSpanNodeWidth?: (val: number) => void;
 }) => {
   const { spanId } = useParams();
+  const { query, matchesQuery, showOnlyMatched } = useSearch();
   const containerRef = useRef<HTMLLIElement>(null);
   const childrenCount = span.children ? span.children.length : 0;
   const [isItemCollapsed, setIsItemCollapsed] = useState(
@@ -50,11 +52,14 @@ const SpanItem = ({
     }
   };
 
+  const isQueried = !showOnlyMatched && query && matchesQuery(span);
+
   return (
     <li key={span.span_id} ref={containerRef}>
       <Link
         className={classNames(
           'hover:bg-primary-700 group flex rounded-sm text-sm',
+          isQueried ? 'bg-primary-200 bg-opacity-20' : '',
           spanId === span.span_id ? 'bg-primary-900' : '',
           span.tags?.source === 'profile' ? 'text-lime-500' : '',
         )}
@@ -66,6 +71,7 @@ const SpanItem = ({
         <div
           className={classNames(
             'node group-hover:bg-primary-700 rounded-sm',
+            isQueried ? 'bg-transparent' : '',
             span.status && span.status !== 'ok' ? 'text-red-400' : '',
             spanId === span.span_id ? 'bg-primary-900' : 'bg-primary-950',
           )}
@@ -101,7 +107,7 @@ const SpanItem = ({
           </span>
         </div>
         <div
-          className={classNames('waterfall group-hover:bg-primary-700 rounded-sm')}
+          className={classNames('waterfall group-hover:bg-primary-700 rounded-sm', isQueried ? '!bg-transparent' : '')}
           style={{
             left: `${spanNodeWidth}%`,
           }}

@@ -16,7 +16,7 @@ export const DEFAULT_SPAN_NODE_WIDTH = 50;
 function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
   const { spanId } = useParams();
 
-  const { setQuery } = useSearch();
+  const { setQuery, showOnlyMatched, setShowOnlyMatched } = useSearch();
 
   const { inputValue, showReset, handleChange, handleReset } = useSearchInput(setQuery, 500);
 
@@ -42,21 +42,33 @@ function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
         </div>
       </div>
       {trace.spans.size > 0 && (
-        <div className="bg-primary-950 text-primary-50 border-primary-600 hover:border-primary-500 relative mx-6 mb-4 mt-2 flex h-auto w-auto gap-2 rounded-md border py-1 pl-4 pr-6 outline-none transition-all">
-          <input
-            className="text-primary-50 h-auto w-full flex-1 bg-transparent outline-none transition-all"
-            onChange={handleChange}
-            value={inputValue}
-            placeholder="Search in Trace"
-          />
-          {showReset ? (
-            <CrossIcon
-              onClick={handleReset}
-              className="fill-primary-50 absolute right-1 top-[5px] cursor-pointer"
-              height={20}
-              width={20}
+        <div className="mx-6 mb-4 mt-2 flex gap-2">
+          <div className="bg-primary-950 text-primary-50 border-primary-600 hover:border-primary-500 relative flex h-auto w-full flex-1 gap-2 rounded-md border py-1 pl-4 pr-6 outline-none transition-all">
+            <input
+              className="text-primary-50 h-auto w-full flex-1 bg-transparent outline-none transition-all"
+              onChange={handleChange}
+              value={inputValue}
+              placeholder="Search in Trace"
             />
-          ) : null}
+            {showReset ? (
+              <CrossIcon
+                onClick={handleReset}
+                className="fill-primary-50 absolute right-1 top-[5px] cursor-pointer"
+                height={20}
+                width={20}
+              />
+            ) : null}
+          </div>
+          <button
+            className={` rounded border px-2 py-1 text-sm ${
+              showOnlyMatched
+                ? 'bg-primary-600 border-white text-white'
+                : 'bg-primary-800 text-primary-300  border-primary-500 hover:bg-primary-700'
+            }`}
+            onClick={() => setShowOnlyMatched(!showOnlyMatched)}
+          >
+            Only Show Matches
+          </button>
         </div>
       )}
       <div className="flex-1 px-2 pb-6">

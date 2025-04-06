@@ -3,14 +3,21 @@ import { Span } from '../types';
 type SearchContextType = {
   query: string;
   setQuery: (query: string) => void;
+  showOnlyMatched: boolean;
+  setShowOnlyMatched: (showOnlyMatched: boolean) => void;
 };
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export function SearchProvider({ children }: { children: ReactNode }) {
   const [query, setQuery] = useState('');
+  const [showOnlyMatched, setShowOnlyMatched] = useState(false);
 
-  return <SearchContext.Provider value={{ query, setQuery }}>{children}</SearchContext.Provider>;
+  return (
+    <SearchContext.Provider value={{ query, setQuery, showOnlyMatched, setShowOnlyMatched }}>
+      {children}
+    </SearchContext.Provider>
+  );
 }
 
 export function useSearch() {

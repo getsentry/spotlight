@@ -23,20 +23,23 @@ export default function SpanTree({
   spanNodeWidth: number;
   setSpanNodeWidth?: (val: number) => void;
 }) {
-  const { query, matchesQuery } = useSearch();
+  const { query, matchesQuery, showOnlyMatched } = useSearch();
 
   const filteredTree = useMemo(() => {
     if (!query) return tree;
-    const spanMemo = new Map<string, boolean>();
-    const hasMatchingDescendant = (span: Span): boolean => {
-      if (spanMemo.has(span.span_id)) return spanMemo.get(span.span_id)!;
-      const result = matchesQuery(span) || (span.children?.some(child => hasMatchingDescendant(child)) ?? false);
-      spanMemo.set(span.span_id, result);
-      return result;
-    };
+    if (showOnlyMatched) {
+      const spanMemo = new Map<string, boolean>();
+      const hasMatchingDescendant = (span: Span): boolean => {
+        if (spanMemo.has(span.span_id)) return spanMemo.get(span.span_id)!;
+        const result = matchesQuery(span) || (span.children?.some(child => hasMatchingDescendant(child)) ?? false);
+        spanMemo.set(span.span_id, result);
+        return result;
+      };
 
-    return tree.filter(span => hasMatchingDescendant(span));
-  }, [query, tree]);
+      return tree.filter(span => hasMatchingDescendant(span));
+    }
+    return tree;
+  }, [query, tree, showOnlyMatched, matchesQuery]);
 
   if (!tree || !tree.length) return null;
 
