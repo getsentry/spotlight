@@ -20,10 +20,12 @@ export function useSearch() {
   }
 
   const matchesQuery = useCallback(
-    (span: Span): boolean | undefined =>
-      span.span_id.includes(context.query) ||
-      span.op?.includes(context.query) ||
-      span.description?.includes(context.query),
+    (span: Span): boolean =>
+      !!(
+        span.span_id.includes(context.query) ||
+        span.op?.includes(context.query) ||
+        span.description?.includes(context.query)
+      ),
     [context.query],
   );
 
