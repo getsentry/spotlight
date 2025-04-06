@@ -20,12 +20,15 @@ export function useSearch() {
   }
 
   const matchesQuery = useCallback(
-    (span: Span): boolean =>
-      !!(
-        span.span_id.includes(context.query) ||
-        span.op?.includes(context.query) ||
-        span.description?.includes(context.query)
-      ),
+    (span: Span): boolean => {
+      const q = context.query.toLowerCase();
+      return (
+        (span.span_id.toLowerCase().includes(q) ||
+          span.op?.toLowerCase().includes(q) ||
+          span.description?.toLowerCase().includes(q)) ??
+        false
+      );
+    },
     [context.query],
   );
 
