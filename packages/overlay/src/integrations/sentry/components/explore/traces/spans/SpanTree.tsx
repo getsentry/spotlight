@@ -23,12 +23,7 @@ export default function SpanTree({
   spanNodeWidth: number;
   setSpanNodeWidth?: (val: number) => void;
 }) {
-  const { query } = useSearch();
-
-  const matchesQuery = (span: Span): boolean | undefined => {
-    return span.span_id.includes(query) || span.op?.includes(query) || span.description?.includes(query);
-  };
-
+  const { query, matchesQuery } = useSearch();
   const hasMatchingDescendant = (span: Span): boolean => {
     if (matchesQuery(span)) return true;
     if (!span.children) return false;
