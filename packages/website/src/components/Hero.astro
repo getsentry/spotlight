@@ -81,10 +81,11 @@ import ButtonLink from './ButtonLink.astro';
 </style>
 
 <div class="wrapper">
-  <h1 class="neon-header">Sentry for Development</h1>
-  <div class="sub-heading mb-4">Spotlight is a highly customizable debug tool embedded in your web app.</div>
+  <h1 class="neon-header">Debuggability Elevated</h1>
+  <div class="sub-heading mb-4">Spotlight is a debugging tool that can be embedded in your web app</div>
   <div class="flex flex-col items-center justify-center gap-2 py-4 mb-4">
-    <ButtonLink href="/about/">Get Started</ButtonLink>
+    <ButtonLink href="/about/">Learn More</ButtonLink> or
+    <button class="inline-flex items-center justify-center px-2 py-2 mx-2 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 cursor-pointer"
+    onclick="Spotlight.openSpotlight()">See It in Action</button>
   </div>
-  <img src="/images/trace.png" alt="Spotlight Hero" class="hero-image" />
 </div>

@@ -6,6 +6,7 @@ import { Trace } from '~/integrations/sentry/types';
 import { ReactComponent as CrossIcon } from '../../../../../../../assets/cross.svg';
 import sentryDataCache from '../../../../../data/sentryDataCache';
 import { getFormattedSpanDuration } from '../../../../../utils/duration';
+
 import DateTime from '../../../../DateTime';
 import SpanDetails from '../../spans/SpanDetails';
 import SpanTree from '../../spans/SpanTree';

@@ -3,14 +3,37 @@ title: Architecture of Spotlight
 ---
 import { LinkCard } from '@astrojs/starlight/components';
 
-import Architecture from "../../../public/images/architecture.png"; 
+import Architecture from "../../../public/images/architecture.png";
 
 <img src={Architecture.src} width="80%" alt="Spotlight Architecture" />
 
 ### Description
 
-Spotlight consists of 2 main components. The UI that is embedded in your Website. 
-And a Sidecar (Proxy) that streams incoming events to the UI.
+At a high level, Spotlight consists of two components:
+
+1. An overlay (`@spotlightjs/overlay`) that renders inside of your application. The overlay is a simple React application, and can
+   seamlessly run in any web application (or even independently!).
+
+2. A proxy server (`@spotlightjs/sidecar`) which enables push-based communication to the overlay. This is achieved via a simple HTTP relay,
+   allowing SDKs to push events to it, and allowing the overlay to receive events using [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events).
+
+For convenience, these packages are combined in a single package (`@spotlightjs/spotlight`), which is the recommended way to use Spotlight.
+This means that adoption in most projects is as simple as adding a single dependency:
+
+```shell
+npm add @spotlightjs/spotlight
+```
+
+Registering Spotlight in your frontend application:
+
+```typescript
+import * as Spotlight from '@spotlightjs/spotlight';
+
+// only load Spotlight in dev
+if (process.env.NODE_ENV === "development") {
+  Spotlight.init();
+}
+```
 
 You can send any kind of events to the Sidecar, it forwards it to Spotlight and the integrations within Spotlight need to understand what to do with it.
 
@@ -18,4 +41,3 @@ You can send any kind of events to the Sidecar, it forwards it to Spotlight and 
 
 Spotlight by default has a Sentry integration, if you are using a Sentry SDK and enable the Spotlight connection (only required on the Server), Spotlight is able
 to render Traces/Errors and more in your frontend.
-

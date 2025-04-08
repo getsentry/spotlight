@@ -4,6 +4,7 @@ import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
 import Breadcrumbs from '~/ui/Breadcrumbs';
+import Table from '~/ui/Table';
 import { TRANSACTION_SUMMARY_SORT_KEYS, TRANSACTION_SUMMARY_TABLE_HEADERS } from '../../constants';
 import { useSentryEvents } from '../../data/useSentryEvents';
 import { useSentryHelpers } from '../../data/useSentryHelpers';
@@ -75,8 +76,8 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
           <div className="w-11/12 px-6 py-4">
             <h1 className="truncate text-2xl font-bold">{atob(name!)}</h1>
           </div>
-          <table className="divide-primary-700 w-full table-fixed divide-y">
-            <thead>
+          <Table variant="detail">
+            <Table.Header>
               <tr>
                 {TRANSACTION_SUMMARY_TABLE_HEADERS.map(header => (
                   <th
@@ -112,9 +113,9 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
                   </th>
                 ))}
               </tr>
-            </thead>
+            </Table.Header>
 
-            <tbody>
+            <Table.Body>
               {transactionsList.map(txn => (
                 <tr key={txn.event_id} className="hover:bg-primary-900">
                   <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
@@ -142,8 +143,8 @@ export default function TransactionDetail({ showAll }: { showAll: boolean }) {
                   </td>
                 </tr>
               ))}
-            </tbody>
-          </table>
+            </Table.Body>
+          </Table>
         </div>
       ) : (
         <div className="text-primary-300 p-6">Looks like there's no transaction recorded matching this query. 🤔</div>
