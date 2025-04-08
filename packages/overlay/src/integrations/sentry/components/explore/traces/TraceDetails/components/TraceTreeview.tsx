@@ -34,7 +34,7 @@ function TraceTreeWithSearch({
   return (
     <>
       <div className="mx-6 mb-4 mt-2 flex gap-2">
-        <div className="bg-primary-950 text-primary-50 border-primary-600 hover:border-primary-500 relative mt-2 flex h-auto w-full flex-1 gap-2 rounded-md border py-1 pl-4 pr-6 outline-none transition-all">
+        <div className="bg-primary-950 text-primary-50 border-primary-600 hover:border-primary-500 relative flex h-auto w-full flex-1 gap-2 rounded-md border py-1 pl-4 pr-6 outline-none transition-all">
           <input
             className="text-primary-50 h-auto w-full flex-1 bg-transparent outline-none transition-all"
             onChange={handleChange}
@@ -51,7 +51,7 @@ function TraceTreeWithSearch({
           ) : null}
         </div>
         <button
-          className={` mt-2 rounded border px-2 py-1 text-sm ${
+          className={`rounded border px-2 py-1 text-sm ${
             showOnlyMatched
               ? 'bg-primary-600 border-white text-white'
               : 'bg-primary-800 text-primary-300  border-primary-500 hover:bg-primary-700'
