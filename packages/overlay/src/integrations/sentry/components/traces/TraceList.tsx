@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Badge from '~/ui/Badge';
-import CardList from '../../../../../components/CardList';
-import TimeSince from '../../../../../components/TimeSince';
-import classNames from '../../../../../lib/classNames';
-import { useSpotlightContext } from '../../../../../lib/useSpotlightContext';
-import { useSentryHelpers } from '../../../data/useSentryHelpers';
-import { useSentryTraces } from '../../../data/useSentrySpans';
-import { getFormattedSpanDuration } from '../../../utils/duration';
-import { truncateId } from '../../../utils/text';
-import HiddenItemsButton from '../../HiddenItemsButton';
+import CardList from '../../../../components/CardList';
+import TimeSince from '../../../../components/TimeSince';
+import classNames from '../../../../lib/classNames';
+import { useSpotlightContext } from '../../../../lib/useSpotlightContext';
+import { useSentryHelpers } from '../../data/useSentryHelpers';
+import { useSentryTraces } from '../../data/useSentrySpans';
+import { getFormattedSpanDuration } from '../../utils/duration';
+import { truncateId } from '../../utils/text';
+import HiddenItemsButton from '../shared/HiddenItemsButton';
 import { TraceRootTxnName } from './TraceDetails/components/TraceRootTxnName';
 import TraceIcon from './TraceIcon';
 
@@ -39,7 +39,7 @@ export default function TraceList() {
               <Link
                 className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
                 key={trace.trace_id}
-                to={trace.trace_id}
+                to={`/traces/${trace.trace_id}`}
               >
                 <TraceIcon trace={trace} />
                 <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
