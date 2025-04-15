@@ -1,8 +1,8 @@
-import { serializeEnvelope } from '@sentry/core';
 import type { Client, Envelope, Event, Integration } from '@sentry/core';
+import { serializeEnvelope } from '@sentry/core';
 import { trigger } from '../../lib/eventTarget';
 import { log } from '../../lib/logger';
-import sentryDataCache from './data/sentryDataCache';
+import useSentryStore from './data/sentryStore';
 
 /**
  * A Sentry integration for Spotlight integration that the Overlay will inject automatically.
@@ -32,7 +32,7 @@ export const spotlightIntegration = () => {
 
       const traceId = event.contexts?.trace?.trace_id;
       if (traceId) {
-        sentryDataCache.trackLocalTrace(traceId);
+        useSentryStore.getState().trackLocalTrace(traceId);
       }
 
       return event;

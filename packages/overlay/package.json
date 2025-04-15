@@ -30,9 +30,9 @@
     "@fontsource/raleway": "^5.1.0",
     "@microlink/react-json-view": "^1.23.4",
     "@sentry/browser": "^8.51.0",
+    "@sentry/core": "^8.51.0",
     "@sentry/react": "^8.51.0",
     "@sentry/types": "^8.51.0",
-    "@sentry/core": "^8.51.0",
     "@spotlightjs/sidecar": "workspace:*",
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/beautify": "^0.0.3",
@@ -63,7 +63,8 @@
     "vite": "^5.4.18",
     "vite-plugin-dts": "^3.9.1",
     "vite-plugin-svgr": "^3.3.0",
-    "vitest": "^0.34.6"
+    "vitest": "^0.34.6",
+    "zustand": "^5.0.3"
   },
   "volta": {
     "extends": "../../package.json"

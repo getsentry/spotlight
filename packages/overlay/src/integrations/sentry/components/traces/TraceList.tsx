@@ -65,7 +65,7 @@ export default function TraceList() {
                     <div>{getFormattedSpanDuration(trace)}</div>
                     <div>&mdash;</div>
                     <div>
-                      {trace.spans.size.toLocaleString()} spans, {trace.transactions.length.toLocaleString()} txns
+                      {trace.spans?.size?.toLocaleString()} spans, {trace.transactions.length.toLocaleString()} txns
                     </div>
                   </div>
                 </div>

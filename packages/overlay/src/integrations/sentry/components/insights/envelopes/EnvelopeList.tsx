@@ -6,7 +6,7 @@ import TimeSince from '~/components/TimeSince';
 import classNames from '~/lib/classNames';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import Badge from '~/ui/Badge';
-import sentryDataCache from '../../../data/sentryDataCache';
+import useSentryStore from '../../../data/sentryStore';
 import { useSentryEnvelopes } from '../../../data/useSentryEnvelopes';
 import { useSentryHelpers } from '../../../data/useSentryHelpers';
 import { sdkToPlatform } from '../../../utils/sdkToPlatform';
@@ -20,12 +20,13 @@ export default function EnvelopeList() {
   const context = useSpotlightContext();
   const helpers = useSentryHelpers();
   const { allEnvelopes, localEnvelopes } = useSentryEnvelopes();
+  const getEnvelopes = useSentryStore(state => state.getEnvelopes);
   const hiddenItemCount = allEnvelopes.length - localEnvelopes.length;
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
 
   const selectedEnvelope = eventId
-    ? sentryDataCache.getEnvelopes().find(({ envelope: _env }) => _env[0].event_id === eventId) || null
+    ? getEnvelopes().find(({ envelope: _env }) => _env[0].event_id === eventId) || null
     : null;
 
   if (allEnvelopes?.length) {
