@@ -3,7 +3,8 @@ import { processEnvelope } from './index';
 
 import type { Event } from '@sentry/types';
 import fs from 'node:fs';
-import sentryDataCache from './data/sentryDataCache';
+import useSentryStore from './data/sentryStore';
+import { SentryTransactionEvent } from './types';
 
 describe('Sentry Integration', () => {
   test('Process Envelope Empty', () => {
@@ -25,14 +26,14 @@ describe('Sentry Integration', () => {
     const envelope = fs.readFileSync('./_fixtures/envelope_php.txt');
     const processedEnvelope = processEnvelope({ data: envelope, contentType: 'test' });
     expect(processedEnvelope).not.toBe(undefined);
-    expect((processedEnvelope.event[1][0][1] as any).type).toEqual('transaction');
+    expect((processedEnvelope.event[1][0][1] as SentryTransactionEvent).type).toEqual('transaction');
   });
 
   test('Process Java Transaction Envelope', () => {
     const envelope = fs.readFileSync('./_fixtures/envelope_java.txt');
     const processedEnvelope = processEnvelope({ data: envelope, contentType: 'test' });
     expect(processedEnvelope.event).not.toBe(undefined);
-    expect((processedEnvelope.event[1][0][1] as any).type).toEqual('transaction');
+    expect((processedEnvelope.event[1][0][1] as SentryTransactionEvent).type).toEqual('transaction');
   });
 
   test('Process Astro SSR pageload (BE -> FE) trace', () => {
@@ -57,7 +58,8 @@ describe('Sentry Integration', () => {
     const browserTraceId = browserEvent.contexts?.trace?.trace_id;
     expect(nodeTraceId).toEqual(browserTraceId);
 
-    const createdTrace = sentryDataCache.getTraceById(nodeTraceId!)!;
+    const getTraceById = useSentryStore(state => state.getTraceById);
+    const createdTrace = getTraceById(nodeTraceId!)!;
     expect(createdTrace.spans).toHaveLength(47);
 
     expect(createdTrace.rootTransaction?.transaction).toEqual('GET /');
