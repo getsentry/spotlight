@@ -103,7 +103,7 @@ importers:
     dependencies:
       '@sentry/sveltekit':
         specifier: ^8.8.0
-        version: 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)
+        version: 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)
       '@spotlightjs/spotlight':
         specifier: workspace:*
         version: link:../../packages/spotlight
@@ -116,10 +116,10 @@ importers:
         version: 1.0.0
       '@sveltejs/adapter-auto':
         specifier: ^3.2.5
-        version: 3.2.5(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))
+        version: 3.2.5(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))
       '@sveltejs/kit':
-        specifier: ^2.8.3
-        version: 2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0))
+        specifier: ^2.20.6
+        version: 2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0))
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.0.0
         version: 3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0))
@@ -232,7 +232,7 @@ importers:
     dependencies:
       '@sentry/sveltekit':
         specifier: 8.8.0
-        version: 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)
+        version: 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)
     devDependencies:
       '@fontsource/fira-mono':
         specifier: ^4.5.10
@@ -248,10 +248,10 @@ importers:
         version: link:../../packages/spotlight
       '@sveltejs/adapter-auto':
         specifier: ^2.1.1
-        version: 2.1.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))
+        version: 2.1.1(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))
       '@sveltejs/kit':
-        specifier: ^2.8.3
-        version: 2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0))
+        specifier: ^2.20.6
+        version: 2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0))
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.0.0
         version: 3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0))
@@ -551,7 +551,7 @@ importers:
         version: 6.0.0(astro@5.3.1(@types/node@22.13.1)(jiti@1.21.6)(rollup@4.39.0)(terser@5.39.0)(typescript@5.6.2)(yaml@2.5.1))(tailwindcss@3.4.13)
       '@astrojs/vercel':
         specifier: ^8.0.8
-        version: 8.0.8(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(astro@5.3.1(@types/node@22.13.1)(jiti@1.21.6)(rollup@4.39.0)(terser@5.39.0)(typescript@5.6.2)(yaml@2.5.1))(next@15.2.4(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.39.0)(svelte@4.2.19)
+        version: 8.0.8(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(astro@5.3.1(@types/node@22.13.1)(jiti@1.21.6)(rollup@4.39.0)(terser@5.39.0)(typescript@5.6.2)(yaml@2.5.1))(next@15.2.4(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.39.0)(svelte@4.2.19)
       '@fontsource/raleway':
         specifier: ^5.1.0
         version: 5.1.0
@@ -2389,6 +2389,9 @@ packages:
   '@polka/url@1.0.0-next.28':
     resolution: {integrity: sha512-8LduaNlMZGwdZ6qWrKlfa+2M4gahzFkprZiAt2TF8uS0qQgBizKXpXURqvTJ4WtmupWxaLqjRb2UCTe72mu+Aw==}
 
+  '@polka/url@1.0.0-next.29':
+    resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
+
   '@prisma/instrumentation@5.15.0':
     resolution: {integrity: sha512-fCWOOOajTKOUEp43gRmBqwt6oN9bPJcLiloi2OG/2ED0N5z62Cuza6FDrlm3SJHQAXYlXqLE0HLdEE5WcUkOzg==}
 
@@ -3219,14 +3222,14 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^2.0.0
 
-  '@sveltejs/kit@2.8.3':
-    resolution: {integrity: sha512-DVBVwugfzzn0SxKA+eAmKqcZ7aHZROCHxH7/pyrOi+HLtQ721eEsctGb9MkhEuqj6q/9S/OFYdn37vdxzFPdvw==}
+  '@sveltejs/kit@2.20.6':
+    resolution: {integrity: sha512-ImUkSQ//Xf4N9r0HHAe5vRA7RyQ7U1Ue1YUT235Ig+IiIqbsixEulHTHrP5LtBiC8xOkJoPZQ1VZ/nWHNOaGGw==}
     engines: {node: '>=18.13'}
     hasBin: true
     peerDependencies:
-      '@sveltejs/vite-plugin-svelte': ^3.0.0 || ^4.0.0-next.1
+      '@sveltejs/vite-plugin-svelte': ^3.0.0 || ^4.0.0-next.1 || ^5.0.0
       svelte: ^4.0.0 || ^5.0.0-next.0
-      vite: ^5.0.3
+      vite: ^5.0.3 || ^6.0.0
 
   '@sveltejs/vite-plugin-svelte-inspector@2.1.0':
     resolution: {integrity: sha512-9QX28IymvBlSCqsCll5t0kQVxipsfhFFL+L2t3nTWfXnddYwxBuAEtTtlaVQpRz9c37BhJjltSeY4AJSC03SSg==}
@@ -4951,6 +4954,9 @@ packages:
   esm-env@1.0.0:
     resolution: {integrity: sha512-Cf6VksWPsTuW01vU9Mk/3vRue91Zevka5SjyNf3nEpokFRuqt/KjUQoGAwq9qMmhpLTHmXzSIrFRw8zxWzmFBA==}
 
+  esm-env@1.2.2:
+    resolution: {integrity: sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==}
+
   espree@9.6.1:
     resolution: {integrity: sha512-oruZaFkjorTpF32kDSI5/75ViwGeZginGGy2NoOSg3Q9bnwlnmDm4HLnkl0RE3n+njDXR037aY1+x58Z/zFdwQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -5289,15 +5295,9 @@ packages:
     resolution: {integrity: sha512-DpLKbNU4WylpxJykQujfCcwYWiV/Jhm50Goo0wrVILAv5jOr9d+H+UR3PhSCD2rCCEIg0uc+G+muBTwD54JhDQ==}
     engines: {node: '>= 0.4'}
 
-  globalyzer@0.1.0:
-    resolution: {integrity: sha512-40oNTM9UfG6aBmuKxk/giHn5nQ8RVz/SS4Ir6zgzOv9/qC3kKZ9v4etGTcJbEl/NyVQH7FGU7d+X1egr57Md2Q==}
-
   globby@11.1.0:
     resolution: {integrity: sha512-jhIXaOzy1sb8IyocaruWSn1TjmnBVs8Ayhcy83rmxNJ8q2uWKCAj3CnJY+KpGSXCueAPc0i05kVvVKtP1t9S3g==}
     engines: {node: '>=10'}
-
-  globrex@0.1.2:
-    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
 
   gopd@1.0.1:
     resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}
@@ -6295,6 +6295,10 @@ packages:
 
   mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
+    engines: {node: '>=10'}
+
+  mrmime@2.0.1:
+    resolution: {integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==}
     engines: {node: '>=10'}
 
   ms@2.0.0:
@@ -7337,8 +7341,8 @@ packages:
   server-destroy@1.0.1:
     resolution: {integrity: sha512-rb+9B5YBIEzYcD6x2VKidaa+cqYBJQKnU4oe4E3ANwRRN56yk/ua1YCJT1n21NTS8w6CcOclAKNP3PhdCXKYtQ==}
 
-  set-cookie-parser@2.7.0:
-    resolution: {integrity: sha512-lXLOiqpkUumhRdFF3k1osNXCy9akgx/dyPZ5p8qAg9seJzXr5ZrlqZuWIMuY6ejOsVLE6flJ5/h3lsn57fQ/PQ==}
+  set-cookie-parser@2.7.1:
+    resolution: {integrity: sha512-IOc8uWeOZgnb3ptbCURJWNjWUPcO3ZnTTdzsurqERrP6nPyv+paC55vJM0LpOlT2ne+Ix+9+CRG1MNLlyZ4GjQ==}
 
   setimmediate@1.0.5:
     resolution: {integrity: sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==}
@@ -7403,8 +7407,8 @@ packages:
     resolution: {integrity: sha512-94Bdh3cC2PKrbgSOUqTiGPWVZeSiXfKOVZNJniWoqrWrRkB1CJzBU3NEbiTsPcYy1lDsANA/THzS+9WBiy5nfQ==}
     engines: {node: '>= 10'}
 
-  sirv@3.0.0:
-    resolution: {integrity: sha512-BPwJGUeDaDCHihkORDchNyyTvWFhcusy1XMmhEVTQTwGeybFbp8YEmB+njbPnth1FibULBSBVwCQni25XlCUDg==}
+  sirv@3.0.1:
+    resolution: {integrity: sha512-FoqMu0NCGBLCcAkS1qA+XJIQTR6/JHfQXl+uGteNCQ76T91DMUjPa9xfmeqMY3z80nLSg9yQmNjK0Px6RWsH/A==}
     engines: {node: '>=18'}
 
   sisteransi@1.0.5:
@@ -7770,9 +7774,6 @@ packages:
 
   thenify@3.3.1:
     resolution: {integrity: sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw==}
-
-  tiny-glob@0.2.9:
-    resolution: {integrity: sha512-g/55ssRPUjShh+xkfx9UPDXqhckHEsHr4Vd9zX55oSdGZc/MD0m3sferOkwWtp98bv+kcVfEHtRJgBVJzelrzg==}
 
   tiny-invariant@1.3.3:
     resolution: {integrity: sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==}
@@ -8921,10 +8922,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/vercel@8.0.8(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(astro@5.3.1(@types/node@22.13.1)(jiti@1.21.6)(rollup@4.39.0)(terser@5.39.0)(typescript@5.6.2)(yaml@2.5.1))(next@15.2.4(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.39.0)(svelte@4.2.19)':
+  '@astrojs/vercel@8.0.8(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(astro@5.3.1(@types/node@22.13.1)(jiti@1.21.6)(rollup@4.39.0)(terser@5.39.0)(typescript@5.6.2)(yaml@2.5.1))(next@15.2.4(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(rollup@4.39.0)(svelte@4.2.19)':
     dependencies:
       '@astrojs/internal-helpers': 0.5.1
-      '@vercel/analytics': 1.4.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(next@15.2.4(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)
+      '@vercel/analytics': 1.4.1(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(next@15.2.4(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)
       '@vercel/edge': 1.2.1
       '@vercel/nft': 0.29.2(rollup@4.39.0)
       '@vercel/routing-utils': 5.0.4
@@ -10868,6 +10869,8 @@ snapshots:
 
   '@polka/url@1.0.0-next.28': {}
 
+  '@polka/url@1.0.0-next.29': {}
+
   '@prisma/instrumentation@5.15.0':
     dependencies:
       '@opentelemetry/api': 1.9.0
@@ -11727,7 +11730,7 @@ snapshots:
       magic-string: 0.30.17
       svelte: 4.2.19
 
-  '@sentry/sveltekit@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)':
+  '@sentry/sveltekit@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)':
     dependencies:
       '@sentry/core': 8.8.0
       '@sentry/node': 8.8.0
@@ -11736,7 +11739,7 @@ snapshots:
       '@sentry/types': 8.8.0
       '@sentry/utils': 8.8.0
       '@sentry/vite-plugin': 2.18.0
-      '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0))
+      '@sveltejs/kit': 2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0))
       magic-string: 0.30.7
       magicast: 0.2.8
       sorcery: 0.11.0
@@ -11750,7 +11753,7 @@ snapshots:
       - supports-color
       - svelte
 
-  '@sentry/sveltekit@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)':
+  '@sentry/sveltekit@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)':
     dependencies:
       '@sentry/core': 8.8.0
       '@sentry/node': 8.8.0
@@ -11759,7 +11762,7 @@ snapshots:
       '@sentry/types': 8.8.0
       '@sentry/utils': 8.8.0
       '@sentry/vite-plugin': 2.18.0
-      '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0))
+      '@sveltejs/kit': 2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0))
       magic-string: 0.30.7
       magicast: 0.2.8
       sorcery: 0.11.0
@@ -11900,68 +11903,65 @@ snapshots:
 
   '@stricli/core@1.1.1': {}
 
-  '@sveltejs/adapter-auto@2.1.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))':
+  '@sveltejs/adapter-auto@2.1.1(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))':
     dependencies:
-      '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0))
+      '@sveltejs/kit': 2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0))
       import-meta-resolve: 4.1.0
 
-  '@sveltejs/adapter-auto@3.2.5(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))':
+  '@sveltejs/adapter-auto@3.2.5(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))':
     dependencies:
-      '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0))
+      '@sveltejs/kit': 2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0))
       import-meta-resolve: 4.1.0
 
-  '@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0))':
+  '@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0))':
     dependencies:
       '@sveltejs/vite-plugin-svelte': 3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@20.10.4)(terser@5.39.0))
       '@types/cookie': 0.6.0
       cookie: 0.6.0
       devalue: 5.1.1
-      esm-env: 1.0.0
+      esm-env: 1.2.2
       import-meta-resolve: 4.1.0
       kleur: 4.1.5
-      magic-string: 0.30.11
-      mrmime: 2.0.0
+      magic-string: 0.30.17
+      mrmime: 2.0.1
       sade: 1.8.1
-      set-cookie-parser: 2.7.0
-      sirv: 3.0.0
+      set-cookie-parser: 2.7.1
+      sirv: 3.0.1
       svelte: 4.2.19
-      tiny-glob: 0.2.9
       vite: 5.4.18(@types/node@20.10.4)(terser@5.39.0)
 
-  '@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0))':
+  '@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0))':
     dependencies:
       '@sveltejs/vite-plugin-svelte': 3.1.2(svelte@4.2.19)(vite@5.4.18(@types/node@22.13.1)(terser@5.39.0))
       '@types/cookie': 0.6.0
       cookie: 0.6.0
       devalue: 5.1.1
-      esm-env: 1.0.0
+      esm-env: 1.2.2
       import-meta-resolve: 4.1.0
       kleur: 4.1.5
-      magic-string: 0.30.11
-      mrmime: 2.0.0
+      magic-string: 0.30.17
+      mrmime: 2.0.1
       sade: 1.8.1
-      set-cookie-parser: 2.7.0
-      sirv: 3.0.0
+      set-cookie-parser: 2.7.1
+      sirv: 3.0.1
       svelte: 4.2.19
-      tiny-glob: 0.2.9
       vite: 5.4.18(@types/node@22.13.1)(terser@5.39.0)
 
-  '@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1))':
+  '@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1))':
     dependencies:
       '@sveltejs/vite-plugin-svelte': 5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1))
       '@types/cookie': 0.6.0
       cookie: 0.6.0
       devalue: 5.1.1
-      esm-env: 1.0.0
+      esm-env: 1.2.2
       import-meta-resolve: 4.1.0
       kleur: 4.1.5
-      magic-string: 0.30.11
-      mrmime: 2.0.0
+      magic-string: 0.30.17
+      mrmime: 2.0.1
       sade: 1.8.1
-      set-cookie-parser: 2.7.0
-      sirv: 3.0.0
+      set-cookie-parser: 2.7.1
+      sirv: 3.0.1
       svelte: 4.2.19
-      tiny-glob: 0.2.9
       vite: 6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)
     optional: true
 
@@ -12539,9 +12539,9 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vercel/analytics@1.4.1(@sveltejs/kit@2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(next@15.2.4(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)':
+  '@vercel/analytics@1.4.1(@sveltejs/kit@2.20.6(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(next@15.2.4(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(svelte@4.2.19)':
     optionalDependencies:
-      '@sveltejs/kit': 2.8.3(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1))
+      '@sveltejs/kit': 2.20.6(@sveltejs/vite-plugin-svelte@5.0.3(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1)))(svelte@4.2.19)(vite@6.2.0(@types/node@22.13.1)(jiti@1.21.6)(terser@5.39.0)(yaml@2.5.1))
       next: 15.2.4(@opentelemetry/api@1.9.0)(@playwright/test@1.48.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
       svelte: 4.2.19
@@ -14343,6 +14343,8 @@ snapshots:
 
   esm-env@1.0.0: {}
 
+  esm-env@1.2.2: {}
+
   espree@9.6.1:
     dependencies:
       acorn: 8.14.0
@@ -14745,8 +14747,6 @@ snapshots:
       gopd: 1.0.1
     optional: true
 
-  globalyzer@0.1.0: {}
-
   globby@11.1.0:
     dependencies:
       array-union: 2.1.0
@@ -14755,8 +14755,6 @@ snapshots:
       ignore: 5.3.2
       merge2: 1.4.1
       slash: 3.0.0
-
-  globrex@0.1.2: {}
 
   gopd@1.0.1:
     dependencies:
@@ -16145,6 +16143,8 @@ snapshots:
 
   mrmime@2.0.0: {}
 
+  mrmime@2.0.1: {}
+
   ms@2.0.0: {}
 
   ms@2.1.3: {}
@@ -17329,7 +17329,7 @@ snapshots:
 
   server-destroy@1.0.1: {}
 
-  set-cookie-parser@2.7.0: {}
+  set-cookie-parser@2.7.1: {}
 
   setimmediate@1.0.5: {}
 
@@ -17416,13 +17416,13 @@ snapshots:
   sirv@2.0.4:
     dependencies:
       '@polka/url': 1.0.0-next.28
-      mrmime: 2.0.0
+      mrmime: 2.0.1
       totalist: 3.0.1
 
-  sirv@3.0.0:
+  sirv@3.0.1:
     dependencies:
-      '@polka/url': 1.0.0-next.28
-      mrmime: 2.0.0
+      '@polka/url': 1.0.0-next.29
+      mrmime: 2.0.1
       totalist: 3.0.1
 
   sisteransi@1.0.5: {}
@@ -17866,11 +17866,6 @@ snapshots:
   thenify@3.3.1:
     dependencies:
       any-promise: 1.3.0
-
-  tiny-glob@0.2.9:
-    dependencies:
-      globalyzer: 0.1.0
-      globrex: 0.1.2
 
   tiny-invariant@1.3.3: {}
 
