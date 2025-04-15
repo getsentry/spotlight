@@ -3,7 +3,7 @@ import Tabs from '../../../../components/Tabs';
 import sentryDataCache from '../../data/sentryDataCache';
 import type { SentryEvent } from '../../types';
 import { createTab } from '../../utils/tabs';
-import PlatformIcon from '../PlatformIcon';
+import PlatformIcon from '../shared/PlatformIcon';
 import Event, { EventTitle } from './Event';
 import EventBreadcrumbs from './EventBreadcrumbs';
 import EventContexts from './EventContexts';
@@ -41,16 +41,13 @@ export default function EventDetails() {
           <div className="text-primary-300 font-mono">
             <div>
               T:{' '}
-              <Link className="cursor-pointer underline" to={`/explore/traces/${traceCtx.trace_id}`}>
+              <Link className="cursor-pointer underline" to={`/traces/${traceCtx.trace_id}`}>
                 {traceCtx.trace_id}
               </Link>
             </div>
             <div>
               S:{' '}
-              <Link
-                className="cursor-pointer underline"
-                to={`/explore/traces/${traceCtx.trace_id}/spans/${traceCtx.span_id}`}
-              >
+              <Link className="cursor-pointer underline" to={`/traces/${traceCtx.trace_id}/spans/${traceCtx.span_id}`}>
                 {traceCtx.span_id}
               </Link>
             </div>

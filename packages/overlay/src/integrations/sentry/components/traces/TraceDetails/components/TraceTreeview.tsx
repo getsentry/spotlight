@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { SearchProvider, useSearch } from '~/integrations/sentry/context/SearchContext';
 import useSearchInput from '~/integrations/sentry/hooks/useSearchInput';
-import { Trace } from '~/integrations/sentry/types';
+import type { Trace } from '~/integrations/sentry/types';
 import { ReactComponent as CrossIcon } from '../../../../../../../assets/cross.svg';
-import sentryDataCache from '../../../../../data/sentryDataCache';
-import { getFormattedSpanDuration } from '../../../../../utils/duration';
+import sentryDataCache from '../../../../data/sentryDataCache';
+import { getFormattedSpanDuration } from '../../../../utils/duration';
 
-import DateTime from '../../../../DateTime';
+import DateTime from '../../../shared/DateTime';
 import SpanDetails from '../../spans/SpanDetails';
 import SpanTree from '../../spans/SpanTree';
 

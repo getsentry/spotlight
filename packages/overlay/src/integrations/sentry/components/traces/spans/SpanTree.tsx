@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useSearch } from '~/integrations/sentry/context/SearchContext';
-import classNames from '../../../../../../lib/classNames';
-import type { Span, TraceContext } from '../../../../types';
+import classNames from '../../../../../lib/classNames';
+import type { Span, TraceContext } from '../../../types';
 import SpanItem from './SpanItem';
 
 export default function SpanTree({
