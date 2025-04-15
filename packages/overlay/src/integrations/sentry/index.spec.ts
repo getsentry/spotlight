@@ -58,8 +58,8 @@ describe('Sentry Integration', () => {
     const browserTraceId = browserEvent.contexts?.trace?.trace_id;
     expect(nodeTraceId).toEqual(browserTraceId);
 
-    const getTraceById = useSentryStore(state => state.getTraceById);
-    const createdTrace = getTraceById(nodeTraceId!)!;
+    const store = useSentryStore.getState();
+    const createdTrace = store.getTraceById(nodeTraceId!)!;
     expect(createdTrace.spans).toHaveLength(47);
 
     expect(createdTrace.rootTransaction?.transaction).toEqual('GET /');
