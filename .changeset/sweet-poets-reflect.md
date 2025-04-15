@@ -1,5 +1,5 @@
 ---
-'@spotlightjs/overlay': patch
+'@spotlightjs/overlay': minor
 ---
 
 Include filter functionality when searching spans
