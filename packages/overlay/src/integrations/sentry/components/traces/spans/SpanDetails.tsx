@@ -1,11 +1,12 @@
 import { type ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
+import { isErrorEvent } from '~/integrations/sentry/utils/sentry';
 import Table from '~/ui/Table';
 import JsonViewer from '../../../../../components/JsonViewer';
 import SidePanel, { SidePanelHeader } from '../../../../../ui/SidePanel';
 import { DB_SPAN_REGEX } from '../../../constants';
-import dataCache, { isErrorEvent } from '../../../data/sentryDataCache';
+import useSentryStore from '../../../data/sentryStore';
 import type { SentryErrorEvent, Span, TraceContext } from '../../../types';
 import { formatBytes } from '../../../utils/bytes';
 import { getFormattedDuration } from '../../../utils/duration';
@@ -88,10 +89,11 @@ export default function SpanDetails({
 }) {
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
   const spanRelativeStart = span.start_timestamp - startTimestamp;
+  const getEventsByTrace = useSentryStore(state => state.getEventsByTrace);
 
   const spanDuration = span.timestamp - span.start_timestamp;
 
-  const errors = span.trace_id ? dataCache.getEventsByTrace(span.trace_id).filter(isErrorEvent) : [];
+  const errors = span.trace_id ? getEventsByTrace(span.trace_id).filter(isErrorEvent) : [];
 
   return (
     <SidePanel backto={`/traces/${span.trace_id}`}>
