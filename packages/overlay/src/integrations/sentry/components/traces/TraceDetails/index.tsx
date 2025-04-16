@@ -21,6 +21,7 @@ export default function TraceDetails() {
     return <p className="text-primary-300 p-6">Unknown trace id</p>;
   }
 
+  // TODO: Don't use dataCache directly, use a helper like useSentryEvents
   const trace = getTraceById(traceId);
 
   if (!trace) {

@@ -219,6 +219,8 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
         trace.transactions.push(event);
         trace.transactions.sort(compareSpans);
 
+        // recompute tree as we might have txn out of order
+        // XXX: we're trusting timestamps, which may not be as reliable as we'd like
         const spanMap: Map<string, Span> = new Map();
         for (const txn of trace.transactions) {
           const trace = txn.contexts.trace;
@@ -228,6 +230,9 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
 
           spanMap.set(trace.span_id, {
             ...trace,
+            // TypeScript is not smart enough to compose the assertion above
+            // with the spread syntax above, hence the need for these explicit
+            // `span_id` and `trace_id` assignments
             span_id: trace.span_id,
             trace_id: trace.trace_id,
             tags: txn?.tags,
@@ -267,8 +272,9 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
       if (!existingTrace) {
         const newTracesById = new Map(tracesById);
         newTracesById.set(trace.trace_id, trace);
+        traces.unshift(trace);
         set({
-          traces: [trace, ...traces],
+          traces,
           tracesById: newTracesById,
         });
       }

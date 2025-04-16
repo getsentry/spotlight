@@ -6,16 +6,7 @@ export function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
 }
 
 export function isProfileEvent(event: SentryEvent): event is SentryProfileV1Event {
-  return (
-    !!event.type &&
-    PROFILE_EVENT_TYPES.has(event.type) &&
-    (event as SentryProfileV1Event).version === '1' &&
-    'profile' in event &&
-    'thread_metadata' in (event as SentryProfileV1Event).profile &&
-    'samples' in (event as SentryProfileV1Event).profile &&
-    'frames' in (event as SentryProfileV1Event).profile &&
-    'stacks' in (event as SentryProfileV1Event).profile
-  );
+  return !!event.type && PROFILE_EVENT_TYPES.has(event.type) && (event as SentryProfileV1Event).version === '1';
 }
 
 export function isTraceEvent(event: SentryEvent): event is SentryTransactionEvent {
