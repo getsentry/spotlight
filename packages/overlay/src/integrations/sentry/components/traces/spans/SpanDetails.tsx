@@ -1,15 +1,16 @@
 import { type ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { format as formatSQL } from 'sql-formatter';
-import JsonViewer from '../../../../../../components/JsonViewer';
-import SidePanel, { SidePanelHeader } from '../../../../../../ui/SidePanel';
-import { DB_SPAN_REGEX } from '../../../../constants';
-import dataCache, { isErrorEvent } from '../../../../data/sentryDataCache';
-import type { SentryErrorEvent, Span, TraceContext } from '../../../../types';
-import { formatBytes } from '../../../../utils/bytes';
-import { getFormattedDuration } from '../../../../utils/duration';
-import DateTime from '../../../DateTime';
-import { ErrorTitle } from '../../../events/error/Error';
+import Table from '~/ui/Table';
+import JsonViewer from '../../../../../components/JsonViewer';
+import SidePanel, { SidePanelHeader } from '../../../../../ui/SidePanel';
+import { DB_SPAN_REGEX } from '../../../constants';
+import dataCache, { isErrorEvent } from '../../../data/sentryDataCache';
+import type { SentryErrorEvent, Span, TraceContext } from '../../../types';
+import { formatBytes } from '../../../utils/bytes';
+import { getFormattedDuration } from '../../../utils/duration';
+import { ErrorTitle } from '../../events/error/Error';
+import DateTime from '../../shared/DateTime';
 import SpanTree from './SpanTree';
 
 function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) {
@@ -93,7 +94,7 @@ export default function SpanDetails({
   const errors = span.trace_id ? dataCache.getEventsByTrace(span.trace_id).filter(isErrorEvent) : [];
 
   return (
-    <SidePanel backto={`/explore/traces/${span.trace_id}`}>
+    <SidePanel backto={`/traces/${span.trace_id}`}>
       <SidePanelHeader
         title="Span Details"
         subtitle={
@@ -106,7 +107,7 @@ export default function SpanDetails({
             {span.span_id}
           </>
         }
-        backto={`/explore/traces/${span.trace_id}`}
+        backto={`/traces/${span.trace_id}`}
       />
 
       <div className="space-y-6">
@@ -151,8 +152,8 @@ export default function SpanDetails({
         <div>
           <h2 className="mb-2 font-bold uppercase">Tags</h2>
           {span.tags && Object.keys(span.tags).length ? (
-            <table className="w-full text-sm">
-              <tbody>
+            <Table className="w-full text-sm">
+              <Table.Body>
                 {Object.entries(span.tags).map(([key, value]) => (
                   <tr key={key} className="text-primary-300">
                     <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
@@ -163,16 +164,16 @@ export default function SpanDetails({
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
+              </Table.Body>
+            </Table>
           ) : (
             <div className="text-primary-300">No tags recorded for this span.</div>
           )}
         </div>
         <div>
           <h2 className="mb-2 font-bold uppercase">Context</h2>
-          <table className="w-full text-sm">
-            <tbody>
+          <Table className="w-full text-sm">
+            <Table.Body>
               {[
                 ['status', span.status || ''],
                 ['trace', span.trace_id],
@@ -182,7 +183,7 @@ export default function SpanDetails({
                   span.parent_span_id ? (
                     <Link
                       className="underline"
-                      to={`/explore/traces/${span.trace_id}/spans/${span.parent_span_id}`}
+                      to={`/traces/${span.trace_id}/spans/${span.parent_span_id}`}
                       key={`link-to-${span.parent_span_id}`}
                     >
                       {span.parent_span_id}
@@ -202,15 +203,15 @@ export default function SpanDetails({
                   </td>
                 </tr>
               ))}
-            </tbody>
-          </table>
+            </Table.Body>
+          </Table>
         </div>
 
         {span.data && (
           <div>
             <h2 className="mb-2 font-bold uppercase">Data</h2>
-            <table className="w-full text-sm">
-              <tbody>
+            <Table className="w-full text-sm">
+              <Table.Body>
                 {Object.entries(span.data).map(([key, value]) => (
                   <tr key={key} className="text-primary-300">
                     <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
@@ -221,8 +222,8 @@ export default function SpanDetails({
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
+              </Table.Body>
+            </Table>
           </div>
         )}
 

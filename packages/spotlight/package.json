@@ -44,17 +44,14 @@
     "@sentry/node": "^8.49.0",
     "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
-    "import-meta-resolve": "^4.1.0",
-    "macho-unsign": "^2.0.6",
-    "portable-executable-signature": "^2.0.6",
-    "postject": "1.0.0-alpha.6"
+    "import-meta-resolve": "^4.1.0"
   },
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "^18.19.55",
     "fossilize": "^0.4.2",
     "typescript": "^5.6.2",
-    "vite": "^5.4.14"
+    "vite": "^5.4.18"
   },
   "volta": {
     "extends": "../../package.json"

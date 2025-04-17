@@ -1,18 +1,26 @@
 import type { Envelope } from '@sentry/core';
 import { useState } from 'react';
 import type { RawEventContext } from '~/integrations/integration';
+import { parseStringFromBuffer } from '~/integrations/sentry/utils/bufferParsers';
 import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
 import JsonViewer from '../../../../../components/JsonViewer';
 
 export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; rawEnvelope: RawEventContext } }) {
   const [showRawJSON, setShowRawJSON] = useState<boolean>(false);
   const { envelope, rawEnvelope } = data;
+
   const header = envelope[0];
   const items = envelope[1];
+
+  const rawEnvelopeData = {
+    ...rawEnvelope,
+    data: typeof rawEnvelope.data === 'string' ? rawEnvelope.data : parseStringFromBuffer(rawEnvelope.data),
+  };
+
   const downloadUrl = URL.createObjectURL(new Blob([rawEnvelope.data], { type: rawEnvelope.contentType }));
   const downloadName = `${header.event_id}-${rawEnvelope.contentType}.bin`;
   return (
-    <SidePanel backto="/explore/envelopes">
+    <SidePanel backto="/insights/envelopes">
       <SidePanelHeader
         title="Envelope Details"
         subtitle={
@@ -23,7 +31,7 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
             </a>
           </>
         }
-        backto="/explore/envelopes"
+        backto="/insights/envelopes"
       />
       <label htmlFor="json-toggle" className="mb-8 flex cursor-pointer items-center">
         <div className="relative flex h-4 items-center gap-2">
@@ -42,7 +50,7 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
 
       {showRawJSON ? (
         <div className="flex-1 overflow-y-auto">
-          <JsonViewer data={rawEnvelope} />
+          <JsonViewer data={rawEnvelopeData} />
         </div>
       ) : (
         <div className="flex flex-col gap-6 space-y-6">

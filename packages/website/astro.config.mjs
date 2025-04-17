@@ -71,6 +71,14 @@ export default defineConfig({
               "Spotlight is Sentry for Development. Inspired by an old project, Django Debug Toolbar, Spotlight brings a rich debug overlay into development environments, and it does it by leveraging the existing power of Sentry's SDKs.",
           },
         },
+        { tag: 'script', content: `window.__spotlight = { initOptions: {startFrom: '/explore'}}` },
+        {
+          tag: 'script',
+          attrs: {
+            src: 'https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.iife.js',
+            crossOrigin: 'anonymous',
+          },
+        },
       ],
       sidebar: [
         {
@@ -96,6 +104,10 @@ export default defineConfig({
             {
               label: 'Spotlight',
               link: '/setup/',
+            },
+            {
+              label: 'For Django',
+              link: '/setup/django/',
             },
             {
               label: 'For Astro',

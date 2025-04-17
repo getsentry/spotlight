@@ -1,7 +1,8 @@
 import { Nullable } from 'vitest';
+import Table from '~/ui/Table';
 import JsonViewer from '../../../../components/JsonViewer';
 import type { SentryEvent } from '../../types';
-import Tags from '../Tags';
+import Tags from '../shared/Tags';
 
 const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
   name: "Mighty Fighter",
@@ -53,8 +54,8 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
         {contextEntries.map(([ctxKey, ctxValues]) => (
           <div key={ctxKey}>
             <h2 className="font-bold uppercase">{ctxKey}</h2>
-            <table className="w-full">
-              <tbody>
+            <Table className="w-full">
+              <Table.Body>
                 {Object.entries(ctxValues).map(([key, value]) => (
                   <tr key={`${ctxKey}-${key}`}>
                     <th className="text-primary-300 w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
@@ -69,8 +70,8 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
+              </Table.Body>
+            </Table>
           </div>
         ))}
       </div>

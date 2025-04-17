@@ -67,3 +67,34 @@ import { Content as CodeBlock } from './codeblock.mdx';
 
 <DocsCta />
 <Footer />
+<script is:inline>
+  (function spotlightGlow() {
+    const host = document.querySelector('#sentry-spotlight-root');
+    if (!host) {
+      setTimeout(spotlightGlow, 500);
+      return;
+    }
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync( `
+      .shadow-pulse {
+        animation: pulse 4s 10;
+      }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(0,0,0,0);
+        }
+        40% {
+            box-shadow: 0 0 105px 35px rgba(79, 70, 229, 1);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(0,0,0,0);
+        }
+    `)
+    host.shadowRoot.adoptedStyleSheets.push(sheet);
+    const trigger = host.shadowRoot.querySelector('#spotlight-overlay-trigger');
+    Spotlight.onOpen(() => {
+      trigger.classList.remove('shadow-pulse');
+    });
+    trigger.classList.add('shadow-pulse');
+  })();
+</script>

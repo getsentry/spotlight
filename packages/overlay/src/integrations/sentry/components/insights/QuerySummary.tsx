@@ -4,6 +4,7 @@ import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
 import Breadcrumbs from '~/ui/Breadcrumbs';
+import Table from '~/ui/Table';
 import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
 import useSort from '../../hooks/useSort';
@@ -70,8 +71,8 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
           },
         ]}
       />
-      <table className="divide-primary-700 w-full table-fixed divide-y">
-        <thead>
+      <Table variant="detail">
+        <Table.Header>
           <tr>
             {QUERY_SUMMARY_HEADERS.map(header => (
               <th
@@ -106,20 +107,17 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
               </th>
             ))}
           </tr>
-        </thead>
-        <tbody>
+        </Table.Header>
+        <Table.Body>
           {filteredDBSpans.map(span => (
             <tr key={span.span_id} className="hover:bg-primary-900">
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                <Link className="truncate hover:underline" to={`/explore/traces/${span.trace_id}`}>
+                <Link className="truncate hover:underline" to={`/traces/${span.trace_id}`}>
                   {truncateId(span.trace_id)}
                 </Link>
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                <Link
-                  className="truncate hover:underline"
-                  to={`/explore/traces/${span.trace_id}/spans/${span.span_id}`}
-                >
+                <Link className="truncate hover:underline" to={`/traces/${span.trace_id}/spans/${span.span_id}`}>
                   {truncateId(span.span_id)}
                 </Link>
               </td>
@@ -128,8 +126,8 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
               </td>
             </tr>
           ))}
-        </tbody>
-      </table>
+        </Table.Body>
+      </Table>
     </>
   );
 };

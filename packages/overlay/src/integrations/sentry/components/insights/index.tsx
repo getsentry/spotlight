@@ -4,11 +4,13 @@ import Tabs from '~/components/Tabs';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import { useSentrySpanCounts } from '../../data/useSentrySpans';
 import { createTab } from '../../utils/tabs';
-import HiddenItemsButton from '../HiddenItemsButton';
+import HiddenItemsButton from '../shared/HiddenItemsButton';
+import EnvelopesTab from './envelopes';
 import FunctionProfiles from './FunctionProfiles';
 import Queries from './Queries';
 import QuerySummary from './QuerySummary';
 import Resources from './Resources';
+import SdksTab from './sdks';
 import WebVitals from './webVitals';
 import WebVitalsDetail from './webVitals/WebVitalsDetail';
 
@@ -25,6 +27,8 @@ export default function InsightsTabDetails() {
     createTab('webvitals', 'Web Vitals'),
     createTab('resources', 'Resources'),
     createTab('functionprofiles', 'Function Profiling'),
+    createTab('envelopes', 'Envelopes'),
+    createTab('sdks', 'SDKs'),
   ];
 
   return (
@@ -38,13 +42,15 @@ export default function InsightsTabDetails() {
         />
       )}
       <Tabs tabs={tabs} nested />
-      <div className="flex-1">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
           <Route path="queries/:type" element={<QuerySummary showAll={showAll} />} />
           <Route path="resources" element={<Resources showAll={showAll} />} />
           <Route path="webvitals" element={<WebVitals />} />
           <Route path="webvitals/:page" element={<WebVitalsDetail />} />
           <Route path="functionprofiles" element={<FunctionProfiles />} />
+          <Route path="envelopes/*" element={<EnvelopesTab />} />
+          <Route path="sdks/*" element={<SdksTab />} />
           {/* Default tab */}
           <Route path="queries" element={<Queries showAll={showAll} />} />
           <Route path="*" element={<Navigate to="/insights/queries" replace />} />

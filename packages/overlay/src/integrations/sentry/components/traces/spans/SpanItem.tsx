@@ -1,12 +1,12 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
 import { useSearch } from '~/integrations/sentry/context/SearchContext';
-import classNames from '../../../../../../lib/classNames';
-import type { Span, TraceContext } from '../../../../types';
-import { getFormattedDuration, getSpanDurationClassName } from '../../../../utils/duration';
-import PlatformIcon from '../../../PlatformIcon';
-import SpanResizer from '../../../SpanResizer';
+import classNames from '../../../../../lib/classNames';
+import type { Span, TraceContext } from '../../../types';
+import { getFormattedDuration, getSpanDurationClassName } from '../../../utils/duration';
+import PlatformIcon from '../../shared/PlatformIcon';
+import SpanResizer from '../../shared/SpanResizer';
 import SpanTree from './SpanTree';
 
 const SpanItem = ({
@@ -29,7 +29,7 @@ const SpanItem = ({
   setSpanNodeWidth?: (val: number) => void;
 }) => {
   const { spanId } = useParams();
-  const { query } = useSearch();
+  const { query, matchesQuery, showOnlyMatched } = useSearch();
   const containerRef = useRef<HTMLLIElement>(null);
   const childrenCount = span.children ? span.children.length : 0;
   const [isItemCollapsed, setIsItemCollapsed] = useState(
@@ -51,10 +51,8 @@ const SpanItem = ({
       setSpanNodeWidth(newLeftWidth);
     }
   };
-  const isQueried = useMemo(() => {
-    if (!query) return false;
-    return span.span_id.includes(query) || span.op?.includes(query) || span.description?.includes(query);
-  }, [query, span.span_id, span.op, span.description]);
+
+  const isQueried = !showOnlyMatched && query && matchesQuery(span);
 
   return (
     <li key={span.span_id} ref={containerRef}>
@@ -68,7 +66,7 @@ const SpanItem = ({
         style={{
           pointerEvents: isResizing ? 'none' : 'auto',
         }}
-        to={`/explore/traces/${span.trace_id}/spans/${span.span_id}`}
+        to={`/traces/${span.trace_id}/spans/${span.span_id}`}
       >
         <div
           className={classNames(

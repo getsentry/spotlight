@@ -1,6 +1,7 @@
 import type { Envelope, EnvelopeItem } from '@sentry/core';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import CardList from '~/components/CardList';
 import TimeSince from '~/components/TimeSince';
 import classNames from '~/lib/classNames';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
@@ -10,8 +11,8 @@ import { useSentryEnvelopes } from '../../../data/useSentryEnvelopes';
 import { useSentryHelpers } from '../../../data/useSentryHelpers';
 import { sdkToPlatform } from '../../../utils/sdkToPlatform';
 import { truncateId } from '../../../utils/text';
-import HiddenItemsButton from '../../HiddenItemsButton';
-import PlatformIcon from '../../PlatformIcon';
+import HiddenItemsButton from '../../shared/HiddenItemsButton';
+import PlatformIcon from '../../shared/PlatformIcon';
 import EnvelopeDetails from './EnvelopeDetails';
 
 export default function EnvelopeList() {
@@ -38,10 +39,7 @@ export default function EnvelopeList() {
             }}
           />
         )}
-        <div>
-          <div className="border-b-primary-700 flex w-full items-center justify-between border-b px-6 py-4">
-            <h1 className="text-2xl font-bold">Event Envelopes</h1>
-          </div>
+        <CardList>
           <div className="flex flex-col">
             {(showAll ? allEnvelopes : localEnvelopes).map(({ envelope }: { envelope: Envelope }) => {
               const header: Envelope[0] = envelope[0];
@@ -52,7 +50,7 @@ export default function EnvelopeList() {
                 return null;
               }
               return (
-                <Link key={envelopeEventId} to={`/explore/envelopes/${header.event_id}`}>
+                <Link key={envelopeEventId} to={`/insights/envelopes/${header.event_id}`}>
                   <div
                     className={classNames(
                       'hover:bg-primary-900 border-b-primary-900 flex cursor-pointer items-center gap-4 border-b px-6 py-2 transition-all',
@@ -87,7 +85,7 @@ export default function EnvelopeList() {
               );
             })}
           </div>
-        </div>
+        </CardList>
         {selectedEnvelope && <EnvelopeDetails data={selectedEnvelope} />}
       </>
     );

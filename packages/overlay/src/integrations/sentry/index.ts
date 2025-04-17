@@ -6,12 +6,13 @@ import type { Integration, RawEventContext } from '../integration';
 import { isErrorEvent, default as sentryDataCache } from './data/sentryDataCache';
 import { spotlightIntegration } from './sentry-integration';
 import ErrorsTab from './tabs/ErrorsTab';
-import ExploreTab from './tabs/ExploreTab';
 import InsightsTab from './tabs/InsightsTab';
-import PerformanceTab from './tabs/PerformanceTab';
 import type { SentryErrorEvent, SentryEvent } from './types';
 
 import { spotlightBrowserIntegration } from '@sentry/browser';
+import TracesTab from './tabs/TracesTab';
+import { parseJSONFromBuffer } from './utils/bufferParsers';
+import { createTab } from './utils/tabs';
 
 const HEADER = 'application/x-sentry-envelope';
 
@@ -63,37 +64,38 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
     tabs: () => {
       const errorCount = sentryDataCache
         .getEvents()
-        .filter(
-          e =>
-            isErrorEvent(e) &&
-            (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
-        ).length;
+        .reduce(
+          (sum, e) =>
+            sum +
+            Number(
+              isErrorEvent(e) &&
+                (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !==
+                  false,
+            ),
+          0,
+        );
+
+      const localTraceCount = sentryDataCache
+        .getTraces()
+        .reduce((sum, t) => sum + Number(sentryDataCache.isTraceLocal(t.trace_id) !== false), 0);
 
       return [
-        {
-          id: 'errors',
-          title: 'Errors',
+        createTab('traces', 'Traces', {
+          notificationCount: {
+            count: localTraceCount,
+          },
+          content: TracesTab,
+        }),
+        createTab('errors', 'Errors', {
           notificationCount: {
             count: errorCount,
             severe: errorCount > 0,
           },
           content: ErrorsTab,
-        },
-        {
-          id: 'explore',
-          title: 'Explore',
-          content: ExploreTab,
-        },
-        {
-          id: 'insights',
-          title: 'Insights',
+        }),
+        createTab('insights', 'Insights', {
           content: InsightsTab,
-        },
-        {
-          id: 'performance',
-          title: 'Performance',
-          content: PerformanceTab,
-        },
+        }),
       ];
     },
 
@@ -110,10 +112,6 @@ function getLineEnd(data: Uint8Array): number {
   }
 
   return end;
-}
-
-function parseJSONFromBuffer(data: Uint8Array): object {
-  return JSON.parse(new TextDecoder().decode(data));
 }
 
 /**

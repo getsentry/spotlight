@@ -15,7 +15,7 @@ import { ReactComponent as RemixIcon } from 'platformicons/svg/remix.svg';
 import { ReactComponent as RubyIcon } from 'platformicons/svg/ruby.svg';
 import { ReactComponent as SafariIcon } from 'platformicons/svg/safari.svg';
 import { ReactComponent as PhpSymfonyIcon } from 'platformicons/svg/symfony.svg';
-import type { SentryEvent } from '../types';
+import type { SentryEvent } from '../../types';
 
 import type { ComponentPropsWithoutRef } from 'react';
 
