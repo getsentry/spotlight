@@ -1,5 +1,21 @@
 # @spotlightjs/astro
 
+## 3.2.0
+
+### Minor Changes
+
+- feat: Keep profile spans collapsed ([#737](https://github.com/getsentry/spotlight/pull/737))
+
+### Patch Changes
+
+- fix: Null-check sentryClient.\_options ([#736](https://github.com/getsentry/spotlight/pull/736))
+
+- Updated dependencies
+  [[`3d569f30fb746d90ecabaac35d23d980360ea99c`](https://github.com/getsentry/spotlight/commit/3d569f30fb746d90ecabaac35d23d980360ea99c),
+  [`d3a2f0a0fae9074802b0551f3e1662833c1423c9`](https://github.com/getsentry/spotlight/commit/d3a2f0a0fae9074802b0551f3e1662833c1423c9),
+  [`d0315bc2ead9ccea722cc73c6b5fd7d9fed3f4a4`](https://github.com/getsentry/spotlight/commit/d0315bc2ead9ccea722cc73c6b5fd7d9fed3f4a4)]:
+  - @spotlightjs/spotlight@2.13.0
+
 ## 3.1.0
 
 ### Minor Changes
