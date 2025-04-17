@@ -70,7 +70,8 @@ import { Content as CodeBlock } from './codeblock.mdx';
 <script is:inline>
   (function spotlightGlow() {
     const host = document.querySelector('#sentry-spotlight-root');
-    if (!host) {
+    const trigger = host?.shadowRoot.querySelector('#spotlight-overlay-trigger');
+    if (!host || !trigger) {
       setTimeout(spotlightGlow, 500);
       return;
     }
@@ -91,7 +92,6 @@ import { Content as CodeBlock } from './codeblock.mdx';
         }
     `)
     host.shadowRoot.adoptedStyleSheets.push(sheet);
-    const trigger = host.shadowRoot.querySelector('#spotlight-overlay-trigger');
     Spotlight.onOpen(() => {
       trigger.classList.remove('shadow-pulse');
     });
