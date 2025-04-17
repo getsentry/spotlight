@@ -6,6 +6,8 @@ sidebar:
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
+## Docker
+
 We provide a Docker container which runs the Sidecar (including the overlay).
 
 ```shell
@@ -17,11 +19,11 @@ docker run --rm \
     ghcr.io/getsentry/spotlight:latest
 ```
 
+## Docker Compose
+
 If you're already using Docker Compose, we recommend adding Spotlight to your `docker-compose.yml` file:
 
-
 ```yaml
-version: "3.7"
 services:
   # ...
   spotlight:
@@ -31,3 +33,9 @@ services:
     ports:
       - "8969:8969"
 ```
+
+Once you add Spotlight to your `docker-compose.yml`, don't forget to set the spotlight URL in the SDKs to
+`http://spotlight:8969/stream`. You can do this by either setting the `spotlight` config setting to this value
+or by setting `SENTRY_SPOTLIGHT` env variable to `http://spotlight:8969/stream` for your application[^1].
+
+[^1]: This environment variable is supported by Node, Python, Ruby, and PHP SDKs.

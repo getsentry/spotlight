@@ -1,5 +1,32 @@
 # @spotlightjs/core
 
+## 2.14.0
+
+### Minor Changes
+
+- feat: Keep profile spans collapsed ([#737](https://github.com/getsentry/spotlight/pull/737))
+
+- Swap "Errors" and "Explore" tab places, making "Explore" the default. It makes more sense this way as there is almost
+  ([#758](https://github.com/getsentry/spotlight/pull/758)) guaranteed to have traces in a good setup but not really
+  errors.
+
+- Restructured Sentry integration tabs and components ([#765](https://github.com/getsentry/spotlight/pull/765))
+
+- - #731: Search Bar sticky and fixed overflow across the overlay.
+    ([#740](https://github.com/getsentry/spotlight/pull/740))
+
+- Include filter functionality when searching spans ([#747](https://github.com/getsentry/spotlight/pull/747))
+
+### Patch Changes
+
+- Fixed parsing of envelope data. ([#751](https://github.com/getsentry/spotlight/pull/751))
+
+- fix: Null-check sentryClient.\_options ([#736](https://github.com/getsentry/spotlight/pull/736))
+
+- format node internals correctly in stacktrace ([#739](https://github.com/getsentry/spotlight/pull/739))
+
+- Fixed #738 ([#741](https://github.com/getsentry/spotlight/pull/741))
+
 ## 2.13.0
 
 ### Minor Changes

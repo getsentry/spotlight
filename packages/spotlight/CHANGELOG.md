@@ -1,5 +1,32 @@
 # @spotlightjs/spotlight
 
+## 2.13.0
+
+### Minor Changes
+
+- feat: Keep profile spans collapsed ([#737](https://github.com/getsentry/spotlight/pull/737))
+
+### Patch Changes
+
+- fix: Null-check sentryClient.\_options ([#736](https://github.com/getsentry/spotlight/pull/736))
+
+- Remove obsolete packages from dependencies ([#761](https://github.com/getsentry/spotlight/pull/761))
+
+- Updated dependencies
+  [[`3d569f30fb746d90ecabaac35d23d980360ea99c`](https://github.com/getsentry/spotlight/commit/3d569f30fb746d90ecabaac35d23d980360ea99c),
+  [`7ea7de17b7ccf9f0c8edb8b413176d2f3482780c`](https://github.com/getsentry/spotlight/commit/7ea7de17b7ccf9f0c8edb8b413176d2f3482780c),
+  [`263ba283efa247e05a022d7f1305cbf819e3e783`](https://github.com/getsentry/spotlight/commit/263ba283efa247e05a022d7f1305cbf819e3e783),
+  [`7ac9fd255cfe85d66e79d632e1d309c3e88d8092`](https://github.com/getsentry/spotlight/commit/7ac9fd255cfe85d66e79d632e1d309c3e88d8092),
+  [`a76b2dadb28ce8699c80fc81b709050655bd4629`](https://github.com/getsentry/spotlight/commit/a76b2dadb28ce8699c80fc81b709050655bd4629),
+  [`d3a2f0a0fae9074802b0551f3e1662833c1423c9`](https://github.com/getsentry/spotlight/commit/d3a2f0a0fae9074802b0551f3e1662833c1423c9),
+  [`f2a48b05a41f80e08d1666247f7ccae60bc3d9e7`](https://github.com/getsentry/spotlight/commit/f2a48b05a41f80e08d1666247f7ccae60bc3d9e7),
+  [`6d26f0d21b3ae75e3d81e48ceb2d8f727a94420f`](https://github.com/getsentry/spotlight/commit/6d26f0d21b3ae75e3d81e48ceb2d8f727a94420f),
+  [`a8f632357d9dcc46187b00724c14dd4423dfa467`](https://github.com/getsentry/spotlight/commit/a8f632357d9dcc46187b00724c14dd4423dfa467),
+  [`9888dbfc6778de910a2aeae9f3e86f0b2f716a18`](https://github.com/getsentry/spotlight/commit/9888dbfc6778de910a2aeae9f3e86f0b2f716a18),
+  [`ced3e736dfef15d368cac202a10eec4eba7508be`](https://github.com/getsentry/spotlight/commit/ced3e736dfef15d368cac202a10eec4eba7508be)]:
+  - @spotlightjs/overlay@2.14.0
+  - @spotlightjs/sidecar@1.11.3
+
 ## 2.12.0
 
 ### Minor Changes

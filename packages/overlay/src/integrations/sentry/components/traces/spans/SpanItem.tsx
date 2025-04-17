@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
 import { useSearch } from '~/integrations/sentry/context/SearchContext';
@@ -29,7 +29,7 @@ const SpanItem = ({
   setSpanNodeWidth?: (val: number) => void;
 }) => {
   const { spanId } = useParams();
-  const { query } = useSearch();
+  const { query, matchesQuery, showOnlyMatched } = useSearch();
   const containerRef = useRef<HTMLLIElement>(null);
   const childrenCount = span.children ? span.children.length : 0;
   const [isItemCollapsed, setIsItemCollapsed] = useState(
@@ -51,10 +51,8 @@ const SpanItem = ({
       setSpanNodeWidth(newLeftWidth);
     }
   };
-  const isQueried = useMemo(() => {
-    if (!query) return false;
-    return span.span_id.includes(query) || span.op?.includes(query) || span.description?.includes(query);
-  }, [query, span.span_id, span.op, span.description]);
+
+  const isQueried = !showOnlyMatched && query && matchesQuery(span);
 
   return (
     <li key={span.span_id} ref={containerRef}>

@@ -105,6 +105,10 @@ export default defineConfig({
               link: '/setup/',
             },
             {
+              label: 'For Django',
+              link: '/setup/django/',
+            },
+            {
               label: 'For Astro',
               link: '/setup/astro/',
             },
