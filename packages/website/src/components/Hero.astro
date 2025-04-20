@@ -51,7 +51,7 @@ import ButtonLink from './ButtonLink.astro';
     line-height: 1.5;
     animation:
       fade-in 1s ease-in-out 0s forwards,
-      fade-in-neon 1s ease-out 0.5s forwards;
+      fade-in-neon 1s ease-out 0.25s forwards;
     font-family: 'Raleway', sans-serif;
   }
 
@@ -62,7 +62,12 @@ import ButtonLink from './ButtonLink.astro';
     text-align: center;
     max-width: 80%;
     opacity: 0;
-    animation: fade-in 1s ease-in-out 1s forwards;
+    animation: fade-in 1s ease-in-out 0.5s forwards;
+  }
+
+  .cta {
+    opacity: 0;
+    animation: fade-in 1s ease-in-out 0.75s forwards;
   }
 
   .hero-image {
@@ -83,9 +88,10 @@ import ButtonLink from './ButtonLink.astro';
 <div class="wrapper">
   <h1 class="neon-header">Debuggability Elevated</h1>
   <div class="sub-heading mb-4">Spotlight is a debugging tool that can be embedded in your web app</div>
-  <div class="flex flex-col items-center justify-center gap-2 py-4 mb-4">
-    <ButtonLink href="/about/">Learn More</ButtonLink> or
-    <button class="inline-flex items-center justify-center px-2 py-2 mx-2 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 cursor-pointer"
-    onclick="Spotlight.openSpotlight()">See It in Action</button>
+  <div class="cta flex items-center justify-center gap-2 py-4 mb-4">
+    <button class="px-3 py-3 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 cursor-pointer"
+    onclick="Spotlight.openSpotlight()">Checkout Live</button>
+    or
+    <ButtonLink href="/about/">Learn More</ButtonLink>
   </div>
 </div>

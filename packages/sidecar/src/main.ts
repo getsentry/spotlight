@@ -179,7 +179,7 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
         }
 
         if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
-          const timestamp = new Date().getTime();
+          const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
           const filename = `${contentType?.replace(/[^a-z0-9]/gi, '_') || 'no_content_type'}-${timestamp}.txt`;
 
           if (incomingPayload) {

@@ -1,5 +1,14 @@
 # @spotlightjs/sidecar
 
+## 1.11.3
+
+### Patch Changes
+
+- use nanosecond timestamp for captured filenames ([#776](https://github.com/getsentry/spotlight/pull/776))
+
+- Improve DX by always showing the Spotlight URL, even if the sidecar was already running. Makes it easy to
+  cmd/ctrl+click ([#748](https://github.com/getsentry/spotlight/pull/748)) and open in browser.
+
 ## 1.11.2
 
 ### Patch Changes

@@ -2,11 +2,9 @@
 import FeatureCard from './FeatureCard.astro';
 import Section from './Section.astro';
 import Highlight from './Highlight.astro';
-import AstroShowcase from './AstroShowcase.astro';
 import Spotlight from './Spotlight.astro';
 import Footer from './Footer.astro';
 import DocsCta from './DocsCta.astro';
-import { Content as CodeBlock } from './codeblock.mdx';
 ---
 
 <style>
@@ -16,19 +14,6 @@ import { Content as CodeBlock } from './codeblock.mdx';
 </style>
 
 <Highlight />
-
-<Section title="Thirty Seconds to Liftoff">
-  <FeatureCard
-    title="As easy as npm install"
-    description="Install Spotlight, inject the Spotlight overlay and run the sidecar."
-    linkUrl="/setup/"
-    linkText="Setup"
-  >
-    <img slot="image" class="!hidden md:!block lg:w-8/12 mt-12 mx-auto" src="/images/simple-event-flow.png" />
-    <CodeBlock />
-    <img class="md:!hidden mx-auto !mt-12 w-8/12" src="/images/simple-event-flow.png" />
-  </FeatureCard>
-</Section>
 
 <Section title="Your perfect dev companion">
   <FeatureCard
@@ -54,23 +39,25 @@ import { Content as CodeBlock } from './codeblock.mdx';
   </FeatureCard>
 </Section>
 
-<Section title="An Extension of You">
+<Section title="Adapts to your needs">
   <FeatureCard
-    title="Customizable overlay to support your use cases"
+    title="Extendable overlay to support your use cases"
     description="The powerful overlay and event proxy make it easy to extend Spotlight to other concepts including first-party concerns."
     linkUrl="/integrations/"
     linkText="Customize"
   >
-    <AstroShowcase />
+  <img class="block rounded-lg" src="/images/integrations.png" width="100%" style={{ maxWidth: 'unset' }} />
   </FeatureCard>
 </Section>
 
 <DocsCta />
+
 <Footer />
 <script is:inline>
   (function spotlightGlow() {
     const host = document.querySelector('#sentry-spotlight-root');
-    if (!host) {
+    const trigger = host?.shadowRoot.querySelector('#spotlight-overlay-trigger');
+    if (!host || !trigger) {
       setTimeout(spotlightGlow, 500);
       return;
     }
@@ -91,7 +78,6 @@ import { Content as CodeBlock } from './codeblock.mdx';
         }
     `)
     host.shadowRoot.adoptedStyleSheets.push(sheet);
-    const trigger = host.shadowRoot.querySelector('#spotlight-overlay-trigger');
     Spotlight.onOpen(() => {
       trigger.classList.remove('shadow-pulse');
     });
