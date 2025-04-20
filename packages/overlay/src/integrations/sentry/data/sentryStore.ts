@@ -44,7 +44,6 @@ type TraceSubscription = ['trace', (trace: Trace) => void];
 type Subscription = OnlineSubscription | EventSubscription | TraceSubscription;
 
 interface SentryStoreState {
-  // Core data
   events: SentryEvent[];
   eventIds: Set<string>;
   sdks: Sdk[];
@@ -57,22 +56,18 @@ interface SentryStoreState {
     rawEnvelope: RawEventContext;
   }>;
 
-  // Configuration
   contextLinesProvider: string;
   subscribers: Map<string, Subscription>;
 }
 
 interface SentryStoreActions {
-  // Core operations
   pushEnvelope: (params: { envelope: Envelope; rawEnvelope: RawEventContext }) => number;
   pushEvent: (event: SentryEvent & { event_id?: string }) => Promise<void>;
   resetData: () => void;
 
-  // Trace operations
   trackLocalTrace: (traceId: string) => void;
   isTraceLocal: (traceId: string) => boolean | null;
 
-  // Getters
   getEvents: () => SentryEvent[];
   getTraces: () => Trace[];
   getSdks: () => Sdk[];
@@ -82,19 +77,15 @@ interface SentryStoreActions {
   getProfileByTraceId: (id: string) => SentryProfileWithTraceMeta | undefined;
   getEventsByTrace: (traceId: string, spanId?: string | null) => SentryEvent[];
 
-  // Configuration
   setSidecarUrl: (url: string) => void;
 
-  // Helper methods
   inferSdkFromEvent: (event: SentryEvent) => Sdk;
   processStacktrace: (errorEvent: SentryErrorEvent) => Promise<void[]>;
 
-  // Subscription
   subscribe: (...args: Subscription) => () => void;
 }
 
 const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get) => ({
-  // Initial state
   events: [],
   eventIds: new Set(),
   sdks: [],
@@ -106,7 +97,6 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
   contextLinesProvider: new URL(CONTEXT_LINES_ENDPOINT, DEFAULT_SIDECAR_URL).href,
   subscribers: new Map(),
 
-  // Actions
   setSidecarUrl: (url: string) => {
     const { href: contextLinesProviderUrl } = new URL(CONTEXT_LINES_ENDPOINT, url);
     set({ contextLinesProvider: contextLinesProviderUrl });
@@ -347,7 +337,6 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
     return null;
   },
 
-  // Getters
   getEvents: () => get().events,
   getTraces: () => get().traces,
   getSdks: () => get().sdks,
@@ -365,7 +354,6 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
     });
   },
 
-  // Helper methods
   inferSdkFromEvent: (event: SentryEvent) => {
     const sdk: Sdk = {
       name: 'unknown',

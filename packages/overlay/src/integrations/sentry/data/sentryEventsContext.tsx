@@ -35,19 +35,17 @@ function eventReducer(state: SentryEvent[], message: SetEventsAction): SentryEve
 export const SentryEventsContextProvider: React.FC<{
   children: ReactNode;
 }> = ({ children }) => {
-  const [events, setEvents] = useReducer(eventReducer, []);
   const getEvents = useSentryStore(state => state.getEvents);
+  const [events, setEvents] = useReducer(eventReducer, getEvents());
   const subscribe = useSentryStore(state => state.subscribe);
 
-  useEffect(() => {
-    // Set initial events
-    setEvents({ action: 'RESET', e: getEvents() });
-
-    // Subscribe to new events
-    return subscribe('event', (event: SentryEvent) => {
-      setEvents({ action: 'APPEND', e: event });
-    });
-  }, [getEvents, subscribe]);
+  useEffect(
+    () =>
+      subscribe('event', (e: SentryEvent) => {
+        setEvents({ action: 'APPEND', e });
+      }) as () => undefined,
+    [],
+  );
 
   const contextValue: SentryEventsContextProps = {
     events,

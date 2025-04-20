@@ -1,4 +1,4 @@
-import { type Client, type Envelope, type EnvelopeItem } from '@sentry/core';
+import type { Client, Envelope, EnvelopeItem } from '@sentry/core';
 import { removeURLSuffix } from '~/lib/removeURLSuffix';
 import { off, on } from '../../lib/eventTarget';
 import { log, warn } from '../../lib/logger';
@@ -10,7 +10,7 @@ import InsightsTab from './tabs/InsightsTab';
 
 import { spotlightBrowserIntegration } from '@sentry/browser';
 import TracesTab from './tabs/TracesTab';
-import type { SentryEvent } from './types';
+import type { SentryErrorEvent, SentryEvent } from './types';
 import { parseJSONFromBuffer } from './utils/bufferParsers';
 import { isErrorEvent } from './utils/sentry';
 import { createTab } from './utils/tabs';
@@ -29,30 +29,24 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
     forwardedContentType: [HEADER],
 
     setup: ({ open, sidecarUrl }) => {
+      if (options.retries == null) {
+        options.retries = 10;
+      }
       const store = useSentryStore.getState();
-
+      let baseSidecarUrl: string | undefined = undefined;
       if (sidecarUrl) {
-        const baseSidecarUrl = removeURLSuffix(sidecarUrl, '/stream');
+        baseSidecarUrl = removeURLSuffix(sidecarUrl, '/stream');
         store.setSidecarUrl(baseSidecarUrl);
       }
 
       log('Setting up Sentry integration for Spotlight');
-      addSpotlightIntegrationToSentry(options, sidecarUrl);
+      addSpotlightIntegrationToSentry(options, baseSidecarUrl && new URL('/stream', baseSidecarUrl).href);
 
       if (options.openLastError) {
-        const unsubscribe = useSentryStore.subscribe((state: { events: SentryEvent[] }) => {
-          const events = state.events;
-          if (events.length > 0) {
-            const lastEvent = events[events.length - 1];
-            if (isErrorEvent(lastEvent)) {
-              setTimeout(() => open(`/errors/${lastEvent.event_id}`), 0);
-            }
-          }
+        store.subscribe('event', (e: SentryEvent) => {
+          if (!(e as SentryErrorEvent).exception) return;
+          setTimeout(() => open(`/errors/${e.event_id}`), 0);
         });
-
-        return () => {
-          unsubscribe();
-        };
       }
 
       const onRenderError = (e: CustomEvent) => {
