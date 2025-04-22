@@ -1,3 +1,4 @@
+import useSentryStore from '~/integrations/sentry/data/sentryStore';
 import type { Trace } from '../../../../types';
 import TraceIcon from '../../TraceIcon';
 import { TraceRootTxnName } from './TraceRootTxnName';
@@ -7,6 +8,8 @@ type TraceDetailHeaderProps = {
 };
 
 export default function TraceDetailHeader({ trace }: TraceDetailHeaderProps) {
+  const profiles = useSentryStore.getState().getProfileByTraceId(trace.trace_id);
+  console.log({ profiles });
   return (
     <div className="border-b-primary-700 bg-primary-950 flex items-center gap-x-2 border-b px-6 py-4">
       <TraceIcon trace={trace} />

@@ -277,7 +277,6 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
 
       for (const txn of transactions) {
         if (typeof txn === 'string') continue; // Skip if it's just a string transaction ID
-
         const profileTxn = txn as SentryProfileTransactionInfo;
         const trace = tracesById.get(profileTxn.trace_id);
         const timestamp =
@@ -304,7 +303,7 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
           graftProfileSpans(trace);
         }
       }
-
+      console.log(traceCtx, newProfilesByTraceId);
       set({ profilesByTraceId: newProfilesByTraceId });
     }
   },

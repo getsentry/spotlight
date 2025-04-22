@@ -1,29 +1,22 @@
 import type { Envelope, EnvelopeItem } from '@sentry/core';
-import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import CardList from '~/components/CardList';
 import TimeSince from '~/components/TimeSince';
 import classNames from '~/lib/classNames';
-import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import Badge from '~/ui/Badge';
 import useSentryStore from '../../../data/sentryStore';
 import { useSentryEnvelopes } from '../../../data/useSentryEnvelopes';
 import { useSentryHelpers } from '../../../data/useSentryHelpers';
 import { sdkToPlatform } from '../../../utils/sdkToPlatform';
 import { truncateId } from '../../../utils/text';
-import HiddenItemsButton from '../../shared/HiddenItemsButton';
 import PlatformIcon from '../../shared/PlatformIcon';
 import EnvelopeDetails from './EnvelopeDetails';
 
-export default function EnvelopeList() {
+export default function EnvelopeList({ showAll }: { showAll: boolean }) {
   const { eventId } = useParams();
-  const context = useSpotlightContext();
   const helpers = useSentryHelpers();
   const { allEnvelopes, localEnvelopes } = useSentryEnvelopes();
   const getEnvelopes = useSentryStore(state => state.getEnvelopes);
-  const hiddenItemCount = allEnvelopes.length - localEnvelopes.length;
-
-  const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
 
   const selectedEnvelope = eventId
     ? getEnvelopes().find(({ envelope: _env }) => _env[0].event_id === eventId) || null
@@ -32,14 +25,6 @@ export default function EnvelopeList() {
   if (allEnvelopes?.length) {
     return (
       <>
-        {hiddenItemCount > 0 && !showAll && (
-          <HiddenItemsButton
-            itemCount={hiddenItemCount}
-            onClick={() => {
-              setShowAll(true);
-            }}
-          />
-        )}
         <CardList>
           <div className="flex flex-col">
             {(showAll ? allEnvelopes : localEnvelopes).map(({ envelope }: { envelope: Envelope }) => {
