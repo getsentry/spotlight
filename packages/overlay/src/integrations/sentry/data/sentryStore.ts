@@ -303,7 +303,6 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
           graftProfileSpans(trace);
         }
       }
-      console.log(traceCtx, newProfilesByTraceId);
       set({ profilesByTraceId: newProfilesByTraceId });
     }
   },
