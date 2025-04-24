@@ -7,6 +7,7 @@ import sentryDataCache from '../../data/sentryDataCache';
 import useSort from '../../hooks/useSort';
 import type { FunctionProfile } from '../../types';
 import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
+import { TimeBar } from '../shared/TimeBar';
 
 type FunctionProfileComparator = (a: FunctionProfile, b: FunctionProfile) => number;
 type FunctionProfileSortTypes = (typeof FUNCTION_PROFILES_SORT_KEYS)[keyof typeof FUNCTION_PROFILES_SORT_KEYS];
@@ -39,7 +40,7 @@ function FunctionProfiles() {
   }, [sort]);
 
   if (!functionProfiles?.length) {
-    return <p className="text-primary-300 px-6 py-4">No functions found.</p>;
+    return <p className="text-primary-300 px-6 py-4">No profiles found.</p>;
   }
 
   // Calculate max time for bar visualization (100%, scaling form here)
@@ -86,15 +87,8 @@ function FunctionProfiles() {
       <tbody>
         {functionProfiles.map(profile => (
           <tr key={`${profile.traceId}-${profile.name}`} className="hover:bg-primary-900">
-            <td className="text-primary-200 relative w-2/5 whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-              <div className="truncate text-lime-500">{profile.name}</div>
-              {/* visualize time bar. made with bgs */}
-              <div className="bg-primary-800 mt-1 h-1 w-full overflow-hidden rounded-full">
-                <div
-                  className={classNames('h-full bg-lime-500')}
-                  style={{ width: `${(profile.totalTime / maxTime) * 100}%` }}
-                ></div>
-              </div>
+            <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4">
+              <TimeBar value={profile.totalTime} maxValue={maxTime} title={profile.name} />
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
               <span className={getSpanDurationClassName(profile.totalTime)}>
