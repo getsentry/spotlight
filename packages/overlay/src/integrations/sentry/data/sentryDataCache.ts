@@ -177,7 +177,6 @@ class SentryDataCache {
 
     if (traceCtx?.trace_id) {
       const existingTrace = this.tracesById.get(traceCtx.trace_id);
-      const startTs = event.start_timestamp ? event.start_timestamp : new Date().getTime();
       const trace = existingTrace ?? {
         ...traceCtx,
         trace_id: traceCtx.trace_id,
@@ -185,13 +184,14 @@ class SentryDataCache {
         spanTree: [] as Span[],
         transactions: [] as SentryTransactionEvent[],
         errors: 0,
+        start_timestamp: event.start_timestamp ?? event.timestamp,
         timestamp: event.timestamp,
-        start_timestamp: startTs,
         status: traceCtx.status,
         rootTransactionName: event.transaction || '(unknown transaction)',
         rootTransaction: null,
         profileGrafted: false,
       };
+      trace.timestamp = Math.max(event.timestamp, trace.timestamp);
 
       if (isTraceEvent(event)) {
         trace.transactions.push(event);
@@ -236,8 +236,6 @@ class SentryDataCache {
       } else if (isErrorEvent(event)) {
         trace.errors += 1;
       }
-      trace.start_timestamp = Math.min(startTs, trace.start_timestamp);
-      trace.timestamp = Math.max(event.timestamp, trace.timestamp);
       if (traceCtx.status !== 'ok') trace.status = traceCtx.status;
 
       const roots = trace.transactions.filter(e => !e.contexts.trace.parent_span_id);
@@ -284,7 +282,9 @@ class SentryDataCache {
           timestamp,
           active_thread_id: txn.active_thread_id,
         });
-        if (trace) {
+        // Avoid grafting partial traces (where we mocked start_timestamp from the event's timestamp)
+        // These should get grafted once we get the full trace data later on
+        if (trace && trace.start_timestamp < trace.timestamp) {
           graftProfileSpans(trace);
         }
       }
