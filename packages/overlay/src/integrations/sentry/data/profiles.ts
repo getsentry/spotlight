@@ -2,8 +2,8 @@ import { log } from '~/lib/logger';
 import { generateUuidv4 } from '../../../lib/uuid';
 import type { Span, Trace } from '../types';
 import { compareSpans } from '../utils/traces';
-import type { SentryProfileWithTraceMeta } from './sentryDataCache';
-import sentryDataCache from './sentryDataCache';
+import type { SentryProfileWithTraceMeta } from './sentryStore';
+import useSentryStore from './sentryStore';
 
 /**
  * Groups consequent spans with the same description and op into a single span per each level.
@@ -169,7 +169,7 @@ export function graftProfileSpans(
     return;
   }
   if (!profile) {
-    profile = trace.trace_id ? sentryDataCache.getProfileByTraceId(trace.trace_id) : undefined;
+    profile = trace.trace_id ? useSentryStore.getState().getProfileByTraceId(trace.trace_id) : undefined;
     if (!profile) {
       log(`Profile not found for trace ${trace.trace_id}`);
       return;

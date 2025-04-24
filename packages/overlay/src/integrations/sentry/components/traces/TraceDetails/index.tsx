@@ -2,9 +2,10 @@ import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { createTab } from '~/integrations/sentry/utils/tabs';
 
 import Tabs from '~/components/Tabs';
-import sentryDataCache, { isErrorEvent } from '~/integrations/sentry/data/sentryDataCache';
+import useSentryStore from '~/integrations/sentry/data/sentryStore';
 import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
 import { useSentryHelpers } from '~/integrations/sentry/data/useSentryHelpers';
+import { isErrorEvent } from '~/integrations/sentry/utils/sentry';
 import EventContexts from '../../events/EventContexts';
 import EventList from '../../events/EventList';
 import TraceDetailHeader from './components/TraceDetailHeader';
@@ -14,13 +15,14 @@ export default function TraceDetails() {
   const { traceId } = useParams();
   const events = useSentryEvents(traceId);
   const helpers = useSentryHelpers();
+  const getTraceById = useSentryStore(state => state.getTraceById);
 
   if (!traceId) {
     return <p className="text-primary-300 p-6">Unknown trace id</p>;
   }
 
   // TODO: Don't use dataCache directly, use a helper like useSentryEvents
-  const trace = sentryDataCache.getTraceById(traceId);
+  const trace = getTraceById(traceId);
 
   if (!trace) {
     return (

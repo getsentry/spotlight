@@ -1,6 +1,6 @@
 import { Link, Outlet, Route, Routes, useParams } from 'react-router-dom';
 import Tabs from '../../../../components/Tabs';
-import sentryDataCache from '../../data/sentryDataCache';
+import useSentryStore from '../../data/sentryStore';
 import type { SentryEvent } from '../../types';
 import { createTab } from '../../utils/tabs';
 import PlatformIcon from '../shared/PlatformIcon';
@@ -14,12 +14,13 @@ function renderEventTitle(event: SentryEvent) {
 
 export default function EventDetails() {
   const { eventId } = useParams();
+  const getEventById = useSentryStore(state => state.getEventById);
 
   if (!eventId) {
     return <p className="text-primary-300 p-6">Unknown event id</p>;
   }
 
-  const event = sentryDataCache.getEventById(eventId);
+  const event = getEventById(eventId);
 
   if (!event) {
     return <p className="text-primary-300 p-6">Event not found.</p>;
