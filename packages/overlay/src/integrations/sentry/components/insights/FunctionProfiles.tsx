@@ -3,7 +3,7 @@ import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
 import { FUNCTION_PROFILES_HEADERS, FUNCTION_PROFILES_SORT_KEYS } from '../../constants';
-import sentryDataCache from '../../data/sentryDataCache';
+import useSentryStore from '../../data/sentryStore';
 import useSort from '../../hooks/useSort';
 import type { FunctionProfile } from '../../types';
 import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
@@ -31,7 +31,7 @@ function FunctionProfiles() {
   const { sort, toggleSortOrder } = useSort({ defaultSortType: FUNCTION_PROFILES_SORT_KEYS.timeSpent });
 
   const functionProfiles = useMemo(() => {
-    const profiles = sentryDataCache.getFunctionProfiles();
+    const profiles = useSentryStore.getState().getFunctionProfiles();
     const compareProfileInfo = COMPARATORS[sort.active] || COMPARATORS[FUNCTION_PROFILES_SORT_KEYS.timeSpent];
 
     return profiles.sort((a, b) => {
