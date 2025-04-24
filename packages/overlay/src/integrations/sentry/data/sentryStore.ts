@@ -269,11 +269,14 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
     }
 
     if (isProfileEvent(event)) {
-      const transactions = event.transaction ? [event.transaction] : [];
+      if (!event.transactions) {
+        event.transactions = event.transaction ? [event.transaction] : [];
+      }
       const { profilesByTraceId, tracesById } = get();
       const newProfilesByTraceId = new Map(profilesByTraceId);
 
-      for (const txn of transactions) {
+      const tracesToGraft: Set<Trace> = new Set();
+      for (const txn of event.transactions) {
         if (typeof txn === 'string') continue; // Skip if it's just a string transaction ID
         const profileTxn = txn as SentryProfileTransactionInfo;
         const trace = tracesById.get(profileTxn.trace_id);
@@ -299,10 +302,13 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
         // Avoid grafting partial traces (where we mocked start_timestamp from the event's timestamp)
         // These should get grafted once we get the full trace data later on
         if (trace && trace.start_timestamp < trace.timestamp) {
-          graftProfileSpans(trace);
+          tracesToGraft.add(trace);
         }
       }
       set({ profilesByTraceId: newProfilesByTraceId });
+      for (const trace of tracesToGraft) {
+        graftProfileSpans(trace);
+      }
     }
   },
 

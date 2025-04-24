@@ -1,5 +1,5 @@
 import { ERROR_EVENT_TYPES, PROFILE_EVENT_TYPES, TRACE_EVENT_TYPES } from '../constants/sentry';
-import { SentryErrorEvent, SentryEvent, SentryProfileV1Event, SentryTransactionEvent } from '../types';
+import type { SentryErrorEvent, SentryEvent, SentryProfileV1Event, SentryTransactionEvent } from '../types';
 
 export function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
   return (!event.type || ERROR_EVENT_TYPES.has(event.type)) && Boolean((event as SentryErrorEvent).exception);
