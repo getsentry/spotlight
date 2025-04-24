@@ -159,9 +159,9 @@ export function getSpansFromProfile(
  */
 export function graftProfileSpans(
   trace: Trace,
+  profile?: SentryProfileWithTraceMeta,
   spanTree: Span[] = trace.spanTree,
   parent: Span | Trace = trace,
-  profile?: SentryProfileWithTraceMeta,
 ) {
   log(`Grafting profile spans into trace ${trace.trace_id}`);
   if (trace.profileGrafted) {
@@ -202,7 +202,7 @@ export function graftProfileSpans(
     }
     if (span) {
       span.children ??= [];
-      graftProfileSpans(trace, span.children, span, profile);
+      graftProfileSpans(trace, profile, span.children, span);
     }
     idx += 1;
   }

@@ -275,7 +275,6 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
       const { profilesByTraceId, tracesById } = get();
       const newProfilesByTraceId = new Map(profilesByTraceId);
 
-      const tracesToGraft: Set<Trace> = new Set();
       for (const txn of event.transactions) {
         if (typeof txn === 'string') continue; // Skip if it's just a string transaction ID
         const profileTxn = txn as SentryProfileTransactionInfo;
@@ -285,7 +284,7 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
             ? relativeNsToTimestamp(trace.start_timestamp, profileTxn.relative_start_ns)
             : event.timestamp;
 
-        newProfilesByTraceId.set(profileTxn.trace_id, {
+        const profile = {
           platform: event.platform,
           thread_metadata: event.profile.thread_metadata,
           samples: event.profile.samples.map((s: ProfileSample) => ({
@@ -298,17 +297,15 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
           stacks: event.profile.stacks.map(s => Array.from(s).reverse()),
           timestamp,
           active_thread_id: profileTxn.active_thread_id,
-        });
+        };
+        newProfilesByTraceId.set(profileTxn.trace_id, profile);
         // Avoid grafting partial traces (where we mocked start_timestamp from the event's timestamp)
         // These should get grafted once we get the full trace data later on
         if (trace && trace.start_timestamp < trace.timestamp) {
-          tracesToGraft.add(trace);
+          graftProfileSpans(trace, profile);
         }
       }
       set({ profilesByTraceId: newProfilesByTraceId });
-      for (const trace of tracesToGraft) {
-        graftProfileSpans(trace);
-      }
     }
   },
 
