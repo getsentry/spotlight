@@ -26,7 +26,7 @@ export default function InsightsTabDetails() {
     createTab('queries', 'Queries'),
     createTab('webvitals', 'Web Vitals'),
     createTab('resources', 'Resources'),
-    createTab('functionprofiles', 'Function Profiling'),
+    createTab('functionprofiles', 'Profiles'),
     createTab('envelopes', 'Envelopes'),
     createTab('sdks', 'SDKs'),
   ];
