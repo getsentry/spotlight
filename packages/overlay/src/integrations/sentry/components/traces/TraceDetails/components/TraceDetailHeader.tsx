@@ -1,4 +1,3 @@
-import useSentryStore from '~/integrations/sentry/data/sentryStore';
 import type { Trace } from '../../../../types';
 import TraceIcon from '../../TraceIcon';
 import { TraceRootTxnName } from './TraceRootTxnName';
