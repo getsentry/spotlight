@@ -1,5 +1,13 @@
 # @spotlightjs/core
 
+## 2.14.1
+
+### Patch Changes
+
+- Fixes a race condition where we try to graft a trace which was a skeleton generated from a trace context rather than a
+  ([#783](https://github.com/getsentry/spotlight/pull/783)) full trace. This was causing profile frames not getting
+  grafted as the start_timestamp and timestamp values were not set correctly.
+
 ## 2.14.0
 
 ### Minor Changes

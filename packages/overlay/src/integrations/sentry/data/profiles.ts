@@ -163,6 +163,7 @@ export function graftProfileSpans(
   parent: Span | Trace = trace,
   profile?: SentryProfileWithTraceMeta,
 ) {
+  log(`Grafting profile spans into trace ${trace.trace_id}`);
   if (trace.profileGrafted) {
     log(`Trace already has profile grafted ${trace.trace_id}`);
     return;
