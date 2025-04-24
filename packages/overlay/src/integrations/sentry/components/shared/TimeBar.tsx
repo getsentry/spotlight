@@ -1,11 +1,11 @@
 import classNames from '~/lib/classNames';
 
-interface TimeBarProps {
+type TimeBarProps = {
   value: number;
   maxValue: number;
   title?: string;
   className?: string;
-}
+};
 
 export function TimeBar({ value, maxValue, title, className }: TimeBarProps) {
   const percentage = (value / maxValue) * 100;
