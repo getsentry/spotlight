@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ReactComponent as CrossIcon } from '~/assets/cross.svg';
 import { SearchProvider, useSearch } from '~/integrations/sentry/context/SearchContext';
+import useSentryStore from '~/integrations/sentry/data/sentryStore';
 import useSearchInput from '~/integrations/sentry/hooks/useSearchInput';
 import type { Trace } from '~/integrations/sentry/types';
-import sentryDataCache from '../../../../data/sentryDataCache';
 import { getFormattedSpanDuration } from '../../../../utils/duration';
 
 import DateTime from '../../../shared/DateTime';
@@ -80,8 +80,9 @@ function TraceTreeWithSearch({
 
 function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
   const { spanId } = useParams();
+  const getTraceById = useSentryStore(state => state.getTraceById);
 
-  const trace = sentryDataCache.getTraceById(traceId)!;
+  const trace = getTraceById(traceId)!;
   const span = spanId ? trace.spans.get(spanId) : undefined;
   const startTimestamp = trace.start_timestamp;
   const totalDuration = trace.timestamp - startTimestamp;

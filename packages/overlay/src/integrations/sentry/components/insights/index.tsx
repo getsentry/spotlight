@@ -48,12 +48,12 @@ export default function InsightsTabDetails() {
           <Route path="resources" element={<Resources showAll={showAll} />} />
           <Route path="webvitals" element={<WebVitals />} />
           <Route path="webvitals/:page" element={<WebVitalsDetail />} />
-          <Route path="functionprofiles" element={<FunctionProfiles />} />
-          <Route path="envelopes/*" element={<EnvelopesTab />} />
+          <Route path="envelopes/*" element={<EnvelopesTab showAll={showAll} />} />
           <Route path="sdks/*" element={<SdksTab />} />
           {/* Default tab */}
           <Route path="queries" element={<Queries showAll={showAll} />} />
           <Route path="*" element={<Navigate to="/insights/queries" replace />} />
+          <Route path="functionprofiles" element={<FunctionProfiles />} />
         </Routes>
         <Outlet />
       </div>

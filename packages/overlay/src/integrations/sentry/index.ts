@@ -3,15 +3,16 @@ import { removeURLSuffix } from '~/lib/removeURLSuffix';
 import { off, on } from '../../lib/eventTarget';
 import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
-import { isErrorEvent, default as sentryDataCache } from './data/sentryDataCache';
+import useSentryStore from './data/sentryStore';
 import { spotlightIntegration } from './sentry-integration';
 import ErrorsTab from './tabs/ErrorsTab';
 import InsightsTab from './tabs/InsightsTab';
-import type { SentryErrorEvent, SentryEvent } from './types';
 
 import { spotlightBrowserIntegration } from '@sentry/browser';
 import TracesTab from './tabs/TracesTab';
+import type { SentryErrorEvent, SentryEvent } from './types';
 import { parseJSONFromBuffer } from './utils/bufferParsers';
+import { isErrorEvent } from './utils/sentry';
 import { createTab } from './utils/tabs';
 
 const HEADER = 'application/x-sentry-envelope';
@@ -31,16 +32,18 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
       if (options.retries == null) {
         options.retries = 10;
       }
+      const store = useSentryStore.getState();
       let baseSidecarUrl: string | undefined = undefined;
       if (sidecarUrl) {
         baseSidecarUrl = removeURLSuffix(sidecarUrl, '/stream');
-        sentryDataCache.setSidecarUrl(baseSidecarUrl);
+        store.setSidecarUrl(baseSidecarUrl);
       }
+
       log('Setting up Sentry integration for Spotlight');
       addSpotlightIntegrationToSentry(options, baseSidecarUrl && new URL('/stream', baseSidecarUrl).href);
 
       if (options.openLastError) {
-        sentryDataCache.subscribe('event', (e: SentryEvent) => {
+        store.subscribe('event', (e: SentryEvent) => {
           if (!(e as SentryErrorEvent).exception) return;
           setTimeout(() => open(`/errors/${e.event_id}`), 0);
         });
@@ -49,7 +52,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
       const onRenderError = (e: CustomEvent) => {
         log('Sentry Event', e.detail.event_id);
         if (!e.detail.event) return;
-        sentryDataCache.pushEvent(e.detail.event).then(() => open(`/errors/${e.detail.event.event_id}`));
+        store.pushEvent(e.detail.event).then(() => open(`/errors/${e.detail.event.event_id}`));
       };
 
       on('sentry:showError', onRenderError as EventListener);
@@ -62,22 +65,23 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
     processEvent: (event: RawEventContext) => processEnvelope(event),
 
     tabs: () => {
-      const errorCount = sentryDataCache
+      const store = useSentryStore.getState();
+
+      const errorCount = store
         .getEvents()
         .reduce(
           (sum, e) =>
             sum +
             Number(
               isErrorEvent(e) &&
-                (e.contexts?.trace?.trace_id ? sentryDataCache.isTraceLocal(e.contexts?.trace?.trace_id) : null) !==
-                  false,
+                (e.contexts?.trace?.trace_id ? store.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
             ),
           0,
         );
 
-      const localTraceCount = sentryDataCache
+      const localTraceCount = store
         .getTraces()
-        .reduce((sum, t) => sum + Number(sentryDataCache.isTraceLocal(t.trace_id) !== false), 0);
+        .reduce((sum, t) => sum + Number(store.isTraceLocal(t.trace_id) !== false), 0);
 
       return [
         createTab('traces', 'Traces', {
@@ -100,7 +104,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
     },
 
     reset: () => {
-      sentryDataCache.resetData();
+      useSentryStore.getState().resetData();
     },
   } satisfies Integration<Envelope>;
 }
@@ -155,7 +159,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
   }
 
   const envelope = [envelopeHeader, items] as Envelope;
-  sentryDataCache.pushEnvelope({ envelope, rawEnvelope: rawEvent });
+  useSentryStore.getState().pushEnvelope({ envelope, rawEnvelope: rawEvent });
 
   return {
     event: envelope,

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import React, { useEffect, useReducer } from 'react';
 import type { SentryEvent } from '../types';
-import sentryDataCache from './sentryDataCache';
+import useSentryStore from './sentryStore';
 
 interface SetEventsAction {
   e: SentryEvent | SentryEvent[];
@@ -35,11 +35,13 @@ function eventReducer(state: SentryEvent[], message: SetEventsAction): SentryEve
 export const SentryEventsContextProvider: React.FC<{
   children: ReactNode;
 }> = ({ children }) => {
-  const [events, setEvents] = useReducer(eventReducer, sentryDataCache.getEvents());
+  const getEvents = useSentryStore(state => state.getEvents);
+  const [events, setEvents] = useReducer(eventReducer, getEvents());
+  const subscribe = useSentryStore(state => state.subscribe);
 
   useEffect(
     () =>
-      sentryDataCache.subscribe('event', (e: SentryEvent) => {
+      subscribe('event', (e: SentryEvent) => {
         setEvents({ action: 'APPEND', e });
       }) as () => undefined,
     [],

@@ -1,13 +1,15 @@
 import { useContext } from 'react';
 import type { Trace } from '../types';
-import sentryDataCache from './sentryDataCache';
 import { SentryEventsContext } from './sentryEventsContext';
+import useSentryStore from './sentryStore';
 import { useSentryHelpers } from './useSentryHelpers';
 
 export const useSentryEnvelopes = () => {
   useContext(SentryEventsContext);
   const helpers = useSentryHelpers();
-  const allEnvelopes = sentryDataCache.getEnvelopes().sort((a, b) => {
+  const getEnvelopes = useSentryStore(state => state.getEnvelopes);
+
+  const allEnvelopes = getEnvelopes().sort((a, b) => {
     const a_sent_at = a.envelope[0].sent_at as string;
     const b_sent_at = b.envelope[0].sent_at as string;
     if (a_sent_at < b_sent_at) return 1;
@@ -20,5 +22,6 @@ export const useSentryEnvelopes = () => {
     if (trace_id) return helpers.isLocalToSession(trace_id) !== false;
     return true;
   });
+
   return { allEnvelopes, localEnvelopes };
 };

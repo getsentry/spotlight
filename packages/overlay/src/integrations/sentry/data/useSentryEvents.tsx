@@ -1,8 +1,11 @@
 import { useContext } from 'react';
-import sentryDataCache from './sentryDataCache';
 import { SentryEventsContext } from './sentryEventsContext';
+import useSentryStore from './sentryStore';
 
 export const useSentryEvents = (traceId?: string) => {
   useContext(SentryEventsContext);
-  return traceId ? sentryDataCache.getEventsByTrace(traceId) : sentryDataCache.getEvents();
+  const getEvents = useSentryStore(state => state.getEvents);
+  const getEventsByTrace = useSentryStore(state => state.getEventsByTrace);
+
+  return traceId ? getEventsByTrace(traceId) : getEvents();
 };
