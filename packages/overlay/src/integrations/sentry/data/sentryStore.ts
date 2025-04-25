@@ -415,47 +415,42 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
   },
 
   getAggregateCallData(): AggregateCallData[] {
-    // separate profiles
-    const allProfiles: AggregateCallData[] = [];
-
+    const aggregateCalls = new Map<string, AggregateCallData>();
     for (const [traceId, profile] of this.profilesByTraceId) {
-      const aggregateCalls = new Map<string, AggregateCallData>();
-
-      // Go over each profile sample
       for (let sampleIdx = 0; sampleIdx < profile.samples.length - 1; sampleIdx++) {
         const sample = profile.samples[sampleIdx];
         const nextSample = profile.samples[sampleIdx + 1];
+        // TODO: Handle the case where nextSample is undefined -- use the end of the profile or associated trace
         const duration = nextSample.start_timestamp - sample.start_timestamp;
+        // TODO: Keep a running average based on continuous samples -- as in where we keep seeing the same
+        //       function name / frame back to back
 
         const stackId = sample.stack_id;
         const frameIndices = profile.stacks[stackId];
 
-        // go over each stack frame (frame = 1 func/meth call)
         for (const frameIdx of frameIndices) {
           const frame = profile.frames[frameIdx];
-          const funcName = getFunctionNameFromFrame(frame);
-
-          const existing = aggregateCalls.get(funcName) || {
-            name: funcName,
-            totalTime: 0,
-            samples: 0,
-            frames: new Set<EventFrame>(),
-            traceIds: new Set<TraceId>(),
-          };
-
-          existing.totalTime += duration;
-          existing.samples += 1;
-          existing.frames.add(frame);
-          existing.traceIds.add(traceId);
-
-          aggregateCalls.set(funcName, existing);
+          const name = getFunctionNameFromFrame(frame);
+          const callData = aggregateCalls.get(name);
+          if (callData) {
+            callData.totalTime += duration;
+            callData.samples += 1;
+            callData.frames.add(frame);
+            callData.traceIds.add(traceId);
+          } else {
+            aggregateCalls.set(name, {
+              name,
+              totalTime: duration,
+              samples: 1,
+              frames: new Set<EventFrame>([frame]),
+              traceIds: new Set<TraceId>([traceId]),
+            });
+          }
         }
       }
-
-      allProfiles.push(...aggregateCalls.values());
     }
 
-    return allProfiles;
+    return Array.from(aggregateCalls.values());
   },
 
   subscribe: (...args: Subscription) => {
