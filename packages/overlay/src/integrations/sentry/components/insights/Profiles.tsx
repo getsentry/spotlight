@@ -21,11 +21,7 @@ const COMPARATORS: Record<AggregateCallProfileSortTypes, AggregateCallProfileCom
   },
   [AGGREGATE_CALL_PROFILES_SORT_KEYS.timeSpent]: (a, b) => a.totalTime - b.totalTime,
   [AGGREGATE_CALL_PROFILES_SORT_KEYS.samples]: (a, b) => a.samples - b.samples,
-  [AGGREGATE_CALL_PROFILES_SORT_KEYS.profiles]: (a, b) => {
-    if (a.traceId < b.traceId) return -1;
-    if (a.traceId > b.traceId) return 1;
-    return 0;
-  },
+  [AGGREGATE_CALL_PROFILES_SORT_KEYS.traces]: (a, b) => a.traceIds.size - b.traceIds.size,
 };
 
 function Profiles() {
@@ -86,21 +82,21 @@ function Profiles() {
         </tr>
       </thead>
       <tbody>
-        {aggregateCallData.map(profile => (
-          <tr key={`${profile.traceId}-${profile.name}`} className="hover:bg-primary-900">
+        {aggregateCallData.map(callData => (
+          <tr key={`${callData.name}`} className="hover:bg-primary-900">
             <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4">
-              <TimeBar value={profile.totalTime} maxValue={maxTime} title={profile.name} />
+              <TimeBar value={callData.totalTime} maxValue={maxTime} title={callData.name} />
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              <span className={getSpanDurationClassName(profile.totalTime)}>
-                {getFormattedDuration(profile.totalTime)}
+              <span className={getSpanDurationClassName(callData.totalTime)}>
+                {getFormattedDuration(callData.totalTime)}
               </span>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              {profile.samples}
+              {callData.samples}
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              {profile.traceId.substring(0, 8)}
+              {callData.traceIds.size}
             </td>
           </tr>
         ))}

@@ -6,17 +6,19 @@ import { log } from '../../../lib/logger';
 import { generateUuidv4 } from '../../../lib/uuid';
 import type { RawEventContext } from '../../integration';
 import { SUPPORTED_EVENT_TYPES } from '../constants/sentry';
-import type {
-  AggregateCallData,
-  ProfileSample,
-  Sdk,
-  SentryErrorEvent,
-  SentryEvent,
-  SentryProcessedProfile,
-  SentryProfileTransactionInfo,
-  SentryTransactionEvent,
-  Span,
-  Trace,
+import {
+  EventFrame,
+  TraceId,
+  type AggregateCallData,
+  type ProfileSample,
+  type Sdk,
+  type SentryErrorEvent,
+  type SentryEvent,
+  type SentryProcessedProfile,
+  type SentryProfileTransactionInfo,
+  type SentryTransactionEvent,
+  type Span,
+  type Trace,
 } from '../types';
 import { getNativeFetchImplementation } from '../utils/fetch';
 import { sdkToPlatform } from '../utils/sdkToPlatform';
@@ -437,15 +439,14 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
             name: funcName,
             totalTime: 0,
             samples: 0,
-            frames: [],
-            traceId, //
+            frames: new Set<EventFrame>(),
+            traceIds: new Set<TraceId>(),
           };
 
           existing.totalTime += duration;
           existing.samples += 1;
-          if (!existing.frames.includes(frame)) {
-            existing.frames.push(frame);
-          }
+          existing.frames.add(frame);
+          existing.traceIds.add(traceId);
 
           aggregateCalls.set(funcName, existing);
         }

@@ -4,7 +4,7 @@ export const AGGREGATE_CALL_PROFILES_SORT_KEYS = {
   functionName: 'FUNCTION_NAME',
   timeSpent: 'TIME_SPENT',
   samples: 'SAMPLES',
-  profiles: 'PROFILES',
+  traces: 'TRACES',
 };
 
 export const AGGREGATE_PROFILES_HEADERS = [
@@ -25,9 +25,9 @@ export const AGGREGATE_PROFILES_HEADERS = [
     sortKey: AGGREGATE_CALL_PROFILES_SORT_KEYS.samples,
   },
   {
-    id: 'profile',
-    title: 'Profile',
-    sortKey: AGGREGATE_CALL_PROFILES_SORT_KEYS.profiles,
+    id: 'traces',
+    title: 'Traces',
+    sortKey: AGGREGATE_CALL_PROFILES_SORT_KEYS.traces,
   },
 ];
 
