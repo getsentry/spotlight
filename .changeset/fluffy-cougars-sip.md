@@ -2,4 +2,4 @@
 '@spotlightjs/overlay': minor
 ---
 
-add a Profiles tab
+Add a Profiles tab under Insights
