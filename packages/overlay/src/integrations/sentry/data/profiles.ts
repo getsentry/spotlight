@@ -1,9 +1,23 @@
 import { log } from '~/lib/logger';
 import { generateUuidv4 } from '../../../lib/uuid';
-import type { Span, Trace } from '../types';
+import type { EventFrame, Span, Trace } from '../types';
 import { compareSpans } from '../utils/traces';
 import type { SentryProfileWithTraceMeta } from './sentryStore';
 import useSentryStore from './sentryStore';
+
+const _FUNCTION_NAME_FROM_FRAME_CACHE = new Map<EventFrame, string>();
+export function getFunctionNameFromFrame(frame: EventFrame): string {
+  let result = _FUNCTION_NAME_FROM_FRAME_CACHE.get(frame);
+  if (!result) {
+    const module = frame.module || frame.filename || frame.abs_path || '<unknown>';
+    const functionName = frame.function || '<anonymous>';
+    const lineNo = frame.lineno ? `:${frame.lineno}` : '';
+    const colNo = frame.lineno && frame.colno ? `:${frame.colno}` : '';
+    result = `${module}@${functionName}${lineNo}${colNo}`;
+    _FUNCTION_NAME_FROM_FRAME_CACHE.set(frame, result);
+  }
+  return result;
+}
 
 /**
  * Groups consequent spans with the same description and op into a single span per each level.
@@ -126,12 +140,13 @@ export function getSpansFromProfile(
       const frame = profile.frames[currentStack[frameIdxIdx]];
       // XXX: We may wanna skip frames that doesn't have `in_app` set to true
       //      that said it's better to have this as a dynamic filter
+      const [op, description] = getFunctionNameFromFrame(frame).split('@');
       const spanFromFrame: Span = {
         span_id: generateUuidv4(),
         parent_span_id: currentSpan.span_id,
         ...commonAttributes,
-        op: frame.module,
-        description: frame.function || `<anonymous>@${frame.lineno}:${frame.colno}`,
+        op,
+        description,
         data: {
           ...frame,
         },

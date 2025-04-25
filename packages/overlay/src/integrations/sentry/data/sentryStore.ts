@@ -22,7 +22,7 @@ import { getNativeFetchImplementation } from '../utils/fetch';
 import { sdkToPlatform } from '../utils/sdkToPlatform';
 import { isErrorEvent, isProfileEvent, isTraceEvent } from '../utils/sentry';
 import { compareSpans, groupSpans } from '../utils/traces';
-import { graftProfileSpans } from './profiles';
+import { getFunctionNameFromFrame, graftProfileSpans } from './profiles';
 
 function toTimestamp(date: string | number) {
   if (typeof date === 'string') return new Date(date).getTime();
@@ -427,20 +427,11 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
 
         const stackId = sample.stack_id;
         const frameIndices = profile.stacks[stackId];
-        if (!frameIndices?.length) continue;
 
         // go over each stack frame (frame = 1 func/meth call)
         for (const frameIdx of frameIndices) {
           const frame = profile.frames[frameIdx];
-          if (!frame) continue;
-
-          const funcName =
-            frame.function ||
-            (frame.module
-              ? `${frame.module}:<anonymous>`
-              : frame.filename
-                ? `${frame.filename}:${frame.lineno || '?'}`
-                : '<unknown>');
+          const funcName = getFunctionNameFromFrame(frame);
 
           const existing = aggregateCalls.get(funcName) || {
             name: funcName,
