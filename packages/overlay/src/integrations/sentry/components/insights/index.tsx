@@ -6,7 +6,7 @@ import { useSentrySpanCounts } from '../../data/useSentrySpans';
 import { createTab } from '../../utils/tabs';
 import HiddenItemsButton from '../shared/HiddenItemsButton';
 import EnvelopesTab from './envelopes';
-import FunctionProfiles from './FunctionProfiles';
+import Profiles from './Profiles';
 import Queries from './Queries';
 import QuerySummary from './QuerySummary';
 import Resources from './Resources';
@@ -26,7 +26,7 @@ export default function InsightsTabDetails() {
     createTab('queries', 'Queries'),
     createTab('webvitals', 'Web Vitals'),
     createTab('resources', 'Resources'),
-    createTab('functionprofiles', 'Profiles'),
+    createTab('profiles', 'Profiles'),
     createTab('envelopes', 'Envelopes'),
     createTab('sdks', 'SDKs'),
   ];
@@ -53,7 +53,7 @@ export default function InsightsTabDetails() {
           {/* Default tab */}
           <Route path="queries" element={<Queries showAll={showAll} />} />
           <Route path="*" element={<Navigate to="/insights/queries" replace />} />
-          <Route path="functionprofiles" element={<FunctionProfiles />} />
+          <Route path="profiles" element={<Profiles />} />
         </Routes>
         <Outlet />
       </div>

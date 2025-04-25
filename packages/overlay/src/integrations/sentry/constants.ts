@@ -1,33 +1,33 @@
 export const DB_SPAN_REGEX = /^db(?:\.[A-Za-z]+)*$/;
 
-export const FUNCTION_PROFILES_SORT_KEYS = {
+export const AGGREGATE_CALL_PROFILES_SORT_KEYS = {
   functionName: 'FUNCTION_NAME',
   timeSpent: 'TIME_SPENT',
   samples: 'SAMPLES',
   profiles: 'PROFILES',
 };
 
-export const FUNCTION_PROFILES_HEADERS = [
+export const AGGREGATE_PROFILES_HEADERS = [
   {
     id: 'name',
     title: 'Function Name',
-    sortKey: FUNCTION_PROFILES_SORT_KEYS.functionName,
+    sortKey: AGGREGATE_CALL_PROFILES_SORT_KEYS.functionName,
     primary: true,
   },
   {
     id: 'timeSpent',
     title: 'Time Spent',
-    sortKey: FUNCTION_PROFILES_SORT_KEYS.timeSpent,
+    sortKey: AGGREGATE_CALL_PROFILES_SORT_KEYS.timeSpent,
   },
   {
     id: 'samples',
     title: 'Samples',
-    sortKey: FUNCTION_PROFILES_SORT_KEYS.samples,
+    sortKey: AGGREGATE_CALL_PROFILES_SORT_KEYS.samples,
   },
   {
     id: 'profile',
     title: 'Profile',
-    sortKey: FUNCTION_PROFILES_SORT_KEYS.profiles,
+    sortKey: AGGREGATE_CALL_PROFILES_SORT_KEYS.profiles,
   },
 ];
 

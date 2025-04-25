@@ -7,7 +7,7 @@ import { generateUuidv4 } from '../../../lib/uuid';
 import type { RawEventContext } from '../../integration';
 import { SUPPORTED_EVENT_TYPES } from '../constants/sentry';
 import type {
-  FunctionProfile,
+  AggregateCallData,
   ProfileSample,
   Sdk,
   SentryErrorEvent,
@@ -77,7 +77,7 @@ interface SentryStoreActions {
   getTraceById: (id: string) => Trace | undefined;
   getProfileByTraceId: (id: string) => SentryProfileWithTraceMeta | undefined;
   getEventsByTrace: (traceId: string, spanId?: string | null) => SentryEvent[];
-  getFunctionProfiles: () => FunctionProfile[];
+  getAggregateCallData: () => AggregateCallData[];
 
   setSidecarUrl: (url: string) => void;
 
@@ -412,12 +412,12 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
     );
   },
 
-  getFunctionProfiles(): FunctionProfile[] {
+  getAggregateCallData(): AggregateCallData[] {
     // separate profiles
-    const allProfiles: FunctionProfile[] = [];
+    const allProfiles: AggregateCallData[] = [];
 
     for (const [traceId, profile] of this.profilesByTraceId) {
-      const functionProfiles = new Map<string, FunctionProfile>();
+      const aggregateCalls = new Map<string, AggregateCallData>();
 
       // Go over each profile sample
       for (let sampleIdx = 0; sampleIdx < profile.samples.length - 1; sampleIdx++) {
@@ -442,7 +442,7 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
                 ? `${frame.filename}:${frame.lineno || '?'}`
                 : '<unknown>');
 
-          const existing = functionProfiles.get(funcName) || {
+          const existing = aggregateCalls.get(funcName) || {
             name: funcName,
             totalTime: 0,
             samples: 0,
@@ -456,11 +456,11 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
             existing.frames.push(frame);
           }
 
-          functionProfiles.set(funcName, existing);
+          aggregateCalls.set(funcName, existing);
         }
       }
 
-      allProfiles.push(...functionProfiles.values());
+      allProfiles.push(...aggregateCalls.values());
     }
 
     return allProfiles;

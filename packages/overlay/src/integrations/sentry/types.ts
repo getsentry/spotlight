@@ -158,7 +158,7 @@ export type SentryProcessedProfile = SentryProfile & {
   samples: ProcessedProfileSample[];
 };
 
-export type FunctionProfile = {
+export type AggregateCallData = {
   name: string;
   totalTime: number;
   samples: number;

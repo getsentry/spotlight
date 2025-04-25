@@ -2,55 +2,56 @@ import { useMemo } from 'react';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
-import { FUNCTION_PROFILES_HEADERS, FUNCTION_PROFILES_SORT_KEYS } from '../../constants';
+import { AGGREGATE_CALL_PROFILES_SORT_KEYS, AGGREGATE_PROFILES_HEADERS } from '../../constants';
 import useSentryStore from '../../data/sentryStore';
 import useSort from '../../hooks/useSort';
-import type { FunctionProfile } from '../../types';
+import type { AggregateCallData } from '../../types';
 import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
 import { TimeBar } from '../shared/TimeBar';
 
-type FunctionProfileComparator = (a: FunctionProfile, b: FunctionProfile) => number;
-type FunctionProfileSortTypes = (typeof FUNCTION_PROFILES_SORT_KEYS)[keyof typeof FUNCTION_PROFILES_SORT_KEYS];
+type AggregateCallProfileComparator = (a: AggregateCallData, b: AggregateCallData) => number;
+type AggregateCallProfileSortTypes =
+  (typeof AGGREGATE_CALL_PROFILES_SORT_KEYS)[keyof typeof AGGREGATE_CALL_PROFILES_SORT_KEYS];
 
-const COMPARATORS: Record<FunctionProfileSortTypes, FunctionProfileComparator> = {
-  [FUNCTION_PROFILES_SORT_KEYS.functionName]: (a, b) => {
+const COMPARATORS: Record<AggregateCallProfileSortTypes, AggregateCallProfileComparator> = {
+  [AGGREGATE_CALL_PROFILES_SORT_KEYS.functionName]: (a, b) => {
     if (a.name < b.name) return -1;
     if (a.name > b.name) return 1;
     return 0;
   },
-  [FUNCTION_PROFILES_SORT_KEYS.timeSpent]: (a, b) => a.totalTime - b.totalTime,
-  [FUNCTION_PROFILES_SORT_KEYS.samples]: (a, b) => a.samples - b.samples,
-  [FUNCTION_PROFILES_SORT_KEYS.profiles]: (a, b) => {
+  [AGGREGATE_CALL_PROFILES_SORT_KEYS.timeSpent]: (a, b) => a.totalTime - b.totalTime,
+  [AGGREGATE_CALL_PROFILES_SORT_KEYS.samples]: (a, b) => a.samples - b.samples,
+  [AGGREGATE_CALL_PROFILES_SORT_KEYS.profiles]: (a, b) => {
     if (a.traceId < b.traceId) return -1;
     if (a.traceId > b.traceId) return 1;
     return 0;
   },
 };
 
-function FunctionProfiles() {
-  const { sort, toggleSortOrder } = useSort({ defaultSortType: FUNCTION_PROFILES_SORT_KEYS.timeSpent });
+function Profiles() {
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: AGGREGATE_CALL_PROFILES_SORT_KEYS.timeSpent });
 
-  const functionProfiles = useMemo(() => {
-    const profiles = useSentryStore.getState().getFunctionProfiles();
-    const compareProfileInfo = COMPARATORS[sort.active] || COMPARATORS[FUNCTION_PROFILES_SORT_KEYS.timeSpent];
+  const aggregateCallData = useMemo(() => {
+    const profiles = useSentryStore.getState().getAggregateCallData();
+    const compareProfileInfo = COMPARATORS[sort.active] || COMPARATORS[AGGREGATE_CALL_PROFILES_SORT_KEYS.timeSpent];
 
     return profiles.sort((a, b) => {
       return sort.asc ? compareProfileInfo(a, b) : compareProfileInfo(b, a);
     });
   }, [sort]);
 
-  if (!functionProfiles.length) {
+  if (!aggregateCallData.length) {
     return <p className="text-primary-300 px-6 py-4">No profiles found.</p>;
   }
 
   // Calculate max time for bar visualization (100%, scaling form here)
-  const maxTime = Math.max(...functionProfiles.map(profile => profile.totalTime));
+  const maxTime = Math.max(...aggregateCallData.map(profile => profile.totalTime));
 
   return (
     <table className="divide-primary-700 w-full table-fixed divide-y">
       <thead>
         <tr>
-          {FUNCTION_PROFILES_HEADERS.map(header => (
+          {AGGREGATE_PROFILES_HEADERS.map(header => (
             <th
               key={header.id}
               scope="col"
@@ -85,7 +86,7 @@ function FunctionProfiles() {
         </tr>
       </thead>
       <tbody>
-        {functionProfiles.map(profile => (
+        {aggregateCallData.map(profile => (
           <tr key={`${profile.traceId}-${profile.name}`} className="hover:bg-primary-900">
             <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4">
               <TimeBar value={profile.totalTime} maxValue={maxTime} title={profile.name} />
@@ -108,4 +109,4 @@ function FunctionProfiles() {
   );
 }
 
-export default FunctionProfiles;
+export default Profiles;
