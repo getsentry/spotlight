@@ -39,7 +39,7 @@ function FunctionProfiles() {
     });
   }, [sort]);
 
-  if (!functionProfiles?.length) {
+  if (!functionProfiles.length) {
     return <p className="text-primary-300 px-6 py-4">No profiles found.</p>;
   }
 
