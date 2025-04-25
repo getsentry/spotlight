@@ -2,7 +2,7 @@ export const DB_SPAN_REGEX = /^db(?:\.[A-Za-z]+)*$/;
 
 export const AGGREGATE_CALL_PROFILES_SORT_KEYS = {
   functionName: 'FUNCTION_NAME',
-  timeSpent: 'TIME_SPENT',
+  totalTime: 'TIME_SPENT',
   samples: 'SAMPLES',
   traces: 'TRACES',
 };
@@ -15,9 +15,9 @@ export const AGGREGATE_PROFILES_HEADERS = [
     primary: true,
   },
   {
-    id: 'timeSpent',
-    title: 'Time Spent',
-    sortKey: AGGREGATE_CALL_PROFILES_SORT_KEYS.timeSpent,
+    id: 'totalTime',
+    title: 'Total Time',
+    sortKey: AGGREGATE_CALL_PROFILES_SORT_KEYS.totalTime,
   },
   {
     id: 'samples',
@@ -33,7 +33,7 @@ export const AGGREGATE_PROFILES_HEADERS = [
 
 export const RESOURCES_SORT_KEYS = {
   avgDuration: 'AVG_DURATION',
-  timeSpent: 'TIME_SPENT',
+  totalTime: 'TOTAL_TIME',
   description: 'DESC',
   avgEncodedSize: 'AVG_ENCODED_SIZE',
 };

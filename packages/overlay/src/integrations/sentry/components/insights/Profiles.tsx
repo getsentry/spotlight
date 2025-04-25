@@ -20,17 +20,17 @@ const COMPARATORS: Record<AggregateCallProfileSortTypes, AggregateCallProfileCom
     if (a.name > b.name) return 1;
     return 0;
   },
-  [AGGREGATE_CALL_PROFILES_SORT_KEYS.timeSpent]: (a, b) => a.totalTime - b.totalTime,
+  [AGGREGATE_CALL_PROFILES_SORT_KEYS.totalTime]: (a, b) => a.totalTime - b.totalTime,
   [AGGREGATE_CALL_PROFILES_SORT_KEYS.samples]: (a, b) => a.samples - b.samples,
   [AGGREGATE_CALL_PROFILES_SORT_KEYS.traces]: (a, b) => a.traceIds.size - b.traceIds.size,
 };
 
 function Profiles() {
-  const { sort, toggleSortOrder } = useSort({ defaultSortType: AGGREGATE_CALL_PROFILES_SORT_KEYS.timeSpent });
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: AGGREGATE_CALL_PROFILES_SORT_KEYS.totalTime });
 
   const aggregateCallData = useMemo(() => {
     const profiles = useSentryStore.getState().getAggregateCallData();
-    const compareProfileInfo = COMPARATORS[sort.active] || COMPARATORS[AGGREGATE_CALL_PROFILES_SORT_KEYS.timeSpent];
+    const compareProfileInfo = COMPARATORS[sort.active] || COMPARATORS[AGGREGATE_CALL_PROFILES_SORT_KEYS.totalTime];
 
     return profiles.sort((a, b) => {
       return sort.asc ? compareProfileInfo(a, b) : compareProfileInfo(b, a);
@@ -86,7 +86,12 @@ function Profiles() {
         {aggregateCallData.map(callData => (
           <tr key={`${callData.name}`} className="hover:bg-primary-900">
             <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4">
-              <TimeBar value={callData.totalTime} maxValue={maxTime} title={callData.name} />
+              <TimeBar
+                value={callData.totalTime}
+                maxValue={maxTime}
+                title={callData.name}
+                text={callData.name.split('@')[1].split(':', 1)[0]}
+              />
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
               <span className={getSpanDurationClassName(callData.totalTime)}>

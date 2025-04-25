@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useContext } from 'react';
+import { type ReactNode, createContext, useContext } from 'react';
 import classNames from '~/lib/classNames';
 
 type TableVariant = 'default' | 'detail';
