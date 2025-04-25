@@ -33,7 +33,7 @@ export const AGGREGATE_PROFILES_HEADERS = [
 
 export const RESOURCES_SORT_KEYS = {
   avgDuration: 'AVG_DURATION',
-  totalTime: 'TOTAL_TIME',
+  timeSpent: 'TIME_SPENT',
   description: 'DESC',
   avgEncodedSize: 'AVG_ENCODED_SIZE',
 };
