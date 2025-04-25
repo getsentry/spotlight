@@ -1,5 +1,8 @@
 import type { EventEnvelopeHeaders, Measurements } from '@sentry/core';
 
+export type TraceId = string;
+export type SpanId = string;
+
 export type FrameVars = {
   [key: string]: string;
 };
@@ -105,8 +108,8 @@ export type SentryErrorEvent = CommonEventAttrs & {
 };
 
 export type Span = {
-  trace_id?: string;
-  span_id: string;
+  trace_id?: TraceId;
+  span_id: SpanId;
   parent_span_id?: string | null;
   op?: string | null;
   description?: string | null;
@@ -156,6 +159,13 @@ export type SentryProfile = {
 
 export type SentryProcessedProfile = SentryProfile & {
   samples: ProcessedProfileSample[];
+};
+
+export type AggregateCallData = {
+  name: string;
+  totalTime: number;
+  samples: number;
+  traceIds: Set<TraceId>;
 };
 
 export type SentryDeviceInfo = {

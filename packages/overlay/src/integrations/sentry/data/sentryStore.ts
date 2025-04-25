@@ -7,6 +7,8 @@ import { generateUuidv4 } from '../../../lib/uuid';
 import type { RawEventContext } from '../../integration';
 import { SUPPORTED_EVENT_TYPES } from '../constants/sentry';
 import type {
+  TraceId,
+  AggregateCallData,
   ProfileSample,
   Sdk,
   SentryErrorEvent,
@@ -21,7 +23,7 @@ import { getNativeFetchImplementation } from '../utils/fetch';
 import { sdkToPlatform } from '../utils/sdkToPlatform';
 import { isErrorEvent, isProfileEvent, isTraceEvent } from '../utils/sentry';
 import { compareSpans, groupSpans } from '../utils/traces';
-import { graftProfileSpans } from './profiles';
+import { getFunctionNameFromFrame, graftProfileSpans } from './profiles';
 
 function toTimestamp(date: string | number) {
   if (typeof date === 'string') return new Date(date).getTime();
@@ -76,6 +78,7 @@ interface SentryStoreActions {
   getTraceById: (id: string) => Trace | undefined;
   getProfileByTraceId: (id: string) => SentryProfileWithTraceMeta | undefined;
   getEventsByTrace: (traceId: string, spanId?: string | null) => SentryEvent[];
+  getAggregateCallData: () => AggregateCallData[];
 
   setSidecarUrl: (url: string) => void;
 
@@ -408,6 +411,43 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
         }
       }),
     );
+  },
+
+  getAggregateCallData(): AggregateCallData[] {
+    const aggregateCalls = new Map<string, AggregateCallData>();
+    for (const [traceId, profile] of this.profilesByTraceId) {
+      for (let sampleIdx = 0; sampleIdx < profile.samples.length - 1; sampleIdx++) {
+        const sample = profile.samples[sampleIdx];
+        const nextSample = profile.samples[sampleIdx + 1];
+        // TODO: Handle the case where nextSample is undefined -- use the end of the profile or associated trace
+        const duration = nextSample.start_timestamp - sample.start_timestamp;
+        // TODO: Keep a running average based on continuous samples
+        //       as in where we keep seeing the same function name / frame back to back
+
+        const stackId = sample.stack_id;
+        const frameIndices = profile.stacks[stackId];
+
+        for (const frameIdx of frameIndices) {
+          const frame = profile.frames[frameIdx];
+          const name = getFunctionNameFromFrame(frame);
+          const callData = aggregateCalls.get(name);
+          if (callData) {
+            callData.totalTime += duration;
+            callData.samples += 1;
+            callData.traceIds.add(traceId);
+          } else {
+            aggregateCalls.set(name, {
+              name,
+              totalTime: duration,
+              samples: 1,
+              traceIds: new Set<TraceId>([traceId]),
+            });
+          }
+        }
+      }
+    }
+
+    return Array.from(aggregateCalls.values());
   },
 
   subscribe: (...args: Subscription) => {
