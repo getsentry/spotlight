@@ -165,7 +165,6 @@ export type AggregateCallData = {
   name: string;
   totalTime: number;
   samples: number;
-  frames: Set<EventFrame>;
   traceIds: Set<TraceId>;
 };
 

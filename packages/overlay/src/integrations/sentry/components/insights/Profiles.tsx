@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
+import Table from '~/ui/Table';
 import { AGGREGATE_CALL_PROFILES_SORT_KEYS, AGGREGATE_PROFILES_HEADERS } from '../../constants';
 import useSentryStore from '../../data/sentryStore';
 import useSort from '../../hooks/useSort';
@@ -44,8 +45,8 @@ function Profiles() {
   const maxTime = Math.max(...aggregateCallData.map(profile => profile.totalTime));
 
   return (
-    <table className="divide-primary-700 w-full table-fixed divide-y">
-      <thead>
+    <Table variant="detail">
+      <Table.Header>
         <tr>
           {AGGREGATE_PROFILES_HEADERS.map(header => (
             <th
@@ -80,8 +81,8 @@ function Profiles() {
             </th>
           ))}
         </tr>
-      </thead>
-      <tbody>
+      </Table.Header>
+      <Table.Body>
         {aggregateCallData.map(callData => (
           <tr key={`${callData.name}`} className="hover:bg-primary-900">
             <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4">
@@ -100,8 +101,8 @@ function Profiles() {
             </td>
           </tr>
         ))}
-      </tbody>
-    </table>
+      </Table.Body>
+    </Table>
   );
 }
 

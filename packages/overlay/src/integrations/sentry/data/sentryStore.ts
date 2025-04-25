@@ -6,19 +6,18 @@ import { log } from '../../../lib/logger';
 import { generateUuidv4 } from '../../../lib/uuid';
 import type { RawEventContext } from '../../integration';
 import { SUPPORTED_EVENT_TYPES } from '../constants/sentry';
-import {
-  EventFrame,
+import type {
   TraceId,
-  type AggregateCallData,
-  type ProfileSample,
-  type Sdk,
-  type SentryErrorEvent,
-  type SentryEvent,
-  type SentryProcessedProfile,
-  type SentryProfileTransactionInfo,
-  type SentryTransactionEvent,
-  type Span,
-  type Trace,
+  AggregateCallData,
+  ProfileSample,
+  Sdk,
+  SentryErrorEvent,
+  SentryEvent,
+  SentryProcessedProfile,
+  SentryProfileTransactionInfo,
+  SentryTransactionEvent,
+  Span,
+  Trace,
 } from '../types';
 import { getNativeFetchImplementation } from '../utils/fetch';
 import { sdkToPlatform } from '../utils/sdkToPlatform';
@@ -422,8 +421,8 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
         const nextSample = profile.samples[sampleIdx + 1];
         // TODO: Handle the case where nextSample is undefined -- use the end of the profile or associated trace
         const duration = nextSample.start_timestamp - sample.start_timestamp;
-        // TODO: Keep a running average based on continuous samples -- as in where we keep seeing the same
-        //       function name / frame back to back
+        // TODO: Keep a running average based on continuous samples
+        //       as in where we keep seeing the same function name / frame back to back
 
         const stackId = sample.stack_id;
         const frameIndices = profile.stacks[stackId];
@@ -435,14 +434,12 @@ const useSentryStore = create<SentryStoreState & SentryStoreActions>()((set, get
           if (callData) {
             callData.totalTime += duration;
             callData.samples += 1;
-            callData.frames.add(frame);
             callData.traceIds.add(traceId);
           } else {
             aggregateCalls.set(name, {
               name,
               totalTime: duration,
               samples: 1,
-              frames: new Set<EventFrame>([frame]),
               traceIds: new Set<TraceId>([traceId]),
             });
           }
