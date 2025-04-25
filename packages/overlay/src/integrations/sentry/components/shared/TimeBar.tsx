@@ -8,7 +8,7 @@ type TimeBarProps = {
 };
 
 export function TimeBar({ value, maxValue, title, className }: TimeBarProps) {
-  const percentage = (value / maxValue) * 100;
+  const percentage = maxValue !== 0 ? (value / maxValue) * 100 : 100;
 
   return (
     <div className={classNames('relative text-left text-sm font-medium', className)}>
