@@ -3,8 +3,8 @@ import { removeURLSuffix } from '~/lib/removeURLSuffix';
 import { off, on } from '../../lib/eventTarget';
 import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
-import useSentryStore from './data/sentryStore';
 import { spotlightIntegration } from './sentry-integration';
+import useSentryStore from './store';
 import ErrorsTab from './tabs/ErrorsTab';
 import InsightsTab from './tabs/InsightsTab';
 

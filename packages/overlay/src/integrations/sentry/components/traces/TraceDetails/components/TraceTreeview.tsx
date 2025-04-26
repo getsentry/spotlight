@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ReactComponent as CrossIcon } from '~/assets/cross.svg';
 import { SearchProvider, useSearch } from '~/integrations/sentry/context/SearchContext';
-import useSentryStore from '~/integrations/sentry/data/sentryStore';
 import useSearchInput from '~/integrations/sentry/hooks/useSearchInput';
+import useSentryStore from '~/integrations/sentry/store';
 import type { Trace } from '~/integrations/sentry/types';
 import { getFormattedSpanDuration } from '../../../../utils/duration';
 

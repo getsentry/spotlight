@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import React, { useEffect, useReducer } from 'react';
+import useSentryStore from '../store';
 import type { SentryEvent } from '../types';
-import useSentryStore from './sentryStore';
 
 interface SetEventsAction {
   e: SentryEvent | SentryEvent[];

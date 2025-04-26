@@ -1,9 +1,9 @@
 import { log } from '~/lib/logger';
 import { generateUuidv4 } from '../../../lib/uuid';
+import useSentryStore from '../store';
+import type { SentryProfileWithTraceMeta } from '../store/types';
 import type { EventFrame, Span, Trace } from '../types';
 import { compareSpans } from '../utils/traces';
-import type { SentryProfileWithTraceMeta } from './sentryStore';
-import useSentryStore from './sentryStore';
 
 const _FUNCTION_NAME_FROM_FRAME_CACHE = new Map<EventFrame, string>();
 export function getFunctionNameFromFrame(frame: EventFrame): string {

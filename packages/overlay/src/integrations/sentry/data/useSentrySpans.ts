@@ -1,7 +1,7 @@
 import { useContext } from 'react';
+import useSentryStore from '../store';
 import type { Span, Trace } from '../types';
 import { SentryEventsContext } from './sentryEventsContext';
-import useSentryStore from './sentryStore';
 import { useSentryHelpers } from './useSentryHelpers';
 
 export function useSentryTraces() {

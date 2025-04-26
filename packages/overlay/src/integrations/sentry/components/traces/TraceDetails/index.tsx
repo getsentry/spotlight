@@ -2,9 +2,9 @@ import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { createTab } from '~/integrations/sentry/utils/tabs';
 
 import Tabs from '~/components/Tabs';
-import useSentryStore from '~/integrations/sentry/data/sentryStore';
 import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
 import { useSentryHelpers } from '~/integrations/sentry/data/useSentryHelpers';
+import useSentryStore from '~/integrations/sentry/store';
 import { isErrorEvent } from '~/integrations/sentry/utils/sentry';
 import EventContexts from '../../events/EventContexts';
 import EventList from '../../events/EventList';

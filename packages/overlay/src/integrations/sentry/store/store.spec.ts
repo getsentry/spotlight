@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { describe, expect, test } from 'vitest';
 import { processEnvelope } from '../index';
-import useSentryStore from './sentryStore';
+import useSentryStore from './index';
 
 describe('SentryStore', () => {
   // We need to refactor this to make it actually testable
