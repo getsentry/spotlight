@@ -9,7 +9,7 @@ import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from '../../constants'
 import { useSentrySpans } from '../../data/useSentrySpans';
 import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
-import { getFormattedDuration } from '../../utils/duration';
+import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
 import { truncateId } from '../../utils/text';
 
 type SpanInfoComparator = (a: Span, b: Span) => number;
@@ -122,7 +122,9 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
                 </Link>
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                {getFormattedDuration(span.timestamp - span.start_timestamp)}
+                <span className={getSpanDurationClassName(span.timestamp - span.start_timestamp)}>
+                  {getFormattedDuration(span.timestamp - span.start_timestamp)}
+                </span>
               </td>
             </tr>
           ))}

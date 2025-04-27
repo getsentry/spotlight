@@ -8,7 +8,7 @@ import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from '../../constan
 import { useSentrySpans } from '../../data/useSentrySpans';
 import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
-import { getFormattedDuration } from '../../utils/duration';
+import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
 import { TimeBar } from '../shared/TimeBar';
 
 type QueryInfo = {
@@ -130,10 +130,14 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
                 />
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                {getFormattedDuration(query.totalTime)}
+                <span className={getSpanDurationClassName(query.totalTime)}>
+                  {getFormattedDuration(query.totalTime)}
+                </span>
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                {getFormattedDuration(query.avgDuration)}
+                <span className={getSpanDurationClassName(query.avgDuration)}>
+                  {getFormattedDuration(query.avgDuration)}
+                </span>
               </td>
             </tr>
           ))}

@@ -9,7 +9,7 @@ import { useSentrySpans } from '../../data/useSentrySpans';
 import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
 import { formatBytes } from '../../utils/bytes';
-import { getFormattedDuration } from '../../utils/duration';
+import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
 
 type ResourceInfo = {
   avgDuration: number;
@@ -152,10 +152,14 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
               </Tooltip>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              {getFormattedDuration(resource.avgDuration)}
+              <span className={getSpanDurationClassName(resource.avgDuration)}>
+                {getFormattedDuration(resource.avgDuration)}
+              </span>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              {getFormattedDuration(resource.totalTime)}
+              <span className={getSpanDurationClassName(resource.totalTime)}>
+                {getFormattedDuration(resource.totalTime)}
+              </span>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
               {formatBytes(resource.avgEncodedSize)}
