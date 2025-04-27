@@ -10,7 +10,6 @@ type TimeBarProps = {
 
 export function TimeBar({ value, maxValue, title, text, className }: TimeBarProps) {
   const percentage = maxValue !== 0 ? Math.round((value / maxValue) * 100) : 100;
-  console.log(percentage);
   const tooltip = title ?? text ?? '';
 
   return (
