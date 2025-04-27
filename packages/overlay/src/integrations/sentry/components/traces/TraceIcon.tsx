@@ -6,9 +6,21 @@ export type TraceIconProps = {
   trace: Trace;
 };
 
-function getPlatformsFromTrace(trace: Trace) {
-  return [...new Set((trace.transactions || []).map(transaction => sdkToPlatform(transaction.sdk?.name || 'unknown')))];
-}
+const getPlatformsFromTrace = (trace: Trace) => {
+  const transactions = trace.transactions || [];
+
+  const platformCounts = transactions.reduce((platformMap, transaction) => {
+    const sdkName = transaction.sdk?.name || 'unknown';
+    const platform = sdkToPlatform(sdkName);
+    const currentCount = platformMap.get(platform) || 0;
+    platformMap.set(platform, currentCount + 1);
+    return platformMap;
+  }, new Map());
+
+  return Array.from(platformCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([platform]) => platform);
+};
 
 export default function TraceIcon({ trace }: TraceIconProps) {
   const platformsInTrace = getPlatformsFromTrace(trace);
