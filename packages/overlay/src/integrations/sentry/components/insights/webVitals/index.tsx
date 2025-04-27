@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { KeyboardEvent, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
@@ -55,6 +55,19 @@ const WebVitals = () => {
     );
   }, [events, sort]);
 
+  const handleRowClick = (measurementEvent: SentryEventWithPerformanceData) => {
+    navigate(`/insights/webvitals/${measurementEvent.event_id}`);
+  };
+
+  const handleRowKeyDown = (
+    e: KeyboardEvent<HTMLTableRowElement>,
+    measurementEvent: SentryEventWithPerformanceData,
+  ) => {
+    if (e.key === 'Enter') {
+      handleRowClick(measurementEvent);
+    }
+  };
+
   if (!measurementEvents?.length) {
     return <p className="text-primary-300 px-6 py-4">No Measurements found.</p>;
   }
@@ -102,7 +115,10 @@ const WebVitals = () => {
             <tr
               key={event.event_id}
               className="hover:bg-primary-900 cursor-pointer"
-              onClick={() => navigate(`/insights/webvitals/${event.event_id}`)}
+              onClick={() => handleRowClick(event)}
+              onKeyDown={e => handleRowKeyDown(e, event)}
+              tabIndex={0}
+              role="link"
             >
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
                 {event.transaction}

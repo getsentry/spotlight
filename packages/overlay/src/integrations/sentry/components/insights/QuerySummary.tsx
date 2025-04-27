@@ -27,20 +27,20 @@ const COMPARATORS: Record<QuerySummarySortTypes, SpanInfoComparator> = {
     if (a.span_id > b.span_id) return 1;
     return 0;
   },
-  [QUERY_SUMMARY_SORT_KEYS.timeSpent]: (a, b) => a.timestamp - a.start_timestamp - (b.timestamp - b.start_timestamp),
+  [QUERY_SUMMARY_SORT_KEYS.totalTime]: (a, b) => a.timestamp - a.start_timestamp - (b.timestamp - b.start_timestamp),
 };
 
 const QuerySummary = ({ showAll }: { showAll: boolean }) => {
   const { allSpans, localSpans } = useSentrySpans();
   const { type } = useParams();
-  const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERY_SUMMARY_SORT_KEYS.timeSpent });
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERY_SUMMARY_SORT_KEYS.totalTime });
 
   const filteredDBSpans: Span[] = useMemo(() => {
     if (!type) {
       return [];
     }
     const spans = showAll ? allSpans : localSpans;
-    const compareSpanInfo = COMPARATORS[sort.active] || COMPARATORS[QUERY_SUMMARY_SORT_KEYS.timeSpent];
+    const compareSpanInfo = COMPARATORS[sort.active] || COMPARATORS[QUERY_SUMMARY_SORT_KEYS.totalTime];
 
     // Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/atob
     const decodedType: string = atob(type);
