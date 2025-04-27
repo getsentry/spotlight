@@ -5,7 +5,6 @@ import TimeSince from '~/components/TimeSince';
 import classNames from '~/lib/classNames';
 import Badge from '~/ui/Badge';
 import { useSentryEnvelopes } from '../../../data/useSentryEnvelopes';
-import { useSentryHelpers } from '../../../data/useSentryHelpers';
 import useSentryStore from '../../../store';
 import { sdkToPlatform } from '../../../utils/sdkToPlatform';
 import { truncateId } from '../../../utils/text';
@@ -14,9 +13,8 @@ import EnvelopeDetails from './EnvelopeDetails';
 
 export default function EnvelopeList({ showAll }: { showAll: boolean }) {
   const { eventId } = useParams();
-  const helpers = useSentryHelpers();
   const { allEnvelopes, localEnvelopes } = useSentryEnvelopes();
-  const getEnvelopes = useSentryStore(state => state.getEnvelopes);
+  const { getEnvelopes, isTraceLocal } = useSentryStore();
 
   const selectedEnvelope = eventId
     ? getEnvelopes().find(({ envelope: _env }) => _env[0].event_id === eventId) || null
@@ -48,7 +46,7 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
                       <h2 className="text-primary-50 text-xs">Event Id</h2>
                       <div className="flex items-center gap-x-2">
                         <div>{truncateId(envelopeEventId)}</div>
-                        {trace_id && helpers.isLocalToSession(trace_id) ? (
+                        {trace_id && isTraceLocal(trace_id) ? (
                           <Badge title="This trace is part of your local session.">Local</Badge>
                         ) : null}
                       </div>

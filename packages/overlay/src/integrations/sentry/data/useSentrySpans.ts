@@ -6,9 +6,10 @@ import { useSentryHelpers } from './useSentryHelpers';
 
 export function useSentryTraces() {
   useContext(SentryEventsContext);
-  const helpers = useSentryHelpers();
-  const allTraces = useSentryStore(state => state.getTraces());
-  const localTraces = allTraces.filter(t => helpers.isLocalToSession(t.trace_id) !== false);
+  const { getLocalTraces } = useSentryHelpers();
+  const { getTraces } = useSentryStore();
+  const allTraces = getTraces();
+  const localTraces = getLocalTraces();
 
   return { allTraces, localTraces };
 }

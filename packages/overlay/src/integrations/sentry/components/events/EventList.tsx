@@ -5,7 +5,7 @@ import Badge from '~/ui/Badge';
 import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
 import { useSentryEvents } from '../../data/useSentryEvents';
-import { useSentryHelpers } from '../../data/useSentryHelpers';
+import useSentryStore from '../../store';
 import { isErrorEvent } from '../../utils/sentry';
 import { truncateId } from '../../utils/text';
 import HiddenItemsButton from '../shared/HiddenItemsButton';
@@ -14,8 +14,8 @@ import { EventSummary } from './Event';
 
 export default function EventList({ traceId }: { traceId?: string }) {
   const events = useSentryEvents(traceId);
-  const helpers = useSentryHelpers();
   const context = useSpotlightContext();
+  const { isTraceLocal } = useSentryStore();
 
   const matchingEvents = events.filter(isErrorEvent);
 
@@ -23,7 +23,7 @@ export default function EventList({ traceId }: { traceId?: string }) {
   const filteredEvents = showAll
     ? matchingEvents
     : matchingEvents.filter(
-        e => (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
+        e => (e.contexts?.trace?.trace_id ? isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
       );
   const hiddenItemCount = matchingEvents.length - filteredEvents.length;
 
@@ -49,7 +49,7 @@ export default function EventList({ traceId }: { traceId?: string }) {
             <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
               <div className="flex items-center gap-x-2">
                 <div>{truncateId(e.event_id)}</div>
-                {traceId && helpers.isLocalToSession(traceId) ? (
+                {traceId && isTraceLocal(traceId) ? (
                   <Badge title="This event is part of your local session.">Local</Badge>
                 ) : null}
               </div>

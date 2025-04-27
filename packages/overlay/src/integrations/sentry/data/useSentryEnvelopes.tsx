@@ -2,11 +2,11 @@ import { useContext } from 'react';
 import useSentryStore from '../store';
 import type { Trace } from '../types';
 import { SentryEventsContext } from './sentryEventsContext';
-import { useSentryHelpers } from './useSentryHelpers';
 
 export const useSentryEnvelopes = () => {
   useContext(SentryEventsContext);
-  const helpers = useSentryHelpers();
+  const { isTraceLocal } = useSentryStore();
+
   const getEnvelopes = useSentryStore(state => state.getEnvelopes);
 
   const allEnvelopes = getEnvelopes().sort((a, b) => {
@@ -19,7 +19,7 @@ export const useSentryEnvelopes = () => {
 
   const localEnvelopes = allEnvelopes.filter(({ envelope }) => {
     const trace_id = (envelope[0]?.trace as Trace)?.trace_id;
-    if (trace_id) return helpers.isLocalToSession(trace_id) !== false;
+    if (trace_id) return isTraceLocal(trace_id) !== false;
     return true;
   });
 

@@ -2,4 +2,5 @@
 '@spotlightjs/overlay': minor
 ---
 
-Sentry Store Slices
+- Sentry Store Slices
+- fixes: #773: Added a helper for getting localTrces and removed redundant isTraceLocal helper
