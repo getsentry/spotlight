@@ -9,10 +9,11 @@ import { useSentrySpans } from '../../data/useSentrySpans';
 import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
 import { getFormattedDuration } from '../../utils/duration';
+import { TimeBar } from '../shared/TimeBar';
 
 type QueryInfo = {
   avgDuration: number;
-  timeSpent: number;
+  totalTime: number;
   description: string;
 };
 
@@ -24,7 +25,7 @@ const calculateQueryInfo = ({ query, spanData }: { query: string; spanData: Span
 
   return {
     avgDuration,
-    timeSpent: totalTimeInMs,
+    totalTime: totalTimeInMs,
     description: query,
   };
 };
@@ -38,15 +39,15 @@ const COMPARATORS: Record<QuerySortTypes, QueryInfoComparator> = {
     return 0;
   },
   [QUERIES_SORT_KEYS.avgDuration]: (a, b) => a.avgDuration - b.avgDuration,
-  [QUERIES_SORT_KEYS.timeSpent]: (a, b) => a.timeSpent - b.timeSpent,
+  [QUERIES_SORT_KEYS.totalTime]: (a, b) => a.totalTime - b.totalTime,
 };
 
 const Queries = ({ showAll }: { showAll: boolean }) => {
   const { allSpans, localSpans } = useSentrySpans();
-  const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERIES_SORT_KEYS.timeSpent });
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERIES_SORT_KEYS.totalTime });
 
   const queriesData: QueryInfo[] = useMemo(() => {
-    const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.timeSpent];
+    const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.totalTime];
     const spans = showAll ? allSpans : localSpans;
     const onlyDBSpans = spans.filter((span: Span) => DB_SPAN_REGEX.test(span.op || ''));
     const uniqueSpansSet = new Set(onlyDBSpans.map(span => String(span?.description).trim()));
@@ -57,70 +58,74 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
       .sort((a, b) => (sort.asc ? compareQueryInfo(a, b) : compareQueryInfo(b, a)));
   }, [allSpans, localSpans, showAll, sort]);
 
-  if (queriesData?.length) {
+  if (!queriesData?.length) {
     return (
-      <Table variant="detail">
-        <Table.Header>
-          <tr>
-            {QUERIES_HEADERS.map(header => (
-              <th
-                key={header.id}
-                scope="col"
+      <p className="text-primary-300 px-6 py-4">
+        No Database queries found. Add integration in Sentry initialization to track Database queries.
+      </p>
+    );
+  }
+
+  const maxTime = Math.max(...queriesData.map(query => query.totalTime));
+
+  return (
+    <Table variant="detail">
+      <Table.Header>
+        <tr>
+          {QUERIES_HEADERS.map(header => (
+            <th
+              key={header.id}
+              scope="col"
+              className={classNames(
+                'text-primary-100 select-none px-6 py-3.5 text-sm font-semibold',
+                header.primary ? 'w-2/5' : 'w-[15%]',
+              )}
+            >
+              <div
                 className={classNames(
-                  'text-primary-100 select-none px-6 py-3.5 text-sm font-semibold',
-                  header.primary ? 'w-2/5' : 'w-[15%]',
+                  'flex cursor-pointer items-center gap-1',
+                  header.primary ? 'justify-start' : 'justify-end',
                 )}
+                onClick={() => toggleSortOrder(header.sortKey)}
               >
-                <div
-                  className={classNames(
-                    'flex cursor-pointer items-center gap-1',
-                    header.primary ? 'justify-start' : 'justify-end',
-                  )}
-                  onClick={() => toggleSortOrder(header.sortKey)}
-                >
-                  {header.title}
-                  {sort.active === header.sortKey ? (
-                    <SortDown
-                      width={12}
-                      height={12}
-                      className={classNames(
-                        'fill-primary-300',
-                        sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
-                      )}
-                    />
-                  ) : (
-                    <Sort width={12} height={12} className="stroke-primary-300" />
-                  )}
-                </div>
-              </th>
-            ))}
-          </tr>
-        </Table.Header>
-        <Table.Body>
-          {queriesData.map(query => (
-            <tr key={query.description} className="hover:bg-primary-900">
-              <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                {/* Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa */}
+                {header.title}
+                {sort.active === header.sortKey ? (
+                  <SortDown
+                    width={12}
+                    height={12}
+                    className={classNames(
+                      'fill-primary-300',
+                      sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
+                    )}
+                  />
+                ) : (
+                  <Sort width={12} height={12} className="stroke-primary-300" />
+                )}
+              </div>
+            </th>
+          ))}
+        </tr>
+      </Table.Header>
+      <Table.Body>
+        {queriesData.map(query => (
+          <tr key={query.description} className="hover:bg-primary-900">
+            <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
+              <TimeBar value={query.totalTime} maxValue={maxTime} title={query.description}>
                 <Link className="truncate hover:underline" to={`/insights/queries/${btoa(query.description)}`}>
                   {query.description}
                 </Link>
-              </td>
-              <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                {getFormattedDuration(query.avgDuration)}
-              </td>
-              <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                {getFormattedDuration(query.timeSpent)}
-              </td>
-            </tr>
-          ))}
-        </Table.Body>
-      </Table>
-    );
-  }
-  return (
-    <p className="text-primary-300 px-6 py-4">
-      No Database queries found. Add integration in Sentry initialization to track Database queries.
-    </p>
+              </TimeBar>
+            </td>
+            <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+              {getFormattedDuration(query.avgDuration)}
+            </td>
+            <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+              {getFormattedDuration(query.totalTime)}
+            </td>
+          </tr>
+        ))}
+      </Table.Body>
+    </Table>
   );
 };
 
