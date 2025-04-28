@@ -2,7 +2,7 @@ export const DB_SPAN_REGEX = /^db(?:\.[A-Za-z]+)*$/;
 
 export const AGGREGATE_CALL_PROFILES_SORT_KEYS = {
   functionName: 'FUNCTION_NAME',
-  totalTime: 'TIME_SPENT',
+  totalTime: 'TOTAL_TIME',
   samples: 'SAMPLES',
   traces: 'TRACES',
 };
@@ -33,7 +33,7 @@ export const AGGREGATE_PROFILES_HEADERS = [
 
 export const RESOURCES_SORT_KEYS = {
   avgDuration: 'AVG_DURATION',
-  timeSpent: 'TIME_SPENT',
+  totalTime: 'TOTAL_TIME',
   description: 'DESC',
   avgEncodedSize: 'AVG_ENCODED_SIZE',
 };
@@ -51,9 +51,9 @@ export const RESOURCE_HEADERS = [
     sortKey: RESOURCES_SORT_KEYS.avgDuration,
   },
   {
-    id: 'timeSpent',
-    title: 'Time Spent',
-    sortKey: RESOURCES_SORT_KEYS.timeSpent,
+    id: 'totalTime',
+    title: 'Total Time',
+    sortKey: RESOURCES_SORT_KEYS.totalTime,
   },
   {
     id: 'avgEncodedSize',
@@ -64,7 +64,7 @@ export const RESOURCE_HEADERS = [
 
 export const QUERIES_SORT_KEYS = {
   queryDesc: 'QUERY_DESCRIPTION',
-  timeSpent: 'TIME_SPENT',
+  totalTime: 'TOTAL_TIME',
   avgDuration: 'AVG_DURATION',
 };
 
@@ -81,17 +81,15 @@ export const QUERIES_HEADERS = [
     sortKey: QUERIES_SORT_KEYS.avgDuration,
   },
   {
-    id: 'timeSpent',
-    title: 'Time Spent',
-    sortKey: QUERIES_SORT_KEYS.timeSpent,
+    id: 'totalTime',
+    title: 'Total Time',
+    sortKey: QUERIES_SORT_KEYS.totalTime,
   },
 ];
 
 export const TRANSACTIONS_SORT_KEYS = {
   count: 'count',
   lastSeen: 'lastSeen',
-  // TODO:
-  // profiles: 'PROFILES',
 };
 
 export const TRANSACTIONS_TABLE_HEADERS = [
@@ -110,12 +108,6 @@ export const TRANSACTIONS_TABLE_HEADERS = [
     title: 'Count',
     sortKey: TRANSACTIONS_SORT_KEYS.count,
   },
-  // TODO:
-  // {
-  //   id: 'profiles',
-  //   title: 'Total Profiles',
-  //   sortKey: TRANSACTIONS_SORT_KEYS.profiles,
-  // },
 ];
 
 export const TRANSACTION_SUMMARY_SORT_KEYS = {
@@ -147,7 +139,7 @@ export const TRANSACTION_SUMMARY_TABLE_HEADERS = [
 export const QUERY_SUMMARY_SORT_KEYS = {
   foundIn: 'FOUND_IN',
   spanId: 'SPAN_ID',
-  timeSpent: 'TIME_SPENT',
+  totalTime: 'TOTAL_TIME',
 };
 
 export const QUERY_SUMMARY_HEADERS = [
@@ -163,9 +155,9 @@ export const QUERY_SUMMARY_HEADERS = [
     sortKey: QUERY_SUMMARY_SORT_KEYS.spanId,
   },
   {
-    id: 'timeSpent',
-    title: 'Time Spent',
-    sortKey: QUERY_SUMMARY_SORT_KEYS.timeSpent,
+    id: 'totalTime',
+    title: 'Total Time',
+    sortKey: QUERY_SUMMARY_SORT_KEYS.totalTime,
   },
 ];
 

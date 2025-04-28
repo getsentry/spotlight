@@ -13,7 +13,7 @@ import { getFormattedDuration } from '../../utils/duration';
 
 type ResourceInfo = {
   avgDuration: number;
-  timeSpent: number;
+  totalTime: number;
   description: string;
   avgEncodedSize: number;
   similarResources: Span[];
@@ -37,7 +37,7 @@ const calculateResourceInfo = ({ resource, spanData }: { resource: string; spanD
 
   return {
     avgDuration,
-    timeSpent: totalTimeInMs,
+    totalTime: totalTimeInMs,
     description: resource,
     avgEncodedSize,
     similarResources: specificResources,
@@ -65,12 +65,12 @@ const COMPARATORS: Record<ResourceSortTypes, ResourceInfoComparator> = {
   },
   [RESOURCES_SORT_KEYS.avgEncodedSize]: (a, b) => a.avgEncodedSize - b.avgEncodedSize,
   [RESOURCES_SORT_KEYS.avgDuration]: (a, b) => a.avgDuration - b.avgDuration,
-  [RESOURCES_SORT_KEYS.timeSpent]: (a, b) => a.timeSpent - b.timeSpent,
+  [RESOURCES_SORT_KEYS.totalTime]: (a, b) => a.totalTime - b.totalTime,
 };
 
 const Resources = ({ showAll }: { showAll: boolean }) => {
   const { allSpans, localSpans } = useSentrySpans();
-  const { sort, toggleSortOrder } = useSort({ defaultSortType: RESOURCES_SORT_KEYS.timeSpent });
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: RESOURCES_SORT_KEYS.totalTime });
 
   const resources = useMemo(() => {
     const filteredResourceSpans = getResourceSpans(showAll ? allSpans : localSpans, { regex: /resource\.[A-Za-z]+/ });
@@ -78,7 +78,7 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
     // CLear out empty ones (they collapse as a single empty string since this is a set)
     uniqueResourceDescriptionsSet.delete('');
     const uniqueResourceDescriptions: string[] = [...uniqueResourceDescriptionsSet];
-    const compareResourceInfo = COMPARATORS[sort.active] || COMPARATORS[RESOURCES_SORT_KEYS.timeSpent];
+    const compareResourceInfo = COMPARATORS[sort.active] || COMPARATORS[RESOURCES_SORT_KEYS.totalTime];
 
     return uniqueResourceDescriptions
       .map(resource => calculateResourceInfo({ resource, spanData: filteredResourceSpans }))
@@ -155,7 +155,7 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
               {getFormattedDuration(resource.avgDuration)}
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              {getFormattedDuration(resource.timeSpent)}
+              {getFormattedDuration(resource.totalTime)}
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
               {formatBytes(resource.avgEncodedSize)}
