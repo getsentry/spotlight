@@ -1,5 +1,21 @@
 # @spotlightjs/core
 
+## 2.15.0
+
+### Minor Changes
+
+- Add a Profiles tab under Insights ([#786](https://github.com/getsentry/spotlight/pull/786))
+
+- - Refactor Sentry integration to use Zustand for state management
+    ([#772](https://github.com/getsentry/spotlight/pull/772))
+
+- Revamp Queries and QuerySummary views in Insights and align them with the new Profiles view
+  ([#793](https://github.com/getsentry/spotlight/pull/793))
+
+### Patch Changes
+
+- - Fixed round condition for profiles ([#790](https://github.com/getsentry/spotlight/pull/790))
+
 ## 2.14.1
 
 ### Patch Changes
