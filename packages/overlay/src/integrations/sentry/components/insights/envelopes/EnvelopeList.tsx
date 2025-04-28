@@ -2,6 +2,7 @@ import type { Envelope, EnvelopeItem } from '@sentry/core';
 import { Link, useParams } from 'react-router-dom';
 import CardList from '~/components/CardList';
 import TimeSince from '~/components/TimeSince';
+import { isLocalTrace } from '~/integrations/sentry/store/helpers';
 import classNames from '~/lib/classNames';
 import Badge from '~/ui/Badge';
 import { useSentryEnvelopes } from '../../../data/useSentryEnvelopes';
@@ -14,7 +15,7 @@ import EnvelopeDetails from './EnvelopeDetails';
 export default function EnvelopeList({ showAll }: { showAll: boolean }) {
   const { eventId } = useParams();
   const { allEnvelopes, localEnvelopes } = useSentryEnvelopes();
-  const { getEnvelopes, isTraceLocal } = useSentryStore();
+  const { getEnvelopes } = useSentryStore();
 
   const selectedEnvelope = eventId
     ? getEnvelopes().find(({ envelope: _env }) => _env[0].event_id === eventId) || null
@@ -46,7 +47,7 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
                       <h2 className="text-primary-50 text-xs">Event Id</h2>
                       <div className="flex items-center gap-x-2">
                         <div>{truncateId(envelopeEventId)}</div>
-                        {trace_id && isTraceLocal(trace_id) ? (
+                        {trace_id && isLocalTrace(trace_id) ? (
                           <Badge title="This trace is part of your local session.">Local</Badge>
                         ) : null}
                       </div>

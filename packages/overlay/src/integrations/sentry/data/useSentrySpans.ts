@@ -1,12 +1,11 @@
 import { useContext } from 'react';
 import useSentryStore from '../store';
+import { getLocalTraces } from '../store/helpers';
 import type { Span, Trace } from '../types';
 import { SentryEventsContext } from './sentryEventsContext';
-import { useSentryHelpers } from './useSentryHelpers';
 
 export function useSentryTraces() {
   useContext(SentryEventsContext);
-  const { getLocalTraces } = useSentryHelpers();
   const { getTraces } = useSentryStore();
   const allTraces = getTraces();
   const localTraces = getLocalTraces();

@@ -4,6 +4,7 @@ import { createTab } from '~/integrations/sentry/utils/tabs';
 import Tabs from '~/components/Tabs';
 import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
 import useSentryStore from '~/integrations/sentry/store';
+import { isLocalTrace } from '~/integrations/sentry/store/helpers';
 import { isErrorEvent } from '~/integrations/sentry/utils/sentry';
 import EventContexts from '../../events/EventContexts';
 import EventList from '../../events/EventList';
@@ -14,7 +15,6 @@ export default function TraceDetails() {
   const { traceId } = useParams();
   const events = useSentryEvents(traceId);
   const getTraceById = useSentryStore(state => state.getTraceById);
-  const { isTraceLocal } = useSentryStore();
 
   if (!traceId) {
     return <p className="text-primary-300 p-6">Unknown trace id</p>;
@@ -35,7 +35,7 @@ export default function TraceDetails() {
   }
 
   const errorCount = events.filter(
-    e => isErrorEvent(e) && (e.contexts?.trace?.trace_id ? isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
+    e => isErrorEvent(e) && (e.contexts?.trace?.trace_id ? isLocalTrace(e.contexts?.trace?.trace_id) : null) !== false,
   ).length;
 
   const tabs = [

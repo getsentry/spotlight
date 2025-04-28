@@ -36,8 +36,8 @@ export const SentryEventsContextProvider: React.FC<{
   children: ReactNode;
 }> = ({ children }) => {
   const getEvents = useSentryStore(state => state.getEvents);
-  const [events, setEvents] = useReducer(eventReducer, getEvents());
   const subscribe = useSentryStore(state => state.subscribe);
+  const [events, setEvents] = useReducer(eventReducer, getEvents());
 
   useEffect(
     () =>

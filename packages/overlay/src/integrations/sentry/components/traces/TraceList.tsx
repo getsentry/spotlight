@@ -6,7 +6,7 @@ import TimeSince from '../../../../components/TimeSince';
 import classNames from '../../../../lib/classNames';
 import { useSpotlightContext } from '../../../../lib/useSpotlightContext';
 import { useSentryTraces } from '../../data/useSentrySpans';
-import useSentryStore from '../../store';
+import { isLocalTrace } from '../../store/helpers';
 import { getFormattedSpanDuration } from '../../utils/duration';
 import { truncateId } from '../../utils/text';
 import HiddenItemsButton from '../shared/HiddenItemsButton';
@@ -16,7 +16,6 @@ import TraceIcon from './TraceIcon';
 export default function TraceList() {
   const { allTraces, localTraces } = useSentryTraces();
   const context = useSpotlightContext();
-  const { isTraceLocal } = useSentryStore();
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
   const filteredTraces = showAll ? allTraces : localTraces;
@@ -45,7 +44,7 @@ export default function TraceList() {
                 <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
                   <div className="flex items-center gap-x-2">
                     <div>{truncateId(trace.trace_id)}</div>
-                    {isTraceLocal(trace.trace_id) ? (
+                    {isLocalTrace(trace.trace_id) ? (
                       <Badge title="This trace is part of your local session.">Local</Badge>
                     ) : null}
                   </div>

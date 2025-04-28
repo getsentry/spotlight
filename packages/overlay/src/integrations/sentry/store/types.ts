@@ -30,7 +30,6 @@ export interface TracesSliceState {
 
 export interface TracesSliceActions {
   trackLocalTrace: (traceId: string) => void;
-  isTraceLocal: (traceId: string) => boolean | null;
   getTraces: () => Trace[];
 }
 

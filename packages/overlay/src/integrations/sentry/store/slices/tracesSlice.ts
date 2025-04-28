@@ -20,11 +20,5 @@ export const createTracesSlice: StateCreator<SentryStore, [], [], TracesSliceSta
       set({ localTraceIds: newLocalTraceIds });
     }
   },
-  isTraceLocal: (traceId: string) => {
-    const { localTraceIds } = get();
-    if (localTraceIds.has(traceId)) return true;
-    if (localTraceIds.size > 0) return false;
-    return null;
-  },
   getTraces: () => get().traces,
 });
