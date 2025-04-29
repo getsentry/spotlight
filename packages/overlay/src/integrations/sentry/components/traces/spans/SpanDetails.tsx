@@ -6,7 +6,7 @@ import Table from '~/ui/Table';
 import JsonViewer from '../../../../../components/JsonViewer';
 import SidePanel, { SidePanelHeader } from '../../../../../ui/SidePanel';
 import { DB_SPAN_REGEX } from '../../../constants';
-import useSentryStore from '../../../data/sentryStore';
+import useSentryStore from '../../../store';
 import type { SentryErrorEvent, Span, TraceContext } from '../../../types';
 import { formatBytes } from '../../../utils/bytes';
 import { getFormattedDuration } from '../../../utils/duration';

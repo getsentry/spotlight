@@ -2,7 +2,7 @@ import type { Client, Envelope, Event, Integration } from '@sentry/core';
 import { serializeEnvelope } from '@sentry/core';
 import { trigger } from '../../lib/eventTarget';
 import { log } from '../../lib/logger';
-import useSentryStore from './data/sentryStore';
+import useSentryStore from './store';
 
 /**
  * A Sentry integration for Spotlight integration that the Overlay will inject automatically.

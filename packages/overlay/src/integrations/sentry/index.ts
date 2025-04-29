@@ -3,12 +3,13 @@ import { removeURLSuffix } from '~/lib/removeURLSuffix';
 import { off, on } from '../../lib/eventTarget';
 import { log, warn } from '../../lib/logger';
 import type { Integration, RawEventContext } from '../integration';
-import useSentryStore from './data/sentryStore';
 import { spotlightIntegration } from './sentry-integration';
+import useSentryStore from './store';
 import ErrorsTab from './tabs/ErrorsTab';
 import InsightsTab from './tabs/InsightsTab';
 
 import { spotlightBrowserIntegration } from '@sentry/browser';
+import { getLocalTraces, isLocalTrace } from './store/helpers';
 import TracesTab from './tabs/TracesTab';
 import type { SentryErrorEvent, SentryEvent } from './types';
 import { parseJSONFromBuffer } from './utils/bufferParsers';
@@ -74,14 +75,12 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
             sum +
             Number(
               isErrorEvent(e) &&
-                (e.contexts?.trace?.trace_id ? store.isTraceLocal(e.contexts?.trace?.trace_id) : null) !== false,
+                (e.contexts?.trace?.trace_id ? isLocalTrace(e.contexts?.trace?.trace_id) : null) !== false,
             ),
           0,
         );
 
-      const localTraceCount = store
-        .getTraces()
-        .reduce((sum, t) => sum + Number(store.isTraceLocal(t.trace_id) !== false), 0);
+      const localTraceCount = getLocalTraces().length;
 
       return [
         createTab('traces', 'Traces', {
