@@ -51,7 +51,7 @@
     "@types/node": "^18.19.55",
     "fossilize": "^0.4.2",
     "typescript": "^5.6.2",
-    "vite": "^5.4.18"
+    "vite": "^5.4.19"
   },
   "volta": {
     "extends": "../../package.json"
