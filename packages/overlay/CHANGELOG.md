@@ -1,5 +1,15 @@
 # @spotlightjs/core
 
+## 2.15.1
+
+### Patch Changes
+
+- `window.crypto` API is only available under secure contexts which prevents Spotlight from being used in dev
+  environments ([#796](https://github.com/getsentry/spotlight/pull/796)) w/o https (most of them?). This patch replaces
+  that with our bona fide `generateUuidv4` function
+
+- Refactor the data store for Sentry integration with slices ([#789](https://github.com/getsentry/spotlight/pull/789))
+
 ## 2.15.0
 
 ### Minor Changes
