@@ -2,4 +2,4 @@
 '@spotlightjs/overlay': patch
 ---
 
-- Added timebar in queries listing
+Better organization and navigation under Insights pages with keyboard nav improvements
