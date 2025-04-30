@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { KeyboardEvent, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
@@ -8,13 +8,25 @@ import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from '../../constan
 import { useSentrySpans } from '../../data/useSentrySpans';
 import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
-import { getFormattedDuration } from '../../utils/duration';
+import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
 import { TimeBar } from '../shared/TimeBar';
 
 type QueryInfo = {
   avgDuration: number;
   totalTime: number;
   description: string;
+};
+type QueryInfoComparator = (a: QueryInfo, b: QueryInfo) => number;
+type QuerySortTypes = (typeof QUERIES_SORT_KEYS)[keyof typeof QUERIES_SORT_KEYS];
+
+const COMPARATORS: Record<QuerySortTypes, QueryInfoComparator> = {
+  [QUERIES_SORT_KEYS.queryDesc]: (a, b) => {
+    if (a.description < b.description) return -1;
+    if (a.description > b.description) return 1;
+    return 0;
+  },
+  [QUERIES_SORT_KEYS.avgDuration]: (a, b) => a.avgDuration - b.avgDuration,
+  [QUERIES_SORT_KEYS.totalTime]: (a, b) => a.totalTime - b.totalTime,
 };
 
 const calculateQueryInfo = ({ query, spanData }: { query: string; spanData: Span[] }): QueryInfo => {
@@ -30,19 +42,8 @@ const calculateQueryInfo = ({ query, spanData }: { query: string; spanData: Span
   };
 };
 
-type QueryInfoComparator = (a: QueryInfo, b: QueryInfo) => number;
-type QuerySortTypes = (typeof QUERIES_SORT_KEYS)[keyof typeof QUERIES_SORT_KEYS];
-const COMPARATORS: Record<QuerySortTypes, QueryInfoComparator> = {
-  [QUERIES_SORT_KEYS.queryDesc]: (a, b) => {
-    if (a.description < b.description) return -1;
-    if (a.description > b.description) return 1;
-    return 0;
-  },
-  [QUERIES_SORT_KEYS.avgDuration]: (a, b) => a.avgDuration - b.avgDuration,
-  [QUERIES_SORT_KEYS.totalTime]: (a, b) => a.totalTime - b.totalTime,
-};
-
 const Queries = ({ showAll }: { showAll: boolean }) => {
+  const navigate = useNavigate();
   const { allSpans, localSpans } = useSentrySpans();
   const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERIES_SORT_KEYS.totalTime });
 
@@ -58,6 +59,18 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
       .sort((a, b) => (sort.asc ? compareQueryInfo(a, b) : compareQueryInfo(b, a)));
   }, [allSpans, localSpans, showAll, sort]);
 
+  const maxTime = Math.max(...queriesData.map(query => query.totalTime));
+
+  const handleRowClick = (query: QueryInfo) => {
+    navigate(`/insights/queries/${btoa(query.description)}`);
+  };
+
+  const handleRowKeyDown = (e: KeyboardEvent<HTMLTableRowElement>, query: QueryInfo) => {
+    if (e.key === 'Enter') {
+      handleRowClick(query);
+    }
+  };
+
   if (!queriesData?.length) {
     return (
       <p className="text-primary-300 px-6 py-4">
@@ -65,8 +78,6 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
       </p>
     );
   }
-
-  const maxTime = Math.max(...queriesData.map(query => query.totalTime));
 
   return (
     <Table variant="detail">
@@ -108,19 +119,26 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
       </Table.Header>
       <Table.Body>
         {queriesData.map(query => (
-          <tr key={query.description} className="hover:bg-primary-900">
+          <tr
+            key={query.description}
+            onClick={() => handleRowClick(query)}
+            onKeyDown={e => handleRowKeyDown(e, query)}
+            tabIndex={0}
+            role="link"
+            className="hover:bg-primary-900 cursor-pointer"
+          >
             <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-              <TimeBar value={query.totalTime} maxValue={maxTime} title={query.description}>
-                <Link className="truncate hover:underline" to={`/insights/queries/${btoa(query.description)}`}>
-                  {query.description}
-                </Link>
+              <TimeBar value={query.totalTime} maxValue={maxTime} title={query.description} className="text-lime-500">
+                {query.description}
               </TimeBar>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              {getFormattedDuration(query.avgDuration)}
+              <span className={getSpanDurationClassName(query.totalTime)}>{getFormattedDuration(query.totalTime)}</span>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              {getFormattedDuration(query.totalTime)}
+              <span className={getSpanDurationClassName(query.avgDuration)}>
+                {getFormattedDuration(query.avgDuration)}
+              </span>
             </td>
           </tr>
         ))}

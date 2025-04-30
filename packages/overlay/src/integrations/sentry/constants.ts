@@ -76,14 +76,14 @@ export const QUERIES_HEADERS = [
     primary: true,
   },
   {
-    id: 'avgDuration',
-    title: 'Avg Duration',
-    sortKey: QUERIES_SORT_KEYS.avgDuration,
-  },
-  {
     id: 'totalTime',
     title: 'Total Time',
     sortKey: QUERIES_SORT_KEYS.totalTime,
+  },
+  {
+    id: 'avgDuration',
+    title: 'Avg Duration',
+    sortKey: QUERIES_SORT_KEYS.avgDuration,
   },
 ];
 
@@ -150,14 +150,14 @@ export const QUERY_SUMMARY_HEADERS = [
     primary: true,
   },
   {
-    id: 'spanId',
-    title: 'Span Id',
-    sortKey: QUERY_SUMMARY_SORT_KEYS.spanId,
-  },
-  {
     id: 'totalTime',
     title: 'Total Time',
     sortKey: QUERY_SUMMARY_SORT_KEYS.totalTime,
+  },
+  {
+    id: 'spanId',
+    title: 'Span Id',
+    sortKey: QUERY_SUMMARY_SORT_KEYS.spanId,
   },
 ];
 
