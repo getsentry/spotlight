@@ -1,6 +1,6 @@
 import { Link, Outlet, Route, Routes, useParams } from 'react-router-dom';
 import Tabs from '../../../../components/Tabs';
-import useSentryStore from '../../data/sentryStore';
+import useSentryStore from '../../store';
 import type { SentryEvent } from '../../types';
 import { createTab } from '../../utils/tabs';
 import PlatformIcon from '../shared/PlatformIcon';

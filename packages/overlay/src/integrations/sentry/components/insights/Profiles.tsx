@@ -4,8 +4,8 @@ import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
 import Table from '~/ui/Table';
 import { AGGREGATE_CALL_PROFILES_SORT_KEYS, AGGREGATE_PROFILES_HEADERS } from '../../constants';
-import useSentryStore from '../../data/sentryStore';
 import useSort from '../../hooks/useSort';
+import useSentryStore from '../../store';
 import type { AggregateCallData } from '../../types';
 import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
 import { TimeBar } from '../shared/TimeBar';
@@ -86,12 +86,9 @@ function Profiles() {
         {aggregateCallData.map(callData => (
           <tr key={`${callData.name}`} className="hover:bg-primary-900">
             <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4">
-              <TimeBar
-                value={callData.totalTime}
-                maxValue={maxTime}
-                title={callData.name}
-                text={callData.name.split('@')[1].split(':', 1)[0]}
-              />
+              <TimeBar value={callData.totalTime} maxValue={maxTime} title={callData.name} className="text-lime-500">
+                {callData.name.split('@')[1].split(':', 1)[0]}
+              </TimeBar>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
               <span className={getSpanDurationClassName(callData.totalTime)}>

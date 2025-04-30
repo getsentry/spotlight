@@ -1,6 +1,6 @@
 import { useContext } from 'react';
+import useSentryStore from '../store';
 import { SentryEventsContext } from './sentryEventsContext';
-import useSentryStore from './sentryStore';
 
 export const useSentryEvents = (traceId?: string) => {
   useContext(SentryEventsContext);

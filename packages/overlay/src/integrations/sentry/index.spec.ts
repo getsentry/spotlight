@@ -3,7 +3,7 @@ import { processEnvelope } from './index';
 
 import type { Event } from '@sentry/types';
 import fs from 'node:fs';
-import useSentryStore from './data/sentryStore';
+import useSentryStore from './store';
 import { SentryTransactionEvent } from './types';
 
 describe('Sentry Integration', () => {

@@ -11,6 +11,7 @@ import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
 import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
 import { truncateId } from '../../utils/text';
+import { TimeBar } from '../shared/TimeBar';
 
 type SpanInfoComparator = (a: Span, b: Span) => number;
 type QuerySummarySortTypes = (typeof QUERY_SUMMARY_SORT_KEYS)[keyof typeof QUERY_SUMMARY_SORT_KEYS];
@@ -35,24 +36,26 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
   const { type } = useParams();
   const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERY_SUMMARY_SORT_KEYS.totalTime });
 
+  // Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/atob
+  const decodedType = type && atob(type);
+
   const filteredDBSpans: Span[] = useMemo(() => {
-    if (!type) {
+    if (!decodedType) {
       return [];
     }
     const spans = showAll ? allSpans : localSpans;
     const compareSpanInfo = COMPARATORS[sort.active] || COMPARATORS[QUERY_SUMMARY_SORT_KEYS.totalTime];
 
-    // Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/atob
-    const decodedType: string = atob(type);
-
     return spans
       .filter(span => span.description === decodedType)
       .sort((a, b) => (sort.asc ? compareSpanInfo(a, b) : compareSpanInfo(b, a)));
-  }, [allSpans, localSpans, showAll, sort, type]);
+  }, [allSpans, localSpans, showAll, sort, decodedType]);
 
   if (!filteredDBSpans || !filteredDBSpans.length) {
     return <p className="text-primary-300 px-6 py-4">Query not found.</p>;
   }
+
+  const maxTime = Math.max(...filteredDBSpans.map(dbSpan => dbSpan.timestamp - dbSpan.start_timestamp));
 
   return (
     <>
@@ -71,6 +74,9 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
           },
         ]}
       />
+      <div className="border-b-primary-700 bg-primary-950 flex items-center gap-x-2 border-b px-6 py-4">
+        <h1 className="flex w-full flex-1 items-center text-xl">{decodedType}</h1>
+      </div>
       <Table variant="detail">
         <Table.Header>
           <tr>
@@ -112,9 +118,11 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
           {filteredDBSpans.map(span => (
             <tr key={span.span_id} className="hover:bg-primary-900">
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                <Link className="truncate hover:underline" to={`/traces/${span.trace_id}`}>
-                  {truncateId(span.trace_id)}
-                </Link>
+                <TimeBar value={span.timestamp - span.start_timestamp} maxValue={maxTime} title={span.trace_id}>
+                  <Link className="truncate hover:underline" to={`/traces/${span.trace_id}`}>
+                    {truncateId(span.trace_id)}
+                  </Link>
+                </TimeBar>
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                 <Link className="truncate hover:underline" to={`/traces/${span.trace_id}/spans/${span.span_id}`}>

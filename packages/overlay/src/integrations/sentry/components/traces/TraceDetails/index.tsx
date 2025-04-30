@@ -2,9 +2,9 @@ import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { createTab } from '~/integrations/sentry/utils/tabs';
 
 import Tabs from '~/components/Tabs';
-import useSentryStore from '~/integrations/sentry/data/sentryStore';
 import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
-import { useSentryHelpers } from '~/integrations/sentry/data/useSentryHelpers';
+import useSentryStore from '~/integrations/sentry/store';
+import { isLocalTrace } from '~/integrations/sentry/store/helpers';
 import { isErrorEvent } from '~/integrations/sentry/utils/sentry';
 import EventContexts from '../../events/EventContexts';
 import EventList from '../../events/EventList';
@@ -14,7 +14,6 @@ import TraceTreeview from './components/TraceTreeview';
 export default function TraceDetails() {
   const { traceId } = useParams();
   const events = useSentryEvents(traceId);
-  const helpers = useSentryHelpers();
   const getTraceById = useSentryStore(state => state.getTraceById);
 
   if (!traceId) {
@@ -36,9 +35,7 @@ export default function TraceDetails() {
   }
 
   const errorCount = events.filter(
-    e =>
-      isErrorEvent(e) &&
-      (e.contexts?.trace?.trace_id ? helpers.isLocalToSession(e.contexts?.trace?.trace_id) : null) !== false,
+    e => isErrorEvent(e) && (e.contexts?.trace?.trace_id ? isLocalTrace(e.contexts?.trace?.trace_id) : null) !== false,
   ).length;
 
   const tabs = [

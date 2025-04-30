@@ -8,7 +8,7 @@ import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from '../../constan
 import { useSentrySpans } from '../../data/useSentrySpans';
 import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
-import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
+import { getFormattedDuration } from '../../utils/duration';
 import { TimeBar } from '../shared/TimeBar';
 
 type QueryInfo = {
@@ -72,83 +72,77 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
     }
   };
 
-  if (queriesData?.length) {
+  if (!queriesData?.length) {
     return (
-      <Table variant="detail">
-        <Table.Header>
-          <tr>
-            {QUERIES_HEADERS.map(header => (
-              <th
-                key={header.id}
-                scope="col"
-                className={classNames(
-                  'text-primary-100 select-none px-6 py-3.5 text-sm font-semibold',
-                  header.primary ? 'w-2/5' : 'w-[15%]',
-                )}
-              >
-                <div
-                  className={classNames(
-                    'flex cursor-pointer items-center gap-1',
-                    header.primary ? 'justify-start' : 'justify-end',
-                  )}
-                  onClick={() => toggleSortOrder(header.sortKey)}
-                >
-                  {header.title}
-                  {sort.active === header.sortKey ? (
-                    <SortDown
-                      width={12}
-                      height={12}
-                      className={classNames(
-                        'fill-primary-300',
-                        sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
-                      )}
-                    />
-                  ) : (
-                    <Sort width={12} height={12} className="stroke-primary-300" />
-                  )}
-                </div>
-              </th>
-            ))}
-          </tr>
-        </Table.Header>
-        <Table.Body>
-          {queriesData.map(query => (
-            <tr
-              key={query.description}
-              onClick={() => handleRowClick(query)}
-              onKeyDown={e => handleRowKeyDown(e, query)}
-              tabIndex={0}
-              role="link"
-              className="hover:bg-primary-900 cursor-pointer"
-            >
-              <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                <TimeBar
-                  value={query.totalTime}
-                  maxValue={maxTime}
-                  title={query.description}
-                  text={query.description}
-                />
-              </td>
-              <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                <span className={getSpanDurationClassName(query.totalTime)}>
-                  {getFormattedDuration(query.totalTime)}
-                </span>
-              </td>
-              <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                <span className={getSpanDurationClassName(query.avgDuration)}>
-                  {getFormattedDuration(query.avgDuration)}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </Table.Body>
-      </Table>
+      <p className="text-primary-300 px-6 py-4">
+        No Database queries found. Add integration in Sentry initialization to track Database queries.
+      </p>
     );
   }
+
   return (
-    <p className="text-primary-300 px-6 py-4">
-      No Database queries found. Add integration in Sentry initialization to track Database queries.
-    </p>
+    <Table variant="detail">
+      <Table.Header>
+        <tr>
+          {QUERIES_HEADERS.map(header => (
+            <th
+              key={header.id}
+              scope="col"
+              className={classNames(
+                'text-primary-100 select-none px-6 py-3.5 text-sm font-semibold',
+                header.primary ? 'w-2/5' : 'w-[15%]',
+              )}
+            >
+              <div
+                className={classNames(
+                  'flex cursor-pointer items-center gap-1',
+                  header.primary ? 'justify-start' : 'justify-end',
+                )}
+                onClick={() => toggleSortOrder(header.sortKey)}
+              >
+                {header.title}
+                {sort.active === header.sortKey ? (
+                  <SortDown
+                    width={12}
+                    height={12}
+                    className={classNames(
+                      'fill-primary-300',
+                      sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
+                    )}
+                  />
+                ) : (
+                  <Sort width={12} height={12} className="stroke-primary-300" />
+                )}
+              </div>
+            </th>
+          ))}
+        </tr>
+      </Table.Header>
+      <Table.Body>
+        {queriesData.map(query => (
+          <tr
+            key={query.description}
+            onClick={() => handleRowClick(query)}
+            onKeyDown={e => handleRowKeyDown(e, query)}
+            tabIndex={0}
+            role="link"
+            className="hover:bg-primary-900 cursor-pointer"
+          >
+            <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
+              <TimeBar value={query.totalTime} maxValue={maxTime} title={query.description}>
+                {query.description}
+              </TimeBar>
+            </td>
+            <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+              {getFormattedDuration(query.totalTime)}
+            </td>
+            <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+              {getFormattedDuration(query.avgDuration)}
+            </td>
+          </tr>
+        ))}
+      </Table.Body>
+    </Table>
   );
 };
 
