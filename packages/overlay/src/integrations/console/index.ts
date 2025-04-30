@@ -1,3 +1,4 @@
+import { generateUuidv4 } from '~/lib/uuid';
 import { trigger } from '../../lib/eventTarget';
 import type { WindowWithSpotlight } from '../../types';
 import type { Integration } from '../integration';
@@ -14,7 +15,7 @@ const CONTENT_TYPE = 'application/x-spotlight-console';
  * @returns Integration Console integration for Spotlight
  */
 export default function consoleIntegration() {
-  const pageloadId = window.crypto.randomUUID();
+  const pageloadId = generateUuidv4();
 
   return {
     name: 'console',
