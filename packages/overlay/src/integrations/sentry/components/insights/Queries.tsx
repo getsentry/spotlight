@@ -8,7 +8,7 @@ import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from '../../constan
 import { useSentrySpans } from '../../data/useSentrySpans';
 import useSort from '../../hooks/useSort';
 import type { Span } from '../../types';
-import { getFormattedDuration } from '../../utils/duration';
+import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
 import { TimeBar } from '../shared/TimeBar';
 
 type QueryInfo = {
@@ -129,15 +129,17 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
             className="hover:bg-primary-900 cursor-pointer"
           >
             <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-              <TimeBar value={query.totalTime} maxValue={maxTime} title={query.description}>
+              <TimeBar value={query.totalTime} maxValue={maxTime} title={query.description} className="text-lime-500">
                 {query.description}
               </TimeBar>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              {getFormattedDuration(query.totalTime)}
+              <span className={getSpanDurationClassName(query.totalTime)}>{getFormattedDuration(query.totalTime)}</span>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              {getFormattedDuration(query.avgDuration)}
+              <span className={getSpanDurationClassName(query.avgDuration)}>
+                {getFormattedDuration(query.avgDuration)}
+              </span>
             </td>
           </tr>
         ))}

@@ -118,21 +118,26 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
           {filteredDBSpans.map(span => (
             <tr key={span.span_id} className="hover:bg-primary-900">
               <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-                <TimeBar value={span.timestamp - span.start_timestamp} maxValue={maxTime} title={span.trace_id}>
+                <TimeBar
+                  value={span.timestamp - span.start_timestamp}
+                  maxValue={maxTime}
+                  title={span.trace_id}
+                  className="text-lime-500"
+                >
                   <Link className="truncate hover:underline" to={`/traces/${span.trace_id}`}>
                     {truncateId(span.trace_id)}
                   </Link>
                 </TimeBar>
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                <Link className="truncate hover:underline" to={`/traces/${span.trace_id}/spans/${span.span_id}`}>
-                  {truncateId(span.span_id)}
-                </Link>
-              </td>
-              <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                 <span className={getSpanDurationClassName(span.timestamp - span.start_timestamp)}>
                   {getFormattedDuration(span.timestamp - span.start_timestamp)}
                 </span>
+              </td>
+              <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                <Link className="truncate hover:underline" to={`/traces/${span.trace_id}/spans/${span.span_id}`}>
+                  {truncateId(span.span_id)}
+                </Link>
               </td>
             </tr>
           ))}
