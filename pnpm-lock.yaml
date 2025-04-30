@@ -103,7 +103,7 @@ importers:
     dependencies:
       '@sentry/sveltekit':
         specifier: ^8.8.0
-        version: 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.7(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0)))(svelte@4.2.19)
+        version: 8.55.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.7(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0))
       '@spotlightjs/spotlight':
         specifier: workspace:*
         version: link:../../packages/spotlight
@@ -232,7 +232,7 @@ importers:
     dependencies:
       '@sentry/sveltekit':
         specifier: 8.8.0
-        version: 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.7(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.19(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)
+        version: 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.7(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.19(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)
     devDependencies:
       '@fontsource/fira-mono':
         specifier: ^4.5.10
@@ -2717,6 +2717,10 @@ packages:
     resolution: {integrity: sha512-9L4RbhS3WNtc/SokIhc0dwgcvs78YSQPakZejsrIgnzLzCi8mS6PeT+BY0+QCtsXxjd1egM8hqcJeB0lukBkXA==}
     engines: {node: '>= 14'}
 
+  '@sentry/babel-plugin-component-annotate@2.22.6':
+    resolution: {integrity: sha512-V2g1Y1I5eSe7dtUVMBvAJr8BaLRr4CLrgNgtPaZyMT4Rnps82SrZ5zqmEkLXPumlXhLUWR6qzoMNN2u+RXVXfQ==}
+    engines: {node: '>= 14'}
+
   '@sentry/babel-plugin-component-annotate@2.22.7':
     resolution: {integrity: sha512-aa7XKgZMVl6l04NY+3X7BP7yvQ/s8scn8KzQfTLrGRarziTlMGrsCOBQtCNWXOPEbtxAIHpZ9dsrAn5EJSivOQ==}
     engines: {node: '>= 14'}
@@ -2735,6 +2739,10 @@ packages:
 
   '@sentry/bundler-plugin-core@2.18.0':
     resolution: {integrity: sha512-JvxVgsMFmDsU0Dgcx1CeFUC1scxOVSAOzOcE06qKAVm9BZzxHpI53iNfeMOXwVTUolD8LZVIfgOjkiXfwN/UPQ==}
+    engines: {node: '>= 14'}
+
+  '@sentry/bundler-plugin-core@2.22.6':
+    resolution: {integrity: sha512-1esQdgSUCww9XAntO4pr7uAM5cfGhLsgTK9MEwAKNfvpMYJi9NUTYa3A7AZmdA8V6107Lo4OD7peIPrDRbaDCg==}
     engines: {node: '>= 14'}
 
   '@sentry/bundler-plugin-core@2.22.7':
@@ -2895,11 +2903,27 @@ packages:
     peerDependencies:
       react: ^16.14.0 || 17.x || 18.x || 19.x
 
+  '@sentry/svelte@8.55.0':
+    resolution: {integrity: sha512-8xQ3RHOUq21f40LWn5eJEgg6rLQfZ+8oBdKLkg03b3SwvfdBs9CrlPkvhhmxdZZslmcGr6ewl0t5WT9ea8Ydlw==}
+    engines: {node: '>=14.18'}
+    peerDependencies:
+      svelte: 3.x || 4.x || 5.x
+
   '@sentry/svelte@8.8.0':
     resolution: {integrity: sha512-0CM6mMOJlURwYkUQNq0Abp64OZ+C7xGbKPK7Tdrl7CGU15Na2DGJgX+I3YBZf7zidK1xZ+gaM144VrN7DdIuYA==}
     engines: {node: '>=14.18'}
     peerDependencies:
       svelte: 3.x || 4.x || 5.x
+
+  '@sentry/sveltekit@8.55.0':
+    resolution: {integrity: sha512-fhjv4hn/y/4olSuZLBzQZbD20EcguIzgSYmarc8P/kn9ZVkO5onNDIqgDP0wmFrGVs5ihCPl/gGn9gXV0cXUjQ==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@sveltejs/kit': 1.x || 2.x
+      vite: '*'
+    peerDependenciesMeta:
+      vite:
+        optional: true
 
   '@sentry/sveltekit@8.8.0':
     resolution: {integrity: sha512-Mm4CXbUUHhETQ1PKvfssncNMlAkM7I6rhe6UfyfVM76mnT07yEZU3PYt6gZH2AwKzONdj5XiiKtJGmEwfruzLA==}
@@ -2925,6 +2949,10 @@ packages:
 
   '@sentry/vite-plugin@2.18.0':
     resolution: {integrity: sha512-yY8QSvbMjRpG5pzN6lnW5guZhyTDSGeWwM9tDyT9ix/ShODy/eE6jErisBtlo50lFJuew7x79WXnVykvds4Ddg==}
+    engines: {node: '>= 14'}
+
+  '@sentry/vite-plugin@2.22.6':
+    resolution: {integrity: sha512-zIieP1VLWQb3wUjFJlwOAoaaJygJhXeUoGd0e/Ha2RLb2eW2S+4gjf6y6NqyY71tZ74LYVZKg/4prB6FAZSMXQ==}
     engines: {node: '>= 14'}
 
   '@sentry/vite-plugin@2.23.0':
@@ -5110,9 +5138,15 @@ packages:
     resolution: {integrity: sha512-DpLKbNU4WylpxJykQujfCcwYWiV/Jhm50Goo0wrVILAv5jOr9d+H+UR3PhSCD2rCCEIg0uc+G+muBTwD54JhDQ==}
     engines: {node: '>= 0.4'}
 
+  globalyzer@0.1.0:
+    resolution: {integrity: sha512-40oNTM9UfG6aBmuKxk/giHn5nQ8RVz/SS4Ir6zgzOv9/qC3kKZ9v4etGTcJbEl/NyVQH7FGU7d+X1egr57Md2Q==}
+
   globby@11.1.0:
     resolution: {integrity: sha512-jhIXaOzy1sb8IyocaruWSn1TjmnBVs8Ayhcy83rmxNJ8q2uWKCAj3CnJY+KpGSXCueAPc0i05kVvVKtP1t9S3g==}
     engines: {node: '>=10'}
+
+  globrex@0.1.2:
+    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
 
   gopd@1.0.1:
     resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}
@@ -7349,6 +7383,10 @@ packages:
     resolution: {integrity: sha512-o7npfeJE6wi6J9l0/5LKshFzZ2rMatRiCDwYeDQaOzqdzRJwALhX7mk/A/ecg6wjMu7wdZbmXfD2S/vpOg0bdQ==}
     hasBin: true
 
+  sorcery@1.0.0:
+    resolution: {integrity: sha512-5ay9oJE+7sNmhzl3YNG18jEEEf4AOQCM/FAqR5wMmzqd1FtRorFbJXn3w3SKOhbiQaVgHM+Q1lszZspjri7bpA==}
+    hasBin: true
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -7669,6 +7707,9 @@ packages:
 
   thenify@3.3.1:
     resolution: {integrity: sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw==}
+
+  tiny-glob@0.2.9:
+    resolution: {integrity: sha512-g/55ssRPUjShh+xkfx9UPDXqhckHEsHr4Vd9zX55oSdGZc/MD0m3sferOkwWtp98bv+kcVfEHtRJgBVJzelrzg==}
 
   tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
@@ -11041,6 +11082,8 @@ snapshots:
 
   '@sentry/babel-plugin-component-annotate@2.18.0': {}
 
+  '@sentry/babel-plugin-component-annotate@2.22.6': {}
+
   '@sentry/babel-plugin-component-annotate@2.22.7': {}
 
   '@sentry/babel-plugin-component-annotate@2.23.0': {}
@@ -11067,6 +11110,20 @@ snapshots:
     dependencies:
       '@babel/core': 7.27.1
       '@sentry/babel-plugin-component-annotate': 2.18.0
+      '@sentry/cli': 2.43.1
+      dotenv: 16.5.0
+      find-up: 5.0.0
+      glob: 9.3.5
+      magic-string: 0.30.8
+      unplugin: 1.0.1
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
+  '@sentry/bundler-plugin-core@2.22.6':
+    dependencies:
+      '@babel/core': 7.27.1
+      '@sentry/babel-plugin-component-annotate': 2.22.6
       '@sentry/cli': 2.43.1
       dotenv: 16.5.0
       find-up: 5.0.0
@@ -11326,23 +11383,19 @@ snapshots:
       '@sentry/types': 8.8.0
       '@sentry/utils': 8.8.0
 
-  '@sentry/opentelemetry@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)':
-    dependencies:
-      '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 1.30.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/instrumentation': 0.57.2(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-trace-base': 1.30.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/semantic-conventions': 1.29.0
-      '@sentry/core': 8.8.0
-      '@sentry/types': 8.8.0
-      '@sentry/utils': 8.8.0
-
   '@sentry/react@8.55.0(react@18.3.1)':
     dependencies:
       '@sentry/browser': 8.55.0
       '@sentry/core': 8.55.0
       hoist-non-react-statics: 3.3.2
       react: 18.3.1
+
+  '@sentry/svelte@8.55.0(svelte@4.2.19)':
+    dependencies:
+      '@sentry/browser': 8.55.0
+      '@sentry/core': 8.55.0
+      magic-string: 0.30.7
+      svelte: 4.2.19
 
   '@sentry/svelte@8.8.0(svelte@4.2.19)':
     dependencies:
@@ -11353,21 +11406,22 @@ snapshots:
       magic-string: 0.30.17
       svelte: 4.2.19
 
-  '@sentry/sveltekit@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.7(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0)))(svelte@4.2.19)':
+  '@sentry/sveltekit@8.55.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.7(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0))':
     dependencies:
-      '@sentry/core': 8.8.0
-      '@sentry/node': 8.8.0
-      '@sentry/opentelemetry': 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)
-      '@sentry/svelte': 8.8.0(svelte@4.2.19)
-      '@sentry/types': 8.8.0
-      '@sentry/utils': 8.8.0
-      '@sentry/vite-plugin': 2.18.0
+      '@sentry/core': 8.55.0
+      '@sentry/node': 8.55.0
+      '@sentry/opentelemetry': 8.55.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)
+      '@sentry/svelte': 8.55.0(svelte@4.2.19)
+      '@sentry/vite-plugin': 2.22.6
       '@sveltejs/kit': 2.20.7(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.3)(terser@5.39.0))
       magic-string: 0.30.7
       magicast: 0.2.8
-      sorcery: 0.11.0
+      sorcery: 1.0.0
+    optionalDependencies:
+      vite: 5.4.19(@types/node@22.15.3)(terser@5.39.0)
     transitivePeerDependencies:
       - '@opentelemetry/api'
+      - '@opentelemetry/context-async-hooks'
       - '@opentelemetry/core'
       - '@opentelemetry/instrumentation'
       - '@opentelemetry/sdk-trace-base'
@@ -11376,11 +11430,11 @@ snapshots:
       - supports-color
       - svelte
 
-  '@sentry/sveltekit@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.7(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.19(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)':
+  '@sentry/sveltekit@8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)(@sveltejs/kit@2.20.7(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)(vite@5.4.19(@types/node@20.10.4)(terser@5.39.0)))(svelte@4.2.19)':
     dependencies:
       '@sentry/core': 8.8.0
       '@sentry/node': 8.8.0
-      '@sentry/opentelemetry': 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.57.2(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)
+      '@sentry/opentelemetry': 8.8.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.29.0)
       '@sentry/svelte': 8.8.0(svelte@4.2.19)
       '@sentry/types': 8.8.0
       '@sentry/utils': 8.8.0
@@ -11417,6 +11471,14 @@ snapshots:
   '@sentry/vite-plugin@2.18.0':
     dependencies:
       '@sentry/bundler-plugin-core': 2.18.0
+      unplugin: 1.0.1
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
+  '@sentry/vite-plugin@2.22.6':
+    dependencies:
+      '@sentry/bundler-plugin-core': 2.22.6
       unplugin: 1.0.1
     transitivePeerDependencies:
       - encoding
@@ -14367,6 +14429,8 @@ snapshots:
       gopd: 1.0.1
     optional: true
 
+  globalyzer@0.1.0: {}
+
   globby@11.1.0:
     dependencies:
       array-union: 2.1.0
@@ -14375,6 +14439,8 @@ snapshots:
       ignore: 5.3.2
       merge2: 1.4.1
       slash: 3.0.0
+
+  globrex@0.1.2: {}
 
   gopd@1.0.1:
     dependencies:
@@ -14939,7 +15005,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 20.10.4
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -17296,6 +17362,12 @@ snapshots:
       minimist: 1.2.8
       sander: 0.5.1
 
+  sorcery@1.0.0:
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.5.0
+      minimist: 1.2.8
+      tiny-glob: 0.2.9
+
   source-map-js@1.2.1: {}
 
   source-map-support@0.5.21:
@@ -17651,6 +17723,11 @@ snapshots:
   thenify@3.3.1:
     dependencies:
       any-promise: 1.3.0
+
+  tiny-glob@0.2.9:
+    dependencies:
+      globalyzer: 0.1.0
+      globrex: 0.1.2
 
   tiny-inflate@1.0.3: {}
 
