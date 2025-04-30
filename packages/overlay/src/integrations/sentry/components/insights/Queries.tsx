@@ -62,7 +62,6 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
   const maxTime = Math.max(...queriesData.map(query => query.totalTime));
 
   const handleRowClick = (query: QueryInfo) => {
-    /* Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/btoa */
     navigate(`/insights/queries/${btoa(query.description)}`);
   };
 
