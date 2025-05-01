@@ -185,8 +185,12 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
           if (incomingPayload) {
             incomingPayload(body.toString('binary'));
           } else {
-            createWriteStream(filename).write(body);
-            logger.info(`🗃️ Saved data to ${filename}`);
+            try {
+              createWriteStream(filename).write(body);
+              logger.info(`🗃️ Saved data to ${filename}`);
+            } catch (err) {
+              logger.error(`Failed to save data to ${filename}: ${err}`);
+            }
           }
         }
 
