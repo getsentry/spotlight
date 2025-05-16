@@ -5,6 +5,7 @@ import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import { useSentrySpanCounts } from '../../data/useSentrySpans';
 import { createTab } from '../../utils/tabs';
 import HiddenItemsButton from '../shared/HiddenItemsButton';
+import AgentsTab from './agents';
 import EnvelopesTab from './envelopes';
 import Profiles from './Profiles';
 import Queries from './Queries';
@@ -29,6 +30,7 @@ export default function InsightsTabDetails() {
     createTab('profiles', 'Profiles'),
     createTab('envelopes', 'Envelopes'),
     createTab('sdks', 'SDKs'),
+    createTab('agents', 'Agents'),
   ];
 
   return (
@@ -50,6 +52,7 @@ export default function InsightsTabDetails() {
           <Route path="webvitals/:page" element={<WebVitalsDetail />} />
           <Route path="envelopes/*" element={<EnvelopesTab showAll={showAll} />} />
           <Route path="sdks/*" element={<SdksTab />} />
+          <Route path="agents/*" element={<AgentsTab />} />
           {/* Default tab */}
           <Route path="queries" element={<Queries showAll={showAll} />} />
           <Route path="*" element={<Navigate to="/insights/queries" replace />} />
