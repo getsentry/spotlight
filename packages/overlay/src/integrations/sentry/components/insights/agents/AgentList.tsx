@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import useAiSpansWithDescendants from '../../traces/spans/useAiSpans';
 
 export default function AgentList() {
@@ -9,11 +10,15 @@ export default function AgentList() {
       {allAiSpans.length !== 0 ? (
         <div>
           {allAiSpans.map(span => {
+            //TODO: check if trace_id is present
             return (
-              <div key={span.span_id}>
-                <div key={span.span_id}>{span.description}</div>
-                TEST
-              </div>
+              <Link
+                key={span.span_id}
+                to={`/traces/${span.trace_id}/spans/${span.span_id}`}
+                className="hover:bg-primary-900 block cursor-pointer p-2"
+              >
+                {span.description} {span.timestamp}
+              </Link>
             );
           })}
         </div>
