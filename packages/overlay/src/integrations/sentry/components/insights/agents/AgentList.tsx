@@ -1,29 +1,40 @@
-import { Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import useAiSpansWithDescendants from '../../../data/useSentryAISpans';
+import useSentryStore from '../../../store';
+import AISpanDetails from './AISpanDetails';
+import AISpanItem from './AISpanItem';
 
 export default function AgentList() {
-  // TODO: make sure we don't really need to take into account local spans
+  const { spanId } = useParams<{ spanId?: string }>();
   const allAiSpans = useAiSpansWithDescendants();
+  const getTraceById = useSentryStore(state => state.getTraceById);
+
+  const selectedSpan = spanId ? allAiSpans.find(s => s.span_id === spanId) : null;
+  const traceContext = selectedSpan?.trace_id ? getTraceById(selectedSpan.trace_id) : null;
+
+  if (allAiSpans.length === 0) {
+    return <div className="text-primary-300 p-6">No AI traces have been recorded yet. 🤔</div>;
+  }
 
   return (
     <>
-      {allAiSpans.length !== 0 ? (
-        <div>
-          {allAiSpans.map(span => {
-            //TODO: check if trace_id is present
-            return (
-              <Link
-                key={span.span_id}
-                to={`/traces/${span.trace_id}/spans/${span.span_id}`}
-                className="hover:bg-primary-900 block cursor-pointer p-2"
-              >
-                {span.description} {span.timestamp}
-              </Link>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="text-primary-300 p-6">No AI traces have been recorded yet. 🤔</div>
+      <div>
+        {allAiSpans.map(span => {
+          if (!span || !span.span_id) {
+            console.warn('Rendering list: Encountered an AI span without a span_id.');
+            return null;
+          }
+          return <AISpanItem key={span.span_id} span={span} />;
+        })}
+      </div>
+
+      {selectedSpan && traceContext && (
+        <AISpanDetails
+          span={selectedSpan}
+          traceContext={traceContext}
+          startTimestamp={traceContext.start_timestamp}
+          totalDuration={traceContext.timestamp - traceContext.start_timestamp}
+        />
       )}
     </>
   );

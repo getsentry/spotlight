@@ -6,8 +6,8 @@ export default function AgentsTab() {
   return (
     <SentryEventsContextProvider>
       <Routes>
-        {/* <Route path="/:traceId/*" element={<TraceDetails />} /> */}
         <Route path="/" element={<AgentList />} />
+        <Route path="/:spanId" element={<AgentList />} />
       </Routes>
     </SentryEventsContextProvider>
   );
