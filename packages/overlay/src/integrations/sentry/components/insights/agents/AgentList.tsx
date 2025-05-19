@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import useAiSpansWithDescendants from '../../traces/spans/useAiSpans';
+import useAiSpansWithDescendants from '../../../data/useSentryAISpans';
 
 export default function AgentList() {
   // TODO: make sure we don't really need to take into account local spans
