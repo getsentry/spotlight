@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ErrorTitle } from '~/integrations/sentry/components/events/error/Error';
 import useSentryStore from '~/integrations/sentry/store';
@@ -9,6 +9,7 @@ import { isErrorEvent } from '~/integrations/sentry/utils/sentry';
 import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
 import Table from '~/ui/Table';
 import DateTime from '../../shared/DateTime';
+import SpanTree from '../../traces/spans/SpanTree';
 
 function formatValue(name: string, value: unknown): ReactNode {
   if (typeof value === 'number') {
@@ -44,7 +45,8 @@ type AISpanDetailsProps = {
   totalDuration: number;
 };
 
-export default function AISpanDetails({ span, startTimestamp, totalDuration }: AISpanDetailsProps) {
+export default function AISpanDetails({ span, startTimestamp, totalDuration, traceContext }: AISpanDetailsProps) {
+  const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
   const spanRelativeStart = span.start_timestamp - startTimestamp;
   const getEventsByTrace = useSentryStore(state => state.getEventsByTrace);
 
@@ -185,6 +187,20 @@ export default function AISpanDetails({ span, startTimestamp, totalDuration }: A
                 ))}
               </Table.Body>
             </Table>
+          </div>
+        )}
+
+        {(span.children?.length ?? 0) > 0 && (
+          <div>
+            <h2 className="mb-2 font-bold uppercase">Sub-tree</h2>
+            <SpanTree
+              traceContext={traceContext}
+              tree={[span]}
+              startTimestamp={startTimestamp}
+              totalDuration={totalDuration}
+              spanNodeWidth={spanNodeWidth}
+              setSpanNodeWidth={setSpanNodeWidth}
+            />
           </div>
         )}
       </div>

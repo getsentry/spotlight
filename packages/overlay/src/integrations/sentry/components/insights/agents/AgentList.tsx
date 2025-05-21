@@ -5,6 +5,7 @@ import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
 import Table from '~/ui/Table';
 import { AGENT_HEADERS, AGENT_SORT_KEYS } from '../../../constants';
+import { SearchProvider } from '../../../context/SearchContext';
 import { useAISpansWithDescendants, useProcessedAITraces, type ProcessedAITrace } from '../../../data/useSentryAISpans';
 import useSort from '../../../hooks/useSort';
 import useSentryStore from '../../../store';
@@ -109,12 +110,14 @@ export default function AgentList() {
       </Table>
 
       {selectedRawSpan && traceContext && (
-        <AISpanDetails
-          span={selectedRawSpan}
-          traceContext={traceContext}
-          startTimestamp={traceContext.start_timestamp}
-          totalDuration={traceContext.timestamp - traceContext.start_timestamp}
-        />
+        <SearchProvider>
+          <AISpanDetails
+            span={selectedRawSpan}
+            traceContext={traceContext}
+            startTimestamp={traceContext.start_timestamp}
+            totalDuration={traceContext.timestamp - traceContext.start_timestamp}
+          />
+        </SearchProvider>
       )}
     </>
   );
