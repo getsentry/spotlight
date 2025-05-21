@@ -9,7 +9,7 @@ import { SearchProvider } from '../../../context/SearchContext';
 import { useAISpansWithDescendants, useProcessedAITraces, type ProcessedAITrace } from '../../../data/useSentryAISpans';
 import useSort from '../../../hooks/useSort';
 import useSentryStore from '../../../store';
-import AISpanDetails from './AISpanDetails';
+import AITraceDetail from './AITraceDetails';
 import AITraceItem from './AITraceItem';
 
 type AgentSortTypes = (typeof AGENT_SORT_KEYS)[keyof typeof AGENT_SORT_KEYS];
@@ -111,12 +111,7 @@ export default function AgentList() {
 
       {selectedRawSpan && traceContext && (
         <SearchProvider>
-          <AISpanDetails
-            span={selectedRawSpan}
-            traceContext={traceContext}
-            startTimestamp={traceContext.start_timestamp}
-            totalDuration={traceContext.timestamp - traceContext.start_timestamp}
-          />
+          <AITraceDetail />
         </SearchProvider>
       )}
     </>
