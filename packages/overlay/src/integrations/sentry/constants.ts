@@ -31,6 +31,49 @@ export const AGGREGATE_PROFILES_HEADERS = [
   },
 ];
 
+export const AGENT_SORT_KEYS = {
+  traceId: 'TRACE_ID',
+  name: 'NAME',
+  operation: 'OPERATION',
+  timestamp: 'TIMESTAMP',
+  duration: 'DURATION',
+  tokens: 'TOKENS',
+};
+
+export const AGENT_HEADERS = [
+  {
+    id: 'traceId',
+    title: 'Trace ID',
+    sortKey: AGENT_SORT_KEYS.traceId,
+    primary: true,
+  },
+  {
+    id: 'name',
+    title: 'Name',
+    sortKey: AGENT_SORT_KEYS.name,
+  },
+  {
+    id: 'operation',
+    title: 'Operation',
+    sortKey: AGENT_SORT_KEYS.operation,
+  },
+  {
+    id: 'timestamp',
+    title: 'Timestamp',
+    sortKey: AGENT_SORT_KEYS.timestamp,
+  },
+  {
+    id: 'duration',
+    title: 'Duration',
+    sortKey: AGENT_SORT_KEYS.duration,
+  },
+  {
+    id: 'tokens',
+    title: 'Tokens (Prompt/Completion)',
+    sortKey: AGENT_SORT_KEYS.tokens,
+  },
+];
+
 export const RESOURCES_SORT_KEYS = {
   avgDuration: 'AVG_DURATION',
   totalTime: 'TOTAL_TIME',
