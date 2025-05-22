@@ -1,5 +1,5 @@
 import type { Trace } from '~/integrations/sentry/types';
-import Tag from '~/ui/Tag';
+import Tag from '~/ui/tag';
 
 export function TraceRootTxnName({ trace, flowing = false }: { trace: Trace; flowing?: boolean }) {
   const method = String(

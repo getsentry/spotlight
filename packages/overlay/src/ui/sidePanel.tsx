@@ -1,5 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export type SidePanelProps = Omit<ComponentPropsWithoutRef<'div'>, 'className'> & {
   backto: string;

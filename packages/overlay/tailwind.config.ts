@@ -5,6 +5,7 @@ import defaultTheme from 'tailwindcss/defaultTheme';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: ['class'],
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
@@ -19,4 +20,5 @@ export default {
       },
     },
   },
+  plugins: [require('tailwindcss-animate')],
 } satisfies Config;

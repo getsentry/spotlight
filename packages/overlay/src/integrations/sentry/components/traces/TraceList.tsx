@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Badge from '~/ui/Badge';
+import { Badge } from '~/ui/badge';
 import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
 import classNames from '../../../../lib/classNames';
@@ -12,6 +12,7 @@ import { truncateId } from '../../utils/text';
 import HiddenItemsButton from '../shared/HiddenItemsButton';
 import { TraceRootTxnName } from './TraceDetails/components/TraceRootTxnName';
 import TraceIcon from './TraceIcon';
+import TraceListFilter from './TraceListFilter';
 
 export default function TraceList() {
   const { allTraces, localTraces } = useSentryTraces();
@@ -33,6 +34,7 @@ export default function TraceList() {
               }}
             />
           )}
+          <TraceListFilter />
           {filteredTraces.map(trace => {
             return (
               <Link

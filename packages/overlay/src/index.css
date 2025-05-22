@@ -136,3 +136,14 @@ input:checked ~ .dot {
 .spotlight-debugger.resizing-row * {
   cursor: row-resize !important;
 }
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+}
+
+.debug-dropdown {
+  outline: 2px solid red !important;
+  z-index: 999999 !important;
+}
