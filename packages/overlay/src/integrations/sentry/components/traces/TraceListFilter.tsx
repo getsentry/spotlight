@@ -7,70 +7,91 @@ import { ReactComponent as Filter } from '~/assets/filter.svg';
 import { ReactComponent as Hash } from '~/assets/hash.svg';
 import { ReactComponent as Search } from '~/assets/search.svg';
 
-import { useState } from 'react';
+import dayjs from 'dayjs';
+import { useMemo, useState } from 'react';
 import { Badge } from '~/ui/badge';
 import { Button } from '~/ui/button';
 import { Input } from '~/ui/input';
 import { getSpotlightContainer } from '~/utils/dom';
+import { Trace } from '../../types';
+import { getRootTransactionMethod, getRootTransactionName } from '../../utils/traces';
 import { FilterDropdown } from '../shared/FilterDropdown';
 
-const FILTER_CONFIGS = {
-  transaction: {
-    icon: Filter,
-    label: 'Transaction',
-    tooltip: 'Filter by transaction type',
-    options: [
-      { label: 'Missing Root Transaction', value: 'missing root transaction' },
-      { label: 'Alerts/Rules', value: '/alerts/rules/' },
-      { label: 'Provider/Owner/Repo', value: '/:provider/:owner/:repo' },
-    ],
-  },
-  method: {
-    icon: Hash,
-    label: 'Method',
-    tooltip: 'Filter by HTTP method',
-    options: [
-      { label: 'GET Requests', value: 'GET' },
-      { label: 'POST Requests', value: 'POST' },
-    ],
-  },
-  status: {
-    icon: AlertCircle,
-    label: 'Status',
-    tooltip: 'Filter by status',
-    options: [
-      { label: 'OK', value: 'ok' },
-      { label: 'Error', value: 'error' },
-    ],
-  },
-  time: {
-    icon: Clock,
-    label: 'Time',
-    tooltip: 'Filter by time period',
-    options: [
-      { label: 'Last 3 months', value: '3 months' },
-      { label: 'Last 6 months', value: '6 months' },
-      { label: 'Last year', value: 'year' },
-    ],
-  },
-  performance: {
-    icon: Branch,
-    label: 'Performance',
-    tooltip: 'Filter by performance metrics',
-    options: [
-      { label: 'No spans (0)', value: '0 spans' },
-      { label: 'With spans (>0)', value: '>0 spans' },
-      { label: 'Fast (<100ms)', value: '<100ms' },
-      { label: 'Medium (100ms-1s)', value: '100ms-1s' },
-      { label: 'Slow (>1s)', value: '>1s' },
-    ],
-  },
-};
-
-export default function TraceListFilter() {
+export default function TraceListFilter({ traces }: { traces: Trace[] }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const spotlightContainer = getSpotlightContainer();
+
+  const { transactionConfig, methodConfig, timeConfig, statusConfig } = useMemo(() => {
+    const transactionNames = new Set<string>();
+    const methodNames = new Set<string>();
+    const timeLabels = new Set<string>();
+    const statusLabels = new Set<string>();
+
+    for (const trace of traces) {
+      transactionNames.add(getRootTransactionName(trace));
+
+      const method = getRootTransactionMethod(trace);
+      if (method) methodNames.add(method);
+
+      const timeLabel = dayjs(trace.start_timestamp).fromNow();
+      if (timeLabel) timeLabels.add(timeLabel);
+
+      const status = trace.status || '';
+      if (status) statusLabels.add(status);
+    }
+
+    return {
+      transactionConfig: [...transactionNames].map(name => ({ label: name, value: name })),
+      methodConfig: [...methodNames].map(name => ({ label: name, value: name })),
+      timeConfig: [...timeLabels].map(name => ({ label: name, value: name })),
+      statusConfig: [...statusLabels].map(name => ({ label: name, value: name })),
+    };
+  }, [traces]);
+
+  const FILTER_CONFIGS = {
+    transaction: {
+      icon: Filter,
+      label: 'Transaction',
+      tooltip: 'Filter by transaction type',
+      options: transactionConfig,
+      show: transactionConfig.length > 0,
+    },
+    method: {
+      icon: Hash,
+      label: 'Method',
+      tooltip: 'Filter by HTTP method',
+      options: methodConfig,
+      show: methodConfig.length > 0,
+    },
+    status: {
+      icon: AlertCircle,
+      label: 'Status',
+      tooltip: 'Filter by status',
+      options: statusConfig,
+      show: statusConfig.length > 0,
+    },
+    time: {
+      icon: Clock,
+      label: 'Time',
+      tooltip: 'Filter by time period',
+      options: timeConfig,
+      show: timeConfig.length > 0,
+    },
+    performance: {
+      icon: Branch,
+      label: 'Performance',
+      tooltip: 'Filter by performance metrics',
+      options: [
+        { label: 'No spans (0)', value: '0 spans' },
+        { label: 'With spans (>0)', value: '>0 spans' },
+        { label: 'Fast (<100ms)', value: '<100ms' },
+        { label: 'Medium (100ms-1s)', value: '100ms-1s' },
+        { label: 'Slow (>1s)', value: '>1s' },
+      ],
+      show: true,
+    },
+  };
 
   const handleFilterChange = (value: string, checked: boolean) => {
     if (checked) {
@@ -110,18 +131,20 @@ export default function TraceListFilter() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {Object.entries(FILTER_CONFIGS).map(([key, config]) => (
-            <FilterDropdown
-              key={key}
-              icon={config.icon}
-              label={config.label}
-              tooltip={config.tooltip}
-              options={config.options}
-              activeFilters={activeFilters}
-              onFilterChange={handleFilterChange}
-              container={spotlightContainer}
-            />
-          ))}
+          {Object.entries(FILTER_CONFIGS)
+            .filter(([, config]) => config.show)
+            .map(([key, config]) => (
+              <FilterDropdown
+                key={key}
+                icon={config.icon}
+                label={config.label}
+                tooltip={config.tooltip}
+                options={config.options}
+                activeFilters={activeFilters}
+                onFilterChange={handleFilterChange}
+                container={spotlightContainer}
+              />
+            ))}
         </div>
       </div>
 

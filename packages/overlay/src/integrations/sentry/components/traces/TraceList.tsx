@@ -34,7 +34,7 @@ export default function TraceList() {
               }}
             />
           )}
-          <TraceListFilter />
+          <TraceListFilter traces={filteredTraces} />
           {filteredTraces.map(trace => {
             return (
               <Link
