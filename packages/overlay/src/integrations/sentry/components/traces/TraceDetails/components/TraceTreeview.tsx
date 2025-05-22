@@ -6,7 +6,8 @@ import useSentryStore from '~/integrations/sentry/store';
 import type { Trace } from '~/integrations/sentry/types';
 import { getFormattedSpanDuration } from '../../../../utils/duration';
 
-import { Search, X } from 'lucide-react';
+import { ReactComponent as X } from '~/assets/cross.svg';
+import { ReactComponent as Search } from '~/assets/search.svg';
 import { Button } from '~/ui/button';
 import { Input } from '~/ui/input';
 import DateTime from '../../../shared/DateTime';

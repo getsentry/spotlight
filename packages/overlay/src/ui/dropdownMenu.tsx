@@ -1,5 +1,8 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { Check, ChevronRight, Circle } from 'lucide-react';
+import { ReactComponent as ChevronIcon } from '~/assets/branch.svg';
+import { ReactComponent as Check } from '~/assets/checkCircle.svg';
+import { ReactComponent as Circle } from '~/assets/circle.svg';
+
 import * as React from 'react';
 import { cn } from '~/lib/cn';
 
@@ -31,7 +34,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
     {...props}
   >
     {children}
-    <ChevronRight className="ml-auto" />
+    <ChevronIcon className="ml-auto rotate-45" />
   </DropdownMenuPrimitive.SubTrigger>
 ));
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName;

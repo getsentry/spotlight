@@ -1,5 +1,12 @@
 'use client';
-import { AlertCircle, Clock, Filter, GitBranch, Hash, Search, X } from 'lucide-react';
+import { ReactComponent as AlertCircle } from '~/assets/alertCircle.svg';
+import { ReactComponent as Branch } from '~/assets/branch.svg';
+import { ReactComponent as Clock } from '~/assets/clock.svg';
+import { ReactComponent as X } from '~/assets/cross.svg';
+import { ReactComponent as Filter } from '~/assets/filter.svg';
+import { ReactComponent as Hash } from '~/assets/hash.svg';
+import { ReactComponent as Search } from '~/assets/search.svg';
+
 import { useState } from 'react';
 import { Badge } from '~/ui/badge';
 import { Button } from '~/ui/button';
@@ -47,7 +54,7 @@ const FILTER_CONFIGS = {
     ],
   },
   performance: {
-    icon: GitBranch,
+    icon: Branch,
     label: 'Performance',
     tooltip: 'Filter by performance metrics',
     options: [

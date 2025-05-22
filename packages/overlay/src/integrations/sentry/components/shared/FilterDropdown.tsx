@@ -1,4 +1,5 @@
-import { ChevronDown, LucideIcon } from 'lucide-react';
+import { ElementType } from 'react';
+import { ReactComponent as ChevronDown } from '~/assets/chevronDown.svg';
 import { Button } from '~/ui/button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '~/ui/dropdownMenu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/ui/tooltip';
@@ -9,7 +10,7 @@ interface FilterOption {
 }
 
 interface FilterDropdownProps {
-  icon: LucideIcon;
+  icon: ElementType;
   label: string;
   tooltip: string;
   options: FilterOption[];
