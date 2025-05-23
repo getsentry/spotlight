@@ -40,7 +40,7 @@ export default function TraceList() {
 
   return (
     <>
-      {filteredTraces.length !== 0 ? (
+      {visibleTraces.length !== 0 ? (
         <CardList>
           {hiddenItemCount > 0 && (
             <HiddenItemsButton
@@ -95,6 +95,11 @@ export default function TraceList() {
               </Link>
             );
           })}
+          {filteredTraces.length === 0 && (
+            <div className="text-primary-300 p-6">
+              Looks like there's no traces recorded matching the applied search & filters. 🤔
+            </div>
+          )}
         </CardList>
       ) : (
         <div className="text-primary-300 p-6">Looks like there's no traces recorded matching this query. 🤔</div>
