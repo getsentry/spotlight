@@ -5,7 +5,7 @@ import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
 import Badge from '~/ui/Badge';
 import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
 import Table from '~/ui/Table';
-import { useAISpansWithDescendants } from '../../../data/useSentryAISpans';
+import useSentryStore from '../../../store';
 import DateTime from '../../shared/DateTime';
 import SpanTree from '../../traces/spans/SpanTree';
 
@@ -142,14 +142,24 @@ function PromptSection({ trace }: { trace: SpotlightAITrace }) {
       {trace.prompt.messages && trace.prompt.messages.length > 0 && (
         <div>
           <h3 className="mb-2 text-sm font-semibold uppercase">Messages</h3>
-          {trace.prompt.messages.map((message, i) => (
-            <div key={`message-${i}-${message.role}`} className="border-primary-700 mb-4 rounded border p-2">
-              <div className="mb-1 font-semibold capitalize">{message.role}</div>
-              <pre className="whitespace-pre-wrap break-words font-mono text-sm">
-                {message.role === 'assistant' ? trace.response?.text : message.content}
-              </pre>
-            </div>
-          ))}
+          {trace.prompt.messages.map((message, i) => {
+            let messageContent: string;
+            if (message.role === 'assistant') {
+              if (!trace.response?.text) {
+                return null; // Don't render empty assistant messages
+              }
+              messageContent = trace.response.text;
+            } else {
+              messageContent = message.content;
+            }
+
+            return (
+              <div key={`message-${i}-${message.role}`} className="border-primary-700 mb-4 rounded border p-2">
+                <div className="mb-1 font-semibold capitalize">{message.role}</div>
+                <pre className="whitespace-pre-wrap break-words font-mono text-sm">{messageContent}</pre>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
@@ -197,8 +207,9 @@ function ToolCallsSection({ trace }: { trace: SpotlightAITrace }) {
 
 export default function AITraceDetail() {
   const { spanId } = useParams<{ spanId: string }>();
+  const getSpanById = useSentryStore(state => state.getSpanById);
+
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
-  const aiSpans = useAISpansWithDescendants();
 
   if (!spanId) {
     return (
@@ -209,8 +220,7 @@ export default function AITraceDetail() {
     );
   }
 
-  // Find the span with the matching ID from all AI spans
-  const span = aiSpans.find(s => s.span_id === spanId);
+  const span = getSpanById(spanId);
 
   if (!span) {
     return (

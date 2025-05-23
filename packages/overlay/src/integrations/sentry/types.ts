@@ -292,3 +292,62 @@ export type MetricWeightsProps = {
   fid: number;
   ttfb: number;
 };
+
+export type AIToolCall = {
+  toolCallId: string;
+  toolName: string;
+  args: Record<string, unknown>;
+  result?: Record<string, unknown> | string;
+  state?: string;
+  step?: number;
+};
+
+export type AIMessage = {
+  role: string;
+  content: string;
+  toolInvocations?: AIToolCall[];
+  parts?: unknown[];
+};
+
+export type AIPrompt = {
+  system?: string;
+  messages?: AIMessage[];
+};
+
+export type AIResponse = {
+  finishReason?: string;
+  text?: string;
+  toolCalls?: AIToolCall[];
+};
+
+export type AIMetadata = {
+  modelId?: string;
+  modelProvider?: string;
+  functionId?: string;
+  metadata: Record<string, unknown>;
+  maxRetries?: number;
+  maxSteps?: number;
+  promptTokens?: number;
+  completionTokens?: number;
+};
+
+export type SpotlightAITrace = {
+  id: string; // root span_id, also used as traceId for display
+  name: string; // root span description or op for primary display
+  operation: string;
+  timestamp: number;
+  durationMs: number;
+  tokensDisplay: string; // prompt/completion or N/A
+  promptTokens?: number;
+  completionTokens?: number;
+  hasToolCall: boolean;
+  rawSpan: Span;
+};
+
+export type AILibraryHandler = {
+  id: string;
+  name: string;
+  canHandleSpan: (span: Span) => boolean;
+  extractRootSpans: (spans: Span[]) => Span[];
+  processTrace: (rootSpan: Span) => SpotlightAITrace;
+};

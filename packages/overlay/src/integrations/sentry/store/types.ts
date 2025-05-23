@@ -1,6 +1,6 @@
 import { Envelope } from '@sentry/core';
 import { RawEventContext } from '~/integrations/integration';
-import { AggregateCallData, Sdk, SentryErrorEvent, SentryEvent, SentryProcessedProfile, Trace } from '../types';
+import { AggregateCallData, Sdk, SentryErrorEvent, SentryEvent, SentryProcessedProfile, Span, Trace } from '../types';
 
 export type SentryProfileWithTraceMeta = SentryProcessedProfile & {
   timestamp: number;
@@ -79,6 +79,7 @@ export interface SDKsSliceActions {
 export interface SharedSliceActions {
   getEventById: (id: string) => SentryEvent | undefined;
   getTraceById: (id: string) => Trace | undefined;
+  getSpanById: (id: string) => Span | undefined;
   getEventsByTrace: (traceId: string, spanId?: string | null) => SentryEvent[];
   processStacktrace: (errorEvent: SentryErrorEvent) => Promise<void[]>;
   resetData: () => void;

@@ -2,18 +2,19 @@ import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
+import type { SpotlightAITrace } from '~/integrations/sentry/types';
 import classNames from '~/lib/classNames';
 import Table from '~/ui/Table';
 import { AGENT_HEADERS, AGENT_SORT_KEYS } from '../../../constants';
 import { SearchProvider } from '../../../context/SearchContext';
-import { useAISpansWithDescendants, useProcessedAITraces, type ProcessedAITrace } from '../../../data/useSentryAISpans';
+import { useSpotlightAITraces } from '../../../data/useSpotlightAITraces';
 import useSort from '../../../hooks/useSort';
 import useSentryStore from '../../../store';
 import AITraceDetail from './AITraceDetails';
 import AITraceItem from './AITraceItem';
 
 type AgentSortTypes = (typeof AGENT_SORT_KEYS)[keyof typeof AGENT_SORT_KEYS];
-type AgentComparator = (a: ProcessedAITrace, b: ProcessedAITrace) => number;
+type AgentComparator = (a: SpotlightAITrace, b: SpotlightAITrace) => number;
 
 const COMPARATORS: Record<AgentSortTypes, AgentComparator> = {
   [AGENT_SORT_KEYS.timestamp]: (a, b) => a.timestamp - b.timestamp,
@@ -34,31 +35,29 @@ const COMPARATORS: Record<AgentSortTypes, AgentComparator> = {
 export default function AgentList() {
   const { spanId } = useParams<{ spanId?: string }>();
   const navigate = useNavigate();
-  const allAiSpans = useAISpansWithDescendants();
+  const getSpanById = useSentryStore(state => state.getSpanById);
   const getTraceById = useSentryStore(state => state.getTraceById);
-  const processedAiTraces = useProcessedAITraces();
+  const spotlightAITraces = useSpotlightAITraces();
 
   const { sort, toggleSortOrder } = useSort({ defaultSortType: AGENT_SORT_KEYS.timestamp });
 
   const sortedAiTraces = useMemo(() => {
     const compareFn = COMPARATORS[sort.active as AgentSortTypes] || COMPARATORS[AGENT_SORT_KEYS.timestamp];
-    return [...processedAiTraces].sort((a, b) => {
+    return [...spotlightAITraces].sort((a, b) => {
       return sort.asc ? compareFn(a, b) : compareFn(b, a);
     });
-  }, [processedAiTraces, sort]);
+  }, [spotlightAITraces, sort]);
 
-  const selectedRawSpan = spanId ? allAiSpans.find(s => s.span_id === spanId) : null;
+  const selectedRawSpan = spanId ? getSpanById(spanId) : null;
   const traceContext = selectedRawSpan?.trace_id ? getTraceById(selectedRawSpan.trace_id) : null;
 
-  if (processedAiTraces.length === 0) {
+  if (spotlightAITraces.length === 0) {
     return <div className="text-primary-300 p-6">No AI traces have been recorded yet. 🤔</div>;
   }
 
-  const handleTraceClick = (trace: ProcessedAITrace) => {
+  const handleTraceClick = (trace: SpotlightAITrace) => {
     if (trace.id) {
       navigate(`../${trace.id}`);
-    } else {
-      console.warn('Clicked trace does not have an ID for details view.');
     }
   };
 

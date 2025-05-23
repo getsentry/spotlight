@@ -1,41 +1,27 @@
-import type { Span, SpanId } from '~/integrations/sentry/types';
+import type { AIMetadata, AIPrompt, AIResponse, AIToolCall, Span, SpanId } from '~/integrations/sentry/types';
 
-export interface AIToolCall {
-  toolCallId: string;
-  toolName: string;
-  args: Record<string, unknown>;
-  result?: Record<string, unknown> | string;
-  state?: string;
-  step?: number;
-}
+export function getAllSpansInTree(rootSpan: Span): Span[] {
+  const allSpans: Span[] = [];
+  const queue: Span[] = [rootSpan];
+  const visited = new Set<SpanId>();
 
-export interface AIMessage {
-  role: string;
-  content: string;
-  toolInvocations?: AIToolCall[];
-  parts?: unknown[];
-}
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (!current || visited.has(current.span_id)) {
+      continue;
+    }
 
-export interface AIPrompt {
-  system?: string;
-  messages?: AIMessage[];
-}
+    visited.add(current.span_id);
+    allSpans.push(current);
 
-export interface AIResponse {
-  finishReason?: string;
-  text?: string;
-  toolCalls?: AIToolCall[];
-}
+    if (current.children) {
+      for (const child of current.children) {
+        queue.push(child);
+      }
+    }
+  }
 
-export interface AIMetadata {
-  modelId?: string;
-  modelProvider?: string;
-  functionId?: string;
-  metadata: Record<string, unknown>;
-  maxRetries?: number;
-  maxSteps?: number;
-  promptTokens?: number;
-  completionTokens?: number;
+  return allSpans;
 }
 
 export class SpotlightAITrace {
@@ -82,7 +68,7 @@ export class SpotlightAITrace {
   }
 
   private parseSpan(rootSpan: Span): void {
-    const allSpans = this.collectAllSpans(rootSpan);
+    const allSpans = getAllSpansInTree(rootSpan);
 
     for (const span of allSpans) {
       if (!span.data) continue;
@@ -172,30 +158,6 @@ export class SpotlightAITrace {
         this.toolCalls.push(toolCall);
       }
     }
-  }
-
-  private collectAllSpans(rootSpan: Span): Span[] {
-    const allSpans: Span[] = [];
-    const queue: Span[] = [rootSpan];
-    const visited = new Set<SpanId>();
-
-    while (queue.length > 0) {
-      const current = queue.shift();
-      if (!current || visited.has(current.span_id)) {
-        continue;
-      }
-
-      visited.add(current.span_id);
-      allSpans.push(current);
-
-      if (current.children) {
-        for (const child of current.children) {
-          queue.push(child);
-        }
-      }
-    }
-
-    return allSpans;
   }
 
   getDisplayTitle(): string {

@@ -1,8 +1,8 @@
+import type { SpotlightAITrace } from '~/integrations/sentry/types';
 import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
-import type { ProcessedAITrace } from '../../../data/useSentryAISpans';
 import DateTime from '../../shared/DateTime';
 interface AITraceItemProps {
-  trace: ProcessedAITrace;
+  trace: SpotlightAITrace;
   onClick: () => void;
 }
 
