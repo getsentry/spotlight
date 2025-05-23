@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { createAITraceFromSpan, type SpotlightAITrace } from '~/integrations/sentry/data/SpotlightAITrace';
+import {
+  createAITraceFromSpan,
+  detectAILibraryHandler,
+} from '~/integrations/sentry/components/insights/agents/sdks/aiLibraries';
+import type { AILibraryHandler, SpotlightAITrace } from '~/integrations/sentry/types';
 import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
 import Badge from '~/ui/Badge';
 import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
@@ -53,14 +57,14 @@ function ToolCallDetail({ toolCall }: ToolCallDetailProps) {
   );
 }
 
-function AITraceMetadata({ trace }: { trace: SpotlightAITrace }) {
+function AITraceMetadata({ trace, handler }: { trace: SpotlightAITrace; handler: AILibraryHandler }) {
   const metadata = [
     ['Trace ID', trace.id],
-    ['Type', trace.getTypeBadge()],
+    ['Type', handler.getTypeBadge(trace)],
     ['Operation', trace.operation],
     ['Timestamp', <DateTime key="timestamp" date={trace.timestamp} />],
     ['Duration', getFormattedDuration(trace.durationMs)],
-    ['Tokens (prompt/completion)', trace.getTokensDisplay()],
+    ['Tokens (prompt/completion)', handler.getTokensDisplay(trace)],
   ];
 
   if (trace.metadata.functionId) {
@@ -232,6 +236,27 @@ export default function AITraceDetail() {
   }
 
   const trace = createAITraceFromSpan(span);
+
+  if (!trace) {
+    return (
+      <SidePanel backto="/insights/agents">
+        <SidePanelHeader title="AI Trace Detail" backto="/insights/agents" />
+        <div className="p-6">Unable to process AI trace</div>
+      </SidePanel>
+    );
+  }
+
+  const handler = detectAILibraryHandler(span);
+
+  if (!handler) {
+    return (
+      <SidePanel backto="/insights/agents">
+        <SidePanelHeader title="AI Trace Detail" backto="/insights/agents" />
+        <div className="p-6">No Spotlight AI handler found for this AI trace</div>
+      </SidePanel>
+    );
+  }
+
   const traceContext = { trace_id: span.trace_id };
   const startTimestamp = span.start_timestamp;
   const totalDuration = span.timestamp - span.start_timestamp;
@@ -239,11 +264,11 @@ export default function AITraceDetail() {
   return (
     <SidePanel backto="/insights/agents">
       <SidePanelHeader
-        title={trace.getDisplayTitle()}
+        title={handler.getDisplayTitle(trace)}
         subtitle={
           <div className="flex items-center gap-2">
             <span className="text-primary-400">{trace.id}</span>
-            <Badge color="primary">{trace.getTypeBadge()}</Badge>
+            <Badge color="primary">{handler.getTypeBadge(trace)}</Badge>
             {trace.metadata.modelId && <Badge color="secondary">{trace.metadata.modelId}</Badge>}
             {trace.metadata.functionId && <Badge color="neutral">{trace.metadata.functionId}</Badge>}
           </div>
@@ -279,7 +304,7 @@ export default function AITraceDetail() {
           </div>
         </div>
 
-        <AITraceMetadata trace={trace} />
+        <AITraceMetadata trace={trace} handler={handler} />
         <PromptSection trace={trace} />
         <ResponseSection trace={trace} />
         <ToolCallsSection trace={trace} />
