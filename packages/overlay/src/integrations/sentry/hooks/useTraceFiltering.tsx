@@ -219,12 +219,7 @@ const matchesFilterGroup = (
   return false;
 };
 
-const useTraceFiltering = (
-  visibleTraces: Trace[],
-  activeFilters: string[],
-  searchQuery: string,
-  setFilteredTraces: (traces: Trace[]) => void,
-) => {
+const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], searchQuery: string) => {
   const filterConfigData = useMemo((): FilterConfigData => {
     if (!visibleTraces.length) {
       return {
@@ -305,7 +300,7 @@ const useTraceFiltering = (
 
   const applyTraceFilters = useCallback(() => {
     if (!visibleTraces.length) {
-      setFilteredTraces([]);
+      return [];
       return;
     }
 
@@ -314,7 +309,7 @@ const useTraceFiltering = (
     const hasActiveFilters = activeFilters.length > 0;
 
     if (!hasSearchCriteria && !hasActiveFilters) {
-      setFilteredTraces(visibleTraces);
+      return visibleTraces;
       return;
     }
     const groupedFilters = hasActiveFilters ? groupFiltersByType(activeFilters, filterConfigData) : null;
@@ -353,13 +348,12 @@ const useTraceFiltering = (
       );
     });
 
-    setFilteredTraces(filteredTraces);
-  }, [visibleTraces, activeFilters, searchQuery, filterConfigData, setFilteredTraces]);
+    return filteredTraces;
+  }, [visibleTraces, activeFilters, searchQuery, filterConfigData]);
 
   return {
-    filterConfigData,
     TRACE_FILTER_CONFIGS,
-    applyTraceFilters,
+    filteredTraces: applyTraceFilters() || [],
   };
 };
 

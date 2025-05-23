@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '~/ui/badge';
 import CardList from '../../../../components/CardList';
@@ -8,7 +8,6 @@ import { useSpotlightContext } from '../../../../lib/useSpotlightContext';
 import { useSentryTraces } from '../../data/useSentrySpans';
 import useTraceFiltering from '../../hooks/useTraceFiltering';
 import { isLocalTrace } from '../../store/helpers';
-import { Trace } from '../../types';
 import { getFormattedSpanDuration } from '../../utils/duration';
 import { truncateId } from '../../utils/text';
 import HiddenItemsButton from '../shared/HiddenItemsButton';
@@ -21,22 +20,13 @@ export default function TraceList() {
   const context = useSpotlightContext();
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [filteredTraces, setFilteredTraces] = useState<Trace[]>([]);
   const visibleTraces = showAll ? allTraces : localTraces;
   const hiddenItemCount = allTraces.length - visibleTraces.length;
 
-  const { TRACE_FILTER_CONFIGS, applyTraceFilters } = useTraceFiltering(
-    visibleTraces,
-    activeFilters,
-    searchQuery,
-    setFilteredTraces,
-  );
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
-  useEffect(() => {
-    applyTraceFilters();
-  }, [activeFilters, searchQuery]);
+  const { TRACE_FILTER_CONFIGS, filteredTraces } = useTraceFiltering(visibleTraces, activeFilters, searchQuery);
 
   return (
     <>
@@ -57,7 +47,7 @@ export default function TraceList() {
             setActiveFilters={setActiveFilters}
             filterConfigs={TRACE_FILTER_CONFIGS}
           />
-          {filteredTraces.map(trace => {
+          {filteredTraces?.map(trace => {
             return (
               <Link
                 className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
@@ -95,7 +85,7 @@ export default function TraceList() {
               </Link>
             );
           })}
-          {filteredTraces.length === 0 && (
+          {filteredTraces?.length === 0 && (
             <div className="text-primary-300 p-6">
               Looks like there's no traces recorded matching the applied search & filters. 🤔
             </div>

@@ -39,8 +39,8 @@ export default function TraceListFilter({
   };
 
   return (
-    <div className="border-primary-600 border-b p-4">
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+    <div className="p-4">
+      <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-[250px] flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
           <Input
@@ -81,7 +81,7 @@ export default function TraceListFilter({
       </div>
 
       {activeFilters.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           {activeFilters.map(filter => (
             <Badge key={filter} className="text-white">
               {filter}
