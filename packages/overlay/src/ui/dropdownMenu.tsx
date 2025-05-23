@@ -1,6 +1,6 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { ReactComponent as ChevronIcon } from '~/assets/branch.svg';
-import { ReactComponent as Check } from '~/assets/checkCircle.svg';
+import { ReactComponent as Check } from '~/assets/check.svg';
 import { ReactComponent as Circle } from '~/assets/circle.svg';
 
 import * as React from 'react';
@@ -117,7 +117,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
+        <Check className="h-4 w-4 stroke-current" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}

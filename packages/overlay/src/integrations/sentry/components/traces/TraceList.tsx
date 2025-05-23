@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '~/ui/badge';
 import CardList from '../../../../components/CardList';
@@ -6,7 +6,9 @@ import TimeSince from '../../../../components/TimeSince';
 import classNames from '../../../../lib/classNames';
 import { useSpotlightContext } from '../../../../lib/useSpotlightContext';
 import { useSentryTraces } from '../../data/useSentrySpans';
+import useTraceFiltering from '../../hooks/useTraceFiltering';
 import { isLocalTrace } from '../../store/helpers';
+import { Trace } from '../../types';
 import { getFormattedSpanDuration } from '../../utils/duration';
 import { truncateId } from '../../utils/text';
 import HiddenItemsButton from '../shared/HiddenItemsButton';
@@ -19,12 +21,26 @@ export default function TraceList() {
   const context = useSpotlightContext();
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
-  const filteredTraces = showAll ? allTraces : localTraces;
-  const hiddenItemCount = allTraces.length - filteredTraces.length;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [filteredTraces, setFilteredTraces] = useState<Trace[]>([]);
+  const visibleTraces = showAll ? allTraces : localTraces;
+  const hiddenItemCount = allTraces.length - visibleTraces.length;
+
+  const { TRACE_FILTER_CONFIGS, applyTraceFilters } = useTraceFiltering(
+    visibleTraces,
+    activeFilters,
+    searchQuery,
+    setFilteredTraces,
+  );
+
+  useEffect(() => {
+    applyTraceFilters();
+  }, [activeFilters, searchQuery]);
 
   return (
     <>
-      {allTraces.length !== 0 ? (
+      {filteredTraces.length !== 0 ? (
         <CardList>
           {hiddenItemCount > 0 && (
             <HiddenItemsButton
@@ -34,7 +50,13 @@ export default function TraceList() {
               }}
             />
           )}
-          <TraceListFilter traces={filteredTraces} />
+          <TraceListFilter
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            activeFilters={activeFilters}
+            setActiveFilters={setActiveFilters}
+            filterConfigs={TRACE_FILTER_CONFIGS}
+          />
           {filteredTraces.map(trace => {
             return (
               <Link
