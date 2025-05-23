@@ -35,6 +35,10 @@ function processSpanAsTrace(span: Span): SpotlightAITrace {
       tokensDisplay: 'N/A',
       hasToolCall: false,
       rawSpan: {} as Span,
+      metadata: {
+        metadata: {},
+      },
+      toolCalls: [],
     };
   }
 
@@ -55,6 +59,10 @@ function processSpanAsTrace(span: Span): SpotlightAITrace {
     tokensDisplay: 'N/A',
     hasToolCall: false,
     rawSpan: span,
+    metadata: {
+      metadata: {},
+    },
+    toolCalls: [],
   };
 }
 
