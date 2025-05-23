@@ -342,6 +342,10 @@ export type SpotlightAITrace = {
   completionTokens?: number;
   hasToolCall: boolean;
   rawSpan: Span;
+  metadata: AIMetadata;
+  prompt?: AIPrompt;
+  response?: AIResponse;
+  toolCalls: AIToolCall[];
 };
 
 export type AILibraryHandler = {
@@ -350,4 +354,7 @@ export type AILibraryHandler = {
   canHandleSpan: (span: Span) => boolean;
   extractRootSpans: (spans: Span[]) => Span[];
   processTrace: (rootSpan: Span) => SpotlightAITrace;
+  getDisplayTitle: (trace: SpotlightAITrace) => string;
+  getTypeBadge: (trace: SpotlightAITrace) => string;
+  getTokensDisplay: (trace: SpotlightAITrace) => string;
 };
