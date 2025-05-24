@@ -13,6 +13,8 @@ import useSentryStore from '../../../store';
 import DateTime from '../../shared/DateTime';
 import SpanTree from '../../traces/spans/SpanTree';
 
+const AGENTS_ROUTE = '/insights/agents';
+
 interface ToolCallDetailProps {
   toolCall: {
     toolCallId: string;
@@ -217,8 +219,8 @@ export default function AITraceDetail() {
 
   if (!spanId) {
     return (
-      <SidePanel backto="/insights/agents">
-        <SidePanelHeader title="AI Trace Detail" backto="/insights/agents" />
+      <SidePanel backto={AGENTS_ROUTE}>
+        <SidePanelHeader title="AI Trace Details" backto={AGENTS_ROUTE} />
         <div className="p-6">No trace selected</div>
       </SidePanel>
     );
@@ -228,8 +230,8 @@ export default function AITraceDetail() {
 
   if (!span) {
     return (
-      <SidePanel backto="/insights/agents">
-        <SidePanelHeader title="AI Trace Detail" backto="/insights/agents" />
+      <SidePanel backto={AGENTS_ROUTE}>
+        <SidePanelHeader title="AI Trace Details" backto={AGENTS_ROUTE} />
         <div className="p-6">Trace not found</div>
       </SidePanel>
     );
@@ -239,8 +241,8 @@ export default function AITraceDetail() {
 
   if (!trace) {
     return (
-      <SidePanel backto="/insights/agents">
-        <SidePanelHeader title="AI Trace Detail" backto="/insights/agents" />
+      <SidePanel backto={AGENTS_ROUTE}>
+        <SidePanelHeader title="AI Trace Details" backto={AGENTS_ROUTE} />
         <div className="p-6">Unable to process AI trace</div>
       </SidePanel>
     );
@@ -250,8 +252,8 @@ export default function AITraceDetail() {
 
   if (!handler) {
     return (
-      <SidePanel backto="/insights/agents">
-        <SidePanelHeader title="AI Trace Detail" backto="/insights/agents" />
+      <SidePanel backto={AGENTS_ROUTE}>
+        <SidePanelHeader title="AI Trace Details" backto={AGENTS_ROUTE} />
         <div className="p-6">No Spotlight AI handler found for this AI trace</div>
       </SidePanel>
     );
@@ -262,7 +264,7 @@ export default function AITraceDetail() {
   const totalDuration = span.timestamp - span.start_timestamp;
 
   return (
-    <SidePanel backto="/insights/agents">
+    <SidePanel backto={AGENTS_ROUTE}>
       <SidePanelHeader
         title={handler.getDisplayTitle(trace)}
         subtitle={
@@ -273,7 +275,7 @@ export default function AITraceDetail() {
             {trace.metadata.functionId && <Badge color="neutral">{trace.metadata.functionId}</Badge>}
           </div>
         }
-        backto="/insights/agents"
+        backto={AGENTS_ROUTE}
       />
 
       <div className="space-y-6 p-6">
