@@ -31,7 +31,6 @@
     "@microlink/react-json-view": "^1.23.4",
     "@sentry/browser": "^9.22.0",
     "@sentry/react": "^9.22.0",
-    "@sentry/types": "9.22.0",
     "@sentry/core": "9.22.0",
     "@spotlightjs/sidecar": "workspace:*",
     "@spotlightjs/tsconfig": "workspace:*",

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { processEnvelope } from './index';
 
-import type { Event } from '@sentry/types';
+import type { Event } from '@sentry/core';
 import fs from 'node:fs';
 import useSentryStore from './store';
 import { SentryTransactionEvent } from './types';

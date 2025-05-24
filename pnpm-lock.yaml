@@ -376,9 +376,6 @@ importers:
       '@sentry/react':
         specifier: ^9.22.0
         version: 9.22.0(react@18.3.1)
-      '@sentry/types':
-        specifier: 9.22.0
-        version: 9.22.0
       '@spotlightjs/sidecar':
         specifier: workspace:*
         version: link:../sidecar
@@ -3443,11 +3440,6 @@ packages:
     resolution:
       { integrity: sha512-2EOkyHoSOJyCRCsK/O6iA3wyELkRApfY7jNxsC/Amgb5ftuGl/rGO6B4dNKjMJNLNvlkEqZIANoUKOcClBH6yw== }
     engines: { node: '>=14.18' }
-
-  '@sentry/types@9.22.0':
-    resolution:
-      { integrity: sha512-ZFY7io7r+uxtng7fYVROfmdxUZJCjAD8WdXAV8L4zxCsyPG2l/w+RPcw4kXfw7JHTwXd3tlxaWXr5eEGZkWDrQ== }
-    engines: { node: '>=18' }
 
   '@sentry/utils@8.8.0':
     resolution:
@@ -13414,10 +13406,6 @@ snapshots:
       - svelte
 
   '@sentry/types@8.8.0': {}
-
-  '@sentry/types@9.22.0':
-    dependencies:
-      '@sentry/core': 9.22.0
 
   '@sentry/utils@8.8.0':
     dependencies:
