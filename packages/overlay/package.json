@@ -30,7 +30,7 @@
     "@fontsource/raleway": "^5.1.0",
     "@microlink/react-json-view": "^1.23.4",
     "@sentry/browser": "^8.51.0",
-    "@sentry/core": "^8.51.0",
+    "@sentry/core": "^9.22.0",
     "@sentry/react": "^8.51.0",
     "@sentry/types": "^8.51.0",
     "@spotlightjs/sidecar": "workspace:*",

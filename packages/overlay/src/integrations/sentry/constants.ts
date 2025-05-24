@@ -272,3 +272,24 @@ export const PERFORMANCE_SCORE_PROFILES = {
     // }
   ],
 };
+
+export const LOGS_SORT_KEYS = {
+  timestamp: 'TIMESTAMP',
+};
+
+export const LOGS_HEADERS = [
+  {
+    id: 'message',
+    title: 'Message',
+    primary: true,
+  },
+  {
+    id: 'timestamp',
+    title: 'Timestamp',
+    sortKey: LOGS_SORT_KEYS.timestamp,
+  },
+  {
+    id: 'sdk',
+    title: 'SDK Name',
+  },
+];

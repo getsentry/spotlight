@@ -35,3 +35,18 @@ export function getFormattedDuration(duration: number): string {
 export function getFormattedSpanDuration(span: { timestamp: number; start_timestamp: number }): string {
   return getFormattedDuration(span.timestamp - span.start_timestamp);
 }
+
+export function formatTimestamp(timestamp: number) {
+  const date = new Date(timestamp);
+
+  const formattedDate = date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+  });
+
+  return formattedDate;
+}
