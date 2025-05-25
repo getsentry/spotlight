@@ -4,11 +4,12 @@ import { graftProfileSpans } from '../../data/profiles';
 import type {
   ProfileSample,
   SentryEvent,
+  SentryLogEventItem,
   SentryProfileTransactionInfo,
   SentryTransactionEvent,
   Span,
 } from '../../types';
-import { isErrorEvent, isProfileEvent, isTraceEvent } from '../../utils/sentry';
+import { isErrorEvent, isLogEvent, isProfileEvent, isTraceEvent } from '../../utils/sentry';
 import { compareSpans, groupSpans } from '../../utils/traces';
 import type { EventsSliceActions, EventsSliceState, SentryStore } from '../types';
 import { relativeNsToTimestamp, toTimestamp } from '../utils';
@@ -39,9 +40,20 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       await get().processStacktrace(event);
     }
 
-    event.timestamp = toTimestamp(event.timestamp);
+    if (event.timestamp) {
+      event.timestamp = toTimestamp(event.timestamp);
+    }
     if (event.start_timestamp) {
       event.start_timestamp = toTimestamp(event.start_timestamp);
+    }
+
+    if (isLogEvent(event)) {
+      if (!event.items) {
+        event.items = [];
+      }
+      event.items.forEach((logItem: SentryLogEventItem) => {
+        logItem.timestamp = toTimestamp(logItem.timestamp);
+      });
     }
 
     const traceCtx = event.contexts?.trace;

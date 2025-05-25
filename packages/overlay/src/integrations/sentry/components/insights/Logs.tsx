@@ -2,22 +2,22 @@ import { useMemo } from 'react';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
+import { generateUuidv4 } from '~/lib/uuid';
 import Table from '~/ui/Table';
 import { LOGS_HEADERS, LOGS_SORT_KEYS } from '../../constants';
-import { LOG_EVENT_TYPES } from '../../constants/sentry';
-import { useSentryEvents } from '../../data/useSentryEvents';
+import { useSentryLogs } from '../../data/useSentryLogs';
 import useSort from '../../hooks/useSort';
-import { SentryLogEvent } from '../../types';
 import { formatTimestamp } from '../../utils/duration';
 
 type LogsData = {
   timestamp: number;
   message: string;
   sdk: string;
+  id: string;
 };
-const Logs = () => {
-  const events = useSentryEvents();
-
+const Logs = ({ showAll }: { showAll: boolean }) => {
+  const { allLogs, localLogs } = useSentryLogs();
+  const logs = showAll ? allLogs : localLogs;
   const { sort, toggleSortOrder } = useSort({ defaultSortType: LOGS_SORT_KEYS.timestamp });
 
   type LogsComparator = (a: LogsData, b: LogsData) => number;
@@ -29,21 +29,23 @@ const Logs = () => {
   };
 
   const logsData = useMemo(() => {
-    const logsEventItems: LogsData[] = (events.filter(e => e.type && LOG_EVENT_TYPES.has(e.type)) as SentryLogEvent[])
-      .map(e => e.items)
-      .flat()
-      .map(e => ({
-        timestamp: e.timestamp,
-        sdk: (e.attributes?.['sentry.sdk.name']?.value as string) || 'unknown',
-        message: e.body,
-      }));
+    const logsEventItems: LogsData[] = logs.map(e => ({
+      timestamp: e.timestamp,
+      sdk: (e.attributes?.['sentry.sdk.name']?.value as string) || 'unknown',
+      message: e.body,
+      id: generateUuidv4(), // tried using timestamp and message - but getting same values sometimes.
+    }));
 
     const compareProfileInfo = COMPARATORS[sort.active] || COMPARATORS[LOGS_SORT_KEYS.timestamp];
 
     return logsEventItems.sort((a, b) => {
       return sort.asc ? compareProfileInfo(a, b) : compareProfileInfo(b, a);
     });
-  }, [sort]);
+  }, [sort, showAll, localLogs, allLogs]);
+
+  if (!logsData?.length) {
+    return <p className="text-primary-300 px-6 py-4">No logs found.</p>;
+  }
 
   return (
     <Table variant="detail">
@@ -86,7 +88,7 @@ const Logs = () => {
       </Table.Header>
       <Table.Body>
         {logsData.map(log => (
-          <tr key={`${log.message}`} className="hover:bg-primary-900">
+          <tr key={log.id} className="hover:bg-primary-900">
             <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4 text-sm font-medium">
               <span>{log.message}</span>
             </td>

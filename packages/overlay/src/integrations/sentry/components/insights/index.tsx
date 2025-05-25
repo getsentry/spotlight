@@ -56,7 +56,7 @@ export default function InsightsTabDetails() {
           <Route path="queries" element={<Queries showAll={showAll} />} />
           <Route path="*" element={<Navigate to="/insights/queries" replace />} />
           <Route path="profiles" element={<Profiles />} />
-          <Route path="logs" element={<Logs />} />
+          <Route path="logs" element={<Logs showAll={showAll} />} />
         </Routes>
         <Outlet />
       </div>
