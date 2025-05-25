@@ -53,6 +53,7 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       }
       event.items.forEach((logItem: SentryLogEventItem) => {
         logItem.timestamp = toTimestamp(logItem.timestamp);
+        logItem.log_id = generateUuidv4();
       });
     }
 

@@ -202,6 +202,7 @@ export type SentryProfileV1Event = CommonEventAttrs & {
 };
 
 export type SentryLogEventItem = {
+  log_id: string; // Needed to have a unique id for every log
   timestamp: number;
   trace_id: string;
   level: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
