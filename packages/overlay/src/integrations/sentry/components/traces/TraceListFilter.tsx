@@ -27,7 +27,7 @@ export default function TraceListFilter({
   const spotlightContainer = getSpotlightContainer();
 
   const handleFilterChange = useCallback(
-    () => (value: string, checked: boolean) => {
+    (value: string, checked: boolean) => {
       if (checked) {
         setActiveFilters(prev => [...prev, value]);
       } else {
