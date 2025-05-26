@@ -1,6 +1,7 @@
 import { ReactComponent as X } from '~/assets/cross.svg';
 import { ReactComponent as Search } from '~/assets/search.svg';
 
+import { useCallback, useMemo } from 'react';
 import { Badge } from '~/ui/badge';
 import { Button } from '~/ui/button';
 import { Input } from '~/ui/input';
@@ -25,18 +26,26 @@ export default function TraceListFilter({
 }: TraceListFilterProps) {
   const spotlightContainer = getSpotlightContainer();
 
-  const handleFilterChange = (value: string, checked: boolean) => {
-    if (checked) {
-      setActiveFilters(prev => [...prev, value]);
-    } else {
-      setActiveFilters(prev => prev.filter(f => f !== value));
-    }
-  };
+  const handleFilterChange = useCallback(
+    () => (value: string, checked: boolean) => {
+      if (checked) {
+        setActiveFilters(prev => [...prev, value]);
+      } else {
+        setActiveFilters(prev => prev.filter(f => f !== value));
+      }
+    },
+    [setActiveFilters],
+  );
 
-  const clearAllFilters = () => {
+  const clearAllFilters = useCallback(() => {
     setActiveFilters([]);
     setSearchQuery('');
-  };
+  }, [setSearchQuery, setActiveFilters]);
+
+  const visibleFilterConfigs = useMemo(
+    () => Object.entries(filterConfigs).filter(([, config]) => config.show),
+    [filterConfigs],
+  );
 
   return (
     <div className="p-4">
@@ -63,20 +72,18 @@ export default function TraceListFilter({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {Object.entries(filterConfigs)
-            .filter(([, config]) => config.show)
-            .map(([key, config]) => (
-              <FilterDropdown
-                key={key}
-                icon={config.icon}
-                label={config.label}
-                tooltip={config.tooltip}
-                options={config.options}
-                activeFilters={activeFilters}
-                onFilterChange={handleFilterChange}
-                container={spotlightContainer}
-              />
-            ))}
+          {visibleFilterConfigs.map(([key, config]) => (
+            <FilterDropdown
+              key={key}
+              icon={config.icon}
+              label={config.label}
+              tooltip={config.tooltip}
+              options={config.options}
+              activeFilters={activeFilters}
+              onFilterChange={handleFilterChange}
+              container={spotlightContainer}
+            />
+          ))}
         </div>
       </div>
 

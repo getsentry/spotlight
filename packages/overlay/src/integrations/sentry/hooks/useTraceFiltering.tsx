@@ -301,7 +301,6 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
   const applyTraceFilters = useCallback(() => {
     if (!visibleTraces.length) {
       return [];
-      return;
     }
 
     const normalizedSearchQuery = searchQuery?.toLowerCase();
@@ -310,7 +309,6 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
 
     if (!hasSearchCriteria && !hasActiveFilters) {
       return visibleTraces;
-      return;
     }
     const groupedFilters = hasActiveFilters ? groupFiltersByType(activeFilters, filterConfigData) : null;
 
