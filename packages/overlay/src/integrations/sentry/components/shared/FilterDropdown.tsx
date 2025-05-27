@@ -44,7 +44,10 @@ export function FilterDropdown({
                 <ChevronDown className="ml-1 h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent container={container} className="border-primary-700 bg-primary-950 text-white ">
+            <DropdownMenuContent
+              container={container}
+              className="border-primary-700 bg-primary-950 max-h-52 text-white"
+            >
               {options.map(filter => (
                 <DropdownMenuCheckboxItem
                   key={filter.value}
