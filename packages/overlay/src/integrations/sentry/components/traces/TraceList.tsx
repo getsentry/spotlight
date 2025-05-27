@@ -87,7 +87,7 @@ export default function TraceList() {
           })}
           {filteredTraces?.length === 0 && (
             <div className="text-primary-300 p-6">
-              Looks like there's no traces recorded matching the applied search & filters. 🤔
+              Looks like there are no traces recorded matching the applied search & filters. 🤔
             </div>
           )}
         </CardList>
