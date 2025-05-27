@@ -18,3 +18,22 @@ All `.txt` files that are contained in `./packages/overlay/_fixtures` will be se
 This can be very handy when testing Spotlight locally.
 
 {/* TODO: Document how to run Spotlight against Spotlight */}
+
+### Browser Debug Console
+
+To get detailed browser console logs for debugging, open the following URL in your browser while the Sidecar is running:
+
+- [`https://localhost:8969/#spotlight-debug`](https://localhost:8969/#spotlight-debug)
+
+This will enable advanced debug output in the browser console.  
+> **Tip:** This is especially useful for inspecting Sidecar behavior. (It may also work with the Overlay, but is primarily intended for the Sidecar.)
+
+### Inspect Sidecar Stream
+
+You can directly inspect the raw envelopes received by the Sidecar using `curl`:
+
+```sh
+curl http://localhost:8969/stream -H 'Accept: text/event-stream' --verbose
+```
+
+This command will stream the envelopes as they arrive, allowing you to verify what data is being processed by the Sidecar in real time.
