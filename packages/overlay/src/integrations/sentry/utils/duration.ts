@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export const DURATION_LABELS = {
   31557600000: 'yr',
   2629800000: 'mo',
@@ -38,15 +40,5 @@ export function getFormattedSpanDuration(span: { timestamp: number; start_timest
 
 export function formatTimestamp(timestamp: number) {
   const date = new Date(timestamp);
-
-  const formattedDate = date.toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: true,
-  });
-
-  return formattedDate;
+  return dayjs(date).format('LL LTS');
 }

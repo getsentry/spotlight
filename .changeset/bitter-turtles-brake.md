@@ -1,5 +1,5 @@
 ---
-'@spotlightjs/overlay': major
+'@spotlightjs/overlay': patch
 ---
 
 - Added support for structured logging

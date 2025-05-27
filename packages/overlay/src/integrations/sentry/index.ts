@@ -10,6 +10,7 @@ import InsightsTab from './tabs/InsightsTab';
 
 import { spotlightBrowserIntegration } from '@sentry/browser';
 import { getLocalTraces, isLocalTrace } from './store/helpers';
+import LogsTab from './tabs/LogsTab';
 import TracesTab from './tabs/TracesTab';
 import type { SentryErrorEvent, SentryEvent } from './types';
 import { parseJSONFromBuffer } from './utils/bufferParsers';
@@ -98,6 +99,9 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
         }),
         createTab('insights', 'Insights', {
           content: InsightsTab,
+        }),
+        createTab('logs', 'Logs', {
+          content: LogsTab,
         }),
       ];
     },

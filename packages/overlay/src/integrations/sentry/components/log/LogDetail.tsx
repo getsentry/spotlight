@@ -4,7 +4,7 @@ import JsonViewer from '~/components/JsonViewer';
 import { useSentryLogs } from '~/integrations/sentry/data/useSentryLogs';
 import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
 import Table from '~/ui/Table';
-import DateTime from '../../shared/DateTime';
+import DateTime from '../shared/DateTime';
 
 const LOG_LEVEL_COLORS: Record<string, string> = {
   trace: 'text-gray-500',
@@ -21,10 +21,10 @@ export default function LogDetails({ id }: { id: string }) {
   const logData = useMemo(() => allLogs.find(log => log.log_id === id), [allLogs, id]);
 
   if (logData) {
-    const { timestamp, trace_id, body, attributes, level, severity_number, time_unix_nano } = logData;
+    const { timestamp, trace_id, body, attributes, level, severity_number } = logData;
 
     return (
-      <SidePanel backto="/insights/logs">
+      <SidePanel backto="/logs">
         <SidePanelHeader
           title="Log Details"
           subtitle={
@@ -32,7 +32,7 @@ export default function LogDetails({ id }: { id: string }) {
               <span className={LOG_LEVEL_COLORS[level] || 'text-primary-500'}>{level.toUpperCase()}</span>
             </>
           }
-          backto="/insights/logs"
+          backto="/logs"
         />
 
         <div className="space-y-6">
@@ -57,13 +57,6 @@ export default function LogDetails({ id }: { id: string }) {
             <div>
               <h2 className="mb-2 font-bold uppercase">Severity Number</h2>
               <pre className="text-primary-300 font-mono">{severity_number}</pre>
-            </div>
-          )}
-
-          {time_unix_nano && (
-            <div>
-              <h2 className="mb-2 font-bold uppercase">Time (Unix Nano)</h2>
-              <pre className="text-primary-300 font-mono">{time_unix_nano}</pre>
             </div>
           )}
 

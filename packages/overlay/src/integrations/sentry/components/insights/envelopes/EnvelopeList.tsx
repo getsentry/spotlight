@@ -32,6 +32,8 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
               const { trace_id } = (header?.trace as { trace_id?: string }) || {};
               const envelopeItems = envelope[1] || [];
               const itemTypes = new Set();
+              const itemTypesList = Array.from(itemTypes).join(',');
+
               for (const item of envelopeItems) {
                 if (item?.length > 1 && item?.[0].type) {
                   itemTypes.add(item[0].type);
@@ -61,8 +63,8 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
 
                     <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
                       <h2 className="text-primary-50 text-xs">Event Types</h2>
-                      <span title={itemTypes.size > 0 ? Array.from(itemTypes).join(',') : undefined}>
-                        {itemTypes.size > 0 ? Array.from(itemTypes).join(',') : '-'}
+                      <span title={itemTypes.size > 0 ? itemTypesList : undefined}>
+                        {itemTypes.size > 0 ? itemTypesList : '-'}
                       </span>
                     </div>
                     <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">

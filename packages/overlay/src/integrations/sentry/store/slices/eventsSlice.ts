@@ -4,7 +4,6 @@ import { graftProfileSpans } from '../../data/profiles';
 import type {
   ProfileSample,
   SentryEvent,
-  SentryLogEventItem,
   SentryProfileTransactionInfo,
   SentryTransactionEvent,
   Span,
@@ -47,14 +46,11 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       event.start_timestamp = toTimestamp(event.start_timestamp);
     }
 
-    if (isLogEvent(event)) {
-      if (!event.items) {
-        event.items = [];
-      }
-      event.items.forEach((logItem: SentryLogEventItem) => {
+    if (isLogEvent(event) && event.items?.length) {
+      for (const logItem of event.items) {
         logItem.timestamp = toTimestamp(logItem.timestamp);
         logItem.log_id = generateUuidv4();
-      });
+      }
     }
 
     const traceCtx = event.contexts?.trace;

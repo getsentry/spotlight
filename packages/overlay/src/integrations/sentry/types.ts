@@ -1,4 +1,4 @@
-import type { EventEnvelopeHeaders, Measurements } from '@sentry/core';
+import type { EventEnvelopeHeaders, Measurements, SerializedLog } from '@sentry/core';
 
 export type TraceId = string;
 export type SpanId = string;
@@ -201,25 +201,13 @@ export type SentryProfileV1Event = CommonEventAttrs & {
   profile: SentryProfile;
 };
 
-export type SentryLogEventItem = {
-  log_id: string; // Needed to have a unique id for every log
-  timestamp: number;
-  trace_id: string;
-  level: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
-  body: string;
-  attributes?: Record<
-    string,
-    | { type: 'string'; value: string }
-    | { type: 'boolean'; value: boolean }
-    | { type: 'integer'; value: number }
-    | { type: 'double'; value: number }
-  >;
-  severity_number?: number;
-  time_unix_nano?: string;
+export type SentryLogEventItem = SerializedLog & {
+  log_id: string; // Need to have a unique id for each log
 };
+
 export type SentryLogEvent = CommonEventAttrs & {
   type: 'log';
-  items: SentryLogEventItem[];
+  items: Array<SentryLogEventItem>;
 };
 
 export type SentryEvent = SentryErrorEvent | SentryTransactionEvent | SentryProfileV1Event | SentryLogEvent;
