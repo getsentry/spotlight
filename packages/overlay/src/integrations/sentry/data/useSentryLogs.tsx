@@ -16,7 +16,7 @@ export const useSentryLogs = (traceId?: string) => {
     .map(e => e.items)
     .flat();
 
-  const localLogs = allLogs.filter(item => isLocalTrace(item.trace_id));
+  const localLogs = allLogs.filter(item => item.trace_id && isLocalTrace(item.trace_id));
 
   return {
     allLogs,

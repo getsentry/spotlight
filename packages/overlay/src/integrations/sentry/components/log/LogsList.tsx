@@ -2,6 +2,7 @@ import { KeyboardEvent, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
+import CardList from '~/components/CardList';
 import classNames from '~/lib/classNames';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import Table from '~/ui/Table';
@@ -66,7 +67,7 @@ const LogsList = () => {
   };
 
   return (
-    <>
+    <CardList>
       {!showAll && hiddenItemCount > 0 && (
         <HiddenItemsButton
           itemCount={hiddenItemCount}
@@ -143,7 +144,7 @@ const LogsList = () => {
       ) : (
         <p className="text-primary-300 px-6 py-4">No logs found.</p>
       )}
-    </>
+    </CardList>
   );
 };
 
