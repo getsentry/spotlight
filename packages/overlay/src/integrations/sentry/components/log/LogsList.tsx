@@ -23,11 +23,11 @@ type LogsData = {
 type LogsComparator = (a: LogsData, b: LogsData) => number;
 type LogsSortTypes = (typeof LOGS_SORT_KEYS)[keyof typeof LOGS_SORT_KEYS];
 
-const LogsList = () => {
+const LogsList = ({ traceId }: { traceId?: string }) => {
   const { id: selectedLogId } = useParams();
   const navigate = useNavigate();
   const context = useSpotlightContext();
-  const { allLogs, localLogs } = useSentryLogs();
+  const { allLogs, localLogs } = useSentryLogs(traceId);
   const { sort, toggleSortOrder } = useSort({ defaultSortType: LOGS_SORT_KEYS.timestamp });
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
@@ -57,7 +57,7 @@ const LogsList = () => {
   }, [sort, showAll, localLogs, allLogs]);
 
   const handleRowClick = (log: LogsData) => {
-    navigate(`/logs/${log.id}`);
+    navigate(`${log.id}`);
   };
 
   const handleRowKeyDown = (e: KeyboardEvent<HTMLTableRowElement>, log: LogsData) => {

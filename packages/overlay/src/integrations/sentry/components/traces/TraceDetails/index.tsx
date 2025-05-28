@@ -8,6 +8,7 @@ import { isLocalTrace } from '~/integrations/sentry/store/helpers';
 import { isErrorEvent } from '~/integrations/sentry/utils/sentry';
 import EventContexts from '../../events/EventContexts';
 import EventList from '../../events/EventList';
+import LogsList from '../../log/LogsList';
 import TraceDetailHeader from './components/TraceDetailHeader';
 import TraceTreeview from './components/TraceTreeview';
 
@@ -41,6 +42,7 @@ export default function TraceDetails() {
   const tabs = [
     createTab('details', 'Details'),
     createTab('context', 'Context'),
+    createTab('logs', 'Logs'),
     createTab('errors', 'Errors', {
       notificationCount: {
         count: errorCount,
@@ -59,6 +61,8 @@ export default function TraceDetails() {
           <Route path="spans/:spanId" element={<TraceTreeview traceId={traceId} />} />
           <Route path="context" element={<EventContexts event={trace.rootTransaction || trace.transactions[0]} />} />
           <Route path="errors" element={<EventList traceId={traceId} />} />
+          <Route path="logs" element={<LogsList traceId={traceId} />} />
+          <Route path="logs/:id" element={<LogsList traceId={traceId} />} />
           {/* Default tab */}
           <Route path="*" element={<Navigate to={`/traces/${traceId}/details`} replace />} />
         </Routes>

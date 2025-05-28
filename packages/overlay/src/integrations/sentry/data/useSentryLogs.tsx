@@ -8,18 +8,18 @@ import { SentryEventsContext } from './sentryEventsContext';
 export const useSentryLogs = (traceId?: string) => {
   useContext(SentryEventsContext);
   const getEvents = useSentryStore(state => state.getEvents);
-  const getEventsByTrace = useSentryStore(state => state.getEventsByTrace);
 
-  const allEvents = traceId ? getEventsByTrace(traceId) : getEvents();
-
+  const allEvents = getEvents();
   const allLogs = (allEvents.filter(e => e.type && LOG_EVENT_TYPES.has(e.type)) as SentryLogEvent[])
     .map(e => e.items)
     .flat();
 
-  const localLogs = allLogs.filter(item => item.trace_id && isLocalTrace(item.trace_id));
+  const filteredAllLogs = traceId ? allLogs.filter(item => item.trace_id === traceId) : allLogs;
+
+  const localLogs = filteredAllLogs.filter(item => item.trace_id && isLocalTrace(item.trace_id));
 
   return {
-    allLogs,
+    allLogs: filteredAllLogs,
     localLogs,
   };
 };
