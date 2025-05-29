@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { ElementType, useCallback, useMemo } from 'react';
 import { ReactComponent as AlertCircle } from '~/assets/alertCircle.svg';
 import { ReactComponent as Branch } from '~/assets/branch.svg';
@@ -8,28 +7,89 @@ import { ReactComponent as Hash } from '~/assets/hash.svg';
 import { Trace } from '../types';
 import { getRootTransactionMethod, getRootTransactionName } from '../utils/traces';
 
+interface FilterOption {
+  label: string;
+  value: string;
+}
+
+interface FilterConfig {
+  icon: ElementType;
+  label: string;
+  tooltip: string;
+  options: FilterOption[];
+  show: boolean;
+}
+
+export interface FilterConfigs {
+  [FILTER_TYPES.TRANSACTION]: FilterConfig;
+  [FILTER_TYPES.METHOD]: FilterConfig;
+  [FILTER_TYPES.STATUS]: FilterConfig;
+  [FILTER_TYPES.TIME]: FilterConfig;
+  [FILTER_TYPES.PERFORMANCE]: FilterConfig;
+}
+
+interface FilterConfigData {
+  transactionOptions: FilterOption[];
+  methodOptions: FilterOption[];
+  statusOptions: FilterOption[];
+}
+
+interface GroupedFilters {
+  [FILTER_TYPES.TRANSACTION]: Set<string>;
+  [FILTER_TYPES.METHOD]: Set<string>;
+  [FILTER_TYPES.STATUS]: Set<string>;
+  [FILTER_TYPES.TIME]: Set<string>;
+  [FILTER_TYPES.PERFORMANCE]: Set<string>;
+}
+
+interface TraceProperties {
+  transactionName: string;
+  method: string | null;
+  startTimestamp: number;
+  status: string;
+  duration: number;
+  spansSize: number;
+}
+
 const DURATION_THRESHOLDS = {
   FAST_RESPONSE_MAX: 100,
   SLOW_RESPONSE_MIN: 1000,
 } as const;
 
 const PERFORMANCE_FILTER_VALUES = {
-  ZERO_SPANS: 'zero_spans',
-  HAS_SPANS: 'has_spans',
-  FAST_RESPONSE: 'fast_response',
-  MEDIUM_RESPONSE: 'medium_response',
-  SLOW_RESPONSE: 'slow_response',
+  ZERO_SPANS: 'No spans (0)',
+  HAS_SPANS: 'With spans (>0)',
+  FAST_RESPONSE: 'Fast (<100ms)',
+  MEDIUM_RESPONSE: 'Medium (100ms-1s)',
+  SLOW_RESPONSE: 'Slow (>1s)',
 } as const;
+
+const PERFORMANCE_FILTER_OPTIONS: FilterOption[] = Object.entries(PERFORMANCE_FILTER_VALUES).map(([, label]) => ({
+  label,
+  value: label,
+}));
 
 const PERFORMANCE_FILTER_SET = new Set(Object.values(PERFORMANCE_FILTER_VALUES));
 
-const PERFORMANCE_FILTER_LABELS = {
-  [PERFORMANCE_FILTER_VALUES.ZERO_SPANS]: 'No spans (0)',
-  [PERFORMANCE_FILTER_VALUES.HAS_SPANS]: 'With spans (>0)',
-  [PERFORMANCE_FILTER_VALUES.FAST_RESPONSE]: 'Fast (<100ms)',
-  [PERFORMANCE_FILTER_VALUES.MEDIUM_RESPONSE]: 'Medium (100ms-1s)',
-  [PERFORMANCE_FILTER_VALUES.SLOW_RESPONSE]: 'Slow (>1s)',
+const TIME_FILTER_VALUES = {
+  LAST_5_MINUTES: 'Last 5 minutes',
+  LAST_15_MINUTES: 'Last 15 minutes',
+  LAST_30_MINUTES: 'Last 30 minutes',
+  LAST_1_HOUR: 'Last 1 hour',
+  LAST_4_HOURS: 'Last 4 hours',
+  TODAY: 'Today',
+  YESTERDAY: 'Yesterday',
+  LAST_24_HOURS: 'Last 24 hours',
+  LAST_7_DAYS: 'Last 7 days',
+  BEYOND_7_DAYS: 'Older than 7 days',
 } as const;
+
+const TIME_FILTER_OPTIONS = Object.entries(TIME_FILTER_VALUES).map(([, label]) => ({
+  value: label,
+  label,
+}));
+
+const TIME_FILTER_SET = new Set(Object.values(TIME_FILTER_VALUES));
 
 const FILTER_TYPES = {
   TRANSACTION: 'transaction',
@@ -70,75 +130,8 @@ const FILTER_ICONS = {
   [FILTER_TYPES.PERFORMANCE]: Branch,
 } as const;
 
-interface FilterOption {
-  label: string;
-  value: string;
-}
-
-interface FilterConfig {
-  icon: ElementType;
-  label: string;
-  tooltip: string;
-  options: FilterOption[];
-  show: boolean;
-}
-
-export interface FilterConfigs {
-  [FILTER_TYPES.TRANSACTION]: FilterConfig;
-  [FILTER_TYPES.METHOD]: FilterConfig;
-  [FILTER_TYPES.STATUS]: FilterConfig;
-  [FILTER_TYPES.TIME]: FilterConfig;
-  [FILTER_TYPES.PERFORMANCE]: FilterConfig;
-}
-
-interface FilterConfigData {
-  transactionOptions: FilterOption[];
-  methodOptions: FilterOption[];
-  timeOptions: FilterOption[];
-  statusOptions: FilterOption[];
-}
-
-interface GroupedFilters {
-  [FILTER_TYPES.TRANSACTION]: Set<string>;
-  [FILTER_TYPES.METHOD]: Set<string>;
-  [FILTER_TYPES.STATUS]: Set<string>;
-  [FILTER_TYPES.TIME]: Set<string>;
-  [FILTER_TYPES.PERFORMANCE]: Set<string>;
-}
-
-interface TraceProperties {
-  transactionName: string;
-  method: string | null;
-  timeLabel: string;
-  status: string;
-  duration: number;
-}
-
 const createFilterOptionsFromSet = (items: Set<string>): FilterOption[] =>
   Array.from(items).map(item => ({ label: item, value: item }));
-
-const PERFORMANCE_FILTER_OPTIONS: FilterOption[] = [
-  {
-    label: PERFORMANCE_FILTER_LABELS[PERFORMANCE_FILTER_VALUES.ZERO_SPANS],
-    value: PERFORMANCE_FILTER_VALUES.ZERO_SPANS,
-  },
-  {
-    label: PERFORMANCE_FILTER_LABELS[PERFORMANCE_FILTER_VALUES.HAS_SPANS],
-    value: PERFORMANCE_FILTER_VALUES.HAS_SPANS,
-  },
-  {
-    label: PERFORMANCE_FILTER_LABELS[PERFORMANCE_FILTER_VALUES.FAST_RESPONSE],
-    value: PERFORMANCE_FILTER_VALUES.FAST_RESPONSE,
-  },
-  {
-    label: PERFORMANCE_FILTER_LABELS[PERFORMANCE_FILTER_VALUES.MEDIUM_RESPONSE],
-    value: PERFORMANCE_FILTER_VALUES.MEDIUM_RESPONSE,
-  },
-  {
-    label: PERFORMANCE_FILTER_LABELS[PERFORMANCE_FILTER_VALUES.SLOW_RESPONSE],
-    value: PERFORMANCE_FILTER_VALUES.SLOW_RESPONSE,
-  },
-];
 
 const groupFiltersByType = (activeFilters: string[], availableOptions: FilterConfigData): GroupedFilters => {
   const grouped: GroupedFilters = {
@@ -152,7 +145,6 @@ const groupFiltersByType = (activeFilters: string[], availableOptions: FilterCon
   const transactionValues = new Set(availableOptions.transactionOptions.map(opt => opt.value));
   const methodValues = new Set(availableOptions.methodOptions.map(opt => opt.value));
   const statusValues = new Set(availableOptions.statusOptions.map(opt => opt.value));
-  const timeValues = new Set(availableOptions.timeOptions.map(opt => opt.value));
 
   for (const filter of activeFilters) {
     if (transactionValues.has(filter)) {
@@ -161,7 +153,7 @@ const groupFiltersByType = (activeFilters: string[], availableOptions: FilterCon
       grouped[FILTER_TYPES.METHOD].add(filter);
     } else if (statusValues.has(filter)) {
       grouped[FILTER_TYPES.STATUS].add(filter);
-    } else if (timeValues.has(filter)) {
+    } else if (TIME_FILTER_SET.has(filter as typeof TIME_FILTER_SET extends Set<infer T> ? T : never)) {
       grouped[FILTER_TYPES.TIME].add(filter);
     } else if (PERFORMANCE_FILTER_SET.has(filter as typeof PERFORMANCE_FILTER_SET extends Set<infer T> ? T : never)) {
       grouped[FILTER_TYPES.PERFORMANCE].add(filter);
@@ -171,12 +163,13 @@ const groupFiltersByType = (activeFilters: string[], availableOptions: FilterCon
   return grouped;
 };
 
-const matchesPerformanceFilter = (trace: Trace, duration: number, filterValue: string): boolean => {
+const matchesPerformanceFilter = (traceProperties: TraceProperties, filterValue: string): boolean => {
+  const { spansSize, duration } = traceProperties;
   switch (filterValue) {
     case PERFORMANCE_FILTER_VALUES.ZERO_SPANS:
-      return trace.spans.size === 0;
+      return spansSize === 0;
     case PERFORMANCE_FILTER_VALUES.HAS_SPANS:
-      return trace.spans.size > 0;
+      return spansSize > 0;
     case PERFORMANCE_FILTER_VALUES.FAST_RESPONSE:
       return duration < DURATION_THRESHOLDS.FAST_RESPONSE_MAX;
     case PERFORMANCE_FILTER_VALUES.MEDIUM_RESPONSE:
@@ -188,12 +181,45 @@ const matchesPerformanceFilter = (trace: Trace, duration: number, filterValue: s
   }
 };
 
-const matchesFilterGroup = (
-  trace: Trace,
-  traceProps: TraceProperties,
-  filterType: string,
-  filterValues: Set<string>,
-): boolean => {
+const matchesTimeFilter = (traceProperties: TraceProperties, filterValue: string): boolean => {
+  const { startTimestamp } = traceProperties;
+  const now = Date.now();
+
+  switch (filterValue) {
+    case TIME_FILTER_VALUES.LAST_5_MINUTES:
+      return startTimestamp >= now - 5 * 60 * 1000;
+    case TIME_FILTER_VALUES.LAST_15_MINUTES:
+      return startTimestamp >= now - 15 * 60 * 1000;
+    case TIME_FILTER_VALUES.LAST_30_MINUTES:
+      return startTimestamp >= now - 30 * 60 * 1000;
+    case TIME_FILTER_VALUES.LAST_1_HOUR:
+      return startTimestamp >= now - 60 * 60 * 1000;
+    case TIME_FILTER_VALUES.LAST_4_HOURS:
+      return startTimestamp >= now - 4 * 60 * 60 * 1000;
+    case TIME_FILTER_VALUES.TODAY: {
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      return startTimestamp >= startOfToday.getTime();
+    }
+    case TIME_FILTER_VALUES.YESTERDAY: {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const startOfYesterday = new Date(today);
+      startOfYesterday.setDate(today.getDate() - 1);
+      return startTimestamp >= startOfYesterday.getTime() && startTimestamp < today.getTime();
+    }
+    case TIME_FILTER_VALUES.LAST_24_HOURS:
+      return startTimestamp >= now - 24 * 60 * 60 * 1000;
+    case TIME_FILTER_VALUES.LAST_7_DAYS:
+      return startTimestamp >= now - 7 * 24 * 60 * 60 * 1000;
+    case TIME_FILTER_VALUES.BEYOND_7_DAYS:
+      return startTimestamp < now - 7 * 24 * 60 * 60 * 1000;
+    default:
+      return false;
+  }
+};
+
+const matchesFilterGroup = (traceProps: TraceProperties, filterType: string, filterValues: Set<string>): boolean => {
   if (filterValues.size === 0) return true;
 
   for (const filterValue of filterValues) {
@@ -208,10 +234,10 @@ const matchesFilterGroup = (
         if (traceProps.status === filterValue) return true;
         break;
       case FILTER_TYPES.TIME:
-        if (traceProps.timeLabel === filterValue) return true;
+        if (matchesTimeFilter(traceProps, filterValue)) return true;
         break;
       case FILTER_TYPES.PERFORMANCE:
-        if (matchesPerformanceFilter(trace, traceProps.duration, filterValue)) return true;
+        if (matchesPerformanceFilter(traceProps, filterValue)) return true;
         break;
     }
   }
@@ -225,14 +251,12 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
       return {
         transactionOptions: [],
         methodOptions: [],
-        timeOptions: [],
         statusOptions: [],
       };
     }
 
     const uniqueTransactionNames = new Set<string>();
     const uniqueMethodNames = new Set<string>();
-    const uniqueTimeLabels = new Set<string>();
     const uniqueStatusLabels = new Set<string>();
 
     for (const trace of visibleTraces) {
@@ -242,9 +266,6 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
       const method = getRootTransactionMethod(trace);
       if (method) uniqueMethodNames.add(method);
 
-      const timeLabel = dayjs(trace.start_timestamp).fromNow();
-      if (timeLabel) uniqueTimeLabels.add(timeLabel);
-
       const status = trace.status;
       if (status) uniqueStatusLabels.add(status);
     }
@@ -252,7 +273,6 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
     return {
       transactionOptions: createFilterOptionsFromSet(uniqueTransactionNames),
       methodOptions: createFilterOptionsFromSet(uniqueMethodNames),
-      timeOptions: createFilterOptionsFromSet(uniqueTimeLabels),
       statusOptions: createFilterOptionsFromSet(uniqueStatusLabels),
     };
   }, [visibleTraces]);
@@ -284,8 +304,8 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         icon: FILTER_ICONS[FILTER_TYPES.TIME],
         label: FILTER_CONFIG_METADATA[FILTER_TYPES.TIME].label,
         tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.TIME].tooltip,
-        options: filterConfigData.timeOptions,
-        show: filterConfigData.timeOptions.length > 0,
+        options: TIME_FILTER_OPTIONS,
+        show: true,
       },
       [FILTER_TYPES.PERFORMANCE]: {
         icon: FILTER_ICONS[FILTER_TYPES.PERFORMANCE],
@@ -327,22 +347,18 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
       const traceProperties: TraceProperties = {
         transactionName: getRootTransactionName(trace),
         method: getRootTransactionMethod(trace),
-        timeLabel: dayjs(trace.start_timestamp).fromNow(),
+        startTimestamp: trace.start_timestamp,
         status: trace.status || '',
+        spansSize: trace?.spans?.size || 0,
         duration: trace.timestamp - trace.start_timestamp || 0,
       };
 
       return (
-        matchesFilterGroup(
-          trace,
-          traceProperties,
-          FILTER_TYPES.TRANSACTION,
-          groupedFilters[FILTER_TYPES.TRANSACTION],
-        ) &&
-        matchesFilterGroup(trace, traceProperties, FILTER_TYPES.METHOD, groupedFilters[FILTER_TYPES.METHOD]) &&
-        matchesFilterGroup(trace, traceProperties, FILTER_TYPES.STATUS, groupedFilters[FILTER_TYPES.STATUS]) &&
-        matchesFilterGroup(trace, traceProperties, FILTER_TYPES.TIME, groupedFilters[FILTER_TYPES.TIME]) &&
-        matchesFilterGroup(trace, traceProperties, FILTER_TYPES.PERFORMANCE, groupedFilters[FILTER_TYPES.PERFORMANCE])
+        matchesFilterGroup(traceProperties, FILTER_TYPES.TRANSACTION, groupedFilters[FILTER_TYPES.TRANSACTION]) &&
+        matchesFilterGroup(traceProperties, FILTER_TYPES.METHOD, groupedFilters[FILTER_TYPES.METHOD]) &&
+        matchesFilterGroup(traceProperties, FILTER_TYPES.STATUS, groupedFilters[FILTER_TYPES.STATUS]) &&
+        matchesFilterGroup(traceProperties, FILTER_TYPES.TIME, groupedFilters[FILTER_TYPES.TIME]) &&
+        matchesFilterGroup(traceProperties, FILTER_TYPES.PERFORMANCE, groupedFilters[FILTER_TYPES.PERFORMANCE])
       );
     });
 
