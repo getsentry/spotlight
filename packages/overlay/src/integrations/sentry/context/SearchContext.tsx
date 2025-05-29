@@ -1,5 +1,5 @@
-import { createContext, ReactNode, useCallback, useContext, useState } from 'react';
-import { Span } from '../types';
+import { type ReactNode, createContext, useCallback, useContext, useState } from 'react';
+import type { Span } from '../types';
 type SearchContextType = {
   query: string;
   setQuery: (query: string) => void;

@@ -1,6 +1,6 @@
-import { Envelope } from '@sentry/core';
-import { StateCreator } from 'zustand';
-import { RawEventContext } from '~/integrations/integration';
+import type { Envelope } from '@sentry/core';
+import type { StateCreator } from 'zustand';
+import type { RawEventContext } from '~/integrations/integration';
 import { SUPPORTED_EVENT_TYPES } from '../../constants/sentry';
 import type { Sdk, SentryEvent } from '../../types';
 import { sdkToPlatform } from '../../utils/sdkToPlatform';

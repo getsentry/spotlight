@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-import { setContext, startSpan } from '@sentry/node';
-import { setupSidecar } from '@spotlightjs/sidecar';
 import { readFileSync } from 'node:fs';
 import Module from 'node:module';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { inflateRawSync } from 'node:zlib';
+import { setContext, startSpan } from '@sentry/node';
+import { setupSidecar } from '@spotlightjs/sidecar';
 import './instrument.js';
 const require = Module.createRequire(import.meta.url);
 let sea = null;

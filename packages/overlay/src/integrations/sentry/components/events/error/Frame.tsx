@@ -1,15 +1,15 @@
 import { useState } from 'react';
+import CopyToClipboard from '~/components/CopyToClipboard';
+import OpenInEditor from '~/components/OpenInEditor';
+import type { EventFrame, FrameVars } from '~/integrations/sentry/types';
+import classNames from '~/lib/classNames';
+import { renderValue } from '~/lib/values';
 import Table from '~/ui/Table';
-import CopyToClipboard from '../../../../../components/CopyToClipboard';
-import OpenInEditor from '../../../../../components/OpenInEditor';
-import classNames from '../../../../../lib/classNames';
-import { renderValue } from '../../../../../lib/values';
-import type { EventFrame, FrameVars } from '../../../types';
 
 function resolveFilename(filename: string) {
   try {
     const url = new URL(filename);
-    filename = url.pathname.slice(1);
+    return url.pathname.slice(1);
   } catch {
     // ignore
   }
@@ -81,6 +81,10 @@ export default function Frame({
         !isOpen && hasSource ? 'hover:bg-primary-900' : '',
         'bg-primary-950 border-primary-900 my-1 overflow-hidden rounded-md border',
       )}
+      role={hasSource ? 'button' : undefined}
+      tabIndex={0}
+      onClick={hasSource ? () => setOpen(!isOpen) : undefined}
+      onKeyDown={e => e.key === 'Enter' && hasSource && setOpen(!isOpen)}
     >
       <div
         className={classNames(

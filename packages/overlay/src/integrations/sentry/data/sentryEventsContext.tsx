@@ -44,7 +44,7 @@ export const SentryEventsContextProvider: React.FC<{
       subscribe('event', (e: SentryEvent) => {
         setEvents({ action: 'APPEND', e });
       }) as () => undefined,
-    [],
+    [subscribe],
   );
 
   const contextValue: SentryEventsContextProps = {

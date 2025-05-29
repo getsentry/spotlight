@@ -1,4 +1,4 @@
-import { DOMAttributes, MouseEvent, RefObject, useCallback, useRef } from 'react';
+import { type DOMAttributes, type MouseEvent, type RefObject, useCallback, useRef } from 'react';
 type CallbackArgs = { height: number; left: number; top: number; width: number };
 
 type Opts<T extends Element> = {
@@ -63,7 +63,7 @@ function useMouseTracking<T extends Element>({
         }
       }
     },
-    [onPositionChange, controller, elem],
+    [onPositionChange, elem],
   );
 
   const handleOnMouseLeave = useCallback(() => {
@@ -73,7 +73,7 @@ function useMouseTracking<T extends Element>({
     }
 
     onPositionChange(undefined);
-  }, [onPositionChange, controller]);
+  }, [onPositionChange]);
 
   return {
     ...rest,

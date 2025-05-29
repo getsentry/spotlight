@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import classNames from '~/lib/classNames';
-import Resizer, { ResizeDirection } from './Resizer';
+import Resizer, { type ResizeDirection } from './Resizer';
 
 type SpanResizerProps = {
   handleResize: (e: MouseEvent) => void;

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import useDebounce from './useDebounce';
 
 export default function useSearchInput(onSearch: (value: string) => void, delay = 500) {

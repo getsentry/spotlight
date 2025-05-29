@@ -1,6 +1,6 @@
 import type { SpotlightInitOptions } from '@spotlightjs/spotlight/vite-plugin';
 
-export const buildServerSnippet: (options: SpotlightInitOptions) => string = options => `
+export const buildServerSnippet: (options?: SpotlightInitOptions) => string = options => `
 import * as _SentrySDKForSpotlight from '@sentry/astro';
 
 if (_SentrySDKForSpotlight && _SentrySDKForSpotlight.getClient()) {

@@ -1,8 +1,0 @@
-.git
-.gitignore
-.astro
-.yalc
-node_modules
-dist
-node
-**/*.mdx

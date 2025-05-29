@@ -1,5 +1,5 @@
 import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/sidecar/constants';
-import { StateCreator } from 'zustand';
+import type { StateCreator } from 'zustand';
 import { DEFAULT_SIDECAR_URL } from '~/constants';
 import type { SentryStore, SettingsSliceActions, SettingsSliceState } from '../types';
 

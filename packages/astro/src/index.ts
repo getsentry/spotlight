@@ -7,14 +7,14 @@ import url from 'node:url';
 
 import spotlight, { buildClientInit } from '@spotlightjs/spotlight/vite-plugin';
 
-type AstroConfigWithExperimentalDevOverlay = AstroConfig & {
-  experimental?: {
-    /**
-     * This used to be the way of enabling the dev overlay pre Astro 4.x
-     */
-    devOverlay?: boolean;
-  };
-};
+// type AstroConfigWithExperimentalDevOverlay = AstroConfig & {
+//   experimental?: {
+//     /**
+//      * This used to be the way of enabling the dev overlay pre Astro 4.x
+//      */
+//     devOverlay?: boolean;
+//   };
+// };
 
 const createPlugin = (options?: SpotlightInitOptions): AstroIntegration => {
   return {
@@ -25,6 +25,7 @@ const createPlugin = (options?: SpotlightInitOptions): AstroIntegration => {
         if (command === 'dev') {
           logger.info('[@spotlightjs/astro] Setting up Spotlight');
           const showTriggerButton = !config.devToolbar?.enabled;
+          // @ts-ignore
           config.vite.plugins = [spotlight({ showTriggerButton, ...options }), ...(config.vite.plugins || [])];
 
           injectScript('page-ssr', buildServerSnippet(options));

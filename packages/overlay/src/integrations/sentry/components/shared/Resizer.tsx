@@ -1,4 +1,4 @@
-import { HTMLAttributes, ReactNode, useRef, type MouseEventHandler } from 'react';
+import { type HTMLAttributes, type MouseEventHandler, type ReactNode, useRef } from 'react';
 import classNames from '~/lib/classNames';
 
 export type ResizeDirection = 'column' | 'row';
@@ -77,8 +77,8 @@ export default function Resizer({
 
     const spotlightRoot = document.getElementById('sentry-spotlight-root');
     const debuggerElement = spotlightRoot?.shadowRoot?.querySelector('.spotlight-debugger');
-    debuggerElement?.classList.remove(`resizing-column`);
-    debuggerElement?.classList.remove(`resizing-row`);
+    debuggerElement?.classList.remove('resizing-column');
+    debuggerElement?.classList.remove('resizing-row');
 
     setIsResizing(false);
     document.removeEventListener('mousemove', handleResizeWrapper);

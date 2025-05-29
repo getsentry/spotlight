@@ -96,7 +96,7 @@ function isSpotlightInjected() {
   return false;
 }
 
-export async function init(options: SpotlightOverlayOptions = {}) {
+export async function init(initOptions: SpotlightOverlayOptions = {}) {
   // The undefined document guard is to avoid being initialized in a Worker
   // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
   if (typeof document === 'undefined') return;
@@ -105,6 +105,7 @@ export async function init(options: SpotlightOverlayOptions = {}) {
   // been initialized, we can just bail out.
   if (isSpotlightInjected()) return;
 
+  let options = initOptions;
   const windowInitOptions = (window as WindowWithSpotlight).__spotlight?.initOptions;
   if (windowInitOptions) {
     options = {

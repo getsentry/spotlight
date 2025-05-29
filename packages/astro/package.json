@@ -6,13 +6,7 @@
   "author": "Sentry",
   "repository": "git@github.com:getsentry/spotlight.git",
   "homepage": "https://github.com/getsentry/spotlight/blob/main/packages/astro/README.md",
-  "keywords": [
-    "astro",
-    "withastro",
-    "astro-component",
-    "astro-integration",
-    "devtools"
-  ],
+  "keywords": ["astro", "withastro", "astro-component", "astro-integration", "devtools"],
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",

@@ -20,7 +20,7 @@ export class MessageBuffer<T> {
     }
 
     const minTime = curTime - this.timeout * 1000;
-    let atItem;
+    let atItem: [number, T] | undefined;
     while (this.head < this.writePos) {
       atItem = this.items[this.head % this.size];
       if (atItem === undefined) break;
@@ -45,7 +45,7 @@ export class MessageBuffer<T> {
     if (!cb) return;
 
     let atReadPos = readPos;
-    let item;
+    let item: [number, T] | undefined;
     /* eslint-disable no-constant-condition */
     while (true) {
       item = this.items[atReadPos % this.size];
@@ -70,9 +70,9 @@ export class MessageBuffer<T> {
 
 function generateUuidv4(): string {
   let dt = new Date().getTime();
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     let rnd = Math.random() * 16;
-    rnd = (dt + rnd) % 16 | 0;
+    rnd = ((dt + rnd) % 16) | 0;
     dt = Math.floor(dt / 16);
     return (c === 'x' ? rnd : (rnd & 0x3) | 0x8).toString(16);
   });

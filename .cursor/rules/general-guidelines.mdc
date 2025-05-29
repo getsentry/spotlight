@@ -1,0 +1,419 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Spotlight Development Guidelines
+
+Based on analysis of the actual codebase structure and patterns.
+
+## Repository Layout
+
+### Monorepo Structure
+
+```shell
+packages/
+├── overlay/         # React-based UI component
+├── sidecar/         # Node.js proxy server
+├── spotlight/       # Main package (combines overlay + sidecar)
+├── astro/           # Astro integration
+├── electron/        # Electron integration
+├── website/         # Documentation site
+└── tsconfig/        # Shared TypeScript configuration
+
+demos/               # Framework integration examples
+e2e-tests/           # End-to-end tests
+.changeset/          # Changeset configuration
+```
+
+### Package Dependencies
+
+- `spotlight` depends on `overlay` and `sidecar` using `workspace:*`
+- All packages extend shared TypeScript config from `@spotlightjs/tsconfig`
+- Each package has its own build configuration and scripts
+
+## Overlay Package Patterns
+
+### Directory Structure
+
+```shell
+src/
+├── components/      # React components (flat structure)
+├── integrations/    # Plugin system with subdirectories per integration
+├── lib/             # Utilities and hooks (flat files)
+├── ui/              # Reusable UI components
+├── assets/          # SVG icons and resources
+├── App.tsx          # Main application component
+├── index.tsx        # Entry point and initialization
+├── types.ts         # Type definitions
+└── constants.ts     # Application constants
+```
+
+### React Component Patterns
+
+#### File Naming & Structure
+
+- Components use PascalCase: `Trigger.tsx`, `Debugger.tsx`
+- Utility files use camelCase: `classNames.ts`, `useKeyPress.ts`
+- Single component per file with default export
+
+#### Component Definition Pattern
+
+```typescript
+export default function ComponentName({
+  prop1,
+  prop2 = defaultValue,
+}: {
+  prop1: boolean;
+  prop2?: string;
+}) {
+  // State declarations first
+  const [state, setState] = useState(defaultValue);
+
+  // Effects second
+  useEffect(() => {
+    // effect logic
+  }, [dependencies]);
+
+  // Event handlers third
+  const handleEvent = useCallback(() => {
+    // handler logic
+  }, [dependencies]);
+
+  // Return JSX
+  return (
+    <div>
+      {/* JSX content */}
+    </div>
+  );
+}
+```
+
+#### Styling Patterns
+
+- Uses Tailwind CSS with custom utilities
+- Custom `classNames()` utility function for conditional classes:
+
+  ```typescript
+  className={classNames(
+    'base-classes',
+    condition ? 'conditional-classes' : '',
+    variable === 'value' ? 'variant-classes' : 'default-classes'
+  )}
+  ```
+
+- Anchor positioning via utility functions that return Tailwind classes
+- No CSS modules or styled-components
+
+#### Component Props
+
+- Inline type definitions in component signature
+- Uses `ComponentPropsWithoutRef<'element'>` for extending native props
+- Omits specific props when extending: `Omit<BaseProps, 'excluded'>`
+
+### Integration System
+
+#### Integration Interface
+
+```typescript
+type Integration<T = any> = {
+  name: string;
+  forwardedContentType?: string[];
+  tabs?: TabsCreationFunction<T>;
+  setup?: (
+    context: SpotlightContext
+  ) => void | Promise<void> | TeardownFunction;
+  processEvent?: (
+    eventContext: RawEventContext
+  ) => ProcessedEventContainer<T> | undefined;
+  reset?: () => void;
+};
+```
+
+#### Integration Organization
+
+```shell
+integrations/
+├── integration.ts       # Base interfaces and utilities
+├── sentry/             # Full integration example
+│   ├── index.ts        # Main integration implementation
+│   ├── types.ts        # Integration-specific types
+│   ├── constants.ts    # Integration constants
+│   ├── components/     # React components for this integration
+│   ├── tabs/           # Tab components
+│   ├── store/          # State management (Zustand)
+│   └── utils/          # Utility functions
+└── console/            # Simpler integration example
+```
+
+### Utility Patterns
+
+#### Custom Hooks
+
+- File naming: `useHookName.ts`
+- Document parameters with JSDoc
+- Return cleanup functions from useEffect as `undefined`:
+
+  ```typescript
+  return () => cleanup() as undefined;
+  ```
+
+#### Utility Functions
+
+- Single responsibility per file
+- Default exports for main utility
+- Simple function signatures without over-abstraction
+
+### State Management
+
+- Local state with React hooks for component state
+- Zustand for complex/shared state (see `sentry/store/`)
+- Event-driven architecture using custom event target
+- No Redux or Context for global state
+
+## Sidecar Package Patterns
+
+### Directory Structure
+
+```shell
+src/
+├── main.ts              # Main server logic
+├── constants.ts         # Port and endpoint constants
+├── logger.ts            # Logging utilities
+├── messageBuffer.ts     # Event buffering system
+├── contextlines.ts      # Source code context handling
+└── vite-plugin.ts       # Vite integration
+```
+
+### Server Architecture
+
+- Single main file with all HTTP handlers
+- Route-based handler mapping using RegExp patterns
+- CORS middleware wrapper pattern
+- Functional composition for middleware
+
+#### Handler Pattern
+
+```typescript
+const handlerName = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  pathname?: string,
+  searchParams?: URLSearchParams
+) => {
+  // Handler logic
+};
+
+const ROUTES: [RegExp, RequestHandler][] = [
+  [/^\/endpoint$/, enableCORS(handlerName)],
+  // more routes...
+];
+```
+
+#### Middleware Pattern
+
+```typescript
+const middlewareName = (handler: RequestHandler): RequestHandler =>
+  withTracing(
+    (req, res, pathname, searchParams) => {
+      // Middleware logic before
+      const result = handler(req, res, pathname, searchParams);
+      // Middleware logic after
+      return result;
+    },
+    { name: "middlewareName", op: "sidecar.operation" }
+  );
+```
+
+### Error Handling
+
+- No try/catch blocks in route handlers
+- Error responses via dedicated error functions
+- Logging via custom logger with levels
+
+## Spotlight Package Patterns
+
+### Directory Structure
+
+```
+src/
+├── vite-plugin.ts       # Vite plugin implementation
+├── overlay.ts           # Re-export overlay
+├── sidecar.ts           # Re-export sidecar
+└── index.html           # Standalone HTML page
+```
+
+### Plugin Pattern
+
+```typescript
+export default function pluginName(options: PluginOptions = {}): PluginOption {
+  return {
+    name: "plugin-name",
+    apply: "serve",
+    transform(code, id) {
+      // Transform logic
+    },
+    configureServer(server) {
+      // Server configuration
+    },
+  };
+}
+```
+
+## TypeScript Patterns
+
+### Type Organization
+
+- Shared types in `types.ts` at package level
+- Integration-specific types in integration subdirectories
+- Use `type` for object shapes, `interface` for extensible contracts
+
+### Type Definitions
+
+```typescript
+// Configuration objects use type
+export type ConfigOptions = {
+  prop1: boolean;
+  prop2?: string;
+};
+
+// React component props use inline types
+export default function Component({ prop }: { prop: string }) {
+  // component logic
+}
+
+// Complex generic types
+export type ProcessedEventContainer<T> = {
+  event: T;
+};
+```
+
+### Import/Export Patterns
+
+- Default exports for main functionality
+- Named exports for utilities and secondary functionality
+- Re-exports in main index files for public API
+- Tilde (`~/`) path alias for src root in overlay package
+
+## Build & Development Patterns
+
+### Build System
+
+- **Turbo** for build orchestration and task caching across the monorepo
+- **Vite** for individual package bundling
+- **TypeScript** for type checking and declaration generation
+
+### Development Tools
+
+- **Linting & Formatting**: Biome for fast linting and formatting
+- **Testing**: Vitest for unit tests, custom E2E testing setup
+- **Type Checking**: Strict TypeScript with composite projects
+- **Version Management**: Changesets for semantic versioning
+
+## Coding Standards
+
+### Biome Configuration
+
+- **Linting**: Comprehensive rule set with TypeScript support
+- **Formatting**: Matches previous Prettier settings
+- **Import Organization**: Automatic import sorting and type-only imports
+- **CSS Class Sorting**: Tailwind class sorting for consistency
+
+### Code Style
+
+- **Line Length**: 120 characters
+- **Quotes**: Single quotes for strings, double quotes in JSON
+- **Trailing Commas**: Always use trailing commas
+- **Arrow Functions**: Parentheses as needed (asNeeded)
+- **Import Organization**: Automatic sorting via Biome
+
+### Common Commands
+
+```shell
+# Development
+pnpm dev              # Start overlay development
+pnpm dev:website      # Start website development
+pnpm dev:playground   # Start Astro playground
+
+# Building
+pnpm build            # Build all packages (excluding playground)
+turbo build           # Direct turbo build command
+turbo build --filter=@spotlightjs/overlay  # Build specific package
+
+# Testing
+pnpm test             # Run package tests
+pnpm test:demos       # Run demo tests
+pnpm test:e2e         # Run end-to-end tests
+
+# Code Quality
+pnpm lint             # Check code with Biome
+pnpm lint:fix         # Fix auto-fixable issues
+pnpm format           # Format code with Biome
+pnpm clean            # Clean all dist folders
+```
+
+### Package Scripts
+
+```json
+{
+  "dev": "vite build --watch",
+  "build": "vite build && tsc",
+  "clean": "rimraf dist",
+  "test": "vitest"
+}
+```
+
+### Turbo Configuration
+
+- **Task Dependencies**: Build tasks depend on dependencies being built first (`^build`)
+- **Caching**: Aggressive caching for build, test, and lint tasks
+- **Development**: No caching for `dev` tasks (persistent/long-running)
+- **Inputs**: File patterns that affect task outputs for cache invalidation
+- **Outputs**: Generated files that should be cached
+
+### Build Outputs
+
+- Dual ESM/CJS builds using Vite
+- TypeScript declarations via `tsc`
+- `exports` field for multiple entry points
+- Dist folder with organized outputs
+
+### Configuration Files
+
+- `biome.json` for linting and formatting
+- `turbo.json` for build orchestration and caching
+- Shared TypeScript config extended from `@spotlightjs/tsconfig`
+- Individual Vite configs per package
+- Tailwind config in overlay package only
+
+## Testing Patterns
+
+### Test Organization
+
+- Vitest for unit tests
+- Test files alongside source: `file.spec.ts`
+- E2E tests in separate package with framework demos
+
+### Test Structure
+
+- Integration tests over unit tests
+- Mock external dependencies
+- Test actual user scenarios in demo applications
+
+## Documentation Patterns
+
+### Code Documentation
+
+- JSDoc for public APIs
+- Inline comments for complex business logic
+- Parameter documentation in custom hooks
+
+### Package Documentation
+
+- Each package has README with setup instructions
+- Changelog files maintained via changesets
+- Migration guides for breaking changes
+
+---
+
+_These guidelines reflect the actual patterns used in the Spotlight codebase as of the current version._
