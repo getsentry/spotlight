@@ -27,11 +27,19 @@ export default function TraceListFilter({
   const spotlightContainer = getSpotlightContainer();
 
   const handleFilterChange = useCallback(
-    (value: string, checked: boolean) => {
-      if (checked) {
-        setActiveFilters(prev => [...prev, value]);
-      } else {
-        setActiveFilters(prev => prev.filter(f => f !== value));
+    (value: string, checked: boolean, type: 'checkbox' | 'radio') => {
+      if (type === 'checkbox') {
+        if (checked) {
+          setActiveFilters(prev => [...prev, value]);
+        } else {
+          setActiveFilters(prev => prev.filter(f => f !== value));
+        }
+      } else if (type === 'radio') {
+        if (checked) {
+          setActiveFilters([value]);
+        } else {
+          setActiveFilters([]);
+        }
       }
     },
     [setActiveFilters],
@@ -79,8 +87,9 @@ export default function TraceListFilter({
               label={config.label}
               tooltip={config.tooltip}
               options={config.options}
+              type={config.type}
               activeFilters={activeFilters}
-              onFilterChange={handleFilterChange}
+              onFilterChange={(value, checked) => handleFilterChange(value, checked, config.type)}
               container={spotlightContainer}
             />
           ))}

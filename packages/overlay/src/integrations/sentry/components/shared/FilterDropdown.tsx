@@ -1,7 +1,14 @@
 import { ElementType } from 'react';
 import { ReactComponent as ChevronDown } from '~/assets/chevronDown.svg';
 import { Button } from '~/ui/button';
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '~/ui/dropdownMenu';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from '~/ui/dropdownMenu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/ui/tooltip';
 
 interface FilterOption {
@@ -17,6 +24,7 @@ interface FilterDropdownProps {
   activeFilters: string[];
   onFilterChange: (value: string, checked: boolean) => void;
   container: HTMLElement | null;
+  type: 'checkbox' | 'radio';
 }
 
 export function FilterDropdown({
@@ -27,6 +35,7 @@ export function FilterDropdown({
   activeFilters,
   onFilterChange,
   container,
+  type,
 }: FilterDropdownProps) {
   return (
     <TooltipProvider>
@@ -48,15 +57,25 @@ export function FilterDropdown({
               container={container}
               className="border-primary-700 bg-primary-950 max-h-52 text-white"
             >
-              {options.map(filter => (
-                <DropdownMenuCheckboxItem
-                  key={filter.value}
-                  checked={activeFilters.includes(filter.value)}
-                  onCheckedChange={checked => onFilterChange(filter.value, checked)}
-                >
-                  {filter.label}
-                </DropdownMenuCheckboxItem>
-              ))}
+              {type === 'checkbox' &&
+                options.map(filter => (
+                  <DropdownMenuCheckboxItem
+                    key={filter.value}
+                    checked={activeFilters.includes(filter.value)}
+                    onCheckedChange={checked => onFilterChange(filter.value, checked)}
+                  >
+                    {filter.label}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              {type === 'radio' && (
+                <DropdownMenuRadioGroup value={activeFilters[0]} onValueChange={value => onFilterChange(value, true)}>
+                  {options.map(filter => (
+                    <DropdownMenuRadioItem key={filter.value} value={filter.value}>
+                      {filter.label}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </TooltipTrigger>

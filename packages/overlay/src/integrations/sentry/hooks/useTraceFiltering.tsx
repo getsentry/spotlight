@@ -18,6 +18,7 @@ interface FilterConfig {
   tooltip: string;
   options: FilterOption[];
   show: boolean;
+  type: 'checkbox' | 'radio';
 }
 
 export interface FilterConfigs {
@@ -72,6 +73,7 @@ const PERFORMANCE_FILTER_OPTIONS: FilterOption[] = Object.entries(PERFORMANCE_FI
 const PERFORMANCE_FILTER_SET = new Set(Object.values(PERFORMANCE_FILTER_VALUES));
 
 const TIME_FILTER_VALUES = {
+  LAST_MINUTE: 'Last minute',
   LAST_5_MINUTES: 'Last 5 minutes',
   LAST_15_MINUTES: 'Last 15 minutes',
   LAST_30_MINUTES: 'Last 30 minutes',
@@ -186,6 +188,8 @@ const matchesTimeFilter = (traceProperties: TraceProperties, filterValue: string
   const now = Date.now();
 
   switch (filterValue) {
+    case TIME_FILTER_VALUES.LAST_MINUTE:
+      return startTimestamp >= now - 60 * 1000;
     case TIME_FILTER_VALUES.LAST_5_MINUTES:
       return startTimestamp >= now - 5 * 60 * 1000;
     case TIME_FILTER_VALUES.LAST_15_MINUTES:
@@ -285,6 +289,7 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.TRANSACTION].tooltip,
         options: filterConfigData.transactionOptions,
         show: filterConfigData.transactionOptions.length > 0,
+        type: 'checkbox',
       },
       [FILTER_TYPES.METHOD]: {
         icon: FILTER_ICONS[FILTER_TYPES.METHOD],
@@ -292,6 +297,7 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.METHOD].tooltip,
         options: filterConfigData.methodOptions,
         show: filterConfigData.methodOptions.length > 0,
+        type: 'checkbox',
       },
       [FILTER_TYPES.STATUS]: {
         icon: FILTER_ICONS[FILTER_TYPES.STATUS],
@@ -299,6 +305,7 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.STATUS].tooltip,
         options: filterConfigData.statusOptions,
         show: filterConfigData.statusOptions.length > 0,
+        type: 'checkbox',
       },
       [FILTER_TYPES.TIME]: {
         icon: FILTER_ICONS[FILTER_TYPES.TIME],
@@ -306,6 +313,7 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.TIME].tooltip,
         options: TIME_FILTER_OPTIONS,
         show: true,
+        type: 'radio',
       },
       [FILTER_TYPES.PERFORMANCE]: {
         icon: FILTER_ICONS[FILTER_TYPES.PERFORMANCE],
@@ -313,6 +321,7 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.PERFORMANCE].tooltip,
         options: PERFORMANCE_FILTER_OPTIONS,
         show: true,
+        type: 'checkbox',
       },
     }),
     [filterConfigData],
