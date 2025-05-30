@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
-import Badge from '~/ui/Badge';
+import { Badge } from '~/ui/badge';
 import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
 import { useSentryEvents } from '../../data/useSentryEvents';

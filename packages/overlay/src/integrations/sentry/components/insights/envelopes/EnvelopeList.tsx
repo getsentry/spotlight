@@ -4,7 +4,7 @@ import CardList from '~/components/CardList';
 import TimeSince from '~/components/TimeSince';
 import { isLocalTrace } from '~/integrations/sentry/store/helpers';
 import classNames from '~/lib/classNames';
-import Badge from '~/ui/Badge';
+import { Badge } from '~/ui/badge';
 import { useSentryEnvelopes } from '../../../data/useSentryEnvelopes';
 import useSentryStore from '../../../store';
 import { sdkToPlatform } from '../../../utils/sdkToPlatform';

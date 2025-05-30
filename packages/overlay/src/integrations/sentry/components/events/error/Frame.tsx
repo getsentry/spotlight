@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Table from '~/ui/Table';
+import Table from '~/ui/table';
 import CopyToClipboard from '../../../../../components/CopyToClipboard';
 import OpenInEditor from '../../../../../components/OpenInEditor';
 import classNames from '../../../../../lib/classNames';

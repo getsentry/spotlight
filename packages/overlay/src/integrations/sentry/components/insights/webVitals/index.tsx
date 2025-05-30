@@ -8,7 +8,7 @@ import useSort from '~/integrations/sentry/hooks/useSort';
 import type { SentryEventWithPerformanceData } from '~/integrations/sentry/types';
 import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
 import classNames from '~/lib/classNames';
-import Table from '~/ui/Table';
+import Table from '~/ui/table';
 import { normalizePerformanceScore } from '../../../utils/webVitals';
 
 type SentryEventComparator = (a: SentryEventWithPerformanceData, b: SentryEventWithPerformanceData) => number;

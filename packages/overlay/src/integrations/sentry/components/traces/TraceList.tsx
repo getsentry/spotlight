@@ -1,29 +1,36 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Badge from '~/ui/Badge';
+import { Badge } from '~/ui/badge';
 import CardList from '../../../../components/CardList';
 import TimeSince from '../../../../components/TimeSince';
 import classNames from '../../../../lib/classNames';
 import { useSpotlightContext } from '../../../../lib/useSpotlightContext';
 import { useSentryTraces } from '../../data/useSentrySpans';
+import useTraceFiltering from '../../hooks/useTraceFiltering';
 import { isLocalTrace } from '../../store/helpers';
 import { getFormattedSpanDuration } from '../../utils/duration';
 import { truncateId } from '../../utils/text';
 import HiddenItemsButton from '../shared/HiddenItemsButton';
 import { TraceRootTxnName } from './TraceDetails/components/TraceRootTxnName';
 import TraceIcon from './TraceIcon';
+import TraceListFilter from './TraceListFilter';
 
 export default function TraceList() {
   const { allTraces, localTraces } = useSentryTraces();
   const context = useSpotlightContext();
 
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
-  const filteredTraces = showAll ? allTraces : localTraces;
-  const hiddenItemCount = allTraces.length - filteredTraces.length;
+  const visibleTraces = showAll ? allTraces : localTraces;
+  const hiddenItemCount = allTraces.length - visibleTraces.length;
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+
+  const { TRACE_FILTER_CONFIGS, filteredTraces } = useTraceFiltering(visibleTraces, activeFilters, searchQuery);
 
   return (
     <>
-      {allTraces.length !== 0 ? (
+      {visibleTraces.length !== 0 ? (
         <CardList>
           {hiddenItemCount > 0 && (
             <HiddenItemsButton
@@ -33,7 +40,14 @@ export default function TraceList() {
               }}
             />
           )}
-          {filteredTraces.map(trace => {
+          <TraceListFilter
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            activeFilters={activeFilters}
+            setActiveFilters={setActiveFilters}
+            filterConfigs={TRACE_FILTER_CONFIGS}
+          />
+          {filteredTraces?.map(trace => {
             return (
               <Link
                 className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
@@ -71,6 +85,11 @@ export default function TraceList() {
               </Link>
             );
           })}
+          {filteredTraces?.length === 0 && (
+            <div className="text-primary-300 p-6">
+              Looks like there are no traces recorded matching the applied search & filters. 🤔
+            </div>
+          )}
         </CardList>
       ) : (
         <div className="text-primary-300 p-6">Looks like there's no traces recorded matching this query. 🤔</div>
