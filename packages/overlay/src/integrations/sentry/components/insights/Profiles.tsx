@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
-import Table from '~/ui/Table';
+import Table from '~/ui/table';
 import { AGGREGATE_CALL_PROFILES_SORT_KEYS, AGGREGATE_PROFILES_HEADERS } from '../../constants';
 import useSort from '../../hooks/useSort';
 import useSentryStore from '../../store';

@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import JsonViewer from '~/components/JsonViewer';
 import { useSentryLogs } from '~/integrations/sentry/data/useSentryLogs';
-import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
-import Table from '~/ui/Table';
+import SidePanel, { SidePanelHeader } from '~/ui/sidePanel';
+import Table from '~/ui/table';
 import DateTime from '../shared/DateTime';
 
 const LOG_LEVEL_COLORS: Record<string, string> = {

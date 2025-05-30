@@ -1,4 +1,4 @@
-import Tag from '~/ui/Tag';
+import Tag from '~/ui/tag';
 
 export default function Tags({ tags }: { tags: { [key: string]: string } }) {
   return (

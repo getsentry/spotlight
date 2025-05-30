@@ -5,7 +5,7 @@ import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import CardList from '~/components/CardList';
 import classNames from '~/lib/classNames';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
-import Table from '~/ui/Table';
+import Table from '~/ui/table';
 import { LOGS_HEADERS, LOGS_SORT_KEYS } from '../../constants';
 import { useSentryLogs } from '../../data/useSentryLogs';
 import useSort from '../../hooks/useSort';

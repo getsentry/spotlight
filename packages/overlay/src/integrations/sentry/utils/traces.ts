@@ -1,5 +1,5 @@
 import { log } from '../../../lib/logger';
-import type { Span } from '../types';
+import type { Span, Trace } from '../types';
 
 // mutates spans in place and adds children, as well as returns the top level tree
 export function groupSpans(spans: Map<string, Span>): Span[] {
@@ -63,4 +63,21 @@ function getParentOfSpan(span: Span, idLookup: Map<string, Span>, allSpans: Span
 
 export function compareSpans(a: { start_timestamp: number }, b: { start_timestamp: number }): number {
   return a.start_timestamp - b.start_timestamp;
+}
+
+export function getRootTransactionMethod(trace: Trace) {
+  const method = String(
+    trace.rootTransaction?.contexts?.trace.data?.method || trace.rootTransaction?.request?.method || '',
+  );
+  return method;
+}
+
+export function getRootTransactionName(trace: Trace) {
+  const method = getRootTransactionMethod(trace);
+  const name =
+    method && trace.rootTransactionName.startsWith(method)
+      ? trace.rootTransactionName.slice(method.length + 1)
+      : trace.rootTransactionName;
+
+  return name;
 }
