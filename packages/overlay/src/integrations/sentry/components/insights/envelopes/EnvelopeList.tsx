@@ -32,13 +32,13 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
               const { trace_id } = (header?.trace as { trace_id?: string }) || {};
               const envelopeItems = envelope[1] || [];
               const itemTypes = new Set();
-              const itemTypesList = Array.from(itemTypes).join(',');
 
               for (const item of envelopeItems) {
                 if (item?.length > 1 && item?.[0].type) {
                   itemTypes.add(item[0].type);
                 }
               }
+              const itemTypesList = Array.from(itemTypes).join(',');
               if (typeof envelopeId !== 'string') {
                 return null;
               }
