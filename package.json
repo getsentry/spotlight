@@ -48,8 +48,8 @@
     ]
   },
   "packageManager": "pnpm@10.9.0",
-  "volta": {
-    "node": "22.11.0",
-    "pnpm": "10.9.0"
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10.9.0"
   }
 }
