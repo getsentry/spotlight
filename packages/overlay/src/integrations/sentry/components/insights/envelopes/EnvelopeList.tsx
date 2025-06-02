@@ -29,19 +29,15 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
             {(showAll ? allEnvelopes : localEnvelopes).map(({ envelope }: { envelope: Envelope }) => {
               const header: Envelope[0] = envelope[0];
               const envelopeId: string | unknown = header.__spotlight_envelope_id;
-              const { trace_id } = (header?.trace as { trace_id?: string }) || {};
-              const envelopeItems = envelope[1] || [];
-              const itemTypes = new Set();
-
-              for (const item of envelopeItems) {
-                if (item?.length > 1 && item?.[0].type) {
-                  itemTypes.add(item[0].type);
-                }
-              }
-              const itemTypesList = Array.from(itemTypes).join(',');
               if (typeof envelopeId !== 'string') {
                 return null;
               }
+              const { trace_id } = (header?.trace as { trace_id?: string }) || {};
+              const envelopeItems = envelope[1] || [];
+              const itemTypes = new Set<string | undefined>(...envelopeItems.map(item => item?.[0].type));
+              itemTypes.delete(undefined);
+              const itemTypesList = Array.from(itemTypes).join(',');
+
               return (
                 <Link key={envelopeId} to={`/insights/envelopes/${envelopeId}`}>
                   <div
@@ -63,9 +59,7 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
 
                     <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
                       <h2 className="text-primary-50 text-xs">Event Types</h2>
-                      <span title={itemTypes.size > 0 ? itemTypesList : undefined}>
-                        {itemTypes.size > 0 ? itemTypesList : '-'}
-                      </span>
+                      <span title={itemTypesList}>{itemTypesList || '-'}</span>
                     </div>
                     <div className="text-primary-300 flex flex-[0.25] flex-col truncate font-mono text-sm">
                       <h2 className="text-primary-50 text-xs">Received</h2>
