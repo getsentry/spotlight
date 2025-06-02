@@ -1,6 +1,7 @@
 {
   "name": "@spotlightjs/e2e-tests-astro",
   "type": "module",
+  "private": true,
   "version": "0.0.5",
   "scripts": {
     "dev": "astro dev",

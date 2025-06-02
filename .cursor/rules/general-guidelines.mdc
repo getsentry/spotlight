@@ -331,12 +331,11 @@ export type ProcessedEventContainer<T> = {
 
 ```shell
 # Development
-pnpm dev              # Start overlay development
+pnpm dev              # Start overlay and sidecar development
 pnpm dev:website      # Start website development
-pnpm dev:playground   # Start Astro playground
 
 # Building
-pnpm build            # Build all packages (excluding playground)
+pnpm build            # Build all packages
 turbo build           # Direct turbo build command
 turbo build --filter=@spotlightjs/overlay  # Build specific package
 
