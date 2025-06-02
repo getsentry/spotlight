@@ -4,7 +4,8 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "dist-bin/**", ".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**", "dist-bin/**", ".next/**", "!.next/cache/**"],
+      "env": ["FOSSILIZE_PLATFORMS", "FOSSILIZE_SIGN", "APPLE_CERT_PASSWORD", "APPLE_TEAM_ID"]
     },
     "dev": {
       "cache": false,
