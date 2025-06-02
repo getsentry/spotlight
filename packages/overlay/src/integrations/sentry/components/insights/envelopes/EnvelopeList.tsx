@@ -34,7 +34,7 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
               }
               const { trace_id } = (header?.trace as { trace_id?: string }) || {};
               const envelopeItems = envelope[1] || [];
-              const itemTypes = new Set<string | undefined>(...envelopeItems.map(item => item?.[0].type));
+              const itemTypes = new Set<string | undefined>(envelopeItems.map(item => item?.[0].type));
               itemTypes.delete(undefined);
               const itemTypesList = Array.from(itemTypes).join(',');
 
