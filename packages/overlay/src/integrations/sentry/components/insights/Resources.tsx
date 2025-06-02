@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
 import classNames from '~/lib/classNames';
-import Table from '~/ui/Table';
-import Tooltip from '~/ui/Tooltip';
+import Table from '~/ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/ui/tooltip';
 import { RESOURCES_SORT_KEYS, RESOURCE_HEADERS } from '../../constants';
 import { useSentrySpans } from '../../data/useSentrySpans';
 import useSort from '../../hooks/useSort';
@@ -132,24 +132,25 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
         {resources.map((resource: ResourceInfo) => (
           <tr key={resource.description} className="hover:bg-primary-900">
             <td className="text-primary-200 relative w-2/5 whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-              <Tooltip
-                position="right"
-                content={
-                  resource.similarResources[0].op === 'resource.img' &&
-                  resource.description?.indexOf('/') === 0 && (
-                    <div className="bg-primary-800 cursor-pointer rounded-lg p-4 shadow-md">
-                      <h2 className="mb-2 font-bold">Preview</h2>
-                      <img
-                        src={resource.description}
-                        className="inline-block max-h-[150px] max-w-[150px] rounded p-1"
-                        alt="preview"
-                      />
-                    </div>
-                  )
-                }
-              >
-                <div className="truncate">{resource.description}</div>
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="w-fit cursor-default truncate">{resource.description}</div>
+                  </TooltipTrigger>
+                  {resource.similarResources[0].op === 'resource.img' && resource.description?.startsWith('/') && (
+                    <TooltipContent side="right" className="border-none bg-transparent p-0 shadow-none">
+                      <div className="bg-primary-800 cursor-pointer rounded-lg p-4 shadow-md">
+                        <h2 className="mb-2 font-bold text-white">Preview</h2>
+                        <img
+                          src={resource.description}
+                          className="inline-block max-h-[150px] max-w-[150px] rounded p-1"
+                          alt="preview"
+                        />
+                      </div>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
               <span className={getSpanDurationClassName(resource.avgDuration)}>

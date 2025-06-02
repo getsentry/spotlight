@@ -2,14 +2,14 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
+import { TimeBar } from '~/integrations/sentry/components/shared/TimeBar';
 import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from '~/integrations/sentry/constants';
 import { useSentrySpans } from '~/integrations/sentry/data/useSentrySpans';
 import useSort from '~/integrations/sentry/hooks/useSort';
 import type { Span } from '~/integrations/sentry/types';
 import { getFormattedDuration, getSpanDurationClassName } from '~/integrations/sentry/utils/duration';
 import classNames from '~/lib/classNames';
-import Table from '~/ui/Table';
-import { TimeBar } from '../shared/TimeBar';
+import Table from '~/ui/table';
 
 type QueryInfo = {
   avgDuration: number;

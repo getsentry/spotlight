@@ -1,5 +1,5 @@
 import type { Nullable } from 'vitest';
-import Table from '~/ui/Table';
+import Table from '~/ui/table';
 import JsonViewer from '../../../../components/JsonViewer';
 import type { SentryEvent } from '../../types';
 import Tags from '../shared/Tags';

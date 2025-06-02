@@ -3,7 +3,7 @@ import { PERFORMANCE_SCORE_PROFILES } from '~/integrations/sentry/constants';
 import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
 import type { MetricScoreProps, MetricWeightsProps, SentryEventWithPerformanceData } from '~/integrations/sentry/types';
 import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
-import Breadcrumbs from '~/ui/Breadcrumbs';
+import Breadcrumbs from '~/ui/breadcrumbs';
 import { normalizePerformanceScore } from '../../../utils/webVitals';
 import PerformanceChart from './PerformanceChart';
 

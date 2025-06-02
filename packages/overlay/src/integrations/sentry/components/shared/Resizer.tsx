@@ -1,5 +1,6 @@
 import { type HTMLAttributes, type MouseEventHandler, type ReactNode, useRef } from 'react';
 import classNames from '~/lib/classNames';
+import { getSpotlightContainer } from '~/utils/dom';
 
 export type ResizeDirection = 'column' | 'row';
 
@@ -60,11 +61,9 @@ export default function Resizer({
 
   const handleMouseDown: MouseEventHandler<HTMLDivElement> = e => {
     e.preventDefault();
-
     lastPositionRef.current = { x: e.clientX, y: e.clientY };
 
-    const spotlightRoot = document.getElementById('sentry-spotlight-root');
-    const debuggerElement = spotlightRoot?.shadowRoot?.querySelector('.spotlight-debugger');
+    const debuggerElement = getSpotlightContainer();
     debuggerElement?.classList.add(`resizing-${direction}`);
 
     setIsResizing(true);
@@ -75,8 +74,7 @@ export default function Resizer({
   const handleMouseUp = () => {
     lastPositionRef.current = null;
 
-    const spotlightRoot = document.getElementById('sentry-spotlight-root');
-    const debuggerElement = spotlightRoot?.shadowRoot?.querySelector('.spotlight-debugger');
+    const debuggerElement = getSpotlightContainer();
     debuggerElement?.classList.remove('resizing-column');
     debuggerElement?.classList.remove('resizing-row');
 

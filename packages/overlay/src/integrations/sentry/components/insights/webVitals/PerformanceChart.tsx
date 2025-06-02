@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import type { MetricScoreProps, MetricWeightsProps } from '~/integrations/sentry/types';
 import { calculateLabelCoordinates } from '~/integrations/sentry/utils/webVitals';
 import classNames from '~/lib/classNames';
-import { RingChart } from '~/ui/Chart';
+import RingChart from '~/ui/ringChart';
 import type { WebVitals } from '../../../constants';
 import useMouseTracking from '../../../hooks/useMouseTracking';
 

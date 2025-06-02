@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import CopyToClipboard from '~/components/CopyToClipboard';
 import OpenInEditor from '~/components/OpenInEditor';
 import type { EventFrame, FrameVars } from '~/integrations/sentry/types';
 import classNames from '~/lib/classNames';
 import { renderValue } from '~/lib/values';
-import Table from '~/ui/Table';
+import Table from '~/ui/table';
 
 function resolveFilename(filename: string) {
   try {
