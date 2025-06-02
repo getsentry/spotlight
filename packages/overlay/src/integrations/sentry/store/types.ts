@@ -1,6 +1,14 @@
 import type { Envelope } from "@sentry/core";
 import type { RawEventContext } from "~/integrations/integration";
-import type { AggregateCallData, Sdk, SentryErrorEvent, SentryEvent, SentryProcessedProfile, Trace } from "../types";
+import type {
+  AggregateCallData,
+  Sdk,
+  SentryErrorEvent,
+  SentryEvent,
+  SentryLogEventItem,
+  SentryProcessedProfile,
+  Trace,
+} from "../types";
 
 export type SentryProfileWithTraceMeta = SentryProcessedProfile & {
   timestamp: number;
@@ -14,7 +22,7 @@ export type Subscription = OnlineSubscription | EventSubscription | TraceSubscri
 
 export interface EventsSliceState {
   events: SentryEvent[];
-  eventIds: Set<string>;
+  eventsById: Map<string, SentryEvent>;
 }
 
 export interface EventsSliceActions {
@@ -71,6 +79,17 @@ export interface SDKsSliceState {
   sdks: Sdk[];
 }
 
+export interface LogsSliceState {
+  logsById: Map<string, SentryLogEventItem>;
+  logsByTraceId: Map<string, Set<SentryLogEventItem>>;
+}
+
+export interface LogsSliceActions {
+  getLogById: (id: string) => SentryLogEventItem | undefined;
+  getLogs: () => SentryLogEventItem[];
+  getLogsByTraceId: (traceId: string) => SentryLogEventItem[];
+}
+
 export interface SDKsSliceActions {
   inferSdkFromEvent: (event: SentryEvent) => Sdk;
   getSdks: () => Sdk[];
@@ -90,6 +109,7 @@ export type SentryStoreState = EventsSliceState &
   SubscriptionsSliceState &
   SettingsSliceState &
   EnvelopesSliceState &
+  LogsSliceState &
   SDKsSliceState;
 
 export type SentryStoreActions = EventsSliceActions &
@@ -98,6 +118,7 @@ export type SentryStoreActions = EventsSliceActions &
   SubscriptionsSliceActions &
   SettingsSliceActions &
   EnvelopesSliceActions &
+  LogsSliceActions &
   SDKsSliceActions &
   SharedSliceActions;
 

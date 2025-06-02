@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const DURATION_LABELS = {
   31557600000: "yr",
   2629800000: "mo",
@@ -34,4 +36,9 @@ export function getFormattedDuration(duration: number): string {
 
 export function getFormattedSpanDuration(span: { timestamp: number; start_timestamp: number }): string {
   return getFormattedDuration(span.timestamp - span.start_timestamp);
+}
+
+export function formatTimestamp(timestamp: number) {
+  const date = new Date(timestamp);
+  return dayjs(date).format("LL LTS");
 }

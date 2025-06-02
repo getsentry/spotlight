@@ -50,10 +50,10 @@ export default function InsightsTabDetails() {
           <Route path="webvitals/:page" element={<WebVitalsDetail />} />
           <Route path="envelopes/*" element={<EnvelopesTab showAll={showAll} />} />
           <Route path="sdks/*" element={<SdksTab />} />
-          {/* Default tab */}
           <Route path="queries" element={<Queries showAll={showAll} />} />
-          <Route path="*" element={<Navigate to="/insights/queries" replace />} />
           <Route path="profiles" element={<Profiles />} />
+          {/* Default tab */}
+          <Route path="*" element={<Navigate to="/insights/queries" replace />} />
         </Routes>
         <Outlet />
       </div>

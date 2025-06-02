@@ -14,6 +14,8 @@
       ".next",
       ".svelte-kit",
       ".vite-inspect",
+      ".jj",
+      ".mypy_cache",
       "coverage/",
       "vite.config.ts.timestamp-*"
     ]
