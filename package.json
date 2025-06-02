@@ -6,7 +6,7 @@
     "dev:overlay": "turbo dev --filter=@spotlightjs/overlay",
     "dev:website": "turbo dev --filter=@spotlightjs/website",
     "dev:electron": "turbo dev --filter=@spotlightjs/electron",
-    "build": "turbo build --filter=!@spotlightjs/astro-playground",
+    "build": "turbo build",
     "preview": "turbo preview",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
