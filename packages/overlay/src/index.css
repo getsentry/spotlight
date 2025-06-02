@@ -2,6 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom minimal scrollbar for */
+.spotlight-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.primary.700') theme('colors.primary.900');
+}
+
+.spotlight-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.spotlight-scrollbar::-webkit-scrollbar-track {
+  background: theme('colors.primary.900');
+  border-radius: 3px;
+}
+
+.spotlight-scrollbar::-webkit-scrollbar-thumb {
+  background: theme('colors.primary.700');
+  border-radius: 3px;
+}
+
+.spotlight-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.primary.600');
+}
+
+.spotlight-scrollbar::-webkit-scrollbar-corner {
+  background: theme('colors.primary.900');
+}
+
 .spotlight-fullscreen-blur {
   @apply fixed flex h-screen w-screen flex-col overflow-hidden bg-black bg-opacity-50 backdrop-blur-sm backdrop-filter;
   z-index: 999998;
