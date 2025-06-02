@@ -22,6 +22,16 @@ type LogsData = {
 
 type LogsComparator = (a: LogsData, b: LogsData) => number;
 type LogsSortTypes = (typeof LOGS_SORT_KEYS)[keyof typeof LOGS_SORT_KEYS];
+const COMPARATORS: Record<LogsSortTypes, LogsComparator> = {
+  [LOGS_SORT_KEYS.timestamp]: (a, b) => {
+    return a.timestamp - b.timestamp;
+  },
+  [LOGS_SORT_KEYS.sdk]: (a, b) => {
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
+  },
+};
 
 const LogsList = ({ traceId }: { traceId?: string }) => {
   const { id: selectedLogId } = useParams();
@@ -35,12 +45,6 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
   const hiddenItemCount = allLogs.length - localLogs.length;
   const logs = showAll ? allLogs : localLogs;
 
-  const COMPARATORS: Record<LogsSortTypes, LogsComparator> = {
-    [LOGS_SORT_KEYS.timestamp]: (a, b) => {
-      return a.timestamp - b.timestamp;
-    },
-  };
-
   const logsData = useMemo(() => {
     const logsEventItems: LogsData[] = logs.map(e => ({
       timestamp: e.timestamp,
@@ -49,12 +53,12 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
       id: e.log_id,
     }));
 
-    const compareProfileInfo = COMPARATORS[sort.active] || COMPARATORS[LOGS_SORT_KEYS.timestamp];
+    const compareLogData = COMPARATORS[sort.active] || COMPARATORS[LOGS_SORT_KEYS.timestamp];
 
     return logsEventItems.sort((a, b) => {
-      return sort.asc ? compareProfileInfo(a, b) : compareProfileInfo(b, a);
+      return sort.asc ? compareLogData(a, b) : compareLogData(b, a);
     });
-  }, [sort, showAll, localLogs, allLogs]);
+  }, [logs, sort.active, sort.asc]);
 
   const handleRowClick = (log: LogsData) => {
     navigate(`${log.id}`);

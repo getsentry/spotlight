@@ -275,6 +275,7 @@ export const PERFORMANCE_SCORE_PROFILES = {
 
 export const LOGS_SORT_KEYS = {
   timestamp: 'TIMESTAMP',
+  sdk: 'SDK',
 };
 
 export const LOGS_HEADERS = [
@@ -291,5 +292,6 @@ export const LOGS_HEADERS = [
   {
     id: 'sdk',
     title: 'SDK Name',
+    sortKey: LOGS_SORT_KEYS.sdk,
   },
 ];
