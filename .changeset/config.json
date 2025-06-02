@@ -9,7 +9,7 @@
   "updateInternalDependencies": "patch",
   "ignore": [
     "@spotlightjs/website",
-    "@spotlightjs/demos-astro",
+    "@spotlightjs/demo-astro",
     "@spotlightjs/demo-sveltekit",
     "@spotlightjs/e2e-tests-astro",
     "@spotlightjs/e2e-tests-nextjs",
