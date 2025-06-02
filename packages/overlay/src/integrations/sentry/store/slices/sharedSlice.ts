@@ -5,7 +5,7 @@ import { getNativeFetchImplementation } from '../../utils/fetch';
 import { SentryStore, SharedSliceActions } from '../types';
 
 export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceActions> = (set, get) => ({
-  getEventById: (id: string) => get().events.find(e => e.event_id === id),
+  getEventById: (id: string) => get().eventsById.get(id),
   getTraceById: (id: string) => get().tracesById.get(id),
   getEventsByTrace: (traceId: string, spanId?: string | null) => {
     const { events } = get();
@@ -58,7 +58,7 @@ export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceAct
     set({
       envelopes: [],
       events: [],
-      eventIds: new Set(),
+      eventsById: new Map(),
       traces: [],
       tracesById: new Map(),
       profilesByTraceId: new Map(),

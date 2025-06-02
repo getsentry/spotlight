@@ -4,6 +4,7 @@ import { graftProfileSpans } from '../../data/profiles';
 import type {
   ProfileSample,
   SentryEvent,
+  SentryLogEventItem,
   SentryProfileTransactionInfo,
   SentryTransactionEvent,
   Span,
@@ -15,7 +16,7 @@ import { relativeNsToTimestamp, toTimestamp } from '../utils';
 
 const initialEventsState: EventsSliceState = {
   events: [],
-  eventIds: new Set(),
+  eventsById: new Map(),
 };
 
 export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceState & EventsSliceActions> = (
@@ -28,12 +29,12 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       event.event_id = generateUuidv4();
     }
 
-    const { eventIds, events } = get();
-    if (eventIds.has(event.event_id)) return;
+    const { eventsById, events } = get();
+    if (eventsById.has(event.event_id)) return;
 
-    const newEventIds = new Set(eventIds);
-    newEventIds.add(event.event_id);
-    set({ eventIds: newEventIds });
+    const newEventIds = new Map(eventsById);
+    newEventIds.set(event.event_id, event);
+    set({ eventsById: newEventIds });
 
     if (isErrorEvent(event)) {
       await get().processStacktrace(event);
@@ -47,6 +48,7 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
     }
 
     if (isLogEvent(event) && event.items?.length) {
+      const { logsById, logsByTraceId } = get();
       for (const logItem of event.items) {
         if (logItem.severity_number == null) {
           logItem.severity_number = 0;
@@ -54,6 +56,18 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
         logItem.sdk = logItem.attributes?.['sentry.sdk.name']?.value as string;
         logItem.timestamp = toTimestamp(logItem.timestamp);
         logItem.id = generateUuidv4();
+        // TODO: check for id collision?
+        const newLogsById = new Map(logsById);
+        logsById.set(logItem.id, logItem);
+        set({ logsById: newLogsById });
+
+        if (logItem.trace_id) {
+          const newLogsByTraceId = new Map(logsByTraceId);
+          const logSet = newLogsByTraceId.get(logItem.trace_id) || new Set<SentryLogEventItem>();
+          logSet.add(logItem);
+          newLogsByTraceId.set(logItem.trace_id, logSet);
+          set({ logsByTraceId: newLogsByTraceId });
+        }
       }
     }
 

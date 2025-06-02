@@ -8,6 +8,7 @@ import { createSharedSlice } from './slices/sharedSlice';
 import { createSubscriptionsSlice } from './slices/subscriptionsSlice';
 import { createTracesSlice } from './slices/tracesSlice';
 import type { SentryStore, SharedSliceActions } from './types';
+import { createLogsSlice } from './slices/logsSlice';
 
 const useSentryStore = create<SentryStore & SharedSliceActions>()((...a) => ({
   ...createEventsSlice(...a),
@@ -17,6 +18,7 @@ const useSentryStore = create<SentryStore & SharedSliceActions>()((...a) => ({
   ...createSettingsSlice(...a),
   ...createEnvelopesSlice(...a),
   ...createSDKsSlice(...a),
+  ...createLogsSlice(...a),
   ...createSharedSlice(...a),
 }));
 

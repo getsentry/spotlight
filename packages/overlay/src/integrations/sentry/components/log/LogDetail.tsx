@@ -1,7 +1,6 @@
-import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import JsonViewer from '~/components/JsonViewer';
-import { useSentryLogs } from '~/integrations/sentry/data/useSentryLogs';
+import { useSentryLog } from '~/integrations/sentry/data/useSentryLogs';
 import SidePanel, { SidePanelHeader } from '~/ui/sidePanel';
 import Table from '~/ui/table';
 import DateTime from '../shared/DateTime';
@@ -16,9 +15,7 @@ const LOG_LEVEL_COLORS: Record<string, string> = {
 };
 
 export default function LogDetails({ id }: { id: string }) {
-  const { allLogs } = useSentryLogs();
-
-  const logData = useMemo(() => allLogs.find(log => log.log_id === id), [allLogs, id]);
+  const logData = useSentryLog(id);
 
   if (logData) {
     const { timestamp, trace_id, body, attributes, level, severity_number } = logData;
