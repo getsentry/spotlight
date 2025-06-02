@@ -48,8 +48,12 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
 
     if (isLogEvent(event) && event.items?.length) {
       for (const logItem of event.items) {
+        if (logItem.severity_number == null) {
+          logItem.severity_number = 0;
+        }
+        logItem.sdk = logItem.attributes?.['sentry.sdk.name']?.value as string;
         logItem.timestamp = toTimestamp(logItem.timestamp);
-        logItem.log_id = generateUuidv4();
+        logItem.id = generateUuidv4();
       }
     }
 

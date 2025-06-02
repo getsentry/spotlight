@@ -12,15 +12,9 @@ import useSort from '../../hooks/useSort';
 import { formatTimestamp } from '../../utils/duration';
 import HiddenItemsButton from '../shared/HiddenItemsButton';
 import LogDetails from './LogDetail';
+import type { SentryLogEventItem } from '../../types';
 
-type LogsData = {
-  timestamp: number;
-  message: string;
-  sdk: string;
-  id: string;
-};
-
-type LogsComparator = (a: LogsData, b: LogsData) => number;
+type LogsComparator = (a: SentryLogEventItem, b: SentryLogEventItem) => number;
 type LogsSortTypes = (typeof LOGS_SORT_KEYS)[keyof typeof LOGS_SORT_KEYS];
 const COMPARATORS: Record<LogsSortTypes, LogsComparator> = {
   [LOGS_SORT_KEYS.timestamp]: (a, b) => {
@@ -30,6 +24,9 @@ const COMPARATORS: Record<LogsSortTypes, LogsComparator> = {
     if (a < b) return -1;
     if (a > b) return 1;
     return 0;
+  },
+  [LOGS_SORT_KEYS.level]: (a, b) => {
+    return a.severity_number - b.severity_number;
   },
 };
 
@@ -46,25 +43,18 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
   const logs = showAll ? allLogs : localLogs;
 
   const logsData = useMemo(() => {
-    const logsEventItems: LogsData[] = logs.map(e => ({
-      timestamp: e.timestamp,
-      sdk: (e.attributes?.['sentry.sdk.name']?.value as string) || 'unknown',
-      message: e.body,
-      id: e.log_id,
-    }));
-
     const compareLogData = COMPARATORS[sort.active] || COMPARATORS[LOGS_SORT_KEYS.timestamp];
 
-    return logsEventItems.sort((a, b) => {
+    return logs.sort((a, b) => {
       return sort.asc ? compareLogData(a, b) : compareLogData(b, a);
     });
   }, [logs, sort.active, sort.asc]);
 
-  const handleRowClick = (log: LogsData) => {
+  const handleRowClick = (log: SentryLogEventItem) => {
     navigate(`${log.id}`);
   };
 
-  const handleRowKeyDown = (e: KeyboardEvent<HTMLTableRowElement>, log: LogsData) => {
+  const handleRowKeyDown = (e: KeyboardEvent<HTMLTableRowElement>, log: SentryLogEventItem) => {
     if (e.key === 'Enter') {
       handleRowClick(log);
     }
@@ -131,7 +121,10 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                   className="hover:bg-primary-900 cursor-pointer"
                 >
                   <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4 text-sm font-medium">
-                    <span>{log.message}</span>
+                    <span>{log.level}</span>
+                  </td>
+                  <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4 text-sm font-medium">
+                    <span>{log.body}</span>
                   </td>
                   <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                     <span>{formatTimestamp(log.timestamp)}</span>

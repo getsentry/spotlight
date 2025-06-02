@@ -202,7 +202,9 @@ export type SentryProfileV1Event = CommonEventAttrs & {
 };
 
 export type SentryLogEventItem = SerializedLog & {
-  log_id: string; // Need to have a unique id for each log
+  id: string; // Need to have a unique id for each log
+  severity_number: number;
+  sdk: string | undefined;
 };
 
 export type SentryLogEvent = CommonEventAttrs & {

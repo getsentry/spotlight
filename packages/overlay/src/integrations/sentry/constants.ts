@@ -275,10 +275,16 @@ export const PERFORMANCE_SCORE_PROFILES = {
 
 export const LOGS_SORT_KEYS = {
   timestamp: 'TIMESTAMP',
+  level: 'LEVEL',
   sdk: 'SDK',
 };
 
 export const LOGS_HEADERS = [
+  {
+    id: 'level',
+    title: 'Level',
+    sortKey: LOGS_SORT_KEYS.level,
+  },
   {
     id: 'message',
     title: 'Message',
