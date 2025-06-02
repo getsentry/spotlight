@@ -6,13 +6,13 @@ import CardList from '~/components/CardList';
 import classNames from '~/lib/classNames';
 import { useSpotlightContext } from '~/lib/useSpotlightContext';
 import Table from '~/ui/table';
-import { LOGS_HEADERS, LOGS_SORT_KEYS } from '../../constants';
+import { LOG_LEVEL_COLORS, LOGS_HEADERS, LOGS_SORT_KEYS } from '../../constants';
 import { useSentryLogs } from '../../data/useSentryLogs';
 import useSort from '../../hooks/useSort';
+import type { SentryLogEventItem } from '../../types';
 import { formatTimestamp } from '../../utils/duration';
 import HiddenItemsButton from '../shared/HiddenItemsButton';
 import LogDetails from './LogDetail';
-import type { SentryLogEventItem } from '../../types';
 
 type LogsComparator = (a: SentryLogEventItem, b: SentryLogEventItem) => number;
 type LogsSortTypes = (typeof LOGS_SORT_KEYS)[keyof typeof LOGS_SORT_KEYS];
@@ -40,15 +40,15 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
   const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
 
   const hiddenItemCount = allLogs.length - localLogs.length;
-  const logs = showAll ? allLogs : localLogs;
 
   const logsData = useMemo(() => {
     const compareLogData = COMPARATORS[sort.active] || COMPARATORS[LOGS_SORT_KEYS.timestamp];
+    const logs = showAll ? allLogs : localLogs;
 
     return logs.sort((a, b) => {
       return sort.asc ? compareLogData(a, b) : compareLogData(b, a);
     });
-  }, [logs, sort.active, sort.asc]);
+  }, [allLogs, localLogs, showAll, sort.active, sort.asc]);
 
   const handleRowClick = (log: SentryLogEventItem) => {
     navigate(`${log.id}`);
@@ -70,24 +70,27 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
           }}
         />
       )}
-      {logsData?.length ? (
+      {logsData.length ? (
         <>
           <Table variant="detail">
             <Table.Header>
               <tr>
-                {LOGS_HEADERS.map(header => (
+                {LOGS_HEADERS.map((header, idx) => (
                   <th
                     key={header.id}
                     scope="col"
                     className={classNames(
-                      'text-primary-100 px-6 py-3.5 text-sm font-semibold',
-                      header.primary ? 'w-2/5' : 'w-[15%]',
+                      'text-primary-100 py-3.5 text-sm font-semibold',
+                      !header.stretch && 'w-[20%]',
+                      header.primary && 'w-[50%]',
+                      idx === 0 && 'ps-6',
+                      idx === LOGS_HEADERS.length - 1 && 'pe-6',
                     )}
                   >
                     <div
                       className={classNames(
                         'flex cursor-pointer select-none items-center gap-1',
-                        header.primary ? 'justify-start' : 'justify-end',
+                        `justify-${header.align === 'right' ? 'end' : 'start'}`,
                       )}
                       onClick={() => header.sortKey && toggleSortOrder(header.sortKey)}
                     >
@@ -110,7 +113,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                 ))}
               </tr>
             </Table.Header>
-            <Table.Body>
+            <Table.Body className="text-primary-200 whitespace-nowrap font-mono text-xs font-medium">
               {logsData.map(log => (
                 <tr
                   key={log.id}
@@ -120,16 +123,16 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                   role="link"
                   className="hover:bg-primary-900 cursor-pointer"
                 >
-                  <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4 text-sm font-medium">
-                    <span>{log.level}</span>
+                  <td className="ps-6">
+                    <span className={LOG_LEVEL_COLORS[log.level] || 'text-primary-500'}>{log.level.toUpperCase()}</span>
                   </td>
-                  <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4 text-sm font-medium">
+                  <td className="text-sm">
                     <span>{log.body}</span>
                   </td>
-                  <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                  <td className="text-right">
                     <span>{formatTimestamp(log.timestamp)}</span>
                   </td>
-                  <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                  <td className="pe-6 text-right">
                     <span>{log.sdk}</span>
                   </td>
                 </tr>

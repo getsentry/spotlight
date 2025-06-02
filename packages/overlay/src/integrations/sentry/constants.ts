@@ -273,6 +273,15 @@ export const PERFORMANCE_SCORE_PROFILES = {
   ],
 };
 
+export const LOG_LEVEL_COLORS: Record<string, string> = {
+  trace: 'text-gray-500',
+  debug: 'text-blue-500',
+  info: 'text-green-500',
+  warn: 'text-yellow-500',
+  error: 'text-red-500',
+  fatal: 'text-purple-500',
+};
+
 export const LOGS_SORT_KEYS = {
   timestamp: 'TIMESTAMP',
   level: 'LEVEL',
@@ -284,6 +293,7 @@ export const LOGS_HEADERS = [
     id: 'level',
     title: 'Level',
     sortKey: LOGS_SORT_KEYS.level,
+    stretch: true,
   },
   {
     id: 'message',
@@ -294,10 +304,12 @@ export const LOGS_HEADERS = [
     id: 'timestamp',
     title: 'Timestamp',
     sortKey: LOGS_SORT_KEYS.timestamp,
+    align: 'right',
   },
   {
     id: 'sdk',
     title: 'SDK Name',
     sortKey: LOGS_SORT_KEYS.sdk,
+    align: 'right',
   },
 ];

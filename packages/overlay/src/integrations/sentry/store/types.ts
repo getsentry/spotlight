@@ -86,6 +86,8 @@ export interface LogsSliceState {
 
 export interface LogsSliceActions {
   getLogById: (id: string) => SentryLogEventItem | undefined;
+  getLogs: () => SentryLogEventItem[];
+  getLogsByTraceId: (traceId: string) => SentryLogEventItem[];
 }
 
 export interface SDKsSliceActions {
