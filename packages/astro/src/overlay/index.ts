@@ -1,6 +1,6 @@
-import type { DevOverlayPlugin } from 'astro';
+import type { DevOverlayPlugin } from "astro";
 
-import * as Spotlight from '@spotlightjs/spotlight';
+import * as Spotlight from "@spotlightjs/spotlight";
 
 const sentryLogo = `<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="256" height="256" fill="none"/>
@@ -10,8 +10,8 @@ const sentryLogo = `<svg width="256" height="256" viewBox="0 0 256 256" fill="no
 </svg>`;
 
 export default {
-  id: 'spotlight-plugin',
-  name: 'Spotlight by Sentry',
+  id: "spotlight-plugin",
+  name: "Spotlight by Sentry",
   icon: sentryLogo,
   init(_canvas, app) {
     // When there is an error already on the page, Spotlight will pop open
@@ -46,7 +46,7 @@ export default {
     });
 
     Spotlight.onSevereEvent(() => {
-      app.toggleNotification({ state: true, level: 'error' });
+      app.toggleNotification({ state: true, level: "error" });
     });
   },
 } satisfies DevOverlayPlugin;

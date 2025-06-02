@@ -1,5 +1,5 @@
-import * as Sentry from '@sentry/sveltekit';
-import { init as initSpotlight } from '@spotlightjs/spotlight';
+import * as Sentry from "@sentry/sveltekit";
+import { init as initSpotlight } from "@spotlightjs/spotlight";
 
 Sentry.init({
   debug: true,
@@ -7,7 +7,7 @@ Sentry.init({
 });
 
 if (import.meta.env.DEV) {
-  initSpotlight({ injectImmediately: true, anchor: 'bottomRight', debug: true });
+  initSpotlight({ injectImmediately: true, anchor: "bottomRight", debug: true });
 }
 
 export const handleError = Sentry.handleErrorWithSentry();

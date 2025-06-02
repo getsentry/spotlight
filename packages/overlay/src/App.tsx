@@ -1,19 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Debugger from './components/Debugger';
-import Trigger from './components/Trigger';
-import { SPOTLIGHT_OPEN_CLASS_NAME } from './constants';
-import type { Integration, IntegrationData } from './integrations/integration';
-import { base64Decode } from './lib/base64';
-import * as db from './lib/db';
-import { getSpotlightEventTarget } from './lib/eventTarget';
-import { log } from './lib/logger';
-import useKeyPress from './lib/useKeyPress';
-import { connectToSidecar } from './sidecar';
-import type { NotificationCount, SpotlightOverlayOptions } from './types';
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Debugger from "./components/Debugger";
+import Trigger from "./components/Trigger";
+import { SPOTLIGHT_OPEN_CLASS_NAME } from "./constants";
+import type { Integration, IntegrationData } from "./integrations/integration";
+import { base64Decode } from "./lib/base64";
+import * as db from "./lib/db";
+import { getSpotlightEventTarget } from "./lib/eventTarget";
+import { log } from "./lib/logger";
+import useKeyPress from "./lib/useKeyPress";
+import { connectToSidecar } from "./sidecar";
+import type { NotificationCount, SpotlightOverlayOptions } from "./types";
 
-type AppProps = Omit<SpotlightOverlayOptions, 'debug' | 'injectImmediately'> &
-  Required<Pick<SpotlightOverlayOptions, 'sidecarUrl'>>;
+type AppProps = Omit<SpotlightOverlayOptions, "debug" | "injectImmediately"> &
+  Required<Pick<SpotlightOverlayOptions, "sidecarUrl">>;
 
 type EventData = { contentType: string; data: string | Uint8Array };
 
@@ -35,14 +35,14 @@ function processInitialEvents(
     result[integration.name] = [];
 
     for (const contentType in initialEvents) {
-      const contentTypeBits = contentType.split(';');
+      const contentTypeBits = contentType.split(";");
       const contentTypeWithoutEncoding = contentTypeBits[0];
 
       if (!integration.forwardedContentType?.includes(contentTypeWithoutEncoding)) {
         continue;
       }
 
-      const shouldUseBase64 = contentTypeBits[contentTypeBits.length - 1] === 'base64';
+      const shouldUseBase64 = contentTypeBits[contentTypeBits.length - 1] === "base64";
 
       for (const data of initialEvents[contentTypeWithoutEncoding]) {
         const processedEvent = processEvent(
@@ -76,7 +76,7 @@ export default function App({
   const [isOnline, setOnline] = useState(false);
   const [triggerButtonCount, setTriggerButtonCount] = useState<NotificationCount>({ count: 0, severe: false });
   const [isOpen, setOpen] = useState(openOnInit);
-  log('App rerender', integrationData, isOnline, triggerButtonCount, isOpen);
+  log("App rerender", integrationData, isOnline, triggerButtonCount, isOpen);
 
   const contentTypeListeners = useMemo(() => {
     // Map that holds the information which kind of content type should be dispatched to which integration(s)
@@ -113,7 +113,7 @@ export default function App({
         }
       };
 
-      log('Adding listener for', contentType);
+      log("Adding listener for", contentType);
 
       // `contentType` could for example be "application/x-sentry-envelope"
       result[contentType] = listener;
@@ -131,15 +131,15 @@ export default function App({
 
   const dispatchToContentTypeListener = useCallback(
     ({ contentType, data }: EventData) => {
-      const contentTypeBits = contentType.split(';');
+      const contentTypeBits = contentType.split(";");
       const contentTypeWithoutEncoding = contentTypeBits[0];
 
       const listener = contentTypeListeners[contentTypeWithoutEncoding];
       if (!listener) {
-        log('Got event for unknown content type:', contentTypeWithoutEncoding);
+        log("Got event for unknown content type:", contentTypeWithoutEncoding);
         return;
       }
-      if (contentTypeBits[contentTypeBits.length - 1] === 'base64') {
+      if (contentTypeBits[contentTypeBits.length - 1] === "base64") {
         listener({ data: base64Decode(data as string) });
       } else {
         listener({ data });
@@ -166,12 +166,12 @@ export default function App({
   const navigate = useNavigate();
   const clearEvents = useCallback(async () => {
     try {
-      const clearEventsUrl: string = new URL('/clear', sidecarUrl).href;
+      const clearEventsUrl: string = new URL("/clear", sidecarUrl).href;
 
       await db.reset();
       await fetch(clearEventsUrl, {
-        method: 'DELETE',
-        mode: 'cors',
+        method: "DELETE",
+        mode: "cors",
       });
     } catch (err) {
       console.error(`Spotlight can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`, err);
@@ -190,7 +190,7 @@ export default function App({
         path: string | undefined;
       }>,
     ) => {
-      log('Open');
+      log("Open");
       setOpen(true);
       if (e.detail.path) navigate(e.detail.path);
     },
@@ -198,18 +198,18 @@ export default function App({
   );
 
   const onClose = useCallback(() => {
-    log('Close');
+    log("Close");
     setOpen(false);
   }, []);
 
   const onToggle = useCallback(() => {
-    log('Toggle');
+    log("Toggle");
     setOpen(prev => !prev);
   }, []);
 
   const onNavigate = useCallback(
     (e: CustomEvent<string>) => {
-      log('Navigate');
+      log("Navigate");
       navigate(e.detail);
     },
     [navigate],
@@ -223,32 +223,32 @@ export default function App({
     [dispatchToContentTypeListener],
   );
 
-  useKeyPress('F12', ['ctrlKey'], onToggle);
+  useKeyPress("F12", ["ctrlKey"], onToggle);
 
   useEffect(() => {
-    log('useEffect: Adding event listeners');
-    spotlightEventTarget.addEventListener('open', onOpen as EventListener);
-    spotlightEventTarget.addEventListener('close', onClose);
-    spotlightEventTarget.addEventListener('navigate', onNavigate as EventListener);
-    spotlightEventTarget.addEventListener('clearEvents', clearEvents as EventListener);
-    spotlightEventTarget.addEventListener('event', onEvent as EventListener);
+    log("useEffect: Adding event listeners");
+    spotlightEventTarget.addEventListener("open", onOpen as EventListener);
+    spotlightEventTarget.addEventListener("close", onClose);
+    spotlightEventTarget.addEventListener("navigate", onNavigate as EventListener);
+    spotlightEventTarget.addEventListener("clearEvents", clearEvents as EventListener);
+    spotlightEventTarget.addEventListener("event", onEvent as EventListener);
 
     return (): undefined => {
-      log('useEffect[destructor]: Removing event listeners');
-      spotlightEventTarget.removeEventListener('open', onOpen as EventListener);
-      spotlightEventTarget.removeEventListener('close', onClose);
-      spotlightEventTarget.removeEventListener('navigate', onNavigate as EventListener);
-      spotlightEventTarget.removeEventListener('clearEvents', clearEvents as EventListener);
-      spotlightEventTarget.removeEventListener('event', onEvent as EventListener);
+      log("useEffect[destructor]: Removing event listeners");
+      spotlightEventTarget.removeEventListener("open", onOpen as EventListener);
+      spotlightEventTarget.removeEventListener("close", onClose);
+      spotlightEventTarget.removeEventListener("navigate", onNavigate as EventListener);
+      spotlightEventTarget.removeEventListener("clearEvents", clearEvents as EventListener);
+      spotlightEventTarget.removeEventListener("event", onEvent as EventListener);
     };
   }, [spotlightEventTarget, onOpen, onClose, onNavigate, clearEvents, onEvent]);
 
   useEffect(() => {
     if (!isOpen) {
-      spotlightEventTarget.dispatchEvent(new CustomEvent('closed'));
+      spotlightEventTarget.dispatchEvent(new CustomEvent("closed"));
       document.body.classList.remove(SPOTLIGHT_OPEN_CLASS_NAME);
     } else {
-      spotlightEventTarget.dispatchEvent(new CustomEvent('opened'));
+      spotlightEventTarget.dispatchEvent(new CustomEvent("opened"));
       document.body.classList.add(SPOTLIGHT_OPEN_CLASS_NAME);
     }
   }, [isOpen, spotlightEventTarget]);
@@ -256,7 +256,7 @@ export default function App({
   useEffect(() => {
     if (triggerButtonCount.severe) {
       spotlightEventTarget.dispatchEvent(
-        new CustomEvent('severeEventCount', { detail: { count: triggerButtonCount.count } }),
+        new CustomEvent("severeEventCount", { detail: { count: triggerButtonCount.count } }),
       );
     }
   }, [triggerButtonCount, spotlightEventTarget]);

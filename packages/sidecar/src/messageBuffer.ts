@@ -50,7 +50,7 @@ export class MessageBuffer<T> {
     while (true) {
       item = this.items[atReadPos % this.size];
       // atReadPos >= this.writePos prevents the case where we have a full buffer
-      if (typeof item === 'undefined' || atReadPos >= this.writePos) {
+      if (typeof item === "undefined" || atReadPos >= this.writePos) {
         break;
       }
       cb(item[1]);
@@ -70,10 +70,10 @@ export class MessageBuffer<T> {
 
 function generateUuidv4(): string {
   let dt = new Date().getTime();
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
     let rnd = Math.random() * 16;
     rnd = ((dt + rnd) % 16) | 0;
     dt = Math.floor(dt / 16);
-    return (c === 'x' ? rnd : (rnd & 0x3) | 0x8).toString(16);
+    return (c === "x" ? rnd : (rnd & 0x3) | 0x8).toString(16);
   });
 }

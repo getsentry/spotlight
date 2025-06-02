@@ -1,5 +1,5 @@
-import * as Sentry from '@sentry/sveltekit';
-import { setupSidecar } from '@spotlightjs/spotlight/sidecar';
+import * as Sentry from "@sentry/sveltekit";
+import { setupSidecar } from "@spotlightjs/spotlight/sidecar";
 
 Sentry.init({
   debug: true,

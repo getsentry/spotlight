@@ -1,7 +1,7 @@
-import { builtinModules } from 'node:module';
-import { defineConfig } from 'vite';
+import { builtinModules } from "node:module";
+import { defineConfig } from "vite";
 
-import packageJson from './package.json';
+import packageJson from "./package.json";
 
 const dependencies = Object.keys({
   ...packageJson.dependencies,
@@ -12,14 +12,14 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        main: './src/main.ts',
-        'vite-plugin': './src/vite-plugin.ts',
-        constants: './src/constants.ts',
-        server: './server.ts',
+        main: "./src/main.ts",
+        "vite-plugin": "./src/vite-plugin.ts",
+        constants: "./src/constants.ts",
+        server: "./server.ts",
       },
-      formats: ['es'],
+      formats: ["es"],
     },
-    outDir: './dist',
+    outDir: "./dist",
     sourcemap: true,
     rollupOptions: {
       external: [...dependencies, ...builtinModules.map(x => `node:${x}`)],

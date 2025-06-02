@@ -1,3 +1,3 @@
 export default function classNames(...classes: (string | undefined | boolean | null)[]) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }

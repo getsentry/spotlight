@@ -1,14 +1,14 @@
-import dayjs from 'dayjs';
-import DayJsLocalizedFormat from 'dayjs/plugin/localizedFormat';
+import dayjs from "dayjs";
+import DayJsLocalizedFormat from "dayjs/plugin/localizedFormat";
 
 dayjs.extend(DayJsLocalizedFormat);
 
-export default function DateTime({ date, ...props }: { date: string | number | Date } & React.ComponentProps<'time'>) {
+export default function DateTime({ date, ...props }: { date: string | number | Date } & React.ComponentProps<"time">) {
   if (!date) return null;
 
   return (
     <time dateTime={date instanceof Date ? date.toISOString() : `${date}`} {...props}>
-      {dayjs(date).format('LL LTS')}
+      {dayjs(date).format("LL LTS")}
     </time>
   );
 }

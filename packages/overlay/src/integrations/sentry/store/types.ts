@@ -1,15 +1,15 @@
-import type { Envelope } from '@sentry/core';
-import type { RawEventContext } from '~/integrations/integration';
-import type { AggregateCallData, Sdk, SentryErrorEvent, SentryEvent, SentryProcessedProfile, Trace } from '../types';
+import type { Envelope } from "@sentry/core";
+import type { RawEventContext } from "~/integrations/integration";
+import type { AggregateCallData, Sdk, SentryErrorEvent, SentryEvent, SentryProcessedProfile, Trace } from "../types";
 
 export type SentryProfileWithTraceMeta = SentryProcessedProfile & {
   timestamp: number;
   active_thread_id: string;
 };
 
-export type OnlineSubscription = ['online', (status: boolean) => void];
-export type EventSubscription = ['event', (event: SentryEvent) => void];
-export type TraceSubscription = ['trace', (trace: Trace) => void];
+export type OnlineSubscription = ["online", (status: boolean) => void];
+export type EventSubscription = ["event", (event: SentryEvent) => void];
+export type TraceSubscription = ["trace", (trace: Trace) => void];
 export type Subscription = OnlineSubscription | EventSubscription | TraceSubscription;
 
 export interface EventsSliceState {

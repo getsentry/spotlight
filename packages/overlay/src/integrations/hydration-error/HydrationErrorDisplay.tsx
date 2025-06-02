@@ -1,7 +1,7 @@
-import beautify from 'beautify';
-import { useEffect, useState } from 'react';
-import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
-import { log } from '~/lib/logger';
+import beautify from "beautify";
+import { useEffect, useState } from "react";
+import ReactDiffViewer, { DiffMethod } from "react-diff-viewer-continued";
+import { log } from "~/lib/logger";
 
 type WindowWithHydrationOverlay = Window & {
   BUILDER_HYDRATION_OVERLAY: {
@@ -11,12 +11,12 @@ type WindowWithHydrationOverlay = Window & {
     APP_ROOT_SELECTOR: string;
   };
 };
-const isBrowser = typeof window !== 'undefined';
+const isBrowser = typeof window !== "undefined";
 const _window = isBrowser ? (window as unknown as WindowWithHydrationOverlay) : null;
 
 export default function HydrationErrorDisplay() {
-  const [SSRHtml, setSSRHtml] = useState('');
-  const [CSRHtml, setCSRHtml] = useState('');
+  const [SSRHtml, setSSRHtml] = useState("");
+  const [CSRHtml, setCSRHtml] = useState("");
   const [isStyleSheetAdded, setIsStyleSheetAdded] = useState(false);
   const isHydrationError = _window?.BUILDER_HYDRATION_OVERLAY.ERROR;
   const ssrHtml = _window?.BUILDER_HYDRATION_OVERLAY.SSR_HTML;
@@ -25,26 +25,26 @@ export default function HydrationErrorDisplay() {
   useEffect(() => {
     if (isBrowser) {
       if (!_window?.BUILDER_HYDRATION_OVERLAY) {
-        log('No hydration error found. Make sure you are using @builder.io/react-hydration-overlay');
+        log("No hydration error found. Make sure you are using @builder.io/react-hydration-overlay");
         return;
       }
 
-      const shadowRoot = document.getElementById('sentry-spotlight-root')?.shadowRoot;
+      const shadowRoot = document.getElementById("sentry-spotlight-root")?.shadowRoot;
 
       const checkAndAddStyleSheet = () => {
         if (isStyleSheetAdded) {
           return true;
         }
         const head = document.head;
-        const styleTags = head.querySelectorAll('style');
+        const styleTags = head.querySelectorAll("style");
         const emotionDiffStyleTags = Array.from(styleTags).filter(styleTag => {
-          return styleTag.getAttribute('data-emotion');
+          return styleTag.getAttribute("data-emotion");
         });
 
         const newStylesheet = new CSSStyleSheet();
         const stylesheetContent = Array.from(emotionDiffStyleTags)
           .map(styleTag => styleTag.innerHTML)
-          .join('\n');
+          .join("\n");
 
         newStylesheet.replaceSync(stylesheetContent);
 
@@ -61,9 +61,9 @@ export default function HydrationErrorDisplay() {
       };
       if (!ssrHtml || !newCSRHtml || !checkAndAddStyleSheet()) return;
 
-      const newSSR = beautify(ssrHtml, { format: 'html' });
+      const newSSR = beautify(ssrHtml, { format: "html" });
       setSSRHtml(newSSR);
-      const newCSR = beautify(newCSRHtml, { format: 'html' });
+      const newCSR = beautify(newCSRHtml, { format: "html" });
       setCSRHtml(newCSR);
     }
   }, [ssrHtml, newCSRHtml, isStyleSheetAdded]);
@@ -71,21 +71,21 @@ export default function HydrationErrorDisplay() {
   const newStyles = {
     variables: {
       dark: {
-        diffViewerBackground: 'transparent',
-        addedBackground: 'transparent',
-        removedBackground: 'transparent',
-        wordAddedBackground: '#055d67',
-        wordRemovedBackground: '#7d383f',
-        addedGutterBackground: 'transparent',
-        removedGutterBackground: 'transparent',
-        gutterBackground: 'transparent',
-        codeFoldBackground: 'transparent',
-        emptyLineBackground: 'transparent',
-        diffViewerTitleBorderColor: 'transparent',
-        highlightBackground: 'transparent',
-        highlightGutterBackground: 'transparent',
-        codeFoldGutterBackground: 'transparent',
-        gutterBackgroundDark: 'transparent',
+        diffViewerBackground: "transparent",
+        addedBackground: "transparent",
+        removedBackground: "transparent",
+        wordAddedBackground: "#055d67",
+        wordRemovedBackground: "#7d383f",
+        addedGutterBackground: "transparent",
+        removedGutterBackground: "transparent",
+        gutterBackground: "transparent",
+        codeFoldBackground: "transparent",
+        emptyLineBackground: "transparent",
+        diffViewerTitleBorderColor: "transparent",
+        highlightBackground: "transparent",
+        highlightGutterBackground: "transparent",
+        codeFoldGutterBackground: "transparent",
+        gutterBackgroundDark: "transparent",
       },
     },
   };
@@ -104,8 +104,8 @@ export default function HydrationErrorDisplay() {
           styles={newStyles}
           oldValue={SSRHtml}
           newValue={CSRHtml}
-          leftTitle={isStyleSheetAdded ? 'Server-Side Render' : ''}
-          rightTitle={isStyleSheetAdded ? 'Client-Side Render' : ''}
+          leftTitle={isStyleSheetAdded ? "Server-Side Render" : ""}
+          rightTitle={isStyleSheetAdded ? "Client-Side Render" : ""}
           compareMethod={DiffMethod.WORDS}
           useDarkTheme
         />

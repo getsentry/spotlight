@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
-import { useMemo } from 'react';
-import classNames from '~/lib/classNames';
+import type { ReactNode } from "react";
+import { useMemo } from "react";
+import classNames from "~/lib/classNames";
 
 export type RingChartProps = React.HTMLAttributes<SVGSVGElement> & {
   backgroundColors: string[];
@@ -17,7 +17,7 @@ export type RingChartProps = React.HTMLAttributes<SVGSVGElement> & {
   /**
    * Endcaps on the progress bar
    */
-  progressEndcaps?: React.SVGAttributes<SVGCircleElement>['strokeLinecap'];
+  progressEndcaps?: React.SVGAttributes<SVGCircleElement>["strokeLinecap"];
   size?: number;
   /**
    * The css to apply to the center text. A function may be provided to compute
@@ -79,12 +79,12 @@ function RingChart({
           onBlur={() => onBlur?.()}
           className={classNames(backgroundColors[index])}
           style={{
-            fill: 'none',
+            fill: "none",
             strokeWidth: barWidth,
             strokeDasharray: `${circumference} ${circumference}`,
             transform: `rotate(${rotate}deg)`,
-            transformOrigin: '50% 50%',
-            transition: 'stroke 300ms',
+            transformOrigin: "50% 50%",
+            transition: "stroke 300ms",
           }}
         />,
         <circle
@@ -100,12 +100,12 @@ function RingChart({
           onBlur={() => onBlur?.()}
           className={classNames(segmentColors[index])}
           style={{
-            fill: 'none',
+            fill: "none",
             strokeWidth: barWidth,
             strokeDasharray: `${circumference} ${circumference}`,
             transform: `rotate(${rotate}deg)`,
-            transformOrigin: '50% 50%',
-            transition: 'stroke 300ms, stroke-dashoffset 300ms',
+            transformOrigin: "50% 50%",
+            transition: "stroke 300ms, stroke-dashoffset 300ms",
           }}
         />,
       ];
@@ -136,7 +136,7 @@ function RingChart({
         {text !== undefined ? (
           <div
             className={classNames(
-              'text-primary-100 flex h-full w-full items-center justify-center text-xl font-bold',
+              "text-primary-100 flex h-full w-full items-center justify-center text-xl font-bold",
               textCss,
             )}
           >

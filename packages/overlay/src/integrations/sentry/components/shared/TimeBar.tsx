@@ -1,4 +1,4 @@
-import classNames from '~/lib/classNames';
+import classNames from "~/lib/classNames";
 
 type TimeBarProps = {
   value: number;
@@ -12,9 +12,9 @@ export function TimeBar({ value, maxValue, title, children, className }: TimeBar
   const percentage = maxValue !== 0 ? Math.round((value / maxValue) * 100) : 100;
 
   return (
-    <div title={title} className={classNames('relative truncate text-left text-sm font-medium', className)}>
+    <div title={title} className={classNames("relative truncate text-left text-sm font-medium", className)}>
       {children}
-      <div className={classNames('bg-primary-800 h-1 w-full overflow-hidden rounded-full', children ? 'mt-1' : '')}>
+      <div className={classNames("bg-primary-800 h-1 w-full overflow-hidden rounded-full", children ? "mt-1" : "")}>
         <div className="h-full bg-lime-500" style={{ width: `${percentage}%` }} />
       </div>
     </div>

@@ -1,8 +1,8 @@
-import { Fragment } from 'react';
-import JsonViewer from '~/components/JsonViewer';
-import classNames from '~/lib/classNames';
-import Time from '../../../../components/Time';
-import type { Breadcrumb, SentryEvent } from '../../types';
+import { Fragment } from "react";
+import JsonViewer from "~/components/JsonViewer";
+import classNames from "~/lib/classNames";
+import Time from "../../../../components/Time";
+import type { Breadcrumb, SentryEvent } from "../../types";
 
 const EXAMPLE_BREADCRUMB = `Sentry.addBreadcrumb({
   category: "auth",
@@ -39,7 +39,7 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
         {breadcrumbs.map((crumb, crumbIdx) => (
           <Fragment key={`${crumb.timestamp}-${crumb.category}-${crumb.type}`}>
             <div className="flex flex-none flex-col p-2">
-              <div className="text-lg font-semibold">{crumb.category || ' '}</div>
+              <div className="text-lg font-semibold">{crumb.category || " "}</div>
               <div className="text-primary-300 text-xs">
                 <Time date={crumb.timestamp} format="HH:mm:ss" />
               </div>
@@ -49,8 +49,8 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
             ) : (
               <pre
                 className={classNames(
-                  'flex grow items-center whitespace-pre-line p-2 !font-mono',
-                  crumbIdx === 0 ? '!border-t-0' : '',
+                  "flex grow items-center whitespace-pre-line p-2 !font-mono",
+                  crumbIdx === 0 ? "!border-t-0" : "",
                 )}
               >
                 {crumb.message}

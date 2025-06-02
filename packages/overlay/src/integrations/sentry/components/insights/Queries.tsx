@@ -1,15 +1,15 @@
-import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ReactComponent as Sort } from '~/assets/sort.svg';
-import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
-import { TimeBar } from '~/integrations/sentry/components/shared/TimeBar';
-import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from '~/integrations/sentry/constants';
-import { useSentrySpans } from '~/integrations/sentry/data/useSentrySpans';
-import useSort from '~/integrations/sentry/hooks/useSort';
-import type { Span } from '~/integrations/sentry/types';
-import { getFormattedDuration, getSpanDurationClassName } from '~/integrations/sentry/utils/duration';
-import classNames from '~/lib/classNames';
-import Table from '~/ui/table';
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { ReactComponent as Sort } from "~/assets/sort.svg";
+import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
+import { TimeBar } from "~/integrations/sentry/components/shared/TimeBar";
+import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from "~/integrations/sentry/constants";
+import { useSentrySpans } from "~/integrations/sentry/data/useSentrySpans";
+import useSort from "~/integrations/sentry/hooks/useSort";
+import type { Span } from "~/integrations/sentry/types";
+import { getFormattedDuration, getSpanDurationClassName } from "~/integrations/sentry/utils/duration";
+import classNames from "~/lib/classNames";
+import Table from "~/ui/table";
 
 type QueryInfo = {
   avgDuration: number;
@@ -50,10 +50,10 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
   const queriesData: QueryInfo[] = useMemo(() => {
     const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.totalTime];
     const spans = showAll ? allSpans : localSpans;
-    const onlyDBSpans = spans.filter((span: Span) => DB_SPAN_REGEX.test(span.op || ''));
+    const onlyDBSpans = spans.filter((span: Span) => DB_SPAN_REGEX.test(span.op || ""));
     const uniqueSpansSet = new Set(onlyDBSpans.map(span => String(span?.description).trim()));
     // CLear out empty ones (they collapse as a single empty string since this is a set)
-    uniqueSpansSet.delete('');
+    uniqueSpansSet.delete("");
     return [...uniqueSpansSet]
       .map(query => calculateQueryInfo({ query, spanData: onlyDBSpans }))
       .sort((a, b) => (sort.asc ? compareQueryInfo(a, b) : compareQueryInfo(b, a)));
@@ -82,15 +82,15 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
               key={header.id}
               scope="col"
               className={classNames(
-                'text-primary-100 select-none px-6 py-3.5 text-sm font-semibold',
-                header.primary ? 'w-2/5' : 'w-[15%]',
+                "text-primary-100 select-none px-6 py-3.5 text-sm font-semibold",
+                header.primary ? "w-2/5" : "w-[15%]",
               )}
             >
               <button
                 type="button"
                 className={classNames(
-                  'flex cursor-pointer items-center gap-1',
-                  header.primary ? 'justify-start' : 'justify-end',
+                  "flex cursor-pointer items-center gap-1",
+                  header.primary ? "justify-start" : "justify-end",
                 )}
                 onClick={() => toggleSortOrder(header.sortKey)}
                 tabIndex={0}
@@ -101,8 +101,8 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
                     width={12}
                     height={12}
                     className={classNames(
-                      'fill-primary-300',
-                      sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
+                      "fill-primary-300",
+                      sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                     )}
                   />
                 ) : (

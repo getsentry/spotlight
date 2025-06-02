@@ -1,11 +1,11 @@
-import { generateUuidv4 } from '~/lib/uuid';
-import { trigger } from '../../lib/eventTarget';
-import type { WindowWithSpotlight } from '../../types';
-import type { Integration } from '../integration';
-import ConsoleTab from './console-tab';
-import type { ConsoleMessage, Level } from './types';
+import { generateUuidv4 } from "~/lib/uuid";
+import { trigger } from "../../lib/eventTarget";
+import type { WindowWithSpotlight } from "../../types";
+import type { Integration } from "../integration";
+import ConsoleTab from "./console-tab";
+import type { ConsoleMessage, Level } from "./types";
 
-const CONTENT_TYPE = 'application/x-spotlight-console';
+const CONTENT_TYPE = "application/x-spotlight-console";
 
 /**
  * This integration is meant to run on the same page where
@@ -18,21 +18,21 @@ export default function consoleIntegration() {
   const pageloadId = generateUuidv4();
 
   return {
-    name: 'console',
+    name: "console",
     forwardedContentType: [CONTENT_TYPE],
     tabs: ({ processedEvents }) => [
       {
-        id: 'console',
-        title: 'Browser Console Logs',
+        id: "console",
+        title: "Browser Console Logs",
         notificationCount: { count: processedEvents.length },
         content: ConsoleTab,
       },
     ],
 
     setup: () => {
-      instrumentConsole('log', pageloadId);
-      instrumentConsole('warn', pageloadId);
-      instrumentConsole('error', pageloadId);
+      instrumentConsole("log", pageloadId);
+      instrumentConsole("warn", pageloadId);
+      instrumentConsole("error", pageloadId);
     },
 
     processEvent({ data }) {
@@ -62,12 +62,12 @@ function instrumentConsole(level: Level, pageloadId: string) {
   window.console[level] = (...args: unknown[]) => {
     const serializedArgs = argsToString(args);
 
-    trigger('event', {
+    trigger("event", {
       contentType: CONTENT_TYPE,
       data: JSON.stringify({
         type: level,
         args: serializedArgs,
-        msg: serializedArgs.join(' '),
+        msg: serializedArgs.join(" "),
         sessionId: pageloadId,
       } satisfies ConsoleMessage),
     });
@@ -79,12 +79,12 @@ function instrumentConsole(level: Level, pageloadId: string) {
 function argsToString(args: unknown[]): string[] {
   return args.map(arg => {
     if (arg === null) {
-      return 'null';
+      return "null";
     }
     if (arg === undefined) {
-      return 'undefined';
+      return "undefined";
     }
-    if (typeof arg === 'string') {
+    if (typeof arg === "string") {
       return arg;
     }
     return safeToString(arg);
@@ -95,6 +95,6 @@ function safeToString(arg: { toString: () => string }): string {
   try {
     return JSON.stringify(arg);
   } catch {
-    return '[serialization error]';
+    return "[serialization error]";
   }
 }

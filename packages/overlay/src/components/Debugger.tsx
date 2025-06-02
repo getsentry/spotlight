@@ -1,10 +1,10 @@
-import { ReactComponent as DeleteIcon } from '~/assets/deleteIcon.svg';
-import { ReactComponent as Logo } from '~/assets/glyph.svg';
-import type { Integration, IntegrationData } from '~/integrations/integration';
-import { getSpotlightEventTarget } from '~/lib/eventTarget';
-import type { NotificationCount } from '~/types';
-import classNames from '../lib/classNames';
-import Overview from './Overview';
+import { ReactComponent as DeleteIcon } from "~/assets/deleteIcon.svg";
+import { ReactComponent as Logo } from "~/assets/glyph.svg";
+import type { Integration, IntegrationData } from "~/integrations/integration";
+import { getSpotlightEventTarget } from "~/lib/eventTarget";
+import type { NotificationCount } from "~/types";
+import classNames from "../lib/classNames";
+import Overview from "./Overview";
 
 function FullscreenBlur({
   isOpen,
@@ -22,7 +22,7 @@ function FullscreenBlur({
   }
   return (
     <div
-      className={classNames('spotlight-fullscreen-blur', isOpen ? '' : '!hidden')}
+      className={classNames("spotlight-fullscreen-blur", isOpen ? "" : "!hidden")}
       onClick={e => {
         if (e.target === e.currentTarget) {
           setOpen(false);
@@ -55,7 +55,7 @@ export default function Debugger({
 }) {
   return (
     <FullscreenBlur isOpen={isOpen} setOpen={setOpen} fullPage={fullPage}>
-      <div className={classNames('spotlight-debugger', fullPage ? 'spotlight-fullscreen' : '')}>
+      <div className={classNames("spotlight-debugger", fullPage ? "spotlight-fullscreen" : "")}>
         <div className="text-primary-200 flex items-center gap-x-2 px-6 py-4">
           <h1 className="font-raleway flex flex-1 items-end gap-x-1 leading-7 opacity-80">
             <div className="inline-flex items-center gap-x-4">
@@ -91,15 +91,15 @@ export default function Debugger({
                 </svg>
               </a>
               <div
-                className={classNames('ml-2 flex items-center gap-x-2 pl-2 text-xs', isOnline ? '' : 'text-red-400')}
+                className={classNames("ml-2 flex items-center gap-x-2 pl-2 text-xs", isOnline ? "" : "text-red-400")}
               >
                 <div
                   className={classNames(
-                    ' block h-2 w-2 rounded-full',
-                    isOnline ? 'bg-green-400' : 'animate-pulse bg-red-400',
+                    " block h-2 w-2 rounded-full",
+                    isOnline ? "bg-green-400" : "animate-pulse bg-red-400",
                   )}
                 />
-                {isOnline ? 'Connected to Sidecar' : 'Not connected to Sidecar'}
+                {isOnline ? "Connected to Sidecar" : "Not connected to Sidecar"}
               </div>
             </div>
           </h1>
@@ -109,7 +109,7 @@ export default function Debugger({
               type="button"
               onClick={() => {
                 getSpotlightEventTarget().dispatchEvent(
-                  new CustomEvent('clearEvents', {
+                  new CustomEvent("clearEvents", {
                     detail: {},
                   }),
                 );
@@ -127,7 +127,7 @@ export default function Debugger({
                 setOpen(false);
               }}
             >
-              {'✕'}
+              {"✕"}
             </button>
           )}
         </div>

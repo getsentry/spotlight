@@ -1,9 +1,9 @@
-import { type ReactNode, createContext, useContext } from 'react';
-import classNames from '~/lib/classNames';
+import { type ReactNode, createContext, useContext } from "react";
+import classNames from "~/lib/classNames";
 
-type TableVariant = 'default' | 'detail';
+type TableVariant = "default" | "detail";
 
-const TableContext = createContext<{ variant: TableVariant }>({ variant: 'default' });
+const TableContext = createContext<{ variant: TableVariant }>({ variant: "default" });
 
 function useTableContext() {
   return useContext(TableContext);
@@ -15,11 +15,11 @@ export type TableProps = {
   variant?: TableVariant;
 };
 
-export default function Table({ children, className, variant = 'default', ...props }: TableProps) {
+export default function Table({ children, className, variant = "default", ...props }: TableProps) {
   return (
     <TableContext.Provider value={{ variant }}>
       <table
-        className={classNames(variant === 'detail' ? 'divide-primary-700 w-full table-fixed divide-y' : '', className)}
+        className={classNames(variant === "detail" ? "divide-primary-700 w-full table-fixed divide-y" : "", className)}
         {...props}
       >
         {children}
@@ -34,12 +34,12 @@ export type TableHeaderProps = {
   variant?: TableVariant;
 };
 
-function TableHeader({ children, className, variant: headerVariant = 'default', ...props }: TableHeaderProps) {
+function TableHeader({ children, className, variant: headerVariant = "default", ...props }: TableHeaderProps) {
   const { variant: tableVariant } = useTableContext();
   const variant = headerVariant ?? tableVariant;
 
   return (
-    <thead className={classNames(variant === 'detail' ? 'bg-primary-950 sticky top-0 z-20' : '', className)} {...props}>
+    <thead className={classNames(variant === "detail" ? "bg-primary-950 sticky top-0 z-20" : "", className)} {...props}>
       {children}
     </thead>
   );

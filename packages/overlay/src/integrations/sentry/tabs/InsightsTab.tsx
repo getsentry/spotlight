@@ -1,7 +1,7 @@
-import InsightsTabDetails from '../components/insights';
-import { SentryEventsContextProvider } from '../data/sentryEventsContext';
+import InsightsTabDetails from "../components/insights";
+import { SentryEventsContextProvider } from "../data/sentryEventsContext";
 
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from "react-router-dom";
 
 export default function InsightsTab() {
   return (

@@ -1,15 +1,15 @@
-import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
-import { createTab } from '~/integrations/sentry/utils/tabs';
+import { Link, Navigate, Route, Routes, useParams } from "react-router-dom";
+import { createTab } from "~/integrations/sentry/utils/tabs";
 
-import Tabs from '~/components/Tabs';
-import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
-import useSentryStore from '~/integrations/sentry/store';
-import { isLocalTrace } from '~/integrations/sentry/store/helpers';
-import { isErrorEvent } from '~/integrations/sentry/utils/sentry';
-import EventContexts from '../../events/EventContexts';
-import EventList from '../../events/EventList';
-import TraceDetailHeader from './components/TraceDetailHeader';
-import TraceTreeview from './components/TraceTreeview';
+import Tabs from "~/components/Tabs";
+import { useSentryEvents } from "~/integrations/sentry/data/useSentryEvents";
+import useSentryStore from "~/integrations/sentry/store";
+import { isLocalTrace } from "~/integrations/sentry/store/helpers";
+import { isErrorEvent } from "~/integrations/sentry/utils/sentry";
+import EventContexts from "../../events/EventContexts";
+import EventList from "../../events/EventList";
+import TraceDetailHeader from "./components/TraceDetailHeader";
+import TraceTreeview from "./components/TraceTreeview";
 
 export default function TraceDetails() {
   const { traceId } = useParams();
@@ -26,7 +26,7 @@ export default function TraceDetails() {
   if (!trace) {
     return (
       <p className="text-primary-300 p-6">
-        Trace not found. Check for more{' '}
+        Trace not found. Check for more{" "}
         <Link to="/traces" className="underline">
           traces
         </Link>
@@ -39,9 +39,9 @@ export default function TraceDetails() {
   ).length;
 
   const tabs = [
-    createTab('details', 'Details'),
-    createTab('context', 'Context'),
-    createTab('errors', 'Errors', {
+    createTab("details", "Details"),
+    createTab("context", "Context"),
+    createTab("errors", "Errors", {
       notificationCount: {
         count: errorCount,
         severe: errorCount > 0,

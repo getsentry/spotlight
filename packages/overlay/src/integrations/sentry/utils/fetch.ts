@@ -13,5 +13,5 @@ export function getNativeFetchImplementation(): FetchImpl {
 }
 
 function fetchIsWrapped(fetchImpl: FetchImpl): fetchImpl is WrappedFetchImpl {
-  return '__sentry_original__' in fetchImpl;
+  return "__sentry_original__" in fetchImpl;
 }

@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
-import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
-import classNames from '~/lib/classNames';
+import { Link } from "react-router-dom";
+import { ReactComponent as ChevronIcon } from "~/assets/chevronDown.svg";
+import classNames from "~/lib/classNames";
 
 export type CrumbProps = {
   id: string;
@@ -24,15 +24,15 @@ export default function Breadcrumbs({ crumbs }: BreadcrumbProps) {
             {crumb.link && crumb.to ? (
               <Link
                 className={classNames(
-                  isActiveTab ? 'text-primary-200' : 'text-primary-300',
-                  'hover:text-primary-100 truncate text-sm hover:underline',
+                  isActiveTab ? "text-primary-200" : "text-primary-300",
+                  "hover:text-primary-100 truncate text-sm hover:underline",
                 )}
                 to={crumb.to}
               >
                 {crumb.label}
               </Link>
             ) : (
-              <span className={classNames(isActiveTab ? 'text-primary-200' : 'text-primary-300', 'truncate text-sm')}>
+              <span className={classNames(isActiveTab ? "text-primary-200" : "text-primary-300", "truncate text-sm")}>
                 {crumb.label}
               </span>
             )}

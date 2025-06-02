@@ -1,14 +1,14 @@
-import { useMemo } from 'react';
-import { ReactComponent as Sort } from '~/assets/sort.svg';
-import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
-import classNames from '~/lib/classNames';
-import Table from '~/ui/table';
-import { AGGREGATE_CALL_PROFILES_SORT_KEYS, AGGREGATE_PROFILES_HEADERS } from '../../constants';
-import useSort from '../../hooks/useSort';
-import useSentryStore from '../../store';
-import type { AggregateCallData } from '../../types';
-import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
-import { TimeBar } from '../shared/TimeBar';
+import { useMemo } from "react";
+import { ReactComponent as Sort } from "~/assets/sort.svg";
+import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
+import classNames from "~/lib/classNames";
+import Table from "~/ui/table";
+import { AGGREGATE_CALL_PROFILES_SORT_KEYS, AGGREGATE_PROFILES_HEADERS } from "../../constants";
+import useSort from "../../hooks/useSort";
+import useSentryStore from "../../store";
+import type { AggregateCallData } from "../../types";
+import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
+import { TimeBar } from "../shared/TimeBar";
 
 type AggregateCallProfileComparator = (a: AggregateCallData, b: AggregateCallData) => number;
 type AggregateCallProfileSortTypes =
@@ -53,14 +53,14 @@ function Profiles() {
               key={header.id}
               scope="col"
               className={classNames(
-                'text-primary-100 px-6 py-3.5 text-sm font-semibold',
-                header.primary ? 'w-2/5' : 'w-[15%]',
+                "text-primary-100 px-6 py-3.5 text-sm font-semibold",
+                header.primary ? "w-2/5" : "w-[15%]",
               )}
             >
               <div
                 className={classNames(
-                  'flex cursor-pointer select-none items-center gap-1',
-                  header.primary ? 'justify-start' : 'justify-end',
+                  "flex cursor-pointer select-none items-center gap-1",
+                  header.primary ? "justify-start" : "justify-end",
                 )}
                 onClick={() => toggleSortOrder(header.sortKey)}
               >
@@ -70,8 +70,8 @@ function Profiles() {
                     width={12}
                     height={12}
                     className={classNames(
-                      'fill-primary-300',
-                      sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
+                      "fill-primary-300",
+                      sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                     )}
                   />
                 ) : (
@@ -87,7 +87,7 @@ function Profiles() {
           <tr key={`${callData.name}`} className="hover:bg-primary-900">
             <td className="text-primary-200 w-2/5 whitespace-nowrap px-6 py-4">
               <TimeBar value={callData.totalTime} maxValue={maxTime} title={callData.name} className="text-lime-500">
-                {callData.name.split('@')[1].split(':', 1)[0]}
+                {callData.name.split("@")[1].split(":", 1)[0]}
               </TimeBar>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">

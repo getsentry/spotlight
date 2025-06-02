@@ -1,7 +1,7 @@
-import { resolve } from 'node:path';
-import { sentryVitePlugin } from '@sentry/vite-plugin';
-import { defineConfig, loadEnv } from 'electron-vite';
-import sourcemaps from 'rollup-plugin-sourcemaps2';
+import { resolve } from "node:path";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
+import { defineConfig, loadEnv } from "electron-vite";
+import sourcemaps from "rollup-plugin-sourcemaps2";
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
@@ -9,13 +9,13 @@ export default defineConfig(({ mode }) => {
   // `PRELOAD_VITE_` and `RENDERER_VITE_` are loaded,
   // unless the third parameter `prefixes` is changed.
   let env = {};
-  if (mode !== 'development') {
+  if (mode !== "development") {
     env = loadEnv(mode);
   }
   return {
     define: {
-      'process.env.NODE_ENV': '"production"',
-      'process.env.npm_package_version': JSON.stringify(process.env.npm_package_version),
+      "process.env.NODE_ENV": '"production"',
+      "process.env.npm_package_version": JSON.stringify(process.env.npm_package_version),
     },
     main: {
       plugins: [
@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => {
         rollupOptions: {
           plugins: [sourcemaps()],
           input: {
-            index: resolve(__dirname, 'src/electron/main/index.ts'),
+            index: resolve(__dirname, "src/electron/main/index.ts"),
           },
         },
       },
@@ -54,7 +54,7 @@ export default defineConfig(({ mode }) => {
         rollupOptions: {
           plugins: [sourcemaps()],
           input: {
-            index: resolve(__dirname, 'src/electron/preload/index.ts'),
+            index: resolve(__dirname, "src/electron/preload/index.ts"),
           },
         },
       },
@@ -68,13 +68,13 @@ export default defineConfig(({ mode }) => {
           debug: true,
         }),
       ],
-      root: '.',
+      root: ".",
       build: {
         sourcemap: true,
         rollupOptions: {
           plugins: [sourcemaps()],
           input: {
-            index: resolve(__dirname, 'index.html'),
+            index: resolve(__dirname, "index.html"),
           },
         },
       },

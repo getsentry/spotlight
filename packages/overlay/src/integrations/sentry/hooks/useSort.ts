@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 type useSortProps = {
   defaultSortType?: string;
   defaultAsc?: boolean;
 };
 
-export default function useSort({ defaultSortType = '', defaultAsc = false }: useSortProps) {
+export default function useSort({ defaultSortType = "", defaultAsc = false }: useSortProps) {
   const [sort, setSort] = useState({
     active: defaultSortType,
     asc: defaultAsc,

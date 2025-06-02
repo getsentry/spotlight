@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const { withSentryConfig } = require('@sentry/nextjs');
-const WebpackHookPlugin = require('webpack-hook-plugin');
+const { withSentryConfig } = require("@sentry/nextjs");
+const WebpackHookPlugin = require("webpack-hook-plugin");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { dev, isServer, nextRuntime }) => {
-    if (dev && isServer && nextRuntime === 'nodejs') {
+    if (dev && isServer && nextRuntime === "nodejs") {
       const newConfig = { ...config };
       newConfig.plugins.push(
         new WebpackHookPlugin({
-          onBuildStart: ['npx @spotlightjs/spotlight'],
+          onBuildStart: ["npx @spotlightjs/spotlight"],
         }),
       );
       return newConfig;
@@ -25,8 +25,8 @@ module.exports = withSentryConfig(
 
     // Suppresses source map uploading logs during build
     silent: true,
-    org: 'sentry',
-    project: 'e2e-tests-nextjs',
+    org: "sentry",
+    project: "e2e-tests-nextjs",
   },
   {
     // For all available options, see:
@@ -39,7 +39,7 @@ module.exports = withSentryConfig(
     transpileClientSDK: true,
 
     // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-    tunnelRoute: '/monitoring',
+    tunnelRoute: "/monitoring",
 
     // Hides source maps from generated client bundles
     hideSourceMaps: true,

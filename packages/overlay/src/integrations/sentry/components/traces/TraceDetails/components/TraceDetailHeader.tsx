@@ -1,6 +1,6 @@
-import type { Trace } from '../../../../types';
-import TraceIcon from '../../TraceIcon';
-import { TraceRootTxnName } from './TraceRootTxnName';
+import type { Trace } from "../../../../types";
+import TraceIcon from "../../TraceIcon";
+import { TraceRootTxnName } from "./TraceRootTxnName";
 
 type TraceDetailHeaderProps = {
   trace: Trace;

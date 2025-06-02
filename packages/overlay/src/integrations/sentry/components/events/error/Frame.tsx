@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import CopyToClipboard from '~/components/CopyToClipboard';
-import OpenInEditor from '~/components/OpenInEditor';
-import type { EventFrame, FrameVars } from '~/integrations/sentry/types';
-import classNames from '~/lib/classNames';
-import { renderValue } from '~/lib/values';
-import Table from '~/ui/table';
+import { useState } from "react";
+import CopyToClipboard from "~/components/CopyToClipboard";
+import OpenInEditor from "~/components/OpenInEditor";
+import type { EventFrame, FrameVars } from "~/integrations/sentry/types";
+import classNames from "~/lib/classNames";
+import { renderValue } from "~/lib/values";
+import Table from "~/ui/table";
 
 function resolveFilename(filename: string) {
   try {
@@ -18,12 +18,12 @@ function resolveFilename(filename: string) {
 }
 
 function formatFilename(filename: string) {
-  if (filename.startsWith('node:')) return filename;
+  if (filename.startsWith("node:")) return filename;
   const resolvedFilename = resolveFilename(filename);
-  if (resolvedFilename.indexOf('/node_modules/') === -1) return resolvedFilename;
+  if (resolvedFilename.indexOf("/node_modules/") === -1) return resolvedFilename;
   return `npm:${resolvedFilename
-    .replace(/\/node_modules\//gi, 'npm:')
-    .split('npm:')
+    .replace(/\/node_modules\//gi, "npm:")
+    .split("npm:")
     .pop()}`;
 }
 
@@ -73,23 +73,23 @@ export default function Frame({
   const [isOpen, setOpen] = useState(defaultExpand);
 
   const hasSource = Boolean(frame.context_line);
-  const fileName = platform === 'java' ? frame.module : frame.filename || frame.module;
+  const fileName = platform === "java" ? frame.module : frame.filename || frame.module;
   return (
     <li
       className={classNames(
-        hasSource ? 'cursor-pointer' : '',
-        !isOpen && hasSource ? 'hover:bg-primary-900' : '',
-        'bg-primary-950 border-primary-900 my-1 overflow-hidden rounded-md border',
+        hasSource ? "cursor-pointer" : "",
+        !isOpen && hasSource ? "hover:bg-primary-900" : "",
+        "bg-primary-950 border-primary-900 my-1 overflow-hidden rounded-md border",
       )}
-      role={hasSource ? 'button' : undefined}
+      role={hasSource ? "button" : undefined}
       tabIndex={0}
       onClick={hasSource ? () => setOpen(!isOpen) : undefined}
-      onKeyDown={e => e.key === 'Enter' && hasSource && setOpen(!isOpen)}
+      onKeyDown={e => e.key === "Enter" && hasSource && setOpen(!isOpen)}
     >
       <div
         className={classNames(
-          'text-primary-400 flex items-center justify-between px-2 py-1',
-          isOpen ? 'bg-primary-900' : '',
+          "text-primary-400 flex items-center justify-between px-2 py-1",
+          isOpen ? "bg-primary-900" : "",
         )}
         onClick={hasSource ? () => setOpen(!isOpen) : undefined}
       >
@@ -97,15 +97,15 @@ export default function Frame({
           {fileName ? (
             <span className="text-primary-100">
               {formatFilename(fileName)}
-              {' in '}
+              {" in "}
             </span>
           ) : null}
 
           <span className="text-primary-100">{frame.function}</span>
           {frame.lineno !== undefined && (
             <>
-              {' '}
-              at line{' '}
+              {" "}
+              at line{" "}
               <span className="text-primary-100">
                 {frame.lineno}
                 {frame.colno !== undefined && `:${frame.colno}`}
@@ -132,8 +132,8 @@ export default function Frame({
           {frame.context_line && (
             <div
               className={classNames(
-                frame.pre_context || frame.post_context ? 'bg-primary-600' : 'bg-primary-900',
-                'flex items-center',
+                frame.pre_context || frame.post_context ? "bg-primary-600" : "bg-primary-900",
+                "flex items-center",
               )}
             >
               {frame.lineno !== undefined && <div className="text-primary-300 w-16 text-right">{frame.lineno}</div>}

@@ -1,5 +1,5 @@
-import type { ComponentType } from 'react';
-import type { ExperimentsConfig, NotificationCount } from '../types';
+import type { ComponentType } from "react";
+import type { ExperimentsConfig, NotificationCount } from "../types";
 
 export type SpotlightContext = {
   open: (path: string | undefined) => void;
@@ -92,7 +92,7 @@ export type ProcessedEventContainer<T> = {
   event: T;
 };
 
-export type Severity = 'default' | 'severe';
+export type Severity = "default" | "severe";
 
 export type IntegrationData<T> = Record<string, ProcessedEventContainer<T>[]>;
 

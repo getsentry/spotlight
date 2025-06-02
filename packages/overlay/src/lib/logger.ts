@@ -1,6 +1,6 @@
-import type { WindowWithSpotlight } from '../types';
+import type { WindowWithSpotlight } from "../types";
 
-export const SPOTLIGHT_PREFIX = '🔎 [Spotlight]';
+export const SPOTLIGHT_PREFIX = "🔎 [Spotlight]";
 
 const windowWithSpotlight = window as WindowWithSpotlight;
 if (!windowWithSpotlight.__spotlight) {
