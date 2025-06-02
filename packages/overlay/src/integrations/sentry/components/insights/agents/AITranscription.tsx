@@ -1,0 +1,259 @@
+import { useMemo } from 'react';
+import { useParams } from 'react-router-dom';
+import useSentryStore from '~/integrations/sentry/store';
+import type { SpotlightAITrace } from '~/integrations/sentry/types';
+import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
+import classNames from '~/lib/classNames';
+import { createAITraceFromSpan, extractAllAIRootSpans } from './sdks/aiLibraries';
+
+type AITranscriptionProps = {
+  traceId: string;
+};
+
+type ConversationMessage = {
+  id: string;
+  type: 'user' | 'ai-response' | 'ai-tool-call';
+  content: string;
+  timestamp: number;
+  spanId: string;
+  metadata?: {
+    toolCall?: {
+      toolName: string;
+      args: Record<string, unknown>;
+      result?: Record<string, unknown> | string;
+    };
+    tokens?: {
+      prompt?: number;
+      completion?: number;
+    };
+    duration?: number;
+    operation?: string;
+  };
+};
+
+function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): ConversationMessage[] {
+  const messages: ConversationMessage[] = [];
+  const seenUserPrompts = new Set<string>();
+
+  // Get all raw spans sorted by timestamp
+  const allSpans = aiTraces.map(trace => trace.rawSpan).sort((a, b) => a.start_timestamp - b.start_timestamp);
+
+  allSpans.forEach(span => {
+    const aiTrace = createAITraceFromSpan(span);
+    if (!aiTrace) return;
+
+    // Extract user prompt (only once per unique prompt)
+    if (aiTrace.prompt?.messages) {
+      const userMessages = aiTrace.prompt.messages
+        .filter(msg => msg.role === 'user' || msg.role === 'human')
+        .map(msg => msg.content)
+        .filter(content => content && content.trim())
+        .join('\n\n');
+
+      if (userMessages && !seenUserPrompts.has(userMessages)) {
+        seenUserPrompts.add(userMessages);
+        messages.push({
+          id: `${span.span_id}-user`,
+          type: 'user',
+          content: userMessages,
+          timestamp: span.start_timestamp,
+          spanId: span.span_id,
+        });
+      }
+    } else if (aiTrace.prompt?.system && !seenUserPrompts.has(aiTrace.prompt.system)) {
+      seenUserPrompts.add(aiTrace.prompt.system);
+      messages.push({
+        id: `${span.span_id}-user`,
+        type: 'user',
+        content: aiTrace.prompt.system,
+        timestamp: span.start_timestamp,
+        spanId: span.span_id,
+      });
+    }
+
+    // Extract individual tool calls (each as separate message)
+    aiTrace.toolCalls.forEach((toolCall, index) => {
+      messages.push({
+        id: `${span.span_id}-tool-${index}`,
+        type: 'ai-tool-call',
+        content: `Using ${toolCall.toolName}`,
+        timestamp: span.start_timestamp + index * 10, // Slight offset for ordering
+        spanId: span.span_id,
+        metadata: {
+          toolCall: {
+            toolName: toolCall.toolName,
+            args: toolCall.args,
+            result: toolCall.result,
+          },
+          duration: aiTrace.durationMs,
+          operation: aiTrace.operation,
+        },
+      });
+    });
+
+    // Extract AI text response (if any)
+    if (aiTrace.response?.text) {
+      messages.push({
+        id: `${span.span_id}-response`,
+        type: 'ai-response',
+        content: aiTrace.response.text,
+        timestamp: span.timestamp - 1, // Near the end of span
+        spanId: span.span_id,
+        metadata: {
+          tokens: {
+            prompt: aiTrace.promptTokens,
+            completion: aiTrace.completionTokens,
+          },
+          duration: aiTrace.durationMs,
+          operation: aiTrace.operation,
+        },
+      });
+    } else if (aiTrace.toolCalls.length === 0) {
+      // If no tool calls and no text response, but it's an AI span, show operation
+      let aiContent = '';
+      if (aiTrace.name && aiTrace.name !== 'AI Interaction') {
+        aiContent = aiTrace.name;
+      } else {
+        aiContent = `${aiTrace.operation} operation`;
+      }
+
+      messages.push({
+        id: `${span.span_id}-operation`,
+        type: 'ai-response',
+        content: aiContent,
+        timestamp: span.timestamp - 1,
+        spanId: span.span_id,
+        metadata: {
+          tokens: {
+            prompt: aiTrace.promptTokens,
+            completion: aiTrace.completionTokens,
+          },
+          duration: aiTrace.durationMs,
+          operation: aiTrace.operation,
+        },
+      });
+    }
+  });
+
+  return messages.sort((a, b) => a.timestamp - b.timestamp);
+}
+
+function ConversationBubble({ message, isSelected }: { message: ConversationMessage; isSelected: boolean }) {
+  const isUser = message.type === 'user';
+  const isToolCall = message.type === 'ai-tool-call';
+  // const isAIResponse = message.type === 'ai-response';
+
+  return (
+    <div className={classNames('mb-4 flex w-full', isUser ? 'justify-end' : 'justify-start')}>
+      <div
+        className={classNames(
+          'max-w-[80%] rounded-lg border p-4',
+          isUser
+            ? 'border-blue-500/30 bg-blue-600/20 text-blue-100'
+            : isToolCall
+              ? isSelected
+                ? 'border-orange-400 bg-orange-600/30 text-orange-100'
+                : 'border-orange-500/30 bg-orange-600/20 text-orange-200'
+              : isSelected
+                ? 'bg-primary-800 border-primary-500 text-primary-100'
+                : 'bg-primary-900 border-primary-700 text-primary-200',
+        )}
+      >
+        {/* Message content */}
+        <div className="mb-2 whitespace-pre-wrap text-sm">{message.content}</div>
+
+        {/* AI metadata */}
+        {!isUser && message.metadata && (
+          <div className="space-y-2">
+            {/* Tool call details (for tool call messages) */}
+            {message.metadata.toolCall && (
+              <div className="space-y-1">
+                <div className="rounded border border-orange-500/30 bg-orange-500/20 p-2 text-xs">
+                  {message.metadata.toolCall.args && Object.keys(message.metadata.toolCall.args).length > 0 && (
+                    <div className="mb-2">
+                      <div className="mb-1 font-medium text-orange-300">Arguments:</div>
+                      <div className="font-mono text-xs text-orange-200">
+                        {JSON.stringify(message.metadata.toolCall.args, null, 2)}
+                      </div>
+                    </div>
+                  )}
+                  {message.metadata.toolCall.result && (
+                    <div>
+                      <div className="mb-1 font-medium text-orange-300">Result:</div>
+                      <div className="font-mono text-xs text-orange-200">
+                        {typeof message.metadata.toolCall.result === 'string'
+                          ? message.metadata.toolCall.result
+                          : JSON.stringify(message.metadata.toolCall.result, null, 2)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Token and duration info */}
+            <div className="text-primary-400 flex items-center gap-4 text-xs">
+              {message.metadata.duration && <span>{getFormattedDuration(message.metadata.duration)}</span>}
+              {message.metadata.tokens && (message.metadata.tokens.prompt || message.metadata.tokens.completion) && (
+                <span>
+                  {message.metadata.tokens.prompt || 0}p / {message.metadata.tokens.completion || 0}c tokens
+                </span>
+              )}
+              {message.metadata.operation && <span className="text-primary-500">{message.metadata.operation}</span>}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AITranscriptionContent({ traceId }: AITranscriptionProps) {
+  const getTraceById = useSentryStore(state => state.getTraceById);
+  const { spanId } = useParams<{ spanId?: string }>();
+
+  const trace = getTraceById(traceId);
+
+  // Extract AI traces from the trace
+  const aiTraces = useMemo(() => {
+    if (!trace?.spanTree) return [];
+
+    const aiRootSpans = extractAllAIRootSpans(trace.spanTree);
+    return aiRootSpans
+      .map(({ span }) => createAITraceFromSpan(span))
+      .filter((aiTrace): aiTrace is SpotlightAITrace => aiTrace !== null)
+      .sort((a, b) => a.timestamp - b.timestamp);
+  }, [trace]);
+
+  const conversation = useMemo(() => {
+    return parseAITracesToConversation(aiTraces);
+  }, [aiTraces]);
+
+  if (!trace) {
+    return (
+      <div className="p-6">
+        <p className="text-red-400">Trace not found</p>
+      </div>
+    );
+  }
+
+  if (conversation.length === 0) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-primary-300">No AI conversation found in this trace</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 overflow-y-auto px-6 py-4">
+      {conversation.map(message => (
+        <ConversationBubble key={message.id} message={message} isSelected={spanId === message.spanId} />
+      ))}
+    </div>
+  );
+}
+
+export default function AITranscription(props: AITranscriptionProps) {
+  return <AITranscriptionContent {...props} />;
+}

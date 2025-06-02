@@ -1,4 +1,4 @@
-import type { AILibraryHandler, Span, SpotlightAITrace } from '~/integrations/sentry/types';
+import type { AILibraryHandler, Span, SpotlightAITrace, Trace } from '~/integrations/sentry/types';
 import { vercelAISDKHandler } from './vercelAISDK';
 
 // Registry of supported AI libraries
@@ -36,4 +36,13 @@ export function createAITraceFromSpan(span: Span): SpotlightAITrace | null {
   }
 
   return handler.processTrace(span);
+}
+
+export function hasAISpans(trace: Trace): boolean {
+  if (!trace.spanTree) {
+    return false;
+  }
+  //TODO: check if this could cause circular import
+  const aiRootSpans = extractAllAIRootSpans(trace.spanTree);
+  return aiRootSpans.length > 0;
 }

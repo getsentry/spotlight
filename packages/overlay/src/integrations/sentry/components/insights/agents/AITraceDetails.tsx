@@ -9,6 +9,7 @@ import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
 import Badge from '~/ui/Badge';
 import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
 import Table from '~/ui/Table';
+import { SearchProvider } from '../../../context/SearchContext';
 import useSentryStore from '../../../store';
 import DateTime from '../../shared/DateTime';
 import SpanTree from '../../traces/spans/SpanTree';
@@ -211,11 +212,120 @@ function ToolCallsSection({ trace }: { trace: SpotlightAITrace }) {
   );
 }
 
+// embedded version for split view
+export function AITraceDetailsEmbedded({ spanId }: { spanId: string }) {
+  const getSpanById = useSentryStore(state => state.getSpanById);
+  const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
+
+  const span = getSpanById(spanId);
+
+  if (!span) {
+    return (
+      <div className="p-6">
+        <p className="text-red-400">Trace not found</p>
+        <p className="text-sm text-gray-400">Looking for span ID: {spanId}</p>
+      </div>
+    );
+  }
+
+  const trace = createAITraceFromSpan(span);
+
+  if (!trace) {
+    return (
+      <div className="p-6">
+        <p className="text-red-400">Unable to process AI trace</p>
+        <p className="text-sm text-gray-400">Span ID: {spanId}</p>
+        <p className="text-sm text-gray-400">Span description: {span.description}</p>
+      </div>
+    );
+  }
+
+  const handler = detectAILibraryHandler(span);
+
+  if (!handler) {
+    return (
+      <div className="p-6">
+        <p className="text-red-400">No Spotlight AI handler found for this AI trace</p>
+        <p className="text-sm text-gray-400">Span ID: {spanId}</p>
+        <p className="text-sm text-gray-400">Span description: {span.description}</p>
+      </div>
+    );
+  }
+
+  const traceContext = { trace_id: span.trace_id };
+  const startTimestamp = span.start_timestamp;
+  const totalDuration = span.timestamp - span.start_timestamp;
+
+  return (
+    <SearchProvider>
+      <div className="h-full overflow-y-auto">
+        {/* Header Section */}
+        <div className="border-b-primary-700 bg-primary-950 border-b px-6 py-4">
+          <div className="mb-2 flex items-center gap-2">
+            <h2 className="text-xl font-bold">{handler.getDisplayTitle(trace)}</h2>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-primary-400 text-sm">{trace.id}</span>
+            <Badge color="primary">{handler.getTypeBadge(trace)}</Badge>
+            {trace.metadata.modelId && <Badge color="secondary">{trace.metadata.modelId}</Badge>}
+            {trace.metadata.functionId && <Badge color="neutral">{trace.metadata.functionId}</Badge>}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="space-y-6 p-6">
+          <div>
+            <div className="flex flex-col space-y-4">
+              <div className="text-primary-300 flex flex-1 items-center gap-x-1">
+                <DateTime date={span.start_timestamp} />
+                <span>&mdash;</span>
+                <span>
+                  <strong>{getFormattedDuration(span.timestamp - span.start_timestamp)}</strong> duration
+                </span>
+              </div>
+              <div className="flex-1">
+                <div className="border-primary-800 relative h-8 border py-1">
+                  <div
+                    className="bg-primary-800 absolute bottom-0 top-0 -m-0.5 flex w-full items-center p-0.5"
+                    style={{
+                      left: 0,
+                      width: '100%',
+                    }}
+                  >
+                    <span className="whitespace-nowrap">
+                      {getFormattedDuration(span.timestamp - span.start_timestamp)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <AITraceMetadata trace={trace} handler={handler} />
+          <PromptSection trace={trace} />
+          <ResponseSection trace={trace} />
+          <ToolCallsSection trace={trace} />
+
+          <div>
+            <h2 className="mb-4 font-bold">Span Tree</h2>
+            <SpanTree
+              traceContext={traceContext}
+              tree={[span]}
+              startTimestamp={startTimestamp}
+              totalDuration={totalDuration}
+              spanNodeWidth={spanNodeWidth}
+              setSpanNodeWidth={setSpanNodeWidth}
+            />
+          </div>
+        </div>
+      </div>
+    </SearchProvider>
+  );
+}
+
+// Original SidePanel version for insights tab
 export default function AITraceDetail() {
   const { spanId } = useParams<{ spanId: string }>();
-  const getSpanById = useSentryStore(state => state.getSpanById);
-
-  const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
 
   if (!spanId) {
     return (
@@ -226,103 +336,10 @@ export default function AITraceDetail() {
     );
   }
 
-  const span = getSpanById(spanId);
-
-  if (!span) {
-    return (
-      <SidePanel backto={AGENTS_ROUTE}>
-        <SidePanelHeader title="AI Trace Details" backto={AGENTS_ROUTE} />
-        <div className="p-6">Trace not found</div>
-      </SidePanel>
-    );
-  }
-
-  const trace = createAITraceFromSpan(span);
-
-  if (!trace) {
-    return (
-      <SidePanel backto={AGENTS_ROUTE}>
-        <SidePanelHeader title="AI Trace Details" backto={AGENTS_ROUTE} />
-        <div className="p-6">Unable to process AI trace</div>
-      </SidePanel>
-    );
-  }
-
-  const handler = detectAILibraryHandler(span);
-
-  if (!handler) {
-    return (
-      <SidePanel backto={AGENTS_ROUTE}>
-        <SidePanelHeader title="AI Trace Details" backto={AGENTS_ROUTE} />
-        <div className="p-6">No Spotlight AI handler found for this AI trace</div>
-      </SidePanel>
-    );
-  }
-
-  const traceContext = { trace_id: span.trace_id };
-  const startTimestamp = span.start_timestamp;
-  const totalDuration = span.timestamp - span.start_timestamp;
-
   return (
     <SidePanel backto={AGENTS_ROUTE}>
-      <SidePanelHeader
-        title={handler.getDisplayTitle(trace)}
-        subtitle={
-          <div className="flex items-center gap-2">
-            <span className="text-primary-400">{trace.id}</span>
-            <Badge color="primary">{handler.getTypeBadge(trace)}</Badge>
-            {trace.metadata.modelId && <Badge color="secondary">{trace.metadata.modelId}</Badge>}
-            {trace.metadata.functionId && <Badge color="neutral">{trace.metadata.functionId}</Badge>}
-          </div>
-        }
-        backto={AGENTS_ROUTE}
-      />
-
-      <div className="space-y-6 p-6">
-        <div>
-          <div className="flex flex-col space-y-4">
-            <div className="text-primary-300 flex flex-1 items-center gap-x-1">
-              <DateTime date={span.start_timestamp} />
-              <span>&mdash;</span>
-              <span>
-                <strong>{getFormattedDuration(span.timestamp - span.start_timestamp)}</strong> duration
-              </span>
-            </div>
-            <div className="flex-1">
-              <div className="border-primary-800 relative h-8 border py-1">
-                <div
-                  className="bg-primary-800 absolute bottom-0 top-0 -m-0.5 flex w-full items-center p-0.5"
-                  style={{
-                    left: 0,
-                    width: '100%',
-                  }}
-                >
-                  <span className="whitespace-nowrap">
-                    {getFormattedDuration(span.timestamp - span.start_timestamp)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <AITraceMetadata trace={trace} handler={handler} />
-        <PromptSection trace={trace} />
-        <ResponseSection trace={trace} />
-        <ToolCallsSection trace={trace} />
-
-        <div>
-          <h2 className="mb-4 font-bold">Span Tree</h2>
-          <SpanTree
-            traceContext={traceContext}
-            tree={[span]}
-            startTimestamp={startTimestamp}
-            totalDuration={totalDuration}
-            spanNodeWidth={spanNodeWidth}
-            setSpanNodeWidth={setSpanNodeWidth}
-          />
-        </div>
-      </div>
+      <SidePanelHeader title="AI Trace Details" backto={AGENTS_ROUTE} />
+      <AITraceDetailsEmbedded spanId={spanId} />
     </SidePanel>
   );
 }
