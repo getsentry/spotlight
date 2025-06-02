@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import CopyToClipboard from '~/components/CopyToClipboard';
 import OpenInEditor from '~/components/OpenInEditor';
 import type { EventFrame, FrameVars } from '~/integrations/sentry/types';
