@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
-import Tabs from "~/components/Tabs";
 import { useSpotlightContext } from "~/lib/useSpotlightContext";
 import { useSentrySpanCounts } from "../../data/useSentrySpans";
-import { createTab } from "../../utils/tabs";
 import HiddenItemsButton from "../shared/HiddenItemsButton";
 import Profiles from "./Profiles";
 import Queries from "./Queries";
@@ -22,15 +20,6 @@ export default function InsightsTabDetails() {
 
   const hiddenItemCount = allSpans - localSpans;
 
-  const tabs = [
-    createTab("queries", "Queries"),
-    createTab("webvitals", "Web Vitals"),
-    createTab("resources", "Resources"),
-    createTab("profiles", "Profiles"),
-    createTab("envelopes", "Envelopes"),
-    createTab("sdks", "SDKs"),
-  ];
-
   return (
     <>
       {!showAll && hiddenItemCount > 0 && (
@@ -41,7 +30,6 @@ export default function InsightsTabDetails() {
           }}
         />
       )}
-      <Tabs tabs={tabs} nested />
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
           <Route path="queries/:type" element={<QuerySummary showAll={showAll} />} />

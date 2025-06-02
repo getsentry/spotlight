@@ -55,8 +55,18 @@ export default function Debugger({
 }) {
   return (
     <FullscreenBlur isOpen={isOpen} setOpen={setOpen} fullPage={fullPage}>
-      <div className={classNames("spotlight-debugger", fullPage ? "spotlight-fullscreen" : "")}>
-        <div className="text-primary-200 flex items-center gap-x-2 px-6 py-4">
+      <div
+        className={classNames(
+          // Used for targeting. DO NOT REMOVE.
+          "spotlight-debugger",
+          "from-primary-900 to-primary-950 flex h-full flex-col overflow-hidden rounded-lg bg-gradient-to-br to-20% font-sans text-white shadow-xl",
+          fullPage ? "relative rounded-none shadow-none" : "",
+        )}
+        style={{
+          margin: fullPage ? "0" : "2.5vh",
+        }}
+      >
+        <div className="text-primary-200 flex items-center gap-x-2 px-6 py-4 border-b-primary-700 border-b">
           <h1 className="font-raleway flex flex-1 items-end gap-x-1 leading-7 opacity-80">
             <div className="inline-flex items-center gap-x-4">
               <Logo height={32} width={32} />

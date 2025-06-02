@@ -2,7 +2,7 @@ import { createElement, useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import type { Integration, IntegrationData } from "~/integrations/integration";
 import type { NotificationCount } from "~/types";
-import Tabs from "./Tabs";
+import Navigation from "./Navigation";
 
 export default function Overview({
   integrations,
@@ -17,18 +17,22 @@ export default function Overview({
 }) {
   const [notificationCountSum, setNotificationCountSum] = useState<NotificationCount>({ count: 0, severe: false });
 
-  const tabs = integrations.flatMap(integration => {
-    if (integration.tabs) {
+  const links = integrations.flatMap(integration => {
+    if (integration.links || integration.tabs) {
       const processedEvents = integrationData[integration.name]?.map(container => container.event) || [];
-      return integration.tabs({ processedEvents }).map(tab => ({
-        ...tab,
-        processedEvents: processedEvents,
-      }));
+      return (
+        integration.links?.({ processedEvents }) ||
+        integration.tabs?.({ processedEvents }).map(tab => ({
+          ...tab,
+          processedEvents: processedEvents,
+        })) ||
+        []
+      );
     }
     return [];
   });
 
-  const newNotificationSum = tabs.reduce(
+  const newNotificationSum = links.reduce(
     (sum, tab) => ({
       count: sum.count + (tab.notificationCount?.count || 0),
       severe: sum.severe || tab.notificationCount?.severe || false,
@@ -45,16 +49,18 @@ export default function Overview({
   }, [notificationCountSum, setTriggerButtonCount]);
 
   return (
-    <>
-      <Tabs tabs={tabs} setOpen={setOpen} />
-      <Routes>
-        <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={"not-found"} />
-        {tabs.map(({ content: TabContent, id, processedEvents }) =>
-          TabContent ? (
-            <Route path={`/${id}/*`} key={id} element={createElement(TabContent, { processedEvents })} />
-          ) : null,
-        )}
-      </Routes>
-    </>
+    <div className="flex flex-1">
+      <Navigation links={links} setOpen={setOpen} />
+      <div className="flex-1">
+        <Routes>
+          <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={"not-found"} />
+          {links.map(({ content: LinkContent, id, processedEvents }) =>
+            LinkContent ? (
+              <Route path={`/${id}/*`} key={id} element={createElement(LinkContent, { processedEvents })} />
+            ) : null,
+          )}
+        </Routes>
+      </div>
+    </div>
   );
 }
