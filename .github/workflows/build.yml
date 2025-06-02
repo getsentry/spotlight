@@ -34,13 +34,12 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: 'package.json'
-          cache: 'pnpm'
+          node-version-file: "package.json"
+          cache: "pnpm"
 
       - uses: actions/cache@v4
         name: Setup pnpm cache
         with:
-          path: ${{ env.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
@@ -128,7 +127,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node_version }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Setup dependencies
         run: pnpm install
@@ -140,7 +139,7 @@ jobs:
         uses: mikepenz/action-junit-report@cf701569b05ccdd861a76b8607a66d76f6fd4857
         if: ${{ !cancelled() }}
         with:
-          report_paths: '**/junit.xml'
+          report_paths: "**/junit.xml"
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
@@ -172,7 +171,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node_version }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Setup dependencies
         run: pnpm install
