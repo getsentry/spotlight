@@ -75,7 +75,7 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
             })}
           </div>
         </CardList>
-        selectedEnvelope && <EnvelopeDetails data={selectedEnvelope} />
+        {selectedEnvelope && <EnvelopeDetails data={selectedEnvelope} />}
       </>
     );
   }
