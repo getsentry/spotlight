@@ -1,138 +1,175 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
 
-.spotlight-fullscreen-blur {
-  @apply fixed flex h-screen w-screen flex-col overflow-hidden bg-black bg-opacity-50 backdrop-blur-sm backdrop-filter;
-  z-index: 999998;
+@theme {
+  --font-raleway:
+    Raleway, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-800: #3730a3;
+  --color-primary-900: #312e81;
+  --color-primary-950: #1e1b4b;
+
+  --grid-template-columns-2-auto: minmax(auto, max-content) 1fr;
 }
 
-.spotlight-debugger {
-  @apply from-primary-900 to-primary-950 flex h-full flex-col overflow-hidden rounded-lg bg-gradient-to-br to-20% font-sans text-white shadow-xl;
-  margin: 2.5vh;
-}
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
 
-.spotlight-fullscreen {
-  @apply relative rounded-none shadow-none;
-  margin: 0;
-}
-
-.spotlight-sidepanel {
-  -webkit-app-region: no-drag;
-  animation: sidepanel 100ms ease-in;
-}
-
-@keyframes sidepanel {
-  0% {
-    transform: translateX(100%);
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
   }
-  100% {
-    transform: translateX(0);
+
+  .spotlight-fullscreen-blur {
+    @apply fixed flex h-screen w-screen flex-col overflow-hidden bg-black [--bg-opacity:50%] backdrop-blur-xs backdrop-filter;
+    z-index: 999998;
   }
-}
 
-ul.tree {
-  position: relative;
-}
-ul.tree ul.tree {
-  position: static;
-}
+  .spotlight-debugger {
+    @apply from-primary-900 to-primary-950 flex h-full flex-col overflow-hidden rounded-lg bg-linear-to-br to-20% font-sans text-white shadow-xl;
+    margin: 2.5vh;
+  }
 
-ul.tree,
-ul.tree ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-ul.tree.deep > li > ul {
-  margin-left: 8px;
-}
-ul.tree.deep > li {
-  @apply border-primary-400 border-l;
-  padding-left: 1rem;
-  margin-left: 1rem;
-}
+  .spotlight-fullscreen {
+    @apply relative rounded-none shadow-none;
+    margin: 0;
+  }
 
-ul.tree li:last-child {
-  @apply border-0;
-}
+  .spotlight-sidepanel {
+    -webkit-app-region: no-drag;
+    animation: sidepanel 100ms ease-in;
+  }
 
-ul.tree > li:first-child:before {
-  display: none;
-}
+  @keyframes sidepanel {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
 
-ul.tree.deep > li:before,
-ul.tree ul.tree > li:before {
-  @apply border-primary-400 border-b;
-  position: absolute;
-  height: 15px;
-  width: 12px;
-  content: '';
-  display: inline-block;
-  margin-left: -16px;
-}
+  ul.tree {
+    position: relative;
+  }
+  ul.tree ul.tree {
+    position: static;
+  }
 
-ul.tree li:last-child:before {
-  @apply border-primary-400 border-l;
-}
+  ul.tree,
+  ul.tree ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ul.tree.deep > li > ul {
+    margin-left: 8px;
+  }
+  ul.tree.deep > li {
+    @apply border-primary-400 border-l;
+    padding-left: 1rem;
+    margin-left: 1rem;
+  }
 
-.tree .node {
-  @apply flex items-center gap-x-1 overflow-auto py-1 pl-1;
-}
+  ul.tree li:last-child {
+    @apply border-0;
+  }
 
-.tree .waterfall {
-  @apply border-l-primary-800 bg-primary-950 absolute right-0 h-7 border-l-2 py-1 pl-1;
-}
+  ul.tree > li:first-child:before {
+    display: none;
+  }
 
-.table-values {
-  @apply bg-primary-900 border-collapse text-sm;
-}
+  ul.tree.deep > li:before,
+  ul.tree ul.tree > li:before {
+    @apply border-primary-400 border-b;
+    position: absolute;
+    height: 15px;
+    width: 12px;
+    content: "";
+    display: inline-block;
+    margin-left: -16px;
+  }
 
-.table-values tbody th {
-  @apply border-primary-950 text-primary-300 w-1/12 border-y px-2 py-1 text-right font-mono font-normal;
-}
+  ul.tree li:last-child:before {
+    @apply border-primary-400 border-l;
+  }
 
-.table-values tbody td {
-  @apply border-primary-950 border-y px-2 py-1;
-}
+  .tree .node {
+    @apply flex items-center gap-x-1 overflow-auto py-1 pl-1;
+  }
 
-.hydration-error-wrapper pre {
-  @apply !text-primary-300;
-}
+  .tree .waterfall {
+    @apply border-l-primary-800 bg-primary-950 absolute right-0 h-7 border-l-2 py-1 pl-1;
+  }
 
-.hydration-error-wrapper td[class^='react-diff'][class$='title-block'] {
-  @apply !bg-primary-900;
-}
+  .table-values {
+    @apply bg-primary-900 border-collapse text-sm;
+  }
 
-.react-json-view {
-  @apply !bg-primary-900 rounded-sm !bg-opacity-50 p-2;
-}
+  .table-values tbody th {
+    @apply border-primary-950 text-primary-300 w-1/12 border-y px-2 py-1 text-right font-mono font-normal;
+  }
 
-.react-json-view .string-value {
-  word-break: break-word;
-}
-input:checked {
-  @apply bg-primary-900;
-}
-input:checked ~ .dot {
-  @apply bg-primary-800 translate-x-full;
-}
+  .table-values tbody td {
+    @apply border-primary-950 border-y px-2 py-1;
+  }
 
-.resizer.is-resizing {
-  @apply bg-primary-500;
-}
-.spotlight-debugger.resizing-column .span-resizer,
-.spotlight-debugger.resizing-row .span-resizer {
-  @apply bg-primary-500;
-  transform: translateX(-2px) !important;
-}
+  .hydration-error-wrapper pre {
+    @apply text-primary-300!;
+  }
 
-.spotlight-debugger.resizing-column,
-.spotlight-debugger.resizing-column * {
-  cursor: col-resize !important;
-}
+  .hydration-error-wrapper td[class^="react-diff"][class$="title-block"] {
+    @apply bg-primary-900!;
+  }
 
-.spotlight-debugger.resizing-row,
-.spotlight-debugger.resizing-row * {
-  cursor: row-resize !important;
+  .react-json-view {
+    @apply bg-primary-900! rounded-xs [--bg-opacity:100%] p-2;
+  }
+
+  .react-json-view .string-value {
+    word-break: break-word;
+  }
+  input:checked {
+    @apply bg-primary-900;
+  }
+  input:checked ~ .dot {
+    @apply bg-primary-800 translate-x-full;
+  }
+
+  .resizer.is-resizing {
+    @apply bg-primary-500;
+  }
+  .spotlight-debugger.resizing-column .span-resizer,
+  .spotlight-debugger.resizing-row .span-resizer {
+    @apply bg-primary-500;
+    transform: translateX(-2px) !important;
+  }
+
+  .spotlight-debugger.resizing-column,
+  .spotlight-debugger.resizing-column * {
+    cursor: col-resize !important;
+  }
+
+  .spotlight-debugger.resizing-row,
+  .spotlight-debugger.resizing-row * {
+    cursor: row-resize !important;
+  }
 }

@@ -12,7 +12,7 @@
 }
 
 header.header {
-  @apply bg-black bg-opacity-50 backdrop-blur-sm backdrop-filter;
+  @apply bg-black [--bg-opacity:50%] backdrop-blur-sm backdrop-filter;
 }
 
 .astro-code {
