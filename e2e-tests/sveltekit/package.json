@@ -1,5 +1,6 @@
 {
   "name": "@spotlightjs/e2e-tests-sveltekit",
+  "private": true,
   "version": "0.0.1",
   "scripts": {
     "dev": "vite dev",

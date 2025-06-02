@@ -1,6 +1,7 @@
 {
-  "name": "@spotlightjs/astro-playground",
+  "name": "@spotlightjs/demo-astro",
   "description": "Playground for testing Spotlight in an Astro SSR app with islands",
+  "private": true,
   "type": "module",
   "version": "0.0.0",
   "license": "Apache-2.0",
