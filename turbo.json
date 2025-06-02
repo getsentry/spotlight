@@ -25,7 +25,7 @@
     },
     "test:e2e": {
       "dependsOn": ["build"],
-      "outputs": ["coverage/**", "**/junit.xml"],
+      "outputs": ["coverage/**", "**/junit.xml", "**/test-results/**"],
       "cache": false
     },
     "clean": {
