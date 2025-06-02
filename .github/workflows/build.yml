@@ -41,9 +41,9 @@ jobs:
       - uses: actions/cache@v4
         name: Setup pnpm cache
         with:
-          key: pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            pnpm-store-
+            ${{ runner.os }}-pnpm-store-
           path: |
             ${{ github.workspace }}/packages/spotlight/.node-cache
 
@@ -121,8 +121,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        # pnpm/action-setup@v4
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        uses: pnpm/action-setup@v4
 
       - name: Set up Node
         uses: actions/setup-node@v4
