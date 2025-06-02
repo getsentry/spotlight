@@ -20,7 +20,6 @@ import { SpotlightContextProvider } from "./lib/useSpotlightContext";
 import { React, ReactDOM } from "./react-instance";
 import type { SpotlightOverlayOptions, WindowWithSpotlight } from "./types";
 
-export { default as console } from "./integrations/console/index";
 export { default as hydrationError } from "./integrations/hydration-error/index";
 export { default as sentry } from "./integrations/sentry/index";
 export { default as viteInspect } from "./integrations/vite-inspect/index";

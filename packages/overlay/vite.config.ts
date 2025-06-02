@@ -59,7 +59,7 @@ export default defineConfig({
       output: {
         footer(chunk: RenderedChunk) {
           if (chunk.fileName.endsWith(".iife.js")) {
-            return "(function(S){S && S.init({integrations: [S.sentry(), S.console()]})}(window.Spotlight))";
+            return "(function(S){S && S.init()}(window.Spotlight))";
           }
           return "";
         },

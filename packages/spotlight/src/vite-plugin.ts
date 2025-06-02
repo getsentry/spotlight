@@ -25,7 +25,7 @@ export function getSpotlightClientModulePath({
   return modulePath;
 }
 
-export type SpotlightIntegration = "sentry" | "console" | "viteInspect";
+export type SpotlightIntegration = "sentry" | "viteInspect";
 
 export type SpotlightInitOptions = {
   importPath?: string;
