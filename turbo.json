@@ -5,7 +5,14 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", "dist-bin/**", ".next/**", "!.next/cache/**"],
-      "env": ["FOSSILIZE_PLATFORMS", "FOSSILIZE_SIGN", "APPLE_CERT_PASSWORD", "APPLE_TEAM_ID"]
+      "env": [
+        "FOSSILIZE_PLATFORMS",
+        "FOSSILIZE_SIGN",
+        "APPLE_CERT_PASSWORD",
+        "APPLE_CERT_PATH",
+        "APPLE_TEAM_ID",
+        "APPLE_API_KEY_PATH"
+      ]
     },
     "dev": {
       "cache": false,
