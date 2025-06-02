@@ -49,7 +49,7 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
       </label>
 
       {showRawJSON ? (
-        <div className="spotlight-scrollbar flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto">
           <JsonViewer data={rawEnvelopeData} />
         </div>
       ) : (
