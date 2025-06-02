@@ -1,10 +1,10 @@
-import { useRef, useState } from 'react';
-import type { MetricScoreProps, MetricWeightsProps } from '~/integrations/sentry/types';
-import { calculateLabelCoordinates } from '~/integrations/sentry/utils/webVitals';
-import classNames from '~/lib/classNames';
-import RingChart from '~/ui/ringChart';
-import type { WebVitals } from '../../../constants';
-import useMouseTracking from '../../../hooks/useMouseTracking';
+import { useRef, useState } from "react";
+import type { MetricScoreProps, MetricWeightsProps } from "~/integrations/sentry/types";
+import { calculateLabelCoordinates } from "~/integrations/sentry/utils/webVitals";
+import classNames from "~/lib/classNames";
+import RingChart from "~/ui/ringChart";
+import type { WebVitals } from "../../../constants";
+import useMouseTracking from "../../../hooks/useMouseTracking";
 
 type Coordinates = {
   x: number;
@@ -89,7 +89,7 @@ const PerformanceChart = ({
       {webVitalTooltip && (
         <div
           className={classNames(
-            'bg-primary-900 border-primary-400 absolute flex w-40 items-center justify-between rounded-lg border p-3 shadow-lg',
+            "bg-primary-900 border-primary-400 absolute flex w-40 items-center justify-between rounded-lg border p-3 shadow-lg",
           )}
           style={{
             transform: `translate3d(${mousePosition.x - 100}px, ${mousePosition.y - 74}px, 0px)`,
@@ -163,27 +163,27 @@ const PerformanceChart = ({
           size={size}
           barWidth={barWidth}
           segmentColors={[
-            'stroke-primary-300',
-            'stroke-primary-400',
-            'stroke-primary-500',
-            'stroke-primary-600',
-            'stroke-primary-700',
+            "stroke-primary-300",
+            "stroke-primary-400",
+            "stroke-primary-500",
+            "stroke-primary-600",
+            "stroke-primary-700",
           ]}
           backgroundColors={[
-            'stroke-gray-400',
-            'stroke-gray-400',
-            'stroke-gray-400',
-            'stroke-gray-400',
-            'stroke-gray-400',
+            "stroke-gray-400",
+            "stroke-gray-400",
+            "stroke-gray-400",
+            "stroke-gray-400",
+            "stroke-gray-400",
           ]}
           x={left}
           y={top}
           onHoverActions={[
-            () => setWebVitalTooltip('lcp'),
-            () => setWebVitalTooltip('fcp'),
-            () => setWebVitalTooltip('fid'),
-            () => setWebVitalTooltip('cls'),
-            () => setWebVitalTooltip('ttfb'),
+            () => setWebVitalTooltip("lcp"),
+            () => setWebVitalTooltip("fcp"),
+            () => setWebVitalTooltip("fid"),
+            () => setWebVitalTooltip("cls"),
+            () => setWebVitalTooltip("ttfb"),
           ]}
           onBlur={() => setWebVitalTooltip(null)}
         />

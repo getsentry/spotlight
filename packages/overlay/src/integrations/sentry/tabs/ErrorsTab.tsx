@@ -1,9 +1,9 @@
-import EventDetails from '../components/events/EventDetails';
-import EventList from '../components/events/EventList';
+import EventDetails from "../components/events/EventDetails";
+import EventList from "../components/events/EventList";
 
-import { SentryEventsContextProvider } from '../data/sentryEventsContext';
+import { SentryEventsContextProvider } from "../data/sentryEventsContext";
 
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from "react-router-dom";
 
 export default function ErrorsTab() {
   return (

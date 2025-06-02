@@ -1,1 +1,1 @@
-export * from '@spotlightjs/overlay';
+export * from "@spotlightjs/overlay";

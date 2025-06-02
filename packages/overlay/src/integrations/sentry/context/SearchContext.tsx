@@ -1,5 +1,5 @@
-import { type ReactNode, createContext, useCallback, useContext, useState } from 'react';
-import type { Span } from '../types';
+import { type ReactNode, createContext, useCallback, useContext, useState } from "react";
+import type { Span } from "../types";
 type SearchContextType = {
   query: string;
   setQuery: (query: string) => void;
@@ -10,7 +10,7 @@ type SearchContextType = {
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export function SearchProvider({ children }: { children: ReactNode }) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [showOnlyMatched, setShowOnlyMatched] = useState(false);
 
   return (
@@ -23,7 +23,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
 export function useSearch() {
   const context = useContext(SearchContext);
   if (context === undefined) {
-    throw new Error('useSearch must be used within a SearchProvider');
+    throw new Error("useSearch must be used within a SearchProvider");
   }
 
   const matchesQuery = useCallback(

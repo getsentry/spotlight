@@ -1,8 +1,8 @@
-import type { Client, Envelope, Event, Integration } from '@sentry/core';
-import { serializeEnvelope } from '@sentry/core';
-import { trigger } from '../../lib/eventTarget';
-import { log } from '../../lib/logger';
-import useSentryStore from './store';
+import type { Client, Envelope, Event, Integration } from "@sentry/core";
+import { serializeEnvelope } from "@sentry/core";
+import { trigger } from "../../lib/eventTarget";
+import { log } from "../../lib/logger";
+import useSentryStore from "./store";
 
 /**
  * A Sentry integration for Spotlight integration that the Overlay will inject automatically.
@@ -16,7 +16,7 @@ import useSentryStore from './store';
  */
 export const spotlightIntegration = () => {
   return {
-    name: 'SpotlightBrowserDirect',
+    name: "SpotlightBrowserDirect",
     setupOnce: () => {
       /* Empty function to ensure compatibility w/ JS SDK v7 >= 7.99.0 */
     },
@@ -26,7 +26,7 @@ export const spotlightIntegration = () => {
       // clicks within Spotlight to Sentry. Neither do we want them to be sent to
       // spotlight.
       if (isSpotlightInteraction(event)) {
-        log('Dropping transaction created from Spotlight interaction');
+        log("Dropping transaction created from Spotlight interaction");
         return null;
       }
 
@@ -38,8 +38,8 @@ export const spotlightIntegration = () => {
       return event;
     },
     afterAllSetup: (client: Client) =>
-      client.on('beforeEnvelope', (envelope: Envelope) =>
-        trigger('event', { contentType: 'application/x-sentry-envelope', data: serializeEnvelope(envelope) }),
+      client.on("beforeEnvelope", (envelope: Envelope) =>
+        trigger("event", { contentType: "application/x-sentry-envelope", data: serializeEnvelope(envelope) }),
       ),
   } satisfies Integration;
 };
@@ -48,9 +48,9 @@ export const spotlightIntegration = () => {
  * Flags if the event is a transaction created from an interaction with the spotlight UI.
  */
 function isSpotlightInteraction(event: Event): boolean {
-  if (event.type === 'transaction' && event.contexts?.trace?.op === 'ui.action.click' && event.spans) {
+  if (event.type === "transaction" && event.contexts?.trace?.op === "ui.action.click" && event.spans) {
     for (const span of event.spans.values()) {
-      if (span.description?.includes('#sentry-spotlight')) {
+      if (span.description?.includes("#sentry-spotlight")) {
         return true;
       }
     }

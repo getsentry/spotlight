@@ -1,18 +1,18 @@
-import { log } from '~/lib/logger';
-import { generateUuidv4 } from '../../../lib/uuid';
-import useSentryStore from '../store';
-import type { SentryProfileWithTraceMeta } from '../store/types';
-import type { EventFrame, Span, Trace } from '../types';
-import { compareSpans } from '../utils/traces';
+import { log } from "~/lib/logger";
+import { generateUuidv4 } from "../../../lib/uuid";
+import useSentryStore from "../store";
+import type { SentryProfileWithTraceMeta } from "../store/types";
+import type { EventFrame, Span, Trace } from "../types";
+import { compareSpans } from "../utils/traces";
 
 const _FUNCTION_NAME_FROM_FRAME_CACHE = new Map<EventFrame, string>();
 export function getFunctionNameFromFrame(frame: EventFrame): string {
   let result = _FUNCTION_NAME_FROM_FRAME_CACHE.get(frame);
   if (!result) {
-    const module = frame.module || frame.filename || frame.abs_path || '<unknown>';
-    const functionName = frame.function || '<anonymous>';
-    const lineNo = frame.lineno ? `:${frame.lineno}` : '';
-    const colNo = frame.lineno && frame.colno ? `:${frame.colno}` : '';
+    const module = frame.module || frame.filename || frame.abs_path || "<unknown>";
+    const functionName = frame.function || "<anonymous>";
+    const lineNo = frame.lineno ? `:${frame.lineno}` : "";
+    const colNo = frame.lineno && frame.colno ? `:${frame.colno}` : "";
     result = `${module}@${functionName}${lineNo}${colNo}`;
     _FUNCTION_NAME_FROM_FRAME_CACHE.set(frame, result);
   }
@@ -66,16 +66,16 @@ function consolidateSpans(trace: Trace, spans: Span[]): Span[] {
 // mean browser, node, etc.
 const SENTRY_FRAME_FILTER_PER_PLATFORM: Record<
   string,
-  (this: SentryProfileWithTraceMeta['frames'], frameIdx: number) => boolean | undefined
+  (this: SentryProfileWithTraceMeta["frames"], frameIdx: number) => boolean | undefined
 > = {
   python: function (frameIdx) {
-    return this[frameIdx].module?.startsWith('sentry_sdk.');
+    return this[frameIdx].module?.startsWith("sentry_sdk.");
   },
   javascript: function (frameIdx) {
     const frame = this[frameIdx];
     const module = frame.module;
     if (module) {
-      return module.startsWith('@sentry') || module.startsWith('@opentelemetry.instrumentation');
+      return module.startsWith("@sentry") || module.startsWith("@opentelemetry.instrumentation");
     }
     // This one below is to match things like `http://localhost:3000/node_modules/.vite/deps/@sentry_react.js?v=6942e78f` etc.
     return frame.abs_path ? /\/node_modules\/.*\/@(sentry|opentelemetry)[^a-z0-9]/.test(frame.abs_path) : false;
@@ -114,18 +114,18 @@ export function getSpansFromProfile(
       start_timestamp: sampleTs,
       timestamp,
       trace_id: trace.trace_id,
-      status: 'ok',
-      tags: { source: 'profile' },
+      status: "ok",
+      tags: { source: "profile" },
       data: {
-        'thread.id': sample.thread_id,
-        'thread.name': profile.thread_metadata?.[sample.thread_id as keyof typeof profile.thread_metadata]?.name,
+        "thread.id": sample.thread_id,
+        "thread.name": profile.thread_metadata?.[sample.thread_id as keyof typeof profile.thread_metadata]?.name,
       },
     };
     const sampleSpan: Span = {
       span_id: generateUuidv4(),
       parent_span_id,
       ...commonAttributes,
-      op: 'Thread',
+      op: "Thread",
       description:
         profile.thread_metadata?.[sample.thread_id as keyof typeof profile.thread_metadata]?.name ||
         `Thread ${sample.thread_id}`,
@@ -140,7 +140,7 @@ export function getSpansFromProfile(
       const frame = profile.frames[currentStack[frameIdxIdx]];
       // XXX: We may wanna skip frames that doesn't have `in_app` set to true
       //      that said it's better to have this as a dynamic filter
-      const [op, description] = getFunctionNameFromFrame(frame).split('@');
+      const [op, description] = getFunctionNameFromFrame(frame).split("@");
       const spanFromFrame: Span = {
         span_id: generateUuidv4(),
         parent_span_id: currentSpan.span_id,
@@ -194,12 +194,12 @@ export function graftProfileSpans(
   let idx = -1;
   while (idx < spanTree.length) {
     const span = spanTree[idx] as Span | undefined;
-    if (span?.tags?.source === 'profile') {
+    if (span?.tags?.source === "profile") {
       idx += 1;
       continue;
     }
     const nextSpan = spanTree[idx + 1];
-    if (nextSpan?.tags?.source === 'profile') {
+    if (nextSpan?.tags?.source === "profile") {
       idx += 1;
       continue;
     }

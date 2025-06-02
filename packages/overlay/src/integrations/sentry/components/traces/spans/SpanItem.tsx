@@ -1,13 +1,13 @@
-import { useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ReactComponent as ChevronIcon } from '~/assets/chevronDown.svg';
-import { useSearch } from '~/integrations/sentry/context/SearchContext';
-import classNames from '../../../../../lib/classNames';
-import type { Span, TraceContext } from '../../../types';
-import { getFormattedDuration, getSpanDurationClassName } from '../../../utils/duration';
-import PlatformIcon from '../../shared/PlatformIcon';
-import SpanResizer from '../../shared/SpanResizer';
-import SpanTree from './SpanTree';
+import { useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { ReactComponent as ChevronIcon } from "~/assets/chevronDown.svg";
+import { useSearch } from "~/integrations/sentry/context/SearchContext";
+import classNames from "../../../../../lib/classNames";
+import type { Span, TraceContext } from "../../../types";
+import { getFormattedDuration, getSpanDurationClassName } from "../../../utils/duration";
+import PlatformIcon from "../../shared/PlatformIcon";
+import SpanResizer from "../../shared/SpanResizer";
+import SpanTree from "./SpanTree";
 
 const SpanItem = ({
   span,
@@ -36,7 +36,7 @@ const SpanItem = ({
     ((span.transaction && totalTransactions > 1) ||
       depth >= 10 ||
       childrenCount > 10 ||
-      span.tags?.source === 'profile') &&
+      span.tags?.source === "profile") &&
       depth !== 1,
   );
   const [isResizing, setIsResizing] = useState(false);
@@ -58,22 +58,22 @@ const SpanItem = ({
     <li key={span.span_id} ref={containerRef}>
       <Link
         className={classNames(
-          'hover:bg-primary-700 group flex rounded-sm text-sm',
-          isQueried ? 'bg-primary-200 bg-opacity-20' : '',
-          spanId === span.span_id ? 'bg-primary-900' : '',
-          span.tags?.source === 'profile' ? 'text-lime-500' : '',
+          "hover:bg-primary-700 group flex rounded-sm text-sm",
+          isQueried ? "bg-primary-200 bg-opacity-20" : "",
+          spanId === span.span_id ? "bg-primary-900" : "",
+          span.tags?.source === "profile" ? "text-lime-500" : "",
         )}
         style={{
-          pointerEvents: isResizing ? 'none' : 'auto',
+          pointerEvents: isResizing ? "none" : "auto",
         }}
         to={`/traces/${span.trace_id}/spans/${span.span_id}`}
       >
         <div
           className={classNames(
-            'node group-hover:bg-primary-700 rounded-sm',
-            isQueried ? 'bg-transparent' : '',
-            span.status && span.status !== 'ok' ? 'text-red-400' : '',
-            spanId === span.span_id ? 'bg-primary-900' : 'bg-primary-950',
+            "node group-hover:bg-primary-700 rounded-sm",
+            isQueried ? "bg-transparent" : "",
+            span.status && span.status !== "ok" ? "text-red-400" : "",
+            spanId === span.span_id ? "bg-primary-900" : "bg-primary-950",
           )}
           style={{
             width: `${spanNodeWidth}%`,
@@ -91,7 +91,7 @@ const SpanItem = ({
               <ChevronIcon
                 width={12}
                 height={12}
-                className={classNames('transition', isItemCollapsed ? 'rotate-0' : 'rotate-180')}
+                className={classNames("transition", isItemCollapsed ? "rotate-0" : "rotate-180")}
               />
             </div>
           )}
@@ -107,7 +107,7 @@ const SpanItem = ({
           </span>
         </div>
         <div
-          className={classNames('waterfall group-hover:bg-primary-700 rounded-sm', isQueried ? '!bg-transparent' : '')}
+          className={classNames("waterfall group-hover:bg-primary-700 rounded-sm", isQueried ? "!bg-transparent" : "")}
           style={{
             left: `${spanNodeWidth}%`,
           }}
@@ -120,7 +120,7 @@ const SpanItem = ({
               width: `max(1px, ${(spanDuration / totalDuration) * 95}%)`,
             }}
           >
-            <span className={classNames('whitespace-nowrap', getSpanDurationClassName(spanDuration))}>
+            <span className={classNames("whitespace-nowrap", getSpanDurationClassName(spanDuration))}>
               {getFormattedDuration(spanDuration)}
             </span>
           </div>

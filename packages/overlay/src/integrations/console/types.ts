@@ -5,4 +5,4 @@ export type ConsoleMessage = {
   sessionId: string;
 };
 
-export type Level = 'log' | 'warn' | 'error';
+export type Level = "log" | "warn" | "error";

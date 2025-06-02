@@ -1,29 +1,29 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Badge } from '~/ui/badge';
-import CardList from '../../../../components/CardList';
-import TimeSince from '../../../../components/TimeSince';
-import classNames from '../../../../lib/classNames';
-import { useSpotlightContext } from '../../../../lib/useSpotlightContext';
-import { useSentryTraces } from '../../data/useSentrySpans';
-import useTraceFiltering from '../../hooks/useTraceFiltering';
-import { isLocalTrace } from '../../store/helpers';
-import { getFormattedSpanDuration } from '../../utils/duration';
-import { truncateId } from '../../utils/text';
-import HiddenItemsButton from '../shared/HiddenItemsButton';
-import { TraceRootTxnName } from './TraceDetails/components/TraceRootTxnName';
-import TraceIcon from './TraceIcon';
-import TraceListFilter from './TraceListFilter';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Badge } from "~/ui/badge";
+import CardList from "../../../../components/CardList";
+import TimeSince from "../../../../components/TimeSince";
+import classNames from "../../../../lib/classNames";
+import { useSpotlightContext } from "../../../../lib/useSpotlightContext";
+import { useSentryTraces } from "../../data/useSentrySpans";
+import useTraceFiltering from "../../hooks/useTraceFiltering";
+import { isLocalTrace } from "../../store/helpers";
+import { getFormattedSpanDuration } from "../../utils/duration";
+import { truncateId } from "../../utils/text";
+import HiddenItemsButton from "../shared/HiddenItemsButton";
+import { TraceRootTxnName } from "./TraceDetails/components/TraceRootTxnName";
+import TraceIcon from "./TraceIcon";
+import TraceListFilter from "./TraceListFilter";
 
 export default function TraceList() {
   const { allTraces, localTraces } = useSentryTraces();
   const context = useSpotlightContext();
 
-  const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
+  const [showAll, setShowAll] = useState(!context.experiments["sentry:focus-local-events"]);
   const visibleTraces = showAll ? allTraces : localTraces;
   const hiddenItemCount = allTraces.length - visibleTraces.length;
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
   const { TRACE_FILTER_CONFIGS, filteredTraces } = useTraceFiltering(visibleTraces, activeFilters, searchQuery);
@@ -69,10 +69,10 @@ export default function TraceList() {
                   <div className="text-primary-300 flex space-x-2 text-sm">
                     <div
                       className={classNames(
-                        trace.status === 'ok' ? 'text-green-400' : trace.status ? 'text-red-400' : '',
+                        trace.status === "ok" ? "text-green-400" : trace.status ? "text-red-400" : "",
                       )}
                     >
-                      {trace.status || ''}
+                      {trace.status || ""}
                     </div>
                     <div>&mdash;</div>
                     <div>{getFormattedSpanDuration(trace)}</div>

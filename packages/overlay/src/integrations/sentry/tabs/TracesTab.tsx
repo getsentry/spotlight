@@ -1,8 +1,8 @@
-import TraceDetails from '../components/traces/TraceDetails';
-import TraceList from '../components/traces/TraceList';
-import { SentryEventsContextProvider } from '../data/sentryEventsContext';
+import TraceDetails from "../components/traces/TraceDetails";
+import TraceList from "../components/traces/TraceList";
+import { SentryEventsContextProvider } from "../data/sentryEventsContext";
 
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from "react-router-dom";
 
 export default function TracesTab() {
   return (

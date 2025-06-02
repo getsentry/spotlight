@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { SearchProvider, useSearch } from '~/integrations/sentry/context/SearchContext';
-import useSearchInput from '~/integrations/sentry/hooks/useSearchInput';
-import useSentryStore from '~/integrations/sentry/store';
-import type { Trace } from '~/integrations/sentry/types';
-import { getFormattedSpanDuration } from '../../../../utils/duration';
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { SearchProvider, useSearch } from "~/integrations/sentry/context/SearchContext";
+import useSearchInput from "~/integrations/sentry/hooks/useSearchInput";
+import useSentryStore from "~/integrations/sentry/store";
+import type { Trace } from "~/integrations/sentry/types";
+import { getFormattedSpanDuration } from "../../../../utils/duration";
 
-import { ReactComponent as X } from '~/assets/cross.svg';
-import { ReactComponent as Search } from '~/assets/search.svg';
-import { Button } from '~/ui/button';
-import { Input } from '~/ui/input';
-import DateTime from '../../../shared/DateTime';
-import SpanDetails from '../../spans/SpanDetails';
-import SpanTree from '../../spans/SpanTree';
+import { ReactComponent as X } from "~/assets/cross.svg";
+import { ReactComponent as Search } from "~/assets/search.svg";
+import { Button } from "~/ui/button";
+import { Input } from "~/ui/input";
+import DateTime from "../../../shared/DateTime";
+import SpanDetails from "../../spans/SpanDetails";
+import SpanTree from "../../spans/SpanTree";
 
 type TraceTreeViewProps = { traceId: string };
 
@@ -61,7 +61,7 @@ function TraceTreeWithSearch({
         <button
           type="button"
           className={`rounded border px-2 py-1 text-sm ${
-            showOnlyMatched ? 'border-primary-300 bg-primary-300' : 'border-primary-500 bg-primary-500'
+            showOnlyMatched ? "border-primary-300 bg-primary-300" : "border-primary-500 bg-primary-500"
           } text-white`}
           onClick={() => setShowOnlyMatched(!showOnlyMatched)}
         >
@@ -102,7 +102,7 @@ function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
           </div>
           <span>&mdash;</span>
           <span>
-            <strong className="text-primary-200 font-bold">{getFormattedSpanDuration(trace)}</strong> recorded in{' '}
+            <strong className="text-primary-200 font-bold">{getFormattedSpanDuration(trace)}</strong> recorded in{" "}
             <strong className="text-primary-200 font-bold">{trace.spans.size.toLocaleString()} spans</strong>
           </span>
         </div>

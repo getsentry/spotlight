@@ -1,5 +1,5 @@
-import type { EventException, EventExceptionValue, SentryErrorEvent } from '../../../types';
-import Frame from './Frame';
+import type { EventException, EventExceptionValue, SentryErrorEvent } from "../../../types";
+import Frame from "./Frame";
 
 export function ErrorTitle({ event }: { event: SentryErrorEvent }) {
   const values = valuesToArray(event.exception);
@@ -39,7 +39,7 @@ export function ErrorItem({ event }: { event: SentryErrorEvent }) {
               </h3>
               <ul>
                 {value.stacktrace?.frames.map((frame, frameIdx) => {
-                  const frameKey = `${frame.filename || 'unknown'}-${frame.function || 'anonymous'}-${frame.lineno || 0}-${frameIdx}`;
+                  const frameKey = `${frame.filename || "unknown"}-${frame.function || "anonymous"}-${frame.lineno || 0}-${frameIdx}`;
                   return (
                     <Frame
                       key={frameKey}

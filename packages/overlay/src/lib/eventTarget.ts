@@ -1,4 +1,4 @@
-import type { WindowWithSpotlight } from '~/types';
+import type { WindowWithSpotlight } from "~/types";
 
 const fallbackEventTarget = new EventTarget();
 
@@ -15,7 +15,7 @@ const fallbackEventTarget = new EventTarget();
  * which is local to one spotlight code instance.
  */
 export function getSpotlightEventTarget(): EventTarget {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return fallbackEventTarget;
   }
 

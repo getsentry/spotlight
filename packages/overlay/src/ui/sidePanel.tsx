@@ -1,7 +1,7 @@
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-export type SidePanelProps = Omit<ComponentPropsWithoutRef<'div'>, 'className'> & {
+export type SidePanelProps = Omit<ComponentPropsWithoutRef<"div">, "className"> & {
   backto: string;
 };
 
@@ -10,7 +10,7 @@ export type SidePanelProps = Omit<ComponentPropsWithoutRef<'div'>, 'className'> 
 export function useGoBackWithFallback(fallback: string) {
   const navigateTo = useNavigate();
   const loc = useLocation();
-  return () => (loc.key === 'default' ? navigateTo(fallback, { replace: true }) : navigateTo(-1));
+  return () => (loc.key === "default" ? navigateTo(fallback, { replace: true }) : navigateTo(-1));
 }
 
 export function SidePanelHeader({
@@ -35,7 +35,7 @@ export function SidePanelHeader({
         className="hover:bg-primary-900 -my-1 flex cursor-pointer items-center justify-center rounded px-6 py-1 font-mono text-2xl"
         onClick={goBackWithFallback}
       >
-        {'✕'}
+        {"✕"}
       </button>
     </div>
   );

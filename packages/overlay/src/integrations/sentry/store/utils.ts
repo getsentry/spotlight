@@ -1,5 +1,5 @@
 export function toTimestamp(date: string | number) {
-  if (typeof date === 'string') return new Date(date).getTime();
+  if (typeof date === "string") return new Date(date).getTime();
   return date * 1000;
 }
 

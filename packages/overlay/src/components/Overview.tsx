@@ -1,8 +1,8 @@
-import { createElement, useEffect, useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import type { Integration, IntegrationData } from '~/integrations/integration';
-import type { NotificationCount } from '~/types';
-import Tabs from './Tabs';
+import { createElement, useEffect, useState } from "react";
+import { Route, Routes } from "react-router-dom";
+import type { Integration, IntegrationData } from "~/integrations/integration";
+import type { NotificationCount } from "~/types";
+import Tabs from "./Tabs";
 
 export default function Overview({
   integrations,
@@ -48,7 +48,7 @@ export default function Overview({
     <>
       <Tabs tabs={tabs} setOpen={setOpen} />
       <Routes>
-        <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={'not-found'} />
+        <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={"not-found"} />
         {tabs.map(({ content: TabContent, id, processedEvents }) =>
           TabContent ? (
             <Route path={`/${id}/*`} key={id} element={createElement(TabContent, { processedEvents })} />
