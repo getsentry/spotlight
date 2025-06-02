@@ -1,4 +1,4 @@
-import { KeyboardEvent, useMemo } from 'react';
+import { type KeyboardEvent, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';

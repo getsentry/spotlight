@@ -30,17 +30,19 @@ export function ErrorItem({ event }: { event: SentryErrorEvent }) {
     <div className="flex-1 px-6 py-4">
       <ol className="space-y-4">
         {values.map((value, valueIdx) => {
+          const valueKey = `${value.type}-${value.value}`;
           return (
-            <li key={valueIdx} className="space-y-4 font-mono">
+            <li key={valueKey} className="space-y-4 font-mono">
               <h3 className="bg-primary-950 flex flex-col">
                 <strong className="text-xl">{value.type}</strong>
                 <pre>{value.value}</pre>
               </h3>
               <ul>
                 {value.stacktrace?.frames.map((frame, frameIdx) => {
+                  const frameKey = `${frame.filename || 'unknown'}-${frame.function || 'anonymous'}-${frame.lineno || 0}-${frameIdx}`;
                   return (
                     <Frame
-                      key={frameIdx}
+                      key={frameKey}
                       frame={frame}
                       defaultExpand={valueIdx === 0 && frameIdx === 0}
                       platform={event.platform}

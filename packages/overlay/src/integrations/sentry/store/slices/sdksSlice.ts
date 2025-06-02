@@ -1,5 +1,5 @@
-import { StateCreator } from 'zustand';
-import { Sdk, SentryEvent } from '../../types';
+import type { StateCreator } from 'zustand';
+import type { Sdk, SentryEvent } from '../../types';
 import type { SDKsSliceActions, SDKsSliceState, SentryStore } from '../types';
 
 const initialSDKsState: SDKsSliceState = {

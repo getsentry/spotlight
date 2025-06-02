@@ -1,15 +1,15 @@
-import { KeyboardEvent, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReactComponent as Sort } from '~/assets/sort.svg';
 import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
+import { TimeBar } from '~/integrations/sentry/components/shared/TimeBar';
+import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from '~/integrations/sentry/constants';
+import { useSentrySpans } from '~/integrations/sentry/data/useSentrySpans';
+import useSort from '~/integrations/sentry/hooks/useSort';
+import type { Span } from '~/integrations/sentry/types';
+import { getFormattedDuration, getSpanDurationClassName } from '~/integrations/sentry/utils/duration';
 import classNames from '~/lib/classNames';
 import Table from '~/ui/table';
-import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from '../../constants';
-import { useSentrySpans } from '../../data/useSentrySpans';
-import useSort from '../../hooks/useSort';
-import type { Span } from '../../types';
-import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
-import { TimeBar } from '../shared/TimeBar';
 
 type QueryInfo = {
   avgDuration: number;
@@ -65,12 +65,6 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
     navigate(`/insights/queries/${btoa(query.description)}`);
   };
 
-  const handleRowKeyDown = (e: KeyboardEvent<HTMLTableRowElement>, query: QueryInfo) => {
-    if (e.key === 'Enter') {
-      handleRowClick(query);
-    }
-  };
-
   if (!queriesData?.length) {
     return (
       <p className="text-primary-300 px-6 py-4">
@@ -92,12 +86,14 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
                 header.primary ? 'w-2/5' : 'w-[15%]',
               )}
             >
-              <div
+              <button
+                type="button"
                 className={classNames(
                   'flex cursor-pointer items-center gap-1',
                   header.primary ? 'justify-start' : 'justify-end',
                 )}
                 onClick={() => toggleSortOrder(header.sortKey)}
+                tabIndex={0}
               >
                 {header.title}
                 {sort.active === header.sortKey ? (
@@ -112,7 +108,7 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
                 ) : (
                   <Sort width={12} height={12} className="stroke-primary-300" />
                 )}
-              </div>
+              </button>
             </th>
           ))}
         </tr>
@@ -122,7 +118,6 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
           <tr
             key={query.description}
             onClick={() => handleRowClick(query)}
-            onKeyDown={e => handleRowKeyDown(e, query)}
             tabIndex={0}
             role="link"
             className="hover:bg-primary-900 cursor-pointer"

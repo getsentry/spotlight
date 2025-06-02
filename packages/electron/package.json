@@ -10,9 +10,7 @@
     "directory": "packages/electron"
   },
   "main": "./out/main/index.js",
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "scripts": {
     "start": "electron-vite preview",
     "dev": "electron-vite dev",

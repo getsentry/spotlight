@@ -1,9 +1,9 @@
-import { addEventProcessor, captureException, getTraceData, startSpan } from '@sentry/node';
-import launchEditor from 'launch-editor';
 import { createWriteStream, readFileSync } from 'node:fs';
 import { type IncomingMessage, type Server, type ServerResponse, createServer, get } from 'node:http';
 import { extname, join, resolve } from 'node:path';
 import { createGunzip, createInflate } from 'node:zlib';
+import { addEventProcessor, captureException, getTraceData, startSpan } from '@sentry/node';
+import launchEditor from 'launch-editor';
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from './constants.js';
 import { contextLinesHandler } from './contextlines.js';
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from './logger.js';
@@ -159,8 +159,11 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
       // Read the (potentially decompressed) stream
       const buffers: Buffer[] = [];
       stream.on('readable', () => {
-        let chunk: Buffer | null;
-        while ((chunk = stream.read()) !== null) {
+        while (true) {
+          const chunk = stream.read();
+          if (chunk === null) {
+            break;
+          }
           buffers.push(chunk);
         }
       });
@@ -435,8 +438,7 @@ const isSidecarRunning = withTracing(
         headers: { Connection: 'close' },
       };
 
-      // eslint-disable-next-line prefer-const
-      let timeoutId: NodeJS.Timeout;
+      let timeoutId: NodeJS.Timeout | null = null;
       const healthReq = get(options, res => {
         const serverIdentifier = res.headers['x-powered-by'];
         if (serverIdentifier === 'spotlight-by-sentry') {
@@ -448,7 +450,9 @@ const isSidecarRunning = withTracing(
       const destroyHealthReq = () => !healthReq.destroyed && healthReq.destroy(new Error('Request timed out.'));
       function resolve(value: boolean) {
         process.off('SIGINT', destroyHealthReq);
-        clearTimeout(timeoutId);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
         _resolve(value);
       }
       process.on('SIGINT', destroyHealthReq);

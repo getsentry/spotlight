@@ -1,10 +1,10 @@
-import react from '@vitejs/plugin-react';
-import spotlightSidecar from '@spotlightjs/sidecar/vite-plugin';
-import MagicString from 'magic-string';
 import { resolve, sep } from 'node:path';
+import spotlightSidecar from '@spotlightjs/sidecar/vite-plugin';
+import react from '@vitejs/plugin-react';
+import MagicString from 'magic-string';
+import type { RenderedChunk } from 'rollup';
 import type { PluginOption } from 'vite';
 import { defineConfig } from 'vite';
-import type { RenderedChunk } from 'rollup';
 import dts from 'vite-plugin-dts';
 import svgr from 'vite-plugin-svgr';
 

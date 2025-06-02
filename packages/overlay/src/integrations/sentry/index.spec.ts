@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'vitest';
 import { processEnvelope } from './index';
 
-import type { Event } from '@sentry/types';
 import fs from 'node:fs';
+import type { Event } from '@sentry/types';
 import useSentryStore from './store';
-import { SentryTransactionEvent } from './types';
+import type { SentryTransactionEvent } from './types';
 
 describe('Sentry Integration', () => {
   test('Process Envelope Empty', () => {

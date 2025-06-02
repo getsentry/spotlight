@@ -1,4 +1,4 @@
-import { StateCreator } from 'zustand';
+import type { StateCreator } from 'zustand';
 import { generateUuidv4 } from '~/lib/uuid';
 import { graftProfileSpans } from '../../data/profiles';
 import type {

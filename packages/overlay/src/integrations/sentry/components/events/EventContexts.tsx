@@ -1,4 +1,4 @@
-import { Nullable } from 'vitest';
+import type { Nullable } from 'vitest';
 import Table from '~/ui/table';
 import JsonViewer from '../../../../components/JsonViewer';
 import type { SentryEvent } from '../../types';

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { TraceMap, originalPositionFor, sourceContentFor, LEAST_UPPER_BOUND } from '@jridgewell/trace-mapping';
+import { LEAST_UPPER_BOUND, TraceMap, originalPositionFor, sourceContentFor } from '@jridgewell/trace-mapping';
 
 type SourceContext = {
   pre_context?: string[];

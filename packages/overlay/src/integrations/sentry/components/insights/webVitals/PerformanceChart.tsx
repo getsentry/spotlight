@@ -101,6 +101,7 @@ const PerformanceChart = ({
       )}
 
       <svg height={size + 3 * top} width={size + 3 * left}>
+        <title>Performance Chart showing Core Web Vitals metrics</title>
         <>
           {metricWeights.lcp > 0 && (
             <WebVitalLabel

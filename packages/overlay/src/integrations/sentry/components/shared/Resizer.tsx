@@ -1,4 +1,4 @@
-import { HTMLAttributes, ReactNode, useRef, type MouseEventHandler } from 'react';
+import { type HTMLAttributes, type MouseEventHandler, type ReactNode, useRef } from 'react';
 import classNames from '~/lib/classNames';
 import { getSpotlightContainer } from '~/utils/dom';
 
@@ -75,8 +75,8 @@ export default function Resizer({
     lastPositionRef.current = null;
 
     const debuggerElement = getSpotlightContainer();
-    debuggerElement?.classList.remove(`resizing-column`);
-    debuggerElement?.classList.remove(`resizing-row`);
+    debuggerElement?.classList.remove('resizing-column');
+    debuggerElement?.classList.remove('resizing-row');
 
     setIsResizing(false);
     document.removeEventListener('mousemove', handleResizeWrapper);

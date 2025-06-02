@@ -31,6 +31,7 @@ export function SidePanelHeader({
         {subtitle && <h3 className="font-mono">{subtitle}</h3>}
       </div>
       <button
+        type="button"
         className="hover:bg-primary-900 -my-1 flex cursor-pointer items-center justify-center rounded px-6 py-1 font-mono text-2xl"
         onClick={goBackWithFallback}
       >

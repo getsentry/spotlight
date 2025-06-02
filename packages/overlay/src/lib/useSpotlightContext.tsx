@@ -1,6 +1,7 @@
-import React, { createContext, useContext, type ReactNode } from 'react';
+import type React from 'react';
+import { type ReactNode, createContext, useContext } from 'react';
 import { DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from '../constants';
-import { type SpotlightContext } from '../integrations/integration';
+import type { SpotlightContext } from '../integrations/integration';
 
 const Context = createContext<SpotlightContext>({
   open: () => {},

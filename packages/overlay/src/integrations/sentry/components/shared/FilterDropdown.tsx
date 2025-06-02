@@ -1,4 +1,4 @@
-import { ElementType } from 'react';
+import type { ElementType } from 'react';
 import { ReactComponent as ChevronDown } from '~/assets/chevronDown.svg';
 import { Button } from '~/ui/button';
 import {

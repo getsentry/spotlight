@@ -2,15 +2,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Debugger from './components/Debugger';
 import Trigger from './components/Trigger';
+import { SPOTLIGHT_OPEN_CLASS_NAME } from './constants';
 import type { Integration, IntegrationData } from './integrations/integration';
+import { base64Decode } from './lib/base64';
 import * as db from './lib/db';
 import { getSpotlightEventTarget } from './lib/eventTarget';
 import { log } from './lib/logger';
 import useKeyPress from './lib/useKeyPress';
 import { connectToSidecar } from './sidecar';
 import type { NotificationCount, SpotlightOverlayOptions } from './types';
-import { SPOTLIGHT_OPEN_CLASS_NAME } from './constants';
-import { base64Decode } from './lib/base64';
 
 type AppProps = Omit<SpotlightOverlayOptions, 'debug' | 'injectImmediately'> &
   Required<Pick<SpotlightOverlayOptions, 'sidecarUrl'>>;
@@ -25,6 +25,41 @@ const processEvent = (contentType: string, event: { data: string | Uint8Array },
       })
     : { event };
 
+function processInitialEvents(
+  integrations: Integration[],
+  initialEvents: Record<string, (string | Uint8Array)[]>,
+): IntegrationData<unknown> {
+  const result: IntegrationData<unknown> = {};
+
+  for (const integration of integrations) {
+    result[integration.name] = [];
+
+    for (const contentType in initialEvents) {
+      const contentTypeBits = contentType.split(';');
+      const contentTypeWithoutEncoding = contentTypeBits[0];
+
+      if (!integration.forwardedContentType?.includes(contentTypeWithoutEncoding)) {
+        continue;
+      }
+
+      const shouldUseBase64 = contentTypeBits[contentTypeBits.length - 1] === 'base64';
+
+      for (const data of initialEvents[contentTypeWithoutEncoding]) {
+        const processedEvent = processEvent(
+          contentTypeWithoutEncoding,
+          { data: shouldUseBase64 ? base64Decode(data as string) : data },
+          integration,
+        );
+        if (processedEvent) {
+          result[integration.name].push(processedEvent);
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
 export default function App({
   openOnInit = false,
   showTriggerButton = true,
@@ -35,32 +70,9 @@ export default function App({
   showClearEventsButton = true,
   initialEvents = {},
 }: AppProps) {
-  const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>(() => {
-    const result: IntegrationData<unknown> = {};
-    // Process initial events
-    for (const integration of integrations) {
-      result[integration.name] = [];
-      for (const contentType in initialEvents) {
-        const contentTypeBits = contentType.split(';');
-        const contentTypeWithoutEncoding = contentTypeBits[0];
-        if (!integration.forwardedContentType?.includes(contentTypeWithoutEncoding)) {
-          continue;
-        }
-        const shouldUseBase64 = contentTypeBits[contentTypeBits.length - 1] === 'base64';
-        for (const data of initialEvents[contentTypeWithoutEncoding]) {
-          const processedEvent = processEvent(
-            contentTypeWithoutEncoding,
-            { data: shouldUseBase64 ? base64Decode(data as string) : data },
-            integration,
-          );
-          if (processedEvent) {
-            result[integration.name].push(processedEvent);
-          }
-        }
-      }
-    }
-    return result;
-  });
+  const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>(() =>
+    processInitialEvents(integrations, initialEvents),
+  );
   const [isOnline, setOnline] = useState(false);
   const [triggerButtonCount, setTriggerButtonCount] = useState<NotificationCount>({ count: 0, severe: false });
   const [isOpen, setOpen] = useState(openOnInit);

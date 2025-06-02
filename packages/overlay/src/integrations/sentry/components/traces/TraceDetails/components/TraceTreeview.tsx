@@ -59,11 +59,10 @@ function TraceTreeWithSearch({
           )}
         </div>
         <button
+          type="button"
           className={`rounded border px-2 py-1 text-sm ${
-            showOnlyMatched
-              ? 'bg-primary-600 border-white text-white'
-              : 'bg-primary-800 text-primary-300  border-primary-500 hover:bg-primary-700'
-          }`}
+            showOnlyMatched ? 'border-primary-300 bg-primary-300' : 'border-primary-500 bg-primary-500'
+          } text-white`}
           onClick={() => setShowOnlyMatched(!showOnlyMatched)}
         >
           Only Show Matches

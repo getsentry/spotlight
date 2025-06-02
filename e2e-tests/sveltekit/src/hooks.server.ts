@@ -2,13 +2,13 @@ import * as Sentry from '@sentry/sveltekit';
 import { setupSidecar } from '@spotlightjs/spotlight/sidecar';
 
 Sentry.init({
-	debug: true,
-	tracesSampleRate: 1.0,
-	spotlight: import.meta.env.DEV
+  debug: true,
+  tracesSampleRate: 1.0,
+  spotlight: import.meta.env.DEV,
 });
 
 if (import.meta.env.DEV) {
-	setupSidecar();
+  setupSidecar();
 }
 
 export const handleError = Sentry.handleErrorWithSentry();

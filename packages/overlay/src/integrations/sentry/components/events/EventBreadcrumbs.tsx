@@ -1,8 +1,8 @@
 import { Fragment } from 'react';
+import JsonViewer from '~/components/JsonViewer';
 import classNames from '~/lib/classNames';
 import Time from '../../../../components/Time';
 import type { Breadcrumb, SentryEvent } from '../../types';
-import JsonViewer from '~/components/JsonViewer';
 
 const EXAMPLE_BREADCRUMB = `Sentry.addBreadcrumb({
   category: "auth",

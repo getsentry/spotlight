@@ -49,8 +49,7 @@ export default function HydrationErrorDisplay() {
         newStylesheet.replaceSync(stylesheetContent);
 
         if (
-          shadowRoot &&
-          shadowRoot.adoptedStyleSheets &&
+          shadowRoot?.adoptedStyleSheets &&
           !(shadowRoot.adoptedStyleSheets.indexOf(newStylesheet) >= 0) &&
           emotionDiffStyleTags.length > 0
         ) {
@@ -67,7 +66,7 @@ export default function HydrationErrorDisplay() {
       const newCSR = beautify(newCSRHtml, { format: 'html' });
       setCSRHtml(newCSR);
     }
-  }, [ssrHtml, newCSRHtml, isHydrationError]);
+  }, [ssrHtml, newCSRHtml, isStyleSheetAdded]);
 
   const newStyles = {
     variables: {

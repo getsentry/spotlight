@@ -6,7 +6,7 @@ import { Badge } from '~/ui/badge';
 import { Button } from '~/ui/button';
 import { Input } from '~/ui/input';
 import { getSpotlightContainer } from '~/utils/dom';
-import { type FilterConfigs } from '../../hooks/useTraceFiltering';
+import type { FilterConfigs } from '../../hooks/useTraceFiltering';
 import { FilterDropdown } from '../shared/FilterDropdown';
 
 interface TraceListFilterProps {

@@ -1,4 +1,4 @@
-import { IntegrationTab } from '~/integrations/integration';
+import type { IntegrationTab } from '~/integrations/integration';
 
 export function createTab<T>(
   id: string,

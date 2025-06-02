@@ -1,8 +1,8 @@
+import path from 'node:path';
 import * as Sentry from '@sentry/electron/main';
 import { clearBuffer, setupSidecar } from '@spotlightjs/sidecar';
 import { BrowserWindow, Menu, app, dialog, ipcMain, shell } from 'electron';
 import Store from 'electron-store';
-import path from 'node:path';
 
 const store = new Store();
 
@@ -245,7 +245,7 @@ const template = [
   },
 ];
 
-function handleBadgeCount(event, count) {
+function handleBadgeCount(_event, count) {
   app.setBadgeCount(count);
 }
 const menu = Menu.buildFromTemplate(template);

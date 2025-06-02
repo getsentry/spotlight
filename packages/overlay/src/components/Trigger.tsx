@@ -1,8 +1,8 @@
-import { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 import { ReactComponent as Logo } from '~/assets/glyph.svg';
 import { DEFAULT_ANCHOR } from '~/constants';
-import classNames from '../lib/classNames';
-import { NotificationCount, type AnchorConfig } from '../types';
+import classNames from '~/lib/classNames';
+import type { AnchorConfig, NotificationCount } from '~/types';
 
 function getAnchorClasses(anchor: AnchorConfig) {
   switch (anchor) {
@@ -64,7 +64,8 @@ export default function Trigger({
   const iconSize = 24;
 
   return (
-    <div
+    <button
+      type="button"
       className={classNames(
         'z-[999999]',
         'fixed inline-flex items-center rounded font-medium',
@@ -80,6 +81,6 @@ export default function Trigger({
       <ToolbarItem count={countSum} severe={Boolean(notificationCount.severe)}>
         <Logo height={iconSize} width={iconSize} />
       </ToolbarItem>
-    </div>
+    </button>
   );
 }

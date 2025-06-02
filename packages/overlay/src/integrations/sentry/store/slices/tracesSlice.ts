@@ -1,4 +1,4 @@
-import { StateCreator } from 'zustand';
+import type { StateCreator } from 'zustand';
 import type { SentryStore, TracesSliceActions, TracesSliceState } from '../types';
 
 const initialTracesState: TracesSliceState = {

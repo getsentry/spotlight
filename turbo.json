@@ -1,0 +1,38 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "dist-bin/**", ".next/**", "!.next/cache/**"],
+      "env": ["FOSSILIZE_PLATFORMS", "FOSSILIZE_SIGN", "APPLE_CERT_PASSWORD", "APPLE_TEAM_ID"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**", "**/junit.xml"],
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**", "**/junit.xml"],
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    },
+    "preview": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true
+    },
+    "yalc:publish": {
+      "dependsOn": ["build"],
+      "cache": false
+    }
+  },
+  "globalDependencies": ["biome.json", "tsconfig.json", "package.json"]
+}

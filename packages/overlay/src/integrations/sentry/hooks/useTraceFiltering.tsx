@@ -1,47 +1,11 @@
-import { ElementType, useCallback, useMemo } from 'react';
+import { type ElementType, useCallback, useMemo } from 'react';
 import { ReactComponent as AlertCircle } from '~/assets/alertCircle.svg';
 import { ReactComponent as Branch } from '~/assets/branch.svg';
 import { ReactComponent as Clock } from '~/assets/clock.svg';
 import { ReactComponent as Filter } from '~/assets/filter.svg';
 import { ReactComponent as Hash } from '~/assets/hash.svg';
-import { Trace } from '../types';
+import type { Trace } from '../types';
 import { getRootTransactionMethod, getRootTransactionName } from '../utils/traces';
-
-interface FilterOption {
-  label: string;
-  value: string;
-}
-
-interface FilterConfig {
-  icon: ElementType;
-  label: string;
-  tooltip: string;
-  options: FilterOption[];
-  show: boolean;
-  type: 'checkbox' | 'radio';
-}
-
-export interface FilterConfigs {
-  [FILTER_TYPES.TRANSACTION]: FilterConfig;
-  [FILTER_TYPES.METHOD]: FilterConfig;
-  [FILTER_TYPES.STATUS]: FilterConfig;
-  [FILTER_TYPES.TIME]: FilterConfig;
-  [FILTER_TYPES.PERFORMANCE]: FilterConfig;
-}
-
-interface FilterConfigData {
-  transactionOptions: FilterOption[];
-  methodOptions: FilterOption[];
-  statusOptions: FilterOption[];
-}
-
-interface GroupedFilters {
-  [FILTER_TYPES.TRANSACTION]: Set<string>;
-  [FILTER_TYPES.METHOD]: Set<string>;
-  [FILTER_TYPES.STATUS]: Set<string>;
-  [FILTER_TYPES.TIME]: Set<string>;
-  [FILTER_TYPES.PERFORMANCE]: Set<string>;
-}
 
 interface TraceProperties {
   transactionName: string;
@@ -131,6 +95,42 @@ const FILTER_ICONS = {
   [FILTER_TYPES.TIME]: Clock,
   [FILTER_TYPES.PERFORMANCE]: Branch,
 } as const;
+
+interface FilterOption {
+  label: string;
+  value: string;
+}
+
+interface FilterConfig {
+  icon: ElementType;
+  label: string;
+  tooltip: string;
+  options: FilterOption[];
+  show: boolean;
+  type: 'checkbox' | 'radio';
+}
+
+export interface FilterConfigs {
+  [FILTER_TYPES.TRANSACTION]: FilterConfig;
+  [FILTER_TYPES.METHOD]: FilterConfig;
+  [FILTER_TYPES.STATUS]: FilterConfig;
+  [FILTER_TYPES.TIME]: FilterConfig;
+  [FILTER_TYPES.PERFORMANCE]: FilterConfig;
+}
+
+interface FilterConfigData {
+  transactionOptions: FilterOption[];
+  methodOptions: FilterOption[];
+  statusOptions: FilterOption[];
+}
+
+interface GroupedFilters {
+  [FILTER_TYPES.TRANSACTION]: Set<string>;
+  [FILTER_TYPES.METHOD]: Set<string>;
+  [FILTER_TYPES.STATUS]: Set<string>;
+  [FILTER_TYPES.TIME]: Set<string>;
+  [FILTER_TYPES.PERFORMANCE]: Set<string>;
+}
 
 const createFilterOptionsFromSet = (items: Set<string>): FilterOption[] =>
   Array.from(items).map(item => ({ label: item, value: item }));

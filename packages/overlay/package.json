@@ -14,9 +14,7 @@
     "yalc:publish": "yalc publish --push --sig --private",
     "clean": "rimraf dist"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "main": "./dist/sentry-spotlight.js",
   "types": "./dist/sentry-spotlight.d.ts",
   "exports": {

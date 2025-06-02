@@ -11,9 +11,7 @@
     "build:watch": "vite build --watch",
     "clean": "rimraf dist"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "bin": {
     "spotlight-sidecar": "dist/server.js"
   },

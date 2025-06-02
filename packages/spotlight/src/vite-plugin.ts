@@ -57,7 +57,7 @@ export function buildClientInit(options: SpotlightInitOptions) {
   return [
     `import * as Spotlight from ${JSON.stringify(`/@fs${options.importPath || getSpotlightClientModulePath()}`)};`,
     `Spotlight.init(${initOptions});`,
-    `window.createErrorOverlay=function createErrorOverlay(err) { Spotlight.openSpotlight(); };`,
+    'window.createErrorOverlay=function createErrorOverlay(err) { Spotlight.openSpotlight(); };',
   ].join('\n');
 }
 

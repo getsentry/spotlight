@@ -12,7 +12,9 @@ export default function ReactIsland() {
         labore quis Lorem commodo mollit ipsum labore sint aliqua. Est occaecat amet proident adipisicing quis aliquip
         fugiat commodo dolor. Consectetur cupidatat cillum occaecat mollit laborum voluptate ea.
       </p>
-      <button onClick={throwError}>Click me to throw an error</button>
+      <button type="button" onClick={throwError}>
+        Click me to throw an error
+      </button>
     </div>
   );
 }

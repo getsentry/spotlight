@@ -18,7 +18,7 @@ export function getSpanDurationClassName(duration: number) {
   if (duration > 100) return 'text-yellow-400';
 }
 
-export function getFormattedNumber(num: number, decimalPlaces: number = 2): string {
+export function getFormattedNumber(num: number, decimalPlaces = 2): string {
   return num.toFixed(decimalPlaces).replace(/\.00$/, '');
 }
 
