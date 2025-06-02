@@ -1,4 +1,4 @@
-import type { EventEnvelopeHeaders, Measurements, SerializedLog } from '@sentry/core';
+import type { EventEnvelopeHeaders, Measurements, SerializedLog } from "@sentry/core";
 
 export type TraceId = string;
 export type SpanId = string;
@@ -47,7 +47,7 @@ export type Breadcrumb = {
   message?: string;
   category: string;
   timestamp: string;
-  type: string | 'default';
+  type: string | "default";
 };
 
 export type Context = Record<string, string | number>;
@@ -76,9 +76,9 @@ type CommonEventAttrs = {
 // Note: For some reason the `sentry/core` module doesn't have these additional properties
 // in `EventEnvelopeHeaders['trace']` but they are present in the actual events.
 // Follow up?
-export type TraceContext = EventEnvelopeHeaders['trace'] & {
+export type TraceContext = EventEnvelopeHeaders["trace"] & {
   span_id?: string;
-  status?: 'ok' | string;
+  status?: "ok" | string;
   description?: string;
   parent_span_id?: string;
   data?: Record<string, string>;
@@ -103,7 +103,7 @@ export type SentryFormattedMessage =
     };
 
 export type SentryErrorEvent = CommonEventAttrs & {
-  type?: 'error' | 'event' | 'message' | 'default';
+  type?: "error" | "event" | "message" | "default";
   exception: EventException;
 };
 
@@ -116,14 +116,14 @@ export type Span = {
   start_timestamp: number;
   tags?: Tags | null;
   timestamp: number;
-  status?: 'ok' | string;
+  status?: "ok" | string;
   transaction?: SentryTransactionEvent;
   children?: Span[];
   data?: Record<string, unknown>;
 };
 
 export type SentryTransactionEvent = CommonEventAttrs & {
-  type: 'transaction';
+  type: "transaction";
   spans?: Span[];
   start_timestamp: string;
   contexts: Contexts & {
@@ -192,12 +192,12 @@ export type SentryProfileTransactionInfo = {
 };
 
 export type SentryProfileV1Event = CommonEventAttrs & {
-  type: 'profile';
+  type: "profile";
   device: SentryDeviceInfo;
   os: SentryOSInfo;
   transactions?: Array<SentryProfileTransactionInfo>;
   transaction?: SentryProfileTransactionInfo;
-  version: '1';
+  version: "1";
   profile: SentryProfile;
 };
 
@@ -208,7 +208,7 @@ export type SentryLogEventItem = SerializedLog & {
 };
 
 export type SentryLogEvent = CommonEventAttrs & {
-  type: 'log';
+  type: "log";
   items: Array<SentryLogEventItem>;
 };
 
@@ -220,7 +220,7 @@ export type Trace = TraceContext & {
   errors: number;
   start_timestamp: number;
   timestamp: number;
-  status?: 'ok' | string;
+  status?: "ok" | string;
   rootTransaction: SentryTransactionEvent | null;
   rootTransactionName: string;
   spans: Map<string, Span>;
@@ -234,7 +234,7 @@ export type Sdk = {
   lastSeen: number;
 };
 
-export type SentryEventWithPerformanceData = Omit<SentryEvent, 'measurements'> & {
+export type SentryEventWithPerformanceData = Omit<SentryEvent, "measurements"> & {
   measurements: Record<
     string,
     {
@@ -242,47 +242,47 @@ export type SentryEventWithPerformanceData = Omit<SentryEvent, 'measurements'> &
       unit: string;
     }
   > & {
-    'score.total': {
+    "score.total": {
       value: number;
       unit: string;
     };
-    'score.fcp': {
+    "score.fcp": {
       value: number;
       unit: string;
     };
-    'score.lcp': {
+    "score.lcp": {
       value: number;
       unit: string;
     };
-    'score.fid': {
+    "score.fid": {
       value: number;
       unit: string;
     };
-    'score.cls': {
+    "score.cls": {
       value: number;
       unit: string;
     };
-    'score.ttfb': {
+    "score.ttfb": {
       value: number;
       unit: string;
     };
-    'score.weight.fcp': {
+    "score.weight.fcp": {
       value: number;
       unit: string;
     };
-    'score.weight.lcp': {
+    "score.weight.lcp": {
       value: number;
       unit: string;
     };
-    'score.weight.fid': {
+    "score.weight.fid": {
       value: number;
       unit: string;
     };
-    'score.weight.cls': {
+    "score.weight.cls": {
       value: number;
       unit: string;
     };
-    'score.weight.ttfb': {
+    "score.weight.ttfb": {
       value: number;
       unit: string;
     };

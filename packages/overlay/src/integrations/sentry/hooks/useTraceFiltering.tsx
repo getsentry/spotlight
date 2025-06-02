@@ -1,11 +1,100 @@
-import { ElementType, useCallback, useMemo } from 'react';
-import { ReactComponent as AlertCircle } from '~/assets/alertCircle.svg';
-import { ReactComponent as Branch } from '~/assets/branch.svg';
-import { ReactComponent as Clock } from '~/assets/clock.svg';
-import { ReactComponent as Filter } from '~/assets/filter.svg';
-import { ReactComponent as Hash } from '~/assets/hash.svg';
-import { Trace } from '../types';
-import { getRootTransactionMethod, getRootTransactionName } from '../utils/traces';
+import { type ElementType, useCallback, useMemo } from "react";
+import { ReactComponent as AlertCircle } from "~/assets/alertCircle.svg";
+import { ReactComponent as Branch } from "~/assets/branch.svg";
+import { ReactComponent as Clock } from "~/assets/clock.svg";
+import { ReactComponent as Filter } from "~/assets/filter.svg";
+import { ReactComponent as Hash } from "~/assets/hash.svg";
+import type { Trace } from "../types";
+import { getRootTransactionMethod, getRootTransactionName } from "../utils/traces";
+
+interface TraceProperties {
+  transactionName: string;
+  method: string | null;
+  startTimestamp: number;
+  status: string;
+  duration: number;
+  spansSize: number;
+}
+
+const DURATION_THRESHOLDS = {
+  FAST_RESPONSE_MAX: 100,
+  SLOW_RESPONSE_MIN: 1000,
+} as const;
+
+const PERFORMANCE_FILTER_VALUES = {
+  ZERO_SPANS: "No spans (0)",
+  HAS_SPANS: "With spans (>0)",
+  FAST_RESPONSE: "Fast (<100ms)",
+  MEDIUM_RESPONSE: "Medium (100ms-1s)",
+  SLOW_RESPONSE: "Slow (>1s)",
+} as const;
+
+const PERFORMANCE_FILTER_OPTIONS: FilterOption[] = Object.entries(PERFORMANCE_FILTER_VALUES).map(([, label]) => ({
+  label,
+  value: label,
+}));
+
+const PERFORMANCE_FILTER_SET = new Set(Object.values(PERFORMANCE_FILTER_VALUES));
+
+const TIME_FILTER_VALUES = {
+  LAST_MINUTE: "Last minute",
+  LAST_5_MINUTES: "Last 5 minutes",
+  LAST_15_MINUTES: "Last 15 minutes",
+  LAST_30_MINUTES: "Last 30 minutes",
+  LAST_1_HOUR: "Last 1 hour",
+  LAST_4_HOURS: "Last 4 hours",
+  TODAY: "Today",
+  YESTERDAY: "Yesterday",
+  LAST_24_HOURS: "Last 24 hours",
+  LAST_7_DAYS: "Last 7 days",
+  BEYOND_7_DAYS: "Older than 7 days",
+} as const;
+
+const TIME_FILTER_OPTIONS = Object.entries(TIME_FILTER_VALUES).map(([, label]) => ({
+  value: label,
+  label,
+}));
+
+const TIME_FILTER_SET = new Set(Object.values(TIME_FILTER_VALUES));
+
+const FILTER_TYPES = {
+  TRANSACTION: "transaction",
+  METHOD: "method",
+  STATUS: "status",
+  TIME: "time",
+  PERFORMANCE: "performance",
+} as const;
+
+const FILTER_CONFIG_METADATA = {
+  [FILTER_TYPES.TRANSACTION]: {
+    label: "Transaction",
+    tooltip: "Filter by transaction type",
+  },
+  [FILTER_TYPES.METHOD]: {
+    label: "Method",
+    tooltip: "Filter by HTTP method",
+  },
+  [FILTER_TYPES.STATUS]: {
+    label: "Status",
+    tooltip: "Filter by response status",
+  },
+  [FILTER_TYPES.TIME]: {
+    label: "Time",
+    tooltip: "Filter by time period",
+  },
+  [FILTER_TYPES.PERFORMANCE]: {
+    label: "Performance",
+    tooltip: "Filter by performance metrics",
+  },
+} as const;
+
+const FILTER_ICONS = {
+  [FILTER_TYPES.TRANSACTION]: Filter,
+  [FILTER_TYPES.METHOD]: Hash,
+  [FILTER_TYPES.STATUS]: AlertCircle,
+  [FILTER_TYPES.TIME]: Clock,
+  [FILTER_TYPES.PERFORMANCE]: Branch,
+} as const;
 
 interface FilterOption {
   label: string;
@@ -18,7 +107,7 @@ interface FilterConfig {
   tooltip: string;
   options: FilterOption[];
   show: boolean;
-  type: 'checkbox' | 'radio';
+  type: "checkbox" | "radio";
 }
 
 export interface FilterConfigs {
@@ -42,95 +131,6 @@ interface GroupedFilters {
   [FILTER_TYPES.TIME]: Set<string>;
   [FILTER_TYPES.PERFORMANCE]: Set<string>;
 }
-
-interface TraceProperties {
-  transactionName: string;
-  method: string | null;
-  startTimestamp: number;
-  status: string;
-  duration: number;
-  spansSize: number;
-}
-
-const DURATION_THRESHOLDS = {
-  FAST_RESPONSE_MAX: 100,
-  SLOW_RESPONSE_MIN: 1000,
-} as const;
-
-const PERFORMANCE_FILTER_VALUES = {
-  ZERO_SPANS: 'No spans (0)',
-  HAS_SPANS: 'With spans (>0)',
-  FAST_RESPONSE: 'Fast (<100ms)',
-  MEDIUM_RESPONSE: 'Medium (100ms-1s)',
-  SLOW_RESPONSE: 'Slow (>1s)',
-} as const;
-
-const PERFORMANCE_FILTER_OPTIONS: FilterOption[] = Object.entries(PERFORMANCE_FILTER_VALUES).map(([, label]) => ({
-  label,
-  value: label,
-}));
-
-const PERFORMANCE_FILTER_SET = new Set(Object.values(PERFORMANCE_FILTER_VALUES));
-
-const TIME_FILTER_VALUES = {
-  LAST_MINUTE: 'Last minute',
-  LAST_5_MINUTES: 'Last 5 minutes',
-  LAST_15_MINUTES: 'Last 15 minutes',
-  LAST_30_MINUTES: 'Last 30 minutes',
-  LAST_1_HOUR: 'Last 1 hour',
-  LAST_4_HOURS: 'Last 4 hours',
-  TODAY: 'Today',
-  YESTERDAY: 'Yesterday',
-  LAST_24_HOURS: 'Last 24 hours',
-  LAST_7_DAYS: 'Last 7 days',
-  BEYOND_7_DAYS: 'Older than 7 days',
-} as const;
-
-const TIME_FILTER_OPTIONS = Object.entries(TIME_FILTER_VALUES).map(([, label]) => ({
-  value: label,
-  label,
-}));
-
-const TIME_FILTER_SET = new Set(Object.values(TIME_FILTER_VALUES));
-
-const FILTER_TYPES = {
-  TRANSACTION: 'transaction',
-  METHOD: 'method',
-  STATUS: 'status',
-  TIME: 'time',
-  PERFORMANCE: 'performance',
-} as const;
-
-const FILTER_CONFIG_METADATA = {
-  [FILTER_TYPES.TRANSACTION]: {
-    label: 'Transaction',
-    tooltip: 'Filter by transaction type',
-  },
-  [FILTER_TYPES.METHOD]: {
-    label: 'Method',
-    tooltip: 'Filter by HTTP method',
-  },
-  [FILTER_TYPES.STATUS]: {
-    label: 'Status',
-    tooltip: 'Filter by response status',
-  },
-  [FILTER_TYPES.TIME]: {
-    label: 'Time',
-    tooltip: 'Filter by time period',
-  },
-  [FILTER_TYPES.PERFORMANCE]: {
-    label: 'Performance',
-    tooltip: 'Filter by performance metrics',
-  },
-} as const;
-
-const FILTER_ICONS = {
-  [FILTER_TYPES.TRANSACTION]: Filter,
-  [FILTER_TYPES.METHOD]: Hash,
-  [FILTER_TYPES.STATUS]: AlertCircle,
-  [FILTER_TYPES.TIME]: Clock,
-  [FILTER_TYPES.PERFORMANCE]: Branch,
-} as const;
 
 const createFilterOptionsFromSet = (items: Set<string>): FilterOption[] =>
   Array.from(items).map(item => ({ label: item, value: item }));
@@ -289,7 +289,7 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.TRANSACTION].tooltip,
         options: filterConfigData.transactionOptions,
         show: filterConfigData.transactionOptions.length > 0,
-        type: 'checkbox',
+        type: "checkbox",
       },
       [FILTER_TYPES.METHOD]: {
         icon: FILTER_ICONS[FILTER_TYPES.METHOD],
@@ -297,7 +297,7 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.METHOD].tooltip,
         options: filterConfigData.methodOptions,
         show: filterConfigData.methodOptions.length > 0,
-        type: 'checkbox',
+        type: "checkbox",
       },
       [FILTER_TYPES.STATUS]: {
         icon: FILTER_ICONS[FILTER_TYPES.STATUS],
@@ -305,7 +305,7 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.STATUS].tooltip,
         options: filterConfigData.statusOptions,
         show: filterConfigData.statusOptions.length > 0,
-        type: 'checkbox',
+        type: "checkbox",
       },
       [FILTER_TYPES.TIME]: {
         icon: FILTER_ICONS[FILTER_TYPES.TIME],
@@ -313,7 +313,7 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.TIME].tooltip,
         options: TIME_FILTER_OPTIONS,
         show: true,
-        type: 'radio',
+        type: "radio",
       },
       [FILTER_TYPES.PERFORMANCE]: {
         icon: FILTER_ICONS[FILTER_TYPES.PERFORMANCE],
@@ -321,7 +321,7 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.PERFORMANCE].tooltip,
         options: PERFORMANCE_FILTER_OPTIONS,
         show: true,
-        type: 'checkbox',
+        type: "checkbox",
       },
     }),
     [filterConfigData],
@@ -357,7 +357,7 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
         transactionName: getRootTransactionName(trace),
         method: getRootTransactionMethod(trace),
         startTimestamp: trace.start_timestamp,
-        status: trace.status || '',
+        status: trace.status || "",
         spansSize: trace?.spans?.size || 0,
         duration: trace.timestamp - trace.start_timestamp || 0,
       };

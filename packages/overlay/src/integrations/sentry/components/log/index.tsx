@@ -1,5 +1,5 @@
-import { Route, Routes } from 'react-router-dom';
-import LogsList from './LogsList';
+import { Route, Routes } from "react-router-dom";
+import LogsList from "./LogsList";
 
 export default function Logs() {
   return (

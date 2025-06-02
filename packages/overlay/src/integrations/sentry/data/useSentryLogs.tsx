@@ -1,7 +1,7 @@
-import { useContext } from 'react';
-import useSentryStore from '../store';
-import { isLocalTrace } from '../store/helpers';
-import { SentryEventsContext } from './sentryEventsContext';
+import { useContext } from "react";
+import useSentryStore from "../store";
+import { isLocalTrace } from "../store/helpers";
+import { SentryEventsContext } from "./sentryEventsContext";
 
 export const useSentryLogs = (traceId?: string) => {
   useContext(SentryEventsContext);

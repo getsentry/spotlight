@@ -1,34 +1,34 @@
-import { useState } from 'react';
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
-import Tabs from '~/components/Tabs';
-import { useSpotlightContext } from '~/lib/useSpotlightContext';
-import { useSentrySpanCounts } from '../../data/useSentrySpans';
-import { createTab } from '../../utils/tabs';
-import HiddenItemsButton from '../shared/HiddenItemsButton';
-import EnvelopesTab from './envelopes';
-import Profiles from './Profiles';
-import Queries from './Queries';
-import QuerySummary from './QuerySummary';
-import Resources from './Resources';
-import SdksTab from './sdks';
-import WebVitals from './webVitals';
-import WebVitalsDetail from './webVitals/WebVitalsDetail';
+import { useState } from "react";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import Tabs from "~/components/Tabs";
+import { useSpotlightContext } from "~/lib/useSpotlightContext";
+import { useSentrySpanCounts } from "../../data/useSentrySpans";
+import { createTab } from "../../utils/tabs";
+import HiddenItemsButton from "../shared/HiddenItemsButton";
+import Profiles from "./Profiles";
+import Queries from "./Queries";
+import QuerySummary from "./QuerySummary";
+import Resources from "./Resources";
+import EnvelopesTab from "./envelopes";
+import SdksTab from "./sdks";
+import WebVitals from "./webVitals";
+import WebVitalsDetail from "./webVitals/WebVitalsDetail";
 
 export default function InsightsTabDetails() {
   const context = useSpotlightContext();
   const { allSpans, localSpans } = useSentrySpanCounts();
 
-  const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
+  const [showAll, setShowAll] = useState(!context.experiments["sentry:focus-local-events"]);
 
   const hiddenItemCount = allSpans - localSpans;
 
   const tabs = [
-    createTab('queries', 'Queries'),
-    createTab('webvitals', 'Web Vitals'),
-    createTab('resources', 'Resources'),
-    createTab('profiles', 'Profiles'),
-    createTab('envelopes', 'Envelopes'),
-    createTab('sdks', 'SDKs'),
+    createTab("queries", "Queries"),
+    createTab("webvitals", "Web Vitals"),
+    createTab("resources", "Resources"),
+    createTab("profiles", "Profiles"),
+    createTab("envelopes", "Envelopes"),
+    createTab("sdks", "SDKs"),
   ];
 
   return (

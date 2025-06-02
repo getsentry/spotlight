@@ -1,11 +1,11 @@
-import dayjs from 'dayjs';
-import DayJsRelativeTime from 'dayjs/plugin/relativeTime';
-import { useState } from 'react';
-import { useTimeout } from 'usehooks-ts';
+import dayjs from "dayjs";
+import DayJsRelativeTime from "dayjs/plugin/relativeTime";
+import { useState } from "react";
+import { useTimeout } from "usehooks-ts";
 
 dayjs.extend(DayJsRelativeTime);
 
-export default function TimeSince({ date, ...props }: { date: string | number | Date } & React.ComponentProps<'time'>) {
+export default function TimeSince({ date, ...props }: { date: string | number | Date } & React.ComponentProps<"time">) {
   const [value, setValue] = useState(date ? dayjs(date).fromNow() : null);
 
   useTimeout(() => {

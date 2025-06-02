@@ -1,7 +1,7 @@
-import { StateCreator } from 'zustand';
-import { getFunctionNameFromFrame } from '../../data/profiles';
-import type { AggregateCallData, TraceId } from '../../types';
-import type { ProfilesSliceActions, ProfilesSliceState, SentryStore } from '../types';
+import type { StateCreator } from "zustand";
+import { getFunctionNameFromFrame } from "../../data/profiles";
+import type { AggregateCallData, TraceId } from "../../types";
+import type { ProfilesSliceActions, ProfilesSliceState, SentryStore } from "../types";
 
 const initialProfilesState: ProfilesSliceState = {
   profilesByTraceId: new Map(),

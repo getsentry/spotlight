@@ -1,18 +1,18 @@
-import type React from 'react';
-import { useCallback } from 'react';
-import { useSpotlightContext } from '~/lib/useSpotlightContext';
-import { ReactComponent as PenIcon } from '../assets/pen.svg';
+import type React from "react";
+import { useCallback } from "react";
+import { useSpotlightContext } from "~/lib/useSpotlightContext";
+import { ReactComponent as PenIcon } from "../assets/pen.svg";
 
 export default function OpenInEditor({ file }: { file: string }) {
   const { getSidecarUrl } = useSpotlightContext();
-  const sidecarOpenUrl: string = getSidecarUrl('/open');
+  const sidecarOpenUrl: string = getSidecarUrl("/open");
 
   const openInEditor = useCallback(
     (evt: React.MouseEvent) => {
       fetch(sidecarOpenUrl, {
-        method: 'POST',
+        method: "POST",
         body: file,
-        credentials: 'omit',
+        credentials: "omit",
       });
       evt.stopPropagation();
     },

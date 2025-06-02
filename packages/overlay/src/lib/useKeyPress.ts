@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-type ModifierKeys = 'altKey' | 'ctrlKey' | 'shiftKey' | 'metaKey';
+type ModifierKeys = "altKey" | "ctrlKey" | "shiftKey" | "metaKey";
 
 /**
  * useKeyPress
@@ -27,8 +27,8 @@ export default function useKeyPress(key: string, modifiers: ModifierKeys[], acti
       }
     }
 
-    window.addEventListener('keyup', onKeyup);
+    window.addEventListener("keyup", onKeyup);
 
-    return () => window.removeEventListener('keyup', onKeyup) as undefined;
+    return () => window.removeEventListener("keyup", onKeyup) as undefined;
   }, [normalizedKey, modifiers, action, propagate]);
 }

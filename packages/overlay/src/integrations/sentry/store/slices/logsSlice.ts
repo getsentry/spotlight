@@ -1,5 +1,5 @@
-import { StateCreator } from 'zustand';
-import type { LogsSliceActions, LogsSliceState, SentryStore } from '../types';
+import type { StateCreator } from "zustand";
+import type { LogsSliceActions, LogsSliceState, SentryStore } from "../types";
 
 const initialLogsState: LogsSliceState = {
   logsById: new Map(),

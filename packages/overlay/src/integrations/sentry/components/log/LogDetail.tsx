@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom';
-import JsonViewer from '~/components/JsonViewer';
-import { useSentryLog } from '~/integrations/sentry/data/useSentryLogs';
-import SidePanel, { SidePanelHeader } from '~/ui/sidePanel';
-import Table from '~/ui/table';
-import { LOG_LEVEL_COLORS } from '../../constants';
-import DateTime from '../shared/DateTime';
+import { Link } from "react-router-dom";
+import JsonViewer from "~/components/JsonViewer";
+import { useSentryLog } from "~/integrations/sentry/data/useSentryLogs";
+import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
+import Table from "~/ui/table";
+import { LOG_LEVEL_COLORS } from "../../constants";
+import DateTime from "../shared/DateTime";
 
 export default function LogDetails({ id }: { id: string }) {
   const logData = useSentryLog(id);
@@ -18,11 +18,7 @@ export default function LogDetails({ id }: { id: string }) {
     <SidePanel backto="/logs">
       <SidePanelHeader
         title="Log Details"
-        subtitle={
-          <>
-            <span className={LOG_LEVEL_COLORS[level] || 'text-primary-500'}>{level.toUpperCase()}</span>
-          </>
-        }
+        subtitle=<span className={LOG_LEVEL_COLORS[level] || "text-primary-500"}>{level.toUpperCase()}</span>
         backto="/logs"
       />
 
@@ -62,7 +58,7 @@ export default function LogDetails({ id }: { id: string }) {
                       <div className="w-full truncate">{key}</div>
                     </th>
                     <td className="py-0.5">
-                      {typeof value !== 'object' || !value ? (
+                      {typeof value !== "object" || !value ? (
                         <pre className="text-primary-300 whitespace-nowrap font-mono">{JSON.stringify(value)}</pre>
                       ) : (
                         <JsonViewer key={key} data={value} />

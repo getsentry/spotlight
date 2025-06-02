@@ -1,12 +1,12 @@
-import { Link, Outlet, Route, Routes, useParams } from 'react-router-dom';
-import Tabs from '../../../../components/Tabs';
-import useSentryStore from '../../store';
-import type { SentryEvent } from '../../types';
-import { createTab } from '../../utils/tabs';
-import PlatformIcon from '../shared/PlatformIcon';
-import Event, { EventTitle } from './Event';
-import EventBreadcrumbs from './EventBreadcrumbs';
-import EventContexts from './EventContexts';
+import { Link, Outlet, Route, Routes, useParams } from "react-router-dom";
+import Tabs from "../../../../components/Tabs";
+import useSentryStore from "../../store";
+import type { SentryEvent } from "../../types";
+import { createTab } from "../../utils/tabs";
+import PlatformIcon from "../shared/PlatformIcon";
+import Event, { EventTitle } from "./Event";
+import EventBreadcrumbs from "./EventBreadcrumbs";
+import EventContexts from "./EventContexts";
 
 function renderEventTitle(event: SentryEvent) {
   return <EventTitle event={event} />;
@@ -27,9 +27,9 @@ export default function EventDetails() {
   }
 
   const tabs = [
-    createTab('details', 'Details'),
-    createTab('breadcrumbs', 'Breadcrumbs'),
-    createTab('contexts', 'Context'),
+    createTab("details", "Details"),
+    createTab("breadcrumbs", "Breadcrumbs"),
+    createTab("contexts", "Context"),
   ];
 
   const traceCtx = event.contexts?.trace;
@@ -41,13 +41,13 @@ export default function EventDetails() {
         {traceCtx && (
           <div className="text-primary-300 font-mono">
             <div>
-              T:{' '}
+              T:{" "}
               <Link className="cursor-pointer underline" to={`/traces/${traceCtx.trace_id}`}>
                 {traceCtx.trace_id}
               </Link>
             </div>
             <div>
-              S:{' '}
+              S:{" "}
               <Link className="cursor-pointer underline" to={`/traces/${traceCtx.trace_id}/spans/${traceCtx.span_id}`}>
                 {traceCtx.span_id}
               </Link>

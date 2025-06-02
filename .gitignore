@@ -16,8 +16,13 @@ dist-ssr
 *.local
 test-results
 
-.eslintcache
 .node-cache
+
+# Turbo
+.turbo
+
+# Biome
+.biome
 
 # Editor directories and files
 .vscode/*

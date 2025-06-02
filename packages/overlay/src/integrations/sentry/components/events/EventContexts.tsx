@@ -1,8 +1,8 @@
-import { Nullable } from 'vitest';
-import Table from '~/ui/table';
-import JsonViewer from '../../../../components/JsonViewer';
-import type { SentryEvent } from '../../types';
-import Tags from '../shared/Tags';
+import type { Nullable } from "vitest";
+import Table from "~/ui/table";
+import JsonViewer from "../../../../components/JsonViewer";
+import type { SentryEvent } from "../../types";
+import Tags from "../shared/Tags";
 
 const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
   name: "Mighty Fighter",
@@ -62,7 +62,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
                       <div className="w-full truncate">{key}</div>
                     </th>
                     <td className="py-0.5">
-                      {typeof value !== 'object' || !value ? (
+                      {typeof value !== "object" || !value ? (
                         <pre className="text-primary-300 whitespace-nowrap font-mono">{JSON.stringify(value)}</pre>
                       ) : (
                         <JsonViewer key={`${ctxKey}-${key}`} data={value} />

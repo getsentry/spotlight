@@ -1,7 +1,7 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { type IntegrationTab } from '~/integrations/integration';
-import classNames from '../lib/classNames';
-import useKeyPress from '../lib/useKeyPress';
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import type { IntegrationTab } from "~/integrations/integration";
+import classNames from "../lib/classNames";
+import useKeyPress from "../lib/useKeyPress";
 
 export type Props = {
   /**
@@ -34,8 +34,8 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useKeyPress('Escape', [], () => {
-    if (setOpen && location.pathname.split('/').length === 2) {
+  useKeyPress("Escape", [], () => {
+    if (setOpen && location.pathname.split("/").length === 2) {
       setOpen(false);
     } else {
       navigate(-1);
@@ -58,7 +58,7 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
             if (activeTab?.onSelect) {
               activeTab.onSelect();
             }
-            navigate(`${nested ? '' : '/'}${activeTab?.id || 'not-found'}`);
+            navigate(`${nested ? "" : "/"}${activeTab?.id || "not-found"}`);
           }}
         >
           {tabs.map(tab => (
@@ -72,15 +72,15 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
         <nav className="border-b-primary-700 flex space-x-8 border-b px-6" aria-label="Tabs">
           {tabs.map(tab => (
             <NavLink
-              to={`${nested ? '' : '/'}${tab.id}`}
+              to={`${nested ? "" : "/"}${tab.id}`}
               key={tab.id}
               replace={true}
               className={({ isActive }) =>
                 classNames(
                   isActive
-                    ? 'border-primary-200 text-primary-100 [&>.count]:bg-primary-100 [&>.count]:text-primary-600'
-                    : 'text-primary-400 hover:border-primary-400 hover:text-primary-100 [&>.count]:bg-primary-700 [&>.count]:text-primary-200 border-transparent',
-                  '-m-y -mx-2 flex select-none whitespace-nowrap border-b-2 px-2 py-3 text-sm font-medium',
+                    ? "border-primary-200 text-primary-100 [&>.count]:bg-primary-100 [&>.count]:text-primary-600"
+                    : "text-primary-400 hover:border-primary-400 hover:text-primary-100 [&>.count]:bg-primary-700 [&>.count]:text-primary-200 border-transparent",
+                  "-m-y -mx-2 flex select-none whitespace-nowrap border-b-2 px-2 py-3 text-sm font-medium",
                 )
               }
               onClick={() => tab.onSelect?.()}

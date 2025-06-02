@@ -1,17 +1,17 @@
 export function getSpotlightContainer(): HTMLElement | null {
-  const spotlightRoot = document.getElementById('sentry-spotlight-root');
+  const spotlightRoot = document.getElementById("sentry-spotlight-root");
   if (!spotlightRoot) {
-    console.warn('Spotlight root not found');
+    console.warn("Spotlight root not found");
     return null;
   }
   const shadowRoot = spotlightRoot.shadowRoot;
   if (!shadowRoot) {
-    console.warn('Shadow root not found');
+    console.warn("Shadow root not found");
     return null;
   }
-  const debuggerContainer = shadowRoot.querySelector('.spotlight-debugger');
+  const debuggerContainer = shadowRoot.querySelector(".spotlight-debugger");
   if (!debuggerContainer) {
-    console.warn('Spotlight debugger container not found');
+    console.warn("Spotlight debugger container not found");
     return null;
   }
 

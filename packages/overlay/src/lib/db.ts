@@ -1,7 +1,7 @@
 export const MAX_AGE = 30 * 60 * 1000; // 30 minutes
 export const MAX_ITEMS = 1000;
-export const DB_NAME = 'SentrySpotlight';
-export const OBJECT_STORE_NAME = 'events';
+export const DB_NAME = "SentrySpotlight";
+export const OBJECT_STORE_NAME = "events";
 export const DB_VERSION = 2;
 
 function promiseWithResolvers<T = unknown>() {
@@ -33,7 +33,7 @@ function createDB(): Promise<IDBDatabase> {
     } catch (_err) {
       // just ignore if it is missing
     }
-    db.createObjectStore(OBJECT_STORE_NAME, { autoIncrement: true }).createIndex('timestamp', 'timestamp', {
+    db.createObjectStore(OBJECT_STORE_NAME, { autoIncrement: true }).createIndex("timestamp", "timestamp", {
       unique: false,
     });
   };
@@ -41,12 +41,12 @@ function createDB(): Promise<IDBDatabase> {
   openDBRequest.onsuccess = () => {
     const db = openDBRequest.result;
     // Clean up expired entries
-    const tx = db.transaction([OBJECT_STORE_NAME], 'readwrite');
+    const tx = db.transaction([OBJECT_STORE_NAME], "readwrite");
     tx.onerror = rejectFromErrorEvent;
     tx.oncomplete = () => resolve(db);
     const cursorRequest = tx
       .objectStore(OBJECT_STORE_NAME)
-      .index('timestamp')
+      .index("timestamp")
       .openCursor(IDBKeyRange.upperBound(new Date(Date.now() - MAX_AGE)));
     cursorRequest.onerror = rejectFromErrorEvent;
     cursorRequest.onsuccess = () => {
@@ -70,7 +70,7 @@ export async function add(value: unknown) {
   const { promise, resolve, reject } = promiseWithResolvers();
   const rejectFromErrorEvent = (evt: Event) => reject((evt.target as IDBOpenDBRequest).error);
   const db = await getDB();
-  const tx = db.transaction([OBJECT_STORE_NAME], 'readwrite');
+  const tx = db.transaction([OBJECT_STORE_NAME], "readwrite");
   tx.onerror = rejectFromErrorEvent;
 
   const addRequest = tx.objectStore(OBJECT_STORE_NAME).add({
@@ -86,7 +86,7 @@ export async function getEntries() {
   const { promise, resolve, reject } = promiseWithResolvers();
   const rejectFromErrorEvent = (evt: Event) => reject((evt.target as IDBOpenDBRequest).error);
   const db = await getDB();
-  const tx = db.transaction([OBJECT_STORE_NAME], 'readwrite');
+  const tx = db.transaction([OBJECT_STORE_NAME], "readwrite");
   tx.onerror = rejectFromErrorEvent;
 
   const items: unknown[] = [];
@@ -111,7 +111,7 @@ export async function reset() {
   const { promise, resolve, reject } = promiseWithResolvers();
   const rejectFromErrorEvent = (evt: Event) => reject((evt.target as IDBOpenDBRequest).error);
   const db = await getDB();
-  const tx = db.transaction([OBJECT_STORE_NAME], 'readwrite');
+  const tx = db.transaction([OBJECT_STORE_NAME], "readwrite");
   tx.onerror = rejectFromErrorEvent;
   const getRequest = tx.objectStore(OBJECT_STORE_NAME).clear();
   getRequest.onerror = rejectFromErrorEvent;

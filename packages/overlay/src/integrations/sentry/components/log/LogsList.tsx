@@ -1,18 +1,18 @@
-import { KeyboardEvent, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ReactComponent as Sort } from '~/assets/sort.svg';
-import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
-import CardList from '~/components/CardList';
-import classNames from '~/lib/classNames';
-import { useSpotlightContext } from '~/lib/useSpotlightContext';
-import Table from '~/ui/table';
-import { LOG_LEVEL_COLORS, LOGS_HEADERS, LOGS_SORT_KEYS } from '../../constants';
-import { useSentryLogs } from '../../data/useSentryLogs';
-import useSort from '../../hooks/useSort';
-import type { SentryLogEventItem } from '../../types';
-import { formatTimestamp } from '../../utils/duration';
-import HiddenItemsButton from '../shared/HiddenItemsButton';
-import LogDetails from './LogDetail';
+import { type KeyboardEvent, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ReactComponent as Sort } from "~/assets/sort.svg";
+import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
+import CardList from "~/components/CardList";
+import classNames from "~/lib/classNames";
+import { useSpotlightContext } from "~/lib/useSpotlightContext";
+import Table from "~/ui/table";
+import { LOGS_HEADERS, LOGS_SORT_KEYS, LOG_LEVEL_COLORS } from "../../constants";
+import { useSentryLogs } from "../../data/useSentryLogs";
+import useSort from "../../hooks/useSort";
+import type { SentryLogEventItem } from "../../types";
+import { formatTimestamp } from "../../utils/duration";
+import HiddenItemsButton from "../shared/HiddenItemsButton";
+import LogDetails from "./LogDetail";
 
 type LogsComparator = (a: SentryLogEventItem, b: SentryLogEventItem) => number;
 type LogsSortTypes = (typeof LOGS_SORT_KEYS)[keyof typeof LOGS_SORT_KEYS];
@@ -37,7 +37,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
   const { allLogs, localLogs } = useSentryLogs(traceId);
   const { sort, toggleSortOrder } = useSort({ defaultSortType: LOGS_SORT_KEYS.timestamp });
 
-  const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
+  const [showAll, setShowAll] = useState(!context.experiments["sentry:focus-local-events"]);
 
   const hiddenItemCount = allLogs.length - localLogs.length;
 
@@ -55,7 +55,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
   };
 
   const handleRowKeyDown = (e: KeyboardEvent<HTMLTableRowElement>, log: SentryLogEventItem) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleRowClick(log);
     }
   };
@@ -80,17 +80,17 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                     key={header.id}
                     scope="col"
                     className={classNames(
-                      'text-primary-100 py-3.5 text-sm font-semibold',
-                      !header.stretch && 'w-[20%]',
-                      header.primary && 'w-[50%]',
-                      idx === 0 && 'ps-6',
-                      idx === LOGS_HEADERS.length - 1 && 'pe-6',
+                      "text-primary-100 py-3.5 text-sm font-semibold",
+                      !header.stretch && "w-[20%]",
+                      header.primary && "w-[50%]",
+                      idx === 0 && "ps-6",
+                      idx === LOGS_HEADERS.length - 1 && "pe-6",
                     )}
                   >
                     <div
                       className={classNames(
-                        'flex cursor-pointer select-none items-center gap-1',
-                        `justify-${header.align === 'right' ? 'end' : 'start'}`,
+                        "flex cursor-pointer select-none items-center gap-1",
+                        `justify-${header.align === "right" ? "end" : "start"}`,
                       )}
                       onClick={() => header.sortKey && toggleSortOrder(header.sortKey)}
                     >
@@ -101,8 +101,8 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                             width={12}
                             height={12}
                             className={classNames(
-                              'fill-primary-300',
-                              sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
+                              "fill-primary-300",
+                              sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                             )}
                           />
                         ) : (
@@ -124,7 +124,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                   className="hover:bg-primary-900 cursor-pointer"
                 >
                   <td className="ps-6">
-                    <span className={LOG_LEVEL_COLORS[log.level] || 'text-primary-500'}>{log.level.toUpperCase()}</span>
+                    <span className={LOG_LEVEL_COLORS[log.level] || "text-primary-500"}>{log.level.toUpperCase()}</span>
                   </td>
                   <td className="text-sm">
                     <span>{log.body}</span>

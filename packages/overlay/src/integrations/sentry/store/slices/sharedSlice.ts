@@ -1,8 +1,8 @@
-import { StateCreator } from 'zustand';
-import { log } from '~/lib/logger';
-import { SentryErrorEvent } from '../../types';
-import { getNativeFetchImplementation } from '../../utils/fetch';
-import { SentryStore, SharedSliceActions } from '../types';
+import type { StateCreator } from "zustand";
+import type { SentryStore, SharedSliceActions } from "~/integrations/sentry/store/types";
+import type { SentryErrorEvent } from "~/integrations/sentry/types";
+import { getNativeFetchImplementation } from "~/integrations/sentry/utils/fetch";
+import { log } from "~/lib/logger";
 
 export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceActions> = (set, get) => ({
   getEventById: (id: string) => get().eventsById.get(id),
@@ -16,12 +16,12 @@ export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceAct
       return true;
     });
   },
-  processStacktrace: async (errorEvent: SentryErrorEvent): Promise<void[]> => {
+  processStacktrace: async (errorEvent: SentryErrorEvent): Promise<void> => {
     if (!errorEvent.exception || !errorEvent.exception.values) {
-      return [];
+      return;
     }
 
-    return Promise.all(
+    await Promise.all(
       (errorEvent.exception.values ?? []).map(async exception => {
         if (!exception.stacktrace) {
           return;
@@ -31,14 +31,14 @@ export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceAct
         if (
           exception.stacktrace.frames?.every(frame => frame.post_context && frame.pre_context && frame.context_line)
         ) {
-          log('Skipping contextlines request as we have full context for', exception);
+          log("Skipping contextlines request as we have full context for", exception);
           return;
         }
 
         try {
           const makeFetch = getNativeFetchImplementation();
           const stackTraceWithContextResponse = await makeFetch(get().contextLinesProvider, {
-            method: 'PUT',
+            method: "PUT",
             body: JSON.stringify(exception.stacktrace),
           });
 
@@ -51,6 +51,8 @@ export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceAct
         } catch {
           // Something went wrong, for now we just ignore it.
         }
+
+        return;
       }),
     );
   },

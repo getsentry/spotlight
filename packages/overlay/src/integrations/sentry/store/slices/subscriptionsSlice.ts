@@ -1,6 +1,6 @@
-import { StateCreator } from 'zustand';
-import { generateUuidv4 } from '~/lib/uuid';
-import { SentryStore, Subscription, SubscriptionsSliceActions, SubscriptionsSliceState } from '../types';
+import type { StateCreator } from "zustand";
+import { generateUuidv4 } from "~/lib/uuid";
+import type { SentryStore, Subscription, SubscriptionsSliceActions, SubscriptionsSliceState } from "../types";
 
 const initialSubscriptionsState: SubscriptionsSliceState = {
   subscribers: new Map(),

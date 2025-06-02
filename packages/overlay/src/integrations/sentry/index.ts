@@ -1,23 +1,23 @@
-import type { Client, Envelope, EnvelopeItem } from '@sentry/core';
-import { removeURLSuffix } from '~/lib/removeURLSuffix';
-import { off, on } from '../../lib/eventTarget';
-import { log, warn } from '../../lib/logger';
-import type { Integration, RawEventContext } from '../integration';
-import { spotlightIntegration } from './sentry-integration';
-import useSentryStore from './store';
-import ErrorsTab from './tabs/ErrorsTab';
-import InsightsTab from './tabs/InsightsTab';
+import type { Client, Envelope, EnvelopeItem } from "@sentry/core";
+import { removeURLSuffix } from "~/lib/removeURLSuffix";
+import { off, on } from "../../lib/eventTarget";
+import { log, warn } from "../../lib/logger";
+import type { Integration, RawEventContext } from "../integration";
+import { spotlightIntegration } from "./sentry-integration";
+import useSentryStore from "./store";
+import ErrorsTab from "./tabs/ErrorsTab";
+import InsightsTab from "./tabs/InsightsTab";
 
-import { spotlightBrowserIntegration } from '@sentry/browser';
-import { getLocalTraces, isLocalTrace } from './store/helpers';
-import LogsTab from './tabs/LogsTab';
-import TracesTab from './tabs/TracesTab';
-import type { SentryErrorEvent, SentryEvent } from './types';
-import { parseJSONFromBuffer } from './utils/bufferParsers';
-import { isErrorEvent } from './utils/sentry';
-import { createTab } from './utils/tabs';
+import { spotlightBrowserIntegration } from "@sentry/browser";
+import { getLocalTraces, isLocalTrace } from "./store/helpers";
+import LogsTab from "./tabs/LogsTab";
+import TracesTab from "./tabs/TracesTab";
+import type { SentryErrorEvent, SentryEvent } from "./types";
+import { parseJSONFromBuffer } from "./utils/bufferParsers";
+import { isErrorEvent } from "./utils/sentry";
+import { createTab } from "./utils/tabs";
 
-const HEADER = 'application/x-sentry-envelope';
+const HEADER = "application/x-sentry-envelope";
 
 type SentryIntegrationOptions = {
   injectIntoSDK?: boolean;
@@ -27,7 +27,7 @@ type SentryIntegrationOptions = {
 
 export default function sentryIntegration(options: SentryIntegrationOptions = {}) {
   return {
-    name: 'sentry',
+    name: "sentry",
     forwardedContentType: [HEADER],
 
     setup: ({ open, sidecarUrl }) => {
@@ -37,30 +37,30 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
       const store = useSentryStore.getState();
       let baseSidecarUrl: string | undefined = undefined;
       if (sidecarUrl) {
-        baseSidecarUrl = removeURLSuffix(sidecarUrl, '/stream');
+        baseSidecarUrl = removeURLSuffix(sidecarUrl, "/stream");
         store.setSidecarUrl(baseSidecarUrl);
       }
 
-      log('Setting up Sentry integration for Spotlight');
-      addSpotlightIntegrationToSentry(options, baseSidecarUrl && new URL('/stream', baseSidecarUrl).href);
+      log("Setting up Sentry integration for Spotlight");
+      addSpotlightIntegrationToSentry(options, baseSidecarUrl && new URL("/stream", baseSidecarUrl).href);
 
       if (options.openLastError) {
-        store.subscribe('event', (e: SentryEvent) => {
+        store.subscribe("event", (e: SentryEvent) => {
           if (!(e as SentryErrorEvent).exception) return;
           setTimeout(() => open(`/errors/${e.event_id}`), 0);
         });
       }
 
       const onRenderError = (e: CustomEvent) => {
-        log('Sentry Event', e.detail.event_id);
+        log("Sentry Event", e.detail.event_id);
         if (!e.detail.event) return;
         store.pushEvent(e.detail.event).then(() => open(`/errors/${e.detail.event.event_id}`));
       };
 
-      on('sentry:showError', onRenderError as EventListener);
+      on("sentry:showError", onRenderError as EventListener);
 
       return () => {
-        off('sentry:showError', onRenderError as EventListener);
+        off("sentry:showError", onRenderError as EventListener);
       };
     },
 
@@ -84,23 +84,23 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
       const localTraceCount = getLocalTraces().length;
 
       return [
-        createTab('traces', 'Traces', {
+        createTab("traces", "Traces", {
           notificationCount: {
             count: localTraceCount,
           },
           content: TracesTab,
         }),
-        createTab('errors', 'Errors', {
+        createTab("errors", "Errors", {
           notificationCount: {
             count: errorCount,
             severe: errorCount > 0,
           },
           content: ErrorsTab,
         }),
-        createTab('insights', 'Insights', {
+        createTab("insights", "Insights", {
           content: InsightsTab,
         }),
-        createTab('logs', 'Logs', {
+        createTab("logs", "Logs", {
           content: LogsTab,
         }),
       ];
@@ -128,7 +128,7 @@ function getLineEnd(data: Uint8Array): number {
  * @returns parsed envelope
  */
 export function processEnvelope(rawEvent: RawEventContext) {
-  let buffer = typeof rawEvent.data === 'string' ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
+  let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
 
   function readLine(length?: number) {
     const cursor = length ?? getLineEnd(buffer);
@@ -185,7 +185,7 @@ type LegacyCarrier = {
   };
 };
 
-type VersionedCarrier = { version: string } & Record<Exclude<string, 'version'>, V8Carrier>;
+type VersionedCarrier = { version: string } & Record<Exclude<string, "version">, V8Carrier>;
 
 type WindowWithSentry = Window & {
   __SENTRY__?: LegacyCarrier & VersionedCarrier;
@@ -235,8 +235,8 @@ function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions, side
         sentryClient.addIntegration(i);
       }
     } catch (e) {
-      warn('Failed to enable all SDK integrations for Spotlight', e);
-      log('Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose');
+      warn("Failed to enable all SDK integrations for Spotlight", e);
+      log("Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose");
     }
   }
 
@@ -266,11 +266,11 @@ function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions, side
     sentryClient.addIntegration(spotlightIntegration());
     sentryClient.addIntegration(spotlightBrowserIntegration({ sidecarUrl }));
   } catch (e) {
-    warn('Failed to add Spotlight integration to Sentry', e);
-    log('Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose');
+    warn("Failed to add Spotlight integration to Sentry", e);
+    log("Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose");
   }
 
-  log('Added Spotlight integration to Sentry SDK');
+  log("Added Spotlight integration to Sentry SDK");
 }
 
 /**
@@ -283,8 +283,8 @@ function getSentryClient(sentryCarrier: LegacyCarrier & VersionedCarrier): Clien
   if (sentryCarrier.version) {
     const versionedCarrier = sentryCarrier[sentryCarrier.version];
     const scope =
-      typeof versionedCarrier?.stack?.getScope === 'function' ? versionedCarrier?.stack?.getScope?.() : undefined;
-    if (typeof scope?.getClient === 'function') {
+      typeof versionedCarrier?.stack?.getScope === "function" ? versionedCarrier?.stack?.getScope?.() : undefined;
+    if (typeof scope?.getClient === "function") {
       return scope.getClient();
     }
   }
@@ -292,7 +292,7 @@ function getSentryClient(sentryCarrier: LegacyCarrier & VersionedCarrier): Clien
   // pre-8.6.0 (+v7) way to get the client
   if (sentryCarrier.hub) {
     const hub = sentryCarrier.hub;
-    if (typeof hub.getClient === 'function') {
+    if (typeof hub.getClient === "function") {
       return hub.getClient();
     }
   }

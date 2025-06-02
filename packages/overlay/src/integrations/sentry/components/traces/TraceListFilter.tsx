@@ -1,13 +1,13 @@
-import { ReactComponent as X } from '~/assets/cross.svg';
-import { ReactComponent as Search } from '~/assets/search.svg';
+import { ReactComponent as X } from "~/assets/cross.svg";
+import { ReactComponent as Search } from "~/assets/search.svg";
 
-import { useCallback, useMemo } from 'react';
-import { Badge } from '~/ui/badge';
-import { Button } from '~/ui/button';
-import { Input } from '~/ui/input';
-import { getSpotlightContainer } from '~/utils/dom';
-import { type FilterConfigs } from '../../hooks/useTraceFiltering';
-import { FilterDropdown } from '../shared/FilterDropdown';
+import { useCallback, useMemo } from "react";
+import { Badge } from "~/ui/badge";
+import { Button } from "~/ui/button";
+import { Input } from "~/ui/input";
+import { getSpotlightContainer } from "~/utils/dom";
+import type { FilterConfigs } from "../../hooks/useTraceFiltering";
+import { FilterDropdown } from "../shared/FilterDropdown";
 
 interface TraceListFilterProps {
   searchQuery: string;
@@ -27,14 +27,14 @@ export default function TraceListFilter({
   const spotlightContainer = getSpotlightContainer();
 
   const handleFilterChange = useCallback(
-    (value: string, checked: boolean, type: 'checkbox' | 'radio') => {
-      if (type === 'checkbox') {
+    (value: string, checked: boolean, type: "checkbox" | "radio") => {
+      if (type === "checkbox") {
         if (checked) {
           setActiveFilters(prev => [...prev, value]);
         } else {
           setActiveFilters(prev => prev.filter(f => f !== value));
         }
-      } else if (type === 'radio') {
+      } else if (type === "radio") {
         if (checked) {
           setActiveFilters([value]);
         } else {
@@ -47,7 +47,7 @@ export default function TraceListFilter({
 
   const clearAllFilters = useCallback(() => {
     setActiveFilters([]);
-    setSearchQuery('');
+    setSearchQuery("");
   }, [setSearchQuery, setActiveFilters]);
 
   const visibleFilterConfigs = useMemo(
@@ -72,7 +72,7 @@ export default function TraceListFilter({
               variant="ghost"
               size="icon"
               className="absolute right-2 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400"
-              onClick={() => setSearchQuery('')}
+              onClick={() => setSearchQuery("")}
             >
               <X className="h-3 w-3" />
             </Button>

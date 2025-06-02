@@ -2,43 +2,37 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm dev:overlay",
-    "dev:overlay": "pnpm --filter overlay dev",
-    "dev:website": "pnpm --filter website dev",
-    "dev:playground": "pnpm --filter astro-playground dev",
-    "dev:electron": "pnpm --filter electron dev",
-    "build": "pnpm --filter=!astro-playground -r run build",
-    "preview": "pnpm -r run preview",
-    "lint": "eslint . --cache --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "dev": "turbo dev --filter=@spotlightjs/overlay --filter=@spotlightjs/sidecar",
+    "dev:overlay": "turbo dev --filter=@spotlightjs/overlay",
+    "dev:website": "turbo dev --filter=@spotlightjs/website",
+    "dev:electron": "turbo dev --filter=@spotlightjs/electron",
+    "build": "turbo build",
+    "preview": "turbo preview",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",
-    "format": "prettier --write --cache .",
-    "test": "pnpm --filter=./packages/* --stream --parallel run test",
-    "test:demos": "pnpm --filter=./demos/* -r --stream --parallel run test",
-    "test:e2e": "pnpm -r --workspace-concurrency=1 --stream run test:e2e",
+    "test": "turbo test --filter=./packages/*",
+    "test:demos": "turbo test --filter=./demos/*",
+    "test:e2e": "turbo test:e2e",
     "yalc:publish": "yalc publish --push --sig --private",
     "changeset:add": "pnpm changeset",
     "changeset:consume": "pnpm changeset version",
     "changeset:publish": "pnpm changeset publish",
-    "clean": "pnpm -r run clean",
+    "clean": "turbo clean",
     "clean:deps": "rimraf ./packages/*/node_modules demos/*/node_modules node_modules",
     "clean:all": "pnpm run clean && pnpm run clean:deps && pnpm install"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@changesets/cli": "^2.27.9",
     "@svitejs/changesets-changelog-github-compact": "^1.1.0",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.3.2",
-    "eslint": "^8.57.1",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "eslint-plugin-react-refresh": "^0.4.12",
     "lint-staged": "^15.2.10",
-    "prettier": "^3.3.3",
-    "prettier-plugin-organize-imports": "^3.2.4",
-    "prettier-plugin-tailwindcss": "^0.5.14",
     "rimraf": "^5.0.10",
     "simple-git-hooks": "^2.11.1",
+    "turbo": "^2.4.0",
     "typescript": "^5.6.2"
   },
   "resolutions": {
@@ -49,13 +43,15 @@
   },
   "lint-staged": {
     "*": [
-      "prettier --write --cache --ignore-unknown"
-    ],
-    "{apps,packages}/**/*.{ts,tsx}": [
-      "eslint --cache --fix"
+      "biome format --write --no-errors-on-unmatched --files-ignore-unknown=true",
+      "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
     ]
   },
   "packageManager": "pnpm@10.9.0",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10.9.0"
+  },
   "volta": {
     "node": "22.11.0",
     "pnpm": "10.9.0"

@@ -1,19 +1,19 @@
-import type { Trace } from '../../types';
-import { sdkToPlatform } from '../../utils/sdkToPlatform';
-import PlatformIcon from '../shared/PlatformIcon';
+import type { Trace } from "../../types";
+import { sdkToPlatform } from "../../utils/sdkToPlatform";
+import PlatformIcon from "../shared/PlatformIcon";
 
 export type TraceIconProps = {
   trace: Trace;
 };
 
 function getPlatformsFromTrace(trace: Trace) {
-  return [...new Set((trace.transactions || []).map(transaction => sdkToPlatform(transaction.sdk?.name || 'unknown')))];
+  return [...new Set((trace.transactions || []).map(transaction => sdkToPlatform(transaction.sdk?.name || "unknown")))];
 }
 
 export default function TraceIcon({ trace }: TraceIconProps) {
   const platformsInTrace = getPlatformsFromTrace(trace);
   if (platformsInTrace.length === 0) {
-    return <PlatformIcon className="rounded-md" platform={'unknown'} />;
+    return <PlatformIcon className="rounded-md" platform={"unknown"} />;
   }
   if (platformsInTrace.length === 1) {
     return <PlatformIcon className="rounded-md" platform={platformsInTrace[0]} />;
@@ -28,7 +28,7 @@ export default function TraceIcon({ trace }: TraceIconProps) {
       ))}
       {remainingPlatforms.length > 0 && (
         <div
-          title={remainingPlatforms.join(', ')}
+          title={remainingPlatforms.join(", ")}
           className="h-[21px] w-[21px] bg-black p-0.5 text-xs font-bold text-white"
         >{`+${remainingPlatforms.length}`}</div>
       )}

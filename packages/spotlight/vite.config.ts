@@ -1,8 +1,8 @@
-import { builtinModules } from 'node:module';
-import { resolve } from 'node:path';
-import { defineConfig } from 'vite';
+import { builtinModules } from "node:module";
+import { resolve } from "node:path";
+import { defineConfig } from "vite";
 
-import packageJson from './package.json';
+import packageJson from "./package.json";
 
 const dependencies = Object.keys({
   ...packageJson.dependencies,
@@ -13,9 +13,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        overlay: resolve(__dirname, 'src/overlay.ts'),
-        sidecar: resolve(__dirname, 'src/sidecar.ts'),
-        'vite-plugin': resolve(__dirname, 'src/vite-plugin.ts'),
+        overlay: resolve(__dirname, "src/overlay.ts"),
+        sidecar: resolve(__dirname, "src/sidecar.ts"),
+        "vite-plugin": resolve(__dirname, "src/vite-plugin.ts"),
       },
     },
     rollupOptions: {
