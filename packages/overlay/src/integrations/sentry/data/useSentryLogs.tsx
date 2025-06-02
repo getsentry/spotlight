@@ -10,9 +10,9 @@ export const useSentryLogs = (traceId?: string) => {
   const getEvents = useSentryStore(state => state.getEvents);
 
   const allEvents = getEvents();
-  const allLogs = (allEvents.filter(e => e.type && LOG_EVENT_TYPES.has(e.type)) as SentryLogEvent[])
-    .map(e => e.items)
-    .flat();
+  const allLogs = (allEvents.filter(e => e.type && LOG_EVENT_TYPES.has(e.type)) as SentryLogEvent[]).flatMap(
+    e => e.items,
+  );
 
   const filteredAllLogs = traceId ? allLogs.filter(item => item.trace_id === traceId) : allLogs;
 
