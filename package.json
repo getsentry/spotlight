@@ -47,13 +47,12 @@
       "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
     ]
   },
-  "packageManager": "pnpm@10.9.0",
+  "packageManager": "pnpm@9.15.9",
   "engines": {
-    "node": ">=22",
-    "pnpm": ">=10.9.0"
+    "node": ">=22"
   },
   "volta": {
     "node": "22.11.0",
-    "pnpm": "10.9.0"
+    "pnpm": "9.15.9"
   }
 }
