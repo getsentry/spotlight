@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     sveltekit(),
     sentrySvelteKit({ autoUploadSourceMaps: false }),
-    spotlight({ integrationNames: ['sentry', 'console'], debug: true }),
+    spotlight({ integrationNames: ['sentry'], debug: true }),
   ],
   test: {
     include: ['src/**/*.{test,spec}.{js,ts}'],
