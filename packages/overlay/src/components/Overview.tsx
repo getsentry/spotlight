@@ -49,16 +49,14 @@ export default function Overview({
   }, [notificationCountSum, setTriggerButtonCount]);
 
   return (
-    <div className="flex flex-1">
+    <div className="flex overflow-hidden">
       <Navigation panels={panels} setOpen={setOpen} />
-      <div className="flex-1">
-        <Routes>
-          <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={"not-found"} />
-          {panels.map(({ content: PanelContent, id }) =>
-            PanelContent ? <Route path={`/${id}/*`} key={id} element={createElement(PanelContent)} /> : null,
-          )}
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={"not-found"} />
+        {panels.map(({ content: PanelContent, id }) =>
+          PanelContent ? <Route path={`/${id}/*`} key={id} element={createElement(PanelContent)} /> : null,
+        )}
+      </Routes>
     </div>
   );
 }

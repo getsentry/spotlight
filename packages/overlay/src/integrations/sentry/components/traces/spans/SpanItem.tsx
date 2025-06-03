@@ -70,13 +70,17 @@ const SpanItem = ({
       >
         <div
           className={classNames(
-            "node group-hover:bg-primary-700 rounded-sm",
+            "node",
+            "group-hover:bg-primary-700",
+            "rounded-sm",
+            "overflow-hidden",
             isQueried ? "bg-transparent" : "",
             span.status && span.status !== "ok" ? "text-red-400" : "",
             spanId === span.span_id ? "bg-primary-900" : "bg-primary-950",
           )}
           style={{
             width: `${spanNodeWidth}%`,
+            paddingRight: "30px",
           }}
         >
           {childrenCount > 0 && (
@@ -110,11 +114,12 @@ const SpanItem = ({
           className={classNames("waterfall group-hover:bg-primary-700 rounded-sm", isQueried ? "!bg-transparent" : "")}
           style={{
             left: `${spanNodeWidth}%`,
+            height: "100%",
           }}
         >
           <SpanResizer setIsResizing={setIsResizing} isResizing={isResizing} handleResize={handleResize} />
           <div
-            className="bg-primary-900 absolute -m-0.5 w-full p-0.5"
+            className="bg-primary-900 absolute -m-0.5 w-full h-full p-0.5"
             style={{
               left: `calc(min(${((span.start_timestamp - startTimestamp) / totalDuration) * 100}%, 95% - 1px) + 4px)`,
               width: `max(1px, ${(spanDuration / totalDuration) * 95}%)`,

@@ -55,7 +55,7 @@ export default function EventList({ traceId }: { traceId?: string }) {
               <span />
               <TimeSince date={e.timestamp} />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 overflow-hidden">
               <EventSummary event={e} />
             </div>
           </Link>

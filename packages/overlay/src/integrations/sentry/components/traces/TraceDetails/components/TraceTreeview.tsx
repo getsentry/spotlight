@@ -69,7 +69,7 @@ function TraceTreeWithSearch({
         </button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2 pb-6">
+      <div className="flex overflow-x-hidden overflow-y-auto">
         <SpanTree
           traceContext={trace}
           tree={trace.spanTree}
