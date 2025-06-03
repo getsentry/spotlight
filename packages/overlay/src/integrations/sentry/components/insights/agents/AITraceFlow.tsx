@@ -1,14 +1,14 @@
-import { useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ReactComponent as CrossIcon } from '~/assets/cross.svg';
-import { SearchProvider, useSearch } from '~/integrations/sentry/context/SearchContext';
-import useSearchInput from '~/integrations/sentry/hooks/useSearchInput';
-import useSentryStore from '~/integrations/sentry/store';
-import type { SpotlightAITrace } from '~/integrations/sentry/types';
-import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
-import classNames from '~/lib/classNames';
-import DateTime from '../../shared/DateTime';
-import { createAITraceFromSpan, extractAllAIRootSpans } from './sdks/aiLibraries';
+import { useMemo } from "react";
+import { Link, useParams } from "react-router-dom";
+import { ReactComponent as CrossIcon } from "~/assets/cross.svg";
+import { SearchProvider, useSearch } from "~/integrations/sentry/context/SearchContext";
+import useSearchInput from "~/integrations/sentry/hooks/useSearchInput";
+import useSentryStore from "~/integrations/sentry/store";
+import type { SpotlightAITrace } from "~/integrations/sentry/types";
+import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
+import classNames from "~/lib/classNames";
+import DateTime from "../../shared/DateTime";
+import { createAITraceFromSpan, extractAllAIRootSpans } from "./sdks/aiLibraries";
 
 type AITraceFlowProps = {
   traceId: string;
@@ -38,33 +38,33 @@ function AIFlowItem({
       <Link
         to={`/traces/${traceId}/spans/${aiTrace.id}`}
         className={classNames(
-          'relative z-10 block flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-all',
+          "relative z-10 block flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-all",
           isSelected
-            ? 'bg-primary-800 border-primary-500'
-            : 'bg-primary-900 border-primary-700 hover:bg-primary-800 hover:border-primary-600',
+            ? "bg-primary-800 border-primary-500"
+            : "bg-primary-900 border-primary-700 hover:bg-primary-800 hover:border-primary-600",
         )}
       >
         {/* flow indicator dot */}
         <div
           className={classNames(
-            'mt-2 h-2 w-2 flex-shrink-0 rounded-full',
-            isSelected ? 'bg-blue-400' : 'bg-primary-400',
+            "mt-2 h-2 w-2 flex-shrink-0 rounded-full",
+            isSelected ? "bg-blue-400" : "bg-primary-400",
           )}
         />
 
         {/* content */}
         <div className="min-w-0 flex-1">
           <div className="mb-1 flex items-center justify-between gap-2">
-            <h3 className={classNames('truncate font-medium', isSelected ? 'text-primary-100' : 'text-primary-200')}>
+            <h3 className={classNames("truncate font-medium", isSelected ? "text-primary-100" : "text-primary-200")}>
               {aiTrace.name}
             </h3>
             <span
               className={classNames(
-                'rounded px-2 py-0.5 text-xs',
-                aiTrace.hasToolCall ? 'bg-orange-500/20 text-orange-300' : 'bg-blue-500/20 text-blue-300',
+                "rounded px-2 py-0.5 text-xs",
+                aiTrace.hasToolCall ? "bg-orange-500/20 text-orange-300" : "bg-blue-500/20 text-blue-300",
               )}
             >
-              {aiTrace.hasToolCall ? 'Tool Call' : aiTrace.operation.replace('ai.', '')}
+              {aiTrace.hasToolCall ? "Tool Call" : aiTrace.operation.replace("ai.", "")}
             </span>
           </div>
 
@@ -75,7 +75,7 @@ function AIFlowItem({
 
           {aiTrace.hasToolCall && aiTrace.toolCalls.length > 0 && (
             <div className="text-primary-300 mt-2 text-xs">
-              Tools: {aiTrace.toolCalls.map(tool => tool.toolName).join(', ')}
+              Tools: {aiTrace.toolCalls.map(tool => tool.toolName).join(", ")}
             </div>
           )}
         </div>
@@ -175,9 +175,9 @@ function AITraceFlowContent({ traceId }: AITraceFlowProps) {
           </div>
           <span>&mdash;</span>
           <span>
-            <strong className="text-primary-200 font-bold">{getFormattedDuration(totalDuration)}</strong> with{' '}
+            <strong className="text-primary-200 font-bold">{getFormattedDuration(totalDuration)}</strong> with{" "}
             <strong className="text-primary-200 font-bold">
-              {aiTraces.length} AI interaction{aiTraces.length !== 1 ? 's' : ''}
+              {aiTraces.length} AI interaction{aiTraces.length !== 1 ? "s" : ""}
             </strong>
           </span>
         </div>

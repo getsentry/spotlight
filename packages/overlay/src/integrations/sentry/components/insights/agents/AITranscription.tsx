@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
-import { useParams } from 'react-router-dom';
-import useSentryStore from '~/integrations/sentry/store';
-import type { SpotlightAITrace } from '~/integrations/sentry/types';
-import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
-import classNames from '~/lib/classNames';
-import { createAITraceFromSpan, extractAllAIRootSpans } from './sdks/aiLibraries';
+import { useMemo } from "react";
+import { useParams } from "react-router-dom";
+import useSentryStore from "~/integrations/sentry/store";
+import type { SpotlightAITrace } from "~/integrations/sentry/types";
+import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
+import classNames from "~/lib/classNames";
+import { createAITraceFromSpan, extractAllAIRootSpans } from "./sdks/aiLibraries";
 
 type AITranscriptionProps = {
   traceId: string;
@@ -12,7 +12,7 @@ type AITranscriptionProps = {
 
 type ConversationMessage = {
   id: string;
-  type: 'user' | 'ai-response' | 'ai-tool-call';
+  type: "user" | "ai-response" | "ai-tool-call";
   content: string;
   timestamp: number;
   spanId: string;
@@ -38,23 +38,23 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
   // Get all raw spans sorted by timestamp
   const allSpans = aiTraces.map(trace => trace.rawSpan).sort((a, b) => a.start_timestamp - b.start_timestamp);
 
-  allSpans.forEach(span => {
+  for (const span of allSpans) {
     const aiTrace = createAITraceFromSpan(span);
-    if (!aiTrace) return;
+    if (!aiTrace) continue;
 
     // Extract user prompt (only once per unique prompt)
     if (aiTrace.prompt?.messages) {
       const userMessages = aiTrace.prompt.messages
-        .filter(msg => msg.role === 'user' || msg.role === 'human')
+        .filter(msg => msg.role === "user" || msg.role === "human")
         .map(msg => msg.content)
-        .filter(content => content && content.trim())
-        .join('\n\n');
+        .filter(content => content?.trim())
+        .join("\n\n");
 
       if (userMessages && !seenUserPrompts.has(userMessages)) {
         seenUserPrompts.add(userMessages);
         messages.push({
           id: `${span.span_id}-user`,
-          type: 'user',
+          type: "user",
           content: userMessages,
           timestamp: span.start_timestamp,
           spanId: span.span_id,
@@ -64,7 +64,7 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
       seenUserPrompts.add(aiTrace.prompt.system);
       messages.push({
         id: `${span.span_id}-user`,
-        type: 'user',
+        type: "user",
         content: aiTrace.prompt.system,
         timestamp: span.start_timestamp,
         spanId: span.span_id,
@@ -75,7 +75,7 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
     aiTrace.toolCalls.forEach((toolCall, index) => {
       messages.push({
         id: `${span.span_id}-tool-${index}`,
-        type: 'ai-tool-call',
+        type: "ai-tool-call",
         content: `Using ${toolCall.toolName}`,
         timestamp: span.start_timestamp + index * 10, // Slight offset for ordering
         spanId: span.span_id,
@@ -95,7 +95,7 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
     if (aiTrace.response?.text) {
       messages.push({
         id: `${span.span_id}-response`,
-        type: 'ai-response',
+        type: "ai-response",
         content: aiTrace.response.text,
         timestamp: span.timestamp - 1, // Near the end of span
         spanId: span.span_id,
@@ -110,8 +110,8 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
       });
     } else if (aiTrace.toolCalls.length === 0) {
       // If no tool calls and no text response, but it's an AI span, show operation
-      let aiContent = '';
-      if (aiTrace.name && aiTrace.name !== 'AI Interaction') {
+      let aiContent = "";
+      if (aiTrace.name && aiTrace.name !== "AI Interaction") {
         aiContent = aiTrace.name;
       } else {
         aiContent = `${aiTrace.operation} operation`;
@@ -119,7 +119,7 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
 
       messages.push({
         id: `${span.span_id}-operation`,
-        type: 'ai-response',
+        type: "ai-response",
         content: aiContent,
         timestamp: span.timestamp - 1,
         spanId: span.span_id,
@@ -133,30 +133,30 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
         },
       });
     }
-  });
+  }
 
   return messages.sort((a, b) => a.timestamp - b.timestamp);
 }
 
 function ConversationBubble({ message, isSelected }: { message: ConversationMessage; isSelected: boolean }) {
-  const isUser = message.type === 'user';
-  const isToolCall = message.type === 'ai-tool-call';
+  const isUser = message.type === "user";
+  const isToolCall = message.type === "ai-tool-call";
   // const isAIResponse = message.type === 'ai-response';
 
   return (
-    <div className={classNames('mb-4 flex w-full', isUser ? 'justify-end' : 'justify-start')}>
+    <div className={classNames("mb-4 flex w-full", isUser ? "justify-end" : "justify-start")}>
       <div
         className={classNames(
-          'max-w-[80%] rounded-lg border p-4',
+          "max-w-[80%] rounded-lg border p-4",
           isUser
-            ? 'border-blue-500/30 bg-blue-600/20 text-blue-100'
+            ? "border-blue-500/30 bg-blue-600/20 text-blue-100"
             : isToolCall
               ? isSelected
-                ? 'border-orange-400 bg-orange-600/30 text-orange-100'
-                : 'border-orange-500/30 bg-orange-600/20 text-orange-200'
+                ? "border-orange-400 bg-orange-600/30 text-orange-100"
+                : "border-orange-500/30 bg-orange-600/20 text-orange-200"
               : isSelected
-                ? 'bg-primary-800 border-primary-500 text-primary-100'
-                : 'bg-primary-900 border-primary-700 text-primary-200',
+                ? "bg-primary-800 border-primary-500 text-primary-100"
+                : "bg-primary-900 border-primary-700 text-primary-200",
         )}
       >
         {/* Message content */}
@@ -181,7 +181,7 @@ function ConversationBubble({ message, isSelected }: { message: ConversationMess
                     <div>
                       <div className="mb-1 font-medium text-orange-300">Result:</div>
                       <div className="font-mono text-xs text-orange-200">
-                        {typeof message.metadata.toolCall.result === 'string'
+                        {typeof message.metadata.toolCall.result === "string"
                           ? message.metadata.toolCall.result
                           : JSON.stringify(message.metadata.toolCall.result, null, 2)}
                       </div>

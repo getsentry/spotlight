@@ -1,6 +1,6 @@
-import { Route, Routes } from 'react-router-dom';
-import { SentryEventsContextProvider } from '~/integrations/sentry/data/sentryEventsContext';
-import AITraceList from './AITraceList';
+import { Route, Routes } from "react-router-dom";
+import { SentryEventsContextProvider } from "~/integrations/sentry/data/sentryEventsContext";
+import AITraceList from "./AITraceList";
 
 export default function AgentsTab() {
   return (

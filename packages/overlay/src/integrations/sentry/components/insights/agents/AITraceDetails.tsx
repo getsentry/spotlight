@@ -1,20 +1,20 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   createAITraceFromSpan,
   detectAILibraryHandler,
-} from '~/integrations/sentry/components/insights/agents/sdks/aiLibraries';
-import type { AILibraryHandler, SpotlightAITrace } from '~/integrations/sentry/types';
-import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
-import Badge from '~/ui/Badge';
-import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
-import Table from '~/ui/Table';
-import { SearchProvider } from '../../../context/SearchContext';
-import useSentryStore from '../../../store';
-import DateTime from '../../shared/DateTime';
-import SpanTree from '../../traces/spans/SpanTree';
+} from "~/integrations/sentry/components/insights/agents/sdks/aiLibraries";
+import type { AILibraryHandler, SpotlightAITrace } from "~/integrations/sentry/types";
+import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
+import { Badge } from "~/ui/badge";
+import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
+import Table from "~/ui/table";
+import { SearchProvider } from "../../../context/SearchContext";
+import useSentryStore from "../../../store";
+import DateTime from "../../shared/DateTime";
+import SpanTree from "../../traces/spans/SpanTree";
 
-const AGENTS_ROUTE = '/insights/agents';
+const AGENTS_ROUTE = "/insights/agents";
 
 interface ToolCallDetailProps {
   toolCall: {
@@ -46,7 +46,7 @@ function ToolCallDetail({ toolCall }: ToolCallDetailProps) {
         <div>
           <h4 className="text-sm font-semibold uppercase">Result</h4>
           <div className="bg-primary-900 p-2">
-            {typeof toolCall.result === 'string' ? (
+            {typeof toolCall.result === "string" ? (
               <pre className="whitespace-pre-wrap break-words font-mono text-sm">{toolCall.result}</pre>
             ) : (
               <pre className="whitespace-pre-wrap break-words font-mono text-sm">
@@ -62,32 +62,32 @@ function ToolCallDetail({ toolCall }: ToolCallDetailProps) {
 
 function AITraceMetadata({ trace, handler }: { trace: SpotlightAITrace; handler: AILibraryHandler }) {
   const metadata = [
-    ['Trace ID', trace.id],
-    ['Type', handler.getTypeBadge(trace)],
-    ['Operation', trace.operation],
-    ['Timestamp', <DateTime key="timestamp" date={trace.timestamp} />],
-    ['Duration', getFormattedDuration(trace.durationMs)],
-    ['Tokens (prompt/completion)', handler.getTokensDisplay(trace)],
+    ["Trace ID", trace.id],
+    ["Type", handler.getTypeBadge(trace)],
+    ["Operation", trace.operation],
+    ["Timestamp", <DateTime key="timestamp" date={trace.timestamp} />],
+    ["Duration", getFormattedDuration(trace.durationMs)],
+    ["Tokens (prompt/completion)", handler.getTokensDisplay(trace)],
   ];
 
   if (trace.metadata.functionId) {
-    metadata.push(['Function ID', trace.metadata.functionId]);
+    metadata.push(["Function ID", trace.metadata.functionId]);
   }
 
   if (trace.metadata.maxRetries !== undefined) {
-    metadata.push(['Max Retries', String(trace.metadata.maxRetries)]);
+    metadata.push(["Max Retries", String(trace.metadata.maxRetries)]);
   }
 
   if (trace.metadata.maxSteps !== undefined) {
-    metadata.push(['Max Steps', String(trace.metadata.maxSteps)]);
+    metadata.push(["Max Steps", String(trace.metadata.maxSteps)]);
   }
 
   if (trace.metadata.modelId) {
-    metadata.push(['Model', trace.metadata.modelId]);
+    metadata.push(["Model", trace.metadata.modelId]);
   }
 
   if (trace.metadata.modelProvider) {
-    metadata.push(['Provider', trace.metadata.modelProvider]);
+    metadata.push(["Provider", trace.metadata.modelProvider]);
   }
 
   return (
@@ -151,7 +151,7 @@ function PromptSection({ trace }: { trace: SpotlightAITrace }) {
           <h3 className="mb-2 text-sm font-semibold uppercase">Messages</h3>
           {trace.prompt.messages.map((message, i) => {
             let messageContent: string;
-            if (message.role === 'assistant') {
+            if (message.role === "assistant") {
               if (!trace.response?.text) {
                 return null; // Don't render empty assistant messages
               }
@@ -289,7 +289,7 @@ export function AITraceDetailsEmbedded({ spanId }: { spanId: string }) {
                     className="bg-primary-800 absolute bottom-0 top-0 -m-0.5 flex w-full items-center p-0.5"
                     style={{
                       left: 0,
-                      width: '100%',
+                      width: "100%",
                     }}
                   >
                     <span className="whitespace-nowrap">

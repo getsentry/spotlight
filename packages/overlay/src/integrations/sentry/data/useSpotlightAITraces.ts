@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
-import { aiLibraries } from '../components/insights/agents/sdks/aiLibraries';
-import type { Span, SpotlightAITrace } from '../types';
-import { useSentryTraces } from './useSentrySpans';
+import { useMemo } from "react";
+import { aiLibraries } from "../components/insights/agents/sdks/aiLibraries";
+import type { Span, SpotlightAITrace } from "../types";
+import { useSentryTraces } from "./useSentrySpans";
 
 // get all AI trace root spans across all AI frameworks
 export function useAITraces(): Span[] {
@@ -27,12 +27,12 @@ export function useAITraces(): Span[] {
 function processSpanAsTrace(span: Span): SpotlightAITrace {
   if (!span?.span_id) {
     return {
-      id: 'error-invalid-span',
-      name: 'Invalid Span',
-      operation: 'error',
+      id: "error-invalid-span",
+      name: "Invalid Span",
+      operation: "error",
       timestamp: 0,
       durationMs: 0,
-      tokensDisplay: 'N/A',
+      tokensDisplay: "N/A",
       hasToolCall: false,
       rawSpan: {} as Span,
       metadata: {
@@ -52,11 +52,11 @@ function processSpanAsTrace(span: Span): SpotlightAITrace {
   // fallback processing
   return {
     id: span.span_id,
-    name: span.description || span.op || 'Unknown AI Interaction',
-    operation: 'unknown',
+    name: span.description || span.op || "Unknown AI Interaction",
+    operation: "unknown",
     timestamp: span.start_timestamp || 0,
     durationMs: (span.timestamp || 0) - (span.start_timestamp || 0),
-    tokensDisplay: 'N/A',
+    tokensDisplay: "N/A",
     hasToolCall: false,
     rawSpan: span,
     metadata: {

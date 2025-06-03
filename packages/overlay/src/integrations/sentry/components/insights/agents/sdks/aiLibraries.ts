@@ -1,5 +1,5 @@
-import type { AILibraryHandler, Span, SpotlightAITrace, Trace } from '~/integrations/sentry/types';
-import { vercelAISDKHandler } from './vercelAISDK';
+import type { AILibraryHandler, Span, SpotlightAITrace, Trace } from "~/integrations/sentry/types";
+import { vercelAISDKHandler } from "./vercelAISDK";
 
 // Registry of supported AI libraries
 const aiLibraries: AILibraryHandler[] = [vercelAISDKHandler];

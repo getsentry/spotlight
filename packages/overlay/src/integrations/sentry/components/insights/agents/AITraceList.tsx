@@ -1,17 +1,17 @@
-import { useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ReactComponent as Sort } from '~/assets/sort.svg';
-import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
-import type { SpotlightAITrace } from '~/integrations/sentry/types';
-import classNames from '~/lib/classNames';
-import Table from '~/ui/Table';
-import { AGENT_HEADERS, AGENT_SORT_KEYS } from '../../../constants';
-import { SearchProvider } from '../../../context/SearchContext';
-import { useSpotlightAITraces } from '../../../data/useSpotlightAITraces';
-import useSort from '../../../hooks/useSort';
-import useSentryStore from '../../../store';
-import AITraceDetail from './AITraceDetails';
-import AITraceItem from './AITraceItem';
+import { useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ReactComponent as Sort } from "~/assets/sort.svg";
+import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
+import type { SpotlightAITrace } from "~/integrations/sentry/types";
+import classNames from "~/lib/classNames";
+import Table from "~/ui/table";
+import { AGENT_HEADERS, AGENT_SORT_KEYS } from "../../../constants";
+import { SearchProvider } from "../../../context/SearchContext";
+import { useSpotlightAITraces } from "../../../data/useSpotlightAITraces";
+import useSort from "../../../hooks/useSort";
+import useSentryStore from "../../../store";
+import AITraceDetail from "./AITraceDetails";
+import AITraceItem from "./AITraceItem";
 
 type AgentSortTypes = (typeof AGENT_SORT_KEYS)[keyof typeof AGENT_SORT_KEYS];
 type AgentComparator = (a: SpotlightAITrace, b: SpotlightAITrace) => number;
@@ -71,18 +71,18 @@ export default function AITraceList() {
                 key={header.id}
                 scope="col"
                 className={classNames(
-                  'text-primary-100 px-6 py-3.5 text-sm font-semibold',
-                  header.id === 'duration' || header.id === 'tokens' ? 'text-right' : 'text-left',
+                  "text-primary-100 px-6 py-3.5 text-sm font-semibold",
+                  header.id === "duration" || header.id === "tokens" ? "text-right" : "text-left",
                 )}
               >
                 <div
                   className={classNames(
-                    'flex cursor-pointer select-none items-center gap-1',
-                    header.id === 'duration' || header.id === 'tokens' ? 'justify-end' : '',
+                    "flex cursor-pointer select-none items-center gap-1",
+                    header.id === "duration" || header.id === "tokens" ? "justify-end" : "",
                   )}
                   onClick={() => header.sortKey && toggleSortOrder(header.sortKey as AgentSortTypes)}
                   onKeyDown={e => {
-                    if ((e.key === 'Enter' || e.key === ' ') && header.sortKey) {
+                    if ((e.key === "Enter" || e.key === " ") && header.sortKey) {
                       toggleSortOrder(header.sortKey as AgentSortTypes);
                     }
                   }}
@@ -95,8 +95,8 @@ export default function AITraceList() {
                       width={12}
                       height={12}
                       className={classNames(
-                        'fill-primary-300',
-                        sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
+                        "fill-primary-300",
+                        sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                       )}
                     />
                   ) : (

@@ -1,6 +1,6 @@
-import type { SpotlightAITrace } from '~/integrations/sentry/types';
-import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
-import DateTime from '../../shared/DateTime';
+import type { SpotlightAITrace } from "~/integrations/sentry/types";
+import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
+import DateTime from "../../shared/DateTime";
 interface AITraceItemProps {
   trace: SpotlightAITrace;
   onClick: () => void;
@@ -20,7 +20,7 @@ export default function AITraceItem({ trace, onClick }: AITraceItemProps) {
       role="link"
       tabIndex={0}
       onKeyDown={e => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === "Enter" || e.key === " ") {
           onClick();
         }
       }}

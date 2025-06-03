@@ -1,9 +1,9 @@
-import { useCallback, useRef, useState } from 'react';
-import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
-import Resizer from '../components/shared/Resizer';
-import TraceDetails from '../components/traces/TraceDetails';
-import TraceList from '../components/traces/TraceList';
-import { SentryEventsContextProvider } from '../data/sentryEventsContext';
+import { useCallback, useRef, useState } from "react";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
+import Resizer from "../components/shared/Resizer";
+import TraceDetails from "../components/traces/TraceDetails";
+import TraceList from "../components/traces/TraceList";
+import { SentryEventsContextProvider } from "../data/sentryEventsContext";
 
 const MIN_PANEL_WIDTH_PERCENT = 20;
 const MAX_PANEL_WIDTH_PERCENT = 80;
@@ -17,23 +17,20 @@ function TraceSplitViewLayout() {
   const [isResizing, setIsResizing] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleResize = useCallback(
-    (e: MouseEvent) => {
-      if (!containerRef.current) return;
+  const handleResize = useCallback((e: MouseEvent) => {
+    if (!containerRef.current) return;
 
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const newLeftPanelWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const newLeftPanelWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
 
-      const clampedWidth = Math.max(MIN_PANEL_WIDTH_PERCENT, Math.min(MAX_PANEL_WIDTH_PERCENT, newLeftPanelWidth));
-      setLeftPanelWidth(clampedWidth);
-    },
-    [setLeftPanelWidth],
-  );
+    const clampedWidth = Math.max(MIN_PANEL_WIDTH_PERCENT, Math.min(MAX_PANEL_WIDTH_PERCENT, newLeftPanelWidth));
+    setLeftPanelWidth(clampedWidth);
+  }, []);
 
   const handleTraceSelect = useCallback(
     (selectedTraceId: string) => {
       if (traceId === selectedTraceId) {
-        navigate('..'); // relative to /:traceId/*, so goes to TracesTab
+        navigate(".."); // relative to /:traceId/*, so goes to TracesTab
       } else {
         navigate(`../${selectedTraceId}`); // relative to /:traceId/*, so goes to /newTraceId/*
       }
@@ -42,7 +39,7 @@ function TraceSplitViewLayout() {
   );
 
   const handleCloseTraceDetails = useCallback(() => {
-    navigate('..'); // relative to /:traceId/*, so goes to TracesTab
+    navigate(".."); // relative to /:traceId/*, so goes to TracesTab
   }, [navigate]);
 
   if (!traceId) {
