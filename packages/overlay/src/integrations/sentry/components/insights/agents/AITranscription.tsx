@@ -144,10 +144,10 @@ function ConversationBubble({ message, isSelected }: { message: ConversationMess
   // const isAIResponse = message.type === 'ai-response';
 
   return (
-    <div className={classNames("mb-4 flex w-full", isUser ? "justify-end" : "justify-start")}>
+    <div className={classNames("mb-2 flex w-full", isUser ? "justify-end" : "justify-start")}>
       <div
         className={classNames(
-          "max-w-[80%] rounded-lg border p-4",
+          "max-w-[80%] rounded-lg border p-3",
           isUser
             ? "border-blue-500/30 bg-blue-600/20 text-blue-100"
             : isToolCall
@@ -159,19 +159,21 @@ function ConversationBubble({ message, isSelected }: { message: ConversationMess
                 : "bg-primary-900 border-primary-700 text-primary-200",
         )}
       >
+        {isUser && <div className="mb-1 text-xs font-medium text-blue-300">User:</div>}
+
         {/* Message content */}
-        <div className="mb-2 whitespace-pre-wrap text-sm">{message.content}</div>
+        <div className="mb-1 whitespace-pre-wrap text-sm">{message.content}</div>
 
         {/* AI metadata */}
         {!isUser && message.metadata && (
-          <div className="space-y-2">
+          <div className="space-y-1">
             {/* Tool call details (for tool call messages) */}
             {message.metadata.toolCall && (
               <div className="space-y-1">
                 <div className="rounded border border-orange-500/30 bg-orange-500/20 p-2 text-xs">
                   {message.metadata.toolCall.args && Object.keys(message.metadata.toolCall.args).length > 0 && (
-                    <div className="mb-2">
-                      <div className="mb-1 font-medium text-orange-300">Arguments:</div>
+                    <div className="mb-1">
+                      <div className="mb-0.5 font-medium text-orange-300">Arguments:</div>
                       <div className="font-mono text-xs text-orange-200">
                         {JSON.stringify(message.metadata.toolCall.args, null, 2)}
                       </div>
@@ -179,11 +181,24 @@ function ConversationBubble({ message, isSelected }: { message: ConversationMess
                   )}
                   {message.metadata.toolCall.result && (
                     <div>
-                      <div className="mb-1 font-medium text-orange-300">Result:</div>
+                      <div className="mb-0.5 font-medium text-orange-300">Result:</div>
                       <div className="font-mono text-xs text-orange-200">
-                        {typeof message.metadata.toolCall.result === "string"
-                          ? message.metadata.toolCall.result
-                          : JSON.stringify(message.metadata.toolCall.result, null, 2)}
+                        {(() => {
+                          const rawResult = message.metadata.toolCall.result;
+                          if (typeof rawResult === "string") {
+                            return rawResult;
+                          }
+                          // Show the tool call result text if any
+                          if (
+                            typeof rawResult === "object" &&
+                            rawResult !== null &&
+                            typeof rawResult.result === "string"
+                          ) {
+                            return rawResult.result;
+                          }
+                          // Otherwise, stringify the whole rawResult object
+                          return JSON.stringify(rawResult, null, 2);
+                        })()}
                       </div>
                     </div>
                   )}
@@ -192,7 +207,7 @@ function ConversationBubble({ message, isSelected }: { message: ConversationMess
             )}
 
             {/* Token and duration info */}
-            <div className="text-primary-400 flex items-center gap-4 text-xs">
+            <div className="text-primary-400 flex items-center gap-3 text-xs">
               {message.metadata.duration && <span>{getFormattedDuration(message.metadata.duration)}</span>}
               {message.metadata.tokens && (message.metadata.tokens.prompt || message.metadata.tokens.completion) && (
                 <span>
