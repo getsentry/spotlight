@@ -10,7 +10,13 @@ const MAX_PANEL_WIDTH_PERCENT = 80;
 const DEFAULT_PANEL_WIDTH_PERCENT = 50;
 
 // TraceList on left, TraceDetails on right
-function TraceSplitViewLayout() {
+function TraceSplitViewLayout({
+  aiMode,
+  onToggleAIMode,
+}: {
+  aiMode: boolean;
+  onToggleAIMode: () => void;
+}) {
   const { traceId } = useParams<{ traceId: string }>();
   const navigate = useNavigate();
   const [leftPanelWidth, setLeftPanelWidth] = useState(DEFAULT_PANEL_WIDTH_PERCENT);
@@ -51,7 +57,7 @@ function TraceSplitViewLayout() {
     <div ref={containerRef} className="flex h-full w-full overflow-hidden">
       {/* left panel - trace list */}
       <div className="flex-shrink-0 overflow-y-auto" style={{ width: `${leftPanelWidth}%` }}>
-        <TraceList onTraceSelect={handleTraceSelect} selectedTraceId={traceId} />
+        <TraceList onTraceSelect={handleTraceSelect} selectedTraceId={traceId} aiMode={aiMode} />
       </div>
 
       {/* Resizer */}
@@ -65,14 +71,14 @@ function TraceSplitViewLayout() {
 
       {/* right panel - selected trace content */}
       <div className="flex-1 overflow-hidden" style={{ width: `${100 - leftPanelWidth}%` }}>
-        <TraceDetails traceId={traceId} onClose={handleCloseTraceDetails} />
+        <TraceDetails traceId={traceId} onClose={handleCloseTraceDetails} aiMode={aiMode} onToggleAI={onToggleAIMode} />
       </div>
     </div>
   );
 }
 
 // Component for showing only the TraceList (for the base route)
-function TraceListOnlyView() {
+function TraceListOnlyView({ aiMode }: { aiMode: boolean }) {
   const navigate = useNavigate();
 
   const handleTraceSelect = useCallback(
@@ -84,17 +90,25 @@ function TraceListOnlyView() {
 
   return (
     <div className="h-full w-full overflow-y-auto">
-      <TraceList onTraceSelect={handleTraceSelect} selectedTraceId={undefined} />
+      <TraceList onTraceSelect={handleTraceSelect} selectedTraceId={undefined} aiMode={aiMode} />
     </div>
   );
 }
 
 export default function TracesTab() {
+  const [aiMode, setAiMode] = useState(false);
+  const handleToggleAIMode = useCallback(() => {
+    setAiMode(prev => !prev);
+  }, []);
+
   return (
     <SentryEventsContextProvider>
       <Routes>
-        <Route path="/:traceId/*" element={<TraceSplitViewLayout />} />
-        <Route path="/" element={<TraceListOnlyView />} />
+        <Route
+          path="/:traceId/*"
+          element={<TraceSplitViewLayout aiMode={aiMode} onToggleAIMode={handleToggleAIMode} />}
+        />
+        <Route path="/" element={<TraceListOnlyView aiMode={aiMode} />} />
       </Routes>
     </SentryEventsContextProvider>
   );

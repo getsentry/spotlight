@@ -22,9 +22,10 @@ import TraceListFilter from "./TraceListFilter";
 type TraceListProps = {
   onTraceSelect?: (traceId: string) => void;
   selectedTraceId?: string;
+  aiMode: boolean;
 };
 
-export default function TraceList({ onTraceSelect, selectedTraceId }: TraceListProps) {
+export default function TraceList({ onTraceSelect, selectedTraceId, aiMode }: TraceListProps) {
   const { allTraces, localTraces } = useSentryTraces();
   const context = useSpotlightContext();
   const getTraceById = useSentryStore(state => state.getTraceById);
@@ -131,7 +132,7 @@ export default function TraceList({ onTraceSelect, selectedTraceId }: TraceListP
                 {/* Inline content below selected trace */}
                 {isSelected && (
                   <div className="border-l-primary-500 bg-primary-950 mx-2 mb-4 border-l-4">
-                    {isAITrace ? (
+                    {aiMode && isAITrace ? (
                       <AITranscription traceId={trace.trace_id} />
                     ) : (
                       <div className="px-8">

@@ -17,9 +17,11 @@ import TraceDetailHeader from "./components/TraceDetailHeader";
 type TraceDetailsProps = {
   traceId: string;
   onClose: () => void;
+  aiMode: boolean;
+  onToggleAI: () => void;
 };
 
-export default function TraceDetails({ traceId, onClose }: TraceDetailsProps) {
+export default function TraceDetails({ traceId, onClose, aiMode, onToggleAI }: TraceDetailsProps) {
   const events = useSentryEvents(traceId);
   const getTraceById = useSentryStore(state => state.getTraceById);
 
@@ -35,7 +37,6 @@ export default function TraceDetails({ traceId, onClose }: TraceDetailsProps) {
   // TODO: Don't use dataCache directly, use a helper like useSentryEvents
   const trace = getTraceById(traceId);
   const hasAI = trace ? hasAISpans(trace) : false;
-  const [aiMode, setAiMode] = useState(false); // (opt out) start with AI mode OFF
 
   if (!traceId) {
     return <p className="text-primary-300 p-6">Unknown trace id</p>;
@@ -78,13 +79,7 @@ export default function TraceDetails({ traceId, onClose }: TraceDetailsProps) {
 
   return (
     <div className="flex h-full flex-col">
-      <TraceDetailHeader
-        trace={trace}
-        onClose={onClose}
-        hasAI={hasAI}
-        aiMode={aiMode}
-        onToggleAI={() => setAiMode(!aiMode)}
-      />
+      <TraceDetailHeader trace={trace} onClose={onClose} hasAI={hasAI} aiMode={aiMode} onToggleAI={onToggleAI} />
 
       {aiMode && hasAI ? renderAITraceView() : renderNormalTraceView()}
     </div>
