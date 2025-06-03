@@ -29,12 +29,12 @@ export type Integration<T = any> = {
    * @param context contains the processed events for the links. Use this information to
    * e.g. update the notification count badge of the link.
    */
-  links?: LinksCreationFunction<T>;
+  panels?: PanelsCreationFunction<T>;
 
   /**
    * @deprecated Use `links` instead.
    */
-  tabs?: LinksCreationFunction<T>;
+  tabs?: PanelsCreationFunction<T>;
 
   /**
    * Setup hook called when Spotlight is initialized.
@@ -63,7 +63,7 @@ export type Integration<T = any> = {
   reset?: () => void;
 };
 
-export type IntegrationLink<T> = {
+export type IntegrationPanel<T> = {
   /**
    * Id of the tab. This needs to be a unique name.
    */
@@ -90,20 +90,20 @@ export type IntegrationLink<T> = {
   onSelect?: () => void;
 
   /**
-   * A function returning an array of links to be displayed in the UI as children of the
-   * parent link.
+   * A function returning an array of panels to be displayed in the UI as children of the
+   * parent panel.
    *
-   * @param context contains the processed events for the links. Use this information to
-   * e.g. update the notification count badge of the link.
+   * @param context contains the processed events for the panels. Use this information to
+   * e.g. update the notification count badge of the panel.
    */
-  links?: (context: LinksContext<T>) => IntegrationLink<T>[];
+  panels?: (context: PanelContext<T>) => IntegrationPanel<T>[];
 };
 
-type LinksContext<T> = {
+type PanelContext<T> = {
   processedEvents: T[];
 };
 
-type LinksCreationFunction<T> = (context: LinksContext<T>) => IntegrationLink<T>[];
+type PanelsCreationFunction<T> = (context: PanelContext<T>) => IntegrationPanel<T>[];
 
 export type ProcessedEventContainer<T> = {
   /**

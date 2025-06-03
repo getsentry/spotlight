@@ -1,37 +1,19 @@
 import { Fragment } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import type { IntegrationLink } from "~/integrations/integration";
+import type { IntegrationPanel } from "~/integrations/integration";
 import classNames from "../lib/classNames";
 import useKeyPress from "../lib/useKeyPress";
 
 export type Props = {
   /**
-   * Array of tabs to display.
+   * Array of panels to display.
    */
-  links: IntegrationLink<unknown>[];
-} & (NestedTabsProps | TopLevelTabsProps);
+  panels: IntegrationPanel<unknown>[];
 
-type NestedTabsProps = {
-  /**
-   * Whether the tabs are nested inside another tab.
-   * If `nested` is `true`, links will be set relative to the parent
-   * tab route instead of absolute to the root.
-   */
-  nested: true;
-
-  setOpen?: undefined;
-};
-
-type TopLevelTabsProps = {
-  nested?: false;
-
-  /**
-   * Setter to control the open state of the overlay
-   */
   setOpen: (value: boolean) => void;
 };
 
-export default function Navigation({ links, nested, setOpen }: Props) {
+export default function Navigation({ panels, setOpen }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -55,14 +37,14 @@ export default function Navigation({ links, nested, setOpen }: Props) {
           name="tabs"
           className="border-primary-800 bg-primary-800 hover:bg-primary-700 hover:border-primary-700 focus:bg-primary-800 text-primary-100 block w-full rounded-md py-2 pl-3 pr-10 focus:outline-none sm:text-sm"
           onChange={e => {
-            const activeLink = links.find(link => link.id === e.target.value);
+            const activeLink = panels.find(link => link.id === e.target.value);
             if (activeLink?.onSelect) {
               activeLink.onSelect();
             }
-            navigate(`${nested ? "" : "/"}${activeLink?.id || "not-found"}`);
+            navigate(`/${activeLink?.id || "not-found"}`);
           }}
         >
-          {links.map(link => (
+          {panels.map(link => (
             <option key={link.id} value={link.id}>
               {link.title} {link.notificationCount?.count}
             </option>
@@ -71,11 +53,11 @@ export default function Navigation({ links, nested, setOpen }: Props) {
       </div>
       <div className="hidden sm:block flex-1 h-full min-w-[200px] py-2">
         <nav className="border-r-primary-700 border-r px-6 h-full flex flex-col" aria-label="Navigation">
-          {links.map(link => (
-            <Fragment key={link.id}>
+          {panels.map(panel => (
+            <Fragment key={panel.id}>
               <NavLink
-                to={`${nested ? "" : "/"}${link.id}`}
-                key={link.id}
+                to={`/${panel.id}`}
+                key={panel.id}
                 replace={true}
                 className={({ isActive }) =>
                   classNames(
@@ -85,21 +67,21 @@ export default function Navigation({ links, nested, setOpen }: Props) {
                     "-m-y -mx-2 select-none whitespace-nowrap px-2 py-3 text-sm font-medium",
                   )
                 }
-                onClick={() => link.onSelect?.()}
+                onClick={() => panel.onSelect?.()}
               >
-                {link.title}
-                {link.notificationCount !== undefined ? (
+                {panel.title}
+                {panel.notificationCount !== undefined ? (
                   <span className="count ml-3 hidden rounded px-2.5 py-0.5 text-xs font-medium md:inline-block">
-                    {link.notificationCount?.count}
+                    {panel.notificationCount?.count}
                   </span>
                 ) : null}
               </NavLink>
-              {link.links && (
+              {panel.panels && (
                 <div className="flex flex-col pl-4">
-                  {link.links({ processedEvents: [] }).map(childLink => (
+                  {panel.panels({ processedEvents: [] }).map(childPanel => (
                     <NavLink
-                      to={`${link.id}/${childLink.id}`}
-                      key={childLink.id}
+                      to={`${panel.id}/${childPanel.id}`}
+                      key={childPanel.id}
                       replace={true}
                       className={({ isActive }) =>
                         classNames(
@@ -109,12 +91,12 @@ export default function Navigation({ links, nested, setOpen }: Props) {
                           "-m-y -mx-2 select-none whitespace-nowrap px-2 py-1 text-sm font-medium",
                         )
                       }
-                      onClick={() => link.onSelect?.()}
+                      onClick={() => panel.onSelect?.()}
                     >
-                      {childLink.title}
-                      {childLink.notificationCount !== undefined ? (
+                      {childPanel.title}
+                      {childPanel.notificationCount !== undefined ? (
                         <span className="count ml-3 hidden rounded px-2.5 py-0.5 text-xs font-medium md:inline-block">
-                          {childLink.notificationCount?.count}
+                          {childPanel.notificationCount?.count}
                         </span>
                       ) : null}
                     </NavLink>

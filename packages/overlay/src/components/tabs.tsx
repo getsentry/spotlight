@@ -1,13 +1,13 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import type { IntegrationTab } from "~/integrations/integration";
+import type { IntegrationPanel } from "~/integrations/integration";
 import classNames from "../lib/classNames";
 import useKeyPress from "../lib/useKeyPress";
 
 export type Props = {
   /**
-   * Array of tabs to display.
+   * Array of panels to display.
    */
-  tabs: IntegrationTab<unknown>[];
+  tabs: IntegrationPanel<unknown>[];
 } & (NestedTabsProps | TopLevelTabsProps);
 
 type NestedTabsProps = {

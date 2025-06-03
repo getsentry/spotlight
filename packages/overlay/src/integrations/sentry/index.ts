@@ -66,7 +66,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
 
     processEvent: (event: RawEventContext) => processEnvelope(event),
 
-    links: () => {
+    panels: () => {
       const store = useSentryStore.getState();
 
       const errorCount = store
@@ -102,7 +102,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
         }),
         createTab("insights", "Insights", {
           content: InsightsTab,
-          links: () => [
+          panels: () => [
             createTab("queries", "Queries"),
             createTab("webvitals", "Web Vitals"),
             createTab("resources", "Resources"),

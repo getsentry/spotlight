@@ -24,12 +24,12 @@ export type Integration<T = any> = {
   forwardedContentType?: string[];
 
   /**
-   * A function returning an array of tabs to be displayed in the UI.
+   * A function returning an array of panels to be displayed in the UI.
    *
-   * @param context contains the processed events for the tabs. Use this information to
+   * @param context contains the processed events for the panels. Use this information to
    * e.g. update the notification count badge of the tab.
    */
-  tabs?: TabsCreationFunction<T>;
+  panels?: PanelsCreationFunction<T>;
 
   /**
    * Setup hook called when Spotlight is initialized.
@@ -46,7 +46,7 @@ export type Integration<T = any> = {
    *
    * If you want to disregard the sent event, simply return `undefined`.
    *
-   * The returned object will be passed to your tabs function.
+   * The returned object will be passed to your panels function.
    */
   processEvent?: (eventContext: RawEventContext) => ProcessedEventContainer<T> | undefined;
 

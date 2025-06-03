@@ -178,7 +178,7 @@ export async function init(initOptions: SpotlightOverlayOptions = {}) {
 
   const tabs = initializedIntegrations.flatMap(
     integration =>
-      integration.links?.({ processedEvents: [] }) ||
+      integration.panels?.({ processedEvents: [] }) ||
       integration.tabs?.({ processedEvents: [] }).map(tab => ({
         ...tab,
         processedEvents: [],
