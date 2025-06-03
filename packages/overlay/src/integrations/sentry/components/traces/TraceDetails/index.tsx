@@ -35,7 +35,7 @@ export default function TraceDetails({ traceId, onClose }: TraceDetailsProps) {
   // TODO: Don't use dataCache directly, use a helper like useSentryEvents
   const trace = getTraceById(traceId);
   const hasAI = trace ? hasAISpans(trace) : false;
-  const [aiMode, setAiMode] = useState(hasAI); // Moved up, before conditionals
+  const [aiMode, setAiMode] = useState(false); // (opt out) start with AI mode OFF
 
   if (!traceId) {
     return <p className="text-primary-300 p-6">Unknown trace id</p>;
