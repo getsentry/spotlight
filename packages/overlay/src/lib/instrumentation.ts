@@ -1,15 +1,15 @@
-import * as Sentry from '@sentry/react';
-import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from 'react-router-dom';
-import { useEffect } from '../react-instance';
+import * as Sentry from "@sentry/react";
+import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
+import { useEffect } from "../react-instance";
 
 export default function initSentry(initialTab: string, options: Sentry.BrowserOptions = {}) {
   const sentryTraceParent: Record<string, string> = {};
-  const navTiming = performance.getEntriesByType('navigation');
+  const navTiming = performance.getEntriesByType("navigation");
   if (navTiming.length > 0) {
     const serverTiming = (navTiming[0] as PerformanceNavigationTiming).serverTiming;
     if (serverTiming && serverTiming.length > 0) {
       for (const { name, description } of serverTiming) {
-        if (name === 'sentryTrace' || name === 'baggage') {
+        if (name === "sentryTrace" || name === "baggage") {
           sentryTraceParent[name] = description;
         }
       }
@@ -31,16 +31,16 @@ export default function initSentry(initialTab: string, options: Sentry.BrowserOp
     Sentry.browserProfilingIntegration(),
   ];
   const hash = document.location.hash.slice(1);
-  if (hash.startsWith('spotlight')) {
-    const splitterPos = hash.indexOf('=');
+  if (hash.startsWith("spotlight")) {
+    const splitterPos = hash.indexOf("=");
     const sidecarUrl = splitterPos > -1 ? decodeURIComponent(hash.slice(splitterPos + 1)) : undefined;
     integrations.push(Sentry.spotlightBrowserIntegration({ sidecarUrl }));
   }
 
   const sentryClient = Sentry.init({
     transport: Sentry.makeBrowserOfflineTransport(Sentry.makeFetchTransport),
-    dsn: 'https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713',
-    environment: process.env.NODE_ENV || 'development',
+    dsn: "https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713",
+    environment: process.env.NODE_ENV || "development",
     release: `spotlight@${process.env.npm_package_version}`,
 
     integrations,

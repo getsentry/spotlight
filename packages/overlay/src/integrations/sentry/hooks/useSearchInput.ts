@@ -1,8 +1,8 @@
-import { FormEvent, useEffect, useState } from 'react';
-import useDebounce from './useDebounce';
+import { type FormEvent, useEffect, useState } from "react";
+import useDebounce from "./useDebounce";
 
 export default function useSearchInput(onSearch: (value: string) => void, delay = 500) {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [showReset, setShowReset] = useState(false);
 
   const debouncedSearch = useDebounce(onSearch, delay);
@@ -18,9 +18,9 @@ export default function useSearchInput(onSearch: (value: string) => void, delay 
   };
 
   const handleReset = () => {
-    setInputValue('');
+    setInputValue("");
     setShowReset(false);
-    onSearch('');
+    onSearch("");
   };
 
   return {

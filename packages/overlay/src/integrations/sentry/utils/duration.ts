@@ -1,11 +1,13 @@
+import dayjs from "dayjs";
+
 export const DURATION_LABELS = {
-  31557600000: 'yr',
-  2629800000: 'mo',
-  604800000: 'wk',
-  86400000: 'd',
-  3600000: 'hr',
-  60000: 'min',
-  1000: 's',
+  31557600000: "yr",
+  2629800000: "mo",
+  604800000: "wk",
+  86400000: "d",
+  3600000: "hr",
+  60000: "min",
+  1000: "s",
 };
 
 const DURATIONS = Object.keys(DURATION_LABELS)
@@ -13,13 +15,13 @@ const DURATIONS = Object.keys(DURATION_LABELS)
   .sort((a, b) => b - a);
 
 export function getSpanDurationClassName(duration: number) {
-  if (duration > 1000) return 'text-red-400';
-  if (duration > 500) return 'text-orange-400';
-  if (duration > 100) return 'text-yellow-400';
+  if (duration > 1000) return "text-red-400";
+  if (duration > 500) return "text-orange-400";
+  if (duration > 100) return "text-yellow-400";
 }
 
-export function getFormattedNumber(num: number, decimalPlaces: number = 2): string {
-  return num.toFixed(decimalPlaces).replace(/\.00$/, '');
+export function getFormattedNumber(num: number, decimalPlaces = 2): string {
+  return num.toFixed(decimalPlaces).replace(/\.00$/, "");
 }
 
 export function getFormattedDuration(duration: number): string {
@@ -34,4 +36,9 @@ export function getFormattedDuration(duration: number): string {
 
 export function getFormattedSpanDuration(span: { timestamp: number; start_timestamp: number }): string {
   return getFormattedDuration(span.timestamp - span.start_timestamp);
+}
+
+export function formatTimestamp(timestamp: number) {
+  const date = new Date(timestamp);
+  return dayjs(date).format("LL LTS");
 }

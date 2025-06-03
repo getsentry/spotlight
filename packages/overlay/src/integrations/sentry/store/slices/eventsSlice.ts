@@ -1,21 +1,22 @@
-import { StateCreator } from 'zustand';
-import { generateUuidv4 } from '~/lib/uuid';
-import { graftProfileSpans } from '../../data/profiles';
+import type { StateCreator } from "zustand";
+import { generateUuidv4 } from "~/lib/uuid";
+import { graftProfileSpans } from "../../data/profiles";
 import type {
   ProfileSample,
   SentryEvent,
+  SentryLogEventItem,
   SentryProfileTransactionInfo,
   SentryTransactionEvent,
   Span,
-} from '../../types';
-import { isErrorEvent, isProfileEvent, isTraceEvent } from '../../utils/sentry';
-import { compareSpans, groupSpans } from '../../utils/traces';
-import type { EventsSliceActions, EventsSliceState, SentryStore } from '../types';
-import { relativeNsToTimestamp, toTimestamp } from '../utils';
+} from "../../types";
+import { isErrorEvent, isLogEvent, isProfileEvent, isTraceEvent } from "../../utils/sentry";
+import { compareSpans, groupSpans } from "../../utils/traces";
+import type { EventsSliceActions, EventsSliceState, SentryStore } from "../types";
+import { relativeNsToTimestamp, toTimestamp } from "../utils";
 
 const initialEventsState: EventsSliceState = {
   events: [],
-  eventIds: new Set(),
+  eventsById: new Map(),
 };
 
 export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceState & EventsSliceActions> = (
@@ -28,20 +29,46 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       event.event_id = generateUuidv4();
     }
 
-    const { eventIds, events } = get();
-    if (eventIds.has(event.event_id)) return;
+    const { eventsById, events } = get();
+    if (eventsById.has(event.event_id)) return;
 
-    const newEventIds = new Set(eventIds);
-    newEventIds.add(event.event_id);
-    set({ eventIds: newEventIds });
+    const newEventIds = new Map(eventsById);
+    newEventIds.set(event.event_id, event);
+    set({ eventsById: newEventIds });
 
     if (isErrorEvent(event)) {
       await get().processStacktrace(event);
     }
 
-    event.timestamp = toTimestamp(event.timestamp);
+    if (event.timestamp) {
+      event.timestamp = toTimestamp(event.timestamp);
+    }
     if (event.start_timestamp) {
       event.start_timestamp = toTimestamp(event.start_timestamp);
+    }
+
+    if (isLogEvent(event) && event.items?.length) {
+      const { logsById, logsByTraceId } = get();
+      for (const logItem of event.items) {
+        if (logItem.severity_number == null) {
+          logItem.severity_number = 0;
+        }
+        logItem.sdk = logItem.attributes?.["sentry.sdk.name"]?.value as string;
+        logItem.timestamp = toTimestamp(logItem.timestamp);
+        logItem.id = generateUuidv4();
+        // TODO: check for id collision?
+        const newLogsById = new Map(logsById);
+        logsById.set(logItem.id, logItem);
+        set({ logsById: newLogsById });
+
+        if (logItem.trace_id) {
+          const newLogsByTraceId = new Map(logsByTraceId);
+          const logSet = newLogsByTraceId.get(logItem.trace_id) || new Set<SentryLogEventItem>();
+          logSet.add(logItem);
+          newLogsByTraceId.set(logItem.trace_id, logSet);
+          set({ logsByTraceId: newLogsByTraceId });
+        }
+      }
     }
 
     const traceCtx = event.contexts?.trace;
@@ -50,7 +77,7 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
 
     // Notify event subscribers
     for (const [type, callback] of get().subscribers.values()) {
-      if (type === 'event') {
+      if (type === "event") {
         (callback as (event: SentryEvent) => void)(event);
       }
     }
@@ -68,7 +95,7 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
         start_timestamp: event.start_timestamp ?? event.timestamp,
         timestamp: event.timestamp,
         status: traceCtx.status,
-        rootTransactionName: event.transaction || '(unknown transaction)',
+        rootTransactionName: event.transaction || "(unknown transaction)",
         rootTransaction: null,
         profileGrafted: false,
       };
@@ -117,14 +144,14 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       } else if (isErrorEvent(event)) {
         trace.errors += 1;
       }
-      if (traceCtx.status !== 'ok') trace.status = traceCtx.status;
+      if (traceCtx.status !== "ok") trace.status = traceCtx.status;
 
       const roots = trace.transactions.filter(e => !e.contexts.trace.parent_span_id);
       if (roots.length === 1) {
         trace.rootTransaction = roots[0];
-        trace.rootTransactionName = roots[0].transaction || '(unknown transaction)';
-      } else if (roots.length > 1) trace.rootTransactionName = '(multiple root transactions)';
-      else trace.rootTransactionName = '(missing root transaction)';
+        trace.rootTransactionName = roots[0].transaction || "(unknown transaction)";
+      } else if (roots.length > 1) trace.rootTransactionName = "(multiple root transactions)";
+      else trace.rootTransactionName = "(missing root transaction)";
 
       if (!existingTrace) {
         const newTracesById = new Map(tracesById);
@@ -145,7 +172,7 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       const newProfilesByTraceId = new Map(profilesByTraceId);
 
       for (const txn of event.transactions) {
-        if (typeof txn === 'string') continue; // Skip if it's just a string transaction ID
+        if (typeof txn === "string") continue; // Skip if it's just a string transaction ID
         const profileTxn = txn as SentryProfileTransactionInfo;
         const trace = tracesById.get(profileTxn.trace_id);
         const timestamp =

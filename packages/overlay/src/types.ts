@@ -1,10 +1,10 @@
-import type { Integration } from './integrations/integration';
+import type { Integration } from "./integrations/integration";
 
-export type ExperimentName = 'sentry:focus-local-events';
+export type ExperimentName = "sentry:focus-local-events";
 
 export type ExperimentsConfig = Record<ExperimentName, boolean>;
 
-export type AnchorConfig = 'bottomRight' | 'bottomLeft' | 'centerRight' | 'centerLeft' | 'topLeft' | 'topRight';
+export type AnchorConfig = "bottomRight" | "bottomLeft" | "centerRight" | "centerLeft" | "topLeft" | "topRight";
 
 export type SpotlightOverlayOptions = {
   /**
@@ -128,6 +128,5 @@ export type WindowWithSpotlight = Window & {
   __spotlight?: {
     eventTarget?: EventTarget;
     initOptions?: SpotlightOverlayOptions;
-    console?: Record<string, (...args: unknown[]) => void>;
   };
 };

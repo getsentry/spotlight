@@ -1,10 +1,11 @@
-import { Envelope } from '@sentry/core';
-import { StateCreator } from 'zustand';
-import { RawEventContext } from '~/integrations/integration';
-import { SUPPORTED_EVENT_TYPES } from '../../constants/sentry';
-import type { Sdk, SentryEvent } from '../../types';
-import { sdkToPlatform } from '../../utils/sdkToPlatform';
-import type { EnvelopesSliceActions, EnvelopesSliceState, SentryStore } from '../types';
+import type { Envelope } from "@sentry/core";
+import type { StateCreator } from "zustand";
+import type { RawEventContext } from "~/integrations/integration";
+import { generateUuidv4 } from "~/lib/uuid";
+import { SUPPORTED_EVENT_TYPES } from "../../constants/sentry";
+import type { Sdk, SentryEvent } from "../../types";
+import { sdkToPlatform } from "../../utils/sdkToPlatform";
+import type { EnvelopesSliceActions, EnvelopesSliceState, SentryStore } from "../types";
 
 const initialEnvelopesState: EnvelopesSliceState = {
   envelopes: [],
@@ -30,8 +31,8 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
       sdk = get().inferSdkFromEvent(items[0][1] as SentryEvent);
     } else {
       sdk = {
-        name: 'unknown',
-        version: '0.0.0',
+        name: "unknown",
+        version: "0.0.0",
         lastSeen,
       };
     }
@@ -43,6 +44,8 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
     } else {
       set({ sdks: [...sdks, sdk] });
     }
+
+    header.__spotlight_envelope_id = generateUuidv4();
 
     const traceContext = header.trace;
 

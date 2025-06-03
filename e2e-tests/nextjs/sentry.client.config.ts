@@ -2,9 +2,9 @@
 // The config you add here will be used whenever a users loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-import * as Sentry from '@sentry/nextjs';
-import * as Spotlight from '@spotlightjs/spotlight';
-import { customIntegration } from './integrations/spotlight-custom-integration';
+import * as Sentry from "@sentry/nextjs";
+import * as Spotlight from "@spotlightjs/spotlight";
+import { customIntegration } from "./integrations/spotlight-custom-integration";
 
 Sentry.init({
   // Adjust this value in production, or use tracesSampler for greater control

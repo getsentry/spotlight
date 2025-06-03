@@ -1,5 +1,5 @@
 // Ref: https://stackoverflow.com/a/78529642/16866418
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from "react";
 
 // The reason we need to go through all these shenanigans is
 // because we cannot just use `useState` and debounce the setter.

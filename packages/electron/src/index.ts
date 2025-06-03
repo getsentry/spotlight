@@ -1,8 +1,8 @@
-import * as Sentry from '@sentry/electron/renderer';
-import * as Spotlight from '@spotlightjs/overlay';
+import * as Sentry from "@sentry/electron/renderer";
+import * as Spotlight from "@spotlightjs/overlay";
 
 Sentry.init({
-  dsn: 'https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976',
+  dsn: "https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976",
   environment: process.env.NODE_ENV,
   release: `spotlight@${process.env.npm_package_version}`,
   integrations: [

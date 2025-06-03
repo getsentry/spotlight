@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useSpotlightContext } from '~/lib/useSpotlightContext';
-import Badge from '~/ui/Badge';
-import CardList from '../../../../components/CardList';
-import TimeSince from '../../../../components/TimeSince';
-import { useSentryEvents } from '../../data/useSentryEvents';
-import { isLocalTrace } from '../../store/helpers';
-import { isErrorEvent } from '../../utils/sentry';
-import { truncateId } from '../../utils/text';
-import HiddenItemsButton from '../shared/HiddenItemsButton';
-import PlatformIcon from '../shared/PlatformIcon';
-import { EventSummary } from './Event';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useSpotlightContext } from "~/lib/useSpotlightContext";
+import { Badge } from "~/ui/badge";
+import CardList from "../../../../components/CardList";
+import TimeSince from "../../../../components/TimeSince";
+import { useSentryEvents } from "../../data/useSentryEvents";
+import { isLocalTrace } from "../../store/helpers";
+import { isErrorEvent } from "../../utils/sentry";
+import { truncateId } from "../../utils/text";
+import HiddenItemsButton from "../shared/HiddenItemsButton";
+import PlatformIcon from "../shared/PlatformIcon";
+import { EventSummary } from "./Event";
 
 export default function EventList({ traceId }: { traceId?: string }) {
   const events = useSentryEvents(traceId);
@@ -18,7 +18,7 @@ export default function EventList({ traceId }: { traceId?: string }) {
 
   const matchingEvents = events.filter(isErrorEvent);
 
-  const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
+  const [showAll, setShowAll] = useState(!context.experiments["sentry:focus-local-events"]);
   const filteredEvents = showAll
     ? matchingEvents
     : matchingEvents.filter(

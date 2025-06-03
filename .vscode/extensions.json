@@ -1,4 +1,4 @@
 {
-  "recommendations": ["streetsidesoftware.code-spell-checker"],
+  "recommendations": ["streetsidesoftware.code-spell-checker", "biomejs.biome"],
   "unwantedRecommendations": []
 }

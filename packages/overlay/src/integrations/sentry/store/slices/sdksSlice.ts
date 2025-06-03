@@ -1,6 +1,6 @@
-import { StateCreator } from 'zustand';
-import { Sdk, SentryEvent } from '../../types';
-import type { SDKsSliceActions, SDKsSliceState, SentryStore } from '../types';
+import type { StateCreator } from "zustand";
+import type { Sdk, SentryEvent } from "../../types";
+import type { SDKsSliceActions, SDKsSliceState, SentryStore } from "../types";
 
 const initialSDKsState: SDKsSliceState = {
   sdks: [],
@@ -10,8 +10,8 @@ export const createSDKsSlice: StateCreator<SentryStore, [], [], SDKsSliceState &
   ...initialSDKsState,
   inferSdkFromEvent: (event: SentryEvent) => {
     const sdk: Sdk = {
-      name: 'unknown',
-      version: 'unknown',
+      name: "unknown",
+      version: "unknown",
       lastSeen: new Date().getTime(),
     };
 

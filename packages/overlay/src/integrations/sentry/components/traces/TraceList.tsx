@@ -1,21 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Badge from '~/ui/Badge';
-import CardList from '../../../../components/CardList';
-import TimeSince from '../../../../components/TimeSince';
-import classNames from '../../../../lib/classNames';
-import { useSpotlightContext } from '../../../../lib/useSpotlightContext';
-import { useSentryTraces } from '../../data/useSentrySpans';
-import useSentryStore from '../../store';
-import { isLocalTrace } from '../../store/helpers';
-import { getFormattedSpanDuration } from '../../utils/duration';
-import { truncateId } from '../../utils/text';
-import AITranscription from '../insights/agents/AITranscription';
-import { hasAISpans } from '../insights/agents/sdks/aiLibraries';
-import HiddenItemsButton from '../shared/HiddenItemsButton';
-import { TraceRootTxnName } from './TraceDetails/components/TraceRootTxnName';
-import TraceTreeview from './TraceDetails/components/TraceTreeview';
-import TraceIcon from './TraceIcon';
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { Badge } from "~/ui/badge";
+import CardList from "../../../../components/CardList";
+import TimeSince from "../../../../components/TimeSince";
+import classNames from "../../../../lib/classNames";
+import { useSpotlightContext } from "../../../../lib/useSpotlightContext";
+import { useSentryTraces } from "../../data/useSentrySpans";
+import useTraceFiltering from "../../hooks/useTraceFiltering";
+import useSentryStore from "../../store";
+import { isLocalTrace } from "../../store/helpers";
+import { getFormattedSpanDuration } from "../../utils/duration";
+import { truncateId } from "../../utils/text";
+import AITranscription from "../insights/agents/AITranscription";
+import { hasAISpans } from "../insights/agents/sdks/aiLibraries";
+import HiddenItemsButton from "../shared/HiddenItemsButton";
+import { TraceRootTxnName } from "./TraceDetails/components/TraceRootTxnName";
+import TraceTreeview from "./TraceDetails/components/TraceTreeview";
+import TraceIcon from "./TraceIcon";
+import TraceListFilter from "./TraceListFilter";
 
 type TraceListProps = {
   onTraceSelect?: (traceId: string) => void;
@@ -28,23 +30,28 @@ export default function TraceList({ onTraceSelect, selectedTraceId }: TraceListP
   const getTraceById = useSentryStore(state => state.getTraceById);
   const selectedTraceRef = useRef<HTMLDivElement>(null);
 
-  const [showAll, setShowAll] = useState(!context.experiments['sentry:focus-local-events']);
-  const filteredTraces = showAll ? allTraces : localTraces;
-  const hiddenItemCount = allTraces.length - filteredTraces.length;
+  const [showAll, setShowAll] = useState(!context.experiments["sentry:focus-local-events"]);
+  const visibleTraces = showAll ? allTraces : localTraces;
+  const hiddenItemCount = allTraces.length - visibleTraces.length;
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+
+  const { TRACE_FILTER_CONFIGS, filteredTraces } = useTraceFiltering(visibleTraces, activeFilters, searchQuery);
 
   // Auto-scroll to selected trace
   useEffect(() => {
     if (selectedTraceId && selectedTraceRef.current) {
       selectedTraceRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
+        behavior: "smooth",
+        block: "start",
       });
     }
   }, [selectedTraceId]);
 
   return (
     <>
-      {allTraces.length !== 0 ? (
+      {visibleTraces.length !== 0 ? (
         <CardList>
           {hiddenItemCount > 0 && (
             <HiddenItemsButton
@@ -54,6 +61,13 @@ export default function TraceList({ onTraceSelect, selectedTraceId }: TraceListP
               }}
             />
           )}
+          <TraceListFilter
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            activeFilters={activeFilters}
+            setActiveFilters={setActiveFilters}
+            filterConfigs={TRACE_FILTER_CONFIGS}
+          />
           {filteredTraces.map(trace => {
             const traceContent = (
               <>
@@ -72,10 +86,10 @@ export default function TraceList({ onTraceSelect, selectedTraceId }: TraceListP
                   <div className="text-primary-300 flex space-x-2 text-sm">
                     <div
                       className={classNames(
-                        trace.status === 'ok' ? 'text-green-400' : trace.status ? 'text-red-400' : '',
+                        trace.status === "ok" ? "text-green-400" : trace.status ? "text-red-400" : "",
                       )}
                     >
-                      {trace.status || ''}
+                      {trace.status || ""}
                     </div>
                     <div>&mdash;</div>
                     <div>{getFormattedSpanDuration(trace)}</div>
@@ -98,8 +112,8 @@ export default function TraceList({ onTraceSelect, selectedTraceId }: TraceListP
                 {onTraceSelect ? (
                   <div
                     className={classNames(
-                      'hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2',
-                      isSelected && 'bg-primary-800',
+                      "hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2",
+                      isSelected && "bg-primary-800",
                     )}
                     onClick={() => onTraceSelect(trace.trace_id)}
                   >
@@ -129,6 +143,11 @@ export default function TraceList({ onTraceSelect, selectedTraceId }: TraceListP
               </div>
             );
           })}
+          {filteredTraces?.length === 0 && (
+            <div className="text-primary-300 p-6">
+              Looks like there are no traces recorded matching the applied search & filters. 🤔
+            </div>
+          )}
         </CardList>
       ) : (
         <div className="text-primary-300 p-6">Looks like there are no traces recorded matching this query. 🤔</div>

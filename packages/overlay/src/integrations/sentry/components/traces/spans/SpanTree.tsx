@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { useSearch } from '~/integrations/sentry/context/SearchContext';
-import classNames from '../../../../../lib/classNames';
-import type { Span, TraceContext } from '../../../types';
-import SpanItem from './SpanItem';
+import { useMemo } from "react";
+import { useSearch } from "~/integrations/sentry/context/SearchContext";
+import classNames from "../../../../../lib/classNames";
+import type { Span, TraceContext } from "../../../types";
+import SpanItem from "./SpanItem";
 
 export default function SpanTree({
   traceContext,
@@ -44,7 +44,7 @@ export default function SpanTree({
   if (!tree || !tree.length) return null;
 
   return (
-    <ul className={classNames(tree.length > 1 && 'deep', 'tree')}>
+    <ul className={classNames(tree.length > 1 && "deep", "tree")}>
       {filteredTree.map(span => {
         return (
           <SpanItem

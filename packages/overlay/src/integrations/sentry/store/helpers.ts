@@ -1,4 +1,4 @@
-import useSentryStore from '.';
+import useSentryStore from ".";
 
 export function isLocalTrace(traceId: string) {
   const localTraceIds = useSentryStore.getState().localTraceIds;

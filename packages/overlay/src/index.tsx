@@ -1,30 +1,29 @@
-import fontStyles from '@fontsource/raleway/index.css?inline';
-import { CONTEXT_LINES_ENDPOINT } from '@spotlightjs/sidecar/constants';
-import { MemoryRouter } from 'react-router-dom';
-import colors from 'tailwindcss/colors';
-import App from './App';
+import fontStyles from "@fontsource/raleway/index.css?inline";
+import { CONTEXT_LINES_ENDPOINT } from "@spotlightjs/sidecar/constants";
+import { MemoryRouter } from "react-router-dom";
+import colors from "tailwindcss/colors";
+import App from "./App";
 import {
   DEFAULT_ANCHOR,
   DEFAULT_EXPERIMENTS,
   DEFAULT_SIDECAR_STREAM_URL,
   SPOTLIGHT_OPEN_CLASS_NAME,
-} from './constants';
-import globalStyles from './index.css?inline';
-import { type SpotlightContext, initIntegrations } from './integrations/integration';
-import { default as sentry } from './integrations/sentry/index';
-import { off, on, trigger } from './lib/eventTarget';
-import initSentry from './lib/instrumentation';
-import { activateLogger, log } from './lib/logger';
-import { removeURLSuffix } from './lib/removeURLSuffix';
-import { SpotlightContextProvider } from './lib/useSpotlightContext';
-import { React, ReactDOM } from './react-instance';
-import type { SpotlightOverlayOptions, WindowWithSpotlight } from './types';
+} from "./constants";
+import globalStyles from "./index.css?inline";
+import { type SpotlightContext, initIntegrations } from "./integrations/integration";
+import { default as sentry } from "./integrations/sentry/index";
+import { off, on, trigger } from "./lib/eventTarget";
+import initSentry from "./lib/instrumentation";
+import { activateLogger, log } from "./lib/logger";
+import { removeURLSuffix } from "./lib/removeURLSuffix";
+import { SpotlightContextProvider } from "./lib/useSpotlightContext";
+import { React, ReactDOM } from "./react-instance";
+import type { SpotlightOverlayOptions, WindowWithSpotlight } from "./types";
 
-export { default as console } from './integrations/console/index';
-export { default as hydrationError } from './integrations/hydration-error/index';
-export { default as sentry } from './integrations/sentry/index';
-export { default as viteInspect } from './integrations/vite-inspect/index';
-export type { SpotlightOverlayOptions, WindowWithSpotlight } from './types';
+export { default as hydrationError } from "./integrations/hydration-error/index";
+export { default as sentry } from "./integrations/sentry/index";
+export { default as viteInspect } from "./integrations/vite-inspect/index";
+export type { SpotlightOverlayOptions, WindowWithSpotlight } from "./types";
 export {
   SPOTLIGHT_OPEN_CLASS_NAME,
   CONTEXT_LINES_ENDPOINT,
@@ -48,35 +47,35 @@ function createStyleSheet(styles: string) {
  * Open the Spotlight debugger Window
  */
 export async function openSpotlight(path?: string | undefined) {
-  trigger('open', { path });
+  trigger("open", { path });
 }
 
 /**
  * Close the Spotlight debugger Window
  */
 export async function closeSpotlight() {
-  trigger('close');
+  trigger("close");
 }
 
 /**
  * Invokes the passed in callback when the Spotlight debugger Window is closed
  */
 export async function onClose(cb: EventListener) {
-  on('closed', cb);
+  on("closed", cb);
 }
 
 /**
  * Send an event to spotlight without the sidecar
  */
 export async function sendEvent(contentType: string, data: string | Uint8Array) {
-  trigger('event', { contentType, data });
+  trigger("event", { contentType, data });
 }
 
 /**
  * Invokes the passed in callback when the Spotlight debugger Window is opened
  */
 export async function onOpen(cb: EventListener) {
-  on('opened', cb);
+  on("opened", cb);
 }
 
 /**
@@ -85,26 +84,27 @@ export async function onOpen(cb: EventListener) {
  * A count of the number of collected severe events is passed to the callback.
  */
 export async function onSevereEvent(cb: (count: number) => void) {
-  on('severeEventCount', e => cb((e as CustomEvent).detail?.count ?? 1));
+  on("severeEventCount", e => cb((e as CustomEvent).detail?.count ?? 1));
 }
 
 function isSpotlightInjected() {
   const windowWithSpotlight = window as WindowWithSpotlight;
-  if (windowWithSpotlight.__spotlight && window.document.getElementById('sentry-spotlight-root')) {
+  if (windowWithSpotlight.__spotlight && window.document.getElementById("sentry-spotlight-root")) {
     return true;
   }
   return false;
 }
 
-export async function init(options: SpotlightOverlayOptions = {}) {
+export async function init(initOptions: SpotlightOverlayOptions = {}) {
   // The undefined document guard is to avoid being initialized in a Worker
   // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
-  if (typeof document === 'undefined') return;
+  if (typeof document === "undefined") return;
 
   // We only want to initialize and inject spotlight once. If it's already
   // been initialized, we can just bail out.
   if (isSpotlightInjected()) return;
 
+  let options = initOptions;
   const windowInitOptions = (window as WindowWithSpotlight).__spotlight?.initOptions;
   if (windowInitOptions) {
     options = {
@@ -125,12 +125,12 @@ export async function init(options: SpotlightOverlayOptions = {}) {
   } = options;
 
   const isLoadedFromSidecar = new URL(sidecarUrl).origin === document.location.origin;
-  const sidecarBaseUrl: string = removeURLSuffix(sidecarUrl, '/stream');
+  const sidecarBaseUrl: string = removeURLSuffix(sidecarUrl, "/stream");
 
   const fullPage = options.fullPage ?? isLoadedFromSidecar;
   const showTriggerButton = options.showTriggerButton ?? !fullPage;
   const injectImmediately = options.injectImmediately ?? (isLoadedFromSidecar || fullPage);
-  const debug = options.debug ?? document.location.hash.endsWith('debug');
+  const debug = options.debug ?? document.location.hash.endsWith("debug");
 
   if (debug) {
     activateLogger();
@@ -151,19 +151,19 @@ export async function init(options: SpotlightOverlayOptions = {}) {
   const [initializedIntegrations] = await initIntegrations(integrations ?? defaultIntegrations(), context);
 
   // build shadow dom container to contain styles
-  const docRoot = document.createElement('div');
-  docRoot.id = 'sentry-spotlight-root';
-  const shadow = docRoot.attachShadow({ mode: 'open' });
-  const appRoot = document.createElement('div');
+  const docRoot = document.createElement("div");
+  docRoot.id = "sentry-spotlight-root";
+  const shadow = docRoot.attachShadow({ mode: "open" });
+  const appRoot = document.createElement("div");
   if (fullPage) {
-    docRoot.style.height = '100%';
+    docRoot.style.height = "100%";
     docRoot.style.backgroundColor = colors.indigo[950];
-    appRoot.style.height = 'inherit';
+    appRoot.style.height = "inherit";
   } else {
-    appRoot.style.position = 'absolute';
-    appRoot.style.top = '0';
-    appRoot.style.left = '0';
-    appRoot.style.right = '0';
+    appRoot.style.position = "absolute";
+    appRoot.style.top = "0";
+    appRoot.style.left = "0";
+    appRoot.style.right = "0";
   }
   shadow.appendChild(appRoot);
 
@@ -171,7 +171,7 @@ export async function init(options: SpotlightOverlayOptions = {}) {
   shadow.adoptedStyleSheets = [createStyleSheet(fontStyles), ssGlobal];
 
   if (import.meta.hot) {
-    import.meta.hot.accept('./index.css?inline', newGlobalStyles => {
+    import.meta.hot.accept("./index.css?inline", newGlobalStyles => {
       ssGlobal.replaceSync(newGlobalStyles?.default);
     });
   }
@@ -184,11 +184,11 @@ export async function init(options: SpotlightOverlayOptions = {}) {
       })) || [],
   );
 
-  const initialTab = startFrom || (tabs.length ? `/${tabs[0].id}` : '/no-tabs');
-  log('Starting from', initialTab);
+  const initialTab = startFrom || (tabs.length ? `/${tabs[0].id}` : "/no-tabs");
+  log("Starting from", initialTab);
 
   // TODO: Shall we enable this for other cases too such as when we use it through Django SDK?
-  if (fullPage && (isLoadedFromSidecar || document.location.hash.startsWith('#spotlight'))) {
+  if (fullPage && (isLoadedFromSidecar || document.location.hash.startsWith("#spotlight"))) {
     initSentry(initialTab, { debug });
   }
 
@@ -213,10 +213,10 @@ export async function init(options: SpotlightOverlayOptions = {}) {
 
   function injectSpotlight() {
     if (isSpotlightInjected()) {
-      log('Spotlight already injected, bailing.');
+      log("Spotlight already injected, bailing.");
       return;
     }
-    log('Injecting into application');
+    log("Injecting into application");
 
     const extraSheet = new CSSStyleSheet();
     extraSheet.replaceSync(`body.${SPOTLIGHT_OPEN_CLASS_NAME} { overflow: hidden!important; }`);
@@ -226,10 +226,10 @@ export async function init(options: SpotlightOverlayOptions = {}) {
     document.body.append(docRoot);
   }
 
-  if (document.readyState === 'complete' || injectImmediately) {
+  if (document.readyState === "complete" || injectImmediately) {
     injectSpotlight();
   } else {
-    window.addEventListener('load', injectSpotlight);
+    window.addEventListener("load", injectSpotlight);
   }
-  window.addEventListener('error', injectSpotlight);
+  window.addEventListener("error", injectSpotlight);
 }

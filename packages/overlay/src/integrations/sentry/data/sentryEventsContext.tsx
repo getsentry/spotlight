@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react';
-import React, { useEffect, useReducer } from 'react';
-import useSentryStore from '../store';
-import type { SentryEvent } from '../types';
+import type { ReactNode } from "react";
+import React, { useEffect, useReducer } from "react";
+import useSentryStore from "../store";
+import type { SentryEvent } from "../types";
 
 interface SetEventsAction {
   e: SentryEvent | SentryEvent[];
@@ -20,11 +20,11 @@ export const SentryEventsContext = React.createContext<SentryEventsContextProps>
 
 function eventReducer(state: SentryEvent[], message: SetEventsAction): SentryEvent[] {
   if (Array.isArray(message.e)) {
-    if (message.action === 'RESET') {
+    if (message.action === "RESET") {
       return message.e;
     }
   } else {
-    if (message.action === 'APPEND') {
+    if (message.action === "APPEND") {
       return [message.e, ...state];
     }
   }
@@ -41,10 +41,10 @@ export const SentryEventsContextProvider: React.FC<{
 
   useEffect(
     () =>
-      subscribe('event', (e: SentryEvent) => {
-        setEvents({ action: 'APPEND', e });
+      subscribe("event", (e: SentryEvent) => {
+        setEvents({ action: "APPEND", e });
       }) as () => undefined,
-    [],
+    [subscribe],
   );
 
   const contextValue: SentryEventsContextProps = {

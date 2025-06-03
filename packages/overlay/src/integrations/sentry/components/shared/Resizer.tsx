@@ -1,7 +1,8 @@
-import { HTMLAttributes, ReactNode, useRef, type MouseEventHandler } from 'react';
-import classNames from '~/lib/classNames';
+import { type HTMLAttributes, type MouseEventHandler, type ReactNode, useRef } from "react";
+import classNames from "~/lib/classNames";
+import { getSpotlightContainer } from "~/utils/dom";
 
-export type ResizeDirection = 'column' | 'row';
+export type ResizeDirection = "column" | "row";
 
 export type ResizerProps = {
   handleResize: (e: MouseEvent) => void;
@@ -11,14 +12,14 @@ export type ResizerProps = {
   className?: string;
   children?: ReactNode;
   style?: React.CSSProperties;
-} & Omit<HTMLAttributes<HTMLDivElement>, 'onMouseDown' | 'onClick'>;
+} & Omit<HTMLAttributes<HTMLDivElement>, "onMouseDown" | "onClick">;
 
 export default function Resizer({
   handleResize,
   isResizing,
   setIsResizing,
-  direction = 'column',
-  className = '',
+  direction = "column",
+  className = "",
   children,
   style,
   ...props
@@ -60,34 +61,31 @@ export default function Resizer({
 
   const handleMouseDown: MouseEventHandler<HTMLDivElement> = e => {
     e.preventDefault();
-
     lastPositionRef.current = { x: e.clientX, y: e.clientY };
 
-    const spotlightRoot = document.getElementById('sentry-spotlight-root');
-    const debuggerElement = spotlightRoot?.shadowRoot?.querySelector('.spotlight-debugger');
+    const debuggerElement = getSpotlightContainer();
     debuggerElement?.classList.add(`resizing-${direction}`);
 
     setIsResizing(true);
-    document.addEventListener('mousemove', handleResizeWrapper);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleResizeWrapper);
+    document.addEventListener("mouseup", handleMouseUp);
   };
 
   const handleMouseUp = () => {
     lastPositionRef.current = null;
 
-    const spotlightRoot = document.getElementById('sentry-spotlight-root');
-    const debuggerElement = spotlightRoot?.shadowRoot?.querySelector('.spotlight-debugger');
-    debuggerElement?.classList.remove(`resizing-column`);
-    debuggerElement?.classList.remove(`resizing-row`);
+    const debuggerElement = getSpotlightContainer();
+    debuggerElement?.classList.remove("resizing-column");
+    debuggerElement?.classList.remove("resizing-row");
 
     setIsResizing(false);
-    document.removeEventListener('mousemove', handleResizeWrapper);
-    document.removeEventListener('mouseup', handleMouseUp);
+    document.removeEventListener("mousemove", handleResizeWrapper);
+    document.removeEventListener("mouseup", handleMouseUp);
   };
 
   return (
     <div
-      className={classNames('resizer', isResizing ? 'is-resizing' : '', className)}
+      className={classNames("resizer", isResizing ? "is-resizing" : "", className)}
       style={style}
       onClick={e => e.preventDefault()}
       onMouseDown={handleMouseDown}

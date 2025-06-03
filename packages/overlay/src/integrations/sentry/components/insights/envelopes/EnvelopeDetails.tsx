@@ -1,9 +1,9 @@
-import type { Envelope } from '@sentry/core';
-import { useState } from 'react';
-import type { RawEventContext } from '~/integrations/integration';
-import { parseStringFromBuffer } from '~/integrations/sentry/utils/bufferParsers';
-import SidePanel, { SidePanelHeader } from '~/ui/SidePanel';
-import JsonViewer from '../../../../../components/JsonViewer';
+import type { Envelope } from "@sentry/core";
+import { useState } from "react";
+import type { RawEventContext } from "~/integrations/integration";
+import { parseStringFromBuffer } from "~/integrations/sentry/utils/bufferParsers";
+import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
+import JsonViewer from "../../../../../components/JsonViewer";
 
 export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; rawEnvelope: RawEventContext } }) {
   const [showRawJSON, setShowRawJSON] = useState<boolean>(false);
@@ -14,20 +14,21 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
 
   const rawEnvelopeData = {
     ...rawEnvelope,
-    data: typeof rawEnvelope.data === 'string' ? rawEnvelope.data : parseStringFromBuffer(rawEnvelope.data),
+    data: typeof rawEnvelope.data === "string" ? rawEnvelope.data : parseStringFromBuffer(rawEnvelope.data),
   };
 
+  const envelopeId: string | unknown = header.__spotlight_envelope_id;
   const downloadUrl = URL.createObjectURL(new Blob([rawEnvelope.data], { type: rawEnvelope.contentType }));
-  const downloadName = `${header.event_id}-${rawEnvelope.contentType}.bin`;
+  const downloadName = `${envelopeId}-${rawEnvelope.contentType}.bin`;
   return (
     <SidePanel backto="/insights/envelopes">
       <SidePanelHeader
         title="Envelope Details"
         subtitle={
           <>
-            Event Id <span className="text-primary-500">&mdash;</span>{' '}
+            Event Id <span className="text-primary-500">&mdash;</span>{" "}
             <a href={downloadUrl} download={downloadName}>
-              {String(header.event_id)}
+              {String(envelopeId)}
             </a>
           </>
         }

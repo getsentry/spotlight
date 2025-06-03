@@ -1,12 +1,12 @@
-import ReactJson from '@microlink/react-json-view';
+import ReactJson from "@microlink/react-json-view";
 
 // Need this separately to fix Storybook 8 bundling
 // See #419 and #420 for more context
 const noop = () => {};
 
 function shouldCollapse({ src, type }: { src: Array<unknown> | object; type: string }) {
-  if (type === 'object') return Object.keys(src).length > 10;
-  if (type === 'array') return (src as Array<unknown>).length > 10;
+  if (type === "object") return Object.keys(src).length > 10;
+  if (type === "array") return (src as Array<unknown>).length > 10;
   return false;
 }
 
@@ -42,7 +42,7 @@ export default function JsonViewer({
       onEdit={
         editingEnabled &&
         (e => {
-          if (e.new_value === 'error') {
+          if (e.new_value === "error") {
             return false;
           }
           onUpdateData(e.updated_src);
@@ -51,7 +51,7 @@ export default function JsonViewer({
       onDelete={
         editingEnabled &&
         (e => {
-          if (e.new_value === 'error') {
+          if (e.new_value === "error") {
             return false;
           }
           onUpdateData(e.updated_src);
@@ -60,7 +60,7 @@ export default function JsonViewer({
       onAdd={
         editingEnabled &&
         (e => {
-          if (e.new_value === 'error') {
+          if (e.new_value === "error") {
             return false;
           }
           onUpdateData(e.updated_src);

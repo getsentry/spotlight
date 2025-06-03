@@ -1,21 +1,21 @@
-import { type ReactNode, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { format as formatSQL } from 'sql-formatter';
-import { isErrorEvent } from '~/integrations/sentry/utils/sentry';
-import Table from '~/ui/Table';
-import JsonViewer from '../../../../../components/JsonViewer';
-import SidePanel, { SidePanelHeader } from '../../../../../ui/SidePanel';
-import { DB_SPAN_REGEX } from '../../../constants';
-import useSentryStore from '../../../store';
-import type { SentryErrorEvent, Span, TraceContext } from '../../../types';
-import { formatBytes } from '../../../utils/bytes';
-import { getFormattedDuration } from '../../../utils/duration';
-import { ErrorTitle } from '../../events/error/Error';
-import DateTime from '../../shared/DateTime';
-import SpanTree from './SpanTree';
+import { type ReactNode, useState } from "react";
+import { Link } from "react-router-dom";
+import { format as formatSQL } from "sql-formatter";
+import { isErrorEvent } from "~/integrations/sentry/utils/sentry";
+import Table from "~/ui/table";
+import JsonViewer from "../../../../../components/JsonViewer";
+import SidePanel, { SidePanelHeader } from "../../../../../ui/sidePanel";
+import { DB_SPAN_REGEX } from "../../../constants";
+import useSentryStore from "../../../store";
+import type { SentryErrorEvent, Span, TraceContext } from "../../../types";
+import { formatBytes } from "../../../utils/bytes";
+import { getFormattedDuration } from "../../../utils/duration";
+import { ErrorTitle } from "../../events/error/Error";
+import DateTime from "../../shared/DateTime";
+import SpanTree from "./SpanTree";
 
 function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) {
-  if (desc.startsWith('{') || dbType === 'mongodb') {
+  if (desc.startsWith("{") || dbType === "mongodb") {
     // looks like JSON?
     try {
       return <JsonViewer data={JSON.parse(desc)} />;
@@ -27,7 +27,7 @@ function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) 
   let description = desc;
   if (desc.match(/^(SELECT|INSERT|UPDATE|DELETE|TRUNCATE|ALTER) /i)) {
     try {
-      description = formatSQL(desc.replace(/([\s,(])(%[a-z])([\s,)])/gim, '$1?$3'), { language: dbType || 'sql' });
+      description = formatSQL(desc.replace(/([\s,(])(%[a-z])([\s,)])/gim, "$1?$3"), { language: dbType || "sql" });
     } catch (err) {
       console.error(err);
     }
@@ -37,8 +37,8 @@ function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) 
 }
 
 function formatValue(name: string, value: unknown): ReactNode {
-  if (typeof value === 'number') {
-    if (name.indexOf('size') !== -1 || name.indexOf('length') !== -1) return formatBytes(value);
+  if (typeof value === "number") {
+    if (name.indexOf("size") !== -1 || name.indexOf("length") !== -1) return formatBytes(value);
     return value.toLocaleString();
   }
   return `${value}` as ReactNode;
@@ -48,10 +48,10 @@ function SpanDescription({ span }: { span: Span }) {
   let body = null;
   let headerText = null;
   if (span.op && DB_SPAN_REGEX.test(span.op) && span.description) {
-    headerText = 'Query';
-    body = <DBSpanDescription desc={span.description} dbType={span.data?.['db.system'] as string} />;
-  } else if (span.op === 'resource.img' && span.description?.indexOf('/') === 0) {
-    headerText = 'Preview';
+    headerText = "Query";
+    body = <DBSpanDescription desc={span.description} dbType={span.data?.["db.system"] as string} />;
+  } else if (span.op === "resource.img" && span.description?.indexOf("/") === 0) {
+    headerText = "Preview";
     body = (
       <a
         href={span.description}
@@ -61,7 +61,7 @@ function SpanDescription({ span }: { span: Span }) {
       </a>
     );
   } else if (span.description) {
-    headerText = 'Description';
+    headerText = "Description";
     body = <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">{span.description}</pre>;
   } else {
     body = <div className="text-primary-300">No description recorded for this span.</div>;
@@ -103,7 +103,7 @@ export default function SpanDetails({
           <>
             {span.op && (
               <>
-                {span.op} <span className="text-primary-500">&mdash;</span>{' '}
+                {span.op} <span className="text-primary-500">&mdash;</span>{" "}
               </>
             )}
             {span.span_id}
@@ -177,11 +177,11 @@ export default function SpanDetails({
           <Table className="w-full text-sm">
             <Table.Body>
               {[
-                ['status', span.status || ''],
-                ['trace', span.trace_id],
-                ['span', span.span_id],
+                ["status", span.status || ""],
+                ["trace", span.trace_id],
+                ["span", span.span_id],
                 [
-                  'parent',
+                  "parent",
                   span.parent_span_id ? (
                     <Link
                       className="underline"
@@ -191,10 +191,10 @@ export default function SpanDetails({
                       {span.parent_span_id}
                     </Link>
                   ) : (
-                    ''
+                    ""
                   ),
                 ],
-                ['op', span.op],
+                ["op", span.op],
               ].map(([key, value]) => (
                 <tr key={key as string} className="text-primary-300">
                   <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">

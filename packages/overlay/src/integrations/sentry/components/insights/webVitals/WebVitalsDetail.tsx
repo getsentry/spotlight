@@ -1,11 +1,11 @@
-import { useParams } from 'react-router-dom';
-import { PERFORMANCE_SCORE_PROFILES } from '~/integrations/sentry/constants';
-import { useSentryEvents } from '~/integrations/sentry/data/useSentryEvents';
-import type { MetricScoreProps, MetricWeightsProps, SentryEventWithPerformanceData } from '~/integrations/sentry/types';
-import { getFormattedDuration } from '~/integrations/sentry/utils/duration';
-import Breadcrumbs from '~/ui/Breadcrumbs';
-import { normalizePerformanceScore } from '../../../utils/webVitals';
-import PerformanceChart from './PerformanceChart';
+import { useParams } from "react-router-dom";
+import { PERFORMANCE_SCORE_PROFILES } from "~/integrations/sentry/constants";
+import { useSentryEvents } from "~/integrations/sentry/data/useSentryEvents";
+import type { MetricScoreProps, MetricWeightsProps, SentryEventWithPerformanceData } from "~/integrations/sentry/types";
+import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
+import Breadcrumbs from "~/ui/breadcrumbs";
+import { normalizePerformanceScore } from "../../../utils/webVitals";
+import PerformanceChart from "./PerformanceChart";
 
 const WebVitalsDetail = () => {
   const events = useSentryEvents();
@@ -22,63 +22,63 @@ const WebVitalsDetail = () => {
 
   if (page && measurementEvents.length) {
     const metricScore: MetricScoreProps = {
-      fcpScore: Math.trunc(measurementEvents[0].measurements['score.fcp'].value * 100),
-      lcpScore: Math.trunc(measurementEvents[0].measurements['score.lcp'].value * 100),
-      fidScore: Math.trunc(measurementEvents[0].measurements['score.fid'].value * 100),
-      clsScore: Math.trunc(measurementEvents[0].measurements['score.cls'].value * 100),
-      ttfbScore: Math.trunc(measurementEvents[0].measurements['score.ttfb'].value * 100),
+      fcpScore: Math.trunc(measurementEvents[0].measurements["score.fcp"].value * 100),
+      lcpScore: Math.trunc(measurementEvents[0].measurements["score.lcp"].value * 100),
+      fidScore: Math.trunc(measurementEvents[0].measurements["score.fid"].value * 100),
+      clsScore: Math.trunc(measurementEvents[0].measurements["score.cls"].value * 100),
+      ttfbScore: Math.trunc(measurementEvents[0].measurements["score.ttfb"].value * 100),
     };
 
     const metricWeights: MetricWeightsProps = {
-      fcp: Math.trunc(measurementEvents[0].measurements['score.weight.fcp'].value * 100),
-      lcp: Math.trunc(measurementEvents[0].measurements['score.weight.lcp'].value * 100),
-      fid: Math.trunc(measurementEvents[0].measurements['score.weight.fid'].value * 100),
-      cls: Math.trunc(measurementEvents[0].measurements['score.weight.cls'].value * 100),
-      ttfb: Math.trunc(measurementEvents[0].measurements['score.weight.ttfb'].value * 100),
+      fcp: Math.trunc(measurementEvents[0].measurements["score.weight.fcp"].value * 100),
+      lcp: Math.trunc(measurementEvents[0].measurements["score.weight.lcp"].value * 100),
+      fid: Math.trunc(measurementEvents[0].measurements["score.weight.fid"].value * 100),
+      cls: Math.trunc(measurementEvents[0].measurements["score.weight.cls"].value * 100),
+      ttfb: Math.trunc(measurementEvents[0].measurements["score.weight.ttfb"].value * 100),
     };
 
-    const totalScore: number = Math.trunc(measurementEvents[0].measurements['score.total'].value * 100);
+    const totalScore: number = Math.trunc(measurementEvents[0].measurements["score.total"].value * 100);
 
     const projectScoreHeaders = [
       {
-        id: 'fcpScore',
-        description: 'First Contentful Paint',
-        label: 'FCP',
+        id: "fcpScore",
+        description: "First Contentful Paint",
+        label: "FCP",
         score: measurementEvents[0].measurements?.fcp
           ? getFormattedDuration(measurementEvents[0].measurements.fcp.value)
-          : '-',
+          : "-",
       },
       {
-        id: 'lcpScore',
-        description: 'Largest Contentful Paint',
-        label: 'LCP',
+        id: "lcpScore",
+        description: "Largest Contentful Paint",
+        label: "LCP",
         score: measurementEvents[0].measurements?.lcp
           ? getFormattedDuration(measurementEvents[0].measurements.lcp.value)
-          : '-',
+          : "-",
       },
       {
-        id: 'fidScore',
-        description: 'First Input Delay',
-        label: 'FID',
+        id: "fidScore",
+        description: "First Input Delay",
+        label: "FID",
         score: measurementEvents[0].measurements?.fid
           ? getFormattedDuration(measurementEvents[0].measurements.fid.value)
-          : '-',
+          : "-",
       },
       {
-        id: 'clsScore',
-        description: 'Cumulative Layout Shift',
-        label: 'CLS',
+        id: "clsScore",
+        description: "Cumulative Layout Shift",
+        label: "CLS",
         score: measurementEvents[0].measurements?.cls
           ? getFormattedDuration(measurementEvents[0].measurements.cls.value)
-          : '-',
+          : "-",
       },
       {
-        id: 'ttfbScore',
-        description: 'Time to First Byte',
-        label: 'TTFB',
+        id: "ttfbScore",
+        description: "Time to First Byte",
+        label: "TTFB",
         score: measurementEvents[0].measurements?.ttfb
           ? getFormattedDuration(measurementEvents[0].measurements.ttfb.value)
-          : '-',
+          : "-",
       },
     ];
 
@@ -87,14 +87,14 @@ const WebVitalsDetail = () => {
         <Breadcrumbs
           crumbs={[
             {
-              id: 'webVitals',
-              label: 'Web Vitals',
+              id: "webVitals",
+              label: "Web Vitals",
               link: true,
-              to: '/insights/webvitals',
+              to: "/insights/webvitals",
             },
             {
-              id: 'performanceSummary',
-              label: 'Performance Summary',
+              id: "performanceSummary",
+              label: "Performance Summary",
               link: false,
             },
           ]}
@@ -111,7 +111,7 @@ const WebVitalsDetail = () => {
               >
                 <span className="text-primary-300 text-base font-semibold">{header.label}</span>
                 <span className="text-primary-300 text-sm font-light">{header.description}</span>
-                <h2 className="text-primary-300 text-lg font-bold">{header.score ?? '-'}</h2>
+                <h2 className="text-primary-300 text-lg font-bold">{header.score ?? "-"}</h2>
               </div>
             ))}
           </div>

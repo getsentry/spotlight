@@ -1,11 +1,11 @@
-import type { SpotlightInitOptions } from '@spotlightjs/spotlight/vite-plugin';
+import type { SpotlightInitOptions } from "@spotlightjs/spotlight/vite-plugin";
 
-export const buildServerSnippet: (options: SpotlightInitOptions) => string = options => `
+export const buildServerSnippet: (options?: SpotlightInitOptions) => string = options => `
 import * as _SentrySDKForSpotlight from '@sentry/astro';
 
 if (_SentrySDKForSpotlight && _SentrySDKForSpotlight.getClient()) {
   _SentrySDKForSpotlight.addIntegration(_SentrySDKForSpotlight.spotlightIntegration({
-    ${options?.sidecarUrl ? `sidecarUrl: '${options.sidecarUrl}'` : ''}
+    ${options?.sidecarUrl ? `sidecarUrl: '${options.sidecarUrl}'` : ""}
   }));
 } else {
   console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!! [@spotlightjs/astro] !!!!!!!!!!!!!!!!!!!!!!!!!!!!');

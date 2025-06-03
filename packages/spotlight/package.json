@@ -13,10 +13,7 @@
     "yalc:publish": "yalc publish --push --sig --private",
     "clean": "rimraf dist"
   },
-  "files": [
-    "dist",
-    "bin"
-  ],
+  "files": ["dist", "bin"],
   "bin": {
     "spotlight": "./bin/run.js"
   },
@@ -57,6 +54,6 @@
     "extends": "../../package.json"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }

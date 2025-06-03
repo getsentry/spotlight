@@ -1,24 +1,24 @@
-import { useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ReactComponent as Sort } from '~/assets/sort.svg';
-import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
-import classNames from '~/lib/classNames';
-import Breadcrumbs from '~/ui/Breadcrumbs';
-import Table from '~/ui/Table';
-import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from '../../constants';
-import { useSentrySpans } from '../../data/useSentrySpans';
-import useSort from '../../hooks/useSort';
-import type { Span } from '../../types';
-import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
-import { truncateId } from '../../utils/text';
-import { TimeBar } from '../shared/TimeBar';
+import { useMemo } from "react";
+import { Link, useParams } from "react-router-dom";
+import { ReactComponent as Sort } from "~/assets/sort.svg";
+import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
+import classNames from "~/lib/classNames";
+import Breadcrumbs from "~/ui/breadcrumbs";
+import Table from "~/ui/table";
+import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from "../../constants";
+import { useSentrySpans } from "../../data/useSentrySpans";
+import useSort from "../../hooks/useSort";
+import type { Span } from "../../types";
+import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
+import { truncateId } from "../../utils/text";
+import { TimeBar } from "../shared/TimeBar";
 
 type SpanInfoComparator = (a: Span, b: Span) => number;
 type QuerySummarySortTypes = (typeof QUERY_SUMMARY_SORT_KEYS)[keyof typeof QUERY_SUMMARY_SORT_KEYS];
 const COMPARATORS: Record<QuerySummarySortTypes, SpanInfoComparator> = {
   [QUERY_SUMMARY_SORT_KEYS.foundIn]: (a, b) => {
-    const aTrace = a.trace_id || '';
-    const bTrace = b.trace_id || '';
+    const aTrace = a.trace_id || "";
+    const bTrace = b.trace_id || "";
     if (aTrace < bTrace) return -1;
     if (aTrace > bTrace) return 1;
     return 0;
@@ -62,14 +62,14 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
       <Breadcrumbs
         crumbs={[
           {
-            id: 'queries',
-            label: 'Queries',
+            id: "queries",
+            label: "Queries",
             link: true,
-            to: '/insights/queries',
+            to: "/insights/queries",
           },
           {
-            id: 'querySummary',
-            label: 'Query Summary',
+            id: "querySummary",
+            label: "Query Summary",
             link: false,
           },
         ]}
@@ -85,14 +85,14 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
                 key={header.id}
                 scope="col"
                 className={classNames(
-                  'text-primary-100 px-6 py-3.5 text-sm font-semibold',
-                  header.primary ? 'w-2/5' : 'w-[15%]',
+                  "text-primary-100 px-6 py-3.5 text-sm font-semibold",
+                  header.primary ? "w-2/5" : "w-[15%]",
                 )}
               >
                 <div
                   className={classNames(
-                    'flex cursor-pointer select-none items-center gap-1',
-                    header.primary ? 'justify-start' : 'justify-end',
+                    "flex cursor-pointer select-none items-center gap-1",
+                    header.primary ? "justify-start" : "justify-end",
                   )}
                   onClick={() => toggleSortOrder(header.sortKey)}
                 >
@@ -102,8 +102,8 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
                       width={12}
                       height={12}
                       className={classNames(
-                        'fill-primary-300',
-                        sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
+                        "fill-primary-300",
+                        sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                       )}
                     />
                   ) : (

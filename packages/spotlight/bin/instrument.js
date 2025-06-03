@@ -1,8 +1,8 @@
-import { init } from '@sentry/node';
+import { init } from "@sentry/node";
 
 init({
-  dsn: 'https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713',
-  environment: process.env.NODE_ENV || 'development',
+  dsn: "https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713",
+  environment: process.env.NODE_ENV || "development",
   release: `spotlight@${process.env.npm_package_version}`,
   debug: Boolean(process.env.SENTRY_DEBUG),
 
@@ -29,7 +29,7 @@ init({
         }
 
         const homeDir = process.env.HOME || process.env.USERPROFILE;
-        frame.filename = frame.filename?.replace(homeDir, '~');
+        frame.filename = frame.filename?.replace(homeDir, "~");
       }
     }
 

@@ -1,20 +1,28 @@
-import { Envelope } from '@sentry/core';
-import { RawEventContext } from '~/integrations/integration';
-import { AggregateCallData, Sdk, SentryErrorEvent, SentryEvent, SentryProcessedProfile, Span, Trace } from '../types';
+import type { Envelope } from "@sentry/core";
+import type { RawEventContext } from "~/integrations/integration";
+import type {
+  AggregateCallData,
+  Sdk,
+  SentryErrorEvent,
+  SentryEvent,
+  SentryLogEventItem,
+  SentryProcessedProfile,
+  Trace,
+} from "../types";
 
 export type SentryProfileWithTraceMeta = SentryProcessedProfile & {
   timestamp: number;
   active_thread_id: string;
 };
 
-export type OnlineSubscription = ['online', (status: boolean) => void];
-export type EventSubscription = ['event', (event: SentryEvent) => void];
-export type TraceSubscription = ['trace', (trace: Trace) => void];
+export type OnlineSubscription = ["online", (status: boolean) => void];
+export type EventSubscription = ["event", (event: SentryEvent) => void];
+export type TraceSubscription = ["trace", (trace: Trace) => void];
 export type Subscription = OnlineSubscription | EventSubscription | TraceSubscription;
 
 export interface EventsSliceState {
   events: SentryEvent[];
-  eventIds: Set<string>;
+  eventsById: Map<string, SentryEvent>;
 }
 
 export interface EventsSliceActions {
@@ -71,6 +79,17 @@ export interface SDKsSliceState {
   sdks: Sdk[];
 }
 
+export interface LogsSliceState {
+  logsById: Map<string, SentryLogEventItem>;
+  logsByTraceId: Map<string, Set<SentryLogEventItem>>;
+}
+
+export interface LogsSliceActions {
+  getLogById: (id: string) => SentryLogEventItem | undefined;
+  getLogs: () => SentryLogEventItem[];
+  getLogsByTraceId: (traceId: string) => SentryLogEventItem[];
+}
+
 export interface SDKsSliceActions {
   inferSdkFromEvent: (event: SentryEvent) => Sdk;
   getSdks: () => Sdk[];
@@ -81,7 +100,7 @@ export interface SharedSliceActions {
   getTraceById: (id: string) => Trace | undefined;
   getSpanById: (id: string) => Span | undefined;
   getEventsByTrace: (traceId: string, spanId?: string | null) => SentryEvent[];
-  processStacktrace: (errorEvent: SentryErrorEvent) => Promise<void[]>;
+  processStacktrace: (errorEvent: SentryErrorEvent) => Promise<void>;
   resetData: () => void;
 }
 
@@ -91,6 +110,7 @@ export type SentryStoreState = EventsSliceState &
   SubscriptionsSliceState &
   SettingsSliceState &
   EnvelopesSliceState &
+  LogsSliceState &
   SDKsSliceState;
 
 export type SentryStoreActions = EventsSliceActions &
@@ -99,6 +119,7 @@ export type SentryStoreActions = EventsSliceActions &
   SubscriptionsSliceActions &
   SettingsSliceActions &
   EnvelopesSliceActions &
+  LogsSliceActions &
   SDKsSliceActions &
   SharedSliceActions;
 

@@ -1,15 +1,18 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { ReactComponent as CrossIcon } from '~/assets/cross.svg';
-import { SearchProvider, useSearch } from '~/integrations/sentry/context/SearchContext';
-import useSearchInput from '~/integrations/sentry/hooks/useSearchInput';
-import useSentryStore from '~/integrations/sentry/store';
-import type { Trace } from '~/integrations/sentry/types';
-import { getFormattedSpanDuration } from '../../../../utils/duration';
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { SearchProvider, useSearch } from "~/integrations/sentry/context/SearchContext";
+import useSearchInput from "~/integrations/sentry/hooks/useSearchInput";
+import useSentryStore from "~/integrations/sentry/store";
+import type { Trace } from "~/integrations/sentry/types";
+import { getFormattedSpanDuration } from "../../../../utils/duration";
 
-import DateTime from '../../../shared/DateTime';
-import SpanDetails from '../../spans/SpanDetails';
-import SpanTree from '../../spans/SpanTree';
+import { ReactComponent as X } from "~/assets/cross.svg";
+import { ReactComponent as Search } from "~/assets/search.svg";
+import { Button } from "~/ui/button";
+import { Input } from "~/ui/input";
+import DateTime from "../../../shared/DateTime";
+import SpanDetails from "../../spans/SpanDetails";
+import SpanTree from "../../spans/SpanTree";
 
 type TraceTreeViewProps = { traceId: string };
 
@@ -35,28 +38,31 @@ function TraceTreeWithSearch({
   return (
     <>
       <div className="mx-6 mb-4 mt-2 flex gap-2">
-        <div className="bg-primary-950 text-primary-50 border-primary-600 hover:border-primary-500 relative flex h-auto w-full flex-1 gap-2 rounded-md border py-1 pl-4 pr-6 outline-none transition-all">
-          <input
-            className="text-primary-50 h-auto w-full flex-1 bg-transparent outline-none transition-all"
-            onChange={handleChange}
-            value={inputValue}
+        <div className="relative min-w-[250px] flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+          <Input
+            type="text"
             placeholder="Search in Trace"
+            value={inputValue}
+            onChange={handleChange}
+            className="border-primary-700 bg-primary-950 w-full pl-9 text-white placeholder:text-gray-400"
           />
-          {showReset ? (
-            <CrossIcon
+          {showReset && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400"
               onClick={handleReset}
-              className="fill-primary-50 absolute right-1 top-[5px] cursor-pointer"
-              height={20}
-              width={20}
-            />
-          ) : null}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          )}
         </div>
         <button
+          type="button"
           className={`rounded border px-2 py-1 text-sm ${
-            showOnlyMatched
-              ? 'bg-primary-600 border-white text-white'
-              : 'bg-primary-800 text-primary-300  border-primary-500 hover:bg-primary-700'
-          }`}
+            showOnlyMatched ? "border-primary-300 bg-primary-300" : "border-primary-500 bg-primary-500"
+          } text-white`}
           onClick={() => setShowOnlyMatched(!showOnlyMatched)}
         >
           Only Show Matches
@@ -96,7 +102,7 @@ function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
           </div>
           <span>&mdash;</span>
           <span>
-            <strong className="text-primary-200 font-bold">{getFormattedSpanDuration(trace)}</strong> recorded in{' '}
+            <strong className="text-primary-200 font-bold">{getFormattedSpanDuration(trace)}</strong> recorded in{" "}
             <strong className="text-primary-200 font-bold">{trace.spans.size.toLocaleString()} spans</strong>
           </span>
         </div>

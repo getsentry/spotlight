@@ -1,15 +1,15 @@
-import { useMemo } from 'react';
-import { ReactComponent as Sort } from '~/assets/sort.svg';
-import { ReactComponent as SortDown } from '~/assets/sortDown.svg';
-import classNames from '~/lib/classNames';
-import Table from '~/ui/Table';
-import Tooltip from '~/ui/Tooltip';
-import { RESOURCES_SORT_KEYS, RESOURCE_HEADERS } from '../../constants';
-import { useSentrySpans } from '../../data/useSentrySpans';
-import useSort from '../../hooks/useSort';
-import type { Span } from '../../types';
-import { formatBytes } from '../../utils/bytes';
-import { getFormattedDuration, getSpanDurationClassName } from '../../utils/duration';
+import { useMemo } from "react";
+import { ReactComponent as Sort } from "~/assets/sort.svg";
+import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
+import classNames from "~/lib/classNames";
+import Table from "~/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/ui/tooltip";
+import { RESOURCES_SORT_KEYS, RESOURCE_HEADERS } from "../../constants";
+import { useSentrySpans } from "../../data/useSentrySpans";
+import useSort from "../../hooks/useSort";
+import type { Span } from "../../types";
+import { formatBytes } from "../../utils/bytes";
+import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
 
 type ResourceInfo = {
   avgDuration: number;
@@ -28,8 +28,8 @@ const calculateResourceInfo = ({ resource, spanData }: { resource: string; spanD
   const avgDuration = totalTimeInMs / specificResources.length;
   const avgEncodedSize =
     specificResources.reduce((acc: number, span: Span) => {
-      const contentLength = span.data?.['http.response_content_length'];
-      if (typeof contentLength === 'number') {
+      const contentLength = span.data?.["http.response_content_length"];
+      if (typeof contentLength === "number") {
         return acc + contentLength;
       }
       return acc;
@@ -50,7 +50,7 @@ const getResourceSpans = (spans: Span[], options: { type?: string; regex?: RegEx
   }
   if (options.regex) {
     const regex = new RegExp(options.regex);
-    return spans.filter((span: Span) => regex.test(span.op || ''));
+    return spans.filter((span: Span) => regex.test(span.op || ""));
   }
   return [];
 };
@@ -76,7 +76,7 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
     const filteredResourceSpans = getResourceSpans(showAll ? allSpans : localSpans, { regex: /resource\.[A-Za-z]+/ });
     const uniqueResourceDescriptionsSet = new Set(filteredResourceSpans.map(span => String(span?.description).trim()));
     // CLear out empty ones (they collapse as a single empty string since this is a set)
-    uniqueResourceDescriptionsSet.delete('');
+    uniqueResourceDescriptionsSet.delete("");
     const uniqueResourceDescriptions: string[] = [...uniqueResourceDescriptionsSet];
     const compareResourceInfo = COMPARATORS[sort.active] || COMPARATORS[RESOURCES_SORT_KEYS.totalTime];
 
@@ -99,14 +99,14 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
               key={header.id}
               scope="col"
               className={classNames(
-                'text-primary-100 px-6 py-3.5 text-sm font-semibold',
-                header.primary ? 'w-2/5' : 'w-[15%]',
+                "text-primary-100 px-6 py-3.5 text-sm font-semibold",
+                header.primary ? "w-2/5" : "w-[15%]",
               )}
             >
               <div
                 className={classNames(
-                  'flex cursor-pointer select-none items-center gap-1',
-                  header.primary ? 'justify-start' : 'justify-end',
+                  "flex cursor-pointer select-none items-center gap-1",
+                  header.primary ? "justify-start" : "justify-end",
                 )}
                 onClick={() => toggleSortOrder(header.sortKey)}
               >
@@ -116,8 +116,8 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
                     width={12}
                     height={12}
                     className={classNames(
-                      'fill-primary-300',
-                      sort.asc ? '-translate-y-0.5 rotate-0' : 'translate-y-0.5 rotate-180',
+                      "fill-primary-300",
+                      sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                     )}
                   />
                 ) : (
@@ -132,24 +132,25 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
         {resources.map((resource: ResourceInfo) => (
           <tr key={resource.description} className="hover:bg-primary-900">
             <td className="text-primary-200 relative w-2/5 whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-              <Tooltip
-                position="right"
-                content={
-                  resource.similarResources[0].op === 'resource.img' &&
-                  resource.description?.indexOf('/') === 0 && (
-                    <div className="bg-primary-800 cursor-pointer rounded-lg p-4 shadow-md">
-                      <h2 className="mb-2 font-bold">Preview</h2>
-                      <img
-                        src={resource.description}
-                        className="inline-block max-h-[150px] max-w-[150px] rounded p-1"
-                        alt="preview"
-                      />
-                    </div>
-                  )
-                }
-              >
-                <div className="truncate">{resource.description}</div>
-              </Tooltip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="w-fit cursor-default truncate">{resource.description}</div>
+                  </TooltipTrigger>
+                  {resource.similarResources[0].op === "resource.img" && resource.description?.startsWith("/") && (
+                    <TooltipContent side="right" className="border-none bg-transparent p-0 shadow-none">
+                      <div className="bg-primary-800 cursor-pointer rounded-lg p-4 shadow-md">
+                        <h2 className="mb-2 font-bold text-white">Preview</h2>
+                        <img
+                          src={resource.description}
+                          className="inline-block max-h-[150px] max-w-[150px] rounded p-1"
+                          alt="preview"
+                        />
+                      </div>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
               <span className={getSpanDurationClassName(resource.avgDuration)}>

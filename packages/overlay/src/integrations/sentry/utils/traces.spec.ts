@@ -1,27 +1,27 @@
-import { describe, expect, test } from 'vitest';
-import { generateUuidv4 } from '../../../lib/uuid';
-import type { Span } from '../types';
-import { groupSpans } from './traces';
+import { describe, expect, test } from "vitest";
+import { generateUuidv4 } from "../../../lib/uuid";
+import type { Span } from "../types";
+import { groupSpans } from "./traces";
 
 function mockSpan({ duration, ...span }: Partial<Span> & { duration?: number } = {}): Span {
   const defaultTimestamp = new Date().getTime();
   return {
     trace_id: generateUuidv4(),
     span_id: generateUuidv4(),
-    op: 'unknown',
-    status: 'unknown',
+    op: "unknown",
+    status: "unknown",
     start_timestamp: defaultTimestamp,
     timestamp: duration ? (span.start_timestamp || defaultTimestamp) + duration : defaultTimestamp,
     ...span,
   };
 }
 
-describe('groupSpans', () => {
-  test('empty span list', () => {
+describe("groupSpans", () => {
+  test("empty span list", () => {
     expect(groupSpans(new Map())).toEqual([]);
   });
 
-  test('simple parent and child relationship', () => {
+  test("simple parent and child relationship", () => {
     const parent1 = mockSpan({});
     const span1 = mockSpan({
       parent_span_id: parent1.span_id,
@@ -46,7 +46,7 @@ describe('groupSpans', () => {
     expect(result[0].children![1].span_id).toEqual(span2.span_id);
   });
 
-  test('multiple parent and child relationship both parents as root', () => {
+  test("multiple parent and child relationship both parents as root", () => {
     const parent1 = mockSpan({
       start_timestamp: new Date().getTime() - 1,
     });
@@ -91,7 +91,7 @@ describe('groupSpans', () => {
     expect(result[1].children![1].span_id).toEqual(span4.span_id);
   });
 
-  test('missing root transactions as siblings, creates faux parent', () => {
+  test("missing root transactions as siblings, creates faux parent", () => {
     const parent_span_id = generateUuidv4();
     const span1 = mockSpan({
       parent_span_id,
@@ -108,9 +108,9 @@ describe('groupSpans', () => {
     );
     console.debug(result);
     expect(result.length).toEqual(1);
-    expect(result[0].op).toEqual('orphan');
-    expect(result[0].description).toEqual('missing or unknown parent span');
-    expect(result[0].status).toEqual('unknown');
+    expect(result[0].op).toEqual("orphan");
+    expect(result[0].description).toEqual("missing or unknown parent span");
+    expect(result[0].status).toEqual("unknown");
     expect(result[0].parent_span_id).toBe(null);
     console.debug(result[0].children);
     expect(result[0].children?.length).toEqual(2);
@@ -118,7 +118,7 @@ describe('groupSpans', () => {
     expect(result[0].children![1].span_id).toEqual(span2.span_id);
   });
 
-  test('missing root transactions as independent children, creates faux parents', () => {
+  test("missing root transactions as independent children, creates faux parents", () => {
     const span1 = mockSpan({
       parent_span_id: generateUuidv4(),
     });
@@ -135,18 +135,18 @@ describe('groupSpans', () => {
     console.debug(result);
     expect(result.length).toEqual(2);
     expect(result[0].span_id).toEqual(span1.parent_span_id);
-    expect(result[0].op).toEqual('orphan');
-    expect(result[0].description).toEqual('missing or unknown parent span');
-    expect(result[0].status).toEqual('unknown');
+    expect(result[0].op).toEqual("orphan");
+    expect(result[0].description).toEqual("missing or unknown parent span");
+    expect(result[0].status).toEqual("unknown");
     expect(result[0].parent_span_id).toBe(null);
     console.debug(result[0].children);
     expect(result[0].children?.length).toEqual(1);
     expect(result[0].children![0].span_id).toEqual(span1.span_id);
 
     expect(result[1].span_id).toEqual(span2.parent_span_id);
-    expect(result[1].op).toEqual('orphan');
-    expect(result[1].description).toEqual('missing or unknown parent span');
-    expect(result[1].status).toEqual('unknown');
+    expect(result[1].op).toEqual("orphan");
+    expect(result[1].description).toEqual("missing or unknown parent span");
+    expect(result[1].status).toEqual("unknown");
     expect(result[1].parent_span_id).toBe(null);
     console.debug(result[1].children);
     expect(result[1].children?.length).toEqual(1);
