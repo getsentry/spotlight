@@ -7,6 +7,7 @@ import type {
   SentryEvent,
   SentryLogEventItem,
   SentryProcessedProfile,
+  Span,
   Trace,
 } from "../types";
 
