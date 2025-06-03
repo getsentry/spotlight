@@ -1,10 +1,10 @@
 ---
-title: IntegrationTab
-description: Interface of an IntegrationTab
+title: IntegrationPanel
+description: Interface of an IntegrationPanel
 ---
 
 ```ts
-export type IntegrationTab<T> = {
+export type IntegrationPanel<T> = {
   /**
    * Id of the tab. This needs to be a unique name.
    */

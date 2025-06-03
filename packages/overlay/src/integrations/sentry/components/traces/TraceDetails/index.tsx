@@ -1,7 +1,7 @@
 import { Link, Navigate, Route, Routes, useParams } from "react-router-dom";
 import { createTab } from "~/integrations/sentry/utils/tabs";
 
-import Tabs from "~/components/Tabs";
+import Tabs from "~/components/tabs";
 import { useSentryEvents } from "~/integrations/sentry/data/useSentryEvents";
 import useSentryStore from "~/integrations/sentry/store";
 import { isLocalTrace } from "~/integrations/sentry/store/helpers";

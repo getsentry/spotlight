@@ -7,16 +7,6 @@
   z-index: 999998;
 }
 
-.spotlight-debugger {
-  @apply from-primary-900 to-primary-950 flex h-full flex-col overflow-hidden rounded-lg bg-gradient-to-br to-20% font-sans text-white shadow-xl;
-  margin: 2.5vh;
-}
-
-.spotlight-fullscreen {
-  @apply relative rounded-none shadow-none;
-  margin: 0;
-}
-
 .spotlight-sidepanel {
   -webkit-app-region: no-drag;
   animation: sidepanel 100ms ease-in;
@@ -67,7 +57,7 @@ ul.tree ul.tree > li:before {
   position: absolute;
   height: 15px;
   width: 12px;
-  content: '';
+  content: "";
   display: inline-block;
   margin-left: -16px;
 }
@@ -100,7 +90,7 @@ ul.tree li:last-child:before {
   @apply !text-primary-300;
 }
 
-.hydration-error-wrapper td[class^='react-diff'][class$='title-block'] {
+.hydration-error-wrapper td[class^="react-diff"][class$="title-block"] {
   @apply !bg-primary-900;
 }
 
