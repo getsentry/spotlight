@@ -26,7 +26,7 @@ export function SidePanelHeader({
 
   return (
     <div className="border-b-primary-400 mb-4 flex border-b pb-4">
-      <div className="flex-1">
+      <div className="flex-1 overflow-hidden">
         <h2 className="text-primary-300 text-xl">{title}</h2>
         {subtitle && <h3 className="font-mono">{subtitle}</h3>}
       </div>

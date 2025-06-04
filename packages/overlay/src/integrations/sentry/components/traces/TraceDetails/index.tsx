@@ -52,21 +52,19 @@ export default function TraceDetails() {
   ];
 
   return (
-    <>
+    <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
       <TraceDetailHeader trace={trace} />
       <Tabs tabs={tabs} nested />
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
-        <Routes>
-          <Route path="details" element={<TraceTreeview traceId={traceId} />} />
-          <Route path="spans/:spanId" element={<TraceTreeview traceId={traceId} />} />
-          <Route path="context" element={<EventContexts event={trace.rootTransaction || trace.transactions[0]} />} />
-          <Route path="errors" element={<EventList traceId={traceId} />} />
-          <Route path="logs" element={<LogsList traceId={traceId} />} />
-          <Route path="logs/:id" element={<LogsList traceId={traceId} />} />
-          {/* Default tab */}
-          <Route path="*" element={<Navigate to={`/traces/${traceId}/details`} replace />} />
-        </Routes>
-      </div>
-    </>
+      <Routes>
+        <Route path="details" element={<TraceTreeview traceId={traceId} />} />
+        <Route path="spans/:spanId" element={<TraceTreeview traceId={traceId} />} />
+        <Route path="context" element={<EventContexts event={trace.rootTransaction || trace.transactions[0]} />} />
+        <Route path="errors" element={<EventList traceId={traceId} />} />
+        <Route path="logs" element={<LogsList traceId={traceId} />} />
+        <Route path="logs/:id" element={<LogsList traceId={traceId} />} />
+        {/* Default tab */}
+        <Route path="*" element={<Navigate to={`/traces/${traceId}/details`} replace />} />
+      </Routes>
+    </div>
   );
 }
