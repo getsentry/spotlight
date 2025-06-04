@@ -24,12 +24,17 @@ export type Integration<T = any> = {
   forwardedContentType?: string[];
 
   /**
-   * A function returning an array of tabs to be displayed in the UI.
+   * A function returning an array of links to be displayed in the UI.
    *
-   * @param context contains the processed events for the tabs. Use this information to
-   * e.g. update the notification count badge of the tab.
+   * @param context contains the processed events for the links. Use this information to
+   * e.g. update the notification count badge of the link.
    */
-  tabs?: TabsCreationFunction<T>;
+  panels?: PanelsCreationFunction<T>;
+
+  /**
+   * @deprecated Use `links` instead.
+   */
+  tabs?: PanelsCreationFunction<T>;
 
   /**
    * Setup hook called when Spotlight is initialized.
@@ -58,7 +63,7 @@ export type Integration<T = any> = {
   reset?: () => void;
 };
 
-export type IntegrationTab<T> = {
+export type IntegrationPanel<T> = {
   /**
    * Id of the tab. This needs to be a unique name.
    */
@@ -83,24 +88,33 @@ export type IntegrationTab<T> = {
   }>;
 
   onSelect?: () => void;
+
+  /**
+   * A function returning an array of panels to be displayed in the UI as children of the
+   * parent panel.
+   *
+   * @param context contains the processed events for the panels. Use this information to
+   * e.g. update the notification count badge of the panel.
+   */
+  panels?: (context: PanelContext<T>) => IntegrationPanel<T>[];
 };
+
+type PanelContext<T> = {
+  processedEvents: T[];
+};
+
+type PanelsCreationFunction<T> = (context: PanelContext<T>) => IntegrationPanel<T>[];
 
 export type ProcessedEventContainer<T> = {
   /**
-   * The processed event data to be passed to your tabs.
+   * The processed event data to be passed to your links.
    */
   event: T;
 };
 
-export type Severity = "default" | "severe";
-
 export type IntegrationData<T> = Record<string, ProcessedEventContainer<T>[]>;
 
-type TabsContext<T> = {
-  processedEvents: T[];
-};
-
-type TabsCreationFunction<T> = (context: TabsContext<T>) => IntegrationTab<T>[];
+export type Severity = "default" | "severe";
 
 export type RawEventContext = {
   /**

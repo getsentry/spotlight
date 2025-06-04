@@ -158,7 +158,7 @@ export async function init(initOptions: SpotlightOverlayOptions = {}) {
   if (fullPage) {
     docRoot.style.height = "100%";
     docRoot.style.backgroundColor = colors.indigo[950];
-    appRoot.style.height = "inherit";
+    appRoot.style.height = "100%";
   } else {
     appRoot.style.position = "absolute";
     appRoot.style.top = "0";
@@ -178,10 +178,12 @@ export async function init(initOptions: SpotlightOverlayOptions = {}) {
 
   const tabs = initializedIntegrations.flatMap(
     integration =>
+      integration.panels?.({ processedEvents: [] }) ||
       integration.tabs?.({ processedEvents: [] }).map(tab => ({
         ...tab,
         processedEvents: [],
-      })) || [],
+      })) ||
+      [],
   );
 
   const initialTab = startFrom || (tabs.length ? `/${tabs[0].id}` : "/no-tabs");

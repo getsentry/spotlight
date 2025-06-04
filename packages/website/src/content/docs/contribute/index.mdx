@@ -52,16 +52,16 @@ If you just want to test things out with some example traces and errors you can 
 pnpm dev
 ```
 
-Then head over to `packages/overlay/_fixtures` and run:
+Send sample fixtures to the sidecar with:
 
 ```shell
-./send_to_sidecar.cjs
+pnpm run --filter @spotlightjs/overlay sample
 ```
 
 This will send all the sample data to Spotlight. You can also pick a specific file and pass that as an argument to the script instead:
 
 ```shell
-./send_to_sidecar.cjs envelope_php_error.txt
+pnpm run --filter @spotlightjs/overlay sample envelope_php_error.txt
 ```
 
 ### Linking against an existing project

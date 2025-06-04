@@ -69,86 +69,91 @@ export default function TraceList({ onTraceSelect, selectedTraceId, aiMode }: Tr
             setActiveFilters={setActiveFilters}
             filterConfigs={TRACE_FILTER_CONFIGS}
           />
-          {filteredTraces.map(trace => {
-            const traceContent = (
-              <>
-                <TraceIcon trace={trace} />
-                <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
-                  <div className="flex items-center gap-x-2">
-                    <div>{truncateId(trace.trace_id)}</div>
-                    {isLocalTrace(trace.trace_id) ? (
-                      <Badge title="This trace is part of your local session.">Local</Badge>
-                    ) : null}
+          <div className="overflow-y-auto overflow-x-hidden">
+            {filteredTraces.map(trace => {
+              const traceContent = (
+                <>
+                  <TraceIcon trace={trace} />
+                  <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
+                    <div className="flex items-center gap-x-2">
+                      <div>{truncateId(trace.trace_id)}</div>
+                      {isLocalTrace(trace.trace_id) ? (
+                        <Badge title="This trace is part of your local session.">Local</Badge>
+                      ) : null}
+                    </div>
+                    <TraceRootTxnName trace={trace} />
+                    <div className="flex flex-col truncate font-mono">
+                      <div className="text-primary-300 flex space-x-2 text-sm">
+                        {trace.status && (
+                          <>
+                            <div
+                              className={classNames(
+                                trace.status === "ok" ? "text-green-400" : trace.status ? "text-red-400" : "",
+                              )}
+                            >
+                              {trace.status}
+                            </div>
+                            <div>&mdash;</div>
+                          </>
+                        )}
+                        <div>{getFormattedSpanDuration(trace)}</div>
+                        <div>&mdash;</div>
+                        <div>
+                          {trace.spans.size.toLocaleString()} spans, {trace.transactions.length.toLocaleString()} txns
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <TimeSince date={trace.start_timestamp} />
-                </div>
-                <TraceRootTxnName trace={trace} />
-                <div className="flex flex-col truncate font-mono">
-                  <div className="text-primary-300 flex space-x-2 text-sm">
+                </>
+              );
+
+              const isSelected = selectedTraceId === trace.trace_id;
+              const traceData = getTraceById(trace.trace_id);
+              const isAITrace = traceData ? hasAISpans(traceData) : false;
+
+              return (
+                <div key={trace.trace_id} ref={isSelected ? selectedTraceRef : null}>
+                  {/* Trace Item */}
+                  {onTraceSelect ? (
                     <div
                       className={classNames(
-                        trace.status === "ok" ? "text-green-400" : trace.status ? "text-red-400" : "",
+                        "hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2",
+                        isSelected && "bg-primary-800",
                       )}
+                      onClick={() => onTraceSelect(trace.trace_id)}
                     >
-                      {trace.status || ""}
+                      {traceContent}
                     </div>
-                    <div>&mdash;</div>
-                    <div>{getFormattedSpanDuration(trace)}</div>
-                    <div>&mdash;</div>
-                    <div>
-                      {trace.spans.size.toLocaleString()} spans, {trace.transactions.length.toLocaleString()} txns
+                  ) : (
+                    <Link
+                      className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
+                      to={`/traces/${trace.trace_id}/context`}
+                    >
+                      {traceContent}
+                    </Link>
+                  )}
+
+                  {/* Inline content below selected trace */}
+                  {isSelected && (
+                    <div className="border-l-primary-500 bg-primary-950 mx-2 mb-4 border-l-4">
+                      {aiMode && isAITrace ? (
+                        <AITranscription traceId={trace.trace_id} />
+                      ) : (
+                        <div className="px-8">
+                          <TraceTreeview traceId={trace.trace_id} />
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  )}
                 </div>
-              </>
-            );
-
-            const isSelected = selectedTraceId === trace.trace_id;
-            const traceData = getTraceById(trace.trace_id);
-            const isAITrace = traceData ? hasAISpans(traceData) : false;
-
-            return (
-              <div key={trace.trace_id} ref={isSelected ? selectedTraceRef : null}>
-                {/* Trace Item */}
-                {onTraceSelect ? (
-                  <div
-                    className={classNames(
-                      "hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2",
-                      isSelected && "bg-primary-800",
-                    )}
-                    onClick={() => onTraceSelect(trace.trace_id)}
-                  >
-                    {traceContent}
-                  </div>
-                ) : (
-                  <Link
-                    className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
-                    to={`/traces/${trace.trace_id}/context`}
-                  >
-                    {traceContent}
-                  </Link>
-                )}
-
-                {/* Inline content below selected trace */}
-                {isSelected && (
-                  <div className="border-l-primary-500 bg-primary-950 mx-2 mb-4 border-l-4">
-                    {aiMode && isAITrace ? (
-                      <AITranscription traceId={trace.trace_id} />
-                    ) : (
-                      <div className="px-8">
-                        <TraceTreeview traceId={trace.trace_id} />
-                      </div>
-                    )}
-                  </div>
-                )}
+              );
+            })}
+            {filteredTraces?.length === 0 && (
+              <div className="text-primary-300 p-6">
+                Looks like there are no traces recorded matching the applied search & filters. 🤔
               </div>
-            );
-          })}
-          {filteredTraces?.length === 0 && (
-            <div className="text-primary-300 p-6">
-              Looks like there are no traces recorded matching the applied search & filters. 🤔
-            </div>
-          )}
+            )}
+          </div>
         </CardList>
       ) : (
         <div className="text-primary-300 p-6">Looks like there are no traces recorded matching this query. 🤔</div>

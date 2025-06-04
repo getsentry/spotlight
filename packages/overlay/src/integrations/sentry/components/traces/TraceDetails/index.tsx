@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import Tabs from "~/components/Tabs";
+import Tabs from "~/components/tabs";
 import AITraceSplitView from "~/integrations/sentry/components/insights/agents/AITraceSplitView";
 import { createTab } from "~/integrations/sentry/utils/tabs";
 import { hasAISpans } from "../../insights/agents/sdks/aiLibraries";
@@ -60,7 +60,7 @@ export default function TraceDetails({ traceId, onClose, aiMode, onToggleAI }: T
   const renderNormalTraceView = () => (
     <>
       <Tabs tabs={tabs} nested />
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden ">
+      <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
           <Route path="context" element={<EventContexts event={trace.rootTransaction || trace.transactions[0]} />} />
           <Route path="errors" element={<EventList traceId={traceId} />} />
