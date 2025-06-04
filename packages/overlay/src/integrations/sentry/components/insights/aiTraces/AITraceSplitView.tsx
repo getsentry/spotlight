@@ -52,12 +52,12 @@ export default function AITraceSplitView({ traceId }: AITraceSplitViewProps) {
   return (
     <div className="flex h-full min-h-0">
       {/* left panel - AI flow */}
-      <div className="border-primary-700 flex min-h-0 w-1/2 flex-col border-r">
+      <div className="border-primary-700 flex min-h-0 w-2/5 flex-col border-r">
         <AITraceFlow traceId={traceId} />
       </div>
 
       {/* right panel - AI details */}
-      <div className="flex min-h-0 w-1/2 flex-col">
+      <div className="flex min-h-0 w-3/5 flex-col">
         <AITraceDetailsEmbedded spanId={selectedSpanId} />
       </div>
     </div>

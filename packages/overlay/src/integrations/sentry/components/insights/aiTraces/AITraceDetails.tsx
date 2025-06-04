@@ -261,11 +261,11 @@ export function AITraceDetailsEmbedded({ spanId }: { spanId: string }) {
       <div className="h-full overflow-y-auto">
         {/* Header Section */}
         <div className="border-b-primary-700 bg-primary-950 border-b px-6 py-4">
-          <div className="mb-2 flex items-center gap-2">
+          <div className="mb-2 flex items-baseline gap-2">
             <h2 className="text-xl font-bold">{handler.getDisplayTitle(trace)}</h2>
+            <span className="text-primary-400 text-sm">{trace.id}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-primary-400 text-sm">{trace.id}</span>
             <Badge color="primary">{handler.getTypeBadge(trace)}</Badge>
             {trace.metadata.modelId && <Badge color="secondary">{trace.metadata.modelId}</Badge>}
             {trace.metadata.functionId && <Badge color="neutral">{trace.metadata.functionId}</Badge>}
