@@ -31,7 +31,7 @@ export const AGGREGATE_PROFILES_HEADERS = [
   },
 ];
 
-export const AGENT_SORT_KEYS = {
+export const AI_TRACES_SORT_KEYS = {
   traceId: "TRACE_ID",
   name: "NAME",
   operation: "OPERATION",
@@ -40,37 +40,37 @@ export const AGENT_SORT_KEYS = {
   tokens: "TOKENS",
 };
 
-export const AGENT_HEADERS = [
+export const AI_TRACES_HEADERS = [
   {
     id: "traceId",
     title: "Trace ID",
-    sortKey: AGENT_SORT_KEYS.traceId,
+    sortKey: AI_TRACES_SORT_KEYS.traceId,
     primary: true,
   },
   {
     id: "name",
     title: "Name",
-    sortKey: AGENT_SORT_KEYS.name,
+    sortKey: AI_TRACES_SORT_KEYS.name,
   },
   {
     id: "operation",
     title: "Operation",
-    sortKey: AGENT_SORT_KEYS.operation,
+    sortKey: AI_TRACES_SORT_KEYS.operation,
   },
   {
     id: "timestamp",
     title: "Timestamp",
-    sortKey: AGENT_SORT_KEYS.timestamp,
+    sortKey: AI_TRACES_SORT_KEYS.timestamp,
   },
   {
     id: "duration",
     title: "Duration",
-    sortKey: AGENT_SORT_KEYS.duration,
+    sortKey: AI_TRACES_SORT_KEYS.duration,
   },
   {
     id: "tokens",
     title: "Tokens (Prompt/Completion)",
-    sortKey: AGENT_SORT_KEYS.tokens,
+    sortKey: AI_TRACES_SORT_KEYS.tokens,
   },
 ];
 

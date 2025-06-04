@@ -7,7 +7,7 @@ import Profiles from "./Profiles";
 import Queries from "./Queries";
 import QuerySummary from "./QuerySummary";
 import Resources from "./Resources";
-import AgentsTab from "./agents";
+import AItracesTab from "./aiTraces";
 import EnvelopesTab from "./envelopes";
 import SdksTab from "./sdks";
 import WebVitals from "./webVitals";
@@ -41,7 +41,7 @@ export default function InsightsTabDetails() {
           <Route path="envelopes/*" element={<EnvelopesTab showAll={showAll} />} />
           <Route path="sdks/*" element={<SdksTab />} />
           <Route path="profiles" element={<Profiles />} />
-          <Route path="agents/*" element={<AgentsTab />} />
+          <Route path="aitraces/*" element={<AItracesTab />} />
           {/* Default tab */}
           <Route path="*" element={<Navigate to="/insights/queries" replace />} />
         </Routes>

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { aiLibraries } from "../components/insights/agents/sdks/aiLibraries";
+import { aiLibraries } from "../components/insights/aiTraces/sdks/aiLibraries";
 import type { Span, SpotlightAITrace } from "../types";
 import { useSentryTraces } from "./useSentrySpans";
 

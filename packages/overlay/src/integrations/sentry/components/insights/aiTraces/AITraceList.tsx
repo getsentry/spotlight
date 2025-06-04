@@ -5,7 +5,7 @@ import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
 import type { SpotlightAITrace } from "~/integrations/sentry/types";
 import classNames from "~/lib/classNames";
 import Table from "~/ui/table";
-import { AGENT_HEADERS, AGENT_SORT_KEYS } from "../../../constants";
+import { AI_TRACES_HEADERS, AI_TRACES_SORT_KEYS } from "../../../constants";
 import { SearchProvider } from "../../../context/SearchContext";
 import { useSpotlightAITraces } from "../../../data/useSpotlightAITraces";
 import useSort from "../../../hooks/useSort";
@@ -13,15 +13,15 @@ import useSentryStore from "../../../store";
 import AITraceDetail from "./AITraceDetails";
 import AITraceItem from "./AITraceItem";
 
-type AgentSortTypes = (typeof AGENT_SORT_KEYS)[keyof typeof AGENT_SORT_KEYS];
-type AgentComparator = (a: SpotlightAITrace, b: SpotlightAITrace) => number;
+type AITracesSortTypes = (typeof AI_TRACES_SORT_KEYS)[keyof typeof AI_TRACES_SORT_KEYS];
+type AITracesComparator = (a: SpotlightAITrace, b: SpotlightAITrace) => number;
 
-const COMPARATORS: Record<AgentSortTypes, AgentComparator> = {
-  [AGENT_SORT_KEYS.timestamp]: (a, b) => a.timestamp - b.timestamp,
-  [AGENT_SORT_KEYS.duration]: (a, b) => a.durationMs - b.durationMs,
-  [AGENT_SORT_KEYS.traceId]: (a, b) => a.id.localeCompare(b.id),
-  [AGENT_SORT_KEYS.name]: (a, b) => a.name.localeCompare(b.name),
-  [AGENT_SORT_KEYS.tokens]: (a, b) => {
+const COMPARATORS: Record<AITracesSortTypes, AITracesComparator> = {
+  [AI_TRACES_SORT_KEYS.timestamp]: (a, b) => a.timestamp - b.timestamp,
+  [AI_TRACES_SORT_KEYS.duration]: (a, b) => a.durationMs - b.durationMs,
+  [AI_TRACES_SORT_KEYS.traceId]: (a, b) => a.id.localeCompare(b.id),
+  [AI_TRACES_SORT_KEYS.name]: (a, b) => a.name.localeCompare(b.name),
+  [AI_TRACES_SORT_KEYS.tokens]: (a, b) => {
     const aPrompt = a.promptTokens ?? 0;
     const bPrompt = b.promptTokens ?? 0;
     if (aPrompt !== bPrompt) {
@@ -29,7 +29,7 @@ const COMPARATORS: Record<AgentSortTypes, AgentComparator> = {
     }
     return (a.completionTokens ?? 0) - (b.completionTokens ?? 0);
   },
-  [AGENT_SORT_KEYS.operation]: (a, b) => a.operation.localeCompare(b.operation),
+  [AI_TRACES_SORT_KEYS.operation]: (a, b) => a.operation.localeCompare(b.operation),
 };
 
 export default function AITraceList() {
@@ -39,10 +39,10 @@ export default function AITraceList() {
   const getTraceById = useSentryStore(state => state.getTraceById);
   const spotlightAITraces = useSpotlightAITraces();
 
-  const { sort, toggleSortOrder } = useSort({ defaultSortType: AGENT_SORT_KEYS.timestamp });
+  const { sort, toggleSortOrder } = useSort({ defaultSortType: AI_TRACES_SORT_KEYS.timestamp });
 
   const sortedAiTraces = useMemo(() => {
-    const compareFn = COMPARATORS[sort.active as AgentSortTypes] || COMPARATORS[AGENT_SORT_KEYS.timestamp];
+    const compareFn = COMPARATORS[sort.active as AITracesSortTypes] || COMPARATORS[AI_TRACES_SORT_KEYS.timestamp];
     return [...spotlightAITraces].sort((a, b) => {
       return sort.asc ? compareFn(a, b) : compareFn(b, a);
     });
@@ -66,7 +66,7 @@ export default function AITraceList() {
       <Table variant="detail">
         <Table.Header>
           <tr>
-            {AGENT_HEADERS.map(header => (
+            {AI_TRACES_HEADERS.map(header => (
               <th
                 key={header.id}
                 scope="col"
@@ -80,10 +80,10 @@ export default function AITraceList() {
                     "flex cursor-pointer select-none items-center gap-1",
                     header.id === "duration" || header.id === "tokens" ? "justify-end" : "",
                   )}
-                  onClick={() => header.sortKey && toggleSortOrder(header.sortKey as AgentSortTypes)}
+                  onClick={() => header.sortKey && toggleSortOrder(header.sortKey as AITracesSortTypes)}
                   onKeyDown={e => {
                     if ((e.key === "Enter" || e.key === " ") && header.sortKey) {
-                      toggleSortOrder(header.sortKey as AgentSortTypes);
+                      toggleSortOrder(header.sortKey as AITracesSortTypes);
                     }
                   }}
                   role="link"

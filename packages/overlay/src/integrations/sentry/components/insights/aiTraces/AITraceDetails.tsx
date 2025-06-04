@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import {
   createAITraceFromSpan,
   detectAILibraryHandler,
-} from "~/integrations/sentry/components/insights/agents/sdks/aiLibraries";
+} from "~/integrations/sentry/components/insights/aiTraces/sdks/aiLibraries";
 import type { AILibraryHandler, SpotlightAITrace } from "~/integrations/sentry/types";
 import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 import { Badge } from "~/ui/badge";
@@ -14,7 +14,7 @@ import useSentryStore from "../../../store";
 import DateTime from "../../shared/DateTime";
 import SpanTree from "../../traces/spans/SpanTree";
 
-const AGENTS_ROUTE = "/insights/agents";
+const AI_TRACES_ROUTE = "/insights/aitraces";
 
 interface ToolCallDetailProps {
   toolCall: {
@@ -329,16 +329,16 @@ export default function AITraceDetail() {
 
   if (!spanId) {
     return (
-      <SidePanel backto={AGENTS_ROUTE}>
-        <SidePanelHeader title="AI Trace Details" backto={AGENTS_ROUTE} />
+      <SidePanel backto={AI_TRACES_ROUTE}>
+        <SidePanelHeader title="AI Trace Details" backto={AI_TRACES_ROUTE} />
         <div className="p-6">No trace selected</div>
       </SidePanel>
     );
   }
 
   return (
-    <SidePanel backto={AGENTS_ROUTE}>
-      <SidePanelHeader title="AI Trace Details" backto={AGENTS_ROUTE} />
+    <SidePanel backto={AI_TRACES_ROUTE}>
+      <SidePanelHeader title="AI Trace Details" backto={AI_TRACES_ROUTE} />
       <AITraceDetailsEmbedded spanId={spanId} />
     </SidePanel>
   );
