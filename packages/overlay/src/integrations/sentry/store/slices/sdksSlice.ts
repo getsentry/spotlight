@@ -3,10 +3,12 @@ import type { Sdk, SentryEvent } from "../../types";
 import type { SDKsSliceActions, SDKsSliceState, SentryStore } from "../types";
 
 const initialSDKsState: SDKsSliceState = {
-  sdks: [],
+  sdks: new Map<string, Sdk>(),
 };
 
-export const createSDKsSlice: StateCreator<SentryStore, [], [], SDKsSliceState & SDKsSliceActions> = (_set, get) => ({
+const getSDKKey = (sdk: Sdk): string => `${sdk.name}@${sdk.version}`;
+
+export const createSDKsSlice: StateCreator<SentryStore, [], [], SDKsSliceState & SDKsSliceActions> = (set, get) => ({
   ...initialSDKsState,
   inferSdkFromEvent: (event: SentryEvent) => {
     const sdk: Sdk = {
@@ -24,5 +26,17 @@ export const createSDKsSlice: StateCreator<SentryStore, [], [], SDKsSliceState &
 
     return sdk;
   },
-  getSdks: () => get().sdks,
+  storeSdkRecord: (sdk: Sdk) => {
+    const sdks = get().sdks;
+    const existingSdk = sdks.get(getSDKKey(sdk));
+    if (existingSdk) {
+      existingSdk.lastSeen = sdk.lastSeen;
+    } else {
+      const newSdks = new Map(sdks);
+      newSdks.set(getSDKKey(sdk), sdk);
+      set({ sdks: newSdks });
+    }
+    return existingSdk || sdk;
+  },
+  getSdks: () => Array.from(get().sdks.values()),
 });

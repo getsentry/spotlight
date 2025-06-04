@@ -1,4 +1,4 @@
-import { getAllSpansInTree } from "~/integrations/sentry/data/useSentrySpans";
+import { getAllSpansInTree } from "~/integrations/sentry/store/helpers";
 import type { AILibraryHandler, AIToolCall, Span, SpotlightAITrace } from "~/integrations/sentry/types";
 
 // https://ai-sdk.dev/docs/ai-sdk-core/telemetry

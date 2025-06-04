@@ -22,7 +22,6 @@ export type TraceSubscription = ["trace", (trace: Trace) => void];
 export type Subscription = OnlineSubscription | EventSubscription | TraceSubscription;
 
 export interface EventsSliceState {
-  events: SentryEvent[];
   eventsById: Map<string, SentryEvent>;
 }
 
@@ -32,8 +31,9 @@ export interface EventsSliceActions {
 }
 
 export interface TracesSliceState {
-  traces: Trace[];
   tracesById: Map<string, Trace>;
+  // Trace Id -> Span Id -> Span
+  spansById: Map<string, Map<string, Span>>;
   localTraceIds: Set<string>;
 }
 
@@ -68,16 +68,17 @@ export interface SettingsSliceActions {
 }
 
 export interface EnvelopesSliceState {
-  envelopes: Array<{ envelope: Envelope; rawEnvelope: RawEventContext }>;
+  envelopes: Map<string, { envelope: Envelope; rawEnvelope: RawEventContext }>;
 }
 
 export interface EnvelopesSliceActions {
   pushEnvelope: (params: { envelope: Envelope; rawEnvelope: RawEventContext }) => number;
+  getEnvelopeById: (id: string) => { envelope: Envelope; rawEnvelope: RawEventContext } | undefined;
   getEnvelopes: () => Array<{ envelope: Envelope; rawEnvelope: RawEventContext }>;
 }
 
 export interface SDKsSliceState {
-  sdks: Sdk[];
+  sdks: Map<string, Sdk>;
 }
 
 export interface LogsSliceState {
@@ -93,13 +94,14 @@ export interface LogsSliceActions {
 
 export interface SDKsSliceActions {
   inferSdkFromEvent: (event: SentryEvent) => Sdk;
+  storeSdkRecord: (sdk: Sdk) => Sdk;
   getSdks: () => Sdk[];
 }
 
 export interface SharedSliceActions {
   getEventById: (id: string) => SentryEvent | undefined;
   getTraceById: (id: string) => Trace | undefined;
-  getSpanById: (id: string) => Span | undefined;
+  getSpanById: (traceId: string, spanId: string) => Span | undefined;
   getEventsByTrace: (traceId: string, spanId?: string | null) => SentryEvent[];
   processStacktrace: (errorEvent: SentryErrorEvent) => Promise<void>;
   resetData: () => void;

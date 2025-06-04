@@ -13,9 +13,9 @@ import { isErrorEvent, isLogEvent, isProfileEvent, isTraceEvent } from "../../ut
 import { compareSpans, groupSpans } from "../../utils/traces";
 import type { EventsSliceActions, EventsSliceState, SentryStore } from "../types";
 import { relativeNsToTimestamp, toTimestamp } from "../utils";
+import { getAllSpansInTree } from "../helpers";
 
 const initialEventsState: EventsSliceState = {
-  events: [],
   eventsById: new Map(),
 };
 
@@ -29,12 +29,8 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       event.event_id = generateUuidv4();
     }
 
-    const { eventsById, events } = get();
+    const { eventsById } = get();
     if (eventsById.has(event.event_id)) return;
-
-    const newEventIds = new Map(eventsById);
-    newEventIds.set(event.event_id, event);
-    set({ eventsById: newEventIds });
 
     if (isErrorEvent(event)) {
       await get().processStacktrace(event);
@@ -71,9 +67,9 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       }
     }
 
-    const traceCtx = event.contexts?.trace;
-    const newEvents = [...events, event];
-    set({ events: newEvents });
+    const newEventIds = new Map(eventsById);
+    newEventIds.set(event.event_id, event);
+    set({ eventsById: newEventIds });
 
     // Notify event subscribers
     for (const [type, callback] of get().subscribers.values()) {
@@ -82,8 +78,9 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       }
     }
 
+    const traceCtx = event.contexts?.trace;
     if (traceCtx?.trace_id) {
-      const { tracesById, traces } = get();
+      const { tracesById } = get();
       const existingTrace = tracesById.get(traceCtx.trace_id);
       const trace = existingTrace ?? {
         ...traceCtx,
@@ -156,12 +153,22 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       if (!existingTrace) {
         const newTracesById = new Map(tracesById);
         newTracesById.set(trace.trace_id, trace);
-        traces.unshift(trace);
         set({
-          traces,
           tracesById: newTracesById,
         });
       }
+
+      const { spansById } = get();
+      const newSpansById = new Map(spansById);
+      const allTraceSpans = trace.spanTree.flatMap(getAllSpansInTree);
+      const spanMap = new Map<string, Span>();
+      for (const span of allTraceSpans) {
+        spanMap.set(span.span_id, span);
+      }
+      newSpansById.set(trace.trace_id, spanMap);
+      set({
+        spansById: newSpansById,
+      });
     }
 
     if (isProfileEvent(event)) {
@@ -204,5 +211,5 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       set({ profilesByTraceId: newProfilesByTraceId });
     }
   },
-  getEvents: () => get().events,
+  getEvents: () => Array.from(get().eventsById.values()),
 });
