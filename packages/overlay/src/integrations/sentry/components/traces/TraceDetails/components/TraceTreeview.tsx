@@ -37,7 +37,7 @@ function TraceTreeWithSearch({
   }
   return (
     <>
-      <div className="mx-6 mb-4 mt-2 flex gap-2">
+      <div className="mb-4 mt-2 flex gap-2">
         <div className="relative min-w-[250px] flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
           <Input
@@ -95,7 +95,7 @@ function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
 
   return (
     <>
-      <div className="px-6 py-4">
+      <div className="py-4">
         <div className="text-primary-300 flex flex-1 items-center gap-x-1">
           <div className="text-primary-200">
             <DateTime date={trace.start_timestamp} />

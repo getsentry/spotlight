@@ -136,11 +136,11 @@ export default function TraceList({ onTraceSelect, selectedTraceId, aiMode }: Tr
 
                   {/* Inline content below selected trace */}
                   {isSelected && (
-                    <div className="border-l-primary-500 bg-primary-950 mx-2 mb-4 border-l-4">
+                    <div className="border-l-primary-500 bg-primary-950 mb-4 border-l-4">
                       {aiMode && isAITrace ? (
                         <AITranscription traceId={trace.trace_id} />
                       ) : (
-                        <div className="px-8">
+                        <div className="px-2">
                           <TraceTreeview traceId={trace.trace_id} />
                         </div>
                       )}
