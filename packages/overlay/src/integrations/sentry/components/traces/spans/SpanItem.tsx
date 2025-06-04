@@ -114,7 +114,6 @@ const SpanItem = ({
           className={classNames("waterfall group-hover:bg-primary-700 rounded-sm", isQueried ? "!bg-transparent" : "")}
           style={{
             left: `${spanNodeWidth}%`,
-            height: "100%",
           }}
         >
           <SpanResizer setIsResizing={setIsResizing} isResizing={isResizing} handleResize={handleResize} />
