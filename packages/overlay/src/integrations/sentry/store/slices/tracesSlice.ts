@@ -2,8 +2,8 @@ import type { StateCreator } from "zustand";
 import type { SentryStore, TracesSliceActions, TracesSliceState } from "../types";
 
 const initialTracesState: TracesSliceState = {
-  traces: [],
   tracesById: new Map(),
+  spansById: new Map(),
   localTraceIds: new Set(),
 };
 
@@ -20,5 +20,5 @@ export const createTracesSlice: StateCreator<SentryStore, [], [], TracesSliceSta
       set({ localTraceIds: newLocalTraceIds });
     }
   },
-  getTraces: () => get().traces,
+  getTraces: () => Array.from(get().tracesById.values()),
 });
