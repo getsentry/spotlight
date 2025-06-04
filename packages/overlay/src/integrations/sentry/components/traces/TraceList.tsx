@@ -81,26 +81,27 @@ export default function TraceList({ onTraceSelect, selectedTraceId, aiMode }: Tr
                         <Badge title="This trace is part of your local session.">Local</Badge>
                       ) : null}
                     </div>
-                    <TraceRootTxnName trace={trace} />
-                    <div className="flex flex-col truncate font-mono">
-                      <div className="text-primary-300 flex space-x-2 text-sm">
-                        {trace.status && (
-                          <>
-                            <div
-                              className={classNames(
-                                trace.status === "ok" ? "text-green-400" : trace.status ? "text-red-400" : "",
-                              )}
-                            >
-                              {trace.status}
-                            </div>
-                            <div>&mdash;</div>
-                          </>
-                        )}
-                        <div>{getFormattedSpanDuration(trace)}</div>
-                        <div>&mdash;</div>
-                        <div>
-                          {trace.spans.size.toLocaleString()} spans, {trace.transactions.length.toLocaleString()} txns
-                        </div>
+                    <TimeSince date={trace.start_timestamp} />
+                  </div>
+                  <TraceRootTxnName trace={trace} />
+                  <div className="flex flex-col truncate font-mono">
+                    <div className="text-primary-300 flex space-x-2 text-sm">
+                      {trace.status && (
+                        <>
+                          <div
+                            className={classNames(
+                              trace.status === "ok" ? "text-green-400" : trace.status ? "text-red-400" : "",
+                            )}
+                          >
+                            {trace.status}
+                          </div>
+                          <div>&mdash;</div>
+                        </>
+                      )}
+                      <div>{getFormattedSpanDuration(trace)}</div>
+                      <div>&mdash;</div>
+                      <div>
+                        {trace.spans.size.toLocaleString()} spans, {trace.transactions.length.toLocaleString()} txns
                       </div>
                     </div>
                   </div>
