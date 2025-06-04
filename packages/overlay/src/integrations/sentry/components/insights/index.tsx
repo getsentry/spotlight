@@ -7,6 +7,7 @@ import Profiles from "./Profiles";
 import Queries from "./Queries";
 import QuerySummary from "./QuerySummary";
 import Resources from "./Resources";
+import AItracesTab from "./aiTraces";
 import EnvelopesTab from "./envelopes";
 import SdksTab from "./sdks";
 import WebVitals from "./webVitals";
@@ -32,14 +33,15 @@ export default function InsightsTabDetails() {
       )}
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <Routes>
+          <Route path="queries" element={<Queries showAll={showAll} />} />
           <Route path="queries/:type" element={<QuerySummary showAll={showAll} />} />
           <Route path="resources" element={<Resources showAll={showAll} />} />
           <Route path="webvitals" element={<WebVitals />} />
           <Route path="webvitals/:page" element={<WebVitalsDetail />} />
           <Route path="envelopes/*" element={<EnvelopesTab showAll={showAll} />} />
           <Route path="sdks/*" element={<SdksTab />} />
-          <Route path="queries" element={<Queries showAll={showAll} />} />
           <Route path="profiles" element={<Profiles />} />
+          <Route path="aitraces/*" element={<AItracesTab />} />
           {/* Default tab */}
           <Route path="*" element={<Navigate to="/insights/queries" replace />} />
         </Routes>

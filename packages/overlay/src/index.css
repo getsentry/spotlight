@@ -126,3 +126,32 @@ input:checked ~ .dot {
 .spotlight-debugger.resizing-row * {
   cursor: row-resize !important;
 }
+
+/* custom scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.primary.700') theme('colors.primary.900');
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: theme('colors.primary.900');
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: theme('colors.primary.700');
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.primary.600');
+}
+
+*::-webkit-scrollbar-corner {
+  background: theme('colors.primary.900');
+}

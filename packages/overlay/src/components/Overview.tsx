@@ -9,11 +9,15 @@ export default function Overview({
   integrationData,
   setTriggerButtonCount,
   setOpen,
+  isOnline,
+  showClearEventsButton,
 }: {
   integrations: Integration[];
   integrationData: IntegrationData<unknown>;
   setTriggerButtonCount: (count: NotificationCount) => void;
   setOpen: (value: boolean) => void;
+  isOnline: boolean;
+  showClearEventsButton: boolean;
 }) {
   const [notificationCountSum, setNotificationCountSum] = useState<NotificationCount>({ count: 0, severe: false });
 
@@ -49,8 +53,8 @@ export default function Overview({
   }, [notificationCountSum, setTriggerButtonCount]);
 
   return (
-    <div className="flex overflow-hidden">
-      <Navigation panels={panels} setOpen={setOpen} />
+    <div className="flex h-full overflow-hidden">
+      <Navigation panels={panels} setOpen={setOpen} isOnline={isOnline} showClearEventsButton={showClearEventsButton} />
       <Routes>
         <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={"not-found"} />
         {panels.map(({ content: PanelContent, id }) =>

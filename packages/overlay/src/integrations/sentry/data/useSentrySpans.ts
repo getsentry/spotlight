@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import useSentryStore from "../store";
 import { getLocalTraces } from "../store/helpers";
-import type { Span, Trace } from "../types";
+import type { Span, SpanId, Trace } from "../types";
 import { SentryEventsContext } from "./sentryEventsContext";
 
 export function useSentryTraces() {
@@ -39,3 +39,27 @@ export const useSentrySpanCounts = () => {
     localSpans: localTraces.reduce(spanCountReducer, 0),
   };
 };
+
+export function getAllSpansInTree(rootSpan: Span): Span[] {
+  const allSpans: Span[] = [];
+  const queue: Span[] = [rootSpan];
+  const visited = new Set<SpanId>();
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (!current || visited.has(current.span_id)) {
+      continue;
+    }
+
+    visited.add(current.span_id);
+    allSpans.push(current);
+
+    if (current.children) {
+      for (const child of current.children) {
+        queue.push(child);
+      }
+    }
+  }
+
+  return allSpans;
+}

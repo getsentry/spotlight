@@ -109,6 +109,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
             createTab("profiles", "Profiles"),
             createTab("envelopes", "Envelopes"),
             createTab("sdks", "SDKs"),
+            createTab("aitraces", "AI Traces"),
           ],
         }),
       ];

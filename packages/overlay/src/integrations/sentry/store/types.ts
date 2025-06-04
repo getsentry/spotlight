@@ -7,6 +7,7 @@ import type {
   SentryEvent,
   SentryLogEventItem,
   SentryProcessedProfile,
+  Span,
   Trace,
 } from "../types";
 
@@ -98,6 +99,7 @@ export interface SDKsSliceActions {
 export interface SharedSliceActions {
   getEventById: (id: string) => SentryEvent | undefined;
   getTraceById: (id: string) => Trace | undefined;
+  getSpanById: (id: string) => Span | undefined;
   getEventsByTrace: (traceId: string, spanId?: string | null) => SentryEvent[];
   processStacktrace: (errorEvent: SentryErrorEvent) => Promise<void>;
   resetData: () => void;
