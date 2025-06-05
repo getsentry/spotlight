@@ -1,22 +1,36 @@
 import { useCallback, useRef, useState } from "react";
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { useSpotlightContext } from "../../../lib/useSpotlightContext";
 import Resizer from "../components/shared/Resizer";
 import TraceDetails from "../components/traces/TraceDetails";
 import TraceList from "../components/traces/TraceList";
+import TraceListFilter from "../components/traces/TraceListFilter";
 import { SentryEventsContextProvider } from "../data/sentryEventsContext";
+import { useSentryTraces } from "../data/useSentrySpans";
+import useTraceFiltering from "../hooks/useTraceFiltering";
+import type { Trace } from "../types"; // Ensure Trace type is available
 
 const MIN_PANEL_WIDTH_PERCENT = 20;
 const MAX_PANEL_WIDTH_PERCENT = 80;
 const DEFAULT_PANEL_WIDTH_PERCENT = 50;
 
-// TraceList on left, TraceDetails on right
+interface TraceSplitViewLayoutProps {
+  aiMode: boolean;
+  onToggleAIMode: () => void;
+  filteredTraces: Trace[];
+  allTraces: Trace[];
+  visibleTraces: Trace[];
+  setShowAll: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 function TraceSplitViewLayout({
   aiMode,
   onToggleAIMode,
-}: {
-  aiMode: boolean;
-  onToggleAIMode: () => void;
-}) {
+  filteredTraces,
+  allTraces,
+  visibleTraces,
+  setShowAll,
+}: TraceSplitViewLayoutProps) {
   const { traceId } = useParams<{ traceId: string }>();
   const navigate = useNavigate();
   const [leftPanelWidth, setLeftPanelWidth] = useState(DEFAULT_PANEL_WIDTH_PERCENT);
@@ -57,7 +71,15 @@ function TraceSplitViewLayout({
     <div ref={containerRef} className="flex h-full w-full overflow-hidden">
       {/* left panel - trace list */}
       <div className="flex-shrink-0 overflow-y-auto" style={{ width: `${leftPanelWidth}%` }}>
-        <TraceList onTraceSelect={handleTraceSelect} selectedTraceId={traceId} aiMode={aiMode} />
+        <TraceList
+          onTraceSelect={handleTraceSelect}
+          selectedTraceId={traceId}
+          aiMode={aiMode}
+          filteredTraces={filteredTraces}
+          allTraces={allTraces}
+          visibleTraces={visibleTraces}
+          setShowAll={setShowAll}
+        />
       </div>
 
       {/* Resizer */}
@@ -77,10 +99,17 @@ function TraceSplitViewLayout({
   );
 }
 
-// Component for showing only the TraceList (for the base route)
-function TraceListOnlyView({ aiMode }: { aiMode: boolean }) {
-  const navigate = useNavigate();
+interface TraceListOnlyViewProps {
+  aiMode: boolean;
+  filteredTraces: Trace[];
+  allTraces: Trace[];
+  visibleTraces: Trace[];
+  setShowAll: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
+// Component for showing only the TraceList (for the base route)
+function TraceListOnlyView({ aiMode, filteredTraces, allTraces, visibleTraces, setShowAll }: TraceListOnlyViewProps) {
+  const navigate = useNavigate();
   const handleTraceSelect = useCallback(
     (traceId: string) => {
       navigate(traceId); // Navigate to /:traceId (relative to current path)
@@ -90,7 +119,15 @@ function TraceListOnlyView({ aiMode }: { aiMode: boolean }) {
 
   return (
     <div className="h-full w-full overflow-y-auto">
-      <TraceList onTraceSelect={handleTraceSelect} selectedTraceId={undefined} aiMode={aiMode} />
+      <TraceList
+        onTraceSelect={handleTraceSelect}
+        selectedTraceId={undefined}
+        aiMode={aiMode}
+        filteredTraces={filteredTraces}
+        allTraces={allTraces}
+        visibleTraces={visibleTraces}
+        setShowAll={setShowAll}
+      />
     </div>
   );
 }
@@ -101,21 +138,68 @@ export default function TracesTab() {
     setAiMode(prev => !prev);
   }, []);
 
+  const context = useSpotlightContext();
+  const { allTraces, localTraces } = useSentryTraces();
+  const [showAll, setShowAll] = useState(() => !context.experiments["sentry:focus-local-events"]);
+  const visibleTraces = showAll ? allTraces : localTraces;
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const { TRACE_FILTER_CONFIGS, filteredTraces } = useTraceFiltering(visibleTraces, activeFilters, searchQuery);
+
   return (
     <SentryEventsContextProvider>
-      <Routes>
-        {/* Route for when clicking AI flow / messages. This shows that particular ai trace details */}
-        <Route
-          path="/:traceId/spans/:spanId"
-          element={<TraceSplitViewLayout aiMode={aiMode} onToggleAIMode={handleToggleAIMode} />}
+      <div className="flex h-full flex-col overflow-hidden">
+        <TraceListFilter
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          activeFilters={activeFilters}
+          setActiveFilters={setActiveFilters}
+          filterConfigs={TRACE_FILTER_CONFIGS}
         />
-        {/* AI Trace id w/o subpaths */}
-        <Route
-          path="/:traceId/*"
-          element={<TraceSplitViewLayout aiMode={aiMode} onToggleAIMode={handleToggleAIMode} />}
-        />
-        <Route path="/" element={<TraceListOnlyView aiMode={aiMode} />} />
-      </Routes>
+        <div className="flex-1 overflow-auto">
+          <Routes>
+            {/* Route for when clicking AI flow / messages. This shows that particular ai trace details */}
+            <Route
+              path="/:traceId/spans/:spanId"
+              element={
+                <TraceSplitViewLayout
+                  aiMode={aiMode}
+                  onToggleAIMode={handleToggleAIMode}
+                  filteredTraces={filteredTraces}
+                  allTraces={allTraces}
+                  visibleTraces={visibleTraces}
+                  setShowAll={setShowAll}
+                />
+              }
+            />
+            <Route
+              path="/:traceId/*"
+              element={
+                <TraceSplitViewLayout
+                  aiMode={aiMode}
+                  onToggleAIMode={handleToggleAIMode}
+                  filteredTraces={filteredTraces}
+                  allTraces={allTraces}
+                  visibleTraces={visibleTraces}
+                  setShowAll={setShowAll}
+                />
+              }
+            />
+            <Route
+              path="/"
+              element={
+                <TraceListOnlyView
+                  aiMode={aiMode}
+                  filteredTraces={filteredTraces}
+                  allTraces={allTraces}
+                  visibleTraces={visibleTraces}
+                  setShowAll={setShowAll}
+                />
+              }
+            />
+          </Routes>
+        </div>
+      </div>
     </SentryEventsContextProvider>
   );
 }
