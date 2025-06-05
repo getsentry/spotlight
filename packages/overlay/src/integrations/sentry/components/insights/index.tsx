@@ -31,7 +31,7 @@ export default function InsightsTabDetails() {
           }}
         />
       )}
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
         <Routes>
           <Route path="queries" element={<Queries showAll={showAll} />} />
           <Route path="queries/:type" element={<QuerySummary showAll={showAll} />} />
