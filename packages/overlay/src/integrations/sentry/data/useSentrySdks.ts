@@ -4,5 +4,5 @@ import { SentryEventsContext } from "./sentryEventsContext";
 
 export const useSentrySdks = () => {
   useContext(SentryEventsContext);
-  return useSentryStore(state => state.getSdks());
+  return useSentryStore(state => state.getSdks)();
 };
