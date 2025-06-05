@@ -213,17 +213,19 @@ function ToolCallsSection({ trace }: { trace: SpotlightAITrace }) {
 }
 
 // embedded version for split view
-export function AITraceDetailsEmbedded({ spanId }: { spanId: string }) {
+export function AITraceDetailsEmbedded({ traceId, spanId }: { traceId: string; spanId: string }) {
   const getSpanById = useSentryStore(state => state.getSpanById);
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
 
-  const span = getSpanById(spanId);
+  const span = getSpanById(traceId, spanId);
 
   if (!span) {
     return (
       <div className="p-6">
-        <p className="text-red-400">Trace not found</p>
-        <p className="text-sm text-gray-400">Looking for span ID: {spanId}</p>
+        <p className="text-red-400">Span not found</p>
+        <p className="text-sm text-gray-400">
+          Looking for: {traceId} - {spanId}
+        </p>
       </div>
     );
   }
@@ -325,9 +327,9 @@ export function AITraceDetailsEmbedded({ spanId }: { spanId: string }) {
 
 // Original SidePanel version for insights tab
 export default function AITraceDetail() {
-  const { spanId } = useParams<{ spanId: string }>();
+  const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
 
-  if (!spanId) {
+  if (!traceId || !spanId) {
     return (
       <SidePanel backto={AI_TRACES_ROUTE}>
         <SidePanelHeader title="AI Trace Details" backto={AI_TRACES_ROUTE} />
@@ -339,7 +341,7 @@ export default function AITraceDetail() {
   return (
     <SidePanel backto={AI_TRACES_ROUTE}>
       <SidePanelHeader title="AI Trace Details" backto={AI_TRACES_ROUTE} />
-      <AITraceDetailsEmbedded spanId={spanId} />
+      <AITraceDetailsEmbedded traceId={traceId} spanId={spanId} />
     </SidePanel>
   );
 }

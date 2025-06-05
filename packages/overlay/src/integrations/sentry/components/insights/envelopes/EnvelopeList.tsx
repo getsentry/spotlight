@@ -15,11 +15,9 @@ import EnvelopeDetails from "./EnvelopeDetails";
 export default function EnvelopeList({ showAll }: { showAll: boolean }) {
   const { id: selectedEnvelopeId } = useParams();
   const { allEnvelopes, localEnvelopes } = useSentryEnvelopes();
-  const { getEnvelopes } = useSentryStore();
+  const { getEnvelopeById } = useSentryStore();
 
-  const selectedEnvelope = selectedEnvelopeId
-    ? getEnvelopes().find(({ envelope: _env }) => _env[0].__spotlight_envelope_id === selectedEnvelopeId) || null
-    : null;
+  const selectedEnvelope = selectedEnvelopeId ? getEnvelopeById(selectedEnvelopeId) : null;
 
   if (allEnvelopes?.length) {
     return (

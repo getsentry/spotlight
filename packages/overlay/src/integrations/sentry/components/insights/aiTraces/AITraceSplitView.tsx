@@ -58,7 +58,7 @@ export default function AITraceSplitView({ traceId }: AITraceSplitViewProps) {
 
       {/* right panel - AI details */}
       <div className="flex min-h-0 w-3/5 flex-col">
-        <AITraceDetailsEmbedded spanId={selectedSpanId} />
+        <AITraceDetailsEmbedded traceId={traceId} spanId={selectedSpanId} />
       </div>
     </div>
   );

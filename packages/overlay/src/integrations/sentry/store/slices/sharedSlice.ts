@@ -7,17 +7,10 @@ import { log } from "~/lib/logger";
 export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceActions> = (set, get) => ({
   getEventById: (id: string) => get().eventsById.get(id),
   getTraceById: (id: string) => get().tracesById.get(id),
-  getSpanById: (id: string) => {
-    const { tracesById } = get();
-    for (const trace of tracesById.values()) {
-      const span = trace.spans.get(id);
-      if (span) return span;
-    }
-    return undefined;
-  },
+  getSpanById: (traceId: string, spanId: string) => get().spansById.get(traceId)?.get(spanId),
   getEventsByTrace: (traceId: string, spanId?: string | null) => {
-    const { events } = get();
-    return events.filter(evt => {
+    const { getEvents } = get();
+    return getEvents().filter(evt => {
       const trace = evt.contexts?.trace;
       if (!trace || trace.trace_id !== traceId) return false;
       if (spanId !== undefined) return trace.span_id === spanId;
@@ -66,11 +59,11 @@ export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceAct
   },
   resetData: () => {
     set({
-      envelopes: [],
-      events: [],
+      envelopes: new Map(),
       eventsById: new Map(),
-      traces: [],
       tracesById: new Map(),
+      spansById: new Map(),
+      sdks: new Map(),
       profilesByTraceId: new Map(),
       localTraceIds: new Set(),
     });

@@ -33,7 +33,7 @@ const COMPARATORS: Record<AITracesSortTypes, AITracesComparator> = {
 };
 
 export default function AITraceList() {
-  const { spanId } = useParams<{ spanId?: string }>();
+  const { traceId, spanId } = useParams<{ traceId?: string; spanId?: string }>();
   const navigate = useNavigate();
   const getSpanById = useSentryStore(state => state.getSpanById);
   const getTraceById = useSentryStore(state => state.getTraceById);
@@ -48,7 +48,7 @@ export default function AITraceList() {
     });
   }, [spotlightAITraces, sort]);
 
-  const selectedRawSpan = spanId ? getSpanById(spanId) : null;
+  const selectedRawSpan = traceId && spanId ? getSpanById(traceId, spanId) : null;
   const traceContext = selectedRawSpan?.trace_id ? getTraceById(selectedRawSpan.trace_id) : null;
 
   if (spotlightAITraces.length === 0) {

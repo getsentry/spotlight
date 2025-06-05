@@ -8,7 +8,7 @@ import { sdkToPlatform } from "../../utils/sdkToPlatform";
 import type { EnvelopesSliceActions, EnvelopesSliceState, SentryStore } from "../types";
 
 const initialEnvelopesState: EnvelopesSliceState = {
-  envelopes: [],
+  envelopes: new Map(),
 };
 
 export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSliceState & EnvelopesSliceActions> = (
@@ -37,15 +37,10 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
       };
     }
 
-    const { sdks } = get();
-    const existingSdk = sdks.find(s => s.name === sdk.name && s.version === sdk.version);
-    if (existingSdk) {
-      existingSdk.lastSeen = lastSeen;
-    } else {
-      set({ sdks: [...sdks, sdk] });
-    }
+    get().storeSdkRecord(sdk);
 
-    header.__spotlight_envelope_id = generateUuidv4();
+    const envelopeId = generateUuidv4();
+    header.__spotlight_envelope_id = envelopeId;
 
     const traceContext = header.trace;
 
@@ -65,9 +60,13 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
     }
 
     const { envelopes } = get();
-    const newEnvelopes = [...envelopes, { envelope, rawEnvelope }];
+    const newEnvelopes = new Map(envelopes);
+    newEnvelopes.set(envelopeId, { envelope, rawEnvelope });
     set({ envelopes: newEnvelopes });
-    return newEnvelopes.length;
+    return newEnvelopes.size;
   },
-  getEnvelopes: () => get().envelopes,
+  getEnvelopeById: (id: string) => {
+    return get().envelopes.get(id);
+  },
+  getEnvelopes: () => Array.from(get().envelopes.values()),
 });
