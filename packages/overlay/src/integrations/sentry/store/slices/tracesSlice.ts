@@ -3,7 +3,6 @@ import type { SentryStore, TracesSliceActions, TracesSliceState } from "../types
 
 const initialTracesState: TracesSliceState = {
   tracesById: new Map(),
-  spansById: new Map(),
   localTraceIds: new Set(),
 };
 

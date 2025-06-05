@@ -4,6 +4,7 @@ import Resizer from "../components/shared/Resizer";
 import TraceDetails from "../components/traces/TraceDetails";
 import TraceList from "../components/traces/TraceList";
 import { SentryEventsContextProvider } from "../data/sentryEventsContext";
+import SpanDetails from "../components/traces/spans/SpanDetails";
 
 const MIN_PANEL_WIDTH_PERCENT = 20;
 const MAX_PANEL_WIDTH_PERCENT = 80;
@@ -17,7 +18,7 @@ function TraceSplitViewLayout({
   aiMode: boolean;
   onToggleAIMode: () => void;
 }) {
-  const { traceId } = useParams<{ traceId: string }>();
+  const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
   const navigate = useNavigate();
   const [leftPanelWidth, setLeftPanelWidth] = useState(DEFAULT_PANEL_WIDTH_PERCENT);
   const [isResizing, setIsResizing] = useState(false);
@@ -33,17 +34,6 @@ function TraceSplitViewLayout({
     setLeftPanelWidth(clampedWidth);
   }, []);
 
-  const handleTraceSelect = useCallback(
-    (selectedTraceId: string) => {
-      if (traceId === selectedTraceId) {
-        navigate(".."); // relative to /:traceId/*, so goes to TracesTab
-      } else {
-        navigate(`../${selectedTraceId}`); // relative to /:traceId/*, so goes to /newTraceId/*
-      }
-    },
-    [navigate, traceId],
-  );
-
   const handleCloseTraceDetails = useCallback(() => {
     navigate(".."); // relative to /:traceId/*, so goes to TracesTab
   }, [navigate]);
@@ -57,7 +47,7 @@ function TraceSplitViewLayout({
     <div ref={containerRef} className="flex h-full w-full overflow-hidden">
       {/* left panel - trace list */}
       <div className="flex-shrink-0 overflow-y-auto" style={{ width: `${leftPanelWidth}%` }}>
-        <TraceList onTraceSelect={handleTraceSelect} selectedTraceId={traceId} aiMode={aiMode} />
+        <TraceList aiMode={aiMode} />
       </div>
 
       {/* Resizer */}
@@ -71,7 +61,16 @@ function TraceSplitViewLayout({
 
       {/* right panel - selected trace content */}
       <div className="flex-1 overflow-hidden" style={{ width: `${100 - leftPanelWidth}%` }}>
-        <TraceDetails traceId={traceId} onClose={handleCloseTraceDetails} aiMode={aiMode} onToggleAI={onToggleAIMode} />
+        {spanId && !aiMode ? (
+          <SpanDetails traceId={traceId} spanId={spanId} />
+        ) : (
+          <TraceDetails
+            traceId={traceId}
+            onClose={handleCloseTraceDetails}
+            aiMode={aiMode}
+            onToggleAI={onToggleAIMode}
+          />
+        )}
       </div>
     </div>
   );
@@ -79,18 +78,9 @@ function TraceSplitViewLayout({
 
 // Component for showing only the TraceList (for the base route)
 function TraceListOnlyView({ aiMode }: { aiMode: boolean }) {
-  const navigate = useNavigate();
-
-  const handleTraceSelect = useCallback(
-    (traceId: string) => {
-      navigate(traceId); // Navigate to /:traceId (relative to current path)
-    },
-    [navigate],
-  );
-
   return (
     <div className="h-full w-full overflow-y-auto">
-      <TraceList onTraceSelect={handleTraceSelect} selectedTraceId={undefined} aiMode={aiMode} />
+      <TraceList aiMode={aiMode} />
     </div>
   );
 }
@@ -107,6 +97,10 @@ export default function TracesTab() {
         {/* Route for when clicking AI flow / messages. This shows that particular ai trace details */}
         <Route
           path="/:traceId/spans/:spanId"
+          element={<TraceSplitViewLayout aiMode={aiMode} onToggleAIMode={handleToggleAIMode} />}
+        />
+        <Route
+          path="/:traceId/spans/:spanId/*"
           element={<TraceSplitViewLayout aiMode={aiMode} onToggleAIMode={handleToggleAIMode} />}
         />
         {/* AI Trace id w/o subpaths */}

@@ -1,18 +1,18 @@
-import { type ReactNode, useState } from "react";
-import { Link } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { format as formatSQL } from "sql-formatter";
 import { isErrorEvent } from "~/integrations/sentry/utils/sentry";
-import Table from "~/ui/table";
 import JsonViewer from "../../../../../components/JsonViewer";
-import SidePanel, { SidePanelHeader } from "../../../../../ui/sidePanel";
 import { DB_SPAN_REGEX } from "../../../constants";
 import useSentryStore from "../../../store";
-import type { SentryErrorEvent, Span, TraceContext } from "../../../types";
-import { formatBytes } from "../../../utils/bytes";
-import { getFormattedDuration } from "../../../utils/duration";
-import { ErrorTitle } from "../../events/error/Error";
+import type { Span, Trace } from "../../../types";
+import TraceIcon from "../TraceIcon";
+import Tabs from "~/components/tabs";
+import { createTab } from "~/integrations/sentry/utils/tabs";
+import EventList from "../../events/EventList";
+import LogsList from "../../log/LogsList";
+import { ContextView } from "../../shared/ContextView";
 import DateTime from "../../shared/DateTime";
-import SpanTree from "./SpanTree";
+import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 
 function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) {
   if (desc.startsWith("{") || dbType === "mongodb") {
@@ -34,14 +34,6 @@ function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) 
   }
 
   return <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">{description}</pre>;
-}
-
-function formatValue(name: string, value: unknown): ReactNode {
-  if (typeof value === "number") {
-    if (name.indexOf("size") !== -1 || name.indexOf("length") !== -1) return formatBytes(value);
-    return value.toLocaleString();
-  }
-  return `${value}` as ReactNode;
 }
 
 function SpanDescription({ span }: { span: Span }) {
@@ -67,183 +59,111 @@ function SpanDescription({ span }: { span: Span }) {
     body = <div className="text-primary-300">No description recorded for this span.</div>;
   }
   return (
-    <div>
+    <div className="space-y-4 px-6 py-4">
       {headerText && <h2 className="mb-2 font-bold uppercase">{headerText}</h2>}
       {body}
     </div>
   );
 }
 
-export default function SpanDetails({
-  traceContext,
-  span,
-  startTimestamp,
-  totalDuration,
-  totalTransactions,
-}: {
-  traceContext: TraceContext;
-  span: Span;
-  totalTransactions?: number;
-  startTimestamp: number;
-  totalDuration: number;
-}) {
-  const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
-  const spanRelativeStart = span.start_timestamp - startTimestamp;
-  const getEventsByTrace = useSentryStore(state => state.getEventsByTrace);
-
-  const spanDuration = span.timestamp - span.start_timestamp;
-
-  const errors = span.trace_id ? getEventsByTrace(span.trace_id).filter(isErrorEvent) : [];
-
+export function SpanContext({ span }: { span: Span }) {
+  const contextEntries: [string, Record<string, unknown>][] = span.data ? [["data", span.data]] : [];
   return (
-    <SidePanel backto={`/traces/${span.trace_id}`}>
-      <SidePanelHeader
-        title="Span Details"
-        subtitle={
-          <>
-            {span.op && (
-              <>
-                {span.op} <span className="text-primary-500">&mdash;</span>{" "}
-              </>
-            )}
-            {span.span_id}
-          </>
-        }
-        backto={`/traces/${span.trace_id}`}
-      />
-
-      <div className="space-y-6">
-        <div>
-          <div className="flex flex-col space-y-4">
-            <div className="text-primary-300 flex flex-1 items-center gap-x-1">
-              <DateTime date={span.start_timestamp} />
-              <span>&mdash;</span>
-              <span>
-                <strong>{getFormattedDuration(spanRelativeStart)}</strong> into trace
-              </span>
-            </div>
-            <div className="flex-1">
-              <div className="border-primary-800 relative h-8 border py-1">
-                <div
-                  className="bg-primary-800 absolute bottom-0 top-0 -m-0.5 flex w-full items-center p-0.5"
-                  style={{
-                    left: `min(${(spanRelativeStart / totalDuration) * 100}%, 100% - 1px)`,
-                    width: `max(1px, ${(spanDuration / totalDuration) * 100}%)`,
-                  }}
-                >
-                  <span className="whitespace-nowrap">{getFormattedDuration(spanDuration)}</span>
-                </div>
-              </div>
+    <>
+      <div className="space-y-6 p-6">
+        <div className="text-primary-300 flex flex-1 items-center gap-x-1">
+          <DateTime date={span.start_timestamp} />
+          <span>&mdash;</span>
+          <span>
+            <strong>{getFormattedDuration(span.timestamp - span.start_timestamp)}</strong> duration
+          </span>
+        </div>
+        <div className="flex-1">
+          <div className="border-primary-800 relative h-8 border py-1">
+            <div
+              className="bg-primary-800 absolute bottom-0 top-0 -m-0.5 flex w-full items-center p-0.5"
+              style={{
+                left: 0,
+                width: "100%",
+              }}
+            >
+              <span className="whitespace-nowrap">{getFormattedDuration(span.timestamp - span.start_timestamp)}</span>
             </div>
           </div>
         </div>
-
-        {errors.length > 0 && (
-          <div className="flex flex-col items-start">
-            <h2 className="mb-2 font-bold uppercase">Related Errors</h2>
-            {errors.map(event => (
-              <Link key={event.event_id} className="cursor-pointer underline" to={`/errors/${event.event_id}`}>
-                <ErrorTitle event={event as SentryErrorEvent} />
-              </Link>
-            ))}
-          </div>
-        )}
-
-        <SpanDescription span={span} />
-
-        <div>
-          <h2 className="mb-2 font-bold uppercase">Tags</h2>
-          {span.tags && Object.keys(span.tags).length ? (
-            <Table className="w-full text-sm">
-              <Table.Body>
-                {Object.entries(span.tags).map(([key, value]) => (
-                  <tr key={key} className="text-primary-300">
-                    <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
-                      <div className="w-full truncate">{key}</div>
-                    </th>
-                    <td className="py-0.5">
-                      <pre className="whitespace-nowrap font-mono">{JSON.stringify(value, undefined, 2)}</pre>
-                    </td>
-                  </tr>
-                ))}
-              </Table.Body>
-            </Table>
-          ) : (
-            <div className="text-primary-300">No tags recorded for this span.</div>
-          )}
-        </div>
-        <div>
-          <h2 className="mb-2 font-bold uppercase">Context</h2>
-          <Table className="w-full text-sm">
-            <Table.Body>
-              {[
-                ["status", span.status || ""],
-                ["trace", span.trace_id],
-                ["span", span.span_id],
-                [
-                  "parent",
-                  span.parent_span_id ? (
-                    <Link
-                      className="underline"
-                      to={`/traces/${span.trace_id}/spans/${span.parent_span_id}`}
-                      key={`link-to-${span.parent_span_id}`}
-                    >
-                      {span.parent_span_id}
-                    </Link>
-                  ) : (
-                    ""
-                  ),
-                ],
-                ["op", span.op],
-              ].map(([key, value]) => (
-                <tr key={key as string} className="text-primary-300">
-                  <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
-                    <div className="w-full truncate">{key}</div>
-                  </th>
-                  <td className="py-0.5">
-                    <pre className="whitespace-nowrap font-mono">{value}</pre>
-                  </td>
-                </tr>
-              ))}
-            </Table.Body>
-          </Table>
-        </div>
-
-        {span.data && (
-          <div>
-            <h2 className="mb-2 font-bold uppercase">Data</h2>
-            <Table className="w-full text-sm">
-              <Table.Body>
-                {Object.entries(span.data).map(([key, value]) => (
-                  <tr key={key} className="text-primary-300">
-                    <th className=" w-1/12 py-0.5 pr-4 text-left font-mono font-normal">
-                      <div className="w-full truncate">{key}</div>
-                    </th>
-                    <td className="py-0.5">
-                      <pre className="whitespace-nowrap font-mono">{formatValue(key, value)}</pre>
-                    </td>
-                  </tr>
-                ))}
-              </Table.Body>
-            </Table>
-          </div>
-        )}
-
-        {(span.children?.length ?? 0) > 0 && (
-          <div>
-            <h2 className="mb-2 font-bold uppercase">Sub-tree</h2>
-            <SpanTree
-              traceContext={traceContext}
-              tree={[span]}
-              startTimestamp={startTimestamp}
-              totalDuration={totalDuration}
-              totalTransactions={totalTransactions}
-              spanNodeWidth={spanNodeWidth}
-              setSpanNodeWidth={setSpanNodeWidth}
-            />
-          </div>
-        )}
       </div>
-    </SidePanel>
+      <SpanDescription span={span} />
+      <ContextView context={contextEntries} tags={span.tags} />
+    </>
   );
 }
+
+export default function SpanDetails({
+  traceId,
+  spanId,
+}: {
+  traceId: string;
+  spanId: string;
+}) {
+  const getEventsByTrace = useSentryStore(state => state.getEventsByTrace);
+  const trace = useSentryStore(state => state.getTraceById(traceId));
+
+  if (!trace) {
+    return <div>Error: cannot find trace: {traceId}</div>;
+  }
+
+  const span = trace?.spans.get(spanId);
+
+  if (!span) {
+    return <div>Error: cannot find span: {`${traceId}@${spanId}`}</div>;
+  }
+
+  // TODO: try to narrow errors to the span and its children?
+  const errors = span.trace_id ? getEventsByTrace(span.trace_id).filter(isErrorEvent) : [];
+  const errorCount = errors.length;
+
+  const tabs = [
+    createTab("context", "Context"),
+    // TODO: Narrow down logs to the span and its children
+    createTab("logs", "Logs"),
+    createTab("errors", "Errors", {
+      notificationCount: {
+        count: errorCount,
+        severe: errorCount > 0,
+      },
+    }),
+  ];
+
+  return (
+    <>
+      <SpanHeader span={span} trace={trace} />
+
+      <Tabs tabs={tabs} nested />
+      <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        <Routes>
+          <Route path="context" element={<SpanContext span={span} />} />
+          <Route path="errors" element={<EventList traceId={traceId} />} />
+          <Route path="logs" element={<LogsList traceId={traceId} />} />
+          <Route path="logs/:id" element={<LogsList traceId={traceId} />} />
+          {/* Default tab */}
+          <Route path="*" element={<Navigate to="context" replace />} />
+        </Routes>
+      </div>
+    </>
+  );
+}
+function SpanHeader({ span, trace }: { span: Span; trace: Trace }) {
+  // Header TODOs:
+  // TODO: Add linear view with span highlighted in it
+  // TODO: Show previous/parent span
+  return (
+    <div className="border-b-primary-700 bg-primary-950 flex items-center gap-x-2 border-b px-6 py-4">
+      <TraceIcon trace={trace} />
+      <h1 className="flex w-full flex-col truncate text-xl">
+        Span:&nbsp;&nbsp;
+        {span.op || span.span_id}
+      </h1>
+    </div>
+  );
+}
+

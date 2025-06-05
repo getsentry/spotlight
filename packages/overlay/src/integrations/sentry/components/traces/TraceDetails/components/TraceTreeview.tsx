@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
 import { SearchProvider, useSearch } from "~/integrations/sentry/context/SearchContext";
 import useSearchInput from "~/integrations/sentry/hooks/useSearchInput";
 import useSentryStore from "~/integrations/sentry/store";
@@ -11,7 +10,6 @@ import { ReactComponent as Search } from "~/assets/search.svg";
 import { Button } from "~/ui/button";
 import { Input } from "~/ui/input";
 import DateTime from "../../../shared/DateTime";
-import SpanDetails from "../../spans/SpanDetails";
 import SpanTree from "../../spans/SpanTree";
 
 type TraceTreeViewProps = { traceId: string };
@@ -85,11 +83,9 @@ function TraceTreeWithSearch({
 }
 
 function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
-  const { spanId } = useParams();
   const getTraceById = useSentryStore(state => state.getTraceById);
 
   const trace = getTraceById(traceId)!;
-  const span = spanId ? trace.spans.get(spanId) : undefined;
   const startTimestamp = trace.start_timestamp;
   const totalDuration = trace.timestamp - startTimestamp;
 
@@ -108,15 +104,6 @@ function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
         </div>
       </div>
       <TraceTreeWithSearch trace={trace} startTimestamp={startTimestamp} totalDuration={totalDuration} />
-      {span ? (
-        <SpanDetails
-          traceContext={trace}
-          startTimestamp={startTimestamp}
-          totalDuration={totalDuration}
-          span={span}
-          totalTransactions={(trace.transactions || []).length}
-        />
-      ) : null}
     </>
   );
 }
