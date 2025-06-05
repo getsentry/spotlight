@@ -73,7 +73,7 @@ const SpanItem = ({
             "node",
             "group-hover:bg-primary-700",
             "rounded-sm",
-            "overflow-hidden",
+            "!overflow-hidden",
             isQueried ? "bg-transparent" : "",
             span.status && span.status !== "ok" ? "text-red-400" : "",
             spanId === span.span_id ? "bg-primary-900" : "bg-primary-950",
@@ -81,6 +81,7 @@ const SpanItem = ({
           style={{
             width: `${spanNodeWidth}%`,
             paddingRight: "30px",
+            // overflow: "hidden",
           }}
         >
           {childrenCount > 0 && (
@@ -102,7 +103,7 @@ const SpanItem = ({
           {span.transaction && <PlatformIcon size={16} platform={span.transaction.platform} />}
           {span.op && (
             <>
-              <span className="font-bold">{span.op}</span>
+              <span className="font-bold break-keep whitespace-nowrap">{span.op}</span>
               <span className="text-primary-400">&ndash;</span>
             </>
           )}
@@ -111,10 +112,13 @@ const SpanItem = ({
           </span>
         </div>
         <div
-          className={classNames("waterfall group-hover:bg-primary-700 rounded-sm", isQueried ? "!bg-transparent" : "")}
+          className={classNames(
+            "waterfall group-hover:bg-primary-700 rounded-sm overflow-hidden",
+            isQueried ? "!bg-transparent" : "",
+          )}
           style={{
             left: `${spanNodeWidth}%`,
-            height: "100%",
+            // height: "100%",
           }}
         >
           <SpanResizer setIsResizing={setIsResizing} isResizing={isResizing} handleResize={handleResize} />

@@ -67,17 +67,16 @@ function TraceTreeWithSearch({
         </button>
       </div>
 
-      <div className="flex overflow-x-hidden overflow-y-auto">
-        <SpanTree
-          traceContext={trace}
-          tree={trace.spanTree}
-          startTimestamp={startTimestamp}
-          totalDuration={totalDuration}
-          totalTransactions={(trace.transactions || []).length}
-          spanNodeWidth={spanNodeWidth}
-          setSpanNodeWidth={setSpanNodeWidth}
-        />
-      </div>
+      <SpanTree
+        className="overflow-x-hidden overflow-y-auto"
+        traceContext={trace}
+        tree={trace.spanTree}
+        startTimestamp={startTimestamp}
+        totalDuration={totalDuration}
+        totalTransactions={(trace.transactions || []).length}
+        spanNodeWidth={spanNodeWidth}
+        setSpanNodeWidth={setSpanNodeWidth}
+      />
     </>
   );
 }
