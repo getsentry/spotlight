@@ -35,7 +35,6 @@ const COMPARATORS: Record<AITracesSortTypes, AITracesComparator> = {
 export default function AITraceList() {
   const { traceId, spanId } = useParams<{ traceId?: string; spanId?: string }>();
   const navigate = useNavigate();
-  const getSpanById = useSentryStore(state => state.getSpanById);
   const getTraceById = useSentryStore(state => state.getTraceById);
   const spotlightAITraces = useSpotlightAITraces();
 
@@ -48,8 +47,8 @@ export default function AITraceList() {
     });
   }, [spotlightAITraces, sort]);
 
-  const selectedRawSpan = traceId && spanId ? getSpanById(traceId, spanId) : null;
-  const traceContext = selectedRawSpan?.trace_id ? getTraceById(selectedRawSpan.trace_id) : null;
+  const traceContext = traceId ? getTraceById(traceId) : null;
+  const selectedRawSpan = spanId ? traceContext?.spans.get(spanId) : null;
 
   if (spotlightAITraces.length === 0) {
     return <div className="text-primary-300 p-6">No AI traces have been recorded yet. 🤔</div>;

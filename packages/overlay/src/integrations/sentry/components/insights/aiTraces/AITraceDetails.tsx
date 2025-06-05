@@ -214,12 +214,11 @@ function ToolCallsSection({ trace }: { trace: SpotlightAITrace }) {
 
 // embedded version for split view
 export function AITraceDetailsEmbedded({ traceId, spanId }: { traceId: string; spanId: string }) {
-  const getSpanById = useSentryStore(state => state.getSpanById);
+  const trace = useSentryStore(state => state.getTraceById)(traceId);
+  const span = trace?.spans.get(spanId);
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
 
-  const span = getSpanById(traceId, spanId);
-
-  if (!span) {
+  if (!trace || !span) {
     return (
       <div className="p-6">
         <p className="text-red-400">Span not found</p>
@@ -230,9 +229,8 @@ export function AITraceDetailsEmbedded({ traceId, spanId }: { traceId: string; s
     );
   }
 
-  const trace = createAITraceFromSpan(span);
-
-  if (!trace) {
+  const aiTrace = createAITraceFromSpan(span);
+  if (!aiTrace) {
     return (
       <div className="p-6">
         <p className="text-red-400">Unable to process AI trace</p>
@@ -254,7 +252,6 @@ export function AITraceDetailsEmbedded({ traceId, spanId }: { traceId: string; s
     );
   }
 
-  const traceContext = { trace_id: span.trace_id };
   const startTimestamp = span.start_timestamp;
   const totalDuration = span.timestamp - span.start_timestamp;
 
@@ -264,54 +261,52 @@ export function AITraceDetailsEmbedded({ traceId, spanId }: { traceId: string; s
         {/* Header Section */}
         <div className="border-b-primary-700 bg-primary-950 border-b px-6 py-4">
           <div className="mb-2 flex items-baseline gap-2">
-            <h2 className="text-xl font-bold">{handler.getDisplayTitle(trace)}</h2>
-            <span className="text-primary-400 text-sm">{trace.id}</span>
+            <h2 className="text-xl font-bold">{handler.getDisplayTitle(aiTrace)}</h2>
+            <span className="text-primary-400 text-sm">{aiTrace.id}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge color="primary">{handler.getTypeBadge(trace)}</Badge>
-            {trace.metadata.modelId && <Badge color="secondary">{trace.metadata.modelId}</Badge>}
-            {trace.metadata.functionId && <Badge color="neutral">{trace.metadata.functionId}</Badge>}
+            <Badge color="primary">{handler.getTypeBadge(aiTrace)}</Badge>
+            {aiTrace.metadata.modelId && <Badge color="secondary">{aiTrace.metadata.modelId}</Badge>}
+            {aiTrace.metadata.functionId && <Badge color="neutral">{aiTrace.metadata.functionId}</Badge>}
           </div>
         </div>
 
         {/* Content */}
         <div className="space-y-6 p-6">
-          <div>
-            <div className="flex flex-col space-y-4">
-              <div className="text-primary-300 flex flex-1 items-center gap-x-1">
-                <DateTime date={span.start_timestamp} />
-                <span>&mdash;</span>
-                <span>
-                  <strong>{getFormattedDuration(span.timestamp - span.start_timestamp)}</strong> duration
-                </span>
-              </div>
-              <div className="flex-1">
-                <div className="border-primary-800 relative h-8 border py-1">
-                  <div
-                    className="bg-primary-800 absolute bottom-0 top-0 -m-0.5 flex w-full items-center p-0.5"
-                    style={{
-                      left: 0,
-                      width: "100%",
-                    }}
-                  >
-                    <span className="whitespace-nowrap">
-                      {getFormattedDuration(span.timestamp - span.start_timestamp)}
-                    </span>
-                  </div>
+          <div className="flex flex-col space-y-4">
+            <div className="text-primary-300 flex flex-1 items-center gap-x-1">
+              <DateTime date={span.start_timestamp} />
+              <span>&mdash;</span>
+              <span>
+                <strong>{getFormattedDuration(span.timestamp - span.start_timestamp)}</strong> duration
+              </span>
+            </div>
+            <div className="flex-1">
+              <div className="border-primary-800 relative h-8 border py-1">
+                <div
+                  className="bg-primary-800 absolute bottom-0 top-0 -m-0.5 flex w-full items-center p-0.5"
+                  style={{
+                    left: 0,
+                    width: "100%",
+                  }}
+                >
+                  <span className="whitespace-nowrap">
+                    {getFormattedDuration(span.timestamp - span.start_timestamp)}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          <AITraceMetadata trace={trace} handler={handler} />
-          <PromptSection trace={trace} />
-          <ResponseSection trace={trace} />
-          <ToolCallsSection trace={trace} />
+          <AITraceMetadata trace={aiTrace} handler={handler} />
+          <PromptSection trace={aiTrace} />
+          <ResponseSection trace={aiTrace} />
+          <ToolCallsSection trace={aiTrace} />
 
           <div>
             <h2 className="mb-4 font-bold">Span Tree</h2>
             <SpanTree
-              traceContext={traceContext}
+              traceContext={trace}
               tree={[span]}
               startTimestamp={startTimestamp}
               totalDuration={totalDuration}

@@ -13,7 +13,6 @@ import { isErrorEvent, isLogEvent, isProfileEvent, isTraceEvent } from "../../ut
 import { compareSpans, groupSpans } from "../../utils/traces";
 import type { EventsSliceActions, EventsSliceState, SentryStore } from "../types";
 import { relativeNsToTimestamp, toTimestamp } from "../utils";
-import { getAllSpansInTree } from "../helpers";
 
 const initialEventsState: EventsSliceState = {
   eventsById: new Map(),
@@ -158,17 +157,6 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
         });
       }
 
-      const { spansById } = get();
-      const newSpansById = new Map(spansById);
-      const allTraceSpans = trace.spanTree.flatMap(getAllSpansInTree);
-      const spanMap = new Map<string, Span>();
-      for (const span of allTraceSpans) {
-        spanMap.set(span.span_id, span);
-      }
-      newSpansById.set(trace.trace_id, spanMap);
-      set({
-        spansById: newSpansById,
-      });
     }
 
     if (isProfileEvent(event)) {

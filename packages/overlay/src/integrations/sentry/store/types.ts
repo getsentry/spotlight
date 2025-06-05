@@ -7,7 +7,6 @@ import type {
   SentryEvent,
   SentryLogEventItem,
   SentryProcessedProfile,
-  Span,
   Trace,
 } from "../types";
 
@@ -32,8 +31,6 @@ export interface EventsSliceActions {
 
 export interface TracesSliceState {
   tracesById: Map<string, Trace>;
-  // Trace Id -> Span Id -> Span
-  spansById: Map<string, Map<string, Span>>;
   localTraceIds: Set<string>;
 }
 
@@ -101,7 +98,6 @@ export interface SDKsSliceActions {
 export interface SharedSliceActions {
   getEventById: (id: string) => SentryEvent | undefined;
   getTraceById: (id: string) => Trace | undefined;
-  getSpanById: (traceId: string, spanId: string) => Span | undefined;
   getEventsByTrace: (traceId: string, spanId?: string | null) => SentryEvent[];
   processStacktrace: (errorEvent: SentryErrorEvent) => Promise<void>;
   resetData: () => void;

@@ -22,19 +22,8 @@ type TraceDetailsProps = {
 };
 
 export default function TraceDetails({ traceId, onClose, aiMode, onToggleAI }: TraceDetailsProps) {
-  const events = useSentryEvents(traceId);
   const getTraceById = useSentryStore(state => state.getTraceById);
 
-  const errorCount = useMemo(
-    () =>
-      events.filter(
-        e =>
-          isErrorEvent(e) && (e.contexts?.trace?.trace_id ? isLocalTrace(e.contexts?.trace?.trace_id) : null) !== false,
-      ).length,
-    [events],
-  );
-
-  // TODO: Don't use dataCache directly, use a helper like useSentryEvents
   const trace = getTraceById(traceId);
   const hasAI = trace ? hasAISpans(trace) : false;
 
@@ -45,6 +34,16 @@ export default function TraceDetails({ traceId, onClose, aiMode, onToggleAI }: T
   if (!trace) {
     return <p className="text-primary-300 p-6">Trace not found.</p>;
   }
+
+  const events = useSentryEvents(traceId);
+  const errorCount = useMemo(
+    () =>
+      events.filter(
+        e =>
+          isErrorEvent(e) && (e.contexts?.trace?.trace_id ? isLocalTrace(e.contexts?.trace?.trace_id) : null) !== false,
+      ).length,
+    [events],
+  );
 
   const tabs = [
     createTab("context", "Context"),

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Badge } from "~/ui/badge";
 import CardList from "../../../../components/CardList";
 import TimeSince from "../../../../components/TimeSince";
@@ -20,12 +20,11 @@ import TraceIcon from "./TraceIcon";
 import TraceListFilter from "./TraceListFilter";
 
 type TraceListProps = {
-  onTraceSelect?: (traceId: string) => void;
-  selectedTraceId?: string;
   aiMode: boolean;
 };
 
-export default function TraceList({ onTraceSelect, selectedTraceId, aiMode }: TraceListProps) {
+export default function TraceList({ aiMode }: TraceListProps) {
+  const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
   const { allTraces, localTraces } = useSentryTraces();
   const context = useSpotlightContext();
   const getTraceById = useSentryStore(state => state.getTraceById);
@@ -42,13 +41,13 @@ export default function TraceList({ onTraceSelect, selectedTraceId, aiMode }: Tr
 
   // Auto-scroll to selected trace
   useEffect(() => {
-    if (selectedTraceId && selectedTraceRef.current) {
+    if (traceId && selectedTraceRef.current) {
       selectedTraceRef.current.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
     }
-  }, [selectedTraceId]);
+  }, [traceId]);
 
   return (
     <>
@@ -108,31 +107,21 @@ export default function TraceList({ onTraceSelect, selectedTraceId, aiMode }: Tr
                 </>
               );
 
-              const isSelected = selectedTraceId === trace.trace_id;
+              const isSelected = traceId === trace.trace_id;
               const traceData = getTraceById(trace.trace_id);
               const isAITrace = traceData ? hasAISpans(traceData) : false;
 
+              // TODO: For this #<traceId> link to work as intended, we need to do something like this:
+              //       https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
               return (
                 <div key={trace.trace_id} ref={isSelected ? selectedTraceRef : null}>
-                  {/* Trace Item */}
-                  {onTraceSelect ? (
-                    <div
-                      className={classNames(
-                        "hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2",
-                        isSelected && "bg-primary-800",
-                      )}
-                      onClick={() => onTraceSelect(trace.trace_id)}
-                    >
-                      {traceContent}
-                    </div>
-                  ) : (
-                    <Link
-                      className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
-                      to={`/traces/${trace.trace_id}/context`}
-                    >
-                      {traceContent}
-                    </Link>
-                  )}
+                  <Link
+                    className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
+                    to={isSelected && !spanId ? `../#${trace.trace_id}` : `/traces/${trace.trace_id}/context`}
+                    id={trace.trace_id}
+                  >
+                    {traceContent}
+                  </Link>
 
                   {/* Inline content below selected trace */}
                   {isSelected && (

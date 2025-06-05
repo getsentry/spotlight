@@ -7,7 +7,6 @@ import { log } from "~/lib/logger";
 export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceActions> = (set, get) => ({
   getEventById: (id: string) => get().eventsById.get(id),
   getTraceById: (id: string) => get().tracesById.get(id),
-  getSpanById: (traceId: string, spanId: string) => get().spansById.get(traceId)?.get(spanId),
   getEventsByTrace: (traceId: string, spanId?: string | null) => {
     const { getEvents } = get();
     return getEvents().filter(evt => {
@@ -62,7 +61,6 @@ export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceAct
       envelopes: new Map(),
       eventsById: new Map(),
       tracesById: new Map(),
-      spansById: new Map(),
       sdks: new Map(),
       profilesByTraceId: new Map(),
       localTraceIds: new Set(),
