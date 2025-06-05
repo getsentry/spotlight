@@ -104,6 +104,12 @@ export default function TracesTab() {
   return (
     <SentryEventsContextProvider>
       <Routes>
+        {/* Route for when clicking AI flow / messages. This shows that particular ai trace details */}
+        <Route
+          path="/:traceId/spans/:spanId"
+          element={<TraceSplitViewLayout aiMode={aiMode} onToggleAIMode={handleToggleAIMode} />}
+        />
+        {/* AI Trace id w/o subpaths */}
         <Route
           path="/:traceId/*"
           element={<TraceSplitViewLayout aiMode={aiMode} onToggleAIMode={handleToggleAIMode} />}
