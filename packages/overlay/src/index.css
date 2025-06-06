@@ -67,7 +67,7 @@ ul.tree li:last-child:before {
 }
 
 .tree .node {
-  @apply flex items-center gap-x-1 overflow-auto py-1 pl-1;
+  @apply flex items-center gap-x-1 overflow-hidden py-1 pl-1;
 }
 
 .tree .waterfall {

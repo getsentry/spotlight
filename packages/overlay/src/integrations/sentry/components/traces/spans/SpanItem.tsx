@@ -73,7 +73,6 @@ const SpanItem = ({
             "node",
             "group-hover:bg-primary-700",
             "rounded-sm",
-            "!overflow-hidden",
             isQueried ? "bg-transparent" : "",
             span.status && span.status !== "ok" ? "text-red-400" : "",
             spanId === span.span_id ? "bg-primary-900" : "bg-primary-950",
