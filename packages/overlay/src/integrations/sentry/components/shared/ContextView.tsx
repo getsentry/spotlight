@@ -1,6 +1,6 @@
 import JsonViewer from "~/components/JsonViewer";
-import Tags from "./Tags";
 import type { Tags as TagsType } from "~/integrations/sentry/types";
+import Tags from "./Tags";
 
 export function ContextView({
   context,

@@ -12,16 +12,17 @@ import { isErrorEvent } from "~/integrations/sentry/utils/sentry";
 import EventContexts from "../../events/EventContexts";
 import EventList from "../../events/EventList";
 import LogsList from "../../log/LogsList";
-import TraceDetailHeader from "./components/TraceDetailHeader";
 
 type TraceDetailsProps = {
   traceId: string;
   onClose: () => void;
-  aiMode: boolean;
-  onToggleAI: () => void;
+  aiConfig: {
+    mode: boolean;
+    onToggle: () => void;
+  };
 };
 
-export default function TraceDetails({ traceId, onClose, aiMode, onToggleAI }: TraceDetailsProps) {
+export default function TraceDetails({ traceId, aiConfig }: TraceDetailsProps) {
   const getTraceById = useSentryStore(state => state.getTraceById);
 
   const trace = getTraceById(traceId);
@@ -77,10 +78,6 @@ export default function TraceDetails({ traceId, onClose, aiMode, onToggleAI }: T
   };
 
   return (
-    <div className="flex h-full flex-col">
-      <TraceDetailHeader trace={trace} onClose={onClose} hasAI={hasAI} aiMode={aiMode} onToggleAI={onToggleAI} />
-
-      {aiMode && hasAI ? renderAITraceView() : renderNormalTraceView()}
-    </div>
+    <div className="flex h-full flex-col">{aiConfig.mode && hasAI ? renderAITraceView() : renderNormalTraceView()}</div>
   );
 }

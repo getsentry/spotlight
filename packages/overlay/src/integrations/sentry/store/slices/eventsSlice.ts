@@ -157,7 +157,6 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
           tracesById: newTracesById,
         });
       }
-
     }
 
     if (isProfileEvent(event)) {

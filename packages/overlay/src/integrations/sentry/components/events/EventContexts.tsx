@@ -34,7 +34,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
   if (event.modules) {
     contexts.extra = Object.assign(contexts.extra || {}, { modules: event.modules });
   }
-  
+
   const contextEntries = Object.entries(contexts).filter(entry => entry[1]) as [string, Record<string, unknown>][];
   if (contextEntries.length === 0 && !event.tags) {
     return exampleContext;

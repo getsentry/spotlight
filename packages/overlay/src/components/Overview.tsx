@@ -55,12 +55,14 @@ export default function Overview({
   return (
     <div className="flex h-full overflow-hidden">
       <Navigation panels={panels} setOpen={setOpen} isOnline={isOnline} showClearEventsButton={showClearEventsButton} />
-      <Routes>
-        <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={"not-found"} />
-        {panels.map(({ content: PanelContent, id }) =>
-          PanelContent ? <Route path={`/${id}/*`} key={id} element={createElement(PanelContent)} /> : null,
-        )}
-      </Routes>
+      <div className="flex-1 overflow-auto">
+        <Routes>
+          <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key={"not-found"} />
+          {panels.map(({ content: PanelContent, id }) =>
+            PanelContent ? <Route path={`/${id}/*`} key={id} element={createElement(PanelContent)} /> : null,
+          )}
+        </Routes>
+      </div>
     </div>
   );
 }
