@@ -10,6 +10,7 @@ import TraceTreeview from "../components/traces/TraceDetails/components/TraceTre
 import TraceItem from "../components/traces/TraceItem";
 import TraceList from "../components/traces/TraceList";
 import TraceListFilter from "../components/traces/TraceListFilter";
+import SpanDetails from "../components/traces/spans/SpanDetails";
 import { SentryEventsContextProvider } from "../data/sentryEventsContext";
 import { useSentryTraces } from "../data/useSentrySpans";
 import useTraceFiltering from "../hooks/useTraceFiltering";
@@ -34,7 +35,7 @@ interface TraceSplitViewLayoutProps {
 }
 
 function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitViewLayoutProps) {
-  const { traceId } = useParams<{ traceId: string }>();
+  const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
   const navigate = useNavigate();
   const [leftPanelWidth, setLeftPanelWidth] = useState(DEFAULT_PANEL_WIDTH_PERCENT);
   const [isResizing, setIsResizing] = useState(false);
@@ -52,20 +53,16 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
     setLeftPanelWidth(clampedWidth);
   }, []);
 
-  const handleTraceSelect = useCallback(
-    (selectedTraceId: string) => {
-      if (traceId === selectedTraceId) {
-        navigate(".."); // relative to /:traceId/*, so goes to TracesTab
-      } else {
-        navigate(`../${selectedTraceId}`); // relative to /:traceId/*, so goes to /newTraceId/*
-      }
-    },
-    [navigate, traceId],
-  );
-
   const handleCloseTraceDetails = useCallback(() => {
     navigate(".."); // relative to /:traceId/*, so goes to TracesTab
   }, [navigate]);
+
+  const handleTraceSelect = useCallback(
+    (traceId: string) => {
+      navigate(`../${traceId}`); // Navigate up one level, then to the new trace
+    },
+    [navigate],
+  );
 
   // Scroll to top when trace changes
   useEffect(() => {
@@ -179,7 +176,11 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
 
         {/* right panel - selected trace content */}
         <div className="flex-1 overflow-hidden" style={{ width: `${100 - leftPanelWidth}%` }}>
-          <TraceDetails traceId={traceId} onClose={handleCloseTraceDetails} aiConfig={aiConfig} />
+          {spanId && !aiConfig.mode ? (
+            <SpanDetails traceId={traceId} spanId={spanId} />
+          ) : (
+            <TraceDetails traceId={traceId} onClose={handleCloseTraceDetails} aiConfig={aiConfig} />
+          )}
         </div>
       </div>
     </div>
@@ -198,7 +199,7 @@ function TraceListOnlyView({ aiMode, filteredTraces, allTraces, visibleTraces, s
   const navigate = useNavigate();
   const handleTraceSelect = useCallback(
     (traceId: string) => {
-      navigate(traceId); // Navigate to /:traceId (relative to current path)
+      navigate(`../${traceId}`); // Navigate up one level, then to the new trace
     },
     [navigate],
   );
@@ -293,6 +294,23 @@ export default function TracesTab() {
                   allTraces={allTraces}
                   visibleTraces={visibleTraces}
                   setShowAll={setShowAll}
+                />
+              }
+            />
+            <Route
+              path="/:traceId/spans/:spanId/*"
+              element={
+                <TraceSplitViewLayout
+                  traceData={{
+                    filtered: filteredTraces,
+                    all: allTraces,
+                    visible: visibleTraces,
+                  }}
+                  aiConfig={{
+                    mode: aiMode,
+                    onToggle: handleToggleAIMode,
+                  }}
+                  onShowAll={() => setShowAll(true)}
                 />
               }
             />

@@ -131,11 +131,14 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
       <Table.Body>
         {resources.map((resource: ResourceInfo) => (
           <tr key={resource.description} className="hover:bg-primary-900">
-            <td className="text-primary-200 relative w-2/5 whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
+            <td
+              title={resource.description}
+              className="text-primary-200 relative w-2/5 whitespace-nowrap px-6 py-4 text-left text-sm font-medium overflow-x-hidden"
+            >
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="w-fit cursor-default truncate">{resource.description}</div>
+                    <span className="cursor-default truncate block">{resource.description}</span>
                   </TooltipTrigger>
                   {resource.similarResources[0].op === "resource.img" && resource.description?.startsWith("/") && (
                     <TooltipContent side="right" className="border-none bg-transparent p-0 shadow-none">

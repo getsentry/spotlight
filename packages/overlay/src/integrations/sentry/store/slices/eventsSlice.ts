@@ -13,7 +13,6 @@ import { isErrorEvent, isLogEvent, isProfileEvent, isTraceEvent } from "../../ut
 import { compareSpans, groupSpans } from "../../utils/traces";
 import type { EventsSliceActions, EventsSliceState, SentryStore } from "../types";
 import { relativeNsToTimestamp, toTimestamp } from "../utils";
-import { getAllSpansInTree } from "../helpers";
 
 const initialEventsState: EventsSliceState = {
   eventsById: new Map(),
@@ -96,6 +95,7 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
         rootTransaction: null,
         profileGrafted: false,
       };
+      trace.start_timestamp = Math.min(event.start_timestamp ?? event.timestamp, trace.start_timestamp);
       trace.timestamp = Math.max(event.timestamp, trace.timestamp);
 
       if (isTraceEvent(event)) {
@@ -157,18 +157,6 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
           tracesById: newTracesById,
         });
       }
-
-      const { spansById } = get();
-      const newSpansById = new Map(spansById);
-      const allTraceSpans = trace.spanTree.flatMap(getAllSpansInTree);
-      const spanMap = new Map<string, Span>();
-      for (const span of allTraceSpans) {
-        spanMap.set(span.span_id, span);
-      }
-      newSpansById.set(trace.trace_id, spanMap);
-      set({
-        spansById: newSpansById,
-      });
     }
 
     if (isProfileEvent(event)) {

@@ -5,6 +5,7 @@ import type { Span, TraceContext } from "../../../types";
 import SpanItem from "./SpanItem";
 
 export default function SpanTree({
+  className,
   traceContext,
   tree,
   startTimestamp,
@@ -14,6 +15,7 @@ export default function SpanTree({
   spanNodeWidth,
   setSpanNodeWidth,
 }: {
+  className?: string;
   traceContext: TraceContext;
   tree: Span[];
   startTimestamp: number;
@@ -44,7 +46,7 @@ export default function SpanTree({
   if (!tree || !tree.length) return null;
 
   return (
-    <ul className={classNames(tree.length > 1 && "deep", "tree")}>
+    <ul className={classNames(tree.length > 1 && "deep", "tree", className)}>
       {filteredTree.map(span => {
         return (
           <SpanItem
