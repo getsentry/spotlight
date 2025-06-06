@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
+import classNames from "~/lib/classNames";
 import { useSpotlightContext } from "../../../lib/useSpotlightContext";
 import AITranscription from "../components/insights/aiTraces/AITranscription";
 import { hasAISpans } from "../components/insights/aiTraces/sdks/aiLibraries";
@@ -82,11 +83,52 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
   const isAITrace = selectedTrace ? hasAISpans(selectedTrace) : false;
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden">
+    <div className="flex h-full w-full flex-col overflow-hidden ">
       {/* selected trace item at the top */}
       {selectedTrace && (
-        <div className="border-b-primary-700 bg-primary-900 border-b">
-          <TraceItem trace={selectedTrace} isSelected={true} onClick={handleCloseTraceDetails} />
+        <div className="border-b-primary-700 bg-primary-900 border-b transition-colors duration-150">
+          <div className="flex items-center bg-primary-800">
+            <div className="flex-1">
+              <TraceItem
+                trace={selectedTrace}
+                isSelected={true}
+                onClick={handleCloseTraceDetails}
+                className="hover:bg-transparent"
+              />
+            </div>
+
+            {/* AI Mode Toggle */}
+            {isAITrace && (
+              <div className="flex items-center px-8">
+                <span
+                  id="ai-mode-label"
+                  className="text-primary-200 mr-3 text-sm font-medium cursor-pointer"
+                  onClick={aiConfig.onToggle}
+                >
+                  AI Mode
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={aiConfig.mode}
+                  aria-labelledby="ai-mode-label"
+                  onClick={aiConfig.onToggle}
+                  className={classNames(
+                    "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2",
+                    aiConfig.mode ? "bg-blue-500 focus:ring-blue-400" : "bg-primary-700 focus:ring-primary-600",
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={classNames(
+                      "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+                      aiConfig.mode ? "translate-x-5" : "translate-x-0",
+                    )}
+                  />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
