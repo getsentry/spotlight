@@ -32,9 +32,10 @@ interface TraceSplitViewLayoutProps {
     onToggle: () => void;
   };
   onShowAll: () => void;
+  onTraceSelect: (traceId: string) => void;
 }
 
-function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitViewLayoutProps) {
+function TraceSplitViewLayout({ traceData, aiConfig, onShowAll, onTraceSelect }: TraceSplitViewLayoutProps) {
   const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
   const navigate = useNavigate();
   const [leftPanelWidth, setLeftPanelWidth] = useState(DEFAULT_PANEL_WIDTH_PERCENT);
@@ -56,13 +57,6 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
   const handleCloseTraceDetails = useCallback(() => {
     navigate(".."); // relative to /:traceId/*, so goes to TracesTab
   }, [navigate]);
-
-  const handleTraceSelect = useCallback(
-    (traceId: string) => {
-      navigate(`../${traceId}`); // Navigate up one level, then to the new trace
-    },
-    [navigate],
-  );
 
   // Scroll to top when trace changes
   useEffect(() => {
@@ -153,7 +147,7 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
           {/* Bottom part of left panel: Trace List */}
           <div className="flex-shrink-0">
             <TraceList
-              onTraceSelect={handleTraceSelect}
+              onTraceSelect={onTraceSelect}
               selectedTraceId={traceId}
               traceData={traceData}
               displayConfig={{
@@ -193,21 +187,21 @@ interface TraceListOnlyViewProps {
   allTraces: Trace[];
   visibleTraces: Trace[];
   setShowAll: React.Dispatch<React.SetStateAction<boolean>>;
+  onTraceSelect: (traceId: string) => void;
 }
 
-function TraceListOnlyView({ aiMode, filteredTraces, allTraces, visibleTraces, setShowAll }: TraceListOnlyViewProps) {
-  const navigate = useNavigate();
-  const handleTraceSelect = useCallback(
-    (traceId: string) => {
-      navigate(`../${traceId}`); // Navigate up one level, then to the new trace
-    },
-    [navigate],
-  );
-
+function TraceListOnlyView({
+  aiMode,
+  filteredTraces,
+  allTraces,
+  visibleTraces,
+  setShowAll,
+  onTraceSelect,
+}: TraceListOnlyViewProps) {
   return (
     <div className="h-full w-full overflow-y-auto">
       <TraceList
-        onTraceSelect={handleTraceSelect}
+        onTraceSelect={onTraceSelect}
         selectedTraceId={undefined}
         traceData={{
           filtered: filteredTraces,
@@ -226,9 +220,18 @@ function TraceListOnlyView({ aiMode, filteredTraces, allTraces, visibleTraces, s
 
 export default function TracesTab() {
   const [aiMode, setAiMode] = useState(false);
+  const navigate = useNavigate();
+
   const handleToggleAIMode = useCallback(() => {
     setAiMode(prev => !prev);
   }, []);
+
+  const handleTraceSelect = useCallback(
+    (traceId: string) => {
+      navigate(`../${traceId}`); // Navigate up one level, then to the new trace
+    },
+    [navigate],
+  );
 
   const context = useSpotlightContext();
   const { allTraces, localTraces } = useSentryTraces();
@@ -265,6 +268,7 @@ export default function TracesTab() {
                     onToggle: handleToggleAIMode,
                   }}
                   onShowAll={() => setShowAll(true)}
+                  onTraceSelect={handleTraceSelect}
                 />
               }
             />
@@ -282,6 +286,7 @@ export default function TracesTab() {
                     onToggle: handleToggleAIMode,
                   }}
                   onShowAll={() => setShowAll(true)}
+                  onTraceSelect={handleTraceSelect}
                 />
               }
             />
@@ -294,6 +299,7 @@ export default function TracesTab() {
                   allTraces={allTraces}
                   visibleTraces={visibleTraces}
                   setShowAll={setShowAll}
+                  onTraceSelect={handleTraceSelect}
                 />
               }
             />
@@ -311,6 +317,7 @@ export default function TracesTab() {
                     onToggle: handleToggleAIMode,
                   }}
                   onShowAll={() => setShowAll(true)}
+                  onTraceSelect={handleTraceSelect}
                 />
               }
             />
