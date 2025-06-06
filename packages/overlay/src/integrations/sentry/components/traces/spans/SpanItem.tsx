@@ -81,7 +81,6 @@ const SpanItem = ({
           style={{
             width: `${spanNodeWidth}%`,
             paddingRight: "30px",
-            // overflow: "hidden",
           }}
         >
           {childrenCount > 0 && (
