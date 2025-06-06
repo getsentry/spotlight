@@ -18,12 +18,8 @@ export const DEFAULT_SPAN_NODE_WIDTH = 50;
 
 function TraceTreeWithSearch({
   trace,
-  startTimestamp,
-  totalDuration,
 }: {
   trace: Trace;
-  startTimestamp: number;
-  totalDuration: number;
 }) {
   const { setQuery, showOnlyMatched, setShowOnlyMatched } = useSearch();
   const { inputValue, showReset, handleChange, handleReset } = useSearchInput(setQuery, 500);
@@ -67,17 +63,16 @@ function TraceTreeWithSearch({
         </button>
       </div>
 
-      <div className="flex overflow-x-hidden overflow-y-auto">
-        <SpanTree
-          traceContext={trace}
-          tree={trace.spanTree}
-          startTimestamp={startTimestamp}
-          totalDuration={totalDuration}
-          totalTransactions={(trace.transactions || []).length}
-          spanNodeWidth={spanNodeWidth}
-          setSpanNodeWidth={setSpanNodeWidth}
-        />
-      </div>
+      <SpanTree
+        className="overflow-x-hidden overflow-y-auto"
+        traceContext={trace}
+        tree={trace.spanTree}
+        startTimestamp={trace.start_timestamp}
+        totalDuration={trace.timestamp - trace.start_timestamp}
+        totalTransactions={(trace.transactions || []).length}
+        spanNodeWidth={spanNodeWidth}
+        setSpanNodeWidth={setSpanNodeWidth}
+      />
     </>
   );
 }
@@ -86,8 +81,6 @@ function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
   const getTraceById = useSentryStore(state => state.getTraceById);
 
   const trace = getTraceById(traceId)!;
-  const startTimestamp = trace.start_timestamp;
-  const totalDuration = trace.timestamp - startTimestamp;
 
   return (
     <>
@@ -103,7 +96,7 @@ function TraceTreeviewContent({ traceId }: TraceTreeViewProps) {
           </span>
         </div>
       </div>
-      <TraceTreeWithSearch trace={trace} startTimestamp={startTimestamp} totalDuration={totalDuration} />
+      <TraceTreeWithSearch trace={trace} />
     </>
   );
 }

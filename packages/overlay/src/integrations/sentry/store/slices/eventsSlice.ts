@@ -95,6 +95,7 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
         rootTransaction: null,
         profileGrafted: false,
       };
+      trace.start_timestamp = Math.min(event.start_timestamp ?? event.timestamp, trace.start_timestamp);
       trace.timestamp = Math.max(event.timestamp, trace.timestamp);
 
       if (isTraceEvent(event)) {
