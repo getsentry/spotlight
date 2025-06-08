@@ -1,15 +1,15 @@
-import starlight from '@astrojs/starlight';
-import tailwind from '@astrojs/tailwind';
-import vercelStatic from '@astrojs/vercel/static';
-import sentry from '@sentry/astro';
-import { defineConfig } from 'astro/config';
-import Inspect from 'vite-plugin-inspect';
+import starlight from "@astrojs/starlight";
+import tailwind from "@astrojs/tailwind";
+import vercelStatic from "@astrojs/vercel/static";
+import sentry from "@sentry/astro";
+import { defineConfig } from "astro/config";
+import Inspect from "vite-plugin-inspect";
 
-import react from '@astrojs/react';
+import react from "@astrojs/react";
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://spotlightjs.com',
+  site: "https://spotlightjs.com",
   vite: {
     plugins: [
       Inspect({
@@ -24,167 +24,172 @@ export default defineConfig({
   devOverlay: true,
   integrations: [
     sentry({
-      clientInitPath: 'sentry.client.config.mjs',
-      debug: process.env.NODE_ENV === 'development',
+      clientInitPath: "sentry.client.config.mjs",
+      debug: process.env.NODE_ENV === "development",
       sourceMapsUploadOptions: {
-        project: 'spotlight-website',
+        project: "spotlight-website",
         authToken: process.env.SENTRY_AUTH_TOKEN,
       },
     }),
     starlight({
-      title: 'Spotlight',
+      title: "Spotlight",
       logo: {
-        src: './public/images/glyph.svg',
+        src: "./public/images/glyph.svg",
       },
       social: {
-        discord: 'https://discord.gg/EJjqM3XtXQ',
-        github: 'https://github.com/getsentry/spotlight',
+        discord: "https://discord.gg/EJjqM3XtXQ",
+        github: "https://github.com/getsentry/spotlight",
       },
       components: {
-        Hero: './src/components/Hero.astro',
-        Header: './src/components/Header.astro',
-        ThemeProvider: './src/components/ThemeProvider.astro',
+        Hero: "./src/components/Hero.astro",
+        Header: "./src/components/Header.astro",
+        ThemeProvider: "./src/components/ThemeProvider.astro",
       },
 
       head: [
         {
-          tag: 'meta',
-          attrs: { property: 'og:image', content: '/images/trace.png' },
+          tag: "meta",
+          attrs: { property: "og:image", content: "/images/trace.png" },
         },
         {
-          tag: 'meta',
-          attrs: { property: 'twitter:image', content: '/images/trace.png' },
+          tag: "meta",
+          attrs: { property: "twitter:image", content: "/images/trace.png" },
         },
         {
-          tag: 'meta',
+          tag: "meta",
           attrs: {
-            property: 'og:description',
+            property: "og:description",
             content:
               "Spotlight is Sentry for Development. Inspired by an old project, Django Debug Toolbar, Spotlight brings a rich debug overlay into development environments, and it does it by leveraging the existing power of Sentry's SDKs.",
           },
         },
         {
-          tag: 'meta',
+          tag: "meta",
           attrs: {
-            property: 'twitter:description',
+            property: "twitter:description",
             content:
               "Spotlight is Sentry for Development. Inspired by an old project, Django Debug Toolbar, Spotlight brings a rich debug overlay into development environments, and it does it by leveraging the existing power of Sentry's SDKs.",
           },
         },
         {
-          tag: 'script',
+          tag: "script",
           attrs: {
-            src: 'https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.iife.js',
-            crossOrigin: 'anonymous',
+            src: "https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.iife.js",
+            crossOrigin: "anonymous",
           },
         },
       ],
       sidebar: [
         {
-          label: 'About',
+          label: "About",
           items: [
             {
-              label: 'What is Spotlight?',
-              link: '/about/',
+              label: "What is Spotlight?",
+              link: "/about/",
             },
             {
-              label: 'Architecture',
-              link: '/architecture/',
+              label: "Architecture",
+              link: "/architecture/",
             },
             {
-              label: 'Roadmap',
-              link: '/roadmap/',
+              label: "Roadmap",
+              link: "/roadmap/",
             },
           ],
         },
         {
-          label: 'Setup',
+          label: "Setup",
           items: [
             {
-              label: 'Spotlight',
-              link: '/setup/',
+              label: "Spotlight",
+              link: "/setup/",
             },
             {
-              label: 'For Django',
-              link: '/setup/django/',
+              label: "For Django",
+              link: "/setup/django/",
             },
             {
-              label: 'For Astro',
-              link: '/setup/astro/',
+              label: "For Laravel",
+              link: "/setup/laravel/",
             },
             {
-              label: 'For Next.js',
-              link: '/setup/nextjs/',
+              label: "For Astro",
+              link: "/setup/astro/",
             },
             {
-              label: 'For Remix',
-              link: '/setup/remix/',
+              label: "For Next.js",
+              link: "/setup/nextjs/",
             },
             {
-              label: 'For SvelteKit',
-              link: '/setup/sveltekit/',
+              label: "For Remix",
+              link: "/setup/remix/",
             },
             {
-              label: 'For Vite',
-              link: '/setup/vite/',
+              label: "For SvelteKit",
+              link: "/setup/sveltekit/",
             },
             {
-              label: 'Just HTML',
-              link: '/setup/html/',
+              label: "For Vite",
+              link: "/setup/vite/",
             },
             {
-              label: 'For Headless Environments',
-              link: '/setup/headless/',
+              label: "Just HTML",
+              link: "/setup/html/",
             },
             {
-              label: 'For Other Frameworks',
-              link: '/setup/other/',
+              label: "For Headless Environments",
+              link: "/setup/headless/",
             },
             {
-              label: 'Migration Guide',
-              link: '/setup/migration/',
+              label: "For Other Frameworks",
+              link: "/setup/other/",
+            },
+            {
+              label: "Migration Guide",
+              link: "/setup/migration/",
             },
           ],
         },
         {
-          label: 'Sidecar',
+          label: "Sidecar",
           autogenerate: {
-            directory: 'sidecar',
+            directory: "sidecar",
           },
         },
         {
-          label: 'Integrations',
+          label: "Integrations",
           autogenerate: {
-            directory: 'integrations',
+            directory: "integrations",
           },
         },
         {
-          label: 'Contribute',
+          label: "Contribute",
           autogenerate: {
-            directory: 'contribute',
+            directory: "contribute",
           },
         },
         {
-          label: 'Reference',
+          label: "Reference",
           autogenerate: {
-            directory: 'reference',
+            directory: "reference",
           },
         },
       ],
       expressiveCode: {
-        themes: ['starlight-dark'],
+        themes: ["starlight-dark"],
         useStarlightUiThemeColors: true,
       },
       editLink: {
-        baseUrl: 'https://github.com/getsentry/spotlight/edit/main/packages/website/',
+        baseUrl:
+          "https://github.com/getsentry/spotlight/edit/main/packages/website/",
       },
-      customCss: ['./src/tailwind.css', './src/theme.css'],
+      customCss: ["./src/tailwind.css", "./src/theme.css"],
     }),
     tailwind({
       applyBaseStyles: false,
     }),
     react(),
   ],
-  output: 'static',
+  output: "static",
   adapter: vercelStatic(),
 });
