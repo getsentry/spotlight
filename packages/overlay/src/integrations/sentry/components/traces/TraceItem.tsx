@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Badge } from "~/ui/badge";
 import TimeSince from "../../../../components/TimeSince";
 import classNames from "../../../../lib/classNames";
@@ -13,20 +13,12 @@ import TraceIcon from "./TraceIcon";
 type TraceItemProps = {
   trace: Trace;
   isSelected?: boolean;
-  onClick?: () => void;
   className?: string;
-  href?: string;
-  asLink?: boolean;
 };
 
-export default function TraceItem({
-  trace,
-  isSelected = false,
-  onClick,
-  className,
-  href,
-  asLink = false,
-}: TraceItemProps) {
+export default function TraceItem({ trace, isSelected = false, className }: TraceItemProps) {
+  const { spanId } = useParams<{ spanId: string }>();
+
   const duration = getFormattedSpanDuration(trace);
   const truncatedId = truncateId(trace.trace_id);
   const isLocal = isLocalTrace(trace.trace_id);
@@ -76,23 +68,16 @@ export default function TraceItem({
     </>
   );
 
-  const wrapperClassName = classNames(
-    "hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2",
-    isSelected && "bg-primary-800",
-    className,
-  );
-
-  if (asLink && href) {
-    return (
-      <Link className={wrapperClassName} to={href}>
-        {content}
-      </Link>
-    );
-  }
-
   return (
-    <div className={wrapperClassName} onClick={onClick}>
+    <Link
+      className={classNames(
+        "hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2",
+        isSelected && "bg-primary-800",
+        className,
+      )}
+      to={isSelected && !spanId ? `../#${trace.trace_id}` : `/traces/${trace.trace_id}/context`}
+    >
       {content}
-    </div>
+    </Link>
   );
 }

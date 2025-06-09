@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import CardList from "../../../../components/CardList";
 import useSentryStore from "../../store";
 import type { Trace } from "../../types";
@@ -9,12 +10,11 @@ import TraceTreeview from "./TraceDetails/components/TraceTreeview";
 import TraceItem from "./TraceItem";
 
 type TraceListProps = {
-  onTraceSelect?: (traceId: string) => void;
-  selectedTraceId?: string;
   traceData: {
     filtered: Trace[];
     all: Trace[];
     visible: Trace[];
+    hiddenItemCount: number;
   };
   displayConfig: {
     aiMode: boolean;
@@ -23,49 +23,37 @@ type TraceListProps = {
   onShowAll: () => void;
 };
 
-export default function TraceList({
-  onTraceSelect,
-  selectedTraceId,
-  traceData,
-  displayConfig,
-  onShowAll,
-}: TraceListProps) {
+export default function TraceList({ traceData, displayConfig, onShowAll }: TraceListProps) {
+  const { traceId } = useParams<{ traceId: string }>();
   const getTraceById = useSentryStore(state => state.getTraceById);
   const selectedTraceRef = useRef<HTMLDivElement>(null);
 
-  const hiddenItemCount = traceData.all.length - traceData.visible.length;
-
   useEffect(() => {
-    if (selectedTraceId && selectedTraceRef.current) {
+    if (traceId && selectedTraceRef.current) {
       selectedTraceRef.current.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
       });
     }
-  }, [selectedTraceId]);
+  }, [traceId]);
 
   return (
     <>
       {traceData.all.length !== 0 ? (
         <CardList>
-          {hiddenItemCount > 0 && <HiddenItemsButton itemCount={hiddenItemCount} onClick={onShowAll} />}
+          {traceData.hiddenItemCount > 0 && (
+            <HiddenItemsButton itemCount={traceData.hiddenItemCount} onClick={onShowAll} />
+          )}
           {traceData.filtered.map(trace => {
-            const isSelected = selectedTraceId === trace.trace_id;
+            const isSelected = traceId === trace.trace_id;
             const traceData = getTraceById(trace.trace_id);
             const isAITrace = traceData ? hasAISpans(traceData) : false;
 
+            // TODO: For this #<traceId> link to work as intended, we need to do something like this:
+            //       https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
             return (
               <div key={trace.trace_id} ref={isSelected ? selectedTraceRef : null}>
-                {onTraceSelect ? (
-                  <TraceItem trace={trace} isSelected={isSelected} onClick={() => onTraceSelect(trace.trace_id)} />
-                ) : (
-                  <TraceItem
-                    trace={trace}
-                    isSelected={isSelected}
-                    asLink={true}
-                    href={`/traces/${trace.trace_id}/context`}
-                  />
-                )}
+                <TraceItem trace={trace} isSelected={isSelected} />
 
                 {/* Inline content below selected trace */}
                 {isSelected && !displayConfig.hideSelectedInline && (
