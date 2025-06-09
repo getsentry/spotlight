@@ -51,7 +51,7 @@ export default function TraceList({ traceData, displayConfig, onShowAll }: Trace
 
             return (
               <div key={trace.trace_id} ref={isSelected ? selectedTraceRef : null}>
-                <TraceItem trace={trace} isSelected={isSelected} />
+                <TraceItem trace={trace} />
 
                 {/* Inline content below selected trace */}
                 {isSelected && !displayConfig.hideSelectedInline && (

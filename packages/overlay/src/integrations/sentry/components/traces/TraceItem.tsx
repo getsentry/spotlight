@@ -12,13 +12,12 @@ import TraceIcon from "./TraceIcon";
 
 type TraceItemProps = {
   trace: Trace;
-  isSelected?: boolean;
   className?: string;
 };
 
-export default function TraceItem({ trace, isSelected = false, className }: TraceItemProps) {
-  const { spanId } = useParams<{ spanId: string }>();
-
+export default function TraceItem({ trace, className }: TraceItemProps) {
+  const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
+  const isSelected = traceId === trace.trace_id;
   const duration = getFormattedSpanDuration(trace);
   const truncatedId = truncateId(trace.trace_id);
   const isLocal = isLocalTrace(trace.trace_id);

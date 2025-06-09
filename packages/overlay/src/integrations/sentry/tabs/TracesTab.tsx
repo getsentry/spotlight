@@ -80,7 +80,7 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
         <div className="border-b-primary-700 bg-primary-900 border-b transition-colors duration-150">
           <div className="flex items-center bg-primary-800">
             <div className="flex-1">
-              <TraceItem trace={selectedTrace} isSelected={true} className="hover:bg-transparent" />
+              <TraceItem trace={selectedTrace} className="hover:bg-transparent" />
             </div>
 
             {/* AI Mode Toggle */}
