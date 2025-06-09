@@ -68,6 +68,8 @@ export default function TraceItem({ trace, isSelected = false, className }: Trac
     </>
   );
 
+  // TODO: For this #<traceId> link to work as intended, we need to do something like this:
+  //       https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
   return (
     <Link
       className={classNames(

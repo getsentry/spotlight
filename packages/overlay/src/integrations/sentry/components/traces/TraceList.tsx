@@ -49,8 +49,6 @@ export default function TraceList({ traceData, displayConfig, onShowAll }: Trace
             const traceData = getTraceById(trace.trace_id);
             const isAITrace = traceData ? hasAISpans(traceData) : false;
 
-            // TODO: For this #<traceId> link to work as intended, we need to do something like this:
-            //       https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
             return (
               <div key={trace.trace_id} ref={isSelected ? selectedTraceRef : null}>
                 <TraceItem trace={trace} isSelected={isSelected} />
