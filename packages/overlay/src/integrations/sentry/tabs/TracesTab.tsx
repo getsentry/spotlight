@@ -26,6 +26,7 @@ interface TraceSplitViewLayoutProps {
     filtered: Trace[];
     all: Trace[];
     visible: Trace[];
+    hiddenItemCount: number;
   };
   aiConfig: {
     mode: boolean;
@@ -57,13 +58,6 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
     navigate(".."); // relative to /:traceId/*, so goes to TracesTab
   }, [navigate]);
 
-  const handleTraceSelect = useCallback(
-    (traceId: string) => {
-      navigate(`../${traceId}`); // Navigate up one level, then to the new trace
-    },
-    [navigate],
-  );
-
   // Scroll to top when trace changes
   useEffect(() => {
     if (leftPanelRef.current) {
@@ -86,12 +80,7 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
         <div className="border-b-primary-700 bg-primary-900 border-b transition-colors duration-150">
           <div className="flex items-center bg-primary-800">
             <div className="flex-1">
-              <TraceItem
-                trace={selectedTrace}
-                isSelected={true}
-                onClick={handleCloseTraceDetails}
-                className="hover:bg-transparent"
-              />
+              <TraceItem trace={selectedTrace} className="hover:bg-transparent" />
             </div>
 
             {/* AI Mode Toggle */}
@@ -153,8 +142,6 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
           {/* Bottom part of left panel: Trace List */}
           <div className="flex-shrink-0">
             <TraceList
-              onTraceSelect={handleTraceSelect}
-              selectedTraceId={traceId}
               traceData={traceData}
               displayConfig={{
                 aiMode: aiConfig.mode,
@@ -189,36 +176,25 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
 
 interface TraceListOnlyViewProps {
   aiMode: boolean;
-  filteredTraces: Trace[];
-  allTraces: Trace[];
-  visibleTraces: Trace[];
-  setShowAll: React.Dispatch<React.SetStateAction<boolean>>;
+  traceData: {
+    filtered: Trace[];
+    all: Trace[];
+    visible: Trace[];
+    hiddenItemCount: number;
+  };
+  onShowAll: () => void;
 }
 
-function TraceListOnlyView({ aiMode, filteredTraces, allTraces, visibleTraces, setShowAll }: TraceListOnlyViewProps) {
-  const navigate = useNavigate();
-  const handleTraceSelect = useCallback(
-    (traceId: string) => {
-      navigate(`../${traceId}`); // Navigate up one level, then to the new trace
-    },
-    [navigate],
-  );
-
+function TraceListOnlyView({ aiMode, traceData, onShowAll }: TraceListOnlyViewProps) {
   return (
     <div className="h-full w-full overflow-y-auto">
       <TraceList
-        onTraceSelect={handleTraceSelect}
-        selectedTraceId={undefined}
-        traceData={{
-          filtered: filteredTraces,
-          all: allTraces,
-          visible: visibleTraces,
-        }}
+        traceData={traceData}
         displayConfig={{
           aiMode: aiMode,
           hideSelectedInline: false,
         }}
-        onShowAll={() => setShowAll(true)}
+        onShowAll={onShowAll}
       />
     </div>
   );
@@ -237,6 +213,14 @@ export default function TracesTab() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const { TRACE_FILTER_CONFIGS, filteredTraces } = useTraceFiltering(visibleTraces, activeFilters, searchQuery);
+  const hiddenItemCount = allTraces.length - visibleTraces.length;
+
+  const traceData = {
+    filtered: filteredTraces,
+    all: allTraces,
+    visible: visibleTraces,
+    hiddenItemCount: hiddenItemCount,
+  };
 
   return (
     <SentryEventsContextProvider>
@@ -255,11 +239,7 @@ export default function TracesTab() {
               path="/:traceId/spans/:spanId"
               element={
                 <TraceSplitViewLayout
-                  traceData={{
-                    filtered: filteredTraces,
-                    all: allTraces,
-                    visible: visibleTraces,
-                  }}
+                  traceData={traceData}
                   aiConfig={{
                     mode: aiMode,
                     onToggle: handleToggleAIMode,
@@ -272,11 +252,7 @@ export default function TracesTab() {
               path="/:traceId/*"
               element={
                 <TraceSplitViewLayout
-                  traceData={{
-                    filtered: filteredTraces,
-                    all: allTraces,
-                    visible: visibleTraces,
-                  }}
+                  traceData={traceData}
                   aiConfig={{
                     mode: aiMode,
                     onToggle: handleToggleAIMode,
@@ -287,25 +263,13 @@ export default function TracesTab() {
             />
             <Route
               path="/"
-              element={
-                <TraceListOnlyView
-                  aiMode={aiMode}
-                  filteredTraces={filteredTraces}
-                  allTraces={allTraces}
-                  visibleTraces={visibleTraces}
-                  setShowAll={setShowAll}
-                />
-              }
+              element={<TraceListOnlyView aiMode={aiMode} traceData={traceData} onShowAll={() => setShowAll(true)} />}
             />
             <Route
               path="/:traceId/spans/:spanId/*"
               element={
                 <TraceSplitViewLayout
-                  traceData={{
-                    filtered: filteredTraces,
-                    all: allTraces,
-                    visible: visibleTraces,
-                  }}
+                  traceData={traceData}
                   aiConfig={{
                     mode: aiMode,
                     onToggle: handleToggleAIMode,
