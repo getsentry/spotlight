@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Trace } from "~/integrations/sentry/types";
-import useSentryStore from "../../../store";
 import { AITraceDetailsEmbedded } from "./AITraceDetails";
 import AITraceFlow from "./AITraceFlow";
 import { extractAllAIRootSpans } from "./sdks/aiLibraries";
