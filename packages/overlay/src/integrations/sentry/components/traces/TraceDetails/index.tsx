@@ -1,9 +1,7 @@
 import { useMemo } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Tabs from "~/components/tabs";
-import AITraceSplitView from "~/integrations/sentry/components/insights/aiTraces/AITraceSplitView";
 import { createTab } from "~/integrations/sentry/utils/tabs";
-import { hasAISpans } from "../../insights/aiTraces/sdks/aiLibraries";
 
 import { useSentryEvents } from "~/integrations/sentry/data/useSentryEvents";
 import useSentryStore from "~/integrations/sentry/store";
@@ -63,7 +61,6 @@ export default function TraceDetails({ traceId, aiConfig }: TraceDetailsProps) {
   const getTraceById = useSentryStore(state => state.getTraceById);
 
   const trace = getTraceById(traceId);
-  const hasAI = trace ? hasAISpans(trace) : false;
 
   if (!traceId) {
     return <p className="text-primary-300 p-6">Unknown trace id</p>;
@@ -94,8 +91,8 @@ export default function TraceDetails({ traceId, aiConfig }: TraceDetailsProps) {
     }),
   ];
 
-  const renderNormalTraceView = () => (
-    <>
+  return (
+    <div className="flex h-full flex-col">
       <Tabs tabs={tabs} nested />
       <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
@@ -107,14 +104,6 @@ export default function TraceDetails({ traceId, aiConfig }: TraceDetailsProps) {
           <Route path="*" element={<Navigate to="context" replace />} />
         </Routes>
       </div>
-    </>
-  );
-
-  const renderAITraceView = () => {
-    return <AITraceSplitView traceId={traceId} />;
-  };
-
-  return (
-    <div className="flex h-full flex-col">{aiConfig.mode && hasAI ? renderAITraceView() : renderNormalTraceView()}</div>
+    </div>
   );
 }

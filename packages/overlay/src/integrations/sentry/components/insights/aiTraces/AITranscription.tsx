@@ -1,10 +1,13 @@
-import { useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import useSentryStore from "~/integrations/sentry/store";
 import type { SpotlightAITrace } from "~/integrations/sentry/types";
 import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 import classNames from "~/lib/classNames";
 import { createAITraceFromSpan, extractAllAIRootSpans } from "./sdks/aiLibraries";
+import { ReactComponent as CrossIcon } from "~/assets/cross.svg";
+import DateTime from "../../shared/DateTime";
+import useSearchInput from "~/integrations/sentry/hooks/useSearchInput";
 
 type AITranscriptionProps = {
   traceId: string;
@@ -138,87 +141,97 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
   return messages.sort((a, b) => a.timestamp - b.timestamp);
 }
 
-function ConversationBubble({ message, isSelected }: { message: ConversationMessage; isSelected: boolean }) {
+function ConversationBubble({ message, isSelected, traceId }: { message: ConversationMessage; isSelected: boolean; traceId: string }) {
   const isUser = message.type === "user";
   const isToolCall = message.type === "ai-tool-call";
   // const isAIResponse = message.type === 'ai-response';
 
+  const bubbleContent = (
+    <div
+      className={classNames(
+        "max-w-[80%] rounded-lg border p-3",
+        isUser
+          ? "border-blue-500/30 bg-blue-600/20 text-blue-100"
+          : isToolCall
+            ? isSelected
+              ? "border-orange-400 bg-orange-600/30 text-orange-100"
+              : "border-orange-500/30 bg-orange-600/20 text-orange-200"
+            : isSelected
+              ? "bg-primary-800 border-primary-500 text-primary-100"
+              : "bg-primary-900 border-primary-700 text-primary-200",
+      )}
+    >
+      {isUser && <div className="mb-1 text-xs font-medium text-blue-300">User:</div>}
+
+      {/* Message content */}
+      <div className="mb-1 whitespace-pre-wrap text-sm">{message.content}</div>
+
+      {/* AI metadata */}
+      {!isUser && message.metadata && (
+        <div className="space-y-1">
+          {/* Tool call details (for tool call messages) */}
+          {message.metadata.toolCall && (
+            <div className="space-y-1">
+              <div className="rounded border border-orange-500/30 bg-orange-500/20 p-2 text-xs">
+                {message.metadata.toolCall.args && Object.keys(message.metadata.toolCall.args).length > 0 && (
+                  <div className="mb-1">
+                    <div className="mb-0.5 font-medium text-orange-300">Arguments:</div>
+                    <div className="font-mono text-xs text-orange-200">
+                      {JSON.stringify(message.metadata.toolCall.args, null, 2)}
+                    </div>
+                  </div>
+                )}
+                {message.metadata.toolCall.result && (
+                  <div>
+                    <div className="mb-0.5 font-medium text-orange-300">Result:</div>
+                    <div className="font-mono text-xs text-orange-200">
+                      {(() => {
+                        const rawResult = message.metadata.toolCall.result;
+                        if (typeof rawResult === "string") {
+                          return rawResult;
+                        }
+                        // Show the tool call result text if any
+                        if (
+                          typeof rawResult === "object" &&
+                          rawResult !== null &&
+                          typeof rawResult.result === "string"
+                        ) {
+                          return rawResult.result;
+                        }
+                        // Otherwise, stringify the whole rawResult object
+                        return JSON.stringify(rawResult, null, 2);
+                      })()}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Token and duration info */}
+          <div className="text-primary-400 flex items-center gap-3 text-xs">
+            {message.metadata.duration && <span>{getFormattedDuration(message.metadata.duration)}</span>}
+            {message.metadata.tokens && (message.metadata.tokens.prompt || message.metadata.tokens.completion) && (
+              <span>
+                {message.metadata.tokens.prompt || 0}p / {message.metadata.tokens.completion || 0}c tokens
+              </span>
+            )}
+            {message.metadata.operation && <span className="text-primary-500">{message.metadata.operation}</span>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className={classNames("mb-2 flex w-full", isUser ? "justify-end" : "justify-start")}>
-      <div
-        className={classNames(
-          "max-w-[80%] rounded-lg border p-3",
-          isUser
-            ? "border-blue-500/30 bg-blue-600/20 text-blue-100"
-            : isToolCall
-              ? isSelected
-                ? "border-orange-400 bg-orange-600/30 text-orange-100"
-                : "border-orange-500/30 bg-orange-600/20 text-orange-200"
-              : isSelected
-                ? "bg-primary-800 border-primary-500 text-primary-100"
-                : "bg-primary-900 border-primary-700 text-primary-200",
-        )}
-      >
-        {isUser && <div className="mb-1 text-xs font-medium text-blue-300">User:</div>}
-
-        {/* Message content */}
-        <div className="mb-1 whitespace-pre-wrap text-sm">{message.content}</div>
-
-        {/* AI metadata */}
-        {!isUser && message.metadata && (
-          <div className="space-y-1">
-            {/* Tool call details (for tool call messages) */}
-            {message.metadata.toolCall && (
-              <div className="space-y-1">
-                <div className="rounded border border-orange-500/30 bg-orange-500/20 p-2 text-xs">
-                  {message.metadata.toolCall.args && Object.keys(message.metadata.toolCall.args).length > 0 && (
-                    <div className="mb-1">
-                      <div className="mb-0.5 font-medium text-orange-300">Arguments:</div>
-                      <div className="font-mono text-xs text-orange-200">
-                        {JSON.stringify(message.metadata.toolCall.args, null, 2)}
-                      </div>
-                    </div>
-                  )}
-                  {message.metadata.toolCall.result && (
-                    <div>
-                      <div className="mb-0.5 font-medium text-orange-300">Result:</div>
-                      <div className="font-mono text-xs text-orange-200">
-                        {(() => {
-                          const rawResult = message.metadata.toolCall.result;
-                          if (typeof rawResult === "string") {
-                            return rawResult;
-                          }
-                          // Show the tool call result text if any
-                          if (
-                            typeof rawResult === "object" &&
-                            rawResult !== null &&
-                            typeof rawResult.result === "string"
-                          ) {
-                            return rawResult.result;
-                          }
-                          // Otherwise, stringify the whole rawResult object
-                          return JSON.stringify(rawResult, null, 2);
-                        })()}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Token and duration info */}
-            <div className="text-primary-400 flex items-center gap-3 text-xs">
-              {message.metadata.duration && <span>{getFormattedDuration(message.metadata.duration)}</span>}
-              {message.metadata.tokens && (message.metadata.tokens.prompt || message.metadata.tokens.completion) && (
-                <span>
-                  {message.metadata.tokens.prompt || 0}p / {message.metadata.tokens.completion || 0}c tokens
-                </span>
-              )}
-              {message.metadata.operation && <span className="text-primary-500">{message.metadata.operation}</span>}
-            </div>
-          </div>
-        )}
-      </div>
+      {isUser ? (
+        bubbleContent
+      ) : (
+        <Link to={`/traces/${traceId}/spans/${message.spanId}`} className="max-w-[80%]">
+          {bubbleContent}
+        </Link>
+      )}
     </div>
   );
 }
@@ -226,6 +239,8 @@ function ConversationBubble({ message, isSelected }: { message: ConversationMess
 function AITranscriptionContent({ traceId }: AITranscriptionProps) {
   const getTraceById = useSentryStore(state => state.getTraceById);
   const { spanId } = useParams<{ spanId?: string }>();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { inputValue, showReset, handleChange, handleReset } = useSearchInput(setSearchQuery, 500);
 
   const trace = getTraceById(traceId);
 
@@ -244,6 +259,18 @@ function AITranscriptionContent({ traceId }: AITranscriptionProps) {
     return parseAITracesToConversation(aiTraces);
   }, [aiTraces]);
 
+  const filteredConversation = useMemo(() => {
+    if (!searchQuery) return conversation;
+
+    const searchLower = searchQuery.toLowerCase();
+    return conversation.filter(
+      message =>
+        message.content.toLowerCase().includes(searchLower) ||
+        message.metadata?.operation?.toLowerCase().includes(searchLower) ||
+        message.metadata?.toolCall?.toolName.toLowerCase().includes(searchLower),
+    );
+  }, [conversation, searchQuery]);
+
   if (!trace) {
     return (
       <div className="p-6">
@@ -260,11 +287,53 @@ function AITranscriptionContent({ traceId }: AITranscriptionProps) {
     );
   }
 
+  const totalDuration = trace.timestamp - trace.start_timestamp;
+  const aiInteractionCount = aiTraces.length;
+
   return (
-    <div className="flex-1 overflow-y-auto px-6 py-4">
-      {conversation.map(message => (
-        <ConversationBubble key={message.id} message={message} isSelected={spanId === message.spanId} />
-      ))}
+    <div className="flex h-full flex-col">
+      {/* Header with trace info */}
+      <div className="px-6 py-4 border-b border-primary-700">
+        <div className="text-primary-300 flex flex-1 items-center gap-x-1">
+          <div className="text-primary-200">
+            <DateTime date={trace.start_timestamp} />
+          </div>
+          <span>&mdash;</span>
+          <span>
+            <strong className="text-primary-200 font-bold">{getFormattedDuration(totalDuration)}</strong> with{" "}
+            <strong className="text-primary-200 font-bold">
+              {aiInteractionCount} AI interaction{aiInteractionCount !== 1 ? "s" : ""}
+            </strong>
+          </span>
+        </div>
+      </div>
+
+      {/* Search bar */}
+      <div className="mx-6 mb-4 mt-4">
+        <div className="bg-primary-950 text-primary-50 border-primary-600 hover:border-primary-500 relative flex h-auto w-full flex-1 gap-2 rounded-md border py-1 pl-4 pr-6 outline-none transition-all">
+          <input
+            className="text-primary-50 h-auto w-full flex-1 bg-transparent outline-none transition-all"
+            onChange={handleChange}
+            value={inputValue}
+            placeholder="Search conversation..."
+          />
+          {showReset && (
+            <CrossIcon
+              onClick={handleReset}
+              className="fill-primary-50 absolute right-1 top-[5px] cursor-pointer"
+              height={20}
+              width={20}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Conversation */}
+      <div className="flex-1 overflow-y-auto px-6 pb-4">
+        {filteredConversation.map(message => (
+          <ConversationBubble key={message.id} message={message} isSelected={spanId === message.spanId} traceId={traceId} />
+        ))}
+      </div>
     </div>
   );
 }
