@@ -15,57 +15,54 @@ type TraceItemProps = {
   className?: string;
 };
 
-export default function TraceItem({ trace, className }: TraceItemProps) {
-  const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
-  const isSelected = traceId === trace.trace_id;
-  const duration = getFormattedSpanDuration(trace);
-  const truncatedId = truncateId(trace.trace_id);
-  const isLocal = isLocalTrace(trace.trace_id);
-  const isAI = hasAISpans(trace);
-
-  const content = (
+export function AIBadge({ trace }: { trace: Trace }) {
+  if (!hasAISpans(trace)) {
+    return null;
+  }
+  // If the trace has AI spans, we display a badge indicating that.
+  return (
     <>
-      <TraceIcon trace={trace} />
-      <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
-        <div className="flex items-center gap-x-2">
-          <div>{truncatedId}</div>
-          {isLocal && <Badge title="This trace is part of your local session.">Local</Badge>}
-        </div>
-        <TimeSince date={trace.start_timestamp} />
-      </div>
-      <TraceRootTxnName trace={trace} />
-      <div className="flex flex-col truncate font-mono">
-        <div className="text-primary-300 flex space-x-2 text-sm">
-          {trace.status && (
-            <>
-              <div
-                className={classNames(trace.status === "ok" ? "text-green-400" : trace.status ? "text-red-400" : "")}
-              >
-                {trace.status}
-              </div>
-              <div>&mdash;</div>
-            </>
-          )}
-          <div>{duration}</div>
-          <div>&mdash;</div>
-          <div>
-            {trace.spans.size.toLocaleString()} spans, {trace.transactions.length.toLocaleString()} txns
-          </div>
-          {isAI && (
-            <>
-              <div>&mdash;</div>
-              <Badge
-                title="This trace contains AI interactions"
-                className="bg-blue-500/20 text-white border-blue-500/30"
-              >
-                ✨ AI
-              </Badge>
-            </>
-          )}
-        </div>
+      <div>&mdash;</div>
+      <Badge title="This trace contains AI interactions" className="bg-blue-500/20 text-white border-blue-500/30">
+        ✨ AI
+      </Badge>
+    </>
+  );
+}
+
+export function TraceStatusBadge({ trace }: { trace: Trace }) {
+  const { status } = trace;
+  if (!status) {
+    return null;
+  }
+
+  return (
+    <>
+      <div className={classNames(status === "ok" ? "text-green-400" : status ? "text-red-400" : "")}>{status}</div>
+      <div>&mdash;</div>
+    </>
+  );
+}
+
+export function TraceHeaderDetails({ trace }: { trace: Trace }) {
+  const duration = getFormattedSpanDuration(trace);
+
+  return (
+    <>
+      <div>{duration}</div>
+      <div>&mdash;</div>
+      <div>
+        {trace.spans.size.toLocaleString()} spans, {trace.transactions.length.toLocaleString()} txns
       </div>
     </>
   );
+}
+
+export default function TraceItem({ trace, className }: TraceItemProps) {
+  const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
+  const isSelected = traceId === trace.trace_id;
+  const truncatedId = truncateId(trace.trace_id);
+  const isLocal = isLocalTrace(trace.trace_id);
 
   // TODO: For this #<traceId> link to work as intended, we need to do something like this:
   //       https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
@@ -78,7 +75,22 @@ export default function TraceItem({ trace, className }: TraceItemProps) {
       )}
       to={isSelected && !spanId ? `../#${trace.trace_id}` : `/traces/${trace.trace_id}/context`}
     >
-      {content}
+      <TraceIcon trace={trace} />
+      <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
+        <div className="flex items-center gap-x-2">
+          <div>{truncatedId}</div>
+          {isLocal && <Badge title="This trace is part of your local session.">Local</Badge>}
+        </div>
+        <TimeSince date={trace.start_timestamp} />
+      </div>
+      <TraceRootTxnName trace={trace} />
+      <div className="flex flex-col truncate font-mono">
+        <div className="text-primary-300 flex space-x-2 text-sm">
+          <TraceStatusBadge trace={trace} />
+          <TraceHeaderDetails trace={trace} />
+          <AIBadge trace={trace} />
+        </div>
+      </div>
     </Link>
   );
 }
