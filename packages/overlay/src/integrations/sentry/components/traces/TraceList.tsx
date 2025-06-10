@@ -37,46 +37,45 @@ export default function TraceList({ traceData, displayConfig, onShowAll }: Trace
     }
   }, [traceId]);
 
+  if (traceData.all.length === 0) {
+    return <div className="text-primary-300 p-6">Looks like there are no traces recorded matching this query. 🤔</div>;
+  }
+
   return (
-    <>
-      {traceData.all.length !== 0 ? (
-        <CardList>
-          {traceData.hiddenItemCount > 0 && (
-            <HiddenItemsButton itemCount={traceData.hiddenItemCount} onClick={onShowAll} />
-          )}
-          {traceData.filtered.map(trace => {
-            const isSelected = traceId === trace.trace_id;
-            const traceData = getTraceById(trace.trace_id);
-            const isAITrace = traceData ? hasAISpans(traceData) : false;
+    <CardList>
+      {traceData.hiddenItemCount > 0 ? (
+        <HiddenItemsButton itemCount={traceData.hiddenItemCount} onClick={onShowAll} />
+      ) : null}
+      {traceData.filtered.length > 0 ? (
+        traceData.filtered.map(trace => {
+          const isSelected = traceId === trace.trace_id;
+          const traceData = getTraceById(trace.trace_id);
+          const isAITrace = traceData ? hasAISpans(traceData) : false;
 
-            return (
-              <div key={trace.trace_id} ref={isSelected ? selectedTraceRef : null}>
-                <TraceItem trace={trace} />
+          return (
+            <div key={trace.trace_id} ref={isSelected ? selectedTraceRef : null}>
+              <TraceItem trace={trace} />
 
-                {/* Inline content below selected trace */}
-                {isSelected && !displayConfig.hideSelectedInline && (
-                  <div className="border-l-primary-500 bg-primary-950 mb-4 border-l-4">
-                    {displayConfig.aiMode && isAITrace ? (
-                      <AITranscription traceId={trace.trace_id} />
-                    ) : (
-                      <div className="px-2">
-                        <TraceTreeview traceId={trace.trace_id} />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-          {traceData.filtered?.length === 0 && (
-            <div className="text-primary-300 p-6">
-              Looks like there are no traces recorded matching the applied search & filters. 🤔
+              {isSelected && !displayConfig.hideSelectedInline && (
+                <div className="border-l-primary-500 bg-primary-950 mb-4 border-l-4">
+                  {displayConfig.aiMode && isAITrace ? (
+                    <AITranscription traceId={trace.trace_id} />
+                  ) : (
+                    <div className="px-2">
+                      <TraceTreeview traceId={trace.trace_id} />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          )}
-        </CardList>
+          );
+        })
       ) : (
-        <div className="text-primary-300 p-6">Looks like there are no traces recorded matching this query. 🤔</div>
+        <div className="text-primary-300 p-6">
+          Looks like there are no traces recorded matching the applied search & filters. 🤔
+        </div>
       )}
-    </>
+    </CardList>
   );
+      
 }
