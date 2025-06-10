@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useParams } from "react-router-dom";
 import classNames from "~/lib/classNames";
 import { useSpotlightContext } from "../../../lib/useSpotlightContext";
 import AITranscription from "../components/insights/aiTraces/AITranscription";
@@ -109,7 +109,7 @@ export function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSp
     return <div className="text-primary-300 p-6">Trace with id {traceId} not found. 🤔</div>;
   }
 
-  const span = spanId ? selectedTrace.spans.get(spanId) : null;
+  const span = spanId ? selectedTrace.spans.get(spanId) : undefined;
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden ">

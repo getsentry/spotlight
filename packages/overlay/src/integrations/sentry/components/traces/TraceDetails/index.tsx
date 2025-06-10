@@ -8,14 +8,13 @@ import { hasAISpans } from "../../insights/aiTraces/sdks/aiLibraries";
 import { useSentryEvents } from "~/integrations/sentry/data/useSentryEvents";
 import useSentryStore from "~/integrations/sentry/store";
 import { isLocalTrace } from "~/integrations/sentry/store/helpers";
+import type { Trace } from "~/integrations/sentry/types";
+import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 import { isErrorEvent } from "~/integrations/sentry/utils/sentry";
 import EventContexts from "../../events/EventContexts";
 import EventList from "../../events/EventList";
 import LogsList from "../../log/LogsList";
-import type { Trace } from "~/integrations/sentry/types";
-import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 import DateTime from "../../shared/DateTime";
-import { ContextView } from "../../shared/ContextView";
 
 type TraceDetailsProps = {
   traceId: string;

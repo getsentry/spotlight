@@ -7,12 +7,11 @@ import { createTab } from "~/integrations/sentry/utils/tabs";
 import JsonViewer from "../../../../../components/JsonViewer";
 import { DB_SPAN_REGEX } from "../../../constants";
 import useSentryStore from "../../../store";
-import type { Span, Trace } from "../../../types";
+import type { Span } from "../../../types";
 import EventList from "../../events/EventList";
 import LogsList from "../../log/LogsList";
 import { ContextView } from "../../shared/ContextView";
 import DateTime from "../../shared/DateTime";
-import TraceIcon from "../TraceIcon";
 
 function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) {
   if (desc.startsWith("{") || dbType === "mongodb") {
