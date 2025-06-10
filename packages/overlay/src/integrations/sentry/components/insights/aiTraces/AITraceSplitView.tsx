@@ -7,7 +7,7 @@ import AITraceFlow from "./AITraceFlow";
 import { extractAllAIRootSpans } from "./sdks/aiLibraries";
 
 type AITraceSplitViewProps = {
-  traceId: string;
+  trace: Trace;
 };
 
 // Get the first AI span ID from the trace
@@ -23,12 +23,11 @@ function getFirstAISpanId(trace: Trace): string | null {
   return null;
 }
 
-export default function AITraceSplitView({ traceId }: AITraceSplitViewProps) {
+export default function AITraceSplitView({ trace }: AITraceSplitViewProps) {
   const { spanId } = useParams<{ spanId?: string }>();
+  const traceId = trace.trace_id;
   const navigate = useNavigate();
-  const getTraceById = useSentryStore(state => state.getTraceById);
 
-  const trace = getTraceById(traceId);
   const firstAISpanId = trace ? getFirstAISpanId(trace) : null;
 
   // auto-navigate to first AI span when no span is selected

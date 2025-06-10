@@ -1,12 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import CardList from "../../../../components/CardList";
-import useSentryStore from "../../store";
+import { TraceSplitViewLayout } from "../../tabs/TracesTab";
 import type { Trace } from "../../types";
-import AITranscription from "../insights/aiTraces/AITranscription";
-import { hasAISpans } from "../insights/aiTraces/sdks/aiLibraries";
 import HiddenItemsButton from "../shared/HiddenItemsButton";
-import TraceTreeview from "./TraceDetails/components/TraceTreeview";
 import TraceItem from "./TraceItem";
 
 type TraceListProps = {
@@ -16,16 +13,15 @@ type TraceListProps = {
     visible: Trace[];
     hiddenItemCount: number;
   };
-  displayConfig: {
-    aiMode: boolean;
-    hideSelectedInline?: boolean;
-  };
   onShowAll: () => void;
 };
 
-export default function TraceList({ traceData, displayConfig, onShowAll }: TraceListProps) {
-  const { traceId } = useParams<{ traceId: string }>();
-  const getTraceById = useSentryStore(state => state.getTraceById);
+export default function TraceList({ traceData, onShowAll }: TraceListProps) {
+  const [aiMode, setAiMode] = useState(false);
+  const onToggle = useCallback(() => {
+    setAiMode(prev => !prev);
+  }, []);
+  const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
   const selectedTraceRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,23 +45,21 @@ export default function TraceList({ traceData, displayConfig, onShowAll }: Trace
       {traceData.filtered.length > 0 ? (
         traceData.filtered.map(trace => {
           const isSelected = traceId === trace.trace_id;
-          const traceData = getTraceById(trace.trace_id);
-          const isAITrace = traceData ? hasAISpans(traceData) : false;
+          const ref = isSelected ? selectedTraceRef : null;
 
           return (
-            <div key={trace.trace_id} ref={isSelected ? selectedTraceRef : null}>
-              <TraceItem trace={trace} />
-
-              {isSelected && !displayConfig.hideSelectedInline && (
-                <div className="border-l-primary-500 bg-primary-950 mb-4 border-l-4">
-                  {displayConfig.aiMode && isAITrace ? (
-                    <AITranscription traceId={trace.trace_id} />
-                  ) : (
-                    <div className="px-2">
-                      <TraceTreeview traceId={trace.trace_id} />
-                    </div>
-                  )}
-                </div>
+            <div key={trace.trace_id} ref={ref}>
+              {isSelected ? (
+                <TraceSplitViewLayout
+                  trace={trace}
+                  span={spanId ? trace.spans.get(spanId) : undefined}
+                  aiConfig={{
+                    mode: aiMode,
+                    onToggle,
+                  }}
+                />
+              ) : (
+                <TraceItem trace={trace} />
               )}
             </div>
           );
@@ -77,5 +71,4 @@ export default function TraceList({ traceData, displayConfig, onShowAll }: Trace
       )}
     </CardList>
   );
-      
 }

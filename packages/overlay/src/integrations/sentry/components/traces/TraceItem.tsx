@@ -3,7 +3,7 @@ import { Badge } from "~/ui/badge";
 import TimeSince from "../../../../components/TimeSince";
 import classNames from "../../../../lib/classNames";
 import { isLocalTrace } from "../../store/helpers";
-import type { Trace, Span } from "../../types";
+import type { Span, Trace } from "../../types";
 import { getFormattedSpanDuration } from "../../utils/duration";
 import { truncateId } from "../../utils/text";
 import { hasAISpans } from "../insights/aiTraces/sdks/aiLibraries";
@@ -12,7 +12,6 @@ import TraceIcon from "./TraceIcon";
 
 type TraceItemProps = {
   trace: Trace;
-  span?: Span;
   className?: string;
 };
 
@@ -68,11 +67,14 @@ export function SpanHeader({ span }: { span: Span }) {
   );
 }
 
-export default function TraceItem({ trace, span, className }: TraceItemProps) {
+export default function TraceItem({ trace, className }: TraceItemProps) {
   const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
   const isSelected = traceId === trace.trace_id;
   const truncatedId = truncateId(trace.trace_id);
   const isLocal = isLocalTrace(trace.trace_id);
+  const span = spanId && trace.spans.get(spanId);
+
+  // TODO: if (spanId && !span) -> error
 
   // TODO: For this #<traceId> link to work as intended, we need to do something like this:
   //       https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
