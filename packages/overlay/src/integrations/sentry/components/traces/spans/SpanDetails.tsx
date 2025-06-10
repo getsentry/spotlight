@@ -92,6 +92,10 @@ export function SpanContext({ span }: { span: Span }) {
           </div>
         </div>
       </div>
+      <div className="space-y-4 px-6 py-4">
+        <h2 className="mb-2 font-bold uppercase">ID</h2>
+        {span.span_id}
+      </div>
       <SpanDescription span={span} />
       <ContextView context={contextEntries} tags={span.tags} />
     </>
@@ -136,8 +140,6 @@ export default function SpanDetails({
 
   return (
     <>
-      <SpanHeader span={span} trace={trace} />
-
       <Tabs tabs={tabs} nested />
       <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
@@ -150,19 +152,5 @@ export default function SpanDetails({
         </Routes>
       </div>
     </>
-  );
-}
-function SpanHeader({ span, trace }: { span: Span; trace: Trace }) {
-  // Header TODOs:
-  // TODO: Add linear view with span highlighted in it
-  // TODO: Show previous/parent span
-  return (
-    <div className="border-b-primary-700 bg-primary-950 flex items-center gap-x-2 border-b px-6 py-4">
-      <TraceIcon trace={trace} />
-      <h1 className="flex w-full flex-col truncate text-xl">
-        Span:&nbsp;&nbsp;
-        {span.op || span.span_id}
-      </h1>
-    </div>
   );
 }

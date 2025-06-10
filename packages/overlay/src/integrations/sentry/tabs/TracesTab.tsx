@@ -35,9 +35,45 @@ interface TraceSplitViewLayoutProps {
   onShowAll: () => void;
 }
 
-function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitViewLayoutProps) {
+export function AITraceToggle({ trace, aiConfig }: { trace: Trace; aiConfig: TraceSplitViewLayoutProps["aiConfig"] }) {
+  if (!hasAISpans(trace)) {
+    return null;
+  }
+
+  return (
+    <div className="flex items-center px-8">
+      <span
+        id="ai-mode-label"
+        className="text-primary-200 mr-3 text-sm font-medium cursor-pointer"
+        onClick={aiConfig.onToggle}
+      >
+        AI Mode
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={aiConfig.mode}
+        aria-labelledby="ai-mode-label"
+        onClick={aiConfig.onToggle}
+        className={classNames(
+          "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2",
+          aiConfig.mode ? "bg-blue-500 focus:ring-blue-400" : "bg-primary-700 focus:ring-primary-600",
+        )}
+      >
+        <span
+          aria-hidden="true"
+          className={classNames(
+            "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+            aiConfig.mode ? "translate-x-5" : "translate-x-0",
+          )}
+        />
+      </button>
+    </div>
+  );
+}
+
+export function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitViewLayoutProps) {
   const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
-  const navigate = useNavigate();
   const [leftPanelWidth, setLeftPanelWidth] = useState(DEFAULT_PANEL_WIDTH_PERCENT);
   const [isResizing, setIsResizing] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -54,12 +90,9 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
     setLeftPanelWidth(clampedWidth);
   }, []);
 
-  const handleCloseTraceDetails = useCallback(() => {
-    navigate(".."); // relative to /:traceId/*, so goes to TracesTab
-  }, [navigate]);
-
-  // Scroll to top when trace changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
+    // Scroll to top when trace changes
     if (leftPanelRef.current) {
       leftPanelRef.current.scrollTop = 0;
     }
@@ -71,52 +104,26 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
   }
 
   const selectedTrace = getTraceById(traceId);
-  const isAITrace = selectedTrace ? hasAISpans(selectedTrace) : false;
+
+  if (!selectedTrace) {
+    return <div className="text-primary-300 p-6">Trace with id {traceId} not found. 🤔</div>;
+  }
+
+  const span = spanId ? selectedTrace.spans.get(spanId) : null;
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden ">
       {/* selected trace item at the top */}
-      {selectedTrace && (
-        <div className="border-b-primary-700 bg-primary-900 border-b transition-colors duration-150">
-          <div className="flex items-center bg-primary-800">
-            <div className="flex-1">
-              <TraceItem trace={selectedTrace} className="hover:bg-transparent" />
-            </div>
-
-            {/* AI Mode Toggle */}
-            {isAITrace && (
-              <div className="flex items-center px-8">
-                <span
-                  id="ai-mode-label"
-                  className="text-primary-200 mr-3 text-sm font-medium cursor-pointer"
-                  onClick={aiConfig.onToggle}
-                >
-                  AI Mode
-                </span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={aiConfig.mode}
-                  aria-labelledby="ai-mode-label"
-                  onClick={aiConfig.onToggle}
-                  className={classNames(
-                    "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2",
-                    aiConfig.mode ? "bg-blue-500 focus:ring-blue-400" : "bg-primary-700 focus:ring-primary-600",
-                  )}
-                >
-                  <span
-                    aria-hidden="true"
-                    className={classNames(
-                      "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
-                      aiConfig.mode ? "translate-x-5" : "translate-x-0",
-                    )}
-                  />
-                </button>
-              </div>
-            )}
+      <div className="border-b-primary-700 bg-primary-900 border-b transition-colors duration-150">
+        <div className="flex items-center bg-primary-800">
+          <div className="flex-1">
+            <TraceItem trace={selectedTrace} span={span} className="hover:bg-transparent" />
           </div>
+
+          {/* AI Mode Toggle */}
+          <AITraceToggle trace={selectedTrace} aiConfig={aiConfig} />
         </div>
-      )}
+      </div>
 
       {/* split panel below */}
       <div ref={containerRef} className="flex h-full w-full flex-1 overflow-hidden">
@@ -129,7 +136,7 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
           {/* Top part of left panel -> TreeView/AITranscription */}
           {selectedTrace && (
             <div className="border-b-primary-700 bg-primary-950 border-b flex-shrink-0">
-              {aiConfig.mode && isAITrace ? (
+              {aiConfig.mode && hasAISpans(selectedTrace) ? (
                 <AITranscription traceId={traceId} />
               ) : (
                 <div className="px-2">
@@ -166,7 +173,7 @@ function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitView
           {spanId && !aiConfig.mode ? (
             <SpanDetails traceId={traceId} spanId={spanId} />
           ) : (
-            <TraceDetails traceId={traceId} onClose={handleCloseTraceDetails} aiConfig={aiConfig} />
+            <TraceDetails traceId={traceId} aiConfig={aiConfig} />
           )}
         </div>
       </div>

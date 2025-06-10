@@ -42,7 +42,8 @@ export function hasAISpans(trace: Trace): boolean {
   if (!trace.spanTree) {
     return false;
   }
-  //TODO: check if this could cause circular import
+  
+  // TODO: We may want to cache/optimize this `extractAllAIRootSpans` helper
   const aiRootSpans = extractAllAIRootSpans(trace.spanTree);
   return aiRootSpans.length > 0;
 }
