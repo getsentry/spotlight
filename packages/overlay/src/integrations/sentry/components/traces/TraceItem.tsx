@@ -3,7 +3,7 @@ import { Badge } from "~/ui/badge";
 import TimeSince from "../../../../components/TimeSince";
 import classNames from "../../../../lib/classNames";
 import { isLocalTrace } from "../../store/helpers";
-import type { Trace } from "../../types";
+import type { Trace, Span } from "../../types";
 import { getFormattedSpanDuration } from "../../utils/duration";
 import { truncateId } from "../../utils/text";
 import { hasAISpans } from "../insights/aiTraces/sdks/aiLibraries";
@@ -12,6 +12,7 @@ import TraceIcon from "./TraceIcon";
 
 type TraceItemProps = {
   trace: Trace;
+  span?: Span;
   className?: string;
 };
 
@@ -58,7 +59,16 @@ export function TraceHeaderDetails({ trace }: { trace: Trace }) {
   );
 }
 
-export default function TraceItem({ trace, className }: TraceItemProps) {
+export function SpanHeader({ span }: { span: Span }) {
+  return (
+    <>
+      <div>&mdash; </div>
+      <div>span: {span.op || truncateId(span.span_id)}</div>
+    </>
+  );
+}
+
+export default function TraceItem({ trace, span, className }: TraceItemProps) {
   const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
   const isSelected = traceId === trace.trace_id;
   const truncatedId = truncateId(trace.trace_id);
@@ -88,7 +98,7 @@ export default function TraceItem({ trace, className }: TraceItemProps) {
         <div className="text-primary-300 flex space-x-2 text-sm">
           <TraceStatusBadge trace={trace} />
           <TraceHeaderDetails trace={trace} />
-          <AIBadge trace={trace} />
+          {isSelected ? span && <SpanHeader span={span} /> : <AIBadge trace={trace} />}
         </div>
       </div>
     </Link>

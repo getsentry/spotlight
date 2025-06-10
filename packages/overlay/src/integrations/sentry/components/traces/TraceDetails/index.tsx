@@ -8,19 +8,56 @@ import { hasAISpans } from "../../insights/aiTraces/sdks/aiLibraries";
 import { useSentryEvents } from "~/integrations/sentry/data/useSentryEvents";
 import useSentryStore from "~/integrations/sentry/store";
 import { isLocalTrace } from "~/integrations/sentry/store/helpers";
+import type { Trace } from "~/integrations/sentry/types";
+import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 import { isErrorEvent } from "~/integrations/sentry/utils/sentry";
 import EventContexts from "../../events/EventContexts";
 import EventList from "../../events/EventList";
 import LogsList from "../../log/LogsList";
+import DateTime from "../../shared/DateTime";
 
 type TraceDetailsProps = {
   traceId: string;
-  onClose: () => void;
   aiConfig: {
     mode: boolean;
     onToggle: () => void;
   };
 };
+
+export function TraceContext({ trace }: { trace: Trace }) {
+  return (
+    <>
+      <div className="space-y-6 p-6">
+        <div className="text-primary-300 flex flex-1 items-center gap-x-1">
+          <DateTime date={trace.start_timestamp} />
+          <span>&mdash;</span>
+          <span>
+            {/* TODO: Add the duration pill here */}
+            <strong>{getFormattedDuration(trace.timestamp - trace.start_timestamp)}</strong> duration
+          </span>
+        </div>
+        <div className="flex-1">
+          <div className="border-primary-800 relative h-8 border py-1">
+            <div
+              className="bg-primary-800 absolute bottom-0 top-0 -m-0.5 flex w-full items-center p-0.5"
+              style={{
+                left: 0,
+                width: "100%",
+              }}
+            >
+              <span className="whitespace-nowrap">{getFormattedDuration(trace.timestamp - trace.start_timestamp)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="space-y-4 px-6 py-4">
+        <h2 className="mb-2 font-bold uppercase">ID</h2>
+        {trace.trace_id}
+      </div>
+      <EventContexts event={trace.rootTransaction || trace.transactions[0]} />
+    </>
+  );
+}
 
 export default function TraceDetails({ traceId, aiConfig }: TraceDetailsProps) {
   const getTraceById = useSentryStore(state => state.getTraceById);
@@ -62,7 +99,7 @@ export default function TraceDetails({ traceId, aiConfig }: TraceDetailsProps) {
       <Tabs tabs={tabs} nested />
       <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
-          <Route path="context" element={<EventContexts event={trace.rootTransaction || trace.transactions[0]} />} />
+          <Route path="context" element={<TraceContext trace={trace} />} />
           <Route path="errors" element={<EventList traceId={traceId} />} />
           <Route path="logs" element={<LogsList traceId={traceId} />} />
           <Route path="logs/:id" element={<LogsList traceId={traceId} />} />
