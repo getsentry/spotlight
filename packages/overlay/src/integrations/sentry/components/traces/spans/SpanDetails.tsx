@@ -102,24 +102,11 @@ export function SpanContext({ span }: { span: Span }) {
 }
 
 export default function SpanDetails({
-  traceId,
-  spanId,
+  span,
 }: {
-  traceId: string;
-  spanId: string;
+  span: Span;
 }) {
   const getEventsByTrace = useSentryStore(state => state.getEventsByTrace);
-  const trace = useSentryStore(state => state.getTraceById(traceId));
-
-  if (!trace) {
-    return <div>Error: cannot find trace: {traceId}</div>;
-  }
-
-  const span = trace?.spans.get(spanId);
-
-  if (!span) {
-    return <div>Error: cannot find span: {`${traceId}@${spanId}`}</div>;
-  }
 
   // TODO: try to narrow errors to the span and its children?
   const errors = span.trace_id ? getEventsByTrace(span.trace_id).filter(isErrorEvent) : [];
@@ -143,9 +130,9 @@ export default function SpanDetails({
       <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
           <Route path="context" element={<SpanContext span={span} />} />
-          <Route path="errors" element={<EventList traceId={traceId} />} />
-          <Route path="logs" element={<LogsList traceId={traceId} />} />
-          <Route path="logs/:id" element={<LogsList traceId={traceId} />} />
+          <Route path="errors" element={<EventList traceId={span.trace_id} />} />
+          <Route path="logs" element={<LogsList traceId={span.trace_id} />} />
+          <Route path="logs/:id" element={<LogsList traceId={span.trace_id} />} />
           {/* Default tab */}
           <Route path="*" element={<Navigate to="context" replace />} />
         </Routes>
