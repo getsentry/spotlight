@@ -4,6 +4,7 @@ import type { RawEventContext } from "~/integrations/integration";
 import { parseStringFromBuffer } from "~/integrations/sentry/utils/bufferParsers";
 import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
 import JsonViewer from "../../../../../components/JsonViewer";
+import { ReactComponent as Download } from "~/assets/download.svg";
 
 export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; rawEnvelope: RawEventContext } }) {
   const [showRawJSON, setShowRawJSON] = useState<boolean>(false);
@@ -27,8 +28,15 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
         subtitle={
           <>
             Event Id <span className="text-primary-500">&mdash;</span>{" "}
-            <a href={downloadUrl} download={downloadName}>
+            <a
+              href={downloadUrl}
+              download={downloadName}
+              className="inline-flex items-center gap-1 group"
+              title="Download"
+              aria-label="Download envelope"
+            >
               {String(envelopeId)}
+              <Download className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity" />
             </a>
           </>
         }
