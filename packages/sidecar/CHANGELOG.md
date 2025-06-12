@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 1.11.4
+
+### Patch Changes
+
+- Handle data capture errors, when SPOTLIGHT_CAPTURE is set, gracefully ([#803](https://github.com/getsentry/spotlight/pull/803))
+
 ## 1.11.3
 
 ### Patch Changes
