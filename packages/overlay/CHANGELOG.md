@@ -1,5 +1,33 @@
 # @spotlightjs/core
 
+## 3.0.0
+
+### Major Changes
+
+- Remove browser console integration -- this is removed in favor of the new structured logging in Sentry SDKs ([#822](https://github.com/getsentry/spotlight/pull/822))
+
+### Minor Changes
+
+- - Added support for structured logging ([#808](https://github.com/getsentry/spotlight/pull/808))
+
+- Add a download icon to envelope details page next to envelope id. ([#839](https://github.com/getsentry/spotlight/pull/839))
+
+- Better organization and navigation under Insights pages with keyboard nav improvements ([#791](https://github.com/getsentry/spotlight/pull/791))
+
+- Create a new view for AI agent traces under insights/agents ([#804](https://github.com/getsentry/spotlight/pull/804))
+
+- Added Trace Filtering Support ([#806](https://github.com/getsentry/spotlight/pull/806))
+
+### Patch Changes
+
+- Improve trace details layout ([#831](https://github.com/getsentry/spotlight/pull/831))
+
+- Do not forcefully disable Sentry SDK DSN, ever ([#841](https://github.com/getsentry/spotlight/pull/841))
+
+- Restore react-router routing ([#835](https://github.com/getsentry/spotlight/pull/835))
+
+- Fix click on AI flow item to show its AI trace details ([#825](https://github.com/getsentry/spotlight/pull/825))
+
 ## 2.15.1
 
 ### Patch Changes
