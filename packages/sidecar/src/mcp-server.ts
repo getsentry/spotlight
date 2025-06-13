@@ -1,6 +1,7 @@
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { logger } from "./logger.js";
+import { createMcpTools, executeMcpTool } from "./mcp-tools.js";
 import type { MessageBuffer } from "./messageBuffer.js";
 
 type Payload = [string, Buffer];
@@ -16,6 +17,9 @@ export function createMcpServer(buffer: MessageBuffer<Payload>): McpServerInterf
     name: "Spotlight Sidecar MCP",
     version: "1.0.0",
   });
+
+  // Get all available tools
+  const tools = createMcpTools(buffer);
 
   // Resource to get all current events
   server.resource("events", "spotlight://events/all", async uri => {
@@ -66,134 +70,13 @@ export function createMcpServer(buffer: MessageBuffer<Payload>): McpServerInterf
     },
   );
 
-  // Tool to get event information
-  server.tool(
-    "get-events",
-    {
-      contentType: z.string().optional().describe("Filter events by content type"),
-      limit: z.number().optional().default(10).describe("Maximum number of events to return"),
-    },
-    async ({ contentType, limit }) => {
-      const allEvents = buffer.getAll();
-      let events = allEvents;
-
-      if (contentType) {
-        events = events.filter(([type]: [string, Buffer]) => type === contentType);
-      }
-
-      const limitedEvents = events.slice(-limit);
-      const eventData = limitedEvents.map(([type, data]: [string, Buffer], index: number) => ({
-        id: index,
-        contentType: type,
-        timestamp: new Date().toISOString(),
-        size: data.length,
-        preview: data.toString("utf-8").substring(0, 200) + (data.length > 200 ? "..." : ""),
-      }));
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(eventData, null, 2),
-          },
-        ],
-      };
-    },
-  );
-
-  // Tool to get detailed event data
-  server.tool(
-    "get-event-details",
-    {
-      eventIndex: z.number().describe("Index of the event to retrieve"),
-    },
-    async ({ eventIndex }) => {
-      const allEvents = buffer.getAll();
-
-      if (eventIndex < 0 || eventIndex >= allEvents.length) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(
-                {
-                  error: "Event index out of range",
-                  availableRange: `0-${allEvents.length - 1}`,
-                },
-                null,
-                2,
-              ),
-            },
-          ],
-          isError: true,
-        };
-      }
-
-      const [contentType, data] = allEvents[eventIndex];
-      const eventDetails = {
-        id: eventIndex,
-        contentType,
-        timestamp: new Date().toISOString(),
-        size: data.length,
-        data: data.toString("utf-8"),
-      };
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(eventDetails, null, 2),
-          },
-        ],
-      };
-    },
-  );
-
-  // Tool to get event statistics
-  server.tool("get-event-stats", {}, async () => {
-    const allEvents = buffer.getAll();
-    const stats = {
-      totalEvents: allEvents.length,
-      eventsByType: {} as Record<string, number>,
-      totalSize: 0,
-    };
-
-    for (const [contentType, data] of allEvents) {
-      stats.eventsByType[contentType] = (stats.eventsByType[contentType] || 0) + 1;
-      stats.totalSize += data.length;
-    }
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(stats, null, 2),
-        },
-      ],
-    };
-  });
-
-  // Tool to clear events
-  server.tool("clear-events", {}, async () => {
-    const eventCount = buffer.getAll().length;
-    buffer.clear();
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(
-            {
-              message: "Events cleared successfully",
-              clearedCount: eventCount,
-            },
-            null,
-            2,
-          ),
-        },
-      ],
-    };
-  });
+  // Register all tools from the tools module
+  for (const tool of tools) {
+    server.tool(tool.name, tool.description, tool.inputSchema, async args => {
+      const result = await tool.handler(args);
+      return result;
+    });
+  }
 
   // Prompt for analyzing events
   server.prompt(
@@ -232,7 +115,7 @@ export function createMcpServer(buffer: MessageBuffer<Payload>): McpServerInterf
     },
   );
 
-  logger.info("MCP server created with event analysis capabilities");
+  logger.info(`MCP server created with ${tools.length} tools and event analysis capabilities`);
 
   return {
     server,
@@ -244,138 +127,15 @@ export function createMcpServer(buffer: MessageBuffer<Payload>): McpServerInterf
         const toolName = request.params?.name;
         const args = request.params?.arguments || {};
 
-        // Handle get-events tool
-        if (toolName === "get-events") {
-          try {
-            const allEvents = buffer.getAll();
-            let events = allEvents;
-            const contentType = args.contentType;
-            const limit = args.limit || 10;
+        // Use the centralized tool execution function
+        const result = await executeMcpTool(tools, toolName, args);
 
-            if (contentType) {
-              events = events.filter(([type]: [string, Buffer]) => type === contentType);
-            }
-
-            const limitedEvents = events.slice(-limit);
-            const eventData = limitedEvents.map(([type, data]: [string, Buffer], index: number) => ({
-              id: index,
-              contentType: type,
-              timestamp: new Date().toISOString(),
-              size: data.length,
-              preview: data.toString("utf-8").substring(0, 200) + (data.length > 200 ? "..." : ""),
-            }));
-
-            return {
-              jsonrpc: "2.0",
-              id: request.id,
-              result: {
-                content: [
-                  {
-                    type: "text",
-                    text: JSON.stringify(eventData, null, 2),
-                  },
-                ],
-              },
-            };
-          } catch (error) {
-            return {
-              jsonrpc: "2.0",
-              id: request.id,
-              error: {
-                code: -32603,
-                message: "Tool execution failed",
-                data: String(error),
-              },
-            };
-          }
+        // Add the request ID to the response
+        if (result.jsonrpc) {
+          result.id = request.id;
         }
 
-        // Handle get-event-stats tool
-        if (toolName === "get-event-stats") {
-          try {
-            const allEvents = buffer.getAll();
-            const stats = {
-              totalEvents: allEvents.length,
-              eventsByType: {} as Record<string, number>,
-              totalSize: 0,
-            };
-
-            for (const [contentType, data] of allEvents) {
-              stats.eventsByType[contentType] = (stats.eventsByType[contentType] || 0) + 1;
-              stats.totalSize += data.length;
-            }
-
-            return {
-              jsonrpc: "2.0",
-              id: request.id,
-              result: {
-                content: [
-                  {
-                    type: "text",
-                    text: JSON.stringify(stats, null, 2),
-                  },
-                ],
-              },
-            };
-          } catch (error) {
-            return {
-              jsonrpc: "2.0",
-              id: request.id,
-              error: {
-                code: -32603,
-                message: "Tool execution failed",
-                data: String(error),
-              },
-            };
-          }
-        }
-
-        // Handle clear-events tool
-        if (toolName === "clear-events") {
-          try {
-            const eventCount = buffer.getAll().length;
-            buffer.clear();
-
-            return {
-              jsonrpc: "2.0",
-              id: request.id,
-              result: {
-                content: [
-                  {
-                    type: "text",
-                    text: JSON.stringify(
-                      {
-                        message: "Events cleared successfully",
-                        clearedCount: eventCount,
-                      },
-                      null,
-                      2,
-                    ),
-                  },
-                ],
-              },
-            };
-          } catch (error) {
-            return {
-              jsonrpc: "2.0",
-              id: request.id,
-              error: {
-                code: -32603,
-                message: "Tool execution failed",
-                data: String(error),
-              },
-            };
-          }
-        }
-
-        return {
-          jsonrpc: "2.0",
-          id: request.id,
-          error: {
-            code: -32601,
-            message: `Tool not found: ${toolName}`,
-          },
-        };
+        return result;
       }
 
       return {
