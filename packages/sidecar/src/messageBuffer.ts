@@ -66,6 +66,20 @@ export class MessageBuffer<T> {
     this.head = 0;
     this.readers = new Map<string, (item: T) => void>();
   }
+
+  /**
+   * Get all stored items for MCP server access
+   */
+  getAll(): T[] {
+    const result: T[] = [];
+    for (let i = this.head; i < this.writePos; i++) {
+      const item = this.items[i % this.size];
+      if (item !== undefined) {
+        result.push(item[1]);
+      }
+    }
+    return result;
+  }
 }
 
 function generateUuidv4(): string {
