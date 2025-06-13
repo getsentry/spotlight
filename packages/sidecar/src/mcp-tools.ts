@@ -17,7 +17,7 @@ export interface ToolResult {
 export interface ToolDefinition {
   name: string;
   description: string;
-  inputSchema: Record<string, z.ZodType>;
+  inputSchema: z.ZodType<any>;
   handler: (args: any, context: ToolContext) => Promise<ToolResult>;
 }
 
@@ -54,10 +54,10 @@ function createSuccessResult(data: any): ToolResult {
 const getEventsToolDefinition: ToolDefinition = {
   name: "get-events",
   description: "Retrieve event information with optional filtering",
-  inputSchema: {
+  inputSchema: z.object({
     contentType: z.string().optional().describe("Filter events by content type"),
     limit: z.number().optional().default(10).describe("Maximum number of events to return"),
-  },
+  }),
   handler: async ({ contentType, limit = 10 }, { buffer }) => {
     try {
       const allEvents = buffer.getAll();
@@ -87,9 +87,9 @@ const getEventsToolDefinition: ToolDefinition = {
 const getEventDetailsToolDefinition: ToolDefinition = {
   name: "get-event-details",
   description: "Get detailed information about a specific event",
-  inputSchema: {
+  inputSchema: z.object({
     eventIndex: z.number().describe("Index of the event to retrieve"),
-  },
+  }),
   handler: async ({ eventIndex }, { buffer }) => {
     try {
       const allEvents = buffer.getAll();
@@ -118,7 +118,7 @@ const getEventDetailsToolDefinition: ToolDefinition = {
 const getEventStatsToolDefinition: ToolDefinition = {
   name: "get-event-stats",
   description: "Get statistics about stored events",
-  inputSchema: {},
+  inputSchema: z.object({}),
   handler: async (_, { buffer }) => {
     try {
       const allEvents = buffer.getAll();
@@ -144,7 +144,7 @@ const getEventStatsToolDefinition: ToolDefinition = {
 const clearEventsToolDefinition: ToolDefinition = {
   name: "clear-events",
   description: "Clear all stored events",
-  inputSchema: {},
+  inputSchema: z.object({}),
   handler: async (_, { buffer }) => {
     try {
       const eventCount = buffer.getAll().length;
@@ -166,11 +166,11 @@ const clearEventsToolDefinition: ToolDefinition = {
 const searchEventsToolDefinition: ToolDefinition = {
   name: "search-events",
   description: "Search events by content using a text query",
-  inputSchema: {
+  inputSchema: z.object({
     query: z.string().describe("Text to search for in event content"),
     caseSensitive: z.boolean().optional().default(false).describe("Whether search should be case sensitive"),
     limit: z.number().optional().default(10).describe("Maximum number of results to return"),
-  },
+  }),
   handler: async ({ query, caseSensitive = false, limit = 10 }, { buffer }) => {
     try {
       const allEvents = buffer.getAll();
@@ -215,10 +215,10 @@ const searchEventsToolDefinition: ToolDefinition = {
 const getEventsByTimeToolDefinition: ToolDefinition = {
   name: "get-events-by-time",
   description: "Get events within a specific time range (last N minutes)",
-  inputSchema: {
+  inputSchema: z.object({
     minutes: z.number().min(1).describe("Number of minutes to look back"),
     contentType: z.string().optional().describe("Filter by content type"),
-  },
+  }),
   handler: async ({ minutes, contentType }, { buffer }) => {
     try {
       // Note: This is a simplified implementation since we don't store actual timestamps
@@ -277,51 +277,6 @@ export function createMcpTools(buffer: MessageBuffer<Payload>) {
       return await toolDef.handler(args, context);
     },
   }));
-}
-
-// Helper function to handle tool execution with error handling
-export async function executeMcpTool(
-  tools: ReturnType<typeof createMcpTools>,
-  toolName: string,
-  args: any,
-): Promise<any> {
-  const tool = tools.find(t => t.name === toolName);
-
-  if (!tool) {
-    return {
-      jsonrpc: "2.0",
-      error: {
-        code: -32601,
-        message: `Tool not found: ${toolName}`,
-        data: {
-          availableTools: tools.map(t => t.name),
-        },
-      },
-    };
-  }
-
-  try {
-    const result = await tool.handler(args);
-
-    return {
-      jsonrpc: "2.0",
-      result: result,
-    };
-  } catch (error) {
-    logger.error(`Error executing tool ${toolName}: ${String(error)}`);
-
-    return {
-      jsonrpc: "2.0",
-      error: {
-        code: -32603,
-        message: "Tool execution failed",
-        data: {
-          toolName,
-          error: String(error),
-        },
-      },
-    };
-  }
 }
 
 // Export tool definitions for easy extension

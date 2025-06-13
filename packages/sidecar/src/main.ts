@@ -212,10 +212,15 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
   };
 };
 
-// MCP Server transport handling
+// MCP Server transport handling using proper StreamableHTTPServerTransport
 const mcpServerHandler = (mcpServer: McpServerInterface) => {
   return async function handleMcpRequest(req: IncomingMessage, res: ServerResponse, _pathname?: string): Promise<void> {
     logger.debug(`🤖 MCP request received: ${req.method}`);
+
+    // Set CORS headers for all MCP requests
+    for (const [header, value] of Object.entries({ ...CORS_HEADERS, ...SPOTLIGHT_HEADERS })) {
+      res.setHeader(header, value);
+    }
 
     if (req.method === "POST") {
       // Read the request body
@@ -233,8 +238,6 @@ const mcpServerHandler = (mcpServer: McpServerInterface) => {
           logger.error(`Failed to parse MCP request body: ${error}`);
           res.writeHead(400, {
             "Content-Type": "application/json",
-            ...CORS_HEADERS,
-            ...SPOTLIGHT_HEADERS,
           });
           res.end(
             JSON.stringify({
@@ -249,33 +252,8 @@ const mcpServerHandler = (mcpServer: McpServerInterface) => {
           return;
         }
 
-        try {
-          const response = await mcpServer.handleRequest(requestData);
-
-          res.writeHead(200, {
-            "Content-Type": "application/json",
-            ...CORS_HEADERS,
-            ...SPOTLIGHT_HEADERS,
-          });
-          res.end(JSON.stringify(response));
-        } catch (error) {
-          logger.error(`MCP request handling error: ${error}`);
-          res.writeHead(500, {
-            "Content-Type": "application/json",
-            ...CORS_HEADERS,
-            ...SPOTLIGHT_HEADERS,
-          });
-          res.end(
-            JSON.stringify({
-              jsonrpc: "2.0",
-              error: {
-                code: -32603,
-                message: "Internal server error",
-              },
-              id: requestData?.id || null,
-            }),
-          );
-        }
+        // Use the proper MCP transport to handle the request
+        await mcpServer.handleRequest(req, res, requestData);
       });
 
       req.on("error", error => {
@@ -283,8 +261,6 @@ const mcpServerHandler = (mcpServer: McpServerInterface) => {
         if (!res.headersSent) {
           res.writeHead(400, {
             "Content-Type": "application/json",
-            ...CORS_HEADERS,
-            ...SPOTLIGHT_HEADERS,
           });
           res.end(
             JSON.stringify({
@@ -299,20 +275,11 @@ const mcpServerHandler = (mcpServer: McpServerInterface) => {
         }
       });
     } else if (req.method === "GET") {
-      // For GET requests, provide MCP server information
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-        ...CORS_HEADERS,
-        ...SPOTLIGHT_HEADERS,
-      });
-      res.end(
-        JSON.stringify({
-          name: "Spotlight Sidecar MCP Server",
-          description: "MCP server for accessing Spotlight events",
-          capabilities: ["tools", "resources", "prompts"],
-          protocol: "mcp/2025-03-26",
-        }),
-      );
+      // Handle GET requests for SSE streams or server info
+      await mcpServer.handleRequest(req, res);
+    } else if (req.method === "DELETE") {
+      // Handle DELETE requests for session termination
+      await mcpServer.handleRequest(req, res);
     } else {
       error405(req, res);
     }

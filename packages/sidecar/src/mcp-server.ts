@@ -1,14 +1,17 @@
-import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import type { z } from "zod";
 import { logger } from "./logger.js";
-import { createMcpTools, executeMcpTool } from "./mcp-tools.js";
+import { createMcpTools } from "./mcp-tools.js";
 import type { MessageBuffer } from "./messageBuffer.js";
 
 type Payload = [string, Buffer];
 
 export interface McpServerInterface {
   server: McpServer;
-  handleRequest: (request: any) => Promise<any>;
+  transport: StreamableHTTPServerTransport;
+  handleRequest: (req: IncomingMessage, res: ServerResponse, body?: any) => Promise<void>;
   close: () => void;
 }
 
@@ -18,7 +21,7 @@ export function createMcpServer(buffer: MessageBuffer<Payload>): McpServerInterf
     version: "1.0.0",
   });
 
-  // Get all available tools
+  // Get all available tools from the tools module
   const tools = createMcpTools(buffer);
 
   // Resource to get all current events
@@ -43,111 +46,99 @@ export function createMcpServer(buffer: MessageBuffer<Payload>): McpServerInterf
   });
 
   // Resource to get events by content type using ResourceTemplate
-  server.resource(
-    "events-by-type",
-    new ResourceTemplate("spotlight://events/type/{contentType}", { list: undefined }),
-    async (uri, params) => {
-      const { contentType } = params as { contentType: string };
-      const allEvents = buffer.getAll();
-      const filteredEvents = allEvents
-        .filter(([type]: [string, Buffer]) => type === contentType)
-        .map(([type, data]: [string, Buffer], index: number) => ({
-          id: index,
-          contentType: type,
-          timestamp: new Date().toISOString(),
-          size: data.length,
-          data: data.toString("utf-8"),
-        }));
+  server.resource("events-by-type", "spotlight://events/type/{contentType}", async uri => {
+    // Extract contentType from URI path
+    const urlPath = new URL(uri.href).pathname;
+    const contentType = urlPath.split("/").pop();
 
-      return {
-        contents: [
-          {
-            uri: uri.href,
-            text: JSON.stringify(filteredEvents, null, 2),
-          },
-        ],
-      };
-    },
-  );
+    if (!contentType) {
+      throw new Error("Content type not specified in URI");
+    }
 
-  // Register all tools from the tools module
+    const allEvents = buffer.getAll();
+    const filteredEvents = allEvents
+      .filter(([type]: [string, Buffer]) => type === contentType)
+      .map(([type, data]: [string, Buffer], index: number) => ({
+        id: index,
+        contentType: type,
+        timestamp: new Date().toISOString(),
+        size: data.length,
+        data: data.toString("utf-8"),
+      }));
+
+    return {
+      contents: [
+        {
+          uri: uri.href,
+          text: JSON.stringify(filteredEvents, null, 2),
+        },
+      ],
+    };
+  });
+
+  // Register all tools from the tools module using the proper MCP API
   for (const tool of tools) {
-    server.tool(tool.name, tool.description, tool.inputSchema, async args => {
+    // Extract the shape from the Zod object schema for MCP SDK compatibility
+    const schema = tool.inputSchema as z.ZodObject<any>;
+    server.tool(tool.name, tool.description, schema.shape, async (args: any) => {
       const result = await tool.handler(args);
       return result;
     });
   }
 
-  // Prompt for analyzing events
-  server.prompt(
-    "analyze-events",
-    {
-      contentType: z.string().optional().describe("Filter by content type"),
-      analysisType: z.enum(["summary", "errors", "performance"]).optional().describe("Type of analysis to perform"),
-    },
-    (args, _extra) => {
-      const { contentType, analysisType = "summary" } = args;
-      let promptText = "";
+  // Note: Prompts can be added later once the core functionality is working
 
-      switch (analysisType) {
-        case "summary":
-          promptText = `Please analyze the Spotlight events${contentType ? ` of type "${contentType}"` : ""} and provide a summary of the activity, including patterns, frequency, and any notable observations.`;
-          break;
-        case "errors":
-          promptText = `Please analyze the Spotlight events${contentType ? ` of type "${contentType}"` : ""} and identify any errors, issues, or anomalies that require attention.`;
-          break;
-        case "performance":
-          promptText = `Please analyze the Spotlight events${contentType ? ` of type "${contentType}"` : ""} and provide insights about performance patterns, bottlenecks, or optimization opportunities.`;
-          break;
-      }
+  // Create StreamableHTTPServerTransport for HTTP integration
+  const transport = new StreamableHTTPServerTransport({
+    sessionIdGenerator: undefined, // Stateless mode for simplicity
+  });
 
-      return {
-        messages: [
-          {
-            role: "user",
-            content: {
-              type: "text",
-              text: promptText,
-            },
-          },
-        ],
-      };
-    },
-  );
-
-  logger.info(`MCP server created with ${tools.length} tools and event analysis capabilities`);
+  // Connect the server to the transport immediately
+  let isConnected = false;
+  const connectPromise = server
+    .connect(transport)
+    .then(() => {
+      isConnected = true;
+      logger.info(`MCP server connected with ${tools.length} tools and event analysis capabilities`);
+    })
+    .catch(error => {
+      logger.error(`Failed to connect MCP server: ${error}`);
+    });
 
   return {
     server,
-    handleRequest: async (request: any) => {
-      // Simplified JSON-RPC handler for MCP protocol
-      logger.debug(`MCP request received: ${JSON.stringify(request)}`);
-
-      if (request.method === "tools/call") {
-        const toolName = request.params?.name;
-        const args = request.params?.arguments || {};
-
-        // Use the centralized tool execution function
-        const result = await executeMcpTool(tools, toolName, args);
-
-        // Add the request ID to the response
-        if (result.jsonrpc) {
-          result.id = request.id;
+    transport,
+    handleRequest: async (req: IncomingMessage, res: ServerResponse, body?: any) => {
+      try {
+        // Wait for the server to be connected
+        if (!isConnected) {
+          await connectPromise;
         }
 
-        return result;
-      }
+        // Handle the request using the proper MCP transport
+        await transport.handleRequest(req, res, body);
+      } catch (error) {
+        logger.error(`MCP request handling error: ${error}`);
 
-      return {
-        jsonrpc: "2.0",
-        id: request.id,
-        error: {
-          code: -32601,
-          message: "Method not found",
-        },
-      };
+        if (!res.headersSent) {
+          res.writeHead(500, {
+            "Content-Type": "application/json",
+          });
+          res.end(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              error: {
+                code: -32603,
+                message: "Internal server error",
+              },
+              id: null,
+            }),
+          );
+        }
+      }
     },
     close: () => {
+      transport.close();
       logger.info("MCP server closed");
     },
   };
