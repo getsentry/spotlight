@@ -7,6 +7,7 @@ import launchEditor from "launch-editor";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
+import { type McpServerInterface, createMcpServer } from "./mcp-server.js";
 import { MessageBuffer } from "./messageBuffer.js";
 
 type Payload = [string, Buffer];
@@ -211,6 +212,115 @@ const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: 
   };
 };
 
+// MCP Server transport handling
+const mcpServerHandler = (mcpServer: McpServerInterface) => {
+  return async function handleMcpRequest(req: IncomingMessage, res: ServerResponse, pathname?: string): Promise<void> {
+    logger.debug(`🤖 MCP request received: ${req.method} ${pathname}`);
+
+    if (req.method === "POST") {
+      // Read the request body
+      const buffers: Buffer[] = [];
+      req.on("data", chunk => {
+        buffers.push(chunk);
+      });
+
+      req.on("end", async () => {
+        const body = Buffer.concat(buffers);
+        let requestData: any;
+        try {
+          requestData = JSON.parse(body.toString("utf-8"));
+        } catch (error) {
+          logger.error(`Failed to parse MCP request body: ${error}`);
+          res.writeHead(400, {
+            "Content-Type": "application/json",
+            ...CORS_HEADERS,
+            ...SPOTLIGHT_HEADERS,
+          });
+          res.end(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              error: {
+                code: -32700,
+                message: "Parse error",
+              },
+              id: null,
+            }),
+          );
+          return;
+        }
+
+        try {
+          // For now, we'll handle basic MCP requests manually
+          // until proper transport integration is working
+          const response = await mcpServer.handleRequest(requestData);
+
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+            ...CORS_HEADERS,
+            ...SPOTLIGHT_HEADERS,
+          });
+          res.end(JSON.stringify(response));
+        } catch (error) {
+          logger.error(`MCP request handling error: ${error}`);
+          res.writeHead(500, {
+            "Content-Type": "application/json",
+            ...CORS_HEADERS,
+            ...SPOTLIGHT_HEADERS,
+          });
+          res.end(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              error: {
+                code: -32603,
+                message: "Internal server error",
+              },
+              id: requestData?.id || null,
+            }),
+          );
+        }
+      });
+
+      req.on("error", error => {
+        logger.error(`MCP request read error: ${error}`);
+        if (!res.headersSent) {
+          res.writeHead(400, {
+            "Content-Type": "application/json",
+            ...CORS_HEADERS,
+            ...SPOTLIGHT_HEADERS,
+          });
+          res.end(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              error: {
+                code: -32600,
+                message: "Invalid request",
+              },
+              id: null,
+            }),
+          );
+        }
+      });
+    } else if (req.method === "GET") {
+      // For GET requests, we could provide MCP server information
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+        ...CORS_HEADERS,
+        ...SPOTLIGHT_HEADERS,
+      });
+      res.end(
+        JSON.stringify({
+          name: "Spotlight Sidecar MCP Server",
+          description: "MCP server for accessing Spotlight events",
+          capabilities: ["tools", "resources", "prompts"],
+          protocol: "mcp/2025-03-26",
+        }),
+      );
+    } else {
+      error405(req, res);
+    }
+  };
+};
+
 const fileServer = (filesToServe: Record<string, Buffer>) => {
   return function serveFile(req: IncomingMessage, res: ServerResponse, pathname?: string): void {
     let filePath = `${pathname || req.url}`;
@@ -329,12 +439,18 @@ function startServer(
       "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
     };
   }
+
+  // Create MCP server instance
+  const mcpServer = createMcpServer(buffer);
+  logger.info("🤖 MCP server created and ready");
+
   const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
     [/^\/clear$/, enableCORS(handleClearRequest)],
     [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
     [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), enableCORS(contextLinesHandler)],
+    [/^\/mcp$/, enableCORS(mcpServerHandler(mcpServer))], // MCP endpoint
     [/^.+$/, filesToServe != null ? enableCORS(fileServer(filesToServe)) : error404],
   ];
 
@@ -402,6 +518,7 @@ function startServer(
 
   function handleServerListen(port: number, basePath?: string): void {
     logger.info(`Sidecar listening on ${port}`);
+    logger.info(`🤖 MCP server available at: http://localhost:${port}/mcp`);
     if (basePath) {
       logSpotlightUrl(port);
     }
