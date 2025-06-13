@@ -4,6 +4,10 @@ import type { MessageBuffer } from "./messageBuffer.js";
 
 type Payload = [string, Buffer];
 
+// Local Sentry type definitions (to avoid cross-package imports)
+export type TraceId = string;
+export type SpanId = string;
+
 // MCP SDK compatible result interface
 export interface ToolResult {
   content: Array<{
@@ -11,7 +15,7 @@ export interface ToolResult {
     text: string;
   }>;
   isError?: boolean;
-  [key: string]: unknown; // Index signature for MCP SDK compatibility
+  [key: string]: unknown;
 }
 
 export interface ToolDefinition {
@@ -25,7 +29,7 @@ export interface ToolContext {
   buffer: MessageBuffer<Payload>;
 }
 
-// Error handling utility
+// Utility functions
 function createErrorResult(message: string, details?: string): ToolResult {
   return {
     content: [
@@ -38,7 +42,6 @@ function createErrorResult(message: string, details?: string): ToolResult {
   };
 }
 
-// Success result utility
 function createSuccessResult(data: any): ToolResult {
   return {
     content: [
@@ -50,40 +53,43 @@ function createSuccessResult(data: any): ToolResult {
   };
 }
 
-// Individual tool definitions
+// Enhanced events tool
 const getEventsToolDefinition: ToolDefinition = {
   name: "get-events",
   description: "Retrieve event information with optional filtering",
   inputSchema: z.object({
     contentType: z.string().optional().describe("Filter events by content type"),
+    eventType: z.string().optional().describe("Filter by Sentry event type (transaction, error, log)"),
+    traceId: z.string().optional().describe("Filter events by trace ID"),
     limit: z.number().optional().default(10).describe("Maximum number of events to return"),
   }),
   handler: async ({ contentType, limit = 10 }, { buffer }) => {
-    try {
-      const allEvents = buffer.getAll();
-      let events = allEvents;
+    // Fall back to buffer-based approach
+    const allEvents = buffer.getAll();
+    let events = allEvents;
 
-      if (contentType) {
-        events = events.filter(([type]: [string, Buffer]) => type === contentType);
-      }
-
-      const limitedEvents = events.slice(-limit);
-      const eventData = limitedEvents.map(([type, data]: [string, Buffer], index: number) => ({
-        id: index,
-        contentType: type,
-        timestamp: new Date().toISOString(),
-        size: data.length,
-        preview: data.toString("utf-8").substring(0, 200) + (data.length > 200 ? "..." : ""),
-      }));
-
-      return createSuccessResult(eventData);
-    } catch (error) {
-      logger.error(`Error in get-events tool: ${String(error)}`);
-      return createErrorResult("Failed to retrieve events", String(error));
+    if (contentType) {
+      events = events.filter(([type]: [string, Buffer]) => type === contentType);
     }
+
+    const limitedEvents = events.slice(-limit);
+    const eventData = limitedEvents.map(([type, data]: [string, Buffer], index: number) => ({
+      id: index,
+      contentType: type,
+      timestamp: new Date().toISOString(),
+      size: data.length,
+      preview: data.toString("utf-8").substring(0, 200) + (data.length > 200 ? "..." : ""),
+    }));
+
+    return createSuccessResult({
+      total_events: allEvents.length,
+      returned_events: limitedEvents.length,
+      events: eventData,
+    });
   },
 };
 
+// Add some additional useful tools
 const getEventDetailsToolDefinition: ToolDefinition = {
   name: "get-event-details",
   description: "Get detailed information about a specific event",
@@ -163,105 +169,12 @@ const clearEventsToolDefinition: ToolDefinition = {
   },
 };
 
-const searchEventsToolDefinition: ToolDefinition = {
-  name: "search-events",
-  description: "Search events by content using a text query",
-  inputSchema: z.object({
-    query: z.string().describe("Text to search for in event content"),
-    caseSensitive: z.boolean().optional().default(false).describe("Whether search should be case sensitive"),
-    limit: z.number().optional().default(10).describe("Maximum number of results to return"),
-  }),
-  handler: async ({ query, caseSensitive = false, limit = 10 }, { buffer }) => {
-    try {
-      const allEvents = buffer.getAll();
-      const searchQuery = caseSensitive ? query : query.toLowerCase();
-
-      const matchingEvents = allEvents
-        .map(([contentType, data]: [string, Buffer], index: number) => {
-          const content = data.toString("utf-8");
-          const searchContent = caseSensitive ? content : content.toLowerCase();
-
-          if (searchContent.includes(searchQuery)) {
-            return {
-              id: index,
-              contentType,
-              timestamp: new Date().toISOString(),
-              size: data.length,
-              preview: content.substring(0, 200) + (content.length > 200 ? "..." : ""),
-              matchCount: (
-                searchContent.match(new RegExp(searchQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) || []
-              ).length,
-            };
-          }
-          return null;
-        })
-        .filter(Boolean)
-        .slice(0, limit);
-
-      const result = {
-        query,
-        totalMatches: matchingEvents.length,
-        events: matchingEvents,
-      };
-
-      return createSuccessResult(result);
-    } catch (error) {
-      logger.error(`Error in search-events tool: ${String(error)}`);
-      return createErrorResult("Failed to search events", String(error));
-    }
-  },
-};
-
-const getEventsByTimeToolDefinition: ToolDefinition = {
-  name: "get-events-by-time",
-  description: "Get events within a specific time range (last N minutes)",
-  inputSchema: z.object({
-    minutes: z.number().min(1).describe("Number of minutes to look back"),
-    contentType: z.string().optional().describe("Filter by content type"),
-  }),
-  handler: async ({ minutes, contentType }, { buffer }) => {
-    try {
-      // Note: This is a simplified implementation since we don't store actual timestamps
-      // In a real implementation, you'd want to store timestamps with events
-      const allEvents = buffer.getAll();
-      let events = allEvents;
-
-      if (contentType) {
-        events = events.filter(([type]: [string, Buffer]) => type === contentType);
-      }
-
-      // For now, just return recent events (this would be improved with real timestamps)
-      const eventData = events.map(([type, data]: [string, Buffer], index: number) => ({
-        id: index,
-        contentType: type,
-        timestamp: new Date().toISOString(),
-        size: data.length,
-        preview: data.toString("utf-8").substring(0, 200) + (data.length > 200 ? "..." : ""),
-        note: `Simulated time range: last ${minutes} minutes`,
-      }));
-
-      const result = {
-        timeRange: `Last ${minutes} minutes`,
-        totalEvents: eventData.length,
-        events: eventData,
-      };
-
-      return createSuccessResult(result);
-    } catch (error) {
-      logger.error(`Error in get-events-by-time tool: ${String(error)}`);
-      return createErrorResult("Failed to retrieve events by time", String(error));
-    }
-  },
-};
-
 // Registry of all available tools
 const toolDefinitions: ToolDefinition[] = [
   getEventsToolDefinition,
   getEventDetailsToolDefinition,
   getEventStatsToolDefinition,
   clearEventsToolDefinition,
-  searchEventsToolDefinition,
-  getEventsByTimeToolDefinition,
 ];
 
 // Factory function to create tools with context

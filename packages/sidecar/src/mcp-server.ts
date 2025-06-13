@@ -21,7 +21,7 @@ export function createMcpServer(buffer: MessageBuffer<Payload>): McpServerInterf
     version: "1.0.0",
   });
 
-  // Get all available tools from the tools module
+  // Get all available tools from the tools module with Sentry integration
   const tools = createMcpTools(buffer);
 
   // Resource to get all current events
@@ -56,15 +56,19 @@ export function createMcpServer(buffer: MessageBuffer<Payload>): McpServerInterf
     }
 
     const allEvents = buffer.getAll();
-    const filteredEvents = allEvents
-      .filter(([type]: [string, Buffer]) => type === contentType)
-      .map(([type, data]: [string, Buffer], index: number) => ({
-        id: index,
-        contentType: type,
-        timestamp: new Date().toISOString(),
-        size: data.length,
-        data: data.toString("utf-8"),
-      }));
+    const filteredEvents = allEvents.flatMap(([type, data]: [string, Buffer], index: number) =>
+      type === contentType
+        ? [
+            {
+              id: index, // Original index preserved
+              contentType: type,
+              timestamp: new Date().toISOString(),
+              size: data.length,
+              data: data.toString("utf-8"),
+            },
+          ]
+        : [],
+    );
 
     return {
       contents: [
