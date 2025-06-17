@@ -247,21 +247,20 @@ function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions, side
       warn("Failed to enable all SDK integrations for Spotlight", e);
       log("Please open an issue with the error at: https://github.com/getsentry/spotlight/issues/new/choose");
     }
-  }
 
-  // HACK: Force enable transactions for this session and disable the existing DSN
-  // @ts-ignore
-  sentryClient._dsn = undefined;
-  // @ts-ignore
-  if (!sentryClient._options) {
     // @ts-ignore
-    sentryClient._options = {};
+    if (!sentryClient._options) {
+      // @ts-ignore
+      sentryClient._options = {};
+    }
+    // @ts-ignore
+    sentryClient._options.tracesSampler = () => 1;
+    // @ts-ignore
+    sentryClient._options.sampleRate = 1;
+    // TODO:  Enable profiling and set sample rate to 1 for that too
+  } else {
+    log("Sentry SDK has a DSN set so did not alter any options. You might be missing some traces, errors, or data.");
   }
-  // @ts-ignore
-  sentryClient._options.tracesSampler = () => 1;
-  // @ts-ignore
-  sentryClient._options.sampleRate = 1;
-  // TODO:  Enable profiling and set sample rate to 1 for that too
 
   try {
     // @ts-expect-error ts(2339) -- We're accessing a private property here

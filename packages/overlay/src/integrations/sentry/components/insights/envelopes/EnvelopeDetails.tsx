@@ -1,5 +1,6 @@
 import type { Envelope } from "@sentry/core";
 import { useState } from "react";
+import { ReactComponent as Download } from "~/assets/download.svg";
 import type { RawEventContext } from "~/integrations/integration";
 import { parseStringFromBuffer } from "~/integrations/sentry/utils/bufferParsers";
 import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
@@ -27,8 +28,15 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
         subtitle={
           <>
             Event Id <span className="text-primary-500">&mdash;</span>{" "}
-            <a href={downloadUrl} download={downloadName}>
+            <a
+              href={downloadUrl}
+              download={downloadName}
+              className="inline-flex items-center gap-1 group"
+              title="Download"
+              aria-label="Download envelope"
+            >
               {String(envelopeId)}
+              <Download className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity" />
             </a>
           </>
         }

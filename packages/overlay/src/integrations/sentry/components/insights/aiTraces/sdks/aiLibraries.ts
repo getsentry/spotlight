@@ -42,7 +42,7 @@ export function hasAISpans(trace: Trace): boolean {
   if (!trace.spanTree) {
     return false;
   }
-  
+
   // TODO: We may want to cache/optimize this `extractAllAIRootSpans` helper
   const aiRootSpans = extractAllAIRootSpans(trace.spanTree);
   return aiRootSpans.length > 0;

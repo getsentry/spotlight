@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Route, Routes, useParams } from "react-router-dom";
+import { useCallback, useRef, useState } from "react";
+import { Route, Routes } from "react-router-dom";
 import classNames from "~/lib/classNames";
 import { useSpotlightContext } from "../../../lib/useSpotlightContext";
 import { AITraceDetailsEmbedded } from "../components/insights/aiTraces/AITraceDetails";
@@ -15,25 +15,19 @@ import SpanDetails from "../components/traces/spans/SpanDetails";
 import { SentryEventsContextProvider } from "../data/sentryEventsContext";
 import { useSentryTraces } from "../data/useSentrySpans";
 import useTraceFiltering from "../hooks/useTraceFiltering";
-import useSentryStore from "../store";
-import type { Trace } from "../types"; // Ensure Trace type is available
+import type { Span, Trace } from "../types"; // Ensure Trace type is available
 
 const MIN_PANEL_WIDTH_PERCENT = 20;
 const MAX_PANEL_WIDTH_PERCENT = 80;
 const DEFAULT_PANEL_WIDTH_PERCENT = 50;
 
 interface TraceSplitViewLayoutProps {
-  traceData: {
-    filtered: Trace[];
-    all: Trace[];
-    visible: Trace[];
-    hiddenItemCount: number;
-  };
+  trace: Trace;
+  span?: Span | null;
   aiConfig: {
     mode: boolean;
     onToggle: () => void;
   };
-  onShowAll: () => void;
 }
 
 export function AITraceToggle({ trace, aiConfig }: { trace: Trace; aiConfig: TraceSplitViewLayoutProps["aiConfig"] }) {
@@ -73,13 +67,11 @@ export function AITraceToggle({ trace, aiConfig }: { trace: Trace; aiConfig: Tra
   );
 }
 
-export function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSplitViewLayoutProps) {
-  const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
+export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLayoutProps) {
   const [leftPanelWidth, setLeftPanelWidth] = useState(DEFAULT_PANEL_WIDTH_PERCENT);
   const [isResizing, setIsResizing] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const leftPanelRef = useRef<HTMLDivElement>(null);
-  const getTraceById = useSentryStore(state => state.getTraceById);
 
   const handleResize = useCallback((e: MouseEvent) => {
     if (!containerRef.current) return;
@@ -91,40 +83,24 @@ export function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSp
     setLeftPanelWidth(clampedWidth);
   }, []);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  useEffect(() => {
-    // Scroll to top when trace changes
-    if (leftPanelRef.current) {
-      leftPanelRef.current.scrollTop = 0;
-    }
-  }, [traceId]);
-
-  if (!traceId) {
-    // safeguard, shouldn't happen if routing is correct
-    return <div>Error: Trace ID not found.</div>;
+  if (!trace) {
+    return <div className="text-primary-300 p-6">Trace not found. 🤔</div>;
   }
-
-  const selectedTrace = getTraceById(traceId);
-
-  if (!selectedTrace) {
-    return <div className="text-primary-300 p-6">Trace with id {traceId} not found. 🤔</div>;
-  }
-
-  const span = spanId ? selectedTrace.spans.get(spanId) : undefined;
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden ">
-      {/* selected trace item at the top */}
-      <div className="border-b-primary-700 bg-primary-900 border-b transition-colors duration-150">
-        <div className="flex items-center bg-primary-800">
-          <div className="flex-1">
-            <TraceItem trace={selectedTrace} span={span} className="hover:bg-transparent" />
-          </div>
+      {trace ? (
+        <div className="border-b-primary-700 bg-primary-900 border-b transition-colors duration-150">
+          <div className="flex items-center bg-primary-800">
+            <div className="flex-1">
+              <TraceItem trace={trace} className="hover:bg-transparent" />
+            </div>
 
-          {/* AI Mode Toggle */}
-          <AITraceToggle trace={selectedTrace} aiConfig={aiConfig} />
+            {/* AI Mode Toggle */}
+            <AITraceToggle trace={trace} aiConfig={aiConfig} />
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {/* split panel below */}
       <div ref={containerRef} className="flex h-full w-full flex-1 overflow-hidden">
@@ -135,29 +111,17 @@ export function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSp
           style={{ width: `${leftPanelWidth}%` }}
         >
           {/* Top part of left panel -> TreeView/AITranscription */}
-          {selectedTrace && (
+          {trace && (
             <div className="border-b-primary-700 bg-primary-950 border-b flex-shrink-0">
-              {aiConfig.mode && hasAISpans(selectedTrace) ? (
-                <AITranscription traceId={traceId} />
+              {aiConfig.mode && hasAISpans(trace) ? (
+                <AITranscription traceId={trace.trace_id} />
               ) : (
                 <div className="px-2">
-                  <TraceTreeview traceId={traceId} />
+                  <TraceTreeview traceId={trace.trace_id} />
                 </div>
               )}
             </div>
           )}
-
-          {/* Bottom part of left panel: Trace List */}
-          <div className="flex-shrink-0">
-            <TraceList
-              traceData={traceData}
-              displayConfig={{
-                aiMode: aiConfig.mode,
-                hideSelectedInline: true,
-              }}
-              onShowAll={onShowAll}
-            />
-          </div>
         </div>
 
         {/* Resizer */}
@@ -171,54 +135,18 @@ export function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSp
 
         {/* right panel - selected trace content */}
         <div className="flex-1 overflow-hidden" style={{ width: `${100 - leftPanelWidth}%` }}>
-          {aiConfig.mode && hasAISpans(selectedTrace) && spanId ? (
-            <AITraceDetailsEmbedded traceId={traceId} spanId={spanId} />
-          ) : spanId && !aiConfig.mode ? (
-            <SpanDetails traceId={traceId} spanId={spanId} />
-          ) : (
-            <TraceDetails traceId={traceId} aiConfig={aiConfig} />
-          )}
+          {span && !aiConfig.mode ? <SpanDetails span={span} /> : <TraceDetails trace={trace} aiConfig={aiConfig} />}
         </div>
       </div>
     </div>
   );
 }
 
-interface TraceListOnlyViewProps {
-  aiMode: boolean;
-  traceData: {
-    filtered: Trace[];
-    all: Trace[];
-    visible: Trace[];
-    hiddenItemCount: number;
-  };
-  onShowAll: () => void;
-}
-
-function TraceListOnlyView({ aiMode, traceData, onShowAll }: TraceListOnlyViewProps) {
-  return (
-    <div className="h-full w-full overflow-y-auto">
-      <TraceList
-        traceData={traceData}
-        displayConfig={{
-          aiMode: aiMode,
-          hideSelectedInline: false,
-        }}
-        onShowAll={onShowAll}
-      />
-    </div>
-  );
-}
-
 export default function TracesTab() {
-  const [aiMode, setAiMode] = useState(false);
-  const handleToggleAIMode = useCallback(() => {
-    setAiMode(prev => !prev);
-  }, []);
-
   const context = useSpotlightContext();
   const { allTraces, localTraces } = useSentryTraces();
   const [showAll, setShowAll] = useState(() => !context.experiments["sentry:focus-local-events"]);
+  const onShowAll = useCallback(() => setShowAll(true), []);
   const visibleTraces = showAll ? allTraces : localTraces;
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -244,50 +172,13 @@ export default function TracesTab() {
         />
         <div className="flex-1 overflow-auto">
           <Routes>
-            {/* Route for when clicking AI flow / messages. This shows that particular ai trace details */}
-            <Route
-              path="/:traceId/spans/:spanId"
-              element={
-                <TraceSplitViewLayout
-                  traceData={traceData}
-                  aiConfig={{
-                    mode: aiMode,
-                    onToggle: handleToggleAIMode,
-                  }}
-                  onShowAll={() => setShowAll(true)}
-                />
-              }
-            />
-            <Route
-              path="/:traceId/*"
-              element={
-                <TraceSplitViewLayout
-                  traceData={traceData}
-                  aiConfig={{
-                    mode: aiMode,
-                    onToggle: handleToggleAIMode,
-                  }}
-                  onShowAll={() => setShowAll(true)}
-                />
-              }
-            />
-            <Route
-              path="/"
-              element={<TraceListOnlyView aiMode={aiMode} traceData={traceData} onShowAll={() => setShowAll(true)} />}
-            />
             <Route
               path="/:traceId/spans/:spanId/*"
-              element={
-                <TraceSplitViewLayout
-                  traceData={traceData}
-                  aiConfig={{
-                    mode: aiMode,
-                    onToggle: handleToggleAIMode,
-                  }}
-                  onShowAll={() => setShowAll(true)}
-                />
-              }
+              element={<TraceList traceData={traceData} onShowAll={onShowAll} />}
             />
+            <Route path="/:traceId/spans/:spanId" element={<TraceList traceData={traceData} onShowAll={onShowAll} />} />
+            <Route path="/:traceId/*" element={<TraceList traceData={traceData} onShowAll={onShowAll} />} />
+            <Route path="/" element={<TraceList traceData={traceData} onShowAll={onShowAll} />} />
           </Routes>
         </div>
       </div>
