@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Route, Routes, useParams } from "react-router-dom";
 import classNames from "~/lib/classNames";
 import { useSpotlightContext } from "../../../lib/useSpotlightContext";
+import { AITraceDetailsEmbedded } from "../components/insights/aiTraces/AITraceDetails";
 import AITranscription from "../components/insights/aiTraces/AITranscription";
 import { hasAISpans } from "../components/insights/aiTraces/sdks/aiLibraries";
 import Resizer from "../components/shared/Resizer";
@@ -170,7 +171,9 @@ export function TraceSplitViewLayout({ traceData, aiConfig, onShowAll }: TraceSp
 
         {/* right panel - selected trace content */}
         <div className="flex-1 overflow-hidden" style={{ width: `${100 - leftPanelWidth}%` }}>
-          {spanId && !aiConfig.mode ? (
+          {aiConfig.mode && hasAISpans(selectedTrace) && spanId ? (
+            <AITraceDetailsEmbedded traceId={traceId} spanId={spanId} />
+          ) : spanId && !aiConfig.mode ? (
             <SpanDetails traceId={traceId} spanId={spanId} />
           ) : (
             <TraceDetails traceId={traceId} aiConfig={aiConfig} />
