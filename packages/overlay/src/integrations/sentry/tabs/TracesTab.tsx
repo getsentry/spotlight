@@ -2,7 +2,6 @@ import { useCallback, useRef, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import classNames from "~/lib/classNames";
 import { useSpotlightContext } from "../../../lib/useSpotlightContext";
-import { AITraceDetailsEmbedded } from "../components/insights/aiTraces/AITraceDetails";
 import AITranscription from "../components/insights/aiTraces/AITranscription";
 import { hasAISpans } from "../components/insights/aiTraces/sdks/aiLibraries";
 import Resizer from "../components/shared/Resizer";
@@ -114,7 +113,7 @@ export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLa
           {trace && (
             <div className="border-b-primary-700 bg-primary-950 border-b flex-shrink-0">
               {aiConfig.mode && hasAISpans(trace) ? (
-                <AITranscription traceId={trace.trace_id} />
+                <AITranscription />
               ) : (
                 <div className="px-2">
                   <TraceTreeview traceId={trace.trace_id} />

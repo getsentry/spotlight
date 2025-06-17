@@ -48,7 +48,6 @@ export default function AITraceSplitView({ trace }: AITraceSplitViewProps) {
 
   return (
     <div className="flex h-full min-h-0">
-      {/* Full width AI details - removed flow panel */}
       <div className="flex min-h-0 w-full flex-col">
         <AITraceDetailsEmbedded traceId={traceId} spanId={selectedSpanId} />
       </div>
