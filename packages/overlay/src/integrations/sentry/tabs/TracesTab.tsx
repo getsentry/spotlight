@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import classNames from "~/lib/classNames";
-import { useSpotlightContext } from "../../../lib/useSpotlightContext";
 import AITranscription from "../components/insights/aiTraces/AITranscription";
 import { hasAISpans } from "../components/insights/aiTraces/sdks/aiLibraries";
 import Resizer from "../components/shared/Resizer";
@@ -12,8 +11,7 @@ import TraceList from "../components/traces/TraceList";
 import TraceListFilter from "../components/traces/TraceListFilter";
 import SpanDetails from "../components/traces/spans/SpanDetails";
 import { SentryEventsContextProvider } from "../data/sentryEventsContext";
-import { useSentryTraces } from "../data/useSentrySpans";
-import useTraceFiltering from "../hooks/useTraceFiltering";
+import { useTraceData } from "../hooks/useTraceData";
 import type { Span, Trace } from "../types"; // Ensure Trace type is available
 
 const MIN_PANEL_WIDTH_PERCENT = 20;
@@ -142,42 +140,40 @@ export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLa
 }
 
 export default function TracesTab() {
-  const context = useSpotlightContext();
-  const { allTraces, localTraces } = useSentryTraces();
-  const [showAll, setShowAll] = useState(() => !context.experiments["sentry:focus-local-events"]);
-  const onShowAll = useCallback(() => setShowAll(true), []);
-  const visibleTraces = showAll ? allTraces : localTraces;
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const { TRACE_FILTER_CONFIGS, filteredTraces } = useTraceFiltering(visibleTraces, activeFilters, searchQuery);
-  const hiddenItemCount = allTraces.length - visibleTraces.length;
+  const traceData = useTraceData();
 
-  const traceData = {
-    filtered: filteredTraces,
-    all: allTraces,
-    visible: visibleTraces,
-    hiddenItemCount: hiddenItemCount,
+  const traceDataForList = {
+    filtered: traceData.filtered,
+    all: traceData.all,
+    visible: traceData.visible,
+    hiddenItemCount: traceData.nonLocalTraceCount,
   };
 
   return (
     <SentryEventsContextProvider>
       <div className="flex h-full flex-col overflow-hidden">
         <TraceListFilter
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          activeFilters={activeFilters}
-          setActiveFilters={setActiveFilters}
-          filterConfigs={TRACE_FILTER_CONFIGS}
+          searchQuery={traceData.searchQuery}
+          setSearchQuery={traceData.setSearchQuery}
+          activeFilters={traceData.activeFilters}
+          setActiveFilters={traceData.setActiveFilters}
+          filterConfigs={traceData.filterConfigs}
         />
         <div className="flex-1 overflow-auto">
           <Routes>
             <Route
               path="/:traceId/spans/:spanId/*"
-              element={<TraceList traceData={traceData} onShowAll={onShowAll} />}
+              element={<TraceList traceData={traceDataForList} onShowAll={traceData.onShowAll} />}
             />
-            <Route path="/:traceId/spans/:spanId" element={<TraceList traceData={traceData} onShowAll={onShowAll} />} />
-            <Route path="/:traceId/*" element={<TraceList traceData={traceData} onShowAll={onShowAll} />} />
-            <Route path="/" element={<TraceList traceData={traceData} onShowAll={onShowAll} />} />
+            <Route
+              path="/:traceId/spans/:spanId"
+              element={<TraceList traceData={traceDataForList} onShowAll={traceData.onShowAll} />}
+            />
+            <Route
+              path="/:traceId/*"
+              element={<TraceList traceData={traceDataForList} onShowAll={traceData.onShowAll} />}
+            />
+            <Route path="/" element={<TraceList traceData={traceDataForList} onShowAll={traceData.onShowAll} />} />
           </Routes>
         </div>
       </div>
