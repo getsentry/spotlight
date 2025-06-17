@@ -4,7 +4,7 @@ import CardList from "../../../../components/CardList";
 import { TraceSplitViewLayout } from "../../tabs/TracesTab";
 import type { Trace } from "../../types";
 import HiddenItemsButton from "../shared/HiddenItemsButton";
-import TraceItem from "./TraceItem";
+import { TraceListItem } from "./TraceItem";
 
 type TraceListProps = {
   traceData: {
@@ -59,7 +59,7 @@ export default function TraceList({ traceData, onShowAll }: TraceListProps) {
                   }}
                 />
               ) : (
-                <TraceItem trace={trace} />
+                <TraceListItem trace={trace} />
               )}
             </div>
           );

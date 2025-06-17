@@ -10,11 +10,6 @@ import { hasAISpans } from "../insights/aiTraces/sdks/aiLibraries";
 import { TraceRootTxnName } from "./TraceDetails/components/TraceRootTxnName";
 import TraceIcon from "./TraceIcon";
 
-type TraceItemProps = {
-  trace: Trace;
-  className?: string;
-};
-
 export function AIBadge({ trace }: { trace: Trace }) {
   if (!hasAISpans(trace)) {
     return null;
@@ -67,26 +62,35 @@ export function SpanHeader({ span }: { span: Span }) {
   );
 }
 
-export default function TraceItem({ trace, className }: TraceItemProps) {
+// Custom hook for shared trace display logic
+function useTraceDisplay(trace: Trace) {
   const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
   const isSelected = traceId === trace.trace_id;
   const truncatedId = truncateId(trace.trace_id);
   const isLocal = isLocalTrace(trace.trace_id);
-  const span = spanId && trace.spans.get(spanId);
+  const span = spanId ? trace.spans.get(spanId) : undefined;
 
-  // TODO: if (spanId && !span) -> error
+  return {
+    isSelected,
+    truncatedId,
+    isLocal,
+    span,
+    spanId,
+  };
+}
 
-  // TODO: For this #<traceId> link to work as intended, we need to do something like this:
-  //       https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
+// Shared content component
+type TraceContentProps = {
+  trace: Trace;
+  isSelected: boolean;
+  truncatedId: string;
+  isLocal: boolean | null;
+  span?: Span;
+};
+
+function TraceContent({ trace, isSelected, truncatedId, isLocal, span }: TraceContentProps) {
   return (
-    <Link
-      className={classNames(
-        "hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2",
-        isSelected && "bg-primary-800",
-        className,
-      )}
-      to={isSelected && !spanId ? `../#${trace.trace_id}` : `/traces/${trace.trace_id}/context`}
-    >
+    <>
       <TraceIcon trace={trace} />
       <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
         <div className="flex items-center gap-x-2">
@@ -103,6 +107,52 @@ export default function TraceItem({ trace, className }: TraceItemProps) {
           {isSelected ? span && <SpanHeader span={span} /> : <AIBadge trace={trace} />}
         </div>
       </div>
+    </>
+  );
+}
+
+// Component for clickable list items
+type TraceListItemProps = {
+  trace: Trace;
+  className?: string;
+};
+
+export function TraceListItem({ trace, className }: TraceListItemProps) {
+  const { isSelected, truncatedId, isLocal, span, spanId } = useTraceDisplay(trace);
+
+  // TODO: For this #<traceId> link to work as intended, we need to do something like this:
+  //       https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
+  return (
+    <Link
+      className={classNames(
+        "hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2",
+        isSelected && "bg-primary-800",
+        className,
+      )}
+      to={isSelected && !spanId ? `../#${trace.trace_id}` : `/traces/${trace.trace_id}/context`}
+    >
+      <TraceContent trace={trace} isSelected={isSelected} truncatedId={truncatedId} isLocal={isLocal} span={span} />
     </Link>
   );
+}
+
+// Component for non-interactive headers
+type TraceHeaderProps = {
+  trace: Trace;
+  className?: string;
+};
+
+export function TraceHeader({ trace, className }: TraceHeaderProps) {
+  const { isSelected, truncatedId, isLocal, span } = useTraceDisplay(trace);
+
+  return (
+    <div className={classNames("flex items-center gap-x-4 px-6 py-2", className)}>
+      <TraceContent trace={trace} isSelected={isSelected} truncatedId={truncatedId} isLocal={isLocal} span={span} />
+    </div>
+  );
+}
+
+// Default export for backward compatibility (can be removed after updating imports)
+export default function TraceItem(props: TraceListItemProps) {
+  return <TraceListItem {...props} />;
 }
