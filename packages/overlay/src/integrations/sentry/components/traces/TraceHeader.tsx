@@ -1,3 +1,4 @@
+import { Link, useParams } from "react-router-dom";
 import { Badge } from "~/ui/badge";
 import TimeSince from "../../../../components/TimeSince";
 import classNames from "../../../../lib/classNames";
@@ -69,9 +70,18 @@ function SpanHeader({ span }: { span: Span }) {
 
 export default function TraceHeader({ trace, span, className }: TraceHeaderProps) {
   const { truncatedId, isLocal, duration, stats, status, startTimestamp } = useTraceDisplay(trace);
+  const { spanId } = useParams<{ traceId: string; spanId: string }>();
+
+  // Navigation logic:
+  // - If we're viewing a span, clicking goes to the trace without the span
+  // - If we're just viewing a trace, clicking goes back to the trace list
+  const linkTo = spanId ? `/traces/${trace.trace_id}/context` : `../#${trace.trace_id}`;
 
   return (
-    <div className={classNames("flex items-center gap-x-4 px-6 py-2", className)}>
+    <Link
+      to={linkTo}
+      className={classNames("flex items-center gap-x-4 px-6 py-2 cursor-pointer hover:bg-primary-800", className)}
+    >
       <TraceIcon trace={trace} />
       <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
         <div className="flex items-center gap-x-2">
@@ -88,6 +98,6 @@ export default function TraceHeader({ trace, span, className }: TraceHeaderProps
           {span ? <SpanHeader span={span} /> : <AIBadge trace={trace} />}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

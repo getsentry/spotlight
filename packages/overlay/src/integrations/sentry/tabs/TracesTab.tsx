@@ -92,7 +92,7 @@ export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLa
         <div className="border-b-primary-700 bg-primary-900 border-b transition-colors duration-150">
           <div className="flex items-center bg-primary-800">
             <div className="flex-1">
-              <TraceHeader trace={trace} span={span} className="hover:bg-transparent" />
+              <TraceHeader trace={trace} span={span} />
             </div>
 
             {/* AI Mode Toggle */}
