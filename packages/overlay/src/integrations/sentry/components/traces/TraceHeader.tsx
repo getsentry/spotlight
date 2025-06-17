@@ -1,4 +1,3 @@
-import { Link, useParams } from "react-router-dom";
 import { Badge } from "~/ui/badge";
 import TimeSince from "../../../../components/TimeSince";
 import classNames from "../../../../lib/classNames";
@@ -8,8 +7,9 @@ import { truncateId } from "../../utils/text";
 import { TraceRootTxnName } from "./TraceDetails/components/TraceRootTxnName";
 import TraceIcon from "./TraceIcon";
 
-type TraceItemProps = {
+type TraceHeaderProps = {
   trace: Trace;
+  span?: Span | null;
   className?: string;
 };
 
@@ -67,25 +67,11 @@ function SpanHeader({ span }: { span: Span }) {
   );
 }
 
-export default function TraceItem({ trace, className }: TraceItemProps) {
-  const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
+export default function TraceHeader({ trace, span, className }: TraceHeaderProps) {
   const { truncatedId, isLocal, duration, stats, status, startTimestamp } = useTraceDisplay(trace);
-  const isSelected = traceId === trace.trace_id;
-  const span = spanId && trace.spans.get(spanId);
 
-  // TODO: if (spanId && !span) -> error
-
-  // TODO: For this #<traceId> link to work as intended, we need to do something like this:
-  //       https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
   return (
-    <Link
-      className={classNames(
-        "hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2",
-        isSelected && "bg-primary-800",
-        className,
-      )}
-      to={isSelected && !spanId ? `../#${trace.trace_id}` : `/traces/${trace.trace_id}/context`}
-    >
+    <div className={classNames("flex items-center gap-x-4 px-6 py-2", className)}>
       <TraceIcon trace={trace} />
       <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
         <div className="flex items-center gap-x-2">
@@ -99,12 +85,9 @@ export default function TraceItem({ trace, className }: TraceItemProps) {
         <div className="text-primary-300 flex space-x-2 text-sm">
           <TraceStatusBadge status={status} />
           <TraceHeaderDetails duration={duration} stats={stats} />
-          {isSelected ? span && <SpanHeader span={span} /> : <AIBadge trace={trace} />}
+          {span ? <SpanHeader span={span} /> : <AIBadge trace={trace} />}
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
-
-// Re-export components that are used externally (in TracesTab)
-export { AIBadge, TraceStatusBadge, TraceHeaderDetails, SpanHeader };
