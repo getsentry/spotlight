@@ -1,17 +1,13 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ReactComponent as CrossIcon } from "~/assets/cross.svg";
+import useSearchInput from "~/integrations/sentry/hooks/useSearchInput";
 import useSentryStore from "~/integrations/sentry/store";
 import type { SpotlightAITrace } from "~/integrations/sentry/types";
 import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 import classNames from "~/lib/classNames";
-import { createAITraceFromSpan, extractAllAIRootSpans } from "./sdks/aiLibraries";
-import { ReactComponent as CrossIcon } from "~/assets/cross.svg";
 import DateTime from "../../shared/DateTime";
-import useSearchInput from "~/integrations/sentry/hooks/useSearchInput";
-
-type AITranscriptionProps = {
-  traceId: string;
-};
+import { createAITraceFromSpan, extractAllAIRootSpans } from "./sdks/aiLibraries";
 
 type ConversationMessage = {
   id: string;
@@ -141,7 +137,11 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
   return messages.sort((a, b) => a.timestamp - b.timestamp);
 }
 
-function ConversationBubble({ message, isSelected, traceId }: { message: ConversationMessage; isSelected: boolean; traceId: string }) {
+function ConversationBubble({
+  message,
+  isSelected,
+  traceId,
+}: { message: ConversationMessage; isSelected: boolean; traceId: string }) {
   const isUser = message.type === "user";
   const isToolCall = message.type === "ai-tool-call";
   // const isAIResponse = message.type === 'ai-response';
@@ -236,11 +236,20 @@ function ConversationBubble({ message, isSelected, traceId }: { message: Convers
   );
 }
 
-function AITranscriptionContent({ traceId }: AITranscriptionProps) {
+export default function AITranscription() {
+  const { traceId } = useParams<{ traceId: string }>();
   const getTraceById = useSentryStore(state => state.getTraceById);
   const { spanId } = useParams<{ spanId?: string }>();
   const [searchQuery, setSearchQuery] = useState("");
   const { inputValue, showReset, handleChange, handleReset } = useSearchInput(setSearchQuery, 500);
+
+  if (!traceId) {
+    return (
+      <div className="p-6">
+        <p className="text-red-400">No trace ID provided</p>
+      </div>
+    );
+  }
 
   const trace = getTraceById(traceId);
 
@@ -331,13 +340,14 @@ function AITranscriptionContent({ traceId }: AITranscriptionProps) {
       {/* Conversation */}
       <div className="flex-1 overflow-y-auto px-6 pb-4">
         {filteredConversation.map(message => (
-          <ConversationBubble key={message.id} message={message} isSelected={spanId === message.spanId} traceId={traceId} />
+          <ConversationBubble
+            key={message.id}
+            message={message}
+            isSelected={spanId === message.spanId}
+            traceId={traceId}
+          />
         ))}
       </div>
     </div>
   );
-}
-
-export default function AITranscription(props: AITranscriptionProps) {
-  return <AITranscriptionContent {...props} />;
 }
