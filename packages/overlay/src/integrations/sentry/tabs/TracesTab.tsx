@@ -7,7 +7,7 @@ import { hasAISpans } from "../components/insights/aiTraces/sdks/aiLibraries";
 import Resizer from "../components/shared/Resizer";
 import TraceDetails from "../components/traces/TraceDetails";
 import TraceTreeview from "../components/traces/TraceDetails/components/TraceTreeview";
-import TraceItem from "../components/traces/TraceItem";
+import TraceItem, { TraceHeader } from "../components/traces/TraceItem";
 import TraceList from "../components/traces/TraceList";
 import TraceListFilter from "../components/traces/TraceListFilter";
 import SpanDetails from "../components/traces/spans/SpanDetails";
@@ -92,7 +92,7 @@ export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLa
         <div className="border-b-primary-700 bg-primary-900 border-b transition-colors duration-150">
           <div className="flex items-center bg-primary-800">
             <div className="flex-1">
-              <TraceItem trace={trace} className="hover:bg-transparent" />
+              <TraceHeader trace={trace} className="hover:bg-transparent" />
             </div>
 
             {/* AI Mode Toggle */}

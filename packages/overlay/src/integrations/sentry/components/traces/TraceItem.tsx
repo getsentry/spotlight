@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Badge } from "~/ui/badge";
 import TimeSince from "../../../../components/TimeSince";
 import classNames from "../../../../lib/classNames";
@@ -9,6 +9,7 @@ import { truncateId } from "../../utils/text";
 import { hasAISpans } from "../insights/aiTraces/sdks/aiLibraries";
 import { TraceRootTxnName } from "./TraceDetails/components/TraceRootTxnName";
 import TraceIcon from "./TraceIcon";
+import { TraceIdentifier, useTraceInfo } from "./TraceSharedComponents";
 
 type TraceItemProps = {
   trace: Trace;
@@ -67,17 +68,25 @@ export function SpanHeader({ span }: { span: Span }) {
   );
 }
 
-export default function TraceItem({ trace, className }: TraceItemProps) {
-  const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
-  const isSelected = traceId === trace.trace_id;
-  const truncatedId = truncateId(trace.trace_id);
-  const isLocal = isLocalTrace(trace.trace_id);
-  const span = spanId && trace.spans.get(spanId);
+// Shared component for trace metadata section
+export function TraceMetadata({ trace, showAIBadge = true }: { trace: Trace; showAIBadge?: boolean }) {
+  const { span, isSelected } = useTraceInfo(trace);
 
-  // TODO: if (spanId && !span) -> error
+  return (
+    <div className="flex flex-col truncate font-mono">
+      <div className="text-primary-300 flex space-x-2 text-sm">
+        <TraceStatusBadge trace={trace} />
+        <TraceHeaderDetails trace={trace} />
+        {isSelected ? span && <SpanHeader span={span} /> : showAIBadge && <AIBadge trace={trace} />}
+      </div>
+    </div>
+  );
+}
 
-  // TODO: For this #<traceId> link to work as intended, we need to do something like this:
-  //       https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
+// TraceListItem - for use in trace lists with navigation
+export function TraceListItem({ trace, className }: { trace: Trace; className?: string }) {
+  const { isSelected, spanId } = useTraceInfo(trace);
+
   return (
     <Link
       className={classNames(
@@ -88,21 +97,27 @@ export default function TraceItem({ trace, className }: TraceItemProps) {
       to={isSelected && !spanId ? `../#${trace.trace_id}` : `/traces/${trace.trace_id}/context`}
     >
       <TraceIcon trace={trace} />
-      <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
-        <div className="flex items-center gap-x-2">
-          <div>{truncatedId}</div>
-          {isLocal && <Badge title="This trace is part of your local session.">Local</Badge>}
-        </div>
-        <TimeSince date={trace.start_timestamp} />
-      </div>
+      <TraceIdentifier trace={trace} />
       <TraceRootTxnName trace={trace} />
-      <div className="flex flex-col truncate font-mono">
-        <div className="text-primary-300 flex space-x-2 text-sm">
-          <TraceStatusBadge trace={trace} />
-          <TraceHeaderDetails trace={trace} />
-          {isSelected ? span && <SpanHeader span={span} /> : <AIBadge trace={trace} />}
-        </div>
-      </div>
+      <TraceMetadata trace={trace} />
     </Link>
   );
+}
+
+// TraceHeader - for use as a non-clickable header in split views
+export function TraceHeader({ trace, className }: { trace: Trace; className?: string }) {
+  return (
+    <div className={classNames("flex items-center gap-x-4 px-6 py-2", className)}>
+      <TraceIcon trace={trace} />
+      <TraceIdentifier trace={trace} />
+      <TraceRootTxnName trace={trace} />
+      <TraceMetadata trace={trace} />
+    </div>
+  );
+}
+
+// Keep the default export for backward compatibility
+// It behaves like TraceListItem
+export default function TraceItem({ trace, className }: TraceItemProps) {
+  return <TraceListItem trace={trace} className={className} />;
 }
