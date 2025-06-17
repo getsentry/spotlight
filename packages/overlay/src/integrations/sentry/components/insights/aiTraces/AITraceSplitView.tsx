@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Trace } from "~/integrations/sentry/types";
 import { AITraceDetailsEmbedded } from "./AITraceDetails";
-import AITraceFlow from "./AITraceFlow";
 import { extractAllAIRootSpans } from "./sdks/aiLibraries";
 
 type AITraceSplitViewProps = {
@@ -49,13 +48,8 @@ export default function AITraceSplitView({ trace }: AITraceSplitViewProps) {
 
   return (
     <div className="flex h-full min-h-0">
-      {/* left panel - AI flow */}
-      <div className="border-primary-700 flex min-h-0 w-2/5 flex-col border-r">
-        <AITraceFlow traceId={traceId} />
-      </div>
-
-      {/* right panel - AI details */}
-      <div className="flex min-h-0 w-3/5 flex-col">
+      {/* Full width AI details - removed flow panel */}
+      <div className="flex min-h-0 w-full flex-col">
         <AITraceDetailsEmbedded traceId={traceId} spanId={selectedSpanId} />
       </div>
     </div>
