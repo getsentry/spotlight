@@ -259,7 +259,7 @@ function addSpotlightIntegrationToSentry(options: SentryIntegrationOptions, side
     sentryClient._options.sampleRate = 1;
     // TODO:  Enable profiling and set sample rate to 1 for that too
   } else {
-    log("Sentry SDK has a DSN set so did not alter any options. You might be missing some traces, errors, or data.")
+    log("Sentry SDK has a DSN set so did not alter any options. You might be missing some traces, errors, or data.");
   }
 
   try {
