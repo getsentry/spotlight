@@ -1,5 +1,12 @@
 # @spotlightjs/astro
 
+## 3.2.5
+
+### Patch Changes
+
+- Updated dependencies [[`cae5b4f`](https://github.com/getsentry/spotlight/commit/cae5b4fa4235c62a9f1e2e286da038c7accf57a4)]:
+  - @spotlightjs/spotlight@3.0.1
+
 ## 3.2.4
 
 ### Patch Changes

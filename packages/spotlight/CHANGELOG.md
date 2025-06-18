@@ -1,5 +1,14 @@
 # @spotlightjs/spotlight
 
+## 3.0.1
+
+### Patch Changes
+
+- Render React _after_ injecting the DOM element ([#848](https://github.com/getsentry/spotlight/pull/848))
+
+- Updated dependencies [[`1f1e8d5`](https://github.com/getsentry/spotlight/commit/1f1e8d5c97b813cb95ae7bd526c336292bd8f28b), [`cae5b4f`](https://github.com/getsentry/spotlight/commit/cae5b4fa4235c62a9f1e2e286da038c7accf57a4)]:
+  - @spotlightjs/overlay@3.1.0
+
 ## 3.0.0
 
 ### Major Changes

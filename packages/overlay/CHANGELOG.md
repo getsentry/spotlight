@@ -1,5 +1,15 @@
 # @spotlightjs/core
 
+## 3.1.0
+
+### Minor Changes
+
+- AI trace view improvement. AI flow is now removed and more info is shown in the AI transcription ([#844](https://github.com/getsentry/spotlight/pull/844))
+
+### Patch Changes
+
+- Render React _after_ injecting the DOM element ([#848](https://github.com/getsentry/spotlight/pull/848))
+
 ## 3.0.0
 
 ### Major Changes
