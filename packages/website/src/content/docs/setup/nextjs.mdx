@@ -18,7 +18,7 @@ By Adding Spotlight to your Next.js application, you can get deep insights into 
 :::caution
   Requires `@sentry/nextjs` version `7.82.0` or higher.
 :::
-Initialize Spotlight within `sentry.client.config.js`, after you've initialized the Sentry:
+Initialize Spotlight within `instrumentation-client.(js|ts)`, after you've initialized the Sentry:
 
 <Tabs>
 
@@ -26,7 +26,7 @@ Initialize Spotlight within `sentry.client.config.js`, after you've initialized 
 In the Browser you don't need to set `spotlight: true`, `Spotlight.init()` will automatically detect if Sentry is available and if so, hook into the SDK.
 
 ```javascript {3, 10-12}
-// sentry.client.config.(js/ts)
+// instrumentation-client.(js|ts)
 import * as Sentry from '@sentry/nextjs';
 import * as Spotlight from '@spotlightjs/spotlight';
 
@@ -34,6 +34,8 @@ Sentry.init({
   dsn: '___DSN___',
   // ...other Sentry options
 });
+
+// ...
 
 if (process.env.NODE_ENV === 'development') {
   Spotlight.init();
@@ -43,7 +45,7 @@ if (process.env.NODE_ENV === 'development') {
 
 <TabItem label="Server">
 ```javascript {6} ins="spotlight:"
-// sentry.server.config.(js/ts)
+// sentry.server.config.(js|ts)
 import * as Sentry from '@sentry/nextjs';
 
 Sentry.init({
@@ -56,7 +58,7 @@ Sentry.init({
 
 <TabItem label="Edge">
 ```javascript {6} ins="spotlight:"
-// sentry.edge.config.(js/ts)
+// sentry.edge.config.(js|ts)
 import * as Sentry from '@sentry/nextjs';
 
 Sentry.init({
