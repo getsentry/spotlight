@@ -369,3 +369,10 @@ export type AILibraryHandler = {
   getTypeBadge: (trace: SpotlightAITrace) => string;
   getTokensDisplay: (trace: SpotlightAITrace) => string;
 };
+
+export type TraceListData = {
+  filtered: Trace[];
+  all: Trace[];
+  visible: Trace[];
+  nonLocalTraceCount: number;
+};

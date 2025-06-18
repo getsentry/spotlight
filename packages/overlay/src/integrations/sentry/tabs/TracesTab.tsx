@@ -12,7 +12,7 @@ import TraceListFilter from "../components/traces/TraceListFilter";
 import SpanDetails from "../components/traces/spans/SpanDetails";
 import { SentryEventsContextProvider } from "../data/sentryEventsContext";
 import { useTraceData } from "../hooks/useTraceData";
-import type { Span, Trace } from "../types"; // Ensure Trace type is available
+import type { Span, Trace, TraceListData } from "../types"; // Ensure Trace type is available
 
 const MIN_PANEL_WIDTH_PERCENT = 20;
 const MAX_PANEL_WIDTH_PERCENT = 80;
@@ -142,7 +142,7 @@ export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLa
 export default function TracesTab() {
   const traceData = useTraceData();
 
-  const traceDataForList = {
+  const traceDataForList: TraceListData = {
     filtered: traceData.filtered,
     all: traceData.all,
     visible: traceData.visible,

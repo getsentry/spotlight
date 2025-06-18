@@ -2,17 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import CardList from "../../../../components/CardList";
 import { TraceSplitViewLayout } from "../../tabs/TracesTab";
-import type { Trace } from "../../types";
+import type { TraceListData } from "../../types";
 import HiddenItemsButton from "../shared/HiddenItemsButton";
 import TraceItem from "./TraceItem";
 
 type TraceListProps = {
-  traceData: {
-    filtered: Trace[];
-    all: Trace[];
-    visible: Trace[];
-    nonLocalTraceCount: number;
-  };
+  traceData: TraceListData;
   onShowAll: () => void;
 };
 
