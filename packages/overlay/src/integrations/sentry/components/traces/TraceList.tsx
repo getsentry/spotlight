@@ -11,7 +11,7 @@ type TraceListProps = {
     filtered: Trace[];
     all: Trace[];
     visible: Trace[];
-    hiddenItemCount: number;
+    nonLocalTraceCount: number;
   };
   onShowAll: () => void;
 };
@@ -39,8 +39,8 @@ export default function TraceList({ traceData, onShowAll }: TraceListProps) {
 
   return (
     <CardList>
-      {traceData.hiddenItemCount > 0 ? (
-        <HiddenItemsButton itemCount={traceData.hiddenItemCount} onClick={onShowAll} />
+      {traceData.nonLocalTraceCount > 0 ? (
+        <HiddenItemsButton itemCount={traceData.nonLocalTraceCount} onClick={onShowAll} />
       ) : null}
       {traceData.filtered.length > 0 ? (
         traceData.filtered.map(trace => {

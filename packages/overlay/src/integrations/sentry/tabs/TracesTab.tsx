@@ -146,7 +146,7 @@ export default function TracesTab() {
     filtered: traceData.filtered,
     all: traceData.all,
     visible: traceData.visible,
-    hiddenItemCount: traceData.nonLocalTraceCount,
+    nonLocalTraceCount: traceData.nonLocalTraceCount,
   };
 
   return (
