@@ -194,25 +194,6 @@ export async function init(initOptions: SpotlightOverlayOptions = {}) {
     initSentry(initialTab, { debug });
   }
 
-  ReactDOM.createRoot(appRoot).render(
-    // <React.StrictMode>
-    <MemoryRouter initialEntries={[initialTab]}>
-      <SpotlightContextProvider context={context}>
-        <App
-          integrations={initializedIntegrations}
-          openOnInit={openOnInit}
-          showTriggerButton={showTriggerButton}
-          sidecarUrl={sidecarUrl}
-          anchor={anchor}
-          fullPage={fullPage}
-          showClearEventsButton={showClearEventsButton}
-          initialEvents={initialEvents}
-        />
-      </SpotlightContextProvider>
-    </MemoryRouter>,
-    // </React.StrictMode>
-  );
-
   function injectSpotlight() {
     if (isSpotlightInjected()) {
       log("Spotlight already injected, bailing.");
@@ -226,6 +207,24 @@ export async function init(initOptions: SpotlightOverlayOptions = {}) {
     document.adoptedStyleSheets = [...document.adoptedStyleSheets, extraSheet];
 
     document.body.append(docRoot);
+    ReactDOM.createRoot(appRoot).render(
+      // <React.StrictMode>
+      <MemoryRouter initialEntries={[initialTab]}>
+        <SpotlightContextProvider context={context}>
+          <App
+            integrations={initializedIntegrations}
+            openOnInit={openOnInit}
+            showTriggerButton={showTriggerButton}
+            sidecarUrl={sidecarUrl}
+            anchor={anchor}
+            fullPage={fullPage}
+            showClearEventsButton={showClearEventsButton}
+            initialEvents={initialEvents}
+          />
+        </SpotlightContextProvider>
+      </MemoryRouter>,
+      // </React.StrictMode>
+    );
   }
 
   if (document.readyState === "complete" || injectImmediately) {
