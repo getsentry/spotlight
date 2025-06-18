@@ -111,7 +111,7 @@ export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLa
           {trace && (
             <div className="border-b-primary-700 bg-primary-950 border-b flex-shrink-0">
               {aiConfig.mode && hasAISpans(trace) ? (
-                <AITranscription traceId={trace.trace_id} />
+                <AITranscription />
               ) : (
                 <div className="px-2">
                   <TraceTreeview traceId={trace.trace_id} />

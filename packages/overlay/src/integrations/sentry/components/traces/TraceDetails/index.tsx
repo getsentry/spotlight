@@ -1,9 +1,7 @@
 import { useMemo } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Tabs from "~/components/tabs";
-import AITraceSplitView from "~/integrations/sentry/components/insights/aiTraces/AITraceSplitView";
 import { createTab } from "~/integrations/sentry/utils/tabs";
-import { hasAISpans } from "../../insights/aiTraces/sdks/aiLibraries";
 
 import { useSentryEvents } from "~/integrations/sentry/data/useSentryEvents";
 import { isLocalTrace } from "~/integrations/sentry/store/helpers";
@@ -12,6 +10,8 @@ import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 import { isErrorEvent } from "~/integrations/sentry/utils/sentry";
 import EventContexts from "../../events/EventContexts";
 import EventList from "../../events/EventList";
+import AITraceSplitView from "../../insights/aiTraces/AITraceSplitView";
+import { hasAISpans } from "../../insights/aiTraces/sdks/aiLibraries";
 import LogsList from "../../log/LogsList";
 import DateTime from "../../shared/DateTime";
 
