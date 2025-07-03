@@ -49,8 +49,8 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
             ) : (
               <pre
                 className={classNames(
-                  "flex grow items-center whitespace-pre-line p-2 !font-mono",
-                  crumbIdx === 0 ? "!border-t-0" : "",
+                  "flex grow items-center whitespace-pre-line p-2 font-mono!",
+                  crumbIdx === 0 ? "border-t-0!" : "",
                 )}
               >
                 {crumb.message}

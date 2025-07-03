@@ -1,5 +1,6 @@
 import { resolve, sep } from "node:path";
 import spotlightSidecar from "@spotlightjs/sidecar/vite-plugin";
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import MagicString from "magic-string";
 import type { RenderedChunk } from "rollup";
@@ -36,6 +37,7 @@ export default defineConfig({
       },
     }),
     removeReactDevToolsMessagePlugin(),
+    tailwindcss(),
   ],
   define: {
     "process.env.NODE_ENV": '"production"',

@@ -172,7 +172,7 @@ function ConversationBubble({
           {/* Tool call details (for tool call messages) */}
           {message.metadata.toolCall && (
             <div className="space-y-1">
-              <div className="rounded border border-orange-500/30 bg-orange-500/20 p-2 text-xs">
+              <div className="rounded-sm border border-orange-500/30 bg-orange-500/20 p-2 text-xs">
                 {message.metadata.toolCall.args && Object.keys(message.metadata.toolCall.args).length > 0 && (
                   <div className="mb-1">
                     <div className="mb-0.5 font-medium text-orange-300">Arguments:</div>
@@ -319,9 +319,9 @@ export default function AITranscription() {
 
       {/* Search bar */}
       <div className="mx-6 mb-4 mt-4">
-        <div className="bg-primary-950 text-primary-50 border-primary-600 hover:border-primary-500 relative flex h-auto w-full flex-1 gap-2 rounded-md border py-1 pl-4 pr-6 outline-none transition-all">
+        <div className="bg-primary-950 text-primary-50 border-primary-600 hover:border-primary-500 relative flex h-auto w-full flex-1 gap-2 rounded-md border py-1 pl-4 pr-6 outline-hidden transition-all">
           <input
-            className="text-primary-50 h-auto w-full flex-1 bg-transparent outline-none transition-all"
+            className="text-primary-50 h-auto w-full flex-1 bg-transparent outline-hidden transition-all"
             onChange={handleChange}
             value={inputValue}
             placeholder="Search conversation..."

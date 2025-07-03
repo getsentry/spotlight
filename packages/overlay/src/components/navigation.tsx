@@ -40,7 +40,7 @@ export default function Navigation({ panels, setOpen, isOnline, showClearEventsB
         <select
           id="tabs"
           name="tabs"
-          className="border-primary-800 bg-primary-800 hover:bg-primary-700 hover:border-primary-700 focus:bg-primary-800 text-primary-100 block w-full rounded-md py-2 pl-3 pr-10 focus:outline-none sm:text-sm"
+          className="border-primary-800 bg-primary-800 hover:bg-primary-700 hover:border-primary-700 focus:bg-primary-800 text-primary-100 block w-full rounded-md py-2 pl-3 pr-10 focus:outline-hidden sm:text-sm"
           onChange={e => {
             const activeLink = panels.find(link => link.id === e.target.value);
             if (activeLink?.onSelect) {
@@ -95,7 +95,7 @@ export default function Navigation({ panels, setOpen, isOnline, showClearEventsB
               >
                 {panel.title}
                 {panel.notificationCount !== undefined ? (
-                  <span className="count ml-3 hidden rounded px-2.5 py-0.5 text-xs font-medium md:inline-block">
+                  <span className="count ml-3 hidden rounded-sm px-2.5 py-0.5 text-xs font-medium md:inline-block">
                     {panel.notificationCount?.count}
                   </span>
                 ) : null}
@@ -119,7 +119,7 @@ export default function Navigation({ panels, setOpen, isOnline, showClearEventsB
                     >
                       {childPanel.title}
                       {childPanel.notificationCount !== undefined ? (
-                        <span className="count ml-3 hidden rounded px-2.5 py-0.5 text-xs font-medium md:inline-block">
+                        <span className="count ml-3 hidden rounded-sm px-2.5 py-0.5 text-xs font-medium md:inline-block">
                           {childPanel.notificationCount?.count}
                         </span>
                       ) : null}

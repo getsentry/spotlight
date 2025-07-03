@@ -58,8 +58,8 @@ const SpanItem = ({
     <li key={span.span_id} ref={containerRef}>
       <Link
         className={classNames(
-          "hover:bg-primary-700 group flex rounded-sm text-sm",
-          isQueried ? "bg-primary-200 bg-opacity-20" : "",
+          "hover:bg-primary-700 group flex rounded-xs text-sm",
+          isQueried ? "bg-primary-200/20" : "",
           spanId === span.span_id ? "bg-primary-900" : "",
           span.tags?.source === "profile" ? "text-lime-500" : "",
         )}
@@ -72,7 +72,7 @@ const SpanItem = ({
           className={classNames(
             "node",
             "group-hover:bg-primary-700",
-            "rounded-sm",
+            "rounded-xs",
             isQueried ? "bg-transparent" : "",
             span.status && span.status !== "ok" ? "text-red-400" : "",
             spanId === span.span_id ? "bg-primary-900" : "bg-primary-950",
@@ -111,8 +111,8 @@ const SpanItem = ({
         </div>
         <div
           className={classNames(
-            "waterfall group-hover:bg-primary-700 rounded-sm overflow-hidden",
-            isQueried ? "!bg-transparent" : "",
+            "waterfall group-hover:bg-primary-700 rounded-xs overflow-hidden",
+            isQueried ? "bg-transparent!" : "",
           )}
           style={{
             left: `${spanNodeWidth}%`,

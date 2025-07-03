@@ -52,7 +52,7 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
         <select
           id="tabs"
           name="tabs"
-          className="border-primary-800 bg-primary-800 hover:bg-primary-700 hover:border-primary-700 focus:bg-primary-800 text-primary-100 block w-full rounded-md py-2 pl-3 pr-10 focus:outline-none sm:text-sm"
+          className="border-primary-800 bg-primary-800 hover:bg-primary-700 hover:border-primary-700 focus:bg-primary-800 text-primary-100 block w-full rounded-md py-2 pl-3 pr-10 focus:outline-hidden sm:text-sm"
           onChange={e => {
             const activeTab = tabs.find(tab => tab.id === e.target.value);
             if (activeTab?.onSelect) {
@@ -69,7 +69,7 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
         </select>
       </div>
       <div className="hidden sm:block">
-        <nav className="border-b-primary-700 flex space-x-8 border-b px-6" aria-label="Tabs">
+        <nav className="border-b-primary-700 flex gap-8  border-b px-6" aria-label="Tabs">
           {tabs.map(tab => (
             <NavLink
               to={`${nested ? "" : "/"}${tab.id}`}
@@ -87,7 +87,7 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
             >
               {tab.title}
               {tab.notificationCount !== undefined ? (
-                <span className="count ml-3 hidden rounded px-2.5 py-0.5 text-xs font-medium md:inline-block">
+                <span className="count ml-3 hidden rounded-sm px-2.5 py-0.5 text-xs font-medium md:inline-block">
                   {tab.notificationCount?.count}
                 </span>
               ) : null}

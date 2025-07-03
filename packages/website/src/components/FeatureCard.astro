@@ -64,7 +64,7 @@ import { LinkCard } from '@astrojs/starlight/components';
 </style>
 
 <div class={reverse ? "card reverse" : "card"} >
-  <div class="flex-1 flex-shrink-0">
+  <div class="flex-1 shrink-0">
     <h5 class="mb-2 heading">{title}</h5>
     <p>{description}</p>
     {linkUrl && linkText ? <a href={linkUrl} class="link">{linkText}</a> : null}

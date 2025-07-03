@@ -1,5 +1,4 @@
 import starlight from "@astrojs/starlight";
-import tailwind from "@astrojs/tailwind";
 import vercelStatic from "@astrojs/vercel/static";
 import sentry from "@sentry/astro";
 import { defineConfig } from "astro/config";
@@ -184,9 +183,6 @@ export default defineConfig({
           "https://github.com/getsentry/spotlight/edit/main/packages/website/",
       },
       customCss: ["./src/tailwind.css", "./src/theme.css"],
-    }),
-    tailwind({
-      applyBaseStyles: false,
     }),
     react(),
   ],
