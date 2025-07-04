@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@config "../tailwind.config.mjs"
+@config "../tailwind.config.mjs";
 
 .site-title {
   @apply font-raleway text-2xl font-light uppercase tracking-widest text-white;

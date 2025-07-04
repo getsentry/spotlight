@@ -3,6 +3,8 @@ import vercelStatic from "@astrojs/vercel/static";
 import sentry from "@sentry/astro";
 import { defineConfig } from "astro/config";
 import Inspect from "vite-plugin-inspect";
+import tailwindcss from "@tailwindcss/vite";
+
 
 import react from "@astrojs/react";
 
@@ -15,6 +17,7 @@ export default defineConfig({
         dev: true,
         build: true,
       }),
+      tailwindcss(),
     ],
     build: {
       sourcemap: true,
