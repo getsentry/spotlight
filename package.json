@@ -36,7 +36,8 @@
     "typescript": "^5.6.2"
   },
   "resolutions": {
-    "path-to-regexp": "^6.3.0"
+    "path-to-regexp": "^6.3.0",
+    "cross-spawn": ">=7.0.5"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged --concurrent false"
