@@ -29,7 +29,7 @@ interface ToolCallDetailProps {
 
 function ToolCallDetail({ toolCall }: ToolCallDetailProps) {
   return (
-    <div className="border-primary-700 mb-4 rounded border p-4">
+    <div className="border-primary-700 mb-4 rounded-sm border p-4">
       <h3 className="mb-2 font-bold">{toolCall.toolName}</h3>
       <div className="text-primary-400 mb-2 text-sm">ID: {toolCall.toolCallId}</div>
 
@@ -161,7 +161,7 @@ function PromptSection({ trace }: { trace: SpotlightAITrace }) {
             }
 
             return (
-              <div key={`message-${i}-${message.role}`} className="border-primary-700 mb-4 rounded border p-2">
+              <div key={`message-${i}-${message.role}`} className="border-primary-700 mb-4 rounded-sm border p-2">
                 <div className="mb-1 font-semibold capitalize">{message.role}</div>
                 <pre className="whitespace-pre-wrap break-words font-mono text-sm">{messageContent}</pre>
               </div>
@@ -189,7 +189,7 @@ function ResponseSection({ trace }: { trace: SpotlightAITrace }) {
       {trace.response.text && (
         <div className="mb-4">
           <h3 className="mb-2 text-sm font-semibold uppercase">Assistant Message</h3>
-          <div className="border-primary-700 mb-4 rounded border p-2">
+          <div className="border-primary-700 mb-4 rounded-sm border p-2">
             <div className="mb-1 font-semibold capitalize">assistant</div>
             <pre className="whitespace-pre-wrap break-words font-mono text-sm">{trace.response.text}</pre>
           </div>

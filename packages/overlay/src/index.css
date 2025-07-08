@@ -1,9 +1,23 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+@config "../tailwind.config.ts";
+
+@theme {
+  --color-primary-50: #f5faff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-800: #3730a3;
+  --color-primary-900: #312e81;
+  --color-primary-950: #1e1b4b;
+}
 
 .spotlight-fullscreen-blur {
-  @apply fixed flex h-screen w-screen flex-col overflow-hidden bg-black bg-opacity-50 backdrop-blur-sm backdrop-filter;
+  @apply fixed flex h-screen w-screen flex-col overflow-hidden bg-black/50 backdrop-blur-xs backdrop-filter;
   z-index: 999998;
 }
 
@@ -87,15 +101,15 @@ ul.tree li:last-child:before {
 }
 
 .hydration-error-wrapper pre {
-  @apply !text-primary-300;
+  @apply text-primary-300!;
 }
 
 .hydration-error-wrapper td[class^="react-diff"][class$="title-block"] {
-  @apply !bg-primary-900;
+  @apply bg-primary-900!;
 }
 
 .react-json-view {
-  @apply !bg-primary-900 rounded-sm !bg-opacity-50 p-2;
+  @apply rounded-xs bg-primary-900/50! p-2;
 }
 
 .react-json-view .string-value {
@@ -130,28 +144,23 @@ input:checked ~ .dot {
 /* custom scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: theme('colors.primary.700') theme('colors.primary.900');
-}
-
-*::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-*::-webkit-scrollbar-track {
-  background: theme('colors.primary.900');
-  border-radius: 3px;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: theme('colors.primary.700');
-  border-radius: 3px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: theme('colors.primary.600');
-}
-
-*::-webkit-scrollbar-corner {
-  background: theme('colors.primary.900');
+  scrollbar-color: var(--color-primary-700) var(--color-primary-900);
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--color-primary-900);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-primary-700);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-600);
+  }
+  &::-webkit-scrollbar-corner {
+    background: var(--color-primary-900);
+  }
 }

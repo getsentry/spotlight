@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@config "../tailwind.config.mjs";
 
 .site-title {
   @apply font-raleway text-2xl font-light uppercase tracking-widest text-white;
@@ -12,9 +12,9 @@
 }
 
 header.header {
-  @apply bg-black bg-opacity-50 backdrop-blur-sm backdrop-filter;
+  @apply bg-black/50 backdrop-blur-xs backdrop-filter;
 }
 
 .astro-code {
-  @apply rounded-lg;
+  @apply rounded-xs;
 }

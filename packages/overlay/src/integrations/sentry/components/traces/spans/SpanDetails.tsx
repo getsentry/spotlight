@@ -46,7 +46,7 @@ function SpanDescription({ span }: { span: Span }) {
     body = (
       <a
         href={span.description}
-        className="border-primary-950 hover:border-primary-700 -m-2 inline-block max-w-sm cursor-pointer rounded border p-1"
+        className="border-primary-950 hover:border-primary-700 -m-2 inline-block max-w-sm cursor-pointer rounded-sm border p-1"
       >
         <img src={span.description} alt="preview" style={{ maxHeight: 300 }} />
       </a>

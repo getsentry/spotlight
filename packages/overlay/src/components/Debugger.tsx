@@ -19,7 +19,7 @@ function FullscreenBlur({
   }
   return (
     <div
-      className={classNames("spotlight-fullscreen-blur", isOpen ? "" : "!hidden")}
+      className={classNames("spotlight-fullscreen-blur", isOpen ? "" : "hidden!")}
       onClick={e => {
         if (e.target === e.currentTarget) {
           setOpen(false);
@@ -56,7 +56,7 @@ export default function Debugger({
         className={classNames(
           // Used for targeting. DO NOT REMOVE.
           "spotlight-debugger",
-          "from-primary-900 to-primary-950 flex h-full flex-col overflow-hidden rounded-lg bg-gradient-to-br to-20% font-sans text-white shadow-xl",
+          "from-primary-900 to-primary-950 flex h-full flex-col overflow-hidden rounded-lg bg-linear-to-br to-20% font-sans text-white shadow-xl",
           fullPage ? "relative rounded-none shadow-none" : "",
         )}
         style={{

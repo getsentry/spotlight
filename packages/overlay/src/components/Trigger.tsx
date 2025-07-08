@@ -32,7 +32,7 @@ function ToolbarItem({
   count?: number | null;
 }) {
   return (
-    <div className="gap-x hover:bg-primary-400 relative flex items-center rounded p-3" {...props}>
+    <div className="gap-x hover:bg-primary-400 relative flex items-center rounded-sm p-3" {...props}>
       {children}
 
       {count ? (
@@ -67,12 +67,12 @@ export default function Trigger({
     <button
       type="button"
       className={classNames(
-        "z-[999999]",
-        "fixed inline-flex items-center rounded font-medium",
+        "z-999999",
+        "fixed inline-flex items-center rounded-sm font-medium",
         "font-raleway bg-primary-700 cursor-pointer text-white",
         "flex-col",
         getAnchorClasses(anchor),
-        isOpen ? "!hidden" : "",
+        isOpen ? "hidden!" : "",
       )}
       id="spotlight-overlay-trigger"
       title="Spotlight by Sentry"

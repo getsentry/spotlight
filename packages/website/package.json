@@ -16,17 +16,17 @@
     "@astrojs/react": "^4.2.0",
     "@astrojs/starlight": "^0.32.4",
     "@astrojs/starlight-tailwind": "^3.0.1",
-    "@astrojs/tailwind": "^6.0.0",
     "@astrojs/vercel": "^8.0.8",
     "@fontsource/raleway": "^5.1.0",
     "@sentry/astro": "^8.49.0",
+    "@tailwindcss/vite": "^4.1.11",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "astro": "^5.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sharp": "^0.33.5",
-    "tailwindcss": "^3.4.13"
+    "tailwindcss": "^4.1.10"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",

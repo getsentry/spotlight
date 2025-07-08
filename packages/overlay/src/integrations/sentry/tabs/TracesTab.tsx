@@ -50,7 +50,7 @@ export function AITraceToggle({ trace, aiConfig }: { trace: Trace; aiConfig: Tra
         aria-labelledby="ai-mode-label"
         onClick={aiConfig.onToggle}
         className={classNames(
-          "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2",
+          "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus:ring-2 focus:ring-offset-2",
           aiConfig.mode ? "bg-blue-500 focus:ring-blue-400" : "bg-primary-700 focus:ring-primary-600",
         )}
       >
@@ -106,12 +106,12 @@ export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLa
         {/* left panel - vertically split: tree/transcription + trace list */}
         <div
           ref={leftPanelRef}
-          className="flex flex-col flex-shrink-0 overflow-y-auto"
+          className="flex flex-col shrink-0 overflow-y-auto"
           style={{ width: `${leftPanelWidth}%` }}
         >
           {/* Top part of left panel -> TreeView/AITranscription */}
           {trace && (
-            <div className="border-b-primary-700 bg-primary-950 border-b flex-shrink-0">
+            <div className="border-b-primary-700 bg-primary-950 border-b shrink-0">
               {aiConfig.mode && hasAISpans(trace) ? (
                 <AITranscription />
               ) : (
@@ -129,7 +129,7 @@ export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLa
           isResizing={isResizing}
           setIsResizing={setIsResizing}
           direction="column"
-          className="w-1 flex-shrink-0 cursor-col-resize bg-gray-600 hover:bg-blue-500"
+          className="w-1 shrink-0 cursor-col-resize bg-gray-600 hover:bg-blue-500"
         />
 
         {/* right panel - selected trace content */}

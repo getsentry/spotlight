@@ -1,4 +1,5 @@
 import spotlightSidecar from "@spotlightjs/sidecar/vite-plugin";
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import dts from "vite-plugin-dts";
 import svgr from "vite-plugin-svgr";
@@ -18,6 +19,7 @@ export default defineConfig({
         titleProp: true,
       },
     }),
+    tailwindcss(),
   ],
   define: {
     "process.env.NODE_ENV": '"development"',

@@ -97,7 +97,7 @@ export default function TraceItem({ trace, className }: TraceItemProps) {
       </div>
       <TraceRootTxnName trace={trace} />
       <div className="flex flex-col truncate font-mono">
-        <div className="text-primary-300 flex space-x-2 text-sm">
+        <div className="text-primary-300 flex gap-2 text-sm">
           <TraceStatusBadge trace={trace} />
           <TraceHeaderDetails trace={trace} />
           {isSelected ? span && <SpanHeader span={span} /> : <AIBadge trace={trace} />}

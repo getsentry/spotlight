@@ -146,7 +146,7 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
                         <h2 className="mb-2 font-bold text-white">Preview</h2>
                         <img
                           src={resource.description}
-                          className="inline-block max-h-[150px] max-w-[150px] rounded p-1"
+                          className="inline-block max-h-[150px] max-w-[150px] rounded-sm p-1"
                           alt="preview"
                         />
                       </div>
