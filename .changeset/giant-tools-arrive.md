@@ -1,5 +1,5 @@
 ---
-"@spotlightjs/overlay": minor
+"@spotlightjs/overlay": patch
 ---
 
 - Tailwind v4
