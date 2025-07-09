@@ -49,62 +49,44 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
 
       const tree = await convertSentryProfileToNormalizedTree(profile);
 
-      const initVisualization = async () => {
-        try {
-          const nanovisModule = await import("nanovis");
-          const { Flamegraph, Treemap, Sunburst } = nanovisModule;
+      const nanovisModule = await import("nanovis");
+      const { Flamegraph, Treemap, Sunburst } = nanovisModule;
 
-          if (visualizationRef.current) {
-            visualizationRef.current.el.remove();
-            visualizationRef.current = null;
-          }
+      if (visualizationRef.current) {
+        visualizationRef.current.el.remove();
+        visualizationRef.current = null;
+      }
 
-          const options = {
-            getColor: (node: TreeNode<unknown>) => node.color,
-          };
-
-          let visualization: NanovisVisualization;
-          switch (visualizationType) {
-            case "treemap":
-              visualization = new Treemap(tree, options) as NanovisVisualization;
-              break;
-            case "sunburst":
-              visualization = new Sunburst(tree, options) as NanovisVisualization;
-              break;
-            default:
-              visualization = new Flamegraph(tree, options) as NanovisVisualization;
-              break;
-          }
-
-          visualizationRef.current = visualization;
-
-          visualization.events.on("select", (node: NanovisTreeNode) => {
-            console.log("Selected node:", node);
-          });
-
-          visualization.events.on("hover", (node: NanovisTreeNode | null) => {
-            setHoveredNode(node);
-          });
-
-          if (containerRef.current) {
-            containerRef.current.appendChild(visualization.el);
-          }
-        } catch (error) {
-          console.error("Failed to load nanovis library:", error);
-          if (containerRef.current) {
-            containerRef.current.innerHTML = `
-            <div class="flex items-center justify-center h-full text-primary-300">
-              <div class="text-center">
-                <p class="mb-2">Visualization requires nanovis library</p>
-                <p class="text-sm text-primary-400">Install with: npm install nanovis</p>
-              </div>
-            </div>
-          `;
-          }
-        }
+      const options = {
+        getColor: (node: TreeNode<unknown>) => node.color,
       };
 
-      initVisualization();
+      let visualization: NanovisVisualization;
+      switch (visualizationType) {
+        case "treemap":
+          visualization = new Treemap(tree, options) as NanovisVisualization;
+          break;
+        case "sunburst":
+          visualization = new Sunburst(tree, options) as NanovisVisualization;
+          break;
+        default:
+          visualization = new Flamegraph(tree, options) as NanovisVisualization;
+          break;
+      }
+
+      visualizationRef.current = visualization;
+
+      visualization.events.on("select", (node: NanovisTreeNode) => {
+        console.log("Selected node:", node);
+      });
+
+      visualization.events.on("hover", (node: NanovisTreeNode | null) => {
+        setHoveredNode(node);
+      });
+
+      if (containerRef.current) {
+        containerRef.current.appendChild(visualization.el);
+      }
       window.addEventListener("mousemove", handleMouseMove);
     })();
 
@@ -174,25 +156,27 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
         </p>
       </div>
       <FlamegraphLegend />
-      <div
-        ref={containerRef}
-        className="w-full border border-primary-700 rounded-md overflow-auto p-2 my-4"
-        {...mouseTrackingProps}
-      >
-        {hoveredNode && (
-          <div
-            className="bg-primary-900 border-primary-400 absolute flex flex-col min-w-[200px] rounded-lg border p-3 shadow-lg z-50"
-            style={{
-              left: mousePosition.x + 12,
-              top: mousePosition.y + 12,
-              pointerEvents: "none",
-            }}
-          >
-            <span className="text-primary-200 font-semibold">{hoveredNode.text}</span>
-            <span className="text-primary-400 text-xs">{hoveredNode.subtext}</span>
-            <span className="text-primary-400 text-xs">Total Time: {hoveredNode.size}</span>
-          </div>
-        )}
+      <div onMouseLeave={() => setHoveredNode(null)}>
+        <div
+          ref={containerRef}
+          className="w-full border border-primary-700 rounded-md overflow-auto p-2 my-4"
+          {...mouseTrackingProps}
+        >
+          {hoveredNode && (
+            <div
+              className="bg-primary-900 border-primary-400 absolute flex flex-col min-w-[200px] rounded-lg border p-3 shadow-lg z-50"
+              style={{
+                left: mousePosition.x + 12,
+                top: mousePosition.y + 12,
+                pointerEvents: "none",
+              }}
+            >
+              <span className="text-primary-200 font-semibold">{hoveredNode.text}</span>
+              <span className="text-primary-400 text-xs">{hoveredNode.subtext}</span>
+              <span className="text-primary-400 text-xs">Total Time: {hoveredNode.size}</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
