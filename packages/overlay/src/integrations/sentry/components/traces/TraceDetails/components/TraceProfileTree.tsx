@@ -176,7 +176,7 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
       <FlamegraphLegend />
       <div
         ref={containerRef}
-        className="w-full border border-primary-700 rounded-md overflow-hidden"
+        className="w-full border border-primary-700 rounded-md overflow-auto p-2 my-4"
         {...mouseTrackingProps}
       >
         {hoveredNode && (
