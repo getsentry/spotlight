@@ -15,7 +15,7 @@ import AITraceSplitView from "../../insights/aiTraces/AITraceSplitView";
 import { hasAISpans } from "../../insights/aiTraces/sdks/aiLibraries";
 import LogsList from "../../log/LogsList";
 import DateTime from "../../shared/DateTime";
-import FlamegraphView from "./components/FlamegraphView";
+import TraceProfileTree from "./components/TraceProfileTree";
 
 type TraceDetailsProps = {
   trace: Trace;
@@ -89,9 +89,8 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
     }),
   ];
 
-  // Add flamegraph tab if profile is available
   if (profile) {
-    tabs.push(createTab("flamegraph", "Flamegraph"));
+    tabs.push(createTab("profileTree", "Profile"));
   }
 
   return (
@@ -107,7 +106,7 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
               <Route path="errors" element={<EventList traceId={trace.trace_id} />} />
               <Route path="logs" element={<LogsList traceId={trace.trace_id} />} />
               <Route path="logs/:id" element={<LogsList traceId={trace.trace_id} />} />
-              {profile && <Route path="flamegraph" element={<FlamegraphView profile={profile} />} />}
+              {profile && <Route path="profileTree" element={<TraceProfileTree profile={profile} />} />}
               {/* Default tab */}
               <Route path="*" element={<Navigate to="context" replace />} />
             </Routes>

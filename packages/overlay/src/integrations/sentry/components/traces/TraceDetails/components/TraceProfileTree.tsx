@@ -1,8 +1,9 @@
+import type { TreeNode } from "nanovis";
 import { useEffect, useRef, useState } from "react";
+import useMouseTracking from "~/integrations/sentry/hooks/useMouseTracking";
 import type { SentryProfileWithTraceMeta } from "../../../../store/types";
-import { type NanovisTreeNode, convertSentryProfileToNormalizedTree } from "../flamegraphutils";
+import { type NanovisTreeNode, convertSentryProfileToNormalizedTree } from "../../../../utils/profileTree";
 
-// Type definitions for nanovis (in case the library is not installed)
 interface NanovisVisualization {
   el: HTMLElement;
   events: {
@@ -12,67 +13,84 @@ interface NanovisVisualization {
 
 type VisualizationType = "flame" | "treemap" | "sunburst";
 
-interface FlamegraphViewProps {
+interface TraceProfileTreeProps {
   profile: SentryProfileWithTraceMeta;
 }
 
-export default function FlamegraphView({ profile }: FlamegraphViewProps) {
+const FlamegraphLegend = () => {
+  return (
+    <div className="flex items-center gap-4">
+      <span className="flex items-center gap-1 text-sm">
+        <span className="inline-block size-4 bg-[#d0d1f5] rounded-xs" />
+        Application Frame
+      </span>
+      <span className="flex items-center gap-1 text-sm">
+        <span className="inline-block size-4 bg-[#ffe0e4] rounded-xs" />
+        System Frame
+      </span>
+    </div>
+  );
+};
+
+export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const visualizationRef = useRef<NanovisVisualization | null>(null);
   const [visualizationType, setVisualizationType] = useState<VisualizationType>("flame");
+  const [hoveredNode, setHoveredNode] = useState<NanovisTreeNode | null>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
     (async () => {
       if (!containerRef.current || !profile) return;
 
-      // Convert Sentry profile to nanovis tree format
       const tree = await convertSentryProfileToNormalizedTree(profile);
 
-      // Try to import nanovis dynamically
       const initVisualization = async () => {
         try {
-          // Dynamic import with proper error handling
           const nanovisModule = await import("nanovis");
           const { Flamegraph, Treemap, Sunburst } = nanovisModule;
 
-          // Clean up previous visualization
           if (visualizationRef.current) {
             visualizationRef.current.el.remove();
             visualizationRef.current = null;
           }
 
-          // Create visualization instance based on selected type
+          const options = {
+            getColor: (node: TreeNode<unknown>) => node.color,
+          };
+
           let visualization: NanovisVisualization;
           switch (visualizationType) {
             case "treemap":
-              visualization = new Treemap(tree) as NanovisVisualization;
+              visualization = new Treemap(tree, options) as NanovisVisualization;
               break;
             case "sunburst":
-              visualization = new Sunburst(tree) as NanovisVisualization;
+              visualization = new Sunburst(tree, options) as NanovisVisualization;
               break;
             default:
-              visualization = new Flamegraph(tree) as NanovisVisualization;
+              visualization = new Flamegraph(tree, options) as NanovisVisualization;
               break;
           }
 
           visualizationRef.current = visualization;
 
-          // Register events
           visualization.events.on("select", (node: NanovisTreeNode) => {
             console.log("Selected node:", node);
           });
 
-          visualization.events.on("hover", (node: NanovisTreeNode) => {
-            console.log("Hovered node:", node);
+          visualization.events.on("hover", (node: NanovisTreeNode | null) => {
+            setHoveredNode(node);
           });
 
-          // Mount to DOM
           if (containerRef.current) {
             containerRef.current.appendChild(visualization.el);
           }
         } catch (error) {
           console.error("Failed to load nanovis library:", error);
-          // Fallback: show a message that the library is not available
           if (containerRef.current) {
             containerRef.current.innerHTML = `
             <div class="flex items-center justify-center h-full text-primary-300">
@@ -87,19 +105,20 @@ export default function FlamegraphView({ profile }: FlamegraphViewProps) {
       };
 
       initVisualization();
+      window.addEventListener("mousemove", handleMouseMove);
     })();
 
-    // Cleanup
     return () => {
       if (visualizationRef.current) {
         visualizationRef.current.el.remove();
         visualizationRef.current = null;
       }
+      window.removeEventListener("mousemove", handleMouseMove);
     };
   }, [profile, visualizationType]);
 
   if (!profile) {
-    return <div className="flex items-center justify-center h-64 text-primary-300">No profile data available</div>;
+    return <div className="text-primary-300 px-6 py-4">No profile data available</div>;
   }
 
   const getVisualizationName = (type: VisualizationType): string => {
@@ -115,11 +134,21 @@ export default function FlamegraphView({ profile }: FlamegraphViewProps) {
     }
   };
 
+  const mouseTrackingProps = useMouseTracking({
+    elem: containerRef,
+    onPositionChange: args => {
+      if (args) {
+        const { left, top } = args;
+        setMousePosition({ x: left, y: top });
+      }
+    },
+  });
+
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative p-4">
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-semibold text-primary-200">Performance Visualization</h3>
+          <h3 className="text-lg font-semibold text-primary-200">Profile</h3>
           <div className="flex items-center space-x-2">
             <span className="text-sm text-primary-400">View:</span>
             <div className="flex bg-primary-800 rounded-md p-1">
@@ -141,11 +170,30 @@ export default function FlamegraphView({ profile }: FlamegraphViewProps) {
           </div>
         </div>
         <p className="text-sm text-primary-400">
-          Visual representation of function call stack and execution time using{" "}
-          {getVisualizationName(visualizationType).toLowerCase()}
+          Visual representation of profile using {getVisualizationName(visualizationType).toLowerCase()}
         </p>
       </div>
-      <div ref={containerRef} className="w-full border border-primary-700 rounded-md overflow-hidden" />
+      <FlamegraphLegend />
+      <div
+        ref={containerRef}
+        className="w-full border border-primary-700 rounded-md overflow-hidden"
+        {...mouseTrackingProps}
+      >
+        {hoveredNode && (
+          <div
+            className="bg-primary-900 border-primary-400 absolute flex flex-col min-w-[200px] rounded-lg border p-3 shadow-lg z-50"
+            style={{
+              left: mousePosition.x + 12,
+              top: mousePosition.y + 12,
+              pointerEvents: "none",
+            }}
+          >
+            <span className="text-primary-200 font-semibold">{hoveredNode.text}</span>
+            <span className="text-primary-400 text-xs">{hoveredNode.subtext}</span>
+            <span className="text-primary-400 text-xs">Total Time: {hoveredNode.size}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
