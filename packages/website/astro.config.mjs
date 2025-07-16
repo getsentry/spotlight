@@ -115,6 +115,10 @@ export default defineConfig({
               link: "/setup/laravel/",
             },
             {
+              label: "For Magento",
+              link: "/setup/magento/",
+            },
+            {
               label: "For Astro",
               link: "/setup/astro/",
             },

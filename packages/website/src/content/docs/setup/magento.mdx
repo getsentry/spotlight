@@ -1,0 +1,69 @@
+---
+title: Using Spotlight with Magento
+description: A guide on how to setup Spotlight for Magento
+---
+
+import { Content as InstallCommand } from "../../../components/InstallCommand.mdx";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+This guide gets Spotlight up and running in Magento with Sentry SDK.
+
+## 1. Installation
+
+### Install Sentry SDK
+
+Follow the [Magento Installation](https://github.com/justbetter/magento2-sentry#installation) guide to install and configure the Sentry SDK for Magento.
+
+Note that you don't need a DSN or don't need to sign up for Sentry to use Spotlight. If you already have Sentry SDK installed, make sure you have a recent version.
+
+### Get and Run Spotlight
+
+<Tabs>
+  <TabItem label="npx">```shell npx @spotlightjs/spotlight ```</TabItem>
+  <TabItem label="docker">
+    ```shell docker run --rm -p 8969 ghcr.io/getsentry/spotlight:latest ```
+  </TabItem>
+  <TabItem label="binary">
+    ```shell curl -q https://spotlightjs.com/install.sh | sh ```
+  </TabItem>
+</Tabs>
+
+## 2. Enable Spotlight
+
+### Configure Sentry
+
+In your `app/etc/env.php` file, add the spotlight configuration:
+
+```php
+'sentry' => [
+  ...
+  'spotlight' => true
+]
+```
+
+Or alternatively add the `CONFIG__SENTRY__ENVIRONMENT__SPOTLIGHT` environment variable to environment
+
+```env
+CONFIG__SENTRY__ENVIRONMENT__SPOTLIGHT=true
+```
+
+That's it! As long as Spotlight is running, and Magento is not running in production mode[^1], the Magento integration will automatically inject Spotlight into your UI.
+
+### Additional Configuration
+
+If you need to run Spotlight on a different port or domain, you can specify a Spotlight URL:
+
+```php
+'sentry' => [
+  ...
+  'spotlight_url' => 'http://localhost:3839/stream'
+]
+```
+
+or
+
+```env
+CONFIG__SENTRY__ENVIRONMENT__SPOTLIGHT_URL=http://localhost:3839/stream
+```
+
+[^1]: This requirement is to prevent enabling Spotlight accidentally on production environments.
