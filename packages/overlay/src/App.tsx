@@ -214,7 +214,7 @@ export default function App({
             navigate(lastRoute);
           }
         } catch {
-          // ignore storage errors
+          // ignore path error
         }
       }
     },
@@ -299,7 +299,6 @@ export default function App({
         setTriggerButtonCount={setTriggerButtonCount}
         fullPage={fullPage}
         showClearEventsButton={showClearEventsButton}
-        // Pass contextId to Overview
         contextId={contextId}
       />
     </>
