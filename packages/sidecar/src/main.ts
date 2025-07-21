@@ -2,11 +2,13 @@ import { createWriteStream, readFileSync } from "node:fs";
 import { type IncomingMessage, type Server, type ServerResponse, createServer, get } from "node:http";
 import { extname, join, resolve } from "node:path";
 import { createGunzip, createInflate } from "node:zlib";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import launchEditor from "launch-editor";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
+import mcp from "./mcp.js";
 import { MessageBuffer } from "./messageBuffer.js";
 
 type Payload = [string, Buffer];
@@ -316,6 +318,12 @@ function logSpotlightUrl(port: number): void {
   logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
 }
 
+const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+mcp.connect(transport);
+async function handleMcpRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  await transport.handleRequest(req, res);
+}
+
 function startServer(
   buffer: MessageBuffer<Payload>,
   port: number,
@@ -331,6 +339,7 @@ function startServer(
   }
   const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
+    [/^\/mcp$/, handleMcpRequest],
     [/^\/clear$/, enableCORS(handleClearRequest)],
     [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
