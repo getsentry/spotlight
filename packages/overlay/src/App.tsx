@@ -172,9 +172,9 @@ export default function App({
   const contextId = sidecarUrl || (typeof window !== "undefined" ? window.location.origin : "default");
 
   // helper to get valid panel routes
-  const getValidRoutes = () => {
+  const getValidRoutes = useCallback(() => {
     return getPanelsFromIntegrations(integrations, integrationData).map(panel => `/${panel.id}`);
-  };
+  }, [integrationData, integrations]);
 
   const clearEvents = useCallback(async () => {
     try {
