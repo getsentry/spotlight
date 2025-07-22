@@ -37,7 +37,8 @@
   },
   "resolutions": {
     "path-to-regexp": "^6.3.0",
-    "cross-spawn": ">=7.0.5"
+    "cross-spawn": ">=7.0.5",
+    "form-data": ">=4.0.4"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged --concurrent false"
