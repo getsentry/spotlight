@@ -23,14 +23,12 @@ export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceAct
 
     await Promise.all(
       (errorEvent.exception.values ?? []).map(async exception => {
-        if (!exception.stacktrace) {
+        if (!exception.stacktrace || !exception.stacktrace.frames) {
           return;
         }
         exception.stacktrace.frames.reverse();
 
-        if (
-          exception.stacktrace.frames?.every(frame => frame.post_context && frame.pre_context && frame.context_line)
-        ) {
+        if (exception.stacktrace.frames.every(frame => frame.post_context && frame.pre_context && frame.context_line)) {
           log("Skipping contextlines request as we have full context for", exception);
           return;
         }
