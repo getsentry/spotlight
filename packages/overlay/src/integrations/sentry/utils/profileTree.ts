@@ -1,4 +1,5 @@
 import type { ColorValue } from "nanovis";
+import { FRAME_COLOR } from "../constants/profile";
 import type { SentryProfileWithTraceMeta } from "../store/types";
 import type { EventFrame } from "../types";
 
@@ -19,6 +20,17 @@ export interface FlamegraphUtilOptions {
   getLabel?: (frame: EventFrame, depth: number, parent?: NanovisTreeNode) => string;
 }
 
+// FIXME: need to work on condition here
+// need to figure out how sentry sets is_application as true after parsing data from sdk.
+function isApplicationFrame(frame: EventFrame): boolean {
+  if (!frame.abs_path) return false;
+  const path = frame.abs_path.toLowerCase();
+  if (path.includes("src/") || path.includes("localhost")) {
+    return true;
+  }
+  return false;
+}
+
 /**
  * Parses a Sentry profile and returns a normalized structure for further processing.
  */
@@ -36,13 +48,12 @@ export function parseSentryProfile(profile: SentryProfileWithTraceMeta) {
 
 // Sentry color scheme
 // ref: https://docs.sentry.io/product/explore/profiling/flame-charts-graphs/
-function getSentryFrameColors(frame: EventFrame): ColorValue {
-  if (!frame.abs_path) return "#f3f4f6";
-  const path = frame.abs_path.toLowerCase();
-  if (path.includes("src/") || path.includes("localhost")) {
-    return "#d0d1f5";
+function getFrameColors(frame: EventFrame): ColorValue {
+  if (!frame.abs_path) return FRAME_COLOR.unknown;
+  if (isApplicationFrame(frame)) {
+    return FRAME_COLOR.application;
   }
-  return "#ffe0e4";
+  return FRAME_COLOR.system;
 }
 
 /**
@@ -66,7 +77,7 @@ export function buildFlamegraphTree(
     };
   }
   const { samples, frames, stacks, platform } = parsed;
-  const getColor = typeof options.getColor === "function" ? options.getColor : getSentryFrameColors;
+  const getColor = typeof options.getColor === "function" ? options.getColor : getFrameColors;
   const getLabel =
     typeof options.getLabel === "function" ? options.getLabel : (frame: EventFrame) => frame.function || "anonymous";
   const totalDuration =

@@ -1,5 +1,6 @@
 import type { TreeNode } from "nanovis";
 import { useEffect, useRef, useState } from "react";
+import { FRAME_COLOR } from "~/integrations/sentry/constants/profile";
 import useMouseTracking from "~/integrations/sentry/hooks/useMouseTracking";
 import type { SentryProfileWithTraceMeta } from "../../../../store/types";
 import { type NanovisTreeNode, convertSentryProfileToNormalizedTree } from "../../../../utils/profileTree";
@@ -21,11 +22,11 @@ const FlamegraphLegend = () => {
   return (
     <div className="flex items-center gap-4">
       <span className="flex items-center gap-1 text-sm">
-        <span className="inline-block size-4 bg-[#d0d1f5] rounded-xs" />
+        <span className={`inline-block size-4 bg-[${FRAME_COLOR.application}] rounded-xs`} />
         Application Frame
       </span>
       <span className="flex items-center gap-1 text-sm">
-        <span className="inline-block size-4 bg-[#ffe0e4] rounded-xs" />
+        <span className={`inline-block size-4 bg-[${FRAME_COLOR.system}] rounded-xs`} />
         System Frame
       </span>
     </div>
