@@ -1,5 +1,7 @@
 import { SidecarEventProcessor } from './eventProcessor.js';
 import { createSpotlightMcpServer } from './mcpServer.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { randomUUID } from 'node:crypto';
 import { logger } from '../logger.js';
 import type { MessageBuffer } from '../messageBuffer.js';
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -34,6 +36,7 @@ export interface McpIntegrationOptions {
 export class McpIntegration {
   private eventProcessor: SidecarEventProcessor;
   private mcpServer: ReturnType<typeof createSpotlightMcpServer> | null = null;
+  private transport: StreamableHTTPServerTransport | null = null;
   private options: McpIntegrationOptions;
 
   constructor(options: McpIntegrationOptions = {}) {
@@ -42,7 +45,19 @@ export class McpIntegration {
     
     if (this.options.enabled) {
       this.mcpServer = createSpotlightMcpServer(this.eventProcessor);
-      logger.info('MCP integration initialized with server');
+      
+      // Create StreamableHTTP transport with session management
+      this.transport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: () => randomUUID(), // Generate secure session IDs
+        onsessioninitialized: (sessionId) => {
+          logger.debug(`MCP session initialized: ${sessionId}`);
+        }
+      });
+      
+      // Connect server to transport
+      this.mcpServer.connect(this.transport);
+      
+      logger.info('MCP integration initialized with StreamableHTTP transport');
     }
   }
 
@@ -97,41 +112,24 @@ export class McpIntegration {
   }
 
   /**
-   * HTTP request handler for MCP endpoints
+   * HTTP request handler for MCP endpoints using StreamableHTTP transport
    */
   async handleMcpRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
-    if (!this.options.enabled || !this.mcpServer) {
+    if (!this.options.enabled || !this.transport) {
       res.writeHead(404);
       res.end('MCP server not enabled');
       return;
     }
 
-    if (req.method !== 'POST') {
-      res.writeHead(405, { 'Allow': 'POST' });
-      res.end('Method Not Allowed');
-      return;
-    }
-
     try {
-      // Read request body
-      const chunks: Buffer[] = [];
-      for await (const chunk of req) {
-        chunks.push(chunk);
-      }
-      const body = Buffer.concat(chunks).toString();
-
-      // Parse MCP request
-      const mcpRequest = JSON.parse(body);
-      
-      // Handle MCP request through the server
-      const response = await this.mcpServer.handleRequest(mcpRequest);
-      
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(response));
+      // Use StreamableHTTP transport to handle the request
+      await this.transport.handleRequest(req, res);
     } catch (error) {
-      logger.error('Failed to handle MCP request:', error);
-      res.writeHead(500);
-      res.end('Internal Server Error');
+      logger.error('Failed to handle MCP request via transport:', error);
+      if (!res.headersSent) {
+        res.writeHead(500);
+        res.end('Internal Server Error');
+      }
     }
   }
 
@@ -140,5 +138,22 @@ export class McpIntegration {
    */
   getMcpServer() {
     return this.mcpServer;
+  }
+
+  /**
+   * Get transport for external use
+   */
+  getTransport() {
+    return this.transport;
+  }
+
+  /**
+   * Close MCP integration
+   */
+  async close() {
+    if (this.mcpServer) {
+      await this.mcpServer.close();
+    }
+    logger.info('MCP integration closed');
   }
 }

@@ -338,12 +338,11 @@ function startServer(
   }
 
   // Initialize MCP integration if enabled
-  let mcpIntegration: McpIntegration | null = null;
   let mcpUnsubscribe: (() => void) | null = null;
   
   if (mcpOptions?.enabled) {
-    mcpIntegration = new McpIntegration(mcpOptions);
-    mcpUnsubscribe = mcpIntegration.subscribeToBuffer(buffer);
+    globalMcpIntegration = new McpIntegration(mcpOptions);
+    mcpUnsubscribe = globalMcpIntegration.subscribeToBuffer(buffer);
   }
 
   const ROUTES: [RegExp, RequestHandler][] = [
@@ -353,8 +352,8 @@ function startServer(
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
     [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), enableCORS(contextLinesHandler)],
     // Add MCP route if integration is enabled
-    ...(mcpIntegration ? [
-      [/^\/mcp$/, enableCORS((req: IncomingMessage, res: ServerResponse) => mcpIntegration.handleMcpRequest(req, res))]
+    ...(globalMcpIntegration ? [
+      [/^\/mcp$/, enableCORS((req: IncomingMessage, res: ServerResponse) => globalMcpIntegration.handleMcpRequest(req, res))]
     ] as [RegExp, RequestHandler][] : []),
     [/^.+$/, filesToServe != null ? enableCORS(fileServer(filesToServe)) : error404],
   ];
@@ -431,6 +430,7 @@ function startServer(
 
 let serverInstance: Server;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
+let globalMcpIntegration: McpIntegration | null = null;
 const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
 
 const isValidPort = withTracing(
@@ -534,7 +534,7 @@ export function clearBuffer(): void {
 }
 
 let forceShutdown = false;
-export const shutdown = () => {
+export const shutdown = async () => {
   if (portInUseRetryTimeout) {
     clearTimeout(portInUseRetryTimeout);
   }
@@ -545,11 +545,22 @@ export const shutdown = () => {
   if (serverInstance) {
     forceShutdown = true;
     logger.info("Shutting down server gracefully...");
+    
+    // Close MCP integration first
+    if (globalMcpIntegration) {
+      try {
+        await globalMcpIntegration.close();
+        globalMcpIntegration = null;
+      } catch (error) {
+        logger.error('Error closing MCP integration:', error);
+      }
+    }
+    
     serverInstance.close();
     serverInstance.closeAllConnections();
     serverInstance.unref();
   }
 };
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+process.on("SIGINT", () => shutdown().catch(console.error));
+process.on("SIGTERM", () => shutdown().catch(console.error));

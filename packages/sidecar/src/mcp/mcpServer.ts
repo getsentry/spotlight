@@ -1,36 +1,32 @@
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StreamableHTTPTransport } from '@modelcontextprotocol/sdk/server/transport.js';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import type { SidecarEventProcessor } from './eventProcessor.js';
 import { logger } from '../logger.js';
 
 export function createSpotlightMcpServer(eventProcessor: SidecarEventProcessor) {
-  const server = new Server('spotlight-mcp', '1.0.0');
-  
-  // Rich error analysis tool
-  server.registerTool('get-recent-errors', {
-    title: 'Get Recent Errors with Full Context',
-    description: 'Get recent error events with stack traces, contexts, breadcrumbs, and related data',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        count: {
-          type: 'number',
-          description: 'Number of errors to fetch',
-          default: 10
-        },
-        level: {
-          type: 'string',
-          enum: ['error', 'fatal'],
-          description: 'Error severity level'
-        },
-        traceId: {
-          type: 'string',
-          description: 'Filter by specific trace ID'
-        }
+  const server = new McpServer(
+    { name: 'spotlight-mcp', version: '1.0.0' },
+    {
+      capabilities: {
+        tools: {},
+        resources: {},
+        logging: {}
       }
     }
-  }, async ({ count = 10, level, traceId }) => {
+  );
+  
+  // Rich error analysis tool using McpServer API
+  server.registerTool('get-recent-errors', 
+    {
+      title: 'Get Recent Errors with Full Context',
+      description: 'Get recent error events with stack traces, contexts, breadcrumbs, and related data',
+      inputSchema: {
+        count: z.number().optional().default(10).describe('Number of errors to fetch'),
+        level: z.enum(['error', 'fatal']).optional().describe('Error severity level'),
+        traceId: z.string().optional().describe('Filter by specific trace ID')
+      }
+    }, 
+    async ({ count = 10, level, traceId }) => {
     const events = eventProcessor.getErrorEvents()
       .filter(event => {
         if (level && event.level !== level) return false;
@@ -69,21 +65,16 @@ export function createSpotlightMcpServer(eventProcessor: SidecarEventProcessor) 
     };
   });
   
-  // Complete trace analysis tool
-  server.registerTool('get-trace-analysis', {
-    title: 'Get Complete Trace Analysis',
-    description: 'Get trace with span tree, performance metrics, and correlated data',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        traceId: {
-          type: 'string',
-          description: 'Trace ID to analyze'
-        }
-      },
-      required: ['traceId']
-    }
-  }, async ({ traceId }) => {
+  // Complete trace analysis tool using McpServer API
+  server.registerTool('get-trace-analysis',
+    {
+      title: 'Get Complete Trace Analysis', 
+      description: 'Get trace with span tree, performance metrics, and correlated data',
+      inputSchema: {
+        traceId: z.string().describe('Trace ID to analyze')
+      }
+    },
+    async ({ traceId }) => {
     const trace = eventProcessor.getTraceById(traceId);
     if (!trace) {
       throw new Error(`Trace ${traceId} not found`);
@@ -134,21 +125,16 @@ export function createSpotlightMcpServer(eventProcessor: SidecarEventProcessor) 
     };
   });
   
-  // Correlated debugging tool
-  server.registerTool('debug-error-with-context', {
-    title: 'Debug Error with Full Context',
-    description: 'Get error with related trace, logs, and complete debugging context',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        errorId: {
-          type: 'string',
-          description: 'Error event ID'
-        }
-      },
-      required: ['errorId']
-    }
-  }, async ({ errorId }) => {
+  // Correlated debugging tool using McpServer API
+  server.registerTool('debug-error-with-context',
+    {
+      title: 'Debug Error with Full Context',
+      description: 'Get error with related trace, logs, and complete debugging context', 
+      inputSchema: {
+        errorId: z.string().describe('Error event ID')
+      }
+    },
+    async ({ errorId }) => {
     const error = eventProcessor.getEventById(errorId);
     if (!error || !error.exception) {
       throw new Error(`Error ${errorId} not found`);
@@ -196,21 +182,16 @@ export function createSpotlightMcpServer(eventProcessor: SidecarEventProcessor) 
     };
   });
 
-  // List all available traces
-  server.registerTool('list-traces', {
-    title: 'List All Available Traces',
-    description: 'Get a summary of all traces with basic metrics',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        limit: {
-          type: 'number',
-          description: 'Maximum number of traces to return',
-          default: 20
-        }
+  // List all available traces using McpServer API
+  server.registerTool('list-traces',
+    {
+      title: 'List All Available Traces',
+      description: 'Get a summary of all traces with basic metrics',
+      inputSchema: {
+        limit: z.number().optional().default(20).describe('Maximum number of traces to return')
       }
-    }
-  }, async ({ limit = 20 }) => {
+    },
+    async ({ limit = 20 }) => {
     const traces = eventProcessor.getTraces().slice(0, limit);
     
     const traceSummaries = traces.map(trace => ({
@@ -234,6 +215,120 @@ export function createSpotlightMcpServer(eventProcessor: SidecarEventProcessor) 
     };
   });
 
-  logger.info('MCP server created with rich debugging tools');
+  // Add a simple debugging prompt
+  server.registerPrompt('analyze-error',
+    {
+      title: 'Analyze Error',
+      description: 'Generate a prompt to analyze a specific error with AI assistance',
+      argsSchema: {
+        errorId: z.string().describe('Error ID to analyze')
+      }
+    },
+    async ({ errorId }) => {
+      const error = eventProcessor.getEventById(errorId);
+      if (!error || !error.exception) {
+        throw new Error(`Error ${errorId} not found`);
+      }
+
+      const errorMessage = error.exception.values?.[0]?.value || 'Unknown error';
+      const errorType = error.exception.values?.[0]?.type || 'Unknown type';
+      const stackFrames = error.exception.values?.[0]?.stacktrace?.frames || [];
+      
+      return {
+        messages: [
+          {
+            role: 'user',
+            content: {
+              type: 'text',
+              text: `Please analyze this error and suggest potential causes and fixes:
+
+Error Type: ${errorType}
+Error Message: ${errorMessage}
+Environment: ${error.environment || 'Unknown'}
+Release: ${error.release || 'Unknown'}
+
+Stack Trace (top 5 frames):
+${stackFrames.slice(-5).map(frame => 
+  `  at ${frame.function || '<anonymous>'} (${frame.filename}:${frame.lineno}:${frame.colno})`
+).join('\n')}
+
+${error.breadcrumbs?.length ? `\nRecent User Actions (${error.breadcrumbs.length} breadcrumbs available):\n${error.breadcrumbs.slice(-3).map(b => `- ${b.message || b.category}`).join('\n')}` : ''}
+
+Please provide:
+1. Likely root cause analysis
+2. Specific code areas to investigate
+3. Debugging steps to reproduce the issue
+4. Suggested fixes or improvements`
+            }
+          }
+        ]
+      };
+    }
+  );
+
+  // Add resource system for structured data access
+  server.registerResource(
+    'recent-errors',
+    'spotlight://errors/recent',
+    {
+      title: 'Recent Errors',
+      description: 'Recent error events with complete context',
+      mimeType: 'application/json'
+    },
+    async () => {
+      const errors = eventProcessor.getErrorEvents().slice(0, 10);
+      const enrichedErrors = errors.map(event => ({
+        id: event.event_id,
+        message: event.exception?.values?.[0]?.value,
+        type: event.exception?.values?.[0]?.type,
+        timestamp: event.timestamp,
+        environment: event.environment,
+        release: event.release,
+        contexts: event.contexts,
+        breadcrumbs: event.breadcrumbs?.length || 0,
+        stackFrames: event.exception?.values?.[0]?.stacktrace?.frames?.length || 0
+      }));
+      
+      return {
+        contents: [{
+          uri: 'spotlight://errors/recent',
+          text: JSON.stringify(enrichedErrors, null, 2),
+          mimeType: 'application/json'
+        }]
+      };
+    }
+  );
+
+  server.registerResource(
+    'trace-list',
+    'spotlight://traces/list',
+    {
+      title: 'Available Traces',
+      description: 'List of all available traces with basic metrics',
+      mimeType: 'application/json'
+    },
+    async () => {
+      const traces = eventProcessor.getTraces().slice(0, 20);
+      const traceSummaries = traces.map(trace => ({
+        trace_id: trace.trace_id,
+        root_transaction: trace.rootTransactionName,
+        status: trace.status,
+        span_count: trace.spans.size,
+        error_count: trace.errors,
+        duration_ms: trace.timestamp - trace.start_timestamp,
+        start_timestamp: trace.start_timestamp
+      }));
+      
+      return {
+        contents: [{
+          uri: 'spotlight://traces/list',
+          text: JSON.stringify({ total_traces: traces.length, traces: traceSummaries }, null, 2),
+          mimeType: 'application/json'
+        }]
+      };
+    }
+  );
+
+  logger.info('MCP server created with rich debugging tools and resources');
   return server;
 }

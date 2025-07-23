@@ -220,9 +220,17 @@ export function skipBrowserOnlySetup<T>(browserFn: () => T, nodeFallback?: () =>
 
 ---
 
-## 🎉 **Implementation Complete!**
+## 🎉 **Implementation Complete!** *(Updated)*
 
-The MCP server integration has been successfully implemented with **90% direct code reuse** from the overlay package, exactly as planned. The implementation includes:
+The MCP server integration has been successfully implemented and **committed to git** with **90% direct code reuse** from the overlay package, exactly as planned. 
+
+### 📝 **Commit Information**
+- **Commit ID**: `900d16d`
+- **Branch**: `mcp-server` 
+- **Files Created**: 7 new MCP integration files
+- **MCP SDK Version**: Updated to v1.16.0
+
+The implementation includes:
 
 ### ✅ **Successfully Implemented**
 - **Node.js Adapter Layer** - Environment detection and compatibility utilities
@@ -263,6 +271,49 @@ setupSidecar({
   }
 });
 ```
+
+---
+
+## 🚀 **Phase 2: MCP v1.16.0 Upgrade** *(Current)*
+
+### 📋 **v1.16.0 Upgrade Status**
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| **Analysis of v1.16.0 Features** | ✅ Completed | Identified key missing features vs current implementation |
+| **Upgrade to McpServer API** | ✅ Completed | Switched from low-level Server to high-level McpServer |  
+| **StreamableHTTPServerTransport** | ✅ Completed | Replaced custom HTTP with official transport + session management |
+| **Resource System** | ✅ Completed | Added resource endpoints: recent-errors, trace-list |
+| **Debugging Prompts** | ✅ Completed | Added analyze-error prompt for AI-assisted debugging |
+| **Enhanced Tool Features** | ⏳ Skipped | Notifications/progress kept simple per user preference |
+
+### 🔍 **v1.16.0 Feature Analysis Results**
+
+**Current Implementation Gaps:**
+- Using low-level `Server` instead of high-level `McpServer` class
+- Custom HTTP handling instead of `StreamableHTTPServerTransport`
+- No resource system for exposing structured data
+- Missing tool annotations and advanced features
+
+**Completed v1.16.0 Upgrades:**
+- ✅ **McpServer High-Level API**: Switched from `Server` to `McpServer` for simpler tool/resource registration
+- ✅ **StreamableHTTPServerTransport**: Replaced custom HTTP handling with official transport including session management
+- ✅ **Resource System**: Added `spotlight://errors/recent` and `spotlight://traces/list` resources
+- ✅ **Debugging Prompts**: Added `analyze-error` prompt for AI-assisted error analysis
+- ✅ **Proper Lifecycle Management**: Added MCP integration cleanup in server shutdown
+
+**Intentionally Skipped (Per User Preference):**
+- ❌ **OAuth Authentication**: Not needed for local development debugging
+- ❌ **Complex Tool Features**: Keeping focused on core debugging use case
+- ❌ **Advanced Notifications**: Simple implementation preferred
+
+### 🎯 **Key v1.16.0 Improvements Implemented**
+
+1. **Better Architecture**: Using official `McpServer` class with proper capability declarations
+2. **Session Management**: `StreamableHTTPServerTransport` with UUID-based session IDs for connection resilience  
+3. **Structured Data Access**: Resources allow LLMs to directly access JSON data without tool calls
+4. **AI-Assisted Debugging**: The `analyze-error` prompt creates context-rich prompts for error analysis
+5. **Production Ready**: Proper async shutdown handling and resource cleanup
 
 ## 🚀 **Next Steps for Testing & Deployment**
 
