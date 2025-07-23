@@ -169,11 +169,11 @@ export default function App({
   const location = useLocation();
 
   // contextId for namespacing of routes in sessionStorage
-  const contextId = sidecarUrl || (typeof window !== "undefined" ? window.location.origin : "default");
+  const contextId = sidecarUrl;
 
   // helper to get valid panel routes
   const getValidRoutes = useCallback(() => {
-    return getPanelsFromIntegrations(integrations, integrationData).map(panel => `/${panel.id}`);
+    return new Set(getPanelsFromIntegrations(integrations, integrationData).map(panel => `/${panel.id}`));
   }, [integrationData, integrations]);
 
   const clearEvents = useCallback(async () => {
@@ -210,11 +210,14 @@ export default function App({
         try {
           const lastRoute = sessionStorage.getItem(getRouteStorageKey(contextId));
           const validRoutes = getValidRoutes();
-          if (lastRoute && validRoutes.includes(lastRoute) && lastRoute !== location.pathname) {
+          if (lastRoute && lastRoute !== location.pathname && validRoutes.has(lastRoute)) {
             navigate(lastRoute);
           }
-        } catch {
-          // ignore path error
+        } catch (error) {
+          log("Failed to retrieve or navigate to the last route from browser storage", {
+            error,
+            currentPath: location.pathname,
+          });
         }
       }
     },
