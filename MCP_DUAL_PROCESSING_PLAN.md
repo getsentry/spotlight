@@ -1,22 +1,79 @@
-# MCP Integration: Dual Processing with Overlay Dependency
+# MCP Integration: Separate Package Architecture (REVISED)
 
-## Review Notes (Corrected)
+## 🔄 **MAJOR ARCHITECTURAL REVISION**
 
-This plan has been reviewed and corrected to ensure accuracy:
-- ✅ Removed axios dependency references (using Node.js built-in fetch)
-- ✅ Corrected processEnvelope reuse claim (needs adaptation due to store import)
-- ✅ Verified browser dependency analysis with fuzzy search
-- ✅ Confirmed 7/9 store slices work directly in Node.js
-- ✅ Updated code reuse percentage from 90% to more accurate 85%
-- ✅ Added requirement for Node.js 18+ (for built-in fetch)
+After encountering circular dependency issues during implementation, we're revising the architecture to use a **separate MCP package** approach for cleaner separation of concerns and elimination of build complexity.
+
+## ❌ **Previous Approach Issues**
+
+The initial plan to have sidecar directly depend on overlay created a **circular dependency**:
+- `@spotlightjs/sidecar` → `@spotlightjs/overlay` (for MCP integration)
+- `@spotlightjs/overlay` → `@spotlightjs/sidecar` (for constants, vite plugin)
+
+This caused:
+- ❌ Build system failures (detected by Turbo)
+- ❌ Complex path alias resolution issues  
+- ❌ TypeScript compilation errors
+- ❌ Fragile build configuration requirements
+
+## ✅ **New Solution: Separate MCP Package**
+
+Create `@spotlightjs/mcp` as an **independent package** with **clean dependency injection**:
+
+```mermaid
+graph TB
+    subgraph "Clean Dependencies (No Cycles)"
+        A["@spotlightjs/overlay<br/>UI + Integration Logic"] 
+        B["@spotlightjs/mcp<br/>MCP Server Implementation"]
+        C["@spotlightjs/sidecar<br/>HTTP Proxy Server"]
+        
+        B --> A
+        C --> B
+        
+        style A fill:#e1f5fe
+        style B fill:#c8e6c9  
+        style C fill:#fff3e0
+    end
+    
+    subgraph "Previous Circular Dependency (❌ BROKEN)"  
+        D["@spotlightjs/overlay"] 
+        E["@spotlightjs/sidecar"]
+        
+        E -.-> D
+        D -.-> E
+        
+        style D fill:#ffebee
+        style E fill:#ffebee
+    end
+```
 
 ## Executive Summary
 
-This plan implements MCP server functionality by having the sidecar import the `@spotlightjs/overlay` package as a dependency, enabling code reuse of integration processing logic. Both the overlay (browser) and sidecar (Node.js) will independently process the same raw events, eliminating the need for data bridges while providing rich MCP access to processed debugging data.
+This **revised plan** implements MCP server functionality through a **separate `@spotlightjs/mcp` package** that depends only on `@spotlightjs/overlay`, eliminating circular dependencies while maintaining high code reuse. The sidecar uses **dependency injection** to integrate the MCP server, creating a clean, maintainable architecture.
 
 ## Architecture Overview
 
-### Dual Processing Pattern
+### New Package Structure
+
+```mermaid
+graph TB
+    subgraph "Package Dependencies (Clean)"
+        PO["📦 @spotlightjs/overlay<br/>• React UI components<br/>• Integration processing logic<br/>• Zustand store slices<br/>• Type definitions"]
+        
+        PM["📦 @spotlightjs/mcp<br/>• MCP server implementation<br/>• Node.js compatibility layers<br/>• Store adapters<br/>• Rich debugging tools"]
+        
+        PS["📦 @spotlightjs/sidecar<br/>• HTTP proxy server<br/>• MessageBuffer system<br/>• Route handlers<br/>• MCP integration via DI"]
+        
+        PM --> PO
+        PS --> PM
+        
+        style PO fill:#e1f5fe,stroke:#0277bd
+        style PM fill:#c8e6c9,stroke:#388e3c  
+        style PS fill:#fff3e0,stroke:#f57c00
+    end
+```
+
+### Dual Processing Pattern (Revised)
 
 ```mermaid
 graph TB
@@ -32,34 +89,34 @@ graph TB
         %% Existing SSE Stream (Unchanged)
         E --> F[SSE Stream /stream]
         
-        %% NEW: Sidecar Integration Processing
-        E --> G[Event Processor]
-        G --> H[processEnvelope from @spotlightjs/overlay]
-        H --> I[Node.js Adapted Store]
+        %% NEW: MCP Package Integration (Dependency Injection)
+        E --> G[MCP Package Processor]
+        G --> H["@spotlightjs/mcp<br/>createMcpServer()"]
+        H --> I[Overlay Store Adapters]
         
-        subgraph "Processed Data Store"
+        subgraph "MCP Package (@spotlightjs/mcp)"
             I --> J[Events: Map<id, SentryEvent>]
             I --> K[Traces: Map<id, Trace>]  
             I --> L[Logs: Map<id, SentryLogEventItem>]
             I --> M[Profiles: Map<traceId, Profile>]
             I --> N[SDKs: Map<id, Sdk>]
+            
+            J --> O[Rich MCP Tools & Resources]
+            K --> O
+            L --> O
+            M --> O
+            N --> O
         end
         
-        %% MCP Server
-        D --> O[MCP Server Routes]
-        O --> P[MCP Server Instance]
-        J --> P
-        K --> P
-        L --> P
-        M --> P
-        N --> P
-        P --> Q[Rich MCP Tools & Resources]
+        %% MCP HTTP Routes
+        D --> P[/mcp HTTP endpoint]
+        P --> H
     end
     
     subgraph "Spotlight Overlay (React Browser)"
         F --> R[EventSource Connection]
         R --> S[Integration System]
-        S --> T[processEnvelope from local code]
+        S --> T[processEnvelope from overlay]
         T --> U[Browser Zustand Store]
         
         subgraph "Browser Processed Data"
@@ -76,22 +133,21 @@ graph TB
     end
     
     subgraph "MCP Clients"
-        AA[Claude Desktop] --> O
-        BB[VS Code Extension] --> O
-        CC[Custom LLM Apps] --> O
+        AA[Claude Desktop] --> P
+        BB[VS Code Extension] --> P
+        CC[Custom LLM Apps] --> P
     end
     
     subgraph "Developer"
         DD[Browser] --> Z
     end
     
-    style G fill:#ccffcc,stroke:#00aa00
-    style H fill:#ccffcc,stroke:#00aa00
-    style I fill:#ccffcc,stroke:#00aa00
-    style P fill:#ccffcc,stroke:#00aa00
-    style S fill:#ffcccc,stroke:#aa0000
-    style T fill:#ffcccc,stroke:#aa0000
-    style U fill:#ffcccc,stroke:#aa0000
+    style H fill:#c8e6c9,stroke:#388e3c
+    style I fill:#c8e6c9,stroke:#388e3c
+    style O fill:#c8e6c9,stroke:#388e3c
+    style S fill:#e1f5fe,stroke:#0277bd
+    style T fill:#e1f5fe,stroke:#0277bd
+    style U fill:#e1f5fe,stroke:#0277bd
 ```
 
 ### Data Flow Comparison
@@ -202,146 +258,212 @@ export function skipBrowserOnlySetup<T>(browserFn: () => T, nodeFallback?: () =>
 
 ## Implementation Plan
 
-### 📊 **Implementation Status Tracking**
+## 🚧 **Revised Implementation Plan: Separate MCP Package**
+
+### 📊 **Previous Implementation Status**
 
 | Phase | Component | Status | Notes |
 |-------|-----------|--------|-------|
-| **Phase 1** | Add overlay dependency | ✅ Completed | Added @spotlightjs/overlay, zustand, @modelcontextprotocol/sdk, zod |
-| **Phase 1** | Create Node.js adapter | ✅ Completed | Created nodeAdapter.ts with environment detection |
-| **Phase 2** | Sidecar store creation | ✅ Completed | Created sidecarStore.ts with 7 direct imports + 2 adapted |
-| **Phase 2** | Node.js compatibility layer | ✅ Completed | Created nodeCompatibilityLayer.ts for 2 problematic slices |
-| **Phase 2** | Sidecar event processor | ✅ Completed | Created eventProcessor.ts with processEnvelope integration |
-| **Phase 3** | MessageBuffer integration | ✅ Completed | Integrated MCP with existing MessageBuffer system |
-| **Phase 4** | MCP server implementation | ✅ Completed | Created mcpServer.ts with rich debugging tools |
-| **Phase 4** | MCP HTTP routes | ✅ Completed | Added /mcp endpoint to sidecar routes |
-| **Phase 5** | Configuration integration | ✅ Completed | Integrated with SideCarOptions |
+| **Phase 1** | Add overlay dependency | ❌ **Circular Dependency** | Caused build failures |
+| **Phase 1** | Create Node.js adapter | ❌ **Circular Dependency** | Import issues with overlay |
+| **Phase 2** | Sidecar store creation | ❌ **Circular Dependency** | TypeScript compilation errors |
+| **Phase 2** | Node.js compatibility layer | ❌ **Circular Dependency** | Path alias resolution problems |
+| **Phase 2** | Sidecar event processor | ❌ **Circular Dependency** | Build system conflicts |
+| **Phase 3** | MessageBuffer integration | ❌ **Blocked** | Dependent on above components |
+| **Phase 4** | MCP server implementation | ❌ **Blocked** | Dependent on above components |
+| **Phase 4** | MCP HTTP routes | ❌ **Blocked** | Dependent on above components |
 
-**Legend**: ⏳ Pending | 🔄 In Progress | ✅ Completed | ❌ Issues Found | 🔧 Needs Revision
+**Issue Discovered**: Direct sidecar → overlay dependency creates circular reference with existing overlay → sidecar dependencies (constants, vite plugin).
+
+### 🆕 **New Implementation Plan: @spotlightjs/mcp Package**
+
+| Phase | Component | Status | Notes |
+|-------|-----------|--------|-------|
+| **Phase 1** | Create @spotlightjs/mcp package | 🔄 **Planned** | New monorepo package with clean dependencies |
+| **Phase 1** | Package.json setup | 🔄 **Planned** | Depends only on @spotlightjs/overlay |
+| **Phase 2** | Move MCP logic to new package | 🔄 **Planned** | Migrate existing MCP implementation |
+| **Phase 2** | Export clean interface | 🔄 **Planned** | createMcpServer() function + types |
+| **Phase 3** | Update sidecar integration | 🔄 **Planned** | Use dependency injection from @spotlightjs/mcp |
+| **Phase 3** | Remove circular dependencies | 🔄 **Planned** | Clean up sidecar → overlay imports |
+| **Phase 4** | Build system verification | 🔄 **Planned** | Ensure no circular dependencies |
+| **Phase 4** | Integration testing | 🔄 **Planned** | Verify MCP functionality works |
+
+**Legend**: 🔄 Planned | ⏳ Pending | 🔄 In Progress | ✅ Completed | ❌ Issues Found
 
 ---
 
-## 🎉 **Implementation Complete!** *(Updated)*
+## 🎯 **Benefits of Separate Package Architecture**
 
-The MCP server integration has been successfully implemented and **committed to git** with **90% direct code reuse** from the overlay package, exactly as planned. 
+### ✅ **Eliminates Build Issues**
+- **No Circular Dependencies**: Clean one-way dependency chain (sidecar → mcp → overlay)
+- **Simplified Build Process**: Each package builds independently without conflicts
+- **Reliable TypeScript Compilation**: No path alias resolution issues
+- **Standard Monorepo Patterns**: Follows established dependency management practices
 
-### 📝 **Commit Information**
-- **Commit ID**: `900d16d`
-- **Branch**: `mcp-server` 
-- **Files Created**: 7 new MCP integration files
-- **MCP SDK Version**: Updated to v1.16.0
+### ✅ **Better Separation of Concerns**
+- **`@spotlightjs/overlay`**: UI components and integration logic (unchanged)
+- **`@spotlightjs/mcp`**: MCP server implementation and Node.js adapters (new)
+- **`@spotlightjs/sidecar`**: HTTP proxy server and routing (simplified)
+- **Clear Interfaces**: Each package has well-defined responsibilities
 
-The implementation includes:
+### ✅ **Enhanced Reusability**
+- **Standalone MCP Package**: Can be used independently of sidecar
+- **Flexible Integration**: Other applications can integrate MCP functionality
+- **Cleaner Testing**: MCP logic can be tested in isolation
+- **Better Documentation**: Each package can have focused documentation
 
-### ✅ **Successfully Implemented**
-- **Node.js Adapter Layer** - Environment detection and compatibility utilities
-- **Sidecar Store** - 7 direct imports + 2 adapted slices working perfectly in Node.js
-- **Event Processing** - Node.js compatible envelope processor with no store side effects
-- **MCP Server** - Rich debugging tools with processed Sentry data
-- **HTTP Integration** - `/mcp` endpoint integrated with existing sidecar routes
-- **MessageBuffer Integration** - Automatic processing of incoming envelope data
+### ✅ **Maintains Code Reuse Benefits**
+- **High Overlay Reuse**: Still leverages 85%+ of overlay integration code
+- **Node.js Adapters**: Maintains efficient Node.js compatibility layers
+- **Rich MCP Features**: All planned MCP tools and resources remain available
+- **Dual Processing**: Both overlay and MCP process events independently
 
-### 🛠️ **MCP Tools Available**
-1. `get-recent-errors` - Recent errors with full stack traces and contexts
-2. `get-trace-analysis` - Complete trace analysis with span trees and performance metrics
-3. `debug-error-with-context` - Comprehensive error debugging with related traces and logs
-4. `list-traces` - Summary of all available traces with basic metrics
+### ✅ **Improved Development Experience**
+- **Faster Builds**: No circular dependency resolution delays
+- **Better IDE Support**: Cleaner import paths and type resolution
+- **Easier Debugging**: Clear separation makes troubleshooting simpler
+- **Maintainable Code**: Well-structured package boundaries
 
-### 📁 **Files Created**
-- `packages/sidecar/src/mcp/nodeAdapter.ts` - Node.js compatibility layer
-- `packages/sidecar/src/mcp/nodeCompatibilityLayer.ts` - Adapted slices for Node.js
-- `packages/sidecar/src/mcp/sidecarStore.ts` - Zustand store with direct imports
-- `packages/sidecar/src/mcp/nodeEnvelopeProcessor.ts` - Node.js envelope processing
-- `packages/sidecar/src/mcp/eventProcessor.ts` - Event processing with store integration
-- `packages/sidecar/src/mcp/mcpIntegration.ts` - Main MCP integration class
-- `packages/sidecar/src/mcp/mcpServer.ts` - MCP server with rich tools
+---
 
-### 🔧 **Configuration Options**
+## 📦 **New Package Structure**
+
 ```typescript
-// Enable MCP server in sidecar
-setupSidecar({
-  port: 8969,
-  mcp: {
-    enabled: true,
-    tools: {
-      'get-recent-errors': { enabled: true },
-      'get-trace-analysis': { enabled: true },
-      'debug-error-with-context': { enabled: true },
-      'list-traces': { enabled: true }
-    }
+// @spotlightjs/mcp - NEW PACKAGE
+{
+  "name": "@spotlightjs/mcp",
+  "description": "MCP server implementation for Spotlight debugging data",
+  "dependencies": {
+    "@spotlightjs/overlay": "workspace:*",  // ✅ ONLY dependency
+    "@modelcontextprotocol/sdk": "^1.16.0",
+    "zustand": "^5.0.3", 
+    "zod": "^3.22.4"
   }
-});
+}
+
+// @spotlightjs/sidecar - UPDATED  
+{
+  "name": "@spotlightjs/sidecar", 
+  "dependencies": {
+    "@spotlightjs/mcp": "workspace:*",     // ✅ NEW: Clean MCP integration
+    // "@spotlightjs/overlay": REMOVED    // ✅ No more circular dependency
+    "@sentry/node": "^8.49.0",
+    "kleur": "^4.1.5",
+    // ... other existing dependencies
+  }
+}
+
+// @spotlightjs/overlay - UNCHANGED
+{
+  "name": "@spotlightjs/overlay",
+  "dependencies": {
+    // Existing dependencies remain the same
+    // No new MCP-related dependencies
+  }
+}
 ```
 
----
+## 🚀 **Revised Implementation Steps**
 
-## 🚀 **Phase 2: MCP v1.16.0 Upgrade** *(Current)*
-
-### 📋 **v1.16.0 Upgrade Status**
-
-| Component | Status | Notes |
-|-----------|--------|-------|
-| **Analysis of v1.16.0 Features** | ✅ Completed | Identified key missing features vs current implementation |
-| **Upgrade to McpServer API** | ✅ Completed | Switched from low-level Server to high-level McpServer |  
-| **StreamableHTTPServerTransport** | ✅ Completed | Replaced custom HTTP with official transport + session management |
-| **Resource System** | ✅ Completed | Added resource endpoints: recent-errors, trace-list |
-| **Debugging Prompts** | ✅ Completed | Added analyze-error prompt for AI-assisted debugging |
-| **Enhanced Tool Features** | ⏳ Skipped | Notifications/progress kept simple per user preference |
-
-### 🔍 **v1.16.0 Feature Analysis Results**
-
-**Current Implementation Gaps:**
-- Using low-level `Server` instead of high-level `McpServer` class
-- Custom HTTP handling instead of `StreamableHTTPServerTransport`
-- No resource system for exposing structured data
-- Missing tool annotations and advanced features
-
-**Completed v1.16.0 Upgrades:**
-- ✅ **McpServer High-Level API**: Switched from `Server` to `McpServer` for simpler tool/resource registration
-- ✅ **StreamableHTTPServerTransport**: Replaced custom HTTP handling with official transport including session management
-- ✅ **Resource System**: Added `spotlight://errors/recent` and `spotlight://traces/list` resources
-- ✅ **Debugging Prompts**: Added `analyze-error` prompt for AI-assisted error analysis
-- ✅ **Proper Lifecycle Management**: Added MCP integration cleanup in server shutdown
-
-**Intentionally Skipped (Per User Preference):**
-- ❌ **OAuth Authentication**: Not needed for local development debugging
-- ❌ **Complex Tool Features**: Keeping focused on core debugging use case
-- ❌ **Advanced Notifications**: Simple implementation preferred
-
-### 🎯 **Key v1.16.0 Improvements Implemented**
-
-1. **Better Architecture**: Using official `McpServer` class with proper capability declarations
-2. **Session Management**: `StreamableHTTPServerTransport` with UUID-based session IDs for connection resilience  
-3. **Structured Data Access**: Resources allow LLMs to directly access JSON data without tool calls
-4. **AI-Assisted Debugging**: The `analyze-error` prompt creates context-rich prompts for error analysis
-5. **Production Ready**: Proper async shutdown handling and resource cleanup
-
-## 🚀 **Next Steps for Testing & Deployment**
-
-### 1. Install Dependencies
+### Step 1: Create @spotlightjs/mcp Package
 ```bash
+# Create new package directory
+mkdir packages/mcp
+cd packages/mcp
+
+# Initialize package.json
+npm init -y
+```
+
+### Step 2: Migrate Existing MCP Code
+```bash
+# Move MCP implementation from sidecar to new package
+mv packages/sidecar/src/mcp/* packages/mcp/src/
+```
+
+### Step 3: Clean Package Interface
+```typescript
+// packages/mcp/src/index.ts - Main export
+export { createMcpServer } from './mcpServer.js';
+export type { McpServerOptions, McpServerInstance } from './types.js';
+
+// Clean dependency injection interface for sidecar
+export interface McpServerOptions {
+  enabled: boolean;
+  tools?: string[];
+  resources?: string[];
+  transport?: 'http' | 'stdio';
+  port?: number;
+}
+
+export interface McpServerInstance {
+  start(): Promise<void>;
+  stop(): Promise<void>;
+  handleRequest(req: any, res: any): Promise<void>;
+  processRawEvent(event: RawEventContext): Promise<void>;
+}
+```
+
+### Step 4: Update Sidecar Integration
+```typescript
+// packages/sidecar/src/main.ts - Simplified MCP integration
+import { createMcpServer, type McpServerInstance } from '@spotlightjs/mcp';
+
+export function startSidecar(options: SideCarOptions = {}): Promise<SidecarInstance> {
+  // ... existing code ...
+  
+  let mcpServer: McpServerInstance | null = null;
+  
+  if (options.mcp?.enabled) {
+    mcpServer = createMcpServer(options.mcp);
+    await mcpServer.start();
+  }
+  
+  const incomingPayload: IncomingPayloadCallback = (body: string) => {
+    const [contentType, payload] = parseIncomingData(body);
+    buffer.push([contentType, payload]);
+    
+    // Simple event forwarding to MCP server
+    if (mcpServer && contentType === 'application/x-sentry-envelope') {
+      mcpServer.processRawEvent({ data: payload, contentType });
+    }
+  };
+  
+  // ... rest of existing code ...
+}
+```
+
+## 🧪 **Testing & Verification Plan**
+
+### 1. Create MCP Package
+```bash
+# In packages/mcp/
 pnpm install
-```
-
-### 2. Build Project
-```bash
 pnpm build
 ```
 
-### 3. Test MCP Integration
+### 2. Build Sidecar with MCP Integration
+```bash  
+# In packages/sidecar/
+pnpm install  # Will install new @spotlightjs/mcp dependency
+pnpm build    # Should build without circular dependency issues
+```
+
+### 3. Verify No Circular Dependencies
+```bash
+# From project root
+pnpm turbo build  # Should complete without dependency cycle errors
+```
+
+### 4. Test MCP Functionality
 ```bash
 # Start sidecar with MCP enabled
 node packages/sidecar/dist/server.js --mcp-enabled
 
-# Send test envelope data to trigger processing
-# MCP server will be available at http://localhost:8969/mcp
-```
-
-### 4. Verify MCP Tools Work
-```bash
-# Test MCP tool call
+# Test MCP endpoint
 curl -X POST http://localhost:8969/mcp \
   -H "Content-Type: application/json" \
-  -d '{"method": "tools/call", "params": {"name": "list-traces", "arguments": {"limit": 5}}}'
+  -d '{"method": "tools/call", "params": {"name": "get-recent-errors", "arguments": {"count": 5}}}'
 ```
 
 ## ⚠️ **Potential Issues & Solutions**
@@ -1151,6 +1273,38 @@ After comprehensive analysis, **85% of the integration code works directly in No
 5. **Independent Operation** - Both overlay and sidecar work autonomously
 6. **No New Dependencies** - Uses only existing packages and Node.js built-ins
 
-This enables powerful MCP integrations that expose truly valuable debugging data to LLM applications while maintaining the robustness and performance of the existing Spotlight architecture.
+---
 
-The result is a **clean implementation** that makes Spotlight's debugging capabilities accessible to Claude Desktop, VS Code extensions, and custom LLM applications with minimal development effort and high code reuse.
+## 🎯 **Summary: Revised Architecture Benefits**
+
+The **separate MCP package architecture** provides a **superior solution** that solves the circular dependency issue while maintaining all the benefits of the original approach:
+
+### ✅ **Problem Solved**
+- **Eliminates Circular Dependencies**: Clean one-way dependency chain (sidecar → mcp → overlay)
+- **Reliable Build Process**: No more TypeScript compilation errors or path resolution issues
+- **Standard Monorepo Patterns**: Follows established best practices for package dependencies
+
+### ✅ **Benefits Preserved**  
+- **High Code Reuse**: Still achieves 85%+ reuse of overlay integration logic
+- **Rich MCP Features**: All planned tools and resources remain available  
+- **Dual Processing**: Both overlay and MCP continue to process events independently
+- **No Network Overhead**: Direct access to processed debugging data
+
+### ✅ **Additional Benefits Gained**
+- **Better Separation of Concerns**: Each package has clear, focused responsibilities
+- **Enhanced Reusability**: MCP package can be used independently of sidecar
+- **Improved Testing**: MCP logic can be tested in isolation
+- **Cleaner Interfaces**: Well-defined dependency injection points
+
+### 🚀 **Final Result**
+
+This **revised approach** delivers a **robust, maintainable MCP integration** that:
+
+1. **Exposes Rich Debugging Data** - Full access to processed events, traces, logs, and profiles
+2. **Eliminates Build Complexity** - Clean package boundaries with no circular dependencies  
+3. **Maintains High Performance** - Direct data access without network bridges
+4. **Enables LLM Integration** - Claude Desktop, VS Code extensions, and custom applications can access Spotlight debugging data
+5. **Preserves Existing Functionality** - Overlay continues to work unchanged
+6. **Follows Best Practices** - Standard monorepo architecture with proper dependency management
+
+The end result is a **production-ready MCP integration** that makes Spotlight's powerful debugging capabilities easily accessible to LLM applications while maintaining the robustness, performance, and maintainability of the existing architecture.
