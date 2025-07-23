@@ -8,6 +8,7 @@ import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./const
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
 import { MessageBuffer } from "./messageBuffer.js";
+import { McpIntegration, type McpIntegrationOptions } from "./mcp/mcpIntegration.js";
 
 type Payload = [string, Buffer];
 
@@ -47,6 +48,11 @@ type SideCarOptions = {
   incomingPayload?: IncomingPayloadCallback;
 
   isStandalone?: boolean;
+
+  /**
+   * MCP (Model Context Protocol) integration options
+   */
+  mcp?: McpIntegrationOptions;
 };
 
 type RequestHandler = (
@@ -322,6 +328,7 @@ function startServer(
   basePath?: string,
   filesToServe?: Record<string, Buffer>,
   incomingPayload?: IncomingPayloadCallback,
+  mcpOptions?: McpIntegrationOptions,
 ): Server {
   if (basePath && !filesToServe) {
     filesToServe = {
@@ -329,12 +336,26 @@ function startServer(
       "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
     };
   }
+
+  // Initialize MCP integration if enabled
+  let mcpIntegration: McpIntegration | null = null;
+  let mcpUnsubscribe: (() => void) | null = null;
+  
+  if (mcpOptions?.enabled) {
+    mcpIntegration = new McpIntegration(mcpOptions);
+    mcpUnsubscribe = mcpIntegration.subscribeToBuffer(buffer);
+  }
+
   const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
     [/^\/clear$/, enableCORS(handleClearRequest)],
     [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
     [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), enableCORS(contextLinesHandler)],
+    // Add MCP route if integration is enabled
+    ...(mcpIntegration ? [
+      [/^\/mcp$/, enableCORS((req: IncomingMessage, res: ServerResponse) => mcpIntegration.handleMcpRequest(req, res))]
+    ] as [RegExp, RequestHandler][] : []),
     [/^.+$/, filesToServe != null ? enableCORS(fileServer(filesToServe)) : error404],
   ];
 
@@ -473,6 +494,7 @@ export function setupSidecar({
   debug,
   incomingPayload,
   isStandalone,
+  mcp,
 }: SideCarOptions = {}): void {
   if (!isStandalone) {
     addEventProcessor(event => (event.spans?.some(span => span.op?.startsWith("sidecar.")) ? null : event));
@@ -502,7 +524,7 @@ export function setupSidecar({
         logSpotlightUrl(sidecarPort);
       }
     } else if (!serverInstance) {
-      serverInstance = startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
+      serverInstance = startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload, mcp);
     }
   });
 }
