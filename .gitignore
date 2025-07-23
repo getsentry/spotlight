@@ -49,3 +49,5 @@ junit.xml
 # Build artifacts
 *.tgz
 tsconfig.tsbuildinfo
+
+git-repos/
