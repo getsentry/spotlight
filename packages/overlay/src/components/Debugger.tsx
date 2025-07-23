@@ -50,7 +50,7 @@ export default function Debugger({
   setTriggerButtonCount: (count: NotificationCount) => void;
   fullPage: boolean;
   showClearEventsButton: boolean;
-  contextId?: string;
+  contextId: string;
 }) {
   return (
     <FullscreenBlur isOpen={isOpen} setOpen={setOpen} fullPage={fullPage}>
