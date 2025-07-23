@@ -78,16 +78,16 @@ graph TB
 ```mermaid
 graph TB
     subgraph "Backend Services"
-        A[Sentry SDK] --> B[POST /stream or /api/envelope]
+        A[Sentry SDK] --> B["POST /stream or /api/envelope"]
         C[Other SDKs] --> B
     end
     
     subgraph "Spotlight Sidecar :8969 (Node.js)"
         B --> D[HTTP Server]
-        D --> E[MessageBuffer<Raw>]
+        D --> E["MessageBuffer&lt;Raw&gt;"]
         
         %% Existing SSE Stream (Unchanged)
-        E --> F[SSE Stream /stream]
+        E --> F["SSE Stream /stream"]
         
         %% NEW: MCP Package Integration (Dependency Injection)
         E --> G[MCP Package Processor]
@@ -95,11 +95,11 @@ graph TB
         H --> I[Overlay Store Adapters]
         
         subgraph "MCP Package (@spotlightjs/mcp)"
-            I --> J[Events: Map<id, SentryEvent>]
-            I --> K[Traces: Map<id, Trace>]  
-            I --> L[Logs: Map<id, SentryLogEventItem>]
-            I --> M[Profiles: Map<traceId, Profile>]
-            I --> N[SDKs: Map<id, Sdk>]
+            I --> J["Events: Map&lt;id, SentryEvent&gt;"]
+            I --> K["Traces: Map&lt;id, Trace&gt;"]  
+            I --> L["Logs: Map&lt;id, SentryLogEventItem&gt;"]
+            I --> M["Profiles: Map&lt;traceId, Profile&gt;"]
+            I --> N["SDKs: Map&lt;id, Sdk&gt;"]
             
             J --> O[Rich MCP Tools & Resources]
             K --> O
@@ -109,7 +109,7 @@ graph TB
         end
         
         %% MCP HTTP Routes
-        D --> P[/mcp HTTP endpoint]
+        D --> P["MCP HTTP endpoint"]
         P --> H
     end
     
@@ -166,27 +166,27 @@ sequenceDiagram
     participant LLM as LLM Client
     participant UI as Browser UI
     
-    %% Raw event processing
-    Backend ->> Sidecar: POST raw event data
-    Sidecar ->> Buffer: Store raw data
+    Note over Backend,UI: Raw event processing
+    Backend->>Sidecar: POST raw event data
+    Sidecar->>Buffer: Store raw data
     
-    %% Parallel processing paths
+    Note over Buffer,UI: Parallel processing paths
     par Sidecar Processing
-        Buffer ->> SidecarProcessor: Raw event
-        SidecarProcessor ->> SidecarStore: Processed data (events, traces, logs)
-        SidecarStore ->> McpServer: Rich data available
+        Buffer->>SidecarProcessor: Raw event
+        SidecarProcessor->>SidecarStore: Processed data
+        SidecarStore->>McpServer: Rich data available
     and Overlay Processing (Existing)
-        Buffer ->> Overlay: SSE stream
-        Overlay ->> OverlayProcessor: Raw event  
-        OverlayProcessor ->> OverlayStore: Processed data (events, traces, logs)
-        OverlayStore ->> UI: UI updates
+        Buffer->>Overlay: SSE stream
+        Overlay->>OverlayProcessor: Raw event  
+        OverlayProcessor->>OverlayStore: Processed data
+        OverlayStore->>UI: UI updates
     end
     
-    %% MCP Access
-    LLM ->> McpServer: get-recent-errors
-    McpServer ->> SidecarStore: Query processed events
-    SidecarStore -->> McpServer: Rich structured data
-    McpServer -->> LLM: Processed error events with full context
+    Note over LLM,McpServer: MCP Access
+    LLM->>McpServer: get-recent-errors
+    McpServer->>SidecarStore: Query processed events
+    SidecarStore-->>McpServer: Rich structured data
+    McpServer-->>LLM: Processed error events with full context
 ```
 
 ## Node.js Compatibility Strategy
