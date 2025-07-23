@@ -22,7 +22,8 @@
       "types": "./dist/sentry-spotlight.d.ts",
       "import": "./dist/sentry-spotlight.js",
       "require": "./dist/sentry-spotlight.umd.cjs"
-    }
+    },
+    "./dist/*": "./dist/*"
   },
   "devDependencies": {
     "@fontsource/raleway": "^5.1.0",

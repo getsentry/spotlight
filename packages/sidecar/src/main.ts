@@ -3,12 +3,12 @@ import { type IncomingMessage, type Server, type ServerResponse, createServer, g
 import { extname, join, resolve } from "node:path";
 import { createGunzip, createInflate } from "node:zlib";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
+import { McpIntegration, type McpIntegrationOptions } from "@spotlightjs/mcp";
 import launchEditor from "launch-editor";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
 import { MessageBuffer } from "./messageBuffer.js";
-import { McpIntegration, type McpIntegrationOptions } from "./mcp/mcpIntegration.js";
 
 type Payload = [string, Buffer];
 
@@ -338,11 +338,16 @@ function startServer(
   }
 
   // Initialize MCP integration if enabled
-  let mcpUnsubscribe: (() => void) | null = null;
-  
   if (mcpOptions?.enabled) {
-    globalMcpIntegration = new McpIntegration(mcpOptions);
-    mcpUnsubscribe = globalMcpIntegration.subscribeToBuffer(buffer);
+    // Create adapter function to match ContextLinesHandler signature
+    const contextLinesAdapter = async (stacktrace: any) => {
+      // Convert stacktrace to context lines - this is a simplified adapter
+      // In a full implementation, you'd process the stacktrace and return context
+      return { frames: stacktrace.frames || [] };
+    };
+
+    globalMcpIntegration = new McpIntegration(mcpOptions, contextLinesAdapter);
+    globalMcpIntegration.subscribeToBuffer(buffer);
   }
 
   const ROUTES: [RegExp, RequestHandler][] = [
@@ -352,9 +357,14 @@ function startServer(
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
     [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), enableCORS(contextLinesHandler)],
     // Add MCP route if integration is enabled
-    ...(globalMcpIntegration ? [
-      [/^\/mcp$/, enableCORS((req: IncomingMessage, res: ServerResponse) => globalMcpIntegration.handleMcpRequest(req, res))]
-    ] as [RegExp, RequestHandler][] : []),
+    ...(globalMcpIntegration
+      ? ([
+          [
+            /^\/mcp$/,
+            enableCORS((req: IncomingMessage, res: ServerResponse) => globalMcpIntegration!.handleMcpRequest(req, res)),
+          ],
+        ] as [RegExp, RequestHandler][])
+      : []),
     [/^.+$/, filesToServe != null ? enableCORS(fileServer(filesToServe)) : error404],
   ];
 
@@ -545,17 +555,17 @@ export const shutdown = async () => {
   if (serverInstance) {
     forceShutdown = true;
     logger.info("Shutting down server gracefully...");
-    
+
     // Close MCP integration first
     if (globalMcpIntegration) {
       try {
         await globalMcpIntegration.close();
         globalMcpIntegration = null;
       } catch (error) {
-        logger.error('Error closing MCP integration:', error);
+        logger.error(`Error closing MCP integration: ${error}`);
       }
     }
-    
+
     serverInstance.close();
     serverInstance.closeAllConnections();
     serverInstance.unref();

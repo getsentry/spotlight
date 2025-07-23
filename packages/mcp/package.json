@@ -1,0 +1,37 @@
+{
+  "name": "@spotlightjs/mcp",
+  "description": "MCP server implementation for Spotlight debugging data",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist"
+  },
+  "files": ["dist"],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "dependencies": {
+    "@spotlightjs/overlay": "workspace:*",
+    "@spotlightjs/sidecar": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.16.0",
+    "@sentry/core": "^9.22.0",
+    "zustand": "^5.0.3",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@spotlightjs/tsconfig": "workspace:*",
+    "@types/node": "^22.15.21",
+    "typescript": "^5.6.2"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

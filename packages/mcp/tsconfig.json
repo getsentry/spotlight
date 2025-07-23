@@ -1,0 +1,23 @@
+{
+  "extends": "@spotlightjs/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"]
+    },
+    "moduleResolution": "nodenext",
+    "esModuleInterop": false,
+    "target": "esnext",
+    "module": "nodenext",
+    /* paths */
+    "outDir": "dist",
+    "rootDir": "src",
+    /* Override base config to emit JS files */
+    "emitDeclarationOnly": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": ["src/*"]
+}

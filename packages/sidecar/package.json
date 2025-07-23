@@ -30,6 +30,11 @@
     "./constants": {
       "import": "./src/constants.js",
       "types": "./dist/constants.d.ts"
+    },
+    "./messageBuffer": {
+      "types": "./src/messageBuffer.ts",
+      "import": "./src/messageBuffer.ts",
+      "default": "./src/messageBuffer.ts"
     }
   },
   "dependencies": {
@@ -37,10 +42,7 @@
     "kleur": "^4.1.5",
     "launch-editor": "^2.9.1",
     "@jridgewell/trace-mapping": "^0.3.25",
-    "@spotlightjs/overlay": "workspace:*",
-    "zustand": "^5.0.3",
-    "@modelcontextprotocol/sdk": "^1.16.0",
-    "zod": "^3.22.4"
+    "@spotlightjs/mcp": "workspace:*"
   },
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
