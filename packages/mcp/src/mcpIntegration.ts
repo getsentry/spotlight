@@ -6,10 +6,13 @@ import { logger } from "./logger.js";
 import { createSpotlightMcpServer } from "./mcpServer.js";
 import type { ContextLinesHandler } from "./nodeCompatibilityLayer.js";
 
-// Import MessageBuffer from sidecar package using proper export
-import type { MessageBuffer } from "@spotlightjs/sidecar/messageBuffer";
-
 type Payload = [string, Buffer];
+
+// Type definition for MessageBuffer to avoid circular dependency
+interface MessageBuffer<T> {
+  subscribe(callback: (item: T) => void): string;
+  unsubscribe(readerId: string): void;
+}
 
 export interface McpIntegrationOptions {
   enabled?: boolean;

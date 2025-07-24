@@ -3,7 +3,31 @@ import { type IncomingMessage, type Server, type ServerResponse, createServer, g
 import { extname, join, resolve } from "node:path";
 import { createGunzip, createInflate } from "node:zlib";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
-import { McpIntegration, type McpIntegrationOptions } from "@spotlightjs/mcp";
+// Import MCP types only - will use dynamic import for runtime
+type McpIntegrationOptions = {
+  enabled?: boolean;
+  tools?: {
+    [toolName: string]: {
+      enabled: boolean;
+      permissions?: string[];
+    };
+  };
+  resources?: {
+    [resourceName: string]: {
+      enabled: boolean;
+      cacheTtl?: number;
+    };
+  };
+  processing?: {
+    enableStacktraceProcessing?: boolean;
+    enableProfileProcessing?: boolean;
+    memoryLimits?: {
+      maxEvents?: number;
+      maxTraces?: number;
+      ttlHours?: number;
+    };
+  };
+};
 import launchEditor from "launch-editor";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
@@ -322,14 +346,14 @@ function logSpotlightUrl(port: number): void {
   logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
 }
 
-function startServer(
+async function startServer(
   buffer: MessageBuffer<Payload>,
   port: number,
   basePath?: string,
   filesToServe?: Record<string, Buffer>,
   incomingPayload?: IncomingPayloadCallback,
   mcpOptions?: McpIntegrationOptions,
-): Server {
+): Promise<Server> {
   if (basePath && !filesToServe) {
     filesToServe = {
       "/src/index.html": readFileSync(join(basePath, "src/index.html")),
@@ -337,17 +361,27 @@ function startServer(
     };
   }
 
-  // Initialize MCP integration if enabled
+  // Initialize MCP integration if enabled using dynamic import
   if (mcpOptions?.enabled) {
-    // Create adapter function to match ContextLinesHandler signature
-    const contextLinesAdapter = async (stacktrace: any) => {
-      // Convert stacktrace to context lines - this is a simplified adapter
-      // In a full implementation, you'd process the stacktrace and return context
-      return { frames: stacktrace.frames || [] };
-    };
+    try {
+      // @ts-ignore - Dynamic import, package not in dependencies
+      const mcpModule = await import("@spotlightjs/mcp");
+      const McpIntegration = mcpModule.McpIntegration;
 
-    globalMcpIntegration = new McpIntegration(mcpOptions, contextLinesAdapter);
-    globalMcpIntegration.subscribeToBuffer(buffer);
+      // Create adapter function to match ContextLinesHandler signature
+      const contextLinesAdapter = async (stacktrace: any) => {
+        // Convert stacktrace to context lines - this is a simplified adapter
+        // In a full implementation, you'd process the stacktrace and return context
+        return { frames: stacktrace.frames || [] };
+      };
+
+      // @ts-ignore - Dynamic import, constructor signature unknown at compile time
+      globalMcpIntegration = new (McpIntegration as any)(mcpOptions, contextLinesAdapter);
+      // @ts-ignore - Dynamic import, method signature unknown at compile time
+      globalMcpIntegration.subscribeToBuffer(buffer);
+    } catch (error) {
+      logger.error(`Failed to load MCP integration: ${error}`);
+    }
   }
 
   const ROUTES: [RegExp, RequestHandler][] = [
@@ -440,7 +474,7 @@ function startServer(
 
 let serverInstance: Server;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
-let globalMcpIntegration: McpIntegration | null = null;
+let globalMcpIntegration: any | null = null;
 const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
 
 const isValidPort = withTracing(
@@ -496,7 +530,7 @@ const isSidecarRunning = withTracing(
   { name: "isSidecarRunning", op: "sidecar.server.collideCheck" },
 );
 
-export function setupSidecar({
+export async function setupSidecar({
   port,
   logger: customLogger,
   basePath,
@@ -505,7 +539,7 @@ export function setupSidecar({
   incomingPayload,
   isStandalone,
   mcp,
-}: SideCarOptions = {}): void {
+}: SideCarOptions = {}): Promise<void> {
   if (!isStandalone) {
     addEventProcessor(event => (event.spans?.some(span => span.op?.startsWith("sidecar.")) ? null : event));
   }
@@ -526,7 +560,7 @@ export function setupSidecar({
     sidecarPort = typeof port === "string" ? Number(port) : port;
   }
 
-  isSidecarRunning(sidecarPort).then((isRunning: boolean) => {
+  isSidecarRunning(sidecarPort).then(async (isRunning: boolean) => {
     if (isRunning) {
       logger.info(`Sidecar is already running on port ${sidecarPort}`);
       const hasSpotlightUI = (filesToServe && "/src/index.html" in filesToServe) || (!filesToServe && basePath);
@@ -534,7 +568,7 @@ export function setupSidecar({
         logSpotlightUrl(sidecarPort);
       }
     } else if (!serverInstance) {
-      serverInstance = startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload, mcp);
+      serverInstance = await startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload, mcp);
     }
   });
 }

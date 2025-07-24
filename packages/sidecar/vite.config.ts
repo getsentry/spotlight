@@ -22,7 +22,11 @@ export default defineConfig({
     outDir: "./dist",
     sourcemap: true,
     rollupOptions: {
-      external: [...dependencies, ...builtinModules.map(x => `node:${x}`)],
+      external: [
+        ...dependencies,
+        ...builtinModules.map(x => `node:${x}`),
+        "@spotlightjs/mcp", // Dynamic import, not in package.json dependencies
+      ],
     },
   },
 });
