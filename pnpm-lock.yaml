@@ -136,7 +136,7 @@ importers:
         version: 4.2.19
       svelte-check:
         specifier: ^3.8.6
-        version: 3.8.6(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.6))(postcss@8.5.6)(svelte@4.2.19)
+        version: 3.8.6(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.3))(postcss@8.5.3)(svelte@4.2.19)
       tslib:
         specifier: ^2.7.0
         version: 2.8.1
@@ -271,7 +271,7 @@ importers:
         version: 4.2.19
       svelte-check:
         specifier: ^3.8.6
-        version: 3.8.6(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.3))(postcss@8.5.3)(svelte@4.2.19)
+        version: 3.8.6(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.6))(postcss@8.5.6)(svelte@4.2.19)
       tslib:
         specifier: ^2.7.0
         version: 2.8.1
@@ -355,9 +355,6 @@ importers:
       '@spotlightjs/overlay':
         specifier: workspace:*
         version: link:../overlay
-      '@spotlightjs/sidecar':
-        specifier: workspace:*
-        version: link:../sidecar
       zod:
         specifier: ^3.22.4
         version: 3.24.2
@@ -371,9 +368,18 @@ importers:
       '@types/node':
         specifier: ^22.15.21
         version: 22.15.28
+      '@vitest/coverage-v8':
+        specifier: ^0.34.6
+        version: 0.34.6(vitest@0.34.6(happy-dom@15.11.7)(lightningcss@1.30.1)(playwright@1.52.0)(terser@5.43.1))
+      happy-dom:
+        specifier: ^15.10.2
+        version: 15.11.7
       typescript:
         specifier: ^5.6.2
         version: 5.8.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(happy-dom@15.11.7)(lightningcss@1.30.1)(playwright@1.52.0)(terser@5.43.1)
 
   packages/overlay:
     devDependencies:
@@ -521,9 +527,6 @@ importers:
       '@sentry/node':
         specifier: ^8.49.0
         version: 8.55.0
-      '@spotlightjs/mcp':
-        specifier: workspace:*
-        version: link:../mcp
       kleur:
         specifier: ^4.1.5
         version: 4.1.5
@@ -9684,7 +9687,7 @@ snapshots:
     dependencies:
       '@babel/types': 7.25.7
       '@jridgewell/gen-mapping': 0.3.8
-      '@jridgewell/trace-mapping': 0.3.25
+      '@jridgewell/trace-mapping': 0.3.29
       jsesc: 3.0.2
 
   '@babel/generator@7.26.2':
@@ -10798,8 +10801,8 @@ snapshots:
   '@jridgewell/gen-mapping@0.3.8':
     dependencies:
       '@jridgewell/set-array': 1.2.1
-      '@jridgewell/sourcemap-codec': 1.5.0
-      '@jridgewell/trace-mapping': 0.3.25
+      '@jridgewell/sourcemap-codec': 1.5.4
+      '@jridgewell/trace-mapping': 0.3.29
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
@@ -12376,7 +12379,7 @@ snapshots:
     dependencies:
       '@sentry/browser': 8.55.0
       '@sentry/core': 8.55.0
-      magic-string: 0.30.7
+      magic-string: 0.30.17
       svelte: 4.2.19
 
   '@sentry/svelte@8.8.0(svelte@4.2.19)':
@@ -13360,7 +13363,7 @@ snapshots:
       istanbul-lib-source-maps: 4.0.1
       istanbul-reports: 3.1.7
       magic-string: 0.30.17
-      picocolors: 1.1.0
+      picocolors: 1.1.1
       std-env: 3.7.0
       test-exclude: 6.0.0
       v8-to-istanbul: 9.3.0
@@ -19408,7 +19411,7 @@ snapshots:
 
   v8-to-istanbul@9.3.0:
     dependencies:
-      '@jridgewell/trace-mapping': 0.3.25
+      '@jridgewell/trace-mapping': 0.3.29
       '@types/istanbul-lib-coverage': 2.0.6
       convert-source-map: 2.0.0
 
