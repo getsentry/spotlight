@@ -32,6 +32,9 @@ export default defineConfig(({ mode }) => {
         sourcemap: true,
         rollupOptions: {
           plugins: [sourcemaps()],
+          external: [
+            "@spotlightjs/mcp", // Dynamic import used by sidecar, not bundled
+          ],
           input: {
             index: resolve(__dirname, "src/electron/main/index.ts"),
           },
