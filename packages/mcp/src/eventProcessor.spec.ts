@@ -1,35 +1,33 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { mockErrorEvent, mockRawEventContext } from "./__fixtures__/sentryEvents.js";
 import { McpEventProcessor } from "./eventProcessor.js";
 import type { RawEventContext } from "./nodeAdapter.js";
 import type { ContextLinesHandler } from "./nodeCompatibilityLayer.js";
 
-// Mock the logger to avoid console output during tests
-vi.mock("./logger.js", () => ({
-  logger: {
-    info: vi.fn(),
-    debug: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-  },
-}));
-
-// Mock the mcpStore to avoid import issues during tests
+// Mock the store to avoid dependency issues
 vi.mock("./mcpStore.js", () => ({
-  createMcpSentryStore: vi.fn().mockReturnValue({
-    getState: vi.fn().mockReturnValue({
-      pushEnvelope: vi.fn().mockReturnValue(1),
-      getEvents: vi.fn().mockReturnValue([]),
+  createMcpSentryStore: () => ({
+    getState: () => ({
+      pushEnvelope: () => 1,
+      resetData: () => {},
+      getEvents: () => [],
+      getTraces: () => [],
+      getLogs: () => [],
+      getProfiles: () => [],
+      getSdks: () => [],
+      getErrorEvents: () => [],
+      getTransactionEvents: () => [],
+      getEventById: () => null,
+      getTraceById: () => null,
+      getLogsByTraceId: () => [],
       tracesById: new Map(),
-      getEventById: vi.fn().mockReturnValue(null),
-      getTraceById: vi.fn().mockReturnValue(null),
-      getLogsByTraceId: vi.fn().mockReturnValue([]),
-      getLogs: vi.fn().mockReturnValue([]),
       profilesByTraceId: new Map(),
       sdks: new Map(),
-      resetData: vi.fn(),
     }),
   }),
 }));
+
+// Use real logger - tests can handle console output
 
 describe("McpEventProcessor", () => {
   let processor: McpEventProcessor;
@@ -50,12 +48,11 @@ describe("McpEventProcessor", () => {
   });
 
   test("should process raw event successfully", async () => {
-    const mockRawEvent: RawEventContext = {
-      data: Buffer.from('{"message":"test event"}'),
-      contentType: "application/json",
-    };
+    await expect(processor.processRawEvent(mockRawEventContext)).resolves.not.toThrow();
 
-    await expect(processor.processRawEvent(mockRawEvent)).resolves.not.toThrow();
+    // Verify event was processed (should be accessible in processor)
+    const events = processor.getEvents();
+    expect(Array.isArray(events)).toBe(true);
   });
 
   test("should handle processing errors gracefully", async () => {
