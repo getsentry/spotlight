@@ -10,6 +10,11 @@ dialog {
   max-width: 90vw;
 }
 
+:root {
+  --sl-font: ui-sans-serif, sans-serif, system-ui, "Helvetica", "Arial";
+  --sl-font-monospace: ui-monospace, monospace, "Menlo", "Consolas", "Courier New";
+}
+
 :root,
 :root[data-theme='light'] {
   --sl-color-white: #fff;
