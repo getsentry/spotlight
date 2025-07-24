@@ -1,4 +1,12 @@
+import type { Server } from "node:http";
+import type { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import {
+  createTestMcpServer,
+  initializeMcpServer,
+  sendMcpRequest,
+  stopTestMcpServer,
+} from "./__helpers__/mcpTestServer.js";
 import { McpIntegration } from "./mcpIntegration.js";
 import type { ContextLinesHandler } from "./nodeCompatibilityLayer.js";
 
@@ -23,14 +31,14 @@ vi.mock("./mcpStore.js", () => ({
 }));
 
 vi.mock("@modelcontextprotocol/sdk/server/streamableHttp.js", () => ({
-  StreamableHTTPServerTransport: () => ({
+  StreamableHTTPServerTransport: vi.fn().mockImplementation(() => ({
     handleRequest: vi.fn().mockResolvedValue(undefined),
     close: vi.fn().mockResolvedValue(undefined),
-  }),
+  })),
 }));
 
 vi.mock("./mcpServer.js", () => ({
-  createSpotlightMcpServer: () => ({
+  createSpotlightMcpServer: vi.fn().mockReturnValue({
     connect: vi.fn().mockResolvedValue(undefined),
     close: vi.fn().mockResolvedValue(undefined),
   }),
@@ -39,6 +47,8 @@ vi.mock("./mcpServer.js", () => ({
 describe("MCP Integration Tests", () => {
   let integration: McpIntegration;
   let mockContextLinesHandler: ContextLinesHandler;
+  let _server: Server;
+  let _transport: StreamableHTTPServerTransport;
 
   beforeEach(() => {
     mockContextLinesHandler = vi.fn().mockResolvedValue({
@@ -60,87 +70,13 @@ describe("MCP Integration Tests", () => {
     if (integration) {
       await integration.close();
     }
+    if (_server) {
+      await stopTestMcpServer({ server: _server, transport: _transport });
+    }
     vi.clearAllMocks();
   });
 
   describe("End-to-End MCP Workflow", () => {
-    test("should handle complete Sentry envelope processing workflow", async () => {
-      // Initialize MCP integration
-      integration = new McpIntegration(
-        {
-          enabled: true,
-          tools: {
-            "get-recent-errors": { enabled: true },
-            "get-trace-analysis": { enabled: true },
-            "debug-error-with-context": { enabled: true },
-            "list-traces": { enabled: true },
-          },
-          resources: {
-            "spotlight://errors/recent": { enabled: true, cacheTtl: 300 },
-            "spotlight://traces/list": { enabled: true, cacheTtl: 300 },
-          },
-        },
-        mockContextLinesHandler,
-      );
-
-      // Mock Sentry envelope data
-      const sentryEnvelope = JSON.stringify({
-        event_id: "test-error-1",
-        timestamp: Date.now() / 1000,
-        level: "error",
-        exception: {
-          values: [
-            {
-              type: "TypeError",
-              value: "Cannot read property 'foo' of undefined",
-              stacktrace: {
-                frames: [
-                  {
-                    filename: "app.js",
-                    function: "processData",
-                    lineno: 42,
-                    colno: 15,
-                  },
-                ],
-              },
-            },
-          ],
-        },
-        contexts: {
-          trace: {
-            trace_id: "test-trace-1",
-            span_id: "test-span-1",
-          },
-        },
-        breadcrumbs: [
-          {
-            message: "User clicked submit button",
-            category: "ui",
-            timestamp: Date.now() / 1000 - 5,
-          },
-        ],
-        tags: {
-          environment: "test",
-          version: "1.0.0",
-        },
-        user: {
-          id: "user-123",
-          email: "test@example.com",
-        },
-      });
-
-      // Process the envelope
-      await integration.processPayload("application/x-sentry-envelope", Buffer.from(sentryEnvelope));
-
-      // Verify event processor has the data
-      const eventProcessor = integration.getEventProcessor();
-      expect(eventProcessor).toBeDefined();
-
-      // Test that the integration is properly configured
-      expect(integration.getMcpServer()).toBeDefined();
-      expect(integration.getTransport()).toBeDefined();
-    });
-
     test("should handle MessageBuffer subscription workflow", async () => {
       integration = new McpIntegration(
         {

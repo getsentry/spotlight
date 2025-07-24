@@ -24,17 +24,17 @@ vi.mock("./mcpStore.js", () => ({
 }));
 
 vi.mock("./mcpServer.js", () => ({
-  createSpotlightMcpServer: () => ({
-    connect: () => Promise.resolve(),
-    close: () => Promise.resolve(),
+  createSpotlightMcpServer: vi.fn().mockReturnValue({
+    connect: vi.fn().mockResolvedValue(undefined),
+    close: vi.fn().mockResolvedValue(undefined),
   }),
 }));
 
 vi.mock("@modelcontextprotocol/sdk/server/streamableHttp.js", () => ({
-  StreamableHTTPServerTransport: () => ({
-    handleRequest: () => Promise.resolve(),
-    close: () => Promise.resolve(),
-  }),
+  StreamableHTTPServerTransport: vi.fn().mockImplementation(() => ({
+    handleRequest: vi.fn().mockResolvedValue(undefined),
+    close: vi.fn().mockResolvedValue(undefined),
+  })),
 }));
 
 describe("McpIntegration", () => {

@@ -24,6 +24,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm test` - Run package tests
 - `pnpm test:demos` - Run demo application tests
 - `pnpm test:e2e` - Run end-to-end tests
+- **Note for LLMs**: Use `CI=true pnpm test` to disable Turbo's interactive TUI
 
 ### Package Management
 - `pnpm clean` - Clean all dist folders

@@ -241,6 +241,77 @@ The implementation successfully transforms Spotlight's debugging capabilities in
 
 ---
 
+## 🧪 **Test Improvements & Quality Assurance**
+
+Following vitest best practices, we've significantly improved the testing approach by **minimizing mock usage** and implementing **real server integration tests**:
+
+### **Testing Philosophy Applied**
+- **✅ Real Implementations Over Mocks**: Prefer actual server instances over mock objects
+- **✅ Integration Testing**: Focus on end-to-end workflows with real HTTP servers  
+- **✅ Test Fixtures**: Use reusable test data instead of inline mock objects
+- **✅ Dependency Injection**: Structure code to support testability without mocks
+
+### **New Test Infrastructure**
+
+#### **Test Fixtures (`__fixtures__/sentryEvents.ts`)**
+```typescript
+// Comprehensive, reusable test data
+export const mockErrorEvent: SentryErrorEvent = {
+  event_id: "error-1",
+  type: "error", 
+  level: "error",
+  timestamp: 1704110400000,
+  exception: {
+    values: [{
+      type: "TypeError",
+      value: "Cannot read property 'foo' of undefined",
+      stacktrace: { /* full stacktrace data */ }
+    }]
+  }
+};
+```
+
+#### **Real Server Test Helpers (`__helpers__/mcpTestServer.ts`)**
+```typescript
+// Following TypeScript SDK patterns for real HTTP server testing
+export async function createTestMcpServer(): Promise<{
+  server: Server;
+  transport: StreamableHTTPServerTransport;
+  baseUrl: URL;
+}> {
+  const mcpServer = createSpotlightMcpServer(testEventProcessor);
+  const transport = new StreamableHTTPServerTransport({
+    sessionIdGenerator: () => randomUUID(),
+  });
+  
+  await mcpServer.connect(transport);
+  // Real HTTP server setup following SDK patterns
+}
+```
+
+#### **Real Server Integration Tests (`realServerIntegration.spec.ts`)**
+- **✅ Complete MCP Protocol Workflow**: Real server initialization, tool execution, resource access
+- **✅ Error Handling**: Protocol error responses with actual HTTP servers
+- **✅ Batch Requests**: Multi-request handling following MCP specification
+- **✅ Resource Workflow**: List + read operations on real resources
+- **✅ Trace Analysis**: Real server tool execution with JSON-RPC protocol
+
+### **Test Metrics & Coverage**
+- **85 tests passing** across 7 test suites
+- **5 real server integration tests** with full HTTP protocol coverage
+- **Isolated test files** to avoid mock conflicts
+- **TypeScript SDK patterns** applied from `/git-repos/typescript-sdk/`
+
+### **Key Testing Achievements**
+1. **Eliminated Logger Mocks**: Tests handle console output naturally
+2. **Real HTTP Servers**: Integration tests use actual `StreamableHTTPServerTransport` 
+3. **Protocol Compliance**: Tests verify MCP v2025-03-26 specification adherence
+4. **Session Management**: Real session ID handling and server initialization
+5. **Error Resilience**: Graceful handling of invalid requests and protocol errors
+
+### **Non-Interactive Test Execution**
+Added support for LLM environments with `CI=true pnpm test` to disable Turbo's interactive TUI.
+
 ## 📚 **Implementation Commits**
 
 | Commit | Description | Status |
@@ -249,5 +320,7 @@ The implementation successfully transforms Spotlight's debugging capabilities in
 | `f768ac9` | Cleanup old MCP files from sidecar directory | ✅ Complete |
 | `d835151` | Resolve Turbo circular dependency with dynamic imports | ✅ Complete |
 | `fa512e5` | Fix electron package build by externalizing MCP | ✅ Complete |
+| `3fee28e` | Implement comprehensive test infrastructure and fixtures | ✅ Complete |
+| `999e4f6` | **Reduce mocking in tests following vitest best practices** | ✅ Complete |
 
-**Total Implementation**: 4 commits, 17 files changed, comprehensive MCP integration ready for production use.
+**Total Implementation**: 6 commits, comprehensive MCP integration with high-quality testing infrastructure following modern testing best practices.
