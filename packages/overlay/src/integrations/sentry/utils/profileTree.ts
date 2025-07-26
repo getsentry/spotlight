@@ -1,5 +1,5 @@
 import type { ColorValue } from "nanovis";
-import { FRAME_COLOR, isApplicationFrame } from "../constants/profile";
+import { FRAME_COLOR } from "../constants/profile";
 import type { SentryProfileWithTraceMeta } from "../store/types";
 import type { EventFrame } from "../types";
 
@@ -20,6 +20,61 @@ interface FlamegraphUtilOptions {
   getColor?: (frame: EventFrame, depth: number, platform?: string, parent?: NanovisTreeNode) => ColorValue;
   getLabel?: (frame: EventFrame, depth: number, parent?: NanovisTreeNode) => string;
 }
+
+export const isApplicationFrame = (frame: EventFrame, platform?: string) => {
+  if (frame.in_app !== undefined) {
+    return frame.in_app;
+  }
+
+  const path = frame.abs_path?.toLowerCase() || "";
+  const func = frame.function?.toLowerCase() || "";
+
+  const fallback =
+    !path.includes("node_modules") &&
+    !path.includes("/gems/") &&
+    !path.includes("vendor/") &&
+    !path.includes("lib/python");
+
+  if (!platform) {
+    return fallback;
+  }
+
+  if (platform.startsWith("javascript")) {
+    return !(
+      path.includes("node_modules") ||
+      func.includes("node::") ||
+      path.includes("webpack-internal") ||
+      path.includes("<anonymous>")
+    );
+  }
+
+  if (platform.startsWith("python")) {
+    return !path.includes("lib/python");
+  }
+
+  if (platform.startsWith("java")) {
+    return !(
+      func.startsWith("java.") ||
+      func.startsWith("javax.") ||
+      func.startsWith("sun.") ||
+      func.startsWith("com.android")
+    );
+  }
+
+  if (platform.startsWith("php")) {
+    return !path.includes("vendor/");
+  }
+
+  if (platform.startsWith("ruby")) {
+    return !path.includes("/gems/");
+  }
+
+  if (platform.startsWith("dotnet")) {
+    return !(func.startsWith("system.") || func.startsWith("microsoft."));
+  }
+
+  return fallback;
+};
 
 /**
  * Parses a Sentry profile and returns a normalized structure for further processing.
