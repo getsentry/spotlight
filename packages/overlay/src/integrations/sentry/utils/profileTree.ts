@@ -1,5 +1,5 @@
 import type { ColorValue } from "nanovis";
-import { FRAME_COLOR } from "../constants/profile";
+import { FRAME_COLOR, isApplicationFrame } from "../constants/profile";
 import type { SentryProfileWithTraceMeta } from "../store/types";
 import type { EventFrame } from "../types";
 
@@ -15,20 +15,10 @@ export interface NanovisTreeNode {
   frameId: number;
   sampleCount: number;
 }
-export interface FlamegraphUtilOptions {
-  getColor?: (frame: EventFrame, depth: number, parent?: NanovisTreeNode) => ColorValue;
-  getLabel?: (frame: EventFrame, depth: number, parent?: NanovisTreeNode) => string;
-}
 
-// FIXME: need to work on condition here
-// need to figure out how sentry sets is_application as true after parsing data from sdk.
-function isApplicationFrame(frame: EventFrame): boolean {
-  if (!frame.abs_path) return false;
-  const path = frame.abs_path.toLowerCase();
-  if (path.includes("src/") || path.includes("localhost")) {
-    return true;
-  }
-  return false;
+interface FlamegraphUtilOptions {
+  getColor?: (frame: EventFrame, depth: number, platform?: string, parent?: NanovisTreeNode) => ColorValue;
+  getLabel?: (frame: EventFrame, depth: number, parent?: NanovisTreeNode) => string;
 }
 
 /**
@@ -48,9 +38,9 @@ export function parseSentryProfile(profile: SentryProfileWithTraceMeta) {
 
 // Sentry color scheme
 // ref: https://docs.sentry.io/product/explore/profiling/flame-charts-graphs/
-function getFrameColors(frame: EventFrame): ColorValue {
+function getFrameColors(frame: EventFrame, platform?: string): ColorValue {
   if (!frame.abs_path) return FRAME_COLOR.unknown;
-  if (isApplicationFrame(frame)) {
+  if (isApplicationFrame(frame, platform)) {
     return FRAME_COLOR.application;
   }
   return FRAME_COLOR.system;
@@ -77,7 +67,8 @@ export function buildFlamegraphTree(
     };
   }
   const { samples, frames, stacks, platform } = parsed;
-  const getColor = typeof options.getColor === "function" ? options.getColor : getFrameColors;
+  const getColor =
+    typeof options.getColor === "function" ? options.getColor : (frame: EventFrame) => getFrameColors(frame, platform);
   const getLabel =
     typeof options.getLabel === "function" ? options.getLabel : (frame: EventFrame) => frame.function || "anonymous";
   const totalDuration =
@@ -124,7 +115,7 @@ export function buildFlamegraphTree(
           frame: frame,
           frameId: frameId,
           sampleCount: 1,
-          color: getColor(frame, depth, currentNode),
+          color: getColor(frame, depth, platform, currentNode),
           childrenMap: new Map<number, TreeNodeWithMap>(),
         };
         currentNode.children.push(childNode);
