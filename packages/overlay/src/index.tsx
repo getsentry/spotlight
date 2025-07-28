@@ -12,6 +12,7 @@ import {
 import globalStyles from "./index.css?inline";
 import { type SpotlightContext, initIntegrations } from "./integrations/integration";
 import { default as sentry } from "./integrations/sentry/index";
+import { getPanelsFromIntegrations } from "./integrations/utils/extractPanelsFromIntegrations";
 import { off, on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
 import { activateLogger, log } from "./lib/logger";
@@ -176,15 +177,7 @@ export async function init(initOptions: SpotlightOverlayOptions = {}) {
     });
   }
 
-  const tabs = initializedIntegrations.flatMap(
-    integration =>
-      integration.panels?.({ processedEvents: [] }) ||
-      integration.tabs?.({ processedEvents: [] }).map(tab => ({
-        ...tab,
-        processedEvents: [],
-      })) ||
-      [],
-  );
+  const tabs = getPanelsFromIntegrations(initializedIntegrations, {});
 
   const initialTab = startFrom || (tabs.length ? `/${tabs[0].id}` : "/no-tabs");
   log("Starting from", initialTab);

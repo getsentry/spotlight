@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Debugger from "./components/Debugger";
 import Trigger from "./components/Trigger";
 import { SPOTLIGHT_OPEN_CLASS_NAME } from "./constants";
 import type { Integration, IntegrationData } from "./integrations/integration";
+import { getPanelsFromIntegrations } from "./integrations/utils/extractPanelsFromIntegrations";
 import { base64Decode } from "./lib/base64";
 import * as db from "./lib/db";
 import { getSpotlightEventTarget } from "./lib/eventTarget";
 import { log } from "./lib/logger";
 import useKeyPress from "./lib/useKeyPress";
+import { getRouteStorageKey } from "./overlay/utils/routePersistence";
 import { connectToSidecar } from "./sidecar";
 import type { NotificationCount, SpotlightOverlayOptions } from "./types";
 
@@ -164,6 +166,16 @@ export default function App({
   // as our <Route>s are scattered around a bit
   // See https://github.com/remix-run/react-router/issues/7634
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // contextId for namespacing of routes in sessionStorage
+  const contextId = sidecarUrl;
+
+  // helper to get valid panel routes
+  const getValidRoutes = useCallback(() => {
+    return new Set(getPanelsFromIntegrations(integrations, integrationData).map(panel => `/${panel.id}`));
+  }, [integrationData, integrations]);
+
   const clearEvents = useCallback(async () => {
     try {
       const clearEventsUrl: string = new URL("/clear", sidecarUrl).href;
@@ -192,9 +204,24 @@ export default function App({
     ) => {
       log("Open");
       setOpen(true);
-      if (e.detail.path) navigate(e.detail.path);
+      if (e.detail.path) {
+        navigate(e.detail.path);
+      } else {
+        try {
+          const lastRoute = sessionStorage.getItem(getRouteStorageKey(contextId));
+          const validRoutes = getValidRoutes();
+          if (lastRoute && lastRoute !== location.pathname && validRoutes.has(lastRoute)) {
+            navigate(lastRoute);
+          }
+        } catch (error) {
+          log("Failed to retrieve or navigate to the last route from browser storage", {
+            error,
+            currentPath: location.pathname,
+          });
+        }
+      }
     },
-    [navigate],
+    [navigate, location.pathname, contextId, integrationData, integrations],
   );
 
   const onClose = useCallback(() => {
@@ -275,6 +302,7 @@ export default function App({
         setTriggerButtonCount={setTriggerButtonCount}
         fullPage={fullPage}
         showClearEventsButton={showClearEventsButton}
+        contextId={contextId}
       />
     </>
   );
