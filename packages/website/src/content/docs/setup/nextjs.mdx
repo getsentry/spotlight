@@ -25,7 +25,7 @@ Initialize Spotlight within `instrumentation-client.(js|ts)`, after you've initi
 <TabItem label="Client">
 In the Browser you don't need to set `spotlight: true`, `Spotlight.init()` will automatically detect if Sentry is available and if so, hook into the SDK.
 
-```javascript {3, 10-12}
+```javascript {3, 12-14}
 // instrumentation-client.(js|ts)
 import * as Sentry from '@sentry/nextjs';
 import * as Spotlight from '@spotlightjs/spotlight';
