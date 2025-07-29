@@ -52,7 +52,7 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
     const spans = showAll ? allSpans : localSpans;
     const onlyDBSpans = spans.filter((span: Span) => DB_SPAN_REGEX.test(span.op || ""));
     const uniqueSpansSet = new Set(onlyDBSpans.map(span => String(span?.description).trim()));
-    // CLear out empty ones (they collapse as a single empty string since this is a set)
+    // Clear out empty ones (they collapse as a single empty string since this is a set)
     uniqueSpansSet.delete("");
     return [...uniqueSpansSet]
       .map(query => calculateQueryInfo({ query, spanData: onlyDBSpans }))
