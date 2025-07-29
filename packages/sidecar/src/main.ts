@@ -5,13 +5,13 @@ import { createGunzip, createInflate } from "node:zlib";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import launchEditor from "launch-editor";
+import type { Muppet } from "muppet";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
-import mcp from "./mcp.js";
+import { createMcpInstance } from "./mcp.js";
 import { MessageBuffer } from "./messageBuffer.js";
-
-type Payload = [string, Buffer];
+import type { Payload } from "./utils.js";
 
 type IncomingPayloadCallback = (body: string) => void;
 
@@ -269,6 +269,18 @@ function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
   }
 }
 
+function handleMcpRequest(mcp: Muppet, transport: StreamableHTTPServerTransport) {
+  let init = false;
+  return async (req: IncomingMessage, res: ServerResponse) => {
+    if (!init) {
+      await mcp.connect(transport);
+      init = true;
+    }
+
+    transport.handleRequest(req, res);
+  };
+}
+
 function openRequestHandler(basePath: string = process.cwd()) {
   return (req: IncomingMessage, res: ServerResponse) => {
     // We're only interested in handling a POST request
@@ -318,12 +330,6 @@ function logSpotlightUrl(port: number): void {
   logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
 }
 
-const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
-mcp.connect(transport);
-async function handleMcpRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  await transport.handleRequest(req, res);
-}
-
 function startServer(
   buffer: MessageBuffer<Payload>,
   port: number,
@@ -337,9 +343,16 @@ function startServer(
       "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
     };
   }
+
+  // MCP Setup
+  const transport = new StreamableHTTPServerTransport({
+    sessionIdGenerator: undefined,
+  });
+  const mcp = createMcpInstance(buffer);
+
   const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
-    [/^\/mcp$/, handleMcpRequest],
+    [/^\/mcp$/, handleMcpRequest(mcp, transport)],
     [/^\/clear$/, enableCORS(handleClearRequest)],
     [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
