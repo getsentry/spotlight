@@ -1,3 +1,5 @@
+import type { NanovisTreeNode } from "./types";
+
 export const DB_SPAN_REGEX = /^db(?:\.[A-Za-z]+)*$/;
 
 export const AGGREGATE_CALL_PROFILES_SORT_KEYS = {
@@ -356,3 +358,15 @@ export const LOGS_HEADERS = [
     align: "right",
   },
 ];
+
+export const SAMPLE_EMPTY_PROFILE_FRAME: NanovisTreeNode = {
+  id: "empty",
+  text: "No profile data",
+  subtext: "",
+  sizeSelf: 0,
+  size: 0,
+  children: [],
+  color: "#6b7280",
+  frameId: -1,
+  sampleCount: 0,
+};

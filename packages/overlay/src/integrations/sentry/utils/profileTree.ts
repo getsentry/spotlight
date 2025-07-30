@@ -1,110 +1,79 @@
 import type { ColorValue } from "nanovis";
-import { FRAME_COLOR } from "../constants/profile";
 import type { SentryProfileWithTraceMeta } from "../store/types";
-import type { EventFrame } from "../types";
-
-export interface NanovisTreeNode {
-  id: string;
-  text: string;
-  subtext: string;
-  sizeSelf: number;
-  size: number;
-  children: NanovisTreeNode[];
-  color: ColorValue;
-  frame?: EventFrame;
-  frameId: number;
-  sampleCount: number;
-}
+import type { EventFrame, NanovisTreeNode } from "../types";
+import { getFormattedDuration, getFormattedNumber } from "./duration";
+import { getFrameColors, parseSentryProfile } from "./frame";
 
 interface FlamegraphUtilOptions {
   getColor?: (frame: EventFrame, depth: number, platform?: string, parent?: NanovisTreeNode) => ColorValue;
   getLabel?: (frame: EventFrame, depth: number, parent?: NanovisTreeNode) => string;
 }
 
-export const isApplicationFrame = (frame: EventFrame, platform?: string) => {
-  if (frame.in_app !== undefined) {
-    return frame.in_app;
-  }
-
-  const path = frame.abs_path?.toLowerCase() || "";
-  const func = frame.function?.toLowerCase() || "";
-
-  const fallback =
-    !path.includes("node_modules") &&
-    !path.includes("/gems/") &&
-    !path.includes("vendor/") &&
-    !path.includes("lib/python");
-
-  if (!platform) {
-    return fallback;
-  }
-
-  if (platform.startsWith("javascript")) {
-    return !(
-      path.includes("node_modules") ||
-      func.includes("node::") ||
-      path.includes("webpack-internal") ||
-      path.includes("<anonymous>")
-    );
-  }
-
-  if (platform.startsWith("python")) {
-    return !path.includes("lib/python");
-  }
-
-  if (platform.startsWith("java")) {
-    return !(
-      func.startsWith("java.") ||
-      func.startsWith("javax.") ||
-      func.startsWith("sun.") ||
-      func.startsWith("com.android")
-    );
-  }
-
-  if (platform.startsWith("php")) {
-    return !path.includes("vendor/");
-  }
-
-  if (platform.startsWith("ruby")) {
-    return !path.includes("/gems/");
-  }
-
-  if (platform.startsWith("dotnet")) {
-    return !(func.startsWith("system.") || func.startsWith("microsoft."));
-  }
-
-  return fallback;
-};
+const compareNodeBySize = (a: NanovisTreeNode, b: NanovisTreeNode) => b.size - a.size;
 
 /**
- * Parses a Sentry profile and returns a normalized structure for further processing.
+ * Recursively sorts the children of a tree node by size in descending order.
+ * @param node The tree node whose children to sort.
  */
-export function parseSentryProfile(profile: SentryProfileWithTraceMeta) {
-  if (!profile || !Array.isArray(profile.samples) || !Array.isArray(profile.frames) || !Array.isArray(profile.stacks)) {
-    return null;
+function sortChildrenBySize(node: NanovisTreeNode): void {
+  node.children.sort(compareNodeBySize);
+  for (const child of node.children) {
+    sortChildrenBySize(child);
   }
-  return {
-    samples: profile.samples,
-    frames: profile.frames,
-    stacks: profile.stacks,
-    platform: profile.platform,
-  };
-}
-
-// Sentry color scheme
-// ref: https://docs.sentry.io/product/explore/profiling/flame-charts-graphs/
-function getFrameColors(frame: EventFrame, platform?: string): ColorValue {
-  if (!frame.abs_path) return FRAME_COLOR.unknown;
-  if (isApplicationFrame(frame, platform)) {
-    return FRAME_COLOR.application;
-  }
-  return FRAME_COLOR.system;
 }
 
 /**
- * Builds a flamegraph tree from parsed profile data, supporting custom color/label logic.
+ * Creates a subtext for a frame, typically including file path, line number, and column number.
+ * @param frame The event frame.
+ * @returns A string representing the frame's location.
  */
-export function buildFlamegraphTree(
+function createSentryFrameSubtext(frame: EventFrame): string {
+  const parts: string[] = [];
+  if (frame.abs_path) {
+    const lastDelimIdx = frame.abs_path.lastIndexOf("/");
+    const filename = lastDelimIdx !== -1 ? frame.abs_path.slice(lastDelimIdx) : frame.abs_path;
+    const cleanFilename = filename.replace(/\?v=[a-f0-9]+$/, "");
+    parts.push(cleanFilename);
+  }
+  if (typeof frame.lineno === "number") {
+    parts.push(`${frame.lineno}`);
+  }
+  if (typeof frame.colno === "number") {
+    parts.push(`${frame.colno}`);
+  }
+  return parts.length > 0 ? parts.join(":") : "unknown location";
+}
+
+/**
+ * Recursively converts sample counts to sizes for each node in the tree.
+ * The size is a combination of its own sample count and the size of its children.
+ * It also prepends the sample percentage to the node's subtext.
+ * @param node The root node of the tree.
+ * @param totalSamples The total number of samples in the profile.
+ */
+function convertSampleCountsToSizes(node: NanovisTreeNode, totalSamples: number): void {
+  const samplePercentage = (node.sampleCount / totalSamples) * 100;
+  for (const child of node.children) {
+    convertSampleCountsToSizes(child, totalSamples);
+  }
+
+  const childrenSize = node.children.reduce((sum, child) => sum + child.size, 0);
+  node.size = node.sampleCount + childrenSize;
+  if (node.frameId !== -1) {
+    const originalSubtext = node.subtext;
+    node.subtext = `${getFormattedNumber(samplePercentage, 1)}% | ${originalSubtext}`;
+  }
+}
+
+/**
+ * Builds a tree from parsed profile data, supporting custom color/label logic.
+ * @param parsed The parsed Sentry profile data.
+ * @param options Optional configuration for customizing the tree.
+ * @param options.getColor A function to determine the color of a frame.
+ * @param options.getLabel A function to determine the label of a frame.
+ * @returns The root node of the constructed flame graph tree.
+ */
+function buildTree(
   parsed: ReturnType<typeof parseSentryProfile>,
   options: FlamegraphUtilOptions = {},
 ): NanovisTreeNode {
@@ -134,7 +103,7 @@ export function buildFlamegraphTree(
   const root: TreeNodeWithMap = {
     id: "root",
     text: `${platform || "unknown"} Profile`,
-    subtext: `${totalDuration.toFixed(2)}ms total`,
+    subtext: `${getFormattedDuration(totalDuration)} total`,
     sizeSelf: 0,
     size: 0,
     children: [],
@@ -147,12 +116,11 @@ export function buildFlamegraphTree(
   for (const sample of samples) {
     const stackId = sample.stack_id;
     const stack = stacks[stackId];
-    if (!Array.isArray(stack) || stack.length === 0) continue;
+    if (stack.length === 0) continue;
     let currentNode: TreeNodeWithMap = root;
     root.sampleCount++;
-    const reversedStack = [...stack].reverse();
-    for (let depth = 0; depth < reversedStack.length; depth++) {
-      const frameId = reversedStack[depth];
+    for (let depth = 0; depth < stack.length; depth++) {
+      const frameId = stack[stack.length - 1 - depth];
       const frame = frames[frameId];
       if (!frame) continue;
       if (!currentNode.childrenMap) {
@@ -203,55 +171,11 @@ export function buildFlamegraphTree(
 }
 
 /**
- * Returns a display name for a Sentry profile (thread name or fallback).
- */
-export function getProfileDisplayName(profile: SentryProfileWithTraceMeta, idx = 0): string {
-  return profile.thread_metadata?.[profile.active_thread_id]?.name || profile.platform || `Profile ${idx + 1}`;
-}
-
-function sortChildrenBySize(node: NanovisTreeNode): void {
-  if (Array.isArray(node.children)) {
-    node.children.sort((a, b) => b.size - a.size);
-    for (const child of node.children) {
-      sortChildrenBySize(child);
-    }
-  }
-}
-
-function createSentryFrameSubtext(frame: EventFrame): string {
-  const parts: string[] = [];
-  if (frame.abs_path) {
-    const filename = frame.abs_path.split("/").pop() || frame.abs_path;
-    const cleanFilename = filename.replace(/\?v=[a-f0-9]+$/, "");
-    parts.push(cleanFilename);
-  }
-  if (typeof frame.lineno === "number") {
-    parts.push(`L${frame.lineno}`);
-  }
-  if (typeof frame.colno === "number") {
-    parts.push(`C${frame.colno}`);
-  }
-  return parts.length > 0 ? parts.join(" ") : "unknown location";
-}
-
-function convertSampleCountsToSizes(node: NanovisTreeNode, totalSamples: number): void {
-  const samplePercentage = (node.sampleCount / totalSamples) * 100;
-  if (Array.isArray(node.children)) {
-    for (const child of node.children) {
-      convertSampleCountsToSizes(child, totalSamples);
-    }
-  }
-  const childrenSize = node.children.reduce((sum, child) => sum + child.size, 0);
-  node.size = node.sampleCount + childrenSize;
-  if (node.frameId !== -1) {
-    const originalSubtext = node.subtext;
-    node.subtext = `${samplePercentage.toFixed(1)}% | ${originalSubtext}`;
-  }
-}
-
-/**
  * Converts a Sentry profile to a normalized nanovis tree node for visualization.
- * Always normalizes the tree for correct sunburst rendering.
+ * This function parses the profile, builds a tree, and then normalizes it for sunburst/flamegraph rendering.
+ * @param profile The Sentry profile with trace metadata.
+ * @param options Optional configuration for customizing the tree.
+ * @returns A promise that resolves to the normalized root node of the tree.
  */
 export async function convertSentryProfileToNormalizedTree(
   profile: SentryProfileWithTraceMeta,
@@ -271,7 +195,7 @@ export async function convertSentryProfileToNormalizedTree(
       sampleCount: 0,
     };
   }
-  const tree = buildFlamegraphTree(parsed, options);
+  const tree = buildTree(parsed, options);
   const { normalizeTreeNode } = await import("nanovis");
   const normalized = normalizeTreeNode(tree) as NanovisTreeNode;
   return {

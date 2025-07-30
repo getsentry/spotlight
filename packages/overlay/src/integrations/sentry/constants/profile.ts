@@ -4,13 +4,7 @@ export const FRAME_COLOR = {
   unknown: "#f3f4f6",
 };
 
-export const FRAME_COLOR_CLASS = {
-  application: "bg-[#d0d1f5]",
-  system: "bg-[#ffe0e4]",
-  default: "bg-[#f3f4f6]",
-};
-
-export const FRAMER_TYPES = [
-  { label: "Application Frame", color: FRAME_COLOR_CLASS.application },
-  { label: "System Frame", color: FRAME_COLOR_CLASS.system },
+export const FRAME_TYPES = [
+  { label: "Application Frame", color: "bg-frame-application" },
+  { label: "System Frame", color: "bg-frame-system" },
 ];
