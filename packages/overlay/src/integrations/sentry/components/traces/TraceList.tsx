@@ -2,17 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import CardList from "../../../../components/CardList";
 import { TraceSplitViewLayout } from "../../tabs/TracesTab";
-import type { Trace } from "../../types";
+import type { TraceListData } from "../../types";
 import HiddenItemsButton from "../shared/HiddenItemsButton";
 import TraceItem from "./TraceItem";
 
 type TraceListProps = {
-  traceData: {
-    filtered: Trace[];
-    all: Trace[];
-    visible: Trace[];
-    hiddenItemCount: number;
-  };
+  traceData: TraceListData;
   onShowAll: () => void;
 };
 
@@ -39,8 +34,8 @@ export default function TraceList({ traceData, onShowAll }: TraceListProps) {
 
   return (
     <CardList>
-      {traceData.hiddenItemCount > 0 ? (
-        <HiddenItemsButton itemCount={traceData.hiddenItemCount} onClick={onShowAll} />
+      {traceData.nonLocalTraceCount > 0 ? (
+        <HiddenItemsButton itemCount={traceData.nonLocalTraceCount} onClick={onShowAll} />
       ) : null}
       {traceData.filtered.length > 0 ? (
         traceData.filtered.map(trace => {
