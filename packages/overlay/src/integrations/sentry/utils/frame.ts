@@ -1,6 +1,5 @@
 import type { ColorValue } from "nanovis";
 import { FRAME_COLOR } from "../constants/profile";
-import type { SentryProfileWithTraceMeta } from "../store/types";
 import type { EventFrame } from "../types";
 
 /**
