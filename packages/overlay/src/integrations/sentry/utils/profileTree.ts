@@ -141,6 +141,12 @@ function buildTree(profile: SentryProfileWithTraceMeta, options: FlamegraphUtilO
     }
   }
 
+  /**
+   * Recursively removes the childrenMap from a node and all its descendants.
+   * This is a cleanup step after the tree is built, as childrenMap is a temporary
+   * structure for efficient node lookup during construction.
+   * @param node The node to start from.
+   */
   function removeChildrenMap(node: TreeNodeWithMap): void {
     if (node.childrenMap) {
       node.childrenMap.clear();
