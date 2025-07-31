@@ -359,7 +359,7 @@ export const LOGS_HEADERS = [
   },
 ];
 
-export const SAMPLE_EMPTY_PROFILE_FRAME: NanovisTreeNode = {
+export const SAMPLE_EMPTY_PROFILE_FRAME: NanovisTreeNode = Object.freeze({
   id: "empty",
   text: "No profile data",
   subtext: "",
@@ -369,4 +369,4 @@ export const SAMPLE_EMPTY_PROFILE_FRAME: NanovisTreeNode = {
   color: "#6b7280",
   frameId: -1,
   sampleCount: 0,
-};
+});
