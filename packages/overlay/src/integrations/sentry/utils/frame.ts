@@ -65,20 +65,6 @@ export const isApplicationFrame = (frame: EventFrame, platform?: string) => {
 };
 
 /**
- * Parses a Sentry profile and returns a normalized structure for further processing.
- * @param profile The Sentry profile with trace metadata.
- * @returns A normalized profile object or null if the profile is invalid.
- */
-export const parseSentryProfile = (profile: SentryProfileWithTraceMeta) => {
-  return {
-    samples: profile.samples,
-    frames: profile.frames,
-    stacks: profile.stacks,
-    platform: profile.platform,
-  };
-};
-
-/**
  * Gets the color for a frame based on whether it's an application frame or a system frame.
  * It uses Sentry's color scheme.
  * @param frame The event frame to get the color for.

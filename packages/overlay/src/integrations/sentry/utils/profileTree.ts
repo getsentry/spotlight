@@ -1,8 +1,9 @@
 import type { ColorValue } from "nanovis";
+import { SAMPLE_EMPTY_PROFILE_FRAME } from "../constants";
 import type { SentryProfileWithTraceMeta } from "../store/types";
 import type { EventFrame, NanovisTreeNode } from "../types";
 import { getFormattedDuration, getFormattedNumber } from "./duration";
-import { getFrameColors, parseSentryProfile } from "./frame";
+import { getFrameColors } from "./frame";
 
 interface FlamegraphUtilOptions {
   getColor?: (frame: EventFrame, depth: number, platform?: string, parent?: NanovisTreeNode) => ColorValue;
@@ -73,24 +74,11 @@ function convertSampleCountsToSizes(node: NanovisTreeNode, totalSamples: number)
  * @param options.getLabel A function to determine the label of a frame.
  * @returns The root node of the constructed flame graph tree.
  */
-function buildTree(
-  parsed: ReturnType<typeof parseSentryProfile>,
-  options: FlamegraphUtilOptions = {},
-): NanovisTreeNode {
-  if (!parsed) {
-    return {
-      id: "empty",
-      text: "No profile data",
-      subtext: "",
-      sizeSelf: 0,
-      size: 0,
-      children: [],
-      color: "#6b7280",
-      frameId: -1,
-      sampleCount: 0,
-    };
+function buildTree(profile: SentryProfileWithTraceMeta, options: FlamegraphUtilOptions = {}): NanovisTreeNode {
+  if (!profile) {
+    return SAMPLE_EMPTY_PROFILE_FRAME;
   }
-  const { samples, frames, stacks, platform } = parsed;
+  const { samples, frames, stacks, platform } = profile;
   const getColor =
     typeof options.getColor === "function" ? options.getColor : (frame: EventFrame) => getFrameColors(frame, platform);
   const getLabel =
@@ -181,21 +169,7 @@ export async function convertSentryProfileToNormalizedTree(
   profile: SentryProfileWithTraceMeta,
   options: FlamegraphUtilOptions = {},
 ): Promise<NanovisTreeNode> {
-  const parsed = parseSentryProfile(profile);
-  if (!parsed) {
-    return {
-      id: "empty",
-      text: "No profile data",
-      subtext: "",
-      sizeSelf: 0,
-      size: 0,
-      children: [],
-      color: "#6b7280",
-      frameId: -1,
-      sampleCount: 0,
-    };
-  }
-  const tree = buildTree(parsed, options);
+  const tree = buildTree(profile, options);
   const { normalizeTreeNode } = await import("nanovis");
   const normalized = normalizeTreeNode(tree) as NanovisTreeNode;
   return {
