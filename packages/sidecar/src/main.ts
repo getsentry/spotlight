@@ -7,12 +7,12 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { addEventProcessor, captureException, startSpan } from "@sentry/node";
 import { type Handler, Hono } from "hono";
 import { cors } from "hono/cors";
-import { streamSSE } from "hono/streaming";
 import launchEditor from "launch-editor";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
 import { MessageBuffer } from "./messageBuffer.js";
+import { streamSSE } from "./streaming.js";
 
 type Payload = [string, Buffer];
 
