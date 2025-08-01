@@ -42,6 +42,14 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
           checkAgain = res.action === "accept" && res.content?.confirmation === true;
         } catch (err) {
           console.error("Error eliciting input", err);
+          return {
+            content: [
+              {
+                type: "text",
+                text: "No recent errors found in Spotlight. This might be because the application started successfully, but runtime issues only appear when you interact with specific pages or features.\n\nAsk the user to navigate to the page where they're experiencing the issue to reproduce it, that way we can get that in the Spotlight debugger. So if you want to check for errors again, just ask me to do that.",
+              },
+            ],
+          };
         }
 
         if (!checkAgain) {
