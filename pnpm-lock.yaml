@@ -498,12 +498,6 @@ importers:
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
-      muppet:
-        specifier: ^0.3.2
-        version: 0.3.2(@modelcontextprotocol/sdk@1.16.0)(@standard-community/standard-json@0.3.0-rc.1(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(zod-to-json-schema@3.24.5(zod@4.0.5))(zod@4.0.5))(@standard-schema/spec@1.0.0)
-      zod:
-        specifier: ^4.0.5
-        version: 4.0.5
     devDependencies:
       '@spotlightjs/tsconfig':
         specifier: workspace:*
@@ -3339,34 +3333,6 @@ packages:
   '@sindresorhus/is@4.6.0':
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
     engines: {node: '>=10'}
-
-  '@standard-community/standard-json@0.3.0-rc.1':
-    resolution: {integrity: sha512-WF0OkR3cbKwtUxis8HFDRzkwPVbmk4WFhrZa35gFslIOKKLKlkh/ejjIeW6nGVoCxVQOQg5AayuggJo8bhn0Cg==}
-    peerDependencies:
-      '@standard-schema/spec': ^1.0.0
-      '@types/json-schema': ^7.0.15
-      '@valibot/to-json-schema': ^1.3.0
-      arktype: ^2.1.20
-      effect: ^3.16.8
-      valibot: ^1.1.0
-      zod: ^3.25.67
-      zod-to-json-schema: ^3.24.5
-    peerDependenciesMeta:
-      '@valibot/to-json-schema':
-        optional: true
-      arktype:
-        optional: true
-      effect:
-        optional: true
-      valibot:
-        optional: true
-      zod:
-        optional: true
-      zod-to-json-schema:
-        optional: true
-
-  '@standard-schema/spec@1.0.0':
-    resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
 
   '@stricli/auto-complete@1.1.1':
     resolution: {integrity: sha512-UGXVgdfaanfJIw5Wtv3fvZjfLTDBNcYuy3VSSSMt8RznJ9YOgK0uFZyQig4tCr2DENb1dVIGMdDAAi3f9oTLcg==}
@@ -6904,21 +6870,6 @@ packages:
   muggle-string@0.4.1:
     resolution: {integrity: sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==}
 
-  muppet@0.3.2:
-    resolution: {integrity: sha512-mQ5+8aHuu56r0+21qyUwXNdFGZZQXOeA5NbVX9JL+rGKPSJ0AUAMyZbK7fbyKAioXbk+pD6CcipWSAttRVTpag==}
-    peerDependencies:
-      '@modelcontextprotocol/sdk': ^1.15.1
-      '@standard-community/standard-json': ^0.3.0-rc.1
-      '@standard-schema/spec': ^1.0.0
-      file-type: ^20.5.0
-    peerDependenciesMeta:
-      '@modelcontextprotocol/sdk':
-        optional: true
-      '@standard-schema/spec':
-        optional: true
-      file-type:
-        optional: true
-
   nanoid@3.3.11:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -9265,9 +9216,6 @@ packages:
 
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
-
-  zod@4.0.5:
-    resolution: {integrity: sha512-/5UuuRPStvHXu7RS+gmvRf4NXrNxpSllGwDnCBcJZtQsKrviYXm54yDGV2KYNLT5kq0lHGcl7lqWJLgSaG+tgA==}
 
   zustand@5.0.3:
     resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
@@ -12602,16 +12550,6 @@ snapshots:
   '@sinclair/typebox@0.27.8': {}
 
   '@sindresorhus/is@4.6.0': {}
-
-  '@standard-community/standard-json@0.3.0-rc.1(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(zod-to-json-schema@3.24.5(zod@4.0.5))(zod@4.0.5)':
-    dependencies:
-      '@standard-schema/spec': 1.0.0
-      '@types/json-schema': 7.0.15
-    optionalDependencies:
-      zod: 4.0.5
-      zod-to-json-schema: 3.24.5(zod@4.0.5)
-
-  '@standard-schema/spec@1.0.0': {}
 
   '@stricli/auto-complete@1.1.1':
     dependencies:
@@ -17378,13 +17316,6 @@ snapshots:
 
   muggle-string@0.4.1: {}
 
-  muppet@0.3.2(@modelcontextprotocol/sdk@1.16.0)(@standard-community/standard-json@0.3.0-rc.1(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(zod-to-json-schema@3.24.5(zod@4.0.5))(zod@4.0.5))(@standard-schema/spec@1.0.0):
-    dependencies:
-      '@standard-community/standard-json': 0.3.0-rc.1(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(zod-to-json-schema@3.24.5(zod@4.0.5))(zod@4.0.5)
-    optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.16.0
-      '@standard-schema/spec': 1.0.0
-
   nanoid@3.3.11: {}
 
   natural-compare@1.4.0: {}
@@ -19959,19 +19890,12 @@ snapshots:
     dependencies:
       zod: 3.24.2
 
-  zod-to-json-schema@3.24.5(zod@4.0.5):
-    dependencies:
-      zod: 4.0.5
-    optional: true
-
   zod-to-ts@1.2.0(typescript@5.8.3)(zod@3.24.2):
     dependencies:
       typescript: 5.8.3
       zod: 3.24.2
 
   zod@3.24.2: {}
-
-  zod@4.0.5: {}
 
   zustand@5.0.3(@types/react@18.3.20)(react@18.3.1):
     optionalDependencies:

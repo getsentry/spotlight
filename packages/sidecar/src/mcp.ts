@@ -1,169 +1,90 @@
-import { Muppet } from "muppet";
-import z from "zod";
-import type { MessageBuffer } from "./messageBuffer.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { MessageBuffer } from "./messageBuffer.js";
 import type { Payload } from "./utils.js";
 
 export function createMcpInstance(buffer: MessageBuffer<Payload>) {
-  const mcp = new Muppet({
+  const mcp = new McpServer({
     name: "spotlight-mcp",
     version: "0.0.1",
   });
 
-  mcp.routes.push({
-    type: "middleware",
-    name: "*",
-    handler: async (c: any, next: any) => {
-      console.log(c.message.method, c.message.params.name);
-      await next();
-    },
+  const errorsBuffer = new MessageBuffer<Payload>(10);
+  buffer.subscribe((item: Payload) => {
+    errorsBuffer.put(item);
   });
 
   mcp.tool(
-    {
-      name: "init",
-      description:
-        "Add Spotlight.js to the project for issue tracking and debugging. Setup spotlight and then call tools for getting the issues",
-      inputSchema: z.object({
-        // TODO: Add all the supported project types
-        framework: z.enum(["nextjs"]),
-      }),
-    },
-    () => ({
-      content: [
-        {
-          type: "text",
-          text: `## 1. Check Spotlight Package
-- Check if \`@spotlightjs/spotlight\` exists in \`package.json\` dependencies
-- If not found: run \`npm install @spotlightjs/spotlight\`
-
-## 2. Check Sentry Package
-- Check if \`@sentry/nextjs\` exists in \`package.json\` dependencies
-- If not found: run \`npm install @sentry/nextjs\`
-
-## 3. Setup Configuration Files
-
-### Check \`instrumentation-client.js\` (or \`.ts\`)
-**If file doesn't exist:** Create it with full Sentry + Spotlight setup:
-\`\`\`javascript
-import * as Sentry from '@sentry/nextjs';
-import * as Spotlight from '@spotlightjs/spotlight';
-
-Sentry.init({
-  dsn: process.env.SENTRY_DSN || 'YOUR_SENTRY_DSN_HERE',
-});
-
-if (process.env.NODE_ENV === 'development') {
-  Spotlight.init();
-}
-\`\`\`
-
-**If file exists:** Add only these lines:
-\`\`\`javascript
-import * as Spotlight from '@spotlightjs/spotlight';
-
-if (process.env.NODE_ENV === 'development') {
-  Spotlight.init();
-}
-\`\`\`
-
-### Create \`sentry.server.config.js\` (or \`.ts\`)
-\`\`\`javascript
-import * as Sentry from '@sentry/nextjs';
-
-Sentry.init({
-  dsn: process.env.SENTRY_DSN || 'YOUR_SENTRY_DSN_HERE',
-  spotlight: process.env.NODE_ENV === 'development',
-});
-\`\`\`
-
-### Create \`sentry.edge.config.js\` (or \`.ts\`)
-\`\`\`javascript
-import * as Sentry from '@sentry/nextjs';
-
-Sentry.init({
-  dsn: process.env.SENTRY_DSN || 'YOUR_SENTRY_DSN_HERE',
-  spotlight: process.env.NODE_ENV === 'development',
-});
-\`\`\`
-
-## 4. Start Sidecar
-Run: \`npx @spotlightjs/spotlight\` (in separate terminal)`,
-        },
-      ],
-    }),
-  );
-
-  let readerId: string | undefined;
-  let issues: Payload[] = [];
-
-  mcp.tool(
-    {
-      name: "start_listening_issues",
-      description: "Start listening for issues from Spotlight. This should run before running the app",
-    },
-    () => {
-      readerId = buffer.subscribe((item: Payload) => {
-        issues.push(item);
-      });
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: "Started listening. You can now run your app and get the issues using the `get_issues` tool. Once the app is running, you should call `get_issues` to fetch the issues.",
-          },
-        ],
-      };
-    },
-  );
-
-  mcp.tool(
-    {
-      name: "get_issues",
-      description:
-        "Get the issues from Spotlight, before running this tool, make sure to call `start_listening_issues` and also run the app so that we can log the issues.",
-    },
+    "get_errors",
+    "Fetches the most recent errors from Spotlight debugger. Returns error details, stack traces, and request details for immediate debugging context.",
     async () => {
-      if (!readerId) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: "You need to call `start_listening_issues` before calling this tool.",
+      let envelopes = errorsBuffer.read();
+      errorsBuffer.clear();
+
+      if (envelopes.length === 0) {
+        let checkAgain = false;
+
+        try {
+          const res = await mcp.server.elicitInput({
+            message:
+              "No recent errors found in Spotlight. This might be because the application started successfully, but runtime issues only appear when you interact with specific pages or features.\n\nWould you like to navigate to the page where you're experiencing the issue to reproduce it?",
+            requestedSchema: {
+              type: "object",
+              properties: {
+                confirmation: {
+                  type: "boolean",
+                  title: "Confirmation",
+                  description: "Do you want me to check for errors again now?",
+                },
+              },
             },
-          ],
-        };
+          });
+
+          checkAgain = res.action === "accept" && res.content?.confirmation === true;
+        } catch (err) {
+          console.error("Error eliciting input", err);
+        }
+
+        if (!checkAgain) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: "No errors found.",
+              },
+            ],
+          };
+        }
+
+        envelopes = errorsBuffer.read();
+        errorsBuffer.clear();
       }
 
-      const _issues = [...issues]; // Copy the issues to avoid mutation during streaming
+      const errors = [];
 
-      // Cleanup
-      issues = [];
-      // buffer.unsubscribe(readerId);
-      // readerId = undefined;
+      for (const [_contentType, data] of envelopes) {
+        const text = data.toString("utf-8");
+        const [_, { type }, payload] = JSON.parse(`[${text.replaceAll("}\n{", "},{")}]`) as any[];
 
-      if (_issues.length === 0) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: "No issues found. Make sure to run your app and generate some issues.",
-            },
-          ],
-        };
+        if (type === "event") {
+          errors.push({
+            exception: payload.exception,
+            level: payload.level,
+            request: payload.request,
+          });
+        }
       }
 
       return {
-        content: _issues.map(([contentType, data]) => ({
+        content: errors.map(error => ({
           type: "text",
-          text: data.toString("utf-8"),
-          _meta: {
-            contentType,
-          },
+          text: JSON.stringify(error),
         })),
       };
     },
   );
+
+  // TODO: Add tool for performance tracing
+  // TODO: Add tool for profiling data
 
   return mcp;
 }

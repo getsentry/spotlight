@@ -37,9 +37,7 @@
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@sentry/node": "^8.49.0",
     "kleur": "^4.1.5",
-    "launch-editor": "^2.9.1",
-    "muppet": "^0.3.2",
-    "zod": "^4.0.5"
+    "launch-editor": "^2.9.1"
   },
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
