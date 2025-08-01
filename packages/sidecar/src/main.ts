@@ -69,7 +69,7 @@ const streamGetRequestHandler = (buffer: MessageBuffer<Payload>): Handler => {
     const base64Indicator = useBase64 ? ";base64" : "";
     return streamSSE(c, async stream => {
       const dataWriter = useBase64
-        ? (data: Buffer) => [data.toString("base64")]
+        ? (data: Buffer) => [`data:${data.toString("base64")}`]
         : (data: Buffer) => {
             const _data = [];
             // The utf-8 encoding here is wrong and is a hack as we are
@@ -77,7 +77,7 @@ const streamGetRequestHandler = (buffer: MessageBuffer<Payload>): Handler => {
             // encoding. This is only for backwards compatibility
             for (const line of data.toString("utf-8").split("\n")) {
               // This is very important - SSE events are delimited by two newlines
-              _data.push(`data:${line}\n`);
+              _data.push(`data:${line}`);
             }
 
             return _data;
@@ -85,7 +85,7 @@ const streamGetRequestHandler = (buffer: MessageBuffer<Payload>): Handler => {
 
       const sub = buffer.subscribe(([payloadType, data]) => {
         logger.debug("🕊️ sending to Spotlight");
-        stream.writeln(`${payloadType}${base64Indicator}`);
+        stream.writeln(`event:${payloadType}${base64Indicator}`);
         for (const line of dataWriter(data)) {
           stream.writeln(line);
         }
