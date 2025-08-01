@@ -2,10 +2,10 @@ import { createWriteStream, readFileSync } from "node:fs";
 import { type IncomingMessage, type Server, type ServerResponse, createServer, get } from "node:http";
 import { extname, join, resolve } from "node:path";
 import { createGunzip, createInflate } from "node:zlib";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import launchEditor from "launch-editor";
-import type { Muppet } from "muppet";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
@@ -269,7 +269,7 @@ function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
   }
 }
 
-function handleMcpRequest(mcp: Muppet, transport: StreamableHTTPServerTransport) {
+function handleMcpRequest(mcp: McpServer, transport: StreamableHTTPServerTransport) {
   let init = false;
   return async (req: IncomingMessage, res: ServerResponse) => {
     if (!init) {
@@ -352,7 +352,7 @@ function startServer(
 
   const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
-    [/^\/mcp$/, handleMcpRequest(mcp, transport)],
+    [/^\/mcp$/, enableCORS(handleMcpRequest(mcp, transport))],
     [/^\/clear$/, enableCORS(handleClearRequest)],
     [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
