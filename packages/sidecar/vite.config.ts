@@ -22,7 +22,13 @@ export default defineConfig({
     outDir: "./dist",
     sourcemap: true,
     rollupOptions: {
-      external: [...dependencies, ...builtinModules.map(x => `node:${x}`), ...builtinModules],
+      external: [
+        ...dependencies,
+        ...builtinModules.map(x => `node:${x}`),
+        // Need to include these for @hono/node-server
+        "fs",
+        "path",
+      ],
     },
   },
 });

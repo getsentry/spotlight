@@ -485,8 +485,8 @@ importers:
   packages/sidecar:
     dependencies:
       '@hono/node-server':
-        specifier: ^1.17.1
-        version: 1.17.1(hono@4.8.9)
+        specifier: ^1.18.0
+        version: 1.18.0(hono@4.8.10)
       '@jridgewell/trace-mapping':
         specifier: ^0.3.25
         version: 0.3.25
@@ -494,8 +494,8 @@ importers:
         specifier: ^8.49.0
         version: 8.55.0
       hono:
-        specifier: ^4.8.9
-        version: 4.8.9
+        specifier: ^4.8.10
+        version: 4.8.10
       kleur:
         specifier: ^4.1.5
         version: 4.1.5
@@ -1696,8 +1696,8 @@ packages:
   '@fontsource/raleway@5.2.5':
     resolution: {integrity: sha512-gVFV8Yi8Y5h8sQw0U/F6TQID53DVIWPuRxqBLOBxwLbQma42JAwqTZ+pi3eDjpm20/rjS2XoVJH5hnMx1KFB+g==}
 
-  '@hono/node-server@1.17.1':
-    resolution: {integrity: sha512-SY79W/C+2b1MyAzmIcV32Q47vO1b5XwLRwj8S9N6Jr5n1QCkIfAIH6umOSgqWZ4/v67hg6qq8Ha5vZonVidGsg==}
+  '@hono/node-server@1.18.0':
+    resolution: {integrity: sha512-CJ0H3/ouk/JWnyiuYOJLdpuWhO2D2BTNigHaFixnW3CrwZb+E+4s/KoFkcikHXcVmXoxaLJx1nlGa3JChEFtFA==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -5755,8 +5755,8 @@ packages:
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
 
-  hono@4.8.9:
-    resolution: {integrity: sha512-ERIxkXMRhUxGV7nS/Af52+j2KL60B1eg+k6cPtgzrGughS+espS9KQ7QO0SMnevtmRlBfAcN0mf1jKtO6j/doA==}
+  hono@4.8.10:
+    resolution: {integrity: sha512-DRMYbR3aFk6YET1FCSAFbgF2cWYTz5j0YAFYPECx9fmrbKBDAYnWU+YCgRTpOaatxMYN6e68U/2IG39zRP4W/A==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@4.1.0:
@@ -10439,9 +10439,9 @@ snapshots:
 
   '@fontsource/raleway@5.2.5': {}
 
-  '@hono/node-server@1.17.1(hono@4.8.9)':
+  '@hono/node-server@1.18.0(hono@4.8.10)':
     dependencies:
-      hono: 4.8.9
+      hono: 4.8.10
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -15715,7 +15715,7 @@ snapshots:
     dependencies:
       react-is: 16.13.1
 
-  hono@4.8.9: {}
+  hono@4.8.10: {}
 
   hosted-git-info@4.1.0:
     dependencies:

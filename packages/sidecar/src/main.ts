@@ -1,8 +1,7 @@
 import { createWriteStream } from "node:fs";
 import { get } from "node:http";
 import { resolve } from "node:path";
-import { createGunzip, createInflate } from "node:zlib";
-import { type HttpBindings, type ServerType, serve } from "@hono/node-server";
+import { type ServerType, serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { addEventProcessor, captureException, startSpan } from "@sentry/node";
 import { type Handler, Hono } from "hono";
@@ -68,29 +67,12 @@ const streamGetRequestHandler = (buffer: MessageBuffer<Payload>): Handler => {
     const useBase64 = c.req.query("base64") != null;
     const base64Indicator = useBase64 ? ";base64" : "";
     return streamSSE(c, async stream => {
-      const dataWriter = useBase64
-        ? (data: Buffer) => [`data:${data.toString("base64")}`]
-        : (data: Buffer) => {
-            const _data = [];
-            // The utf-8 encoding here is wrong and is a hack as we are
-            // sending binary data as utf-8 over SSE which enforces utf-8
-            // encoding. This is only for backwards compatibility
-            for (const line of data.toString("utf-8").split("\n")) {
-              // This is very important - SSE events are delimited by two newlines
-              _data.push(`data:${line}`);
-            }
-
-            return _data;
-          };
-
       const sub = buffer.subscribe(([payloadType, data]) => {
         logger.debug("🕊️ sending to Spotlight");
-        stream.writeln(`event:${payloadType}${base64Indicator}`);
-        for (const line of dataWriter(data)) {
-          stream.writeln(line);
-        }
-        // This last \n is important as every message ends with an empty line in SSE
-        stream.write("\n");
+        stream.writeSSE({
+          event: `${payloadType}${base64Indicator}`,
+          data: data.toString(useBase64 ? "base64" : "utf-8"),
+        });
       });
 
       stream.onAbort(() => {
@@ -103,67 +85,43 @@ const streamGetRequestHandler = (buffer: MessageBuffer<Payload>): Handler => {
 const streamPostRequestHandler = (
   buffer: MessageBuffer<Payload>,
   incomingPayload?: IncomingPayloadCallback,
-): Handler<{ Bindings: HttpBindings }> => {
+): Handler => {
   return async function handleStreamRequest(c) {
     logger.debug("📩 Received event");
-    let stream = c.env.incoming;
-    // Check for gzip or deflate encoding and create appropriate stream
-    const encoding = c.req.header("content-encoding");
-    if (encoding === "gzip") {
-      // @ts-ignore
-      stream = c.env.incoming.pipe(createGunzip());
-    } else if (encoding === "deflate") {
-      // @ts-ignore
-      stream = c.env.incoming.pipe(createInflate());
+    const arrayBuffer = await c.req.arrayBuffer();
+    const body = Buffer.from(arrayBuffer);
+
+    let contentType = c.req.header("content-type")?.split(";")[0].toLocaleLowerCase();
+    if (c.req.query("sentry_client")?.startsWith("sentry.javascript.browser") && c.req.header("Origin")) {
+      // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
+      contentType = "application/x-sentry-envelope";
     }
-    // TODO: Add brotli and zstd support!
+    if (!contentType) {
+      logger.warn("No content type, skipping payload...");
+    } else {
+      buffer.put([contentType, body]);
+    }
 
-    // Read the (potentially decompressed) stream
-    const buffers: Buffer[] = [];
-    stream.on("readable", () => {
-      while (true) {
-        const chunk = stream.read();
-        if (chunk === null) {
-          break;
-        }
-        buffers.push(chunk);
-      }
-    });
+    if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
+      const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
+      const filename = `${contentType?.replace(/[^a-z0-9]/gi, "_") || "no_content_type"}-${timestamp}.txt`;
 
-    stream.on("end", () => {
-      const body = Buffer.concat(buffers);
-      let contentType = c.req.header("content-type")?.split(";")[0].toLocaleLowerCase();
-      if (c.req.query("sentry_client")?.startsWith("sentry.javascript.browser") && c.req.header("Origin")) {
-        // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
-        contentType = "application/x-sentry-envelope";
-      }
-      if (!contentType) {
-        logger.warn("No content type, skipping payload...");
+      if (incomingPayload) {
+        incomingPayload(body.toString("binary"));
       } else {
-        buffer.put([contentType, body]);
-      }
-
-      if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
-        const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
-        const filename = `${contentType?.replace(/[^a-z0-9]/gi, "_") || "no_content_type"}-${timestamp}.txt`;
-
-        if (incomingPayload) {
-          incomingPayload(body.toString("binary"));
-        } else {
-          try {
-            createWriteStream(filename).write(body);
-            logger.info(`🗃️ Saved data to ${filename}`);
-          } catch (err) {
-            logger.error(`Failed to save data to ${filename}: ${err}`);
-          }
+        try {
+          createWriteStream(filename).write(body);
+          logger.info(`🗃️ Saved data to ${filename}`);
+        } catch (err) {
+          logger.error(`Failed to save data to ${filename}: ${err}`);
         }
       }
+    }
 
-      // 204 would be more appropriate but returning 200 to match what /envelope returns
-      return c.body(null, 200, {
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-      });
+    // 204 would be more appropriate but returning 200 to match what /envelope returns
+    return c.body(null, 200, {
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
     });
   };
 };
