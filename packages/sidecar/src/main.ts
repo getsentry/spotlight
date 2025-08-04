@@ -74,9 +74,9 @@ const SPOTLIGHT_HEADERS = {
   "X-Powered-by": SERVER_IDENTIFIER,
 } as const;
 
-const enableCORS = (handler: RequestHandler): RequestHandler =>
+const enableCORS = (handler: RequestHandler | Promise<RequestHandler>): RequestHandler =>
   withTracing(
-    (req: IncomingMessage, res: ServerResponse, pathname?: string, searchParams?: URLSearchParams) => {
+    async (req: IncomingMessage, res: ServerResponse, pathname?: string, searchParams?: URLSearchParams) => {
       const headers = {
         ...CORS_HEADERS,
         ...SPOTLIGHT_HEADERS,
@@ -91,7 +91,7 @@ const enableCORS = (handler: RequestHandler): RequestHandler =>
         res.end();
         return;
       }
-      return handler(req, res, pathname, searchParams);
+      return (await handler)(req, res, pathname, searchParams);
     },
     { name: "enableCORS", op: "sidecar.http.middleware.cors" },
   );
@@ -269,16 +269,9 @@ function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
   }
 }
 
-function handleMcpRequest(mcp: McpServer, transport: StreamableHTTPServerTransport) {
-  let init = false;
-  return async (req: IncomingMessage, res: ServerResponse) => {
-    if (!init) {
-      await mcp.connect(transport);
-      init = true;
-    }
-
-    transport.handleRequest(req, res);
-  };
+async function handleMcpRequest(mcp: McpServer, transport: StreamableHTTPServerTransport): Promise<RequestHandler> {
+  await mcp.connect(transport);
+  return (req, res) => transport.handleRequest(req, res);
 }
 
 function openRequestHandler(basePath: string = process.cwd()) {
