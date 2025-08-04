@@ -68,10 +68,16 @@ export class MessageBuffer<T> {
   }
 
   read(): T[] {
-    return [
-      ...this.items.slice(this.head % this.size, this.size).map(item => item[1]),
-      ...this.items.slice(0, this.head % this.size).map(item => item[1]),
-    ].filter(Boolean);
+    const result: T[] = [];
+    const start = this.head;
+    const end = this.writePos;
+    for (let i = start; i < end; i++) {
+      const item = this.items[i % this.size];
+      if (item !== undefined) {
+        result.push(item[1]);
+      }
+    }
+    return result;
   }
 }
 
