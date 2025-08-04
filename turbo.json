@@ -15,7 +15,7 @@
       ]
     },
     "dev": {
-      "dependsOn": ["^build"],
+      "with": ["@spotlightjs/sidecar#dev"],
       "cache": false,
       "persistent": true
     },
