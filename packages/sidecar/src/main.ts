@@ -9,7 +9,7 @@ import launchEditor from "launch-editor";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
-import { createMcpInstance } from "./mcp.js";
+import { createMcpInstance } from "./mcp/index.js";
 import { MessageBuffer } from "./messageBuffer.js";
 import type { Payload } from "./utils.js";
 

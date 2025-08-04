@@ -1,7 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import packageJson from "../package.json" with { type: "json" };
-import { MessageBuffer } from "./messageBuffer.js";
-import type { Payload } from "./utils.js";
+import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
+import packageJson from "../../package.json" with { type: "json" };
+import { MessageBuffer } from "../messageBuffer.js";
+import type { Payload } from "../utils.js";
+import { processEnvelope } from "./parsing.js";
 
 export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   const mcp = new McpServer({
@@ -32,26 +34,35 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
         };
       }
 
-      const errors = [];
+      const errors = envelopes
+        .map(([contentType, data]) => processEnvelope({ contentType, data }))
+        .sort((a, b) => {
+          const a_sent_at = a.envelope[0].sent_at as string;
+          const b_sent_at = b.envelope[0].sent_at as string;
+          if (a_sent_at < b_sent_at) return 1;
+          if (a_sent_at > b_sent_at) return -1;
+          return 0;
+        });
 
-      for (const [_contentType, data] of envelopes) {
-        const text = data.toString("utf-8");
-        const [_, { type }, payload] = JSON.parse(`[${text.replaceAll("}\n{", "},{")}]`) as any[];
-
+      const content: TextContent[] = [];
+      for (const error of errors) {
+        const {
+          envelope: [, { type }, payload],
+        } = error;
         if (type === "event") {
-          errors.push({
-            exception: payload.exception,
-            level: payload.level,
-            request: payload.request,
+          content.push({
+            type: "text",
+            text: JSON.stringify({
+              exception: payload.exception,
+              level: payload.level,
+              request: payload.request,
+            }),
           });
         }
       }
 
       return {
-        content: errors.map(error => ({
-          type: "text",
-          text: JSON.stringify(error),
-        })),
+        content,
       };
     },
   );
