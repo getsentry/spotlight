@@ -14,11 +14,8 @@
         "APPLE_API_KEY_PATH"
       ]
     },
-    "build#overlay": {
-      "dependsOn": ["build#sidecar"],
-      "outputs": ["dist/**", "dist-bin/**", ".next/**", "!.next/cache/**"]
-    },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
