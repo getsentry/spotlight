@@ -14,13 +14,13 @@
   "bin": {
     "spotlight-sidecar": "dist/server.js"
   },
-  "main": "dist/main.js",
-  "module": "dist/main.js",
-  "types": "dist/main.d.ts",
+  "main": "dist/src/main.js",
+  "module": "dist/src/main.js",
+  "types": "dist/src/main.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/main.js",
-      "types": "./dist/main.d.ts"
+      "import": "./dist/src/main.js",
+      "types": "./dist/src/main.d.ts"
     },
     "./vite-plugin": {
       "import": "./dist/src/vite-plugin.js",
