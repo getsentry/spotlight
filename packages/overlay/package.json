@@ -9,7 +9,8 @@
     "build": "NODE_ENV=production tsc && vite build",
     "build:watch": "vite build --watch",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:dev": "vitest",
     "sample": "node _fixtures/send_to_sidecar.cjs",
     "yalc:publish": "yalc publish --push --sig --private",
     "clean": "rimraf dist"
