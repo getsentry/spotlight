@@ -1,6 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
-import packageJson from "../../package.json" with { type: "json" };
 import { MessageBuffer } from "../messageBuffer.js";
 import type { Payload } from "../utils.js";
 import { processEnvelope } from "./parsing.js";
@@ -8,7 +7,7 @@ import { processEnvelope } from "./parsing.js";
 export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   const mcp = new McpServer({
     name: "spotlight-mcp",
-    version: packageJson.version,
+    version: String(process.env.npm_package_version),
   });
 
   const errorsBuffer = new MessageBuffer<Payload>(10);
