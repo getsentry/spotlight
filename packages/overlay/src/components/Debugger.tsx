@@ -40,6 +40,7 @@ export default function Debugger({
   setTriggerButtonCount: setNotificationCount,
   fullPage,
   showClearEventsButton,
+  contextId,
 }: {
   integrations: Integration[];
   isOpen: boolean;
@@ -49,6 +50,7 @@ export default function Debugger({
   setTriggerButtonCount: (count: NotificationCount) => void;
   fullPage: boolean;
   showClearEventsButton: boolean;
+  contextId: string;
 }) {
   return (
     <FullscreenBlur isOpen={isOpen} setOpen={setOpen} fullPage={fullPage}>
@@ -56,7 +58,7 @@ export default function Debugger({
         className={classNames(
           // Used for targeting. DO NOT REMOVE.
           "spotlight-debugger",
-          "from-primary-900 to-primary-950 flex h-full flex-col overflow-hidden rounded-lg bg-linear-to-br to-20% font-sans text-white shadow-xl",
+          "from-primary-900 to-primary-950 flex h-full flex-col overflow-hidden rounded-lg bg-gradient-to-br from-0% to-20% font-sans text-white shadow-xl",
           fullPage ? "relative rounded-none shadow-none" : "",
         )}
         style={{
@@ -70,6 +72,7 @@ export default function Debugger({
           setOpen={setOpen}
           isOnline={isOnline}
           showClearEventsButton={showClearEventsButton}
+          contextId={contextId}
         />
       </div>
     </FullscreenBlur>

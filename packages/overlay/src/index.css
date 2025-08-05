@@ -14,6 +14,10 @@
   --color-primary-800: #3730a3;
   --color-primary-900: #312e81;
   --color-primary-950: #1e1b4b;
+
+  --color-frame-application: #d0d1f5;
+  --color-frame-system: #ffe0e4;
+  --color-frame-unknown: #f3f4f6;
 }
 
 .spotlight-fullscreen-blur {

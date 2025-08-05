@@ -75,7 +75,7 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
   const resources = useMemo(() => {
     const filteredResourceSpans = getResourceSpans(showAll ? allSpans : localSpans, { regex: /resource\.[A-Za-z]+/ });
     const uniqueResourceDescriptionsSet = new Set(filteredResourceSpans.map(span => String(span?.description).trim()));
-    // CLear out empty ones (they collapse as a single empty string since this is a set)
+    // Clear out empty ones (they collapse as a single empty string since this is a set)
     uniqueResourceDescriptionsSet.delete("");
     const uniqueResourceDescriptions: string[] = [...uniqueResourceDescriptionsSet];
     const compareResourceInfo = COMPARATORS[sort.active] || COMPARATORS[RESOURCES_SORT_KEYS.totalTime];

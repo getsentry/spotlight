@@ -9,7 +9,8 @@
     "build": "NODE_ENV=production tsc && vite build",
     "build:watch": "vite build --watch",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:dev": "vitest",
     "sample": "node _fixtures/send_to_sidecar.cjs",
     "yalc:publish": "yalc publish --push --sig --private",
     "clean": "rimraf dist"
@@ -54,6 +55,7 @@
     "eslint-plugin-react-refresh": "^0.4.12",
     "happy-dom": "^15.10.2",
     "magic-string": "^0.30.11",
+    "nanovis": "^0.1.3",
     "platformicons": "^7.0.4",
     "react": "^18.3.1",
     "react-diff-viewer-continued": "^3.4.0",

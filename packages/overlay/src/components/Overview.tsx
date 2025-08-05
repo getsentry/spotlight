@@ -1,7 +1,10 @@
 import { createElement, useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import type { Integration, IntegrationData } from "~/integrations/integration";
+import { log } from "~/lib/logger";
 import type { NotificationCount } from "~/types";
+import { getPanelsFromIntegrations } from "../integrations/utils/extractPanelsFromIntegrations";
+import { getRouteStorageKey } from "../overlay/utils/routePersistence";
 import Navigation from "./navigation";
 
 export default function Overview({
@@ -11,6 +14,7 @@ export default function Overview({
   setOpen,
   isOnline,
   showClearEventsButton,
+  contextId,
 }: {
   integrations: Integration[];
   integrationData: IntegrationData<unknown>;
@@ -18,23 +22,23 @@ export default function Overview({
   setOpen: (value: boolean) => void;
   isOnline: boolean;
   showClearEventsButton: boolean;
+  contextId: string;
 }) {
   const [notificationCountSum, setNotificationCountSum] = useState<NotificationCount>({ count: 0, severe: false });
+  const location = useLocation();
 
-  const panels = integrations.flatMap(integration => {
-    if (integration.panels || integration.tabs) {
-      const processedEvents = integrationData[integration.name]?.map(container => container.event) || [];
-      return (
-        integration.panels?.({ processedEvents }) ||
-        integration.tabs?.({ processedEvents }).map(tab => ({
-          ...tab,
-          processedEvents: processedEvents,
-        })) ||
-        []
-      );
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(getRouteStorageKey(contextId), location.pathname);
+    } catch (error) {
+      log("Failed to set current route to browser storage", {
+        error,
+        currentPath: location.pathname,
+      });
     }
-    return [];
-  });
+  }, [location.pathname, contextId]);
+
+  const panels = getPanelsFromIntegrations(integrations, integrationData);
 
   const newNotificationSum = panels.reduce(
     (sum, panel) => ({
