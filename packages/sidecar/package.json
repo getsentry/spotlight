@@ -38,8 +38,7 @@
     "@sentry/core": "^9.22.0",
     "@sentry/node": "^8.49.0",
     "kleur": "^4.1.5",
-    "launch-editor": "^2.9.1",
-    "zod": "^4.0.14"
+    "launch-editor": "^2.9.1"
   },
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",

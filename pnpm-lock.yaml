@@ -490,7 +490,7 @@ importers:
         specifier: ^1.16.0
         version: 1.16.0
       '@sentry/core':
-        specifier: 9.22.0
+        specifier: ^9.22.0
         version: 9.22.0
       '@sentry/node':
         specifier: ^8.49.0
@@ -501,9 +501,6 @@ importers:
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
-      zod:
-        specifier: ^4.0.14
-        version: 4.0.14
     devDependencies:
       '@spotlightjs/tsconfig':
         specifier: workspace:*
@@ -9227,9 +9224,6 @@ packages:
 
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
-
-  zod@4.0.14:
-    resolution: {integrity: sha512-nGFJTnJN6cM2v9kXL+SOBq3AtjQby3Mv5ySGFof5UGRHrRioSJ5iG680cYNjE/yWk671nROcpPj4hAS8nyLhSw==}
 
   zustand@5.0.3:
     resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
@@ -19912,8 +19906,6 @@ snapshots:
       zod: 3.24.2
 
   zod@3.24.2: {}
-
-  zod@4.0.14: {}
 
   zustand@5.0.3(@types/react@18.3.20)(react@18.3.1):
     optionalDependencies:
