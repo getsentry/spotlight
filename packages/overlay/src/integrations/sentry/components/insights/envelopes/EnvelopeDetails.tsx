@@ -19,7 +19,7 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
   };
 
   const envelopeId: string | unknown = header.__spotlight_envelope_id;
-  const downloadUrl = URL.createObjectURL(new Blob([rawEnvelope.data], { type: rawEnvelope.contentType }));
+  const downloadUrl = URL.createObjectURL(new Blob([rawEnvelope.data as BlobPart], { type: rawEnvelope.contentType }));
   const downloadName = `${envelopeId}-${rawEnvelope.contentType}.bin`;
   return (
     <SidePanel backto="/insights/envelopes">
