@@ -1,8 +1,12 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
+import type { ErrorEvent } from "@sentry/core";
+import type { z } from "zod/v3";
 import { MessageBuffer } from "../messageBuffer.js";
 import type { Payload } from "../utils.js";
+import { formatIssueOutput } from "./formatting.js";
 import { processEnvelope } from "./parsing.js";
+import type { ErrorEventSchema } from "./utils.js";
 
 export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   const mcp = new McpServer({
@@ -46,16 +50,26 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
       const content: TextContent[] = [];
       for (const error of errors) {
         const {
-          envelope: [, { type }, payload],
+          envelope: [, [[{ type }, payload]]],
         } = error;
-        if (type === "event") {
+
+        if (type === "event" && isErrorEvent(payload)) {
           content.push({
             type: "text",
-            text: JSON.stringify({
-              exception: payload.exception,
-              level: payload.level,
-              request: payload.request,
-            }),
+            text: formatIssueOutput({
+              id: payload.event_id,
+              dateCreated: payload.timestamp,
+              platform: payload.platform,
+              tags: payload.tags,
+              type: "error",
+              title: payload.message,
+              description: payload.message,
+              stack: payload.stack,
+              cause: payload.cause,
+              solution: payload.solution,
+              related: payload.related,
+              related_issues: payload.related_issues,
+            } satisfies z.infer<typeof ErrorEventSchema>),
           });
         }
       }
@@ -70,4 +84,8 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   // TODO: Add tool for profiling data
 
   return mcp;
+}
+
+function isErrorEvent(payload: unknown): payload is ErrorEvent {
+  return typeof payload === "object" && payload !== null && "exception" in payload;
 }

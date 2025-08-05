@@ -489,6 +489,9 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.16.0
         version: 1.16.0
+      '@sentry/core':
+        specifier: 9.22.0
+        version: 9.22.0
       '@sentry/node':
         specifier: ^8.49.0
         version: 8.55.0
@@ -498,6 +501,9 @@ importers:
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
+      zod:
+        specifier: ^4.0.14
+        version: 4.0.14
     devDependencies:
       '@spotlightjs/tsconfig':
         specifier: workspace:*
@@ -8525,6 +8531,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@5.9.2:
+    resolution: {integrity: sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   ufo@1.5.4:
     resolution: {integrity: sha512-UsUk3byDzKd04EyoZ7U4DOlxQaD14JUKQl6/P7wiX4FNvUfm3XL246n9W5AmqwW5RSFJ27NAuM0iLscAOYUiGQ==}
 
@@ -9217,6 +9228,9 @@ packages:
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
+  zod@4.0.14:
+    resolution: {integrity: sha512-nGFJTnJN6cM2v9kXL+SOBq3AtjQby3Mv5ySGFof5UGRHrRioSJ5iG680cYNjE/yWk671nROcpPj4hAS8nyLhSw==}
+
   zustand@5.0.3:
     resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
     engines: {node: '>=12.20.0'}
@@ -9763,7 +9777,7 @@ snapshots:
   '@babel/helper-simple-access@7.25.7':
     dependencies:
       '@babel/traverse': 7.25.7
-      '@babel/types': 7.25.7
+      '@babel/types': 7.27.1
     transitivePeerDependencies:
       - supports-color
 
@@ -12622,7 +12636,7 @@ snapshots:
   '@sveltejs/vite-plugin-svelte-inspector@2.1.0(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@20.10.4)(lightningcss@1.30.1)(terser@5.43.1)))(svelte@4.2.19)(vite@5.4.19(@types/node@20.10.4)(lightningcss@1.30.1)(terser@5.43.1))':
     dependencies:
       '@sveltejs/vite-plugin-svelte': 3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@20.10.4)(lightningcss@1.30.1)(terser@5.43.1))
-      debug: 4.3.7
+      debug: 4.4.0
       svelte: 4.2.19
       vite: 5.4.19(@types/node@20.10.4)(lightningcss@1.30.1)(terser@5.43.1)
     transitivePeerDependencies:
@@ -12631,7 +12645,7 @@ snapshots:
   '@sveltejs/vite-plugin-svelte-inspector@2.1.0(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.28)(lightningcss@1.30.1)(terser@5.43.1)))(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.28)(lightningcss@1.30.1)(terser@5.43.1))':
     dependencies:
       '@sveltejs/vite-plugin-svelte': 3.1.2(svelte@4.2.19)(vite@5.4.19(@types/node@22.15.28)(lightningcss@1.30.1)(terser@5.43.1))
-      debug: 4.3.7
+      debug: 4.4.0
       svelte: 4.2.19
       vite: 5.4.19(@types/node@22.15.28)(lightningcss@1.30.1)(terser@5.43.1)
     transitivePeerDependencies:
@@ -12892,7 +12906,7 @@ snapshots:
 
   '@types/accepts@1.3.7':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/acorn@4.0.6':
     dependencies:
@@ -12928,13 +12942,13 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/cacheable-request@6.0.3':
     dependencies:
       '@types/http-cache-semantics': 4.0.4
       '@types/keyv': 3.1.4
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
       '@types/responselike': 1.0.3
 
   '@types/chai-subset@1.3.5':
@@ -12945,11 +12959,11 @@ snapshots:
 
   '@types/connect@3.4.36':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/content-disposition@0.5.8': {}
 
@@ -12962,7 +12976,7 @@ snapshots:
       '@types/connect': 3.4.38
       '@types/express': 5.0.0
       '@types/keygrip': 1.0.6
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/debug@4.1.12':
     dependencies:
@@ -12990,7 +13004,7 @@ snapshots:
 
   '@types/express-serve-static-core@5.0.6':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
       '@types/qs': 6.9.18
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -13004,12 +13018,12 @@ snapshots:
 
   '@types/fs-extra@9.0.13':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/hast@3.0.4':
     dependencies:
@@ -13031,7 +13045,7 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/koa-compose@3.2.8':
     dependencies:
@@ -13046,7 +13060,7 @@ snapshots:
       '@types/http-errors': 2.0.4
       '@types/keygrip': 1.0.6
       '@types/koa-compose': 3.2.8
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/koa__router@12.0.3':
     dependencies:
@@ -13068,11 +13082,11 @@ snapshots:
 
   '@types/mysql@2.15.22':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/mysql@2.15.26':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/nlcst@2.0.3':
     dependencies:
@@ -13106,13 +13120,13 @@ snapshots:
 
   '@types/pg@8.6.1':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
       pg-protocol: 1.9.5
       pg-types: 2.2.0
 
   '@types/plist@3.0.5':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
       xmlbuilder: 15.1.1
     optional: true
 
@@ -13141,11 +13155,11 @@ snapshots:
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/scheduler@0.23.0': {}
 
@@ -13154,19 +13168,19 @@ snapshots:
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/serve-static@1.15.7':
     dependencies:
       '@types/http-errors': 2.0.4
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
       '@types/send': 0.17.4
 
   '@types/shimmer@1.2.0': {}
 
   '@types/tedious@4.0.14':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
 
   '@types/unist@2.0.11': {}
 
@@ -13177,7 +13191,7 @@ snapshots:
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 18.19.87
+      '@types/node': 22.15.28
     optional: true
 
   '@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)':
@@ -14515,7 +14529,7 @@ snapshots:
   config-file-ts@0.2.6:
     dependencies:
       glob: 10.4.5
-      typescript: 5.8.3
+      typescript: 5.9.2
 
   consola@3.4.0: {}
 
@@ -15075,7 +15089,7 @@ snapshots:
   eslint-compat-utils@0.5.1(eslint@8.57.1):
     dependencies:
       eslint: 8.57.1
-      semver: 7.7.1
+      semver: 7.7.2
 
   eslint-config-prettier@9.1.0(eslint@8.57.1):
     dependencies:
@@ -18886,8 +18900,8 @@ snapshots:
       picocolors: 1.1.0
       sade: 1.8.1
       svelte: 4.2.19
-      svelte-preprocess: 5.1.4(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.3))(postcss@8.5.3)(svelte@4.2.19)(typescript@5.8.3)
-      typescript: 5.8.3
+      svelte-preprocess: 5.1.4(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.3))(postcss@8.5.3)(svelte@4.2.19)(typescript@5.9.2)
+      typescript: 5.9.2
     transitivePeerDependencies:
       - '@babel/core'
       - coffeescript
@@ -18906,8 +18920,8 @@ snapshots:
       picocolors: 1.1.0
       sade: 1.8.1
       svelte: 4.2.19
-      svelte-preprocess: 5.1.4(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.6))(postcss@8.5.6)(svelte@4.2.19)(typescript@5.8.3)
-      typescript: 5.8.3
+      svelte-preprocess: 5.1.4(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.6))(postcss@8.5.6)(svelte@4.2.19)(typescript@5.9.2)
+      typescript: 5.9.2
     transitivePeerDependencies:
       - '@babel/core'
       - coffeescript
@@ -18933,7 +18947,7 @@ snapshots:
     dependencies:
       svelte: 4.2.19
 
-  svelte-preprocess@5.1.4(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.3))(postcss@8.5.3)(svelte@4.2.19)(typescript@5.8.3):
+  svelte-preprocess@5.1.4(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.3))(postcss@8.5.3)(svelte@4.2.19)(typescript@5.9.2):
     dependencies:
       '@types/pug': 2.0.10
       detect-indent: 6.1.0
@@ -18945,9 +18959,9 @@ snapshots:
       '@babel/core': 7.27.1
       postcss: 8.5.3
       postcss-load-config: 4.0.2(postcss@8.5.3)
-      typescript: 5.8.3
+      typescript: 5.9.2
 
-  svelte-preprocess@5.1.4(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.6))(postcss@8.5.6)(svelte@4.2.19)(typescript@5.8.3):
+  svelte-preprocess@5.1.4(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.6))(postcss@8.5.6)(svelte@4.2.19)(typescript@5.9.2):
     dependencies:
       '@types/pug': 2.0.10
       detect-indent: 6.1.0
@@ -18959,7 +18973,7 @@ snapshots:
       '@babel/core': 7.27.1
       postcss: 8.5.6
       postcss-load-config: 4.0.2(postcss@8.5.6)
-      typescript: 5.8.3
+      typescript: 5.9.2
 
   svelte2tsx@0.7.36(svelte@5.0.0-next.263)(typescript@5.8.3):
     dependencies:
@@ -19216,6 +19230,8 @@ snapshots:
   typescript@5.8.2: {}
 
   typescript@5.8.3: {}
+
+  typescript@5.9.2: {}
 
   ufo@1.5.4: {}
 
@@ -19630,7 +19646,7 @@ snapshots:
   volar-service-typescript@0.0.61(@volar/language-service@2.4.6):
     dependencies:
       path-browserify: 1.0.1
-      semver: 7.7.1
+      semver: 7.7.2
       typescript-auto-import-cache: 0.3.3
       vscode-languageserver-textdocument: 1.0.12
       vscode-nls: 5.2.0
@@ -19896,6 +19912,8 @@ snapshots:
       zod: 3.24.2
 
   zod@3.24.2: {}
+
+  zod@4.0.14: {}
 
   zustand@5.0.3(@types/react@18.3.20)(react@18.3.1):
     optionalDependencies:

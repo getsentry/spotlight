@@ -1,10 +1,9 @@
+import type { Envelope, EnvelopeItem } from "@sentry/core";
+
 type RawEventContext = {
   contentType: string;
   data: string | Uint8Array;
 };
-
-type Envelope = any;
-type EnvelopeItem = any[];
 
 export function processEnvelope(rawEvent: RawEventContext) {
   let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
@@ -29,6 +28,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
       itemPayload = parseJSONFromBuffer(itemPayloadRaw);
       // data sanitization
       if (itemHeader.type) {
+        // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
         itemPayload.type = itemHeader.type;
       }
     } catch (err) {
