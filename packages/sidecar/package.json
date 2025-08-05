@@ -5,10 +5,9 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "start": "./server.js",
-    "dev": "vite build --watch",
-    "build": "vite build && tsc",
-    "build:watch": "vite build --watch",
+    "start": "./dist/server.js",
+    "dev": "tsdown --watch",
+    "build": "tsdown",
     "clean": "rimraf dist"
   },
   "files": ["dist"],
@@ -33,10 +32,11 @@
     }
   },
   "dependencies": {
+    "@jridgewell/trace-mapping": "^0.3.25",
     "@sentry/node": "^8.49.0",
     "kleur": "^4.1.5",
     "launch-editor": "^2.9.1",
-    "@jridgewell/trace-mapping": "^0.3.25"
+    "tsdown": "^0.13.3"
   },
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
