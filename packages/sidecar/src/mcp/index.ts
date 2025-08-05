@@ -53,16 +53,11 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
         if (type === "event" && isErrorEvent(payload)) {
           content.push({
             type: "text",
-            text: "",
-            // text: formatIssueOutput({
-            //   id: payload.event_id,
-            //   dateCreated: payload.timestamp,
-            //   platform: payload.platform,
-            //   tags: payload.tags,
-            //   type: "error",
-            //   title: payload.message,
-            //   description: payload.message,
-            // } satisfies z.infer<typeof ErrorEventSchema>),
+            text: JSON.stringify({
+              exception: payload.exception,
+              level: payload.level,
+              request: payload.request,
+            }),
           });
         }
       }

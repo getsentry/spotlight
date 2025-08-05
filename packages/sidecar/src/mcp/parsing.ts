@@ -44,7 +44,6 @@ export function processEnvelope(rawEvent: RawEventContext) {
 
   return {
     envelope,
-    rawEvent,
   };
 }
 
