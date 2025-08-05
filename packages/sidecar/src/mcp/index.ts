@@ -1,12 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import type { ErrorEvent } from "@sentry/core";
-import type { z } from "zod/v3";
 import { MessageBuffer } from "../messageBuffer.js";
 import type { Payload } from "../utils.js";
-import { formatIssueOutput } from "./formatting.js";
 import { processEnvelope } from "./parsing.js";
-import type { ErrorEventSchema } from "./utils.js";
 
 export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   const mcp = new McpServer({
@@ -56,20 +53,16 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
         if (type === "event" && isErrorEvent(payload)) {
           content.push({
             type: "text",
-            text: formatIssueOutput({
-              id: payload.event_id,
-              dateCreated: payload.timestamp,
-              platform: payload.platform,
-              tags: payload.tags,
-              type: "error",
-              title: payload.message,
-              description: payload.message,
-              stack: payload.stack,
-              cause: payload.cause,
-              solution: payload.solution,
-              related: payload.related,
-              related_issues: payload.related_issues,
-            } satisfies z.infer<typeof ErrorEventSchema>),
+            text: "",
+            // text: formatIssueOutput({
+            //   id: payload.event_id,
+            //   dateCreated: payload.timestamp,
+            //   platform: payload.platform,
+            //   tags: payload.tags,
+            //   type: "error",
+            //   title: payload.message,
+            //   description: payload.message,
+            // } satisfies z.infer<typeof ErrorEventSchema>),
           });
         }
       }

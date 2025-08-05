@@ -2,7 +2,6 @@ import { createWriteStream, readFileSync } from "node:fs";
 import { type IncomingMessage, type Server, type ServerResponse, createServer, get } from "node:http";
 import { extname, join, resolve } from "node:path";
 import { createGunzip, createInflate } from "node:zlib";
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import launchEditor from "launch-editor";
@@ -74,7 +73,7 @@ const SPOTLIGHT_HEADERS = {
   "X-Powered-by": SERVER_IDENTIFIER,
 } as const;
 
-const enableCORS = (handler: RequestHandler | Promise<RequestHandler>): RequestHandler =>
+const enableCORS = (handler: RequestHandler): RequestHandler =>
   withTracing(
     async (req: IncomingMessage, res: ServerResponse, pathname?: string, searchParams?: URLSearchParams) => {
       const headers = {
@@ -91,7 +90,7 @@ const enableCORS = (handler: RequestHandler | Promise<RequestHandler>): RequestH
         res.end();
         return;
       }
-      return (await handler)(req, res, pathname, searchParams);
+      return handler(req, res, pathname, searchParams);
     },
     { name: "enableCORS", op: "sidecar.http.middleware.cors" },
   );
@@ -269,11 +268,6 @@ function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
   }
 }
 
-async function handleMcpRequest(mcp: McpServer, transport: StreamableHTTPServerTransport): Promise<RequestHandler> {
-  await mcp.connect(transport);
-  return (req, res) => transport.handleRequest(req, res);
-}
-
 function openRequestHandler(basePath: string = process.cwd()) {
   return (req: IncomingMessage, res: ServerResponse) => {
     // We're only interested in handling a POST request
@@ -323,13 +317,13 @@ function logSpotlightUrl(port: number): void {
   logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
 }
 
-function startServer(
+async function startServer(
   buffer: MessageBuffer<Payload>,
   port: number,
   basePath?: string,
   filesToServe?: Record<string, Buffer>,
   incomingPayload?: IncomingPayloadCallback,
-): Server {
+): Promise<Server> {
   if (basePath && !filesToServe) {
     filesToServe = {
       "/src/index.html": readFileSync(join(basePath, "src/index.html")),
@@ -342,10 +336,11 @@ function startServer(
     sessionIdGenerator: undefined,
   });
   const mcp = createMcpInstance(buffer);
+  await mcp.connect(transport);
 
   const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
-    [/^\/mcp$/, enableCORS(handleMcpRequest(mcp, transport))],
+    [/^\/mcp$/, enableCORS(transport.handleRequest)],
     [/^\/clear$/, enableCORS(handleClearRequest)],
     [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
@@ -509,7 +504,7 @@ export function setupSidecar({
     sidecarPort = typeof port === "string" ? Number(port) : port;
   }
 
-  isSidecarRunning(sidecarPort).then((isRunning: boolean) => {
+  isSidecarRunning(sidecarPort).then(async (isRunning: boolean) => {
     if (isRunning) {
       logger.info(`Sidecar is already running on port ${sidecarPort}`);
       const hasSpotlightUI = (filesToServe && "/src/index.html" in filesToServe) || (!filesToServe && basePath);
@@ -517,7 +512,7 @@ export function setupSidecar({
         logSpotlightUrl(sidecarPort);
       }
     } else if (!serverInstance) {
-      serverInstance = startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
+      serverInstance = await startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
     }
   });
 }

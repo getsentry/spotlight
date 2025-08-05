@@ -1,3 +1,4 @@
+// This file is a copy of utils from @spotlightjs/overlay to parse envelopes from Buffer
 import type { Envelope, EnvelopeItem } from "@sentry/core";
 
 type RawEventContext = {
