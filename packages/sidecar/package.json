@@ -27,12 +27,14 @@
       "types": "./dist/src/vite-plugin.d.ts"
     },
     "./constants": {
-      "import": "./src/constants.js",
-      "types": "./dist/constants.d.ts"
+      "import": "./dist/src/constants.js",
+      "types": "./dist/src/constants.d.ts"
     }
   },
   "dependencies": {
     "@jridgewell/trace-mapping": "^0.3.25",
+    "@modelcontextprotocol/sdk": "^1.16.0",
+    "@sentry/core": "^9.22.0",
     "@sentry/node": "^8.49.0",
     "kleur": "^4.1.5",
     "launch-editor": "^2.9.1"

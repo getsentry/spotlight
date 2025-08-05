@@ -66,6 +66,19 @@ export class MessageBuffer<T> {
     this.head = 0;
     this.readers = new Map<string, (item: T) => void>();
   }
+
+  read(): T[] {
+    const result: T[] = [];
+    const start = this.head;
+    const end = this.writePos;
+    for (let i = start; i < end; i++) {
+      const item = this.items[i % this.size];
+      if (item !== undefined) {
+        result.push(item[1]);
+      }
+    }
+    return result;
+  }
 }
 
 function generateUuidv4(): string {

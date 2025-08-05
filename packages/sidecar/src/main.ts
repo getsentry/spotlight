@@ -2,14 +2,15 @@ import { createWriteStream, readFileSync } from "node:fs";
 import { type IncomingMessage, type Server, type ServerResponse, createServer, get } from "node:http";
 import { extname, join, resolve } from "node:path";
 import { createGunzip, createInflate } from "node:zlib";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import launchEditor from "launch-editor";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
+import { createMcpInstance } from "./mcp/index.js";
 import { MessageBuffer } from "./messageBuffer.js";
-
-type Payload = [string, Buffer];
+import type { Payload } from "./utils.js";
 
 type IncomingPayloadCallback = (body: string) => void;
 
@@ -74,7 +75,7 @@ const SPOTLIGHT_HEADERS = {
 
 const enableCORS = (handler: RequestHandler): RequestHandler =>
   withTracing(
-    (req: IncomingMessage, res: ServerResponse, pathname?: string, searchParams?: URLSearchParams) => {
+    async (req: IncomingMessage, res: ServerResponse, pathname?: string, searchParams?: URLSearchParams) => {
       const headers = {
         ...CORS_HEADERS,
         ...SPOTLIGHT_HEADERS,
@@ -316,21 +317,30 @@ function logSpotlightUrl(port: number): void {
   logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
 }
 
-function startServer(
+async function startServer(
   buffer: MessageBuffer<Payload>,
   port: number,
   basePath?: string,
   filesToServe?: Record<string, Buffer>,
   incomingPayload?: IncomingPayloadCallback,
-): Server {
+): Promise<Server> {
   if (basePath && !filesToServe) {
     filesToServe = {
       "/src/index.html": readFileSync(join(basePath, "src/index.html")),
       "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
     };
   }
+
+  // MCP Setup
+  const transport = new StreamableHTTPServerTransport({
+    sessionIdGenerator: undefined,
+  });
+  const mcp = createMcpInstance(buffer);
+  await mcp.connect(transport);
+
   const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
+    [/^\/mcp$/, enableCORS((req, res) => transport.handleRequest(req, res))],
     [/^\/clear$/, enableCORS(handleClearRequest)],
     [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
@@ -494,7 +504,7 @@ export function setupSidecar({
     sidecarPort = typeof port === "string" ? Number(port) : port;
   }
 
-  isSidecarRunning(sidecarPort).then((isRunning: boolean) => {
+  isSidecarRunning(sidecarPort).then(async (isRunning: boolean) => {
     if (isRunning) {
       logger.info(`Sidecar is already running on port ${sidecarPort}`);
       const hasSpotlightUI = (filesToServe && "/src/index.html" in filesToServe) || (!filesToServe && basePath);
@@ -502,7 +512,7 @@ export function setupSidecar({
         logSpotlightUrl(sidecarPort);
       }
     } else if (!serverInstance) {
-      serverInstance = startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
+      serverInstance = await startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
     }
   });
 }
