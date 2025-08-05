@@ -28,12 +28,11 @@
     "@biomejs/biome": "^1.9.4",
     "@changesets/cli": "^2.27.9",
     "@svitejs/changesets-changelog-github-compact": "^1.1.0",
-    "@vitejs/plugin-react": "^4.3.2",
     "lint-staged": "^15.2.10",
     "rimraf": "^5.0.10",
     "simple-git-hooks": "^2.11.1",
     "turbo": "^2.4.0",
-    "typescript": "^5.6.2"
+    "typescript": "catalog:"
   },
   "resolutions": {
     "path-to-regexp": "^6.3.0",

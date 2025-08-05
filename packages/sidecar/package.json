@@ -34,16 +34,16 @@
   "dependencies": {
     "@jridgewell/trace-mapping": "^0.3.25",
     "@modelcontextprotocol/sdk": "^1.16.0",
-    "@sentry/core": "^9.22.0",
-    "@sentry/node": "^8.49.0",
+    "@sentry/core": "catalog:",
+    "@sentry/node": "catalog:",
     "kleur": "^4.1.5",
     "launch-editor": "^2.9.1"
   },
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
-    "@types/node": "^18.19.55",
+    "@types/node": "catalog:",
     "tsdown": "^0.13.3",
-    "typescript": "^5.6.2"
+    "typescript": "catalog:"
   },
   "volta": {
     "extends": "../../package.json"

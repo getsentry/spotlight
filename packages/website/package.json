@@ -17,20 +17,20 @@
     "@astrojs/starlight": "^0.32.4",
     "@astrojs/starlight-tailwind": "^3.0.1",
     "@astrojs/vercel": "^8.0.8",
-    "@fontsource/raleway": "^5.1.0",
-    "@sentry/astro": "^8.49.0",
-    "@tailwindcss/vite": "^4.1.11",
-    "@types/react": "^18.3.11",
-    "@types/react-dom": "^18.3.0",
+    "@fontsource/raleway": "catalog:",
+    "@sentry/astro": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "astro": "^5.3.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "sharp": "^0.33.5",
-    "tailwindcss": "^4.1.10"
+    "tailwindcss": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
-    "typescript": "^5.6.2",
+    "typescript": "catalog:",
     "vite-plugin-inspect": "^0.7.42"
   },
   "volta": {

@@ -14,14 +14,14 @@
   },
   "dependencies": {
     "@astrojs/node": "^8.3.4",
-    "@sentry/astro": "^8.49.0",
+    "@sentry/astro": "catalog:",
     "@spotlightjs/astro": "workspace:^",
     "astro": "^4.16.18"
   },
   "devDependencies": {
     "@astrojs/check": "^0.3.4",
     "@playwright/test": "^1.48.0",
-    "@types/node": "^18.19.55",
-    "typescript": "^5.6.2"
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
   }
 }

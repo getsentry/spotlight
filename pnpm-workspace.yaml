@@ -2,3 +2,18 @@ packages:
   - 'packages/*'
   - 'demos/*'
   - 'e2e-tests/*'
+
+catalog:
+  "@tailwindcss/vite": ^4.1.11
+  "@types/node": ^22.15.21
+  "@types/react": ^18.3.11
+  "@types/react-dom": ^18.3.0
+  "@sentry/astro": ^8.49.0
+  "@sentry/core": 9.22.0
+  "@sentry/node": ^8.49.0
+  react: ^18.3.1
+  react-dom: ^18.3.1
+  tailwindcss: ^4.1.10
+  typescript: ^5.6.2
+  vite: ^5.4.19
+  vitest: ^0.34.6
