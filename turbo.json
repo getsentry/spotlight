@@ -15,9 +15,15 @@
       ]
     },
     "dev": {
+      "dependsOn": ["^build"],
+      "persistent": true,
+      "cache": false
+    },
+    "@spotlightjs/overlay#dev": {
       "with": ["@spotlightjs/sidecar#dev"],
-      "cache": false,
-      "persistent": true
+      "dependsOn": ["^build"],
+      "persistent": true,
+      "cache": false
     },
     "test": {
       "dependsOn": ["^build"],
