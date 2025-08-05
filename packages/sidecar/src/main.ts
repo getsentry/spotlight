@@ -340,7 +340,7 @@ async function startServer(
 
   const ROUTES: [RegExp, RequestHandler][] = [
     [/^\/health$/, handleHealthRequest],
-    [/^\/mcp$/, enableCORS(transport.handleRequest)],
+    [/^\/mcp$/, enableCORS((req, res) => transport.handleRequest(req, res))],
     [/^\/clear$/, enableCORS(handleClearRequest)],
     [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
     [/^\/open$/, enableCORS(openRequestHandler(basePath))],
