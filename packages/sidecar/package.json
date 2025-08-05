@@ -23,8 +23,8 @@
       "types": "./dist/main.d.ts"
     },
     "./vite-plugin": {
-      "import": "./dist/vite-plugin.js",
-      "types": "./dist/vite-plugin.d.ts"
+      "import": "./dist/src/vite-plugin.js",
+      "types": "./dist/src/vite-plugin.d.ts"
     },
     "./constants": {
       "import": "./src/constants.js",
