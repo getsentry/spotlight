@@ -6,7 +6,6 @@
  * and contextual information with consistent formatting patterns.
  */
 import type { z } from "zod";
-import type { Event } from "./types.js";
 import type {
   ErrorEntrySchema,
   EventSchema,
@@ -14,7 +13,8 @@ import type {
   MessageEntrySchema,
   RequestEntrySchema,
   ThreadsEntrySchema,
-} from "./utils.js";
+} from "./schema.js";
+import type { Event } from "./types.js";
 
 // Language detection mappings
 const LANGUAGE_EXTENSIONS: Record<string, string> = {
