@@ -163,12 +163,6 @@ ${JSON.stringify(extra, null, 2)}
 - Check for missing dependencies or imports
 - Validate user input and data types
 - Review error handling and try-catch blocks
-
-### Investigation Questions:
-- Is this error reproducible?
-- What user actions led to this error?
-- Are there similar errors in the logs?
-- Has this code path been recently modified?
 `;
 
   return markdown;
