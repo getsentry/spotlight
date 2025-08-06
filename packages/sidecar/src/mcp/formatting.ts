@@ -252,6 +252,16 @@ export function formatIssue(event: ErrorEvent): string {
     const platformLower = platform.toLowerCase();
     const errorTypeLower = errorType.toLowerCase();
 
+    // Check for Flutter/Dart first (can be on javascript platform)
+    if (
+      errorTypeLower.includes("flutter") ||
+      (contexts.runtime as any)?.name?.toLowerCase().includes("flutter") ||
+      (contexts as any).dart_context ||
+      (contexts as any).flutter_context
+    ) {
+      return "Flutter/Dart Error";
+    }
+
     if (platformLower.includes("javascript") || platformLower.includes("node")) {
       if (errorTypeLower.includes("syntax")) return "JavaScript Syntax Error";
       if (errorTypeLower.includes("reference")) return "JavaScript Reference Error";
@@ -261,7 +271,6 @@ export function formatIssue(event: ErrorEvent): string {
     if (platformLower.includes("python")) return "Python Error";
     if (platformLower.includes("php")) return "PHP Error";
     if (platformLower.includes("java")) return "Java/Android Error";
-    if (errorTypeLower.includes("flutter")) return "Flutter/Dart Error";
     if (errorTypeLower.includes("http")) return "HTTP/Network Error";
     return "General Runtime Error";
   };
@@ -395,6 +404,7 @@ ${
 
 ### 📦 Library/Framework Code (${libraryFrames.length} frames)
 <details>
+<summary>Click to expand library stack trace</summary>
 
 \`\`\`
 ${libraryFrames.map(frame => formatFrameHeader(frame, platform)).join("\n")}
@@ -438,7 +448,11 @@ ${errorBreadcrumbs
 ${userBreadcrumbs
   .map(crumb => {
     const timestamp = crumb.timestamp ? new Date(crumb.timestamp * 1000).toISOString() : "Unknown";
-    const message = crumb.message || "No message";
+    const message =
+      crumb.message ||
+      crumb.data?.label ||
+      (crumb.data && typeof crumb.data === "object" ? JSON.stringify(crumb.data) : "") ||
+      "No message";
     return `- **${timestamp}**: ${message}`;
   })
   .join("\n")}
@@ -722,11 +736,12 @@ ${JSON.stringify(extra, null, 2)}
 
     case "Flutter/Dart Error":
       markdown += `#### Flutter/Dart Issues:
-- Check widget tree structure and context usage
-- Verify state management and lifecycle methods
-- Review async operations and Future handling
-- Check for proper disposal of resources
-- Validate platform-specific implementations
+- **Widget Context**: Ensure widgets have proper context (common with Scaffold.of(), Theme.of())
+- **State Management**: Check setState() calls and widget lifecycle
+- **Async Operations**: Verify Future/Stream handling and async/await usage
+- **Build Context**: Ensure context is valid when accessing inherited widgets
+- **Widget Tree**: Check for proper widget hierarchy and parent-child relationships
+- **Platform Channels**: Validate native platform integration if applicable
 
 `;
       break;
