@@ -100,7 +100,7 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
                   key,
                   value: String(value),
                 })),
-                dateCreated: payload.timestamp ? new Date(payload.timestamp).toISOString() : new Date(),
+                dateCreated: payload.timestamp ? new Date(payload.timestamp).toISOString() : new Date().toISOString(),
                 title: payload.message ?? "",
                 entries,
                 // @ts-expect-error
