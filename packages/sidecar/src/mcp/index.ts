@@ -3,6 +3,7 @@ import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import type { ErrorEvent } from "@sentry/core";
 import { MessageBuffer } from "../messageBuffer.js";
 import type { Payload } from "../utils.js";
+import { formatIssue } from "./formatting.js";
 import { processEnvelope } from "./parsing.js";
 
 export function createMcpInstance(buffer: MessageBuffer<Payload>) {
@@ -53,11 +54,7 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
         if (type === "event" && isErrorEvent(payload)) {
           content.push({
             type: "text",
-            text: JSON.stringify({
-              exception: payload.exception,
-              level: payload.level,
-              request: payload.request,
-            }),
+            text: JSON.stringify(formatIssue(payload)),
           });
         }
       }
