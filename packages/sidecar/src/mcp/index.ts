@@ -47,15 +47,19 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
 
       const content: TextContent[] = [];
       for (const error of errors) {
-        const {
-          envelope: [, [[{ type }, payload]]],
-        } = error;
+        try {
+          const {
+            envelope: [, [[{ type }, payload]]],
+          } = error;
 
-        if (type === "event" && isErrorEvent(payload)) {
-          content.push({
-            type: "text",
-            text: JSON.stringify(formatIssue(payload)),
-          });
+          if (type === "event" && isErrorEvent(payload)) {
+            content.push({
+              type: "text",
+              text: JSON.stringify(formatIssue(payload)),
+            });
+          }
+        } catch (err) {
+          console.error(err);
         }
       }
 
