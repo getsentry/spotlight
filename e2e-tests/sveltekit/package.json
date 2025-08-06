@@ -12,7 +12,6 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "clean": "rimraf .svelte-kit",
-    "pretest:e2e": "playwright install --with-deps",
     "test:e2e": "playwright test"
   },
   "dependencies": {
