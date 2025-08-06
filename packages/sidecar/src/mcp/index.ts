@@ -55,7 +55,7 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
           if (type === "event" && isErrorEvent(payload)) {
             content.push({
               type: "text",
-              text: JSON.stringify(formatIssue(payload)),
+              text: formatIssue(payload),
             });
           }
         } catch (err) {
