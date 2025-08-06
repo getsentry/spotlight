@@ -547,6 +547,9 @@ importers:
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
+      zod:
+        specifier: ^3
+        version: 3.24.2
     devDependencies:
       '@spotlightjs/tsconfig':
         specifier: workspace:*

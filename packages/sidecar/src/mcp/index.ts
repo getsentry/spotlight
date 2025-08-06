@@ -3,7 +3,7 @@ import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import type { ErrorEvent } from "@sentry/core";
 import { MessageBuffer } from "../messageBuffer.js";
 import type { Payload } from "../utils.js";
-import { formatIssue } from "./formatting.js";
+import { formatEventOutput } from "./formatting.js";
 import { processEnvelope } from "./parsing.js";
 
 export function createMcpInstance(buffer: MessageBuffer<Payload>) {
@@ -53,9 +53,60 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
           } = error;
 
           if (type === "event" && isErrorEvent(payload)) {
+            const entries = [];
+
+            if (payload.exception) {
+              entries.push({
+                type: "exception",
+                data: payload.exception,
+              });
+            }
+
+            if (payload.request) {
+              entries.push({
+                type: "request",
+                data: payload.request,
+              });
+            }
+
+            if (payload.breadcrumbs) {
+              entries.push({
+                type: "breadcrumbs",
+                data: payload.breadcrumbs,
+              });
+            }
+
+            if (payload.spans) {
+              entries.push({
+                type: "spans",
+                data: payload.spans,
+              });
+            }
+
+            if (payload.threads) {
+              entries.push({
+                type: "threads",
+                data: payload.threads,
+              });
+            }
+
             content.push({
               type: "text",
-              text: formatIssue(payload),
+              text: formatEventOutput({
+                message: payload.message ?? "",
+                id: payload.event_id ?? "",
+                type: "error",
+                tags: Object.entries(payload.tags ?? {}).map(([key, value]) => ({
+                  key,
+                  value: String(value),
+                })),
+                dateCreated: payload.timestamp ? new Date(payload.timestamp).toISOString() : new Date(),
+                title: payload.message ?? "",
+                entries,
+                // @ts-expect-error
+                contexts: payload.contexts,
+                platform: payload.platform,
+              }),
             });
           }
         } catch (err) {
