@@ -34,7 +34,7 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
         };
       }
 
-      const errors = envelopes
+      const content = envelopes
         .map(([contentType, data]) => processEnvelope({ contentType, data }))
         .sort((a, b) => {
           const a_sent_at = a.envelope[0].sent_at as string;
@@ -42,25 +42,26 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
           if (a_sent_at < b_sent_at) return 1;
           if (a_sent_at > b_sent_at) return -1;
           return 0;
+        })
+        .flatMap(processed => {
+          const [, items] = processed.envelope;
+          return items
+            .map((item): TextContent | null => {
+              const [{ type }, payload] = item;
+              if (type === "event" && isErrorEvent(payload)) {
+                return {
+                  type: "text",
+                  text: JSON.stringify({
+                    exception: payload.exception,
+                    level: payload.level,
+                    request: payload.request,
+                  }),
+                };
+              }
+              return null;
+            })
+            .filter((c): c is TextContent => c !== null);
         });
-
-      const content: TextContent[] = [];
-      for (const error of errors) {
-        const {
-          envelope: [, [[{ type }, payload]]],
-        } = error;
-
-        if (type === "event" && isErrorEvent(payload)) {
-          content.push({
-            type: "text",
-            text: JSON.stringify({
-              exception: payload.exception,
-              level: payload.level,
-              request: payload.request,
-            }),
-          });
-        }
-      }
 
       return {
         content,
