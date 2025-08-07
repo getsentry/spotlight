@@ -1,14 +1,16 @@
 {
   "name": "@spotlightjs/sidecar",
   "description": "A small proxy server to capture and forward data from backend services to Spotlight.",
-  "version": "1.11.4",
+  "version": "1.12.0",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "start": "./dist/server.js",
     "dev": "tsdown --watch",
     "build": "tsdown",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "test": "vitest run",
+    "test:dev": "vitest"
   },
   "files": ["dist"],
   "bin": {
@@ -37,13 +39,15 @@
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
     "kleur": "^4.1.5",
-    "launch-editor": "^2.9.1"
+    "launch-editor": "^2.9.1",
+    "zod": "^3"
   },
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "tsdown": "^0.13.3",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "volta": {
     "extends": "../../package.json"

@@ -1,9 +1,21 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
+import type { CallToolResult, TextContent } from "@modelcontextprotocol/sdk/types.js";
 import type { ErrorEvent } from "@sentry/core";
+import type { z } from "zod";
 import { MessageBuffer } from "../messageBuffer.js";
 import type { Payload } from "../utils.js";
+import { formatEventOutput } from "./formatting.js";
 import { processEnvelope } from "./parsing.js";
+import type { ErrorEventSchema } from "./schema.js";
+
+const NO_ERRORS_CONTENT: CallToolResult = {
+  content: [
+    {
+      type: "text",
+      text: "No recent errors found in Spotlight. This might be because the application started successfully, but runtime issues only appear when you interact with specific pages or features.\n\nAsk the user to navigate to the page where they're experiencing the issue to reproduce it, that way we can get that in the Spotlight debugger. So if you want to check for errors again, just ask me to do that.",
+    },
+  ],
+};
 
 export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   const mcp = new McpServer({
@@ -24,44 +36,28 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
       errorsBuffer.clear();
 
       if (envelopes.length === 0) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: "No recent errors found in Spotlight. This might be because the application started successfully, but runtime issues only appear when you interact with specific pages or features.\n\nAsk the user to navigate to the page where they're experiencing the issue to reproduce it, that way we can get that in the Spotlight debugger. So if you want to check for errors again, just ask me to do that.",
-            },
-          ],
-        };
+        return NO_ERRORS_CONTENT;
       }
 
-      const content = envelopes
-        .map(([contentType, data]) => processEnvelope({ contentType, data }))
-        .sort((a, b) => {
-          const a_sent_at = a.envelope[0].sent_at as string;
-          const b_sent_at = b.envelope[0].sent_at as string;
-          if (a_sent_at < b_sent_at) return 1;
-          if (a_sent_at > b_sent_at) return -1;
-          return 0;
-        })
-        .flatMap(processed => {
-          const [, items] = processed.envelope;
-          return items
-            .map((item): TextContent | null => {
-              const [{ type }, payload] = item;
-              if (type === "event" && isErrorEvent(payload)) {
-                return {
-                  type: "text",
-                  text: JSON.stringify({
-                    exception: payload.exception,
-                    level: payload.level,
-                    request: payload.request,
-                  }),
-                };
-              }
-              return null;
-            })
-            .filter((c): c is TextContent => c !== null);
-        });
+      const content: TextContent[] = [];
+      for (const envelope of envelopes) {
+        try {
+          const markdown = await formatErrorEnvelope(envelope);
+
+          if (markdown) {
+            content.push({
+              type: "text",
+              text: markdown,
+            });
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      if (content.length === 0) {
+        return NO_ERRORS_CONTENT;
+      }
 
       return {
         content,
@@ -75,6 +71,73 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   return mcp;
 }
 
+async function formatErrorEnvelope([contentType, data]: Payload) {
+  const event = processEnvelope({ contentType, data });
+
+  const {
+    envelope: [, [[{ type }, payload]]],
+  } = event;
+
+  if (type === "event" && isErrorEvent(payload)) {
+    return formatEventOutput(processErrorEvent(payload));
+  }
+}
+
 function isErrorEvent(payload: unknown): payload is ErrorEvent {
   return typeof payload === "object" && payload !== null && "exception" in payload;
+}
+
+export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventSchema> {
+  const entries = [];
+
+  if (event.exception) {
+    entries.push({
+      type: "exception",
+      data: event.exception,
+    });
+  }
+
+  if (event.request) {
+    entries.push({
+      type: "request",
+      data: event.request,
+    });
+  }
+
+  if (event.breadcrumbs) {
+    entries.push({
+      type: "breadcrumbs",
+      data: event.breadcrumbs,
+    });
+  }
+
+  if (event.spans) {
+    entries.push({
+      type: "spans",
+      data: event.spans,
+    });
+  }
+
+  if (event.threads) {
+    entries.push({
+      type: "threads",
+      data: event.threads,
+    });
+  }
+
+  return {
+    message: event.message ?? "",
+    id: event.event_id ?? "",
+    type: "error",
+    tags: Object.entries(event.tags ?? {}).map(([key, value]) => ({
+      key,
+      value: String(value),
+    })),
+    dateCreated: event.timestamp ? new Date(event.timestamp).toISOString() : new Date().toISOString(),
+    title: event.message ?? "",
+    entries,
+    // @ts-expect-error
+    contexts: event.contexts,
+    platform: event.platform,
+  };
 }
