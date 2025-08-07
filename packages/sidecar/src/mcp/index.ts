@@ -1,3 +1,4 @@
+import { writeFile } from "node:fs/promises";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult, TextContent } from "@modelcontextprotocol/sdk/types.js";
 import type { ErrorEvent } from "@sentry/core";
@@ -42,7 +43,7 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
       const content: TextContent[] = [];
       for (const envelope of envelopes) {
         try {
-          const markdown = formatErrorEnvelope(envelope);
+          const markdown = await formatErrorEnvelope(envelope);
 
           if (markdown) {
             content.push({
@@ -71,7 +72,7 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   return mcp;
 }
 
-function formatErrorEnvelope([contentType, data]: Payload) {
+async function formatErrorEnvelope([contentType, data]: Payload) {
   const event = processEnvelope({ contentType, data });
 
   const {
@@ -87,7 +88,7 @@ function isErrorEvent(payload: unknown): payload is ErrorEvent {
   return typeof payload === "object" && payload !== null && "exception" in payload;
 }
 
-function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventSchema> {
+export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventSchema> {
   const entries = [];
 
   if (event.exception) {

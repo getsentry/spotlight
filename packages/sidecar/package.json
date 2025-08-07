@@ -8,7 +8,9 @@
     "start": "./dist/server.js",
     "dev": "tsdown --watch",
     "build": "tsdown",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "test": "vitest run",
+    "test:dev": "vitest"
   },
   "files": ["dist"],
   "bin": {
@@ -44,7 +46,8 @@
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "tsdown": "^0.13.3",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catelog:"
   },
   "volta": {
     "extends": "../../package.json"
