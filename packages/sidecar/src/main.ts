@@ -162,7 +162,7 @@ async function startServer(
   basePath?: string,
   filesToServe?: string[],
   incomingPayload?: IncomingPayloadCallback,
-): Promise<Server> {
+): Promise<ServerType> {
   if (basePath && !filesToServe) {
     filesToServe = ["/src/index.html", "/assets/main.js"];
   }
