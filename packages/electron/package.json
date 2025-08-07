@@ -1,5 +1,6 @@
 {
   "name": "@spotlightjs/electron",
+  "productName": "Spotlight",
   "description": "Electron app for Spotlight",
   "author": "Sentry",
   "license": "Apache-2.0",
