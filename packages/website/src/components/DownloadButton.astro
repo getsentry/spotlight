@@ -4,7 +4,7 @@ import { Fragment } from 'react';
 let response = await fetch('https://api.github.com/repos/getsentry/spotlight/releases');
 let releases = await response.json().then(data => data.filter((release:any) => release.name.startsWith('@spotlightjs/electron@')));
 
-let assets = releases[0].assets;
+let assets = releases[0]?.assets || [];
 let version = null;
 
 const links = assets.map((asset: any) => {
