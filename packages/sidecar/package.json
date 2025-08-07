@@ -47,7 +47,7 @@
     "@types/node": "catalog:",
     "tsdown": "^0.13.3",
     "typescript": "catalog:",
-    "vitest": "catelog:"
+    "vitest": "catalog:"
   },
   "volta": {
     "extends": "../../package.json"
