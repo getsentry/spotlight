@@ -1,5 +1,23 @@
 # @spotlightjs/core
 
+## 3.2.0
+
+### Minor Changes
+
+- - Added support to visualize Profile in specific Trace ([#857](https://github.com/getsentry/spotlight/pull/857))
+
+### Patch Changes
+
+- update dependencies to address security vulnerability ([#851](https://github.com/getsentry/spotlight/pull/851))
+
+- - Tailwind v4 ([#852](https://github.com/getsentry/spotlight/pull/852))
+
+- Fix background of Overlay Debugger ([#872](https://github.com/getsentry/spotlight/pull/872))
+
+- Fix crash on the rare case when an exception has a stacktrace property but not frames under it ([#858](https://github.com/getsentry/spotlight/pull/858))
+
+- - Added route persistence for overlay ([#856](https://github.com/getsentry/spotlight/pull/856))
+
 ## 3.1.0
 
 ### Minor Changes
