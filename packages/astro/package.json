@@ -29,8 +29,8 @@
   },
   "devDependencies": {
     "astro": "^4.16.18",
-    "typescript": "^5.6.2",
-    "vite": "^5.4.19"
+    "typescript": "catalog:",
+    "vite": "catalog:"
   },
   "volta": {
     "extends": "../../package.json"

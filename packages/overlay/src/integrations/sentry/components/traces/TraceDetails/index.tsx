@@ -5,6 +5,7 @@ import { createTab } from "~/integrations/sentry/utils/tabs";
 
 import { useSentryEvents } from "~/integrations/sentry/data/useSentryEvents";
 import { isLocalTrace } from "~/integrations/sentry/store/helpers";
+import useSentryStore from "~/integrations/sentry/store/store";
 import type { Trace } from "~/integrations/sentry/types";
 import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 import { isErrorEvent } from "~/integrations/sentry/utils/sentry";
@@ -14,6 +15,7 @@ import AITraceSplitView from "../../insights/aiTraces/AITraceSplitView";
 import { hasAISpans } from "../../insights/aiTraces/sdks/aiLibraries";
 import LogsList from "../../log/LogsList";
 import DateTime from "../../shared/DateTime";
+import TraceProfileTree from "./components/TraceProfileTree";
 
 type TraceDetailsProps = {
   trace: Trace;
@@ -66,6 +68,7 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
   }
 
   const events = useSentryEvents(trace.trace_id);
+  const profile = useSentryStore.getState().getProfileByTraceId(trace.trace_id);
   const errorCount = useMemo(
     () =>
       events.filter(
@@ -86,6 +89,10 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
     }),
   ];
 
+  if (profile) {
+    tabs.push(createTab("profileTree", "Profile"));
+  }
+
   return (
     <div className="flex h-full flex-col">
       {aiConfig.mode && hasAI ? (
@@ -99,6 +106,7 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
               <Route path="errors" element={<EventList traceId={trace.trace_id} />} />
               <Route path="logs" element={<LogsList traceId={trace.trace_id} />} />
               <Route path="logs/:id" element={<LogsList traceId={trace.trace_id} />} />
+              {profile && <Route path="profileTree" element={<TraceProfileTree profile={profile} />} />}
               {/* Default tab */}
               <Route path="*" element={<Navigate to="context" replace />} />
             </Routes>

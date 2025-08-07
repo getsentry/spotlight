@@ -14,13 +14,16 @@
         "APPLE_API_KEY_PATH"
       ]
     },
-    "build#overlay": {
-      "dependsOn": ["build#sidecar"],
-      "outputs": ["dist/**", "dist-bin/**", ".next/**", "!.next/cache/**"]
-    },
     "dev": {
-      "cache": false,
-      "persistent": true
+      "dependsOn": ["^build"],
+      "persistent": true,
+      "cache": false
+    },
+    "@spotlightjs/overlay#dev": {
+      "with": ["@spotlightjs/sidecar#dev"],
+      "dependsOn": ["^build"],
+      "persistent": true,
+      "cache": false
     },
     "test": {
       "dependsOn": ["^build"],

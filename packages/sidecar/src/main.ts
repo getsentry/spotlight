@@ -1,6 +1,7 @@
 import { createWriteStream } from "node:fs";
 import { get } from "node:http";
 import { resolve } from "node:path";
+import { StreamableHTTPTransport } from "@hono/mcp";
 import { type ServerType, serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { addEventProcessor, captureException, startSpan } from "@sentry/node";
@@ -10,10 +11,10 @@ import launchEditor from "launch-editor";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
+import { createMcpInstance } from "./mcp/index.js";
 import { MessageBuffer } from "./messageBuffer.js";
 import { streamSSE } from "./streaming.js";
-
-type Payload = [string, Buffer];
+import type { Payload } from "./utils.js";
 
 type IncomingPayloadCallback = (body: string) => void;
 
@@ -155,16 +156,21 @@ function logSpotlightUrl(port: number): void {
   logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
 }
 
-function startServer(
+async function startServer(
   buffer: MessageBuffer<Payload>,
   port: number,
   basePath?: string,
   filesToServe?: string[],
   incomingPayload?: IncomingPayloadCallback,
-) {
+): Promise<Server> {
   if (basePath && !filesToServe) {
     filesToServe = ["/src/index.html", "/assets/main.js"];
   }
+
+  // MCP Setup
+  const transport = new StreamableHTTPTransport();
+  const mcp = createMcpInstance(buffer);
+  await mcp.connect(transport);
 
   const server = new Hono();
 
@@ -179,6 +185,7 @@ function startServer(
     startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
   });
 
+  server.delete("/mcp", c => transport.handleRequest(c));
   server.delete("/clear", handleClearRequest);
   server.get("/stream", streamGetRequestHandler(buffer));
   server.on("POST", ["/stream", "/api/:id/envelope"], streamPostRequestHandler(buffer, incomingPayload));
@@ -315,7 +322,7 @@ export function setupSidecar({
     sidecarPort = typeof port === "string" ? Number(port) : port;
   }
 
-  isSidecarRunning(sidecarPort).then((isRunning: boolean) => {
+  isSidecarRunning(sidecarPort).then(async (isRunning: boolean) => {
     if (isRunning) {
       logger.info(`Sidecar is already running on port ${sidecarPort}`);
       const hasSpotlightUI = (filesToServe && "/src/index.html" in filesToServe) || (!filesToServe && basePath);
@@ -323,7 +330,7 @@ export function setupSidecar({
         logSpotlightUrl(sidecarPort);
       }
     } else if (!serverInstance) {
-      serverInstance = startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
+      serverInstance = await startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
     }
   });
 }
