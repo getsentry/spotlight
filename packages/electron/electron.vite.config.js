@@ -60,6 +60,12 @@ export default defineConfig(({ mode }) => {
       },
     },
     renderer: {
+      define:
+        mode === "development"
+          ? {
+              "process.env.npm_package_version": JSON.stringify(process.env.npm_package_version),
+            }
+          : undefined,
       plugins: [
         sentryVitePlugin({
           org: env.MAIN_VITE_SENTRY_ORG,
