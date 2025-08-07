@@ -63,7 +63,10 @@ const createWindow = () => {
 
   win.webContents.on("did-finish-load", () => {
     win.webContents.executeJavaScript(
-      `document.querySelector('#sentry-spotlight-root').shadowRoot.querySelector('.spotlight-fullscreen > :first-child').style.cssText = 'padding-top: 34px; -webkit-app-region:drag;'`,
+      `const firstChild = document.querySelector('#sentry-spotlight-root')?.shadowRoot?.querySelector('.spotlight-fullscreen > :first-child');
+        if(firstChild) {
+          firstChild.style.cssText = 'padding-top: 34px; -webkit-app-region:drag;'
+        }`,
     );
   });
 };
@@ -268,8 +271,14 @@ store.onDidChange("sentry-send-envelopes", newValue => {
 const showErrorMessage = () => {
   if (win) {
     win.webContents.executeJavaScript(`
-      document.getElementById('sentry-spotlight-root').style.display = 'none';
-      document.getElementById('error-screen').style.display = 'block';
+      const sentryRoot = document.getElementById('sentry-spotlight-root');
+      const errorScreen = document.getElementById('error-screen');
+      if(sentryRoot){
+        sentryRoot.style.display = 'none';
+      }
+      if(errorScreen){
+        errorScreen.style.display = 'block';
+      }
     `);
   }
 };
