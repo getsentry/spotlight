@@ -1,5 +1,11 @@
 # @spotlightjs/electron
 
+## 1.7.7
+
+### Patch Changes
+
+- fix issues which were causing crashes when launching the app and minor changes ([#885](https://github.com/getsentry/spotlight/pull/885))
+
 ## 1.7.6
 
 ### Patch Changes
