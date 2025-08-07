@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 1.12.0
+
+### Minor Changes
+
+- Added MCP for spotlight ([#879](https://github.com/getsentry/spotlight/pull/879))
+
 ## 1.11.4
 
 ### Patch Changes
