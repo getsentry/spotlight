@@ -22,7 +22,7 @@
     "@spotlightjs/astro": "workspace:*",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "astro": "^5.3.1",
+    "astro": "^5.12.8",
     "react": "catalog:",
     "react-dom": "catalog:",
     "svelte": "5.0.0-next.263",
