@@ -77,12 +77,13 @@ app.on("window-all-closed", () => {
 
 const isMac = process.platform === "darwin";
 
-const template = [
+const template: Electron.MenuItemConstructorOptions[] = [
   // { role: 'appMenu' }
-  ...(isMac
+  ...((isMac
     ? [
         {
           label: "Spotlight",
+          role: "appMenu",
           submenu: [
             { role: "about" },
             { type: "separator" },
@@ -96,7 +97,7 @@ const template = [
           ],
         },
       ]
-    : []),
+    : []) satisfies Electron.MenuItemConstructorOptions[]),
   // { role: 'fileMenu' }
   {
     label: "File",
@@ -112,7 +113,7 @@ const template = [
       { role: "cut" },
       { role: "copy" },
       { role: "paste" },
-      ...(isMac
+      ...((isMac
         ? [
             { role: "pasteAndMatchStyle" },
             { role: "delete" },
@@ -123,7 +124,11 @@ const template = [
               submenu: [{ role: "startSpeaking" }, { role: "stopSpeaking" }],
             },
           ]
-        : [{ role: "delete" }, { type: "separator" }, { role: "selectAll" }]),
+        : [
+            { role: "delete" },
+            { type: "separator" },
+            { role: "selectAll" },
+          ]) satisfies Electron.MenuItemConstructorOptions[]),
     ],
   },
   // { role: 'viewMenu' }
@@ -190,7 +195,6 @@ const template = [
       { role: "minimize" },
       { role: "zoom" },
       {
-        role: "alwaysontop",
         label: "Always on Top",
         type: "checkbox",
         click: () => {
@@ -199,9 +203,9 @@ const template = [
         },
         checked: alwaysOnTop,
       },
-      ...(isMac
+      ...((isMac
         ? [{ type: "separator" }, { role: "front" }, { type: "separator" }, { role: "window" }]
-        : [{ role: "close" }]),
+        : [{ role: "close" }]) satisfies Electron.MenuItemConstructorOptions[]),
     ],
   },
   {
