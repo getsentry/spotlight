@@ -1,4 +1,3 @@
-import { writeFile } from "node:fs/promises";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult, TextContent } from "@modelcontextprotocol/sdk/types.js";
 import type { ErrorEvent } from "@sentry/core";
