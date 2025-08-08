@@ -175,7 +175,7 @@ jobs:
   test-e2e:
     name: E2E Tests
     needs: build
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node_version: [20, 22]
@@ -184,13 +184,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Cache turbo build setup
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: .turbo
-      #     key: ${{ runner.os }}-turbo-${{ github.sha }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-turbo-
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -204,53 +204,35 @@ jobs:
       - name: Setup dependencies
         run: pnpm install
 
-      # - name: Cache turbo build setup
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: .turbo
-      #     key: ${{ runner.os }}-turbo-${{ github.sha }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-turbo-
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
-      # - name: Restore build cache
-      #   uses: actions/cache/restore@v4
-      #   with:
-      #     enableCrossOsArchive: true
-      #     fail-on-cache-miss: true
-      #     path: ${{ env.CACHED_BUILD_PATHS }}
-      #     key: ${{ env.BUILD_CACHE_KEY }}
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-          xvfb \
-          libnss3 \
-          libatk-bridge2.0-0 \
-          libdrm2 \
-          libxkbcommon0 \
-          libxss1 \
-          libasound2
+      - name: Restore build cache
+        uses: actions/cache/restore@v4
+        with:
+          enableCrossOsArchive: true
+          fail-on-cache-miss: true
+          path: ${{ env.CACHED_BUILD_PATHS }}
+          key: ${{ env.BUILD_CACHE_KEY }}
 
       # do this separately so e2e tests can run in parallel
       - name: Install playwright
         run: pnpx playwright install --with-deps
 
       - name: Run tests
-        env:
-          DISPLAY: :99
-          ELECTRON_DISABLE_SANDBOX: 1
-        run: |
-          pnpm build --filter=@spotlightjs/electron
-          Xvfb :99 -ac -screen 0 1280x1024x24 &
-          sleep 5
-          pnpm test:e2e
+        run: pnpm test:e2e
 
       - name: Test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: packages/electron/test-results/**
+          path: e2e-tests/**/test-results/**
   docker:
     name: Docker Image
     needs: build
