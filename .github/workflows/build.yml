@@ -225,7 +225,7 @@ jobs:
         run: pnpx playwright install --with-deps
 
       - name: Build app
-        run: pnpm build
+        run: pnpm run --filter=@spotlightjs/electron build
 
       - name: Run tests
         run: pnpm test:e2e
