@@ -14,7 +14,7 @@ test("launch app", async () => {
   // Wait for the first BrowserWindow to open
   // and return its Page object
   const window = await app.firstWindow();
-  await window.getByLabel("Navigation").getByText("Spotlight").waitFor({ state: "visible" });
+  await window.getByRole("navigation", { name: "Navigation" }).getByText("Spotlight").waitFor({ state: "visible" });
 
   // close app
   await app.close();

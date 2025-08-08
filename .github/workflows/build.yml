@@ -225,7 +225,9 @@ jobs:
         run: pnpx playwright install --with-deps
 
       - name: Run tests
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" pnpm test:e2e
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: pnpm test:e2e
 
       - name: Test results
         if: always()
