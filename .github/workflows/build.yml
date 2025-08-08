@@ -219,15 +219,31 @@ jobs:
       #     fail-on-cache-miss: true
       #     path: ${{ env.CACHED_BUILD_PATHS }}
       #     key: ${{ env.BUILD_CACHE_KEY }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+          xvfb \
+          libnss3 \
+          libatk-bridge2.0-0 \
+          libdrm2 \
+          libxkbcommon0 \
+          libxss1 \
+          libasound2
 
       # do this separately so e2e tests can run in parallel
       - name: Install playwright
         run: pnpx playwright install --with-deps
 
       - name: Run tests
+        env:
+          DISPLAY: :99
+          ELECTRON_DISABLE_SANDBOX: 1
         run: |
           pnpm build --filter=@spotlightjs/electron
-          xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" pnpm test:e2e
+          Xvfb :99 -ac -screen 0 1280x1024x24 &
+          sleep 5
+          pnpm test:e2e
 
       - name: Test results
         if: always()
