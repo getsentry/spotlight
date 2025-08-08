@@ -42,13 +42,15 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
       const content: TextContent[] = [];
       for (const envelope of envelopes) {
         try {
-          const markdown = await formatErrorEnvelope(envelope);
+          const formattedErrors = await formatErrorEnvelope(envelope);
 
-          if (markdown) {
-            content.push({
-              type: "text",
-              text: markdown,
-            });
+          if (formattedErrors?.length) {
+            for (const formattedError of formattedErrors) {
+              content.push({
+                type: "text",
+                text: formattedError,
+              });
+            }
           }
         } catch (err) {
           console.error(err);
@@ -75,12 +77,19 @@ async function formatErrorEnvelope([contentType, data]: Payload) {
   const event = processEnvelope({ contentType, data });
 
   const {
-    envelope: [, [[{ type }, payload]]],
+    envelope: [, items],
   } = event;
 
-  if (type === "event" && isErrorEvent(payload)) {
-    return formatEventOutput(processErrorEvent(payload));
+  const formattedErrors: string[] = [];
+  for (const item of items) {
+    const [{ type }, payload] = item;
+
+    if (type === "event" && isErrorEvent(payload)) {
+      formattedErrors.push(formatEventOutput(processErrorEvent(payload)));
+    }
   }
+
+  return formattedErrors;
 }
 
 function isErrorEvent(payload: unknown): payload is ErrorEvent {
