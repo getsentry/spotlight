@@ -175,7 +175,7 @@ jobs:
   test-e2e:
     name: E2E Tests
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       matrix:
         node_version: [20, 22]
@@ -225,10 +225,7 @@ jobs:
         run: pnpx playwright install --with-deps
 
       - name: Run tests
-        run:
-          chown root ./node_modules/.pnpm/electron@31.7.7/node_modules/electron/dist/chrome-sandbox &&
-          chmod 04755 ./node_modules/.pnpm/electron@31.7.7/node_modules/electron/dist/chrome-sandbox &&
-          pnpm test:e2e
+        run: pnpm test:e2e
 
       - name: Test results
         if: always()
