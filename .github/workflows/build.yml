@@ -22,7 +22,7 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -123,7 +123,7 @@ jobs:
 
   test-unit:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       matrix:
         node_version: [20, 22]
@@ -212,6 +212,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
+      - name: Restore build cache
+        uses: actions/cache/restore@v4
+        with:
+          enableCrossOsArchive: true
+          path: ${{ env.CACHED_BUILD_PATHS }}
+          key: ${{ env.BUILD_CACHE_KEY }}
+
       # do this separately so e2e tests can run in parallel
       - name: Install playwright
         run: pnpx playwright install --with-deps
@@ -228,7 +235,7 @@ jobs:
   docker:
     name: Docker Image
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     if: |
       !cancelled()
     env:
