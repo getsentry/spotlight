@@ -339,7 +339,6 @@ turbo build --filter=@spotlightjs/overlay  # Build specific package
 
 # Testing
 pnpm test             # Run package tests
-pnpm test:demos       # Run demo tests
 pnpm test:e2e         # Run end-to-end tests
 
 # Code Quality
