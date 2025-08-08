@@ -1,7 +1,5 @@
 packages:
   - 'packages/*'
-  - 'demos/*'
-  - 'e2e-tests/*'
 
 catalog:
   "@fontsource/raleway": ^5.1.0

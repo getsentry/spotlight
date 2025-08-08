@@ -21,8 +21,6 @@ packages/
 ├── website/         # Documentation site
 └── tsconfig/        # Shared TypeScript configuration
 
-demos/               # Framework integration examples
-e2e-tests/           # End-to-end tests
 .changeset/          # Changeset configuration
 ```
 
