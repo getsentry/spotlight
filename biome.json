@@ -6,7 +6,6 @@
   "files": {
     "include": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx", "**/*.json"],
     "ignore": [
-      "demos/",
       "dist/",
       "dist-bin",
       "out/",
