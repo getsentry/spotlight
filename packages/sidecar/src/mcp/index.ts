@@ -46,12 +46,10 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
 
           if (formattedErrors?.length) {
             for (const formattedError of formattedErrors) {
-              if (formattedError) {
-                content.push({
-                  type: "text",
-                  text: formattedError,
-                });
-              }
+              content.push({
+                type: "text",
+                text: formattedError,
+              });
             }
           }
         } catch (err) {
@@ -82,16 +80,14 @@ async function formatErrorEnvelope([contentType, data]: Payload) {
     envelope: [, items],
   } = event;
 
-  const formattedErrors = items
-    .map(item => {
-      const [{ type }, payload] = item;
+  const formattedErrors: string[] = [];
+  for (const item of items) {
+    const [{ type }, payload] = item;
 
-      if (type === "event" && isErrorEvent(payload)) {
-        return formatEventOutput(processErrorEvent(payload));
-      }
-      return undefined;
-    })
-    .filter((formattedError): formattedError is string => formattedError !== undefined);
+    if (type === "event" && isErrorEvent(payload)) {
+      formattedErrors.push(formatEventOutput(processErrorEvent(payload)));
+    }
+  }
 
   return formattedErrors;
 }
