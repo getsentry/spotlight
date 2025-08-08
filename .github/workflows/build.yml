@@ -232,7 +232,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: e2e-tests/**/test-results/**
+          path: packages/electron/test-results/**
   docker:
     name: Docker Image
     needs: build
