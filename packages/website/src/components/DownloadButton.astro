@@ -2,19 +2,12 @@
 import { Fragment } from 'react';
 
 let response = await fetch('https://api.github.com/repos/getsentry/spotlight/releases');
-let releases = await response.json();
+const releases = (await response.json()).filter((release:any) => release.name.startsWith('@spotlightjs/electron@'));
 
-let assets = [];
+let assets = releases[0]?.assets || [];
 let version = null;
 
-let releaseIndex = 0;
-
-while (assets.length === 0 && releaseIndex < releases.length) {
-  assets = releases[releaseIndex].assets;
-  releaseIndex++;
-}
-
-const links = assets.map(asset => {
+const links = assets.map((asset: any) => {
   if (asset.name.includes('mac')) {
     const versionMatch = asset.name.match(/Spotlight-(.*)-.*.zip/);
     if (versionMatch) {
@@ -48,10 +41,10 @@ const links = assets.map(asset => {
 
 <div class="group relative text-center text-sm">
   <div>{
-    links.map(link => (
+    links.map((link: any) => (
       <a
         href={link.url}
-        class="downloadButton inline-flex items-center justify-center px-2 py-2 mx-2 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
+        class="downloadButton !mr-1 inline-flex items-center justify-center px-2 py-2 mx-2 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
       >
         {link.name}
       </a>
