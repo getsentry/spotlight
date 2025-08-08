@@ -63,7 +63,10 @@ const createWindow = () => {
 
   win.webContents.on("did-finish-load", () => {
     win.webContents.executeJavaScript(
-      `document.querySelector('#sentry-spotlight-root').shadowRoot.querySelector('.spotlight-fullscreen > :first-child').style.cssText = 'padding-top: 34px; -webkit-app-region:drag;'`,
+      `const firstChild = document.querySelector('#sentry-spotlight-root')?.shadowRoot?.querySelector('.spotlight-fullscreen > :first-child');
+        if(firstChild) {
+          firstChild.style.cssText = 'padding-top: 34px; -webkit-app-region:drag;'
+        }`,
     );
   });
 };
@@ -74,12 +77,13 @@ app.on("window-all-closed", () => {
 
 const isMac = process.platform === "darwin";
 
-const template = [
+const template: Electron.MenuItemConstructorOptions[] = [
   // { role: 'appMenu' }
-  ...(isMac
+  ...((isMac
     ? [
         {
           label: "Spotlight",
+          role: "appMenu",
           submenu: [
             { role: "about" },
             { type: "separator" },
@@ -93,7 +97,7 @@ const template = [
           ],
         },
       ]
-    : []),
+    : []) satisfies Electron.MenuItemConstructorOptions[]),
   // { role: 'fileMenu' }
   {
     label: "File",
@@ -109,7 +113,7 @@ const template = [
       { role: "cut" },
       { role: "copy" },
       { role: "paste" },
-      ...(isMac
+      ...((isMac
         ? [
             { role: "pasteAndMatchStyle" },
             { role: "delete" },
@@ -120,7 +124,11 @@ const template = [
               submenu: [{ role: "startSpeaking" }, { role: "stopSpeaking" }],
             },
           ]
-        : [{ role: "delete" }, { type: "separator" }, { role: "selectAll" }]),
+        : [
+            { role: "delete" },
+            { type: "separator" },
+            { role: "selectAll" },
+          ]) satisfies Electron.MenuItemConstructorOptions[]),
     ],
   },
   // { role: 'viewMenu' }
@@ -187,7 +195,6 @@ const template = [
       { role: "minimize" },
       { role: "zoom" },
       {
-        role: "alwaysontop",
         label: "Always on Top",
         type: "checkbox",
         click: () => {
@@ -196,9 +203,9 @@ const template = [
         },
         checked: alwaysOnTop,
       },
-      ...(isMac
+      ...((isMac
         ? [{ type: "separator" }, { role: "front" }, { type: "separator" }, { role: "window" }]
-        : [{ role: "close" }]),
+        : [{ role: "close" }]) satisfies Electron.MenuItemConstructorOptions[]),
     ],
   },
   {
@@ -268,8 +275,14 @@ store.onDidChange("sentry-send-envelopes", newValue => {
 const showErrorMessage = () => {
   if (win) {
     win.webContents.executeJavaScript(`
-      document.getElementById('sentry-spotlight-root').style.display = 'none';
-      document.getElementById('error-screen').style.display = 'block';
+      const sentryRoot = document.getElementById('sentry-spotlight-root');
+      const errorScreen = document.getElementById('error-screen');
+      if(sentryRoot){
+        sentryRoot.style.display = 'none';
+      }
+      if(errorScreen){
+        errorScreen.style.display = 'block';
+      }
     `);
   }
 };
