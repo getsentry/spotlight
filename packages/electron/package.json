@@ -18,7 +18,7 @@
     "build": "electron-vite build",
     "build:mac": "./electron-builder.js",
     "pretest:e2e": "playwright install --with-deps",
-    "test:e2e": "xvfb-maybe -- playwright test"
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@sentry/electron": "^5.6.0",
@@ -35,8 +35,7 @@
     "electron": "^31.6.0",
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
-    "rollup-plugin-sourcemaps2": "^0.4.1",
-    "xvfb-maybe": "^0.2.1"
+    "rollup-plugin-sourcemaps2": "^0.4.1"
   },
   "volta": {
     "extends": "../../package.json"
