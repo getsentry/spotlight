@@ -212,13 +212,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      - name: Restore build cache
-        uses: actions/cache/restore@v4
-        with:
-          enableCrossOsArchive: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
-
       # do this separately so e2e tests can run in parallel
       - name: Install playwright
         run: pnpx playwright install --with-deps
