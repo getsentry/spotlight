@@ -1,7 +1,7 @@
 import { _electron as electron, expect, test } from "@playwright/test";
 
 test("launch app", async () => {
-  const app = await electron.launch({ args: ["./out/main/index.js"] });
+  const app = await electron.launch({ args: ["./out/main/index.js", "--no-sandbox", "--disable-setuid-sandbox"] });
 
   const isPackaged = await app.evaluate(async ({ app }) => {
     // This runs in Electron's main process, parameter here is always
