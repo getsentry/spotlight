@@ -9,7 +9,6 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "pretest:e2e": "playwright install --with-deps",
     "test:e2e": "playwright test"
   },
   "dependencies": {

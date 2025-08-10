@@ -219,9 +219,17 @@ jobs:
           fail-on-cache-miss: true
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
+      
+      - name: Playwright Cache
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
 
       # do this separately so e2e tests can run in parallel
       - name: Install playwright
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpx playwright install --with-deps
 
       - name: Test Demos
