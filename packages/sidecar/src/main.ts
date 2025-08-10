@@ -518,7 +518,7 @@ export function setupSidecar({
 }
 
 export function clearBuffer(): void {
-  buffer.clear();
+  buffer.reset();
 }
 
 let forceShutdown = false;
