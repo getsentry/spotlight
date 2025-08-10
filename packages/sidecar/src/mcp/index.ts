@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult, TextContent } from "@modelcontextprotocol/sdk/types.js";
 import type { ErrorEvent } from "@sentry/core";
-import type { z } from "zod";
+import { z } from "zod";
 import { MessageBuffer } from "../messageBuffer.js";
 import type { Payload } from "../utils.js";
 import { formatEventOutput } from "./formatting.js";
@@ -31,7 +31,10 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   mcp.tool(
     "get_errors",
     "Fetches the most recent errors from Spotlight debugger. Returns error details, stack traces, and request details for immediate debugging context.",
-    async () => {
+    {
+      eventId: z.string().optional(),
+    },
+    async ({ eventId }) => {
       const envelopes = errorsBuffer.read();
       errorsBuffer.clear();
 
@@ -42,7 +45,7 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
       const content: TextContent[] = [];
       for (const envelope of envelopes) {
         try {
-          const formattedErrors = await formatErrorEnvelope(envelope);
+          const formattedErrors = await formatErrorEnvelope(envelope, eventId);
 
           if (formattedErrors?.length) {
             for (const formattedError of formattedErrors) {
@@ -73,7 +76,7 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   return mcp;
 }
 
-async function formatErrorEnvelope([contentType, data]: Payload) {
+async function formatErrorEnvelope([contentType, data]: Payload, eventId?: string) {
   const event = processEnvelope({ contentType, data });
 
   const {
@@ -85,6 +88,9 @@ async function formatErrorEnvelope([contentType, data]: Payload) {
     const [{ type }, payload] = item;
 
     if (type === "event" && isErrorEvent(payload)) {
+      if (eventId && payload.event_id !== eventId) {
+        continue;
+      }
       formattedErrors.push(formatEventOutput(processErrorEvent(payload)));
     }
   }
