@@ -64,19 +64,17 @@ export class MessageBuffer<T> {
    * hard reset: drops items and subscribers and resets cursors.
    */
   clear(): void {
-    this.items = new Array(this.size);
-    this.writePos = 0;
-    this.head = 0;
-    this.readers = new Map<string, (item: T) => void>();
+    this.reset();
+    this.readers.clear();
   }
 
   /**
    * soft reset: clears buffered items but preserves subscribers
-   * and write cursor. Readers will fast-forward to the new head and continue
-   * streaming from the next write.
    */
   reset(): void {
     this.items = new Array(this.size);
+    this.writePos = 0;
+    this.head = 0;
     this.head = this.writePos;
   }
 
