@@ -29,11 +29,11 @@ export function createMcpInstance() {
       description:
         "Fetches the most recent errors from Spotlight debugger. Returns error details, stack traces, and request details for immediate debugging context.",
       inputSchema: {
-        duration: z.number().optional(),
+        duration: z.number().default(60),
       },
     },
-    async () => {
-      const events = getBuffer().read();
+    async args => {
+      const events = getBuffer().read({ duration: args.duration });
 
       if (events.length === 0) {
         return NO_ERRORS_CONTENT;

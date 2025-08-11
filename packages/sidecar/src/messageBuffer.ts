@@ -69,16 +69,12 @@ export class MessageBuffer<T> {
     this.readers = new Map<string, (item: T) => void>();
   }
 
-  read(filters: ReadFilter = {}): ReturnType<typeof processEnvelope>[] {
+  read(filters: ReadFilter): ReturnType<typeof processEnvelope>[] {
     const result: ReturnType<typeof processEnvelope>[] = [];
     const start = this.head;
     const end = this.writePos;
 
-    let minTime: number | undefined;
-
-    if (filters.duration) {
-      minTime = Date.now() - filters.duration * 1000;
-    }
+    const minTime = Date.now() - filters.duration * 1000;
 
     for (let i = end; i > start; i--) {
       const item = this.items[i % this.size];
@@ -88,7 +84,7 @@ export class MessageBuffer<T> {
 
         const timestamp = Number(packet.envelope[0].timestamp);
 
-        if (minTime && timestamp < minTime) {
+        if (timestamp < minTime) {
           break;
         }
 
@@ -102,7 +98,7 @@ export class MessageBuffer<T> {
 
 type ReadFilter = {
   // duration in seconds
-  duration?: number;
+  duration: number;
 };
 
 function generateUuidv4(): string {
