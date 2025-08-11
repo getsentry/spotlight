@@ -185,7 +185,7 @@ async function startServer(
     startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
   });
 
-  server.delete("/mcp", c => transport.handleRequest(c));
+  server.all("/mcp", c => transport.handleRequest(c));
   server.delete("/clear", handleClearRequest);
   server.get("/stream", streamGetRequestHandler(buffer));
   server.on("POST", ["/stream", "/api/:id/envelope"], streamPostRequestHandler(buffer, incomingPayload));
