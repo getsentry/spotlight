@@ -25,7 +25,7 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
 
   buffer.subscribe((item: Payload) => {
     try {
-      const projectKey = extractWorkingDirectoryPath(item) ?? "generic";
+      const projectKey = extractProjectId(item) ?? "generic";
       addEnvelopeToProject(projectKey, item);
     } catch (err) {
       console.error(err);
@@ -44,14 +44,14 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
     buf.put(payload);
   }
 
-  function extractWorkingDirectoryPath([contentType, data]: Payload): string | undefined {
+  function extractProjectId([contentType, data]: Payload): string | undefined {
     const { envelope } = processEnvelope({ contentType, data });
     const items = envelope[1] ?? [];
     for (const item of items) {
       const [, payload] = item;
       if (payload) {
         const { extra } = payload as EventItem[1];
-        const wd = extra?.workingDirectoryPath;
+        const wd = extra?.projectId;
         if (wd && typeof wd === "string" && wd.trim().length > 0) {
           return wd;
         }
@@ -125,7 +125,7 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
 
   mcp.tool(
     "list_projects",
-    "Lists known projects detected from incoming Sentry envelopes, grouped by workingDirectoryPath (missing paths are grouped under 'generic').",
+    "Lists known projects detected from incoming Sentry envelopes, grouped by projectId (missing paths are grouped under 'generic').",
     async () => {
       const withCounts = [...projectToEnvelopes.entries()].map(
         ([name, buf]) => [name, buf, buf.readEntries().length] as const,
