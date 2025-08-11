@@ -1,7 +1,7 @@
+import { envelopeFetchRequestError, envelopeReactClientSideError } from "@spotlightjs/test-fixtures";
 import { describe, expect, it } from "vitest";
 import { formatEventOutput } from "../formatting.js";
 import { processErrorEvent } from "../index.js";
-import { envelopeFetchRequestError, envelopeReactClientSideError } from "./test_envelopes.js";
 
 describe("tools", () => {
   it("should format error envelope", () => {

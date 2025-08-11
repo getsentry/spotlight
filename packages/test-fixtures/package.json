@@ -1,0 +1,24 @@
+{
+  "name": "@spotlightjs/test-fixtures",
+  "version": "0.0.1",
+  "description": "Shared test fixtures for Spotlight packages",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@sentry/core": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

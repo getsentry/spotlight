@@ -38,6 +38,7 @@
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
+    "@spotlightjs/test-fixtures": "workspace:*",
     "kleur": "^4.1.5",
     "launch-editor": "^2.9.1",
     "zod": "^3"
