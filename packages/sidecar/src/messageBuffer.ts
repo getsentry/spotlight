@@ -3,11 +3,12 @@ export class MessageBuffer<T> {
   private items: [number, T][];
   private writePos = 0;
   private head = 0;
-  private timeout = 10;
+  private timeout: number;
   private readers = new Map<string, (item: T) => void>();
 
-  constructor(size = 100) {
+  constructor(size = 100, timeoutSec = 10) {
     this.size = size;
+    this.timeout = timeoutSec;
     this.items = new Array(size);
   }
 
@@ -75,6 +76,23 @@ export class MessageBuffer<T> {
       const item = this.items[i % this.size];
       if (item !== undefined) {
         result.push(item[1]);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Returns a shallow copy of buffered entries including timestamps.
+   * Old entries might already be evicted based on timeout.
+   */
+  readEntries(): [number, T][] {
+    const result: [number, T][] = [];
+    const start = this.head;
+    const end = this.writePos;
+    for (let i = start; i < end; i++) {
+      const item = this.items[i % this.size];
+      if (item !== undefined) {
+        result.push(item);
       }
     }
     return result;
