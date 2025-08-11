@@ -31,15 +31,60 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   mcp.tool(
     "get_errors",
     "Fetches the most recent errors from Spotlight debugger. Returns error details, stack traces, and request details for immediate debugging context.",
-    {
-      eventId: z.string().optional(),
-    },
-    async ({ eventId }) => {
+    async () => {
       const envelopes = errorsBuffer.read();
       errorsBuffer.clear();
 
       if (envelopes.length === 0) {
         return NO_ERRORS_CONTENT;
+      }
+
+      const content: TextContent[] = [];
+      for (const envelope of envelopes) {
+        try {
+          const formattedErrors = await formatErrorEnvelope(envelope);
+
+          if (formattedErrors?.length) {
+            for (const formattedError of formattedErrors) {
+              content.push({
+                type: "text",
+                text: formattedError,
+              });
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      if (content.length === 0) {
+        return NO_ERRORS_CONTENT;
+      }
+
+      return {
+        content,
+      };
+    },
+  );
+
+  mcp.tool(
+    "get_specific_error",
+    "Fetches a specific error by event ID from Spotlight debugger. Returns error details, stack traces, and request details for immediate debugging context.",
+    {
+      eventId: z.string(),
+    },
+    async ({ eventId }) => {
+      const envelopes = errorsBuffer.read();
+
+      if (envelopes.length === 0) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `No errors found in Spotlight buffer. The error with ID '${eventId}' may have already been cleared or never captured.`,
+            },
+          ],
+        };
       }
 
       const content: TextContent[] = [];
@@ -61,7 +106,14 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
       }
 
       if (content.length === 0) {
-        return NO_ERRORS_CONTENT;
+        return {
+          content: [
+            {
+              type: "text",
+              text: `No error found with ID '${eventId}' in the current Spotlight buffer.`,
+            },
+          ],
+        };
       }
 
       return {
