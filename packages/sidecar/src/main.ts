@@ -5,18 +5,16 @@ import { StreamableHTTPTransport } from "@hono/mcp";
 import { type ServerType, serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { addEventProcessor, captureException, startSpan } from "@sentry/node";
-import { type Handler, Hono } from "hono";
+import { Hono } from "hono";
+import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
 import launchEditor from "launch-editor";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
 import { createMcpInstance } from "./mcp/index.js";
-import { MessageBuffer } from "./messageBuffer.js";
 import { streamSSE } from "./streaming.js";
-import type { Payload } from "./utils.js";
-
-type IncomingPayloadCallback = (body: string) => void;
+import { type HonoEnv, type IncomingPayloadCallback, getBuffer } from "./utils.js";
 
 type SideCarOptions = {
   /**
@@ -59,14 +57,51 @@ const withTracing =
   (...args: unknown[]) =>
     startSpan({ name: fn.name, ...spanArgs }, () => fn(...args));
 
-const streamGetRequestHandler = (buffer: MessageBuffer<Payload>): Handler => {
-  return function handleStreamRequest(c) {
+const contextId = "some-unique-id";
+const transport = new StreamableHTTPTransport();
+const mcp = createMcpInstance();
+
+export const app = new Hono<HonoEnv>()
+  .use(contextStorage(), cors())
+  .use(async (c, next) => {
+    c.header("X-Powered-By", SERVER_IDENTIFIER);
+
+    c.set("contextId", contextId);
+    c.set("transport", transport);
+    await next();
+  })
+  .get("/health", c => c.text("OK"))
+  .use(async (_c, next) => {
+    startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
+  })
+  .all(
+    "/mcp",
+    async (c, next) => {
+      const transport = c.get("transport");
+
+      if (!mcp.isConnected) {
+        await mcp.connect(transport);
+      }
+
+      await next();
+    },
+    c => c.get("transport").handleRequest(c),
+  )
+  .delete("/clear", c => {
+    getBuffer().clear();
+    return c.text("Cleared");
+  })
+  .get("/stream", c => {
+    const buffer = getBuffer();
+
     // TODO: Check if we still need this
     // // Send something in the body to trigger the `open` event
     // // This is mostly for Firefox -- see getsentry/spotlight#376
     // res.write("\n");
+
     const useBase64 = c.req.query("base64") != null;
     const base64Indicator = useBase64 ? ";base64" : "";
+
     return streamSSE(c, async stream => {
       const sub = buffer.subscribe(([payloadType, data]) => {
         logger.debug("🕊️ sending to Spotlight");
@@ -80,14 +115,8 @@ const streamGetRequestHandler = (buffer: MessageBuffer<Payload>): Handler => {
         buffer.unsubscribe(sub);
       });
     });
-  };
-};
-
-const streamPostRequestHandler = (
-  buffer: MessageBuffer<Payload>,
-  incomingPayload?: IncomingPayloadCallback,
-): Handler => {
-  return async function handleStreamRequest(c) {
+  })
+  .on("POST", ["/stream", "/api/:id/envelope"], async c => {
     logger.debug("📩 Received event");
     const arrayBuffer = await c.req.arrayBuffer();
     const body = Buffer.from(arrayBuffer);
@@ -100,8 +129,10 @@ const streamPostRequestHandler = (
     if (!contentType) {
       logger.warn("No content type, skipping payload...");
     } else {
-      buffer.put([contentType, body]);
+      getBuffer().put([contentType, body]);
     }
+
+    const incomingPayload = c.get("incomingPayload");
 
     if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
       const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
@@ -124,18 +155,10 @@ const streamPostRequestHandler = (
       "Cache-Control": "no-cache",
       Connection: "keep-alive",
     });
-  };
-};
+  })
+  .post("/open", async c => {
+    const basePath = c.get("basePath") ?? process.cwd();
 
-const handleHealthRequest: Handler = c => c.text("OK");
-
-const handleClearRequest: Handler = c => {
-  clearBuffer();
-  return c.text("Cleared");
-};
-
-function openRequestHandler(basePath: string = process.cwd()): Handler {
-  return async c => {
     const requestBody = await c.req.text();
     const targetPath = resolve(basePath, requestBody);
     logger.debug(`Launching editor for ${targetPath}`);
@@ -149,15 +172,14 @@ function openRequestHandler(basePath: string = process.cwd()): Handler {
       },
     );
     return c.body(null, 204);
-  };
-}
+  })
+  .put(CONTEXT_LINES_ENDPOINT, contextLinesHandler);
 
 function logSpotlightUrl(port: number): void {
   logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
 }
 
 async function startServer(
-  buffer: MessageBuffer<Payload>,
   port: number,
   basePath?: string,
   filesToServe?: string[],
@@ -167,30 +189,13 @@ async function startServer(
     filesToServe = ["/src/index.html", "/assets/main.js"];
   }
 
-  // MCP Setup
-  const transport = new StreamableHTTPTransport();
-  const mcp = createMcpInstance(buffer);
-  await mcp.connect(transport);
-
-  const server = new Hono();
-
-  server.use(cors(), async (c, next) => {
-    c.header("X-Powered-By", SERVER_IDENTIFIER);
-    await next();
-  });
-
-  server.get("/health", handleHealthRequest);
-
-  server.use(async (_c, next) => {
-    startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
-  });
-
-  server.all("/mcp", c => transport.handleRequest(c));
-  server.delete("/clear", handleClearRequest);
-  server.get("/stream", streamGetRequestHandler(buffer));
-  server.on("POST", ["/stream", "/api/:id/envelope"], streamPostRequestHandler(buffer, incomingPayload));
-  server.post("/open", openRequestHandler(basePath));
-  server.put(CONTEXT_LINES_ENDPOINT, contextLinesHandler);
+  const server = new Hono<HonoEnv>()
+    .use(async (c, next) => {
+      c.set("basePath", basePath);
+      c.set("incomingPayload", incomingPayload);
+      await next();
+    })
+    .route("/", app);
 
   if (filesToServe) {
     for (const path of filesToServe) {
@@ -238,7 +243,6 @@ async function startServer(
 
 let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
-const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
 
 const isValidPort = withTracing(
   (value: string | number) => {
@@ -330,13 +334,9 @@ export function setupSidecar({
         logSpotlightUrl(sidecarPort);
       }
     } else if (!serverInstance) {
-      serverInstance = await startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
+      serverInstance = await startServer(sidecarPort, basePath, filesToServe, incomingPayload);
     }
   });
-}
-
-export function clearBuffer(): void {
-  buffer.clear();
 }
 
 let forceShutdown = false;

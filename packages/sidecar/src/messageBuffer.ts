@@ -1,3 +1,5 @@
+import { processEnvelope } from "./mcp/parsing.js";
+
 export class MessageBuffer<T> {
   private size: number;
   private items: [number, T][];
@@ -67,19 +69,41 @@ export class MessageBuffer<T> {
     this.readers = new Map<string, (item: T) => void>();
   }
 
-  read(): T[] {
-    const result: T[] = [];
+  read(filters: ReadFilter = {}): ReturnType<typeof processEnvelope>[] {
+    const result: ReturnType<typeof processEnvelope>[] = [];
     const start = this.head;
     const end = this.writePos;
-    for (let i = start; i < end; i++) {
+
+    let minTime: number | undefined;
+
+    if (filters.duration) {
+      minTime = Date.now() - filters.duration * 1000;
+    }
+
+    for (let i = end; i > start; i--) {
       const item = this.items[i % this.size];
       if (item !== undefined) {
-        result.push(item[1]);
+        const [contentType, data] = item[1] as [string, string];
+        const packet = processEnvelope({ contentType, data });
+
+        const timestamp = Number(packet.envelope[0].timestamp);
+
+        if (minTime && timestamp < minTime) {
+          break;
+        }
+
+        result.push(packet);
       }
     }
+
     return result;
   }
 }
+
+type ReadFilter = {
+  // duration in seconds
+  duration?: number;
+};
 
 function generateUuidv4(): string {
   let dt = new Date().getTime();

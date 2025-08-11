@@ -1,11 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult, TextContent } from "@modelcontextprotocol/sdk/types.js";
 import type { ErrorEvent } from "@sentry/core";
-import type { z } from "zod";
-import { MessageBuffer } from "../messageBuffer.js";
-import type { Payload } from "../utils.js";
+import { z } from "zod";
+import { getBuffer } from "../utils.js";
 import { formatEventOutput } from "./formatting.js";
-import { processEnvelope } from "./parsing.js";
+import type { processEnvelope } from "./parsing.js";
 import type { ErrorEventSchema } from "./schema.js";
 
 const NO_ERRORS_CONTENT: CallToolResult = {
@@ -17,32 +16,33 @@ const NO_ERRORS_CONTENT: CallToolResult = {
   ],
 };
 
-export function createMcpInstance(buffer: MessageBuffer<Payload>) {
+export function createMcpInstance() {
   const mcp = new McpServer({
     name: "spotlight-mcp",
     version: String(process.env.npm_package_version),
   });
 
-  const errorsBuffer = new MessageBuffer<Payload>(10);
-  buffer.subscribe((item: Payload) => {
-    errorsBuffer.put(item);
-  });
-
-  mcp.tool(
-    "get_errors",
-    "Fetches the most recent errors from Spotlight debugger. Returns error details, stack traces, and request details for immediate debugging context.",
+  mcp.registerTool(
+    "get_local_errors",
+    {
+      title: "Get Local Errors",
+      description:
+        "Fetches the most recent errors from Spotlight debugger. Returns error details, stack traces, and request details for immediate debugging context.",
+      inputSchema: {
+        duration: z.number().optional(),
+      },
+    },
     async () => {
-      const envelopes = errorsBuffer.read();
-      errorsBuffer.clear();
+      const events = getBuffer().read();
 
-      if (envelopes.length === 0) {
+      if (events.length === 0) {
         return NO_ERRORS_CONTENT;
       }
 
       const content: TextContent[] = [];
-      for (const envelope of envelopes) {
+      for (const event of events) {
         try {
-          const markdown = await formatErrorEnvelope(envelope);
+          const markdown = await formatErrorEnvelope(event);
 
           if (markdown) {
             content.push({
@@ -71,12 +71,9 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   return mcp;
 }
 
-async function formatErrorEnvelope([contentType, data]: Payload) {
-  const event = processEnvelope({ contentType, data });
-
-  const {
-    envelope: [, [[{ type }, payload]]],
-  } = event;
+async function formatErrorEnvelope(event: ReturnType<typeof processEnvelope>) {
+  const { envelope } = event;
+  const [, [[{ type }, payload]]] = envelope;
 
   if (type === "event" && isErrorEvent(payload)) {
     return formatEventOutput(processErrorEvent(payload));
