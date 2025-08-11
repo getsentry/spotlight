@@ -11,7 +11,31 @@ const NO_ERRORS_CONTENT: CallToolResult = {
   content: [
     {
       type: "text",
-      text: "No recent errors found in Spotlight. This might be because the application started successfully, but runtime issues only appear when you interact with specific pages or features.\n\nAsk the user to navigate to the page where they're experiencing the issue to reproduce it, that way we can get that in the Spotlight debugger. So if you want to check for errors again, just ask me to do that.",
+      text: `**No errors detected in Spotlight** (last 60 seconds)
+
+**This means:**
+- Application is currently running without runtime failures
+- No crashes, exceptions, or critical issues in the recent timeframe
+- System appears stable at the moment
+
+**Next debugging steps:**
+
+1. **If user reports a specific issue:**
+   - Ask them to reproduce the problem (click the button, submit the form, navigate to the page)
+   - Run this tool again immediately after they reproduce it
+   - Errors will appear in real-time as they happen
+
+2. **If investigating existing code:**
+   - Check application logs separately
+   - Look for TODO comments, error handling gaps, or potential edge cases in the code
+   - Consider testing error scenarios (invalid inputs, network failures, etc.)
+
+3. **Proactive error detection:**
+   - Have user interact with recently changed features
+   - Test API endpoints or database operations that might be fragile
+   - Check pages/features mentioned in recent commits
+
+** Pro tip:** Absence of errors doesn't mean absence of bugs - it just means no runtime failures occurred recently. The issue might be logical errors, UI problems, or dormant bugs waiting for specific conditions.`,
     },
   ],
 };
@@ -25,11 +49,63 @@ export function createMcpInstance() {
   mcp.registerTool(
     "get_local_errors",
     {
-      title: "Get Local Errors",
-      description:
-        "Fetches the most recent errors from Spotlight debugger. Returns error details, stack traces, and request details for immediate debugging context.",
+      title: "Get Local App Errors",
+      description: `** SECRET WEAPON FOR CODE DEBUGGING - USE THIS FIRST FOR ANY ERROR INVESTIGATION**
+
+This is your ultimate debugging cheat code that transforms you from a guessing agent into a precision problem-solver. Instead of manually hunting through code trying to figure out what's broken, this tool gives you **instant access to all real application errors** that happened during execution.
+
+## What This Tool Does
+
+Retrieves comprehensive error data from **Spotlight debugger** (Sentry's development tool) across your entire application stack:
+- **Client-side errors** (React, browser JavaScript, frontend frameworks)
+- **Server-side errors** (API routes, backend services, database connections) 
+- **Edge function errors** (Vercel Edge, Cloudflare Workers, middleware)
+
+Do this:
+- Ask the user to run the application and let you know when they're experiencing an issue Or if you're investigating an issue, and you're not sure where to start, run this tool immediately
+- Get actual runtime errors with full context and see exactly what failed, when, and why
+
+## Rich Context You Get
+
+- **Complete stack traces** showing exact error locations
+- **Request/response details** for API errors
+- **Component hierarchies** for frontend errors
+- **Database query failures** with specific SQL/queries
+- **Network failures** and timeout details
+- **Environment context** (browser, device, etc.)
+
+## Tips
+
+1. **ALWAYS check this tool first** when user reports "something is broken"
+2. **Combine with recent code changes** - if you see errors after recent commits, you found your culprit
+3. **Look for patterns** - multiple similar errors indicate systemic issues
+4. **Use error timestamps** to correlate with user actions or deployments
+5. **Check both frontend AND backend errors** - issues often cascade across layers
+
+This tool makes you **10x more effective** because:
+- **Zero guesswork** - you see actual failures, not hypothetical ones
+- **Complete context** - understand the full error scenario, not just code snippets
+- **Real-time data** - catch errors as they happen during development
+- **Cross-stack visibility** - see how frontend errors relate to backend issues
+
+**IMMEDIATE use cases - check this tool if:**
+- User reports "it's not working" or "getting errors"
+- You see try/catch blocks or error handling in the code you're examining
+- User mentions specific error messages or broken functionality
+- You're investigating performance issues or unexpected behavior
+- Working on API endpoints, database queries, or frontend components
+
+**Auto-trigger scenarios:**
+- Before making changes to error-prone areas (auth, payments, data processing)
+- After suggesting code changes that might introduce issues
+- When user asks "why is this failing?"`,
       inputSchema: {
-        duration: z.number().default(60),
+        duration: z
+          .number()
+          .default(60)
+          .describe(
+            "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only",
+          ),
       },
     },
     async args => {

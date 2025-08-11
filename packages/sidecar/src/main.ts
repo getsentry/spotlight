@@ -62,42 +62,24 @@ const transport = new StreamableHTTPTransport();
 const mcp = createMcpInstance();
 
 export const app = new Hono<HonoEnv>()
-  .use(contextStorage(), cors())
-  .use(async (c, next) => {
+  .use(contextStorage(), async (c, next) => {
     c.header("X-Powered-By", SERVER_IDENTIFIER);
 
     c.set("contextId", contextId);
     c.set("transport", transport);
     await next();
   })
+  .all("/mcp", c => c.get("transport").handleRequest(c))
   .get("/health", c => c.text("OK"))
-  .use(async (_c, next) => {
-    startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
+  .use(cors(), async (_c, next) => {
+    await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
   })
-  .all(
-    "/mcp",
-    async (c, next) => {
-      const transport = c.get("transport");
-
-      if (!mcp.isConnected) {
-        await mcp.connect(transport);
-      }
-
-      await next();
-    },
-    c => c.get("transport").handleRequest(c),
-  )
   .delete("/clear", c => {
     getBuffer().clear();
     return c.text("Cleared");
   })
   .get("/stream", c => {
     const buffer = getBuffer();
-
-    // TODO: Check if we still need this
-    // // Send something in the body to trigger the `open` event
-    // // This is mostly for Firefox -- see getsentry/spotlight#376
-    // res.write("\n");
 
     const useBase64 = c.req.query("base64") != null;
     const base64Indicator = useBase64 ? ";base64" : "";
@@ -208,6 +190,9 @@ async function startServer(
       server.get(url, serveStatic({ root: basePath, path }));
     }
   }
+
+  // Connecting the MCP with the transport
+  await mcp.connect(transport);
 
   const _server = serve(
     {
