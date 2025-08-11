@@ -273,11 +273,7 @@ const isSidecarRunning = withTracing(
       let timeoutId: NodeJS.Timeout | null = null;
       const healthReq = get(options, res => {
         const serverIdentifier = res.headers["x-powered-by"];
-        if (serverIdentifier === "spotlight-by-sentry") {
-          resolve(true);
-        } else {
-          resolve(false);
-        }
+        resolve(serverIdentifier === SERVER_IDENTIFIER);
       });
       const destroyHealthReq = () => !healthReq.destroyed && healthReq.destroy(new Error("Request timed out."));
       function resolve(value: boolean) {
