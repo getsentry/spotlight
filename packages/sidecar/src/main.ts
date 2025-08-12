@@ -195,7 +195,7 @@ async function startServer(
 
       const host = ctx.req.header("Host") || "localhost";
       const path = ctx.req.path;
-      startSpan(
+      await startSpan(
         {
           name: `HTTP ${ctx.req.method} ${path}`,
           op: `sidecar.http.${ctx.req.method?.toLowerCase()}`,
