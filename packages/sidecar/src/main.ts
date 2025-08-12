@@ -248,24 +248,27 @@ async function startServer(
     .route("/", app);
 
   if (filesToServe) {
-    for (const [path, content] of Object.entries(filesToServe)) {
-      let url = path;
+    server.get("/*", ctx => {
+      let filePath = `${ctx.req.path || ctx.req.url}`;
 
-      if (url === "/src/index.html") {
-        url = "/";
+      if (filePath === "/") {
+        filePath = "/src/index.html";
       }
+      filePath = filePath.slice(1);
 
-      const extName = extname(path);
+      const extName = extname(filePath);
       const contentType = extensionsToContentType[extName] ?? "text/html";
 
-      server.get(url, c => {
-        // Enable profiling in browser
-        c.header("Document-Policy", "js-profiling");
-        c.header("Content-Type", contentType);
+      if (!Object.hasOwn(filesToServe, filePath)) {
+        return ctx.notFound();
+      }
 
-        return c.body(content);
-      });
-    }
+      // Enable profiling in browser
+      ctx.header("Document-Policy", "js-profiling");
+      ctx.header("Content-Type", contentType);
+
+      return ctx.body(filesToServe[filePath]);
+    });
   }
 
   const _server = serve(
