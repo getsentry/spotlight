@@ -111,7 +111,7 @@ User: "App crashes after deployment"
           .number()
           .default(60)
           .describe(
-            "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only",
+            "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
           ),
       },
     },
