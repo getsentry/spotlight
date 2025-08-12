@@ -74,16 +74,14 @@ export class MessageBuffer<T> {
 
     const minTime = Date.now() - filters.duration * 1000;
 
-    if (start !== undefined && end !== undefined) {
-      for (let i = end - 1; i >= start; i--) {
-        const item = this.items[i % this.size];
-        if (item !== undefined) {
-          if (item[0] < minTime) {
-            break;
-          }
-
-          result.push(item[1]);
+    for (let i = end - 1; i >= start; i--) {
+      const item = this.items[i % this.size];
+      if (item !== undefined) {
+        if (item[0] < minTime) {
+          break;
         }
+
+        result.push(item[1]);
       }
     }
 
