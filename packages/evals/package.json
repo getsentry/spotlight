@@ -1,0 +1,29 @@
+{
+  "name": "@spotlightjs/evals",
+  "version": "0.0.1",
+  "description": "Evaluation tests for Spotlight MCP tools",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "eval": "vitest --config=vitest.config.ts",
+    "eval:ci": "vitest run --coverage --reporter=vitest-evals/reporter --reporter=junit",
+    "eval:dev": "vitest --config=vitest.config.ts --watch"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^1.0.12",
+    "@modelcontextprotocol/sdk": "^1.16.0",
+    "@spotlightjs/sidecar": "workspace:*",
+    "@spotlightjs/test-fixtures": "workspace:*",
+    "ai": "^4.0.31",
+    "zod": "^3"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "vitest-evals": "^0.5.0"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

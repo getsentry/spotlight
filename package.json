@@ -16,6 +16,7 @@
     "postinstall": "simple-git-hooks",
     "test": "turbo test --filter=./packages/*",
     "test:e2e": "turbo test:e2e",
+    "test:evals": "turbo eval --filter=@spotlightjs/evals",
     "yalc:publish": "yalc publish --push --sig --private",
     "changeset:add": "pnpm changeset",
     "changeset:consume": "pnpm changeset version",

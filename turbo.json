@@ -35,6 +35,16 @@
       "outputs": ["coverage/**", "**/junit.xml", "**/test-results/**"],
       "cache": false
     },
+    "eval": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**", "**/junit.xml"],
+      "cache": false
+    },
+    "eval:ci": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**", "**/junit.xml"],
+      "cache": false
+    },
     "clean": {
       "cache": false
     },
