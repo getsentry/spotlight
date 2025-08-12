@@ -64,8 +64,6 @@ const mcp = createMcpInstance();
 
 export const app = new Hono<HonoEnv>()
   .use(contextStorage(), async (c, next) => {
-    c.header("X-Powered-By", SERVER_IDENTIFIER);
-
     c.set("contextId", contextId);
     await next();
   })
@@ -82,9 +80,7 @@ export const app = new Hono<HonoEnv>()
     c => transport.handleRequest(c),
   )
   .get("/health", c => c.text("OK"))
-  .use(cors(), async (_c, next) => {
-    await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
-  })
+  .use(cors())
   .delete("/clear", c => {
     getBuffer().clear();
     return c.text("Cleared");
@@ -184,9 +180,16 @@ async function startServer(
 
   const server = new Hono<HonoEnv>()
     .use(async (c, next) => {
+      c.header("X-Powered-By", SERVER_IDENTIFIER);
+
       c.set("basePath", basePath);
       c.set("incomingPayload", incomingPayload);
-      await next();
+
+      if (c.req.path === "/mcp" || c.req.path === "/health") {
+        await next();
+      } else {
+        await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
+      }
     })
     .route("/", app);
 
