@@ -1,3 +1,4 @@
+import { brotliCompressSync, deflateSync, gzipSync } from "node:zlib";
 import { events } from "fetch-event-stream";
 import { describe, expect, it } from "vitest";
 import { app } from "../main.js";
@@ -51,6 +52,42 @@ describe("envelopes", () => {
     expect(response.status).toBe(200);
     expect(await response.text()).toBe("Cleared");
   });
+});
+
+describe("encoded envelopes", () => {
+  const compressors: Record<string, (buf: Buffer) => Buffer> = {
+    gzip: gzipSync,
+    deflate: deflateSync,
+    brotli: brotliCompressSync,
+  };
+
+  function testEncodedEnvelope(encoding: string) {
+    return async () => {
+      const sendResponse = await app.request("/stream", {
+        method: "POST",
+        body: compressors[encoding](Buffer.from(JSON.stringify(envelopeReactClientSideError))),
+        headers: {
+          "Content-Type": "application/x-sentry-envelope",
+          "Content-Encoding": encoding,
+        },
+      });
+      expect(sendResponse.status).toBe(200);
+
+      const receiveResponse = await app.request("/stream");
+      expect(receiveResponse.status).toBe(200);
+
+      const stream = events(receiveResponse);
+
+      for await (const event of stream) {
+        expect(event.data).toBe(JSON.stringify(envelopeReactClientSideError));
+        break;
+      }
+    };
+  }
+
+  it("gzip", testEncodedEnvelope("gzip"));
+  it("deflate", testEncodedEnvelope("deflate"));
+  it("brotli", testEncodedEnvelope("brotli"));
 });
 
 describe("mcp", () => {

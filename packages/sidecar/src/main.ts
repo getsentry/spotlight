@@ -1,6 +1,7 @@
 import { createWriteStream, readFileSync } from "node:fs";
 import { get } from "node:http";
 import { extname, join, resolve } from "node:path";
+import { brotliDecompressSync, gunzipSync, inflateSync } from "node:zlib";
 import { StreamableHTTPTransport } from "@hono/mcp";
 import { type ServerType, serve } from "@hono/node-server";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
@@ -50,6 +51,13 @@ type SideCarOptions = {
   incomingPayload?: IncomingPayloadCallback;
 
   isStandalone?: boolean;
+};
+
+// TODO: Add zstd support!
+const decompressors: Record<string, ((buf: Buffer) => Buffer) | undefined> = {
+  gzip: gunzipSync,
+  deflate: inflateSync,
+  br: brotliDecompressSync,
 };
 
 const withTracing =
@@ -107,7 +115,14 @@ export const app = new Hono<HonoEnv>()
   .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {
     logger.debug("📩 Received event");
     const arrayBuffer = await ctx.req.arrayBuffer();
-    const body = Buffer.from(arrayBuffer);
+    let body = Buffer.from(arrayBuffer);
+
+    // Check for gzip or deflate encoding and create appropriate stream
+    const encoding = ctx.req.header("Content-Encoding");
+    const decompressor = decompressors[encoding ?? ""];
+    if (decompressor) {
+      body = decompressor(body);
+    }
 
     let contentType = ctx.req.header("content-type")?.split(";")[0].toLocaleLowerCase();
     if (ctx.req.query("sentry_client")?.startsWith("sentry.javascript.browser") && ctx.req.header("Origin")) {
