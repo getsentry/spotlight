@@ -3,7 +3,7 @@ import { get } from "node:http";
 import { extname, join, resolve } from "node:path";
 import { StreamableHTTPTransport } from "@hono/mcp";
 import { type ServerType, serve } from "@hono/node-server";
-import { addEventProcessor, captureException, startSpan } from "@sentry/node";
+import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import { Hono } from "hono";
 import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
@@ -193,11 +193,42 @@ async function startServer(
       ctx.set("basePath", basePath);
       ctx.set("incomingPayload", incomingPayload);
 
-      if (ctx.req.path === "/mcp" || ctx.req.path === "/health") {
-        await next();
-      } else {
-        await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
-      }
+      const host = ctx.req.header("Host") || "localhost";
+      const path = ctx.req.path;
+      startSpan(
+        {
+          name: `HTTP ${ctx.req.method} ${path}`,
+          op: `sidecar.http.${ctx.req.method?.toLowerCase()}`,
+          forceTransaction: true,
+          attributes: {
+            "http.request.method": ctx.req.method,
+            "http.request.url": ctx.req.url,
+            "http.request.query": ctx.req.query().toString(),
+            "server.address": host,
+            // TODO: Figure out how to get the port
+            // "server.port": ctx.req.socket.localPort,
+          },
+        },
+        async span => {
+          if (path === "/mcp" || path === "/health") {
+            await next();
+          } else {
+            await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
+          }
+
+          const traceData = getTraceData();
+          ctx.res.headers.append(
+            "server-timing",
+            [
+              `sentryTrace;desc="${traceData["sentry-trace"]}"`,
+              `baggage;desc="${traceData.baggage}"`,
+              `sentrySpotlightPort;desc=${port}`,
+            ].join(", "),
+          );
+
+          span.setAttribute("http.response.status_code", ctx.res.status);
+        },
+      );
     })
     .route("/", app);
 
