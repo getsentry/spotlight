@@ -1,18 +1,21 @@
 import { createWriteStream, readFileSync } from "node:fs";
-import { type IncomingMessage, type Server, type ServerResponse, createServer, get } from "node:http";
+import { get } from "node:http";
 import { extname, join, resolve } from "node:path";
-import { createGunzip, createInflate } from "node:zlib";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { brotliDecompressSync, gunzipSync, inflateSync } from "node:zlib";
+import { StreamableHTTPTransport } from "@hono/mcp";
+import { type ServerType, serve } from "@hono/node-server";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
+import { Hono } from "hono";
+import { contextStorage } from "hono/context-storage";
+import { cors } from "hono/cors";
 import launchEditor from "launch-editor";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
 import { createMcpInstance } from "./mcp/index.js";
-import { MessageBuffer } from "./messageBuffer.js";
-import type { Payload } from "./utils.js";
-
-type IncomingPayloadCallback = (body: string) => void;
+import { generateUuidv4 } from "./messageBuffer.js";
+import { streamSSE } from "./streaming.js";
+import { type HonoEnv, type IncomingPayloadCallback, getBuffer } from "./utils.js";
 
 type SideCarOptions = {
   /**
@@ -50,280 +53,147 @@ type SideCarOptions = {
   isStandalone?: boolean;
 };
 
-type RequestHandler = (
-  req: IncomingMessage,
-  res: ServerResponse,
-  pathname?: string,
-  searchParams?: URLSearchParams,
-) => void;
+// TODO: Add zstd support!
+const decompressors: Record<string, ((buf: Buffer) => Buffer) | undefined> = {
+  gzip: gunzipSync,
+  deflate: inflateSync,
+  br: brotliDecompressSync,
+};
 
 const withTracing =
   (fn: CallableFunction, spanArgs = {}) =>
   (...args: unknown[]) =>
     startSpan({ name: fn.name, ...spanArgs }, () => fn(...args));
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Credentials": "true",
-  "Access-Control-Allow-Headers": "*",
-  "Access-Control-Allow-Methods": "GET,POST,PUT,OPTIONS,DELETE,PATCH",
-} as const;
+const contextId = generateUuidv4();
+const transport = new StreamableHTTPTransport();
+const mcp = createMcpInstance();
 
-const SPOTLIGHT_HEADERS = {
-  "X-Powered-by": SERVER_IDENTIFIER,
-} as const;
+export const app = new Hono<HonoEnv>()
+  .use(contextStorage(), async (ctx, next) => {
+    ctx.set("contextId", contextId);
+    await next();
+  })
+  .all(
+    "/mcp",
+    async (_ctx, next) => {
+      if (!mcp.isConnected()) {
+        // Connecting the MCP with the transport
+        await mcp.connect(transport);
+      }
 
-const enableCORS = (handler: RequestHandler): RequestHandler =>
-  withTracing(
-    async (req: IncomingMessage, res: ServerResponse, pathname?: string, searchParams?: URLSearchParams) => {
-      const headers = {
-        ...CORS_HEADERS,
-        ...SPOTLIGHT_HEADERS,
-      };
-      for (const [header, value] of Object.entries(headers)) {
-        res.setHeader(header, value);
-      }
-      if (req.method === "OPTIONS") {
-        res.writeHead(204, {
-          "Cache-Control": "no-cache",
-        });
-        res.end();
-        return;
-      }
-      return handler(req, res, pathname, searchParams);
+      await next();
     },
-    { name: "enableCORS", op: "sidecar.http.middleware.cors" },
-  );
+    ctx => transport.handleRequest(ctx),
+  )
+  .get("/health", ctx => ctx.text("OK"))
+  .use(cors())
+  .delete("/clear", ctx => {
+    getBuffer().clear();
+    return ctx.text("Cleared");
+  })
+  .get("/stream", ctx => {
+    const buffer = getBuffer();
 
-const streamRequestHandler = (buffer: MessageBuffer<Payload>, incomingPayload?: IncomingPayloadCallback) => {
-  return function handleStreamRequest(
-    req: IncomingMessage,
-    res: ServerResponse,
-    pathname?: string,
-    searchParams?: URLSearchParams,
-  ): void {
-    if (
-      req.method === "GET" &&
-      req.headers.accept &&
-      req.headers.accept === "text/event-stream" &&
-      pathname === "/stream"
-    ) {
-      res.writeHead(200, {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-      });
-      res.flushHeaders();
-      // Send something in the body to trigger the `open` event
-      // This is mostly for Firefox -- see getsentry/spotlight#376
-      res.write("\n");
+    const useBase64 = ctx.req.query("base64") != null;
+    const base64Indicator = useBase64 ? ";base64" : "";
 
-      const useBase64 = searchParams?.get("base64") != null;
-      const base64Indicator = useBase64 ? ";base64" : "";
-      const dataWriter = useBase64
-        ? (data: Buffer) => res.write(`data:${data.toString("base64")}\n`)
-        : (data: Buffer) => {
-            // The utf-8 encoding here is wrong and is a hack as we are
-            // sending binary data as utf-8 over SSE which enforces utf-8
-            // encoding. This is only for backwards compatibility
-            for (const line of data.toString("utf-8").split("\n")) {
-              // This is very important - SSE events are delimited by two newlines
-              res.write(`data:${line}\n`);
-            }
-          };
+    return streamSSE(ctx, async stream => {
       const sub = buffer.subscribe(([payloadType, data]) => {
         logger.debug("🕊️ sending to Spotlight");
-        res.write(`event:${payloadType}${base64Indicator}\n`);
-        dataWriter(data);
-        // This last \n is important as every message ends with an empty line in SSE
-        res.write("\n");
-      });
-
-      req.on("close", () => {
-        buffer.unsubscribe(sub);
-        res.end();
-      });
-    } else if (req.method === "POST") {
-      logger.debug("📩 Received event");
-      let stream = req;
-      // Check for gzip or deflate encoding and create appropriate stream
-      const encoding = req.headers["content-encoding"];
-      if (encoding === "gzip") {
-        // @ts-ignore
-        stream = req.pipe(createGunzip());
-      } else if (encoding === "deflate") {
-        // @ts-ignore
-        stream = req.pipe(createInflate());
-      }
-      // TODO: Add brotli and zstd support!
-
-      // Read the (potentially decompressed) stream
-      const buffers: Buffer[] = [];
-      stream.on("readable", () => {
-        while (true) {
-          const chunk = stream.read();
-          if (chunk === null) {
-            break;
-          }
-          buffers.push(chunk);
-        }
-      });
-
-      stream.on("end", () => {
-        const body = Buffer.concat(buffers);
-        let contentType = req.headers["content-type"]?.split(";")[0].toLocaleLowerCase();
-        if (searchParams?.get("sentry_client")?.startsWith("sentry.javascript.browser") && req.headers.origin) {
-          // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
-          contentType = "application/x-sentry-envelope";
-        }
-        if (!contentType) {
-          logger.warn("No content type, skipping payload...");
-        } else {
-          buffer.put([contentType, body]);
-        }
-
-        if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
-          const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
-          const filename = `${contentType?.replace(/[^a-z0-9]/gi, "_") || "no_content_type"}-${timestamp}.txt`;
-
-          if (incomingPayload) {
-            incomingPayload(body.toString("binary"));
-          } else {
-            try {
-              createWriteStream(filename).write(body);
-              logger.info(`🗃️ Saved data to ${filename}`);
-            } catch (err) {
-              logger.error(`Failed to save data to ${filename}: ${err}`);
-            }
-          }
-        }
-
-        // 204 would be more appropriate but returning 200 to match what /envelope returns
-        res.writeHead(200, {
-          "Cache-Control": "no-cache",
-          Connection: "keep-alive",
+        stream.writeSSE({
+          event: `${payloadType}${base64Indicator}`,
+          data: data.toString(useBase64 ? "base64" : "utf-8"),
         });
-        res.end();
       });
-    } else {
-      error405(req, res);
-      return;
-    }
-  };
-};
 
-const fileServer = (filesToServe: Record<string, Buffer>) => {
-  return function serveFile(req: IncomingMessage, res: ServerResponse, pathname?: string): void {
-    let filePath = `${pathname || req.url}`;
-    if (filePath === "/") {
-      filePath = "/src/index.html";
-    }
-    filePath = filePath.slice(1);
-
-    const extName = extname(filePath);
-    let contentType = "text/html";
-    switch (extName) {
-      case ".js":
-        contentType = "text/javascript";
-        break;
-      case ".css":
-        contentType = "text/css";
-        break;
-      case ".json":
-        contentType = "application/json";
-        break;
-    }
-
-    if (!Object.hasOwn(filesToServe, filePath)) {
-      error404(req, res);
-    } else {
-      res.writeHead(200, {
-        // Enable profiling in browser
-        "Document-Policy": "js-profiling",
-        "Content-Type": contentType,
+      stream.onAbort(() => {
+        buffer.unsubscribe(sub);
       });
-      res.end(filesToServe[filePath]);
-    }
-  };
-};
-
-function handleHealthRequest(_req: IncomingMessage, res: ServerResponse): void {
-  res.writeHead(200, {
-    "Content-Type": "text/plain",
-    ...CORS_HEADERS,
-    ...SPOTLIGHT_HEADERS,
-  });
-  res.end("OK");
-}
-
-function handleClearRequest(req: IncomingMessage, res: ServerResponse): void {
-  if (req.method === "DELETE") {
-    res.writeHead(200, {
-      "Content-Type": "text/plain",
     });
-    clearBuffer();
-    res.end("Cleared");
-  } else {
-    error405(req, res);
-  }
-}
+  })
+  .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {
+    logger.debug("📩 Received event");
+    const arrayBuffer = await ctx.req.arrayBuffer();
+    let body = Buffer.from(arrayBuffer);
 
-function openRequestHandler(basePath: string = process.cwd()) {
-  return (req: IncomingMessage, res: ServerResponse) => {
-    // We're only interested in handling a POST request
-    if (req.method !== "POST") {
-      res.writeHead(405);
-      res.end();
-      return;
+    // Check for gzip or deflate encoding and create appropriate stream
+    const encoding = ctx.req.header("Content-Encoding");
+    const decompressor = decompressors[encoding ?? ""];
+    if (decompressor) {
+      body = decompressor(body);
     }
 
-    let requestBody = "";
-    req.on("data", chunk => {
-      requestBody += chunk;
+    let contentType = ctx.req.header("content-type")?.split(";")[0].toLocaleLowerCase();
+    if (ctx.req.query("sentry_client")?.startsWith("sentry.javascript.browser") && ctx.req.header("Origin")) {
+      // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
+      contentType = "application/x-sentry-envelope";
+    }
+    if (!contentType) {
+      logger.warn("No content type, skipping payload...");
+    } else {
+      getBuffer().put([contentType, body]);
+    }
+
+    const incomingPayload = ctx.get("incomingPayload");
+
+    if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
+      const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
+      const filename = `${contentType?.replace(/[^a-z0-9]/gi, "_") || "no_content_type"}-${timestamp}.txt`;
+
+      if (incomingPayload) {
+        incomingPayload(body.toString("binary"));
+      } else {
+        try {
+          createWriteStream(filename).write(body);
+          logger.info(`🗃️ Saved data to ${filename}`);
+        } catch (err) {
+          logger.error(`Failed to save data to ${filename}: ${err}`);
+        }
+      }
+    }
+
+    // 204 would be more appropriate but returning 200 to match what /envelope returns
+    return ctx.body(null, 200, {
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
     });
+  })
+  .post("/open", async ctx => {
+    const basePath = ctx.get("basePath") ?? process.cwd();
 
-    req.on("end", () => {
-      const targetPath = resolve(basePath, requestBody);
-      logger.debug(`Launching editor for ${targetPath}`);
-      launchEditor(
-        // filename:line:column
-        // both line and column are optional
-        targetPath,
-        // callback if failed to launch (optional)
-        (fileName: string, errorMsg: string) => {
-          logger.error(`Failed to launch editor for ${fileName}: ${errorMsg}`);
-        },
-      );
-      res.writeHead(204);
-      res.end();
-    });
-  };
-}
-
-function errorResponse(code: number) {
-  return withTracing(
-    (_req: IncomingMessage, res: ServerResponse) => {
-      res.writeHead(code);
-      res.end();
-    },
-    { name: `HTTP ${code}`, op: `sidecar.http.error.${code}`, attributes: { "http.response.status_code": code } },
-  );
-}
-
-const error404 = errorResponse(404);
-const error405 = errorResponse(405);
+    const requestBody = await ctx.req.text();
+    const targetPath = resolve(basePath, requestBody);
+    logger.debug(`Launching editor for ${targetPath}`);
+    launchEditor(
+      // filename:line:column
+      // both line and column are optional
+      targetPath,
+      // callback if failed to launch (optional)
+      (fileName: string, errorMsg: string) => {
+        logger.error(`Failed to launch editor for ${fileName}: ${errorMsg}`);
+      },
+    );
+    return ctx.body(null, 204);
+  })
+  .put(CONTEXT_LINES_ENDPOINT, contextLinesHandler);
 
 function logSpotlightUrl(port: number): void {
   logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
 }
 
+const extensionsToContentType: Record<string, string | undefined> = {
+  ".js": "text/javascript",
+  ".css": "text/css",
+  ".json": "application/json",
+};
+
 async function startServer(
-  buffer: MessageBuffer<Payload>,
   port: number,
   basePath?: string,
   filesToServe?: Record<string, Buffer>,
   incomingPayload?: IncomingPayloadCallback,
-): Promise<Server> {
+): Promise<ServerType> {
   if (basePath && !filesToServe) {
     filesToServe = {
       "/src/index.html": readFileSync(join(basePath, "src/index.html")),
@@ -331,79 +201,92 @@ async function startServer(
     };
   }
 
-  // MCP Setup
-  const transport = new StreamableHTTPServerTransport({
-    sessionIdGenerator: undefined,
-  });
-  const mcp = createMcpInstance(buffer);
-  await mcp.connect(transport);
+  const server = new Hono<HonoEnv>()
+    .use(async (ctx, next) => {
+      ctx.header("X-Powered-By", SERVER_IDENTIFIER);
 
-  const ROUTES: [RegExp, RequestHandler][] = [
-    [/^\/health$/, handleHealthRequest],
-    [/^\/mcp$/, enableCORS((req, res) => transport.handleRequest(req, res))],
-    [/^\/clear$/, enableCORS(handleClearRequest)],
-    [/^\/stream$|^\/api\/\d+\/envelope\/?$/, enableCORS(streamRequestHandler(buffer, incomingPayload))],
-    [/^\/open$/, enableCORS(openRequestHandler(basePath))],
-    [RegExp(`^${CONTEXT_LINES_ENDPOINT}$`), enableCORS(contextLinesHandler)],
-    [/^.+$/, filesToServe != null ? enableCORS(fileServer(filesToServe)) : error404],
-  ];
+      ctx.set("basePath", basePath);
+      ctx.set("incomingPayload", incomingPayload);
 
-  const server = createServer((req: IncomingMessage, res: ServerResponse) => {
-    const url = req.url;
-    if (!url) {
-      return error404(req, res);
-    }
-
-    const host = req.headers.host || "localhost";
-    const { pathname, searchParams } = new URL(url, `http://${host}`);
-    const route = ROUTES.find(route => route[0].test(pathname));
-    if (!route) {
-      return error404(req, res);
-    }
-    return startSpan(
-      {
-        name: `HTTP ${req.method} ${pathname}`,
-        op: `sidecar.http.${req.method?.toLowerCase()}`,
-        forceTransaction: true,
-        attributes: {
-          "http.request.method": req.method,
-          "http.request.url": url,
-          "http.request.query": searchParams.toString(),
-          "server.address": host,
-          "server.port": req.socket.localPort,
+      const host = ctx.req.header("Host") || "localhost";
+      const path = ctx.req.path;
+      await startSpan(
+        {
+          name: `HTTP ${ctx.req.method} ${path}`,
+          op: `sidecar.http.${ctx.req.method?.toLowerCase()}`,
+          forceTransaction: true,
+          attributes: {
+            "http.request.method": ctx.req.method,
+            "http.request.url": ctx.req.url,
+            "http.request.query": ctx.req.query().toString(),
+            "server.address": host,
+            // TODO: Figure out how to get the port
+            // "server.port": ctx.req.socket.localPort,
+          },
         },
-      },
-      span => {
-        const traceData = getTraceData();
-        res.appendHeader(
-          "server-timing",
-          [
-            `sentryTrace;desc="${traceData["sentry-trace"]}"`,
-            `baggage;desc="${traceData.baggage}"`,
-            `sentrySpotlightPort;desc=${port}`,
-          ].join(", "),
-        );
-        const result = route[1](req, res, pathname, searchParams);
-        span.setAttribute("http.response.status_code", res.statusCode);
-        return result;
-      },
-    );
-  });
+        async span => {
+          if (path === "/mcp" || path === "/health") {
+            await next();
+          } else {
+            await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, () => next());
+          }
 
-  server.on("error", handleServerError);
+          const traceData = getTraceData();
+          ctx.res.headers.append(
+            "server-timing",
+            [
+              `sentryTrace;desc="${traceData["sentry-trace"]}"`,
+              `baggage;desc="${traceData.baggage}"`,
+              `sentrySpotlightPort;desc=${port}`,
+            ].join(", "),
+          );
 
-  server.listen(port, () => {
-    handleServerListen(port, basePath);
-  });
+          span.setAttribute("http.response.status_code", ctx.res.status);
+        },
+      );
+    })
+    .route("/", app);
 
-  return server;
+  if (filesToServe) {
+    server.get("/*", ctx => {
+      let filePath = `${ctx.req.path || ctx.req.url}`;
+
+      if (filePath === "/") {
+        filePath = "/src/index.html";
+      }
+      filePath = filePath.slice(1);
+
+      const extName = extname(filePath);
+      const contentType = extensionsToContentType[extName] ?? "text/html";
+
+      if (!Object.hasOwn(filesToServe, filePath)) {
+        return ctx.notFound();
+      }
+
+      // Enable profiling in browser
+      ctx.header("Document-Policy", "js-profiling");
+      ctx.header("Content-Type", contentType);
+
+      return ctx.body(filesToServe[filePath]);
+    });
+  }
+
+  const _server = serve(
+    {
+      fetch: server.fetch,
+      port,
+    },
+    () => handleServerListen(port, basePath),
+  );
+
+  _server.addListener("error", handleServerError);
 
   function handleServerError(e: { code?: string }): void {
     if ("code" in e && e.code === "EADDRINUSE") {
       logger.info(`Port ${port} in use, retrying...`);
-      server.close();
+      _server.close();
       portInUseRetryTimeout = setTimeout(() => {
-        server.listen(port);
+        _server.listen(port);
       }, 5000);
     } else {
       captureException(e);
@@ -416,11 +299,12 @@ async function startServer(
       logSpotlightUrl(port);
     }
   }
+
+  return _server;
 }
 
-let serverInstance: Server;
+let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
-const buffer: MessageBuffer<Payload> = new MessageBuffer<Payload>();
 
 const isValidPort = withTracing(
   (value: string | number) => {
@@ -451,11 +335,7 @@ const isSidecarRunning = withTracing(
       let timeoutId: NodeJS.Timeout | null = null;
       const healthReq = get(options, res => {
         const serverIdentifier = res.headers["x-powered-by"];
-        if (serverIdentifier === "spotlight-by-sentry") {
-          resolve(true);
-        } else {
-          resolve(false);
-        }
+        resolve(serverIdentifier === SERVER_IDENTIFIER);
       });
       const destroyHealthReq = () => !healthReq.destroyed && healthReq.destroy(new Error("Request timed out."));
       function resolve(value: boolean) {
@@ -512,13 +392,13 @@ export function setupSidecar({
         logSpotlightUrl(sidecarPort);
       }
     } else if (!serverInstance) {
-      serverInstance = await startServer(buffer, sidecarPort, basePath, filesToServe, incomingPayload);
+      serverInstance = await startServer(sidecarPort, basePath, filesToServe, incomingPayload);
     }
   });
 }
 
 export function clearBuffer(): void {
-  buffer.reset();
+  getBuffer(contextId).reset();
 }
 
 let forceShutdown = false;
@@ -534,7 +414,8 @@ export const shutdown = () => {
     forceShutdown = true;
     logger.info("Shutting down server gracefully...");
     serverInstance.close();
-    serverInstance.closeAllConnections();
+    // TODO: This doesn't exist
+    // serverInstance.closeAllConnections();
     serverInstance.unref();
   }
 };
