@@ -213,7 +213,7 @@ async function startServer(
           if (path === "/mcp" || path === "/health") {
             await next();
           } else {
-            await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
+            await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, () => next());
           }
 
           const traceData = getTraceData();
