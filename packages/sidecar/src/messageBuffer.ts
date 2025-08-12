@@ -1,5 +1,3 @@
-import { processEnvelope } from "./mcp/parsing.js";
-
 export class MessageBuffer<T> {
   private size: number;
   private items: [number, T][];
@@ -8,7 +6,7 @@ export class MessageBuffer<T> {
   private timeout = 10;
   private readers = new Map<string, (item: T) => void>();
 
-  constructor(size = 100) {
+  constructor(size = 10) {
     this.size = size;
     this.items = new Array(size);
   }
@@ -69,26 +67,23 @@ export class MessageBuffer<T> {
     this.readers = new Map<string, (item: T) => void>();
   }
 
-  read(filters: ReadFilter): ReturnType<typeof processEnvelope>[] {
-    const result: ReturnType<typeof processEnvelope>[] = [];
+  read(filters: ReadFilter): T[] {
+    const result: T[] = [];
     const start = this.head;
     const end = this.writePos;
 
     const minTime = Date.now() - filters.duration * 1000;
 
-    for (let i = end; i > start; i--) {
-      const item = this.items[i % this.size];
-      if (item !== undefined) {
-        const [contentType, data] = item[1] as [string, string];
-        const packet = processEnvelope({ contentType, data });
+    if (start !== undefined && end !== undefined) {
+      for (let i = end - 1; i >= start; i--) {
+        const item = this.items[i % this.size];
+        if (item !== undefined) {
+          if (item[0] < minTime) {
+            break;
+          }
 
-        const timestamp = Number(packet.envelope[0].timestamp);
-
-        if (timestamp < minTime) {
-          break;
+          result.push(item[1]);
         }
-
-        result.push(packet);
       }
     }
 

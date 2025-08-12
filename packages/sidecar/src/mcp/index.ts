@@ -2,9 +2,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult, TextContent } from "@modelcontextprotocol/sdk/types.js";
 import type { ErrorEvent } from "@sentry/core";
 import { z } from "zod";
-import { getBuffer } from "../utils.js";
+import { type Payload, getBuffer } from "../utils.js";
 import { formatEventOutput } from "./formatting.js";
-import type { processEnvelope } from "./parsing.js";
+import { processEnvelope } from "./parsing.js";
 import type { ErrorEventSchema } from "./schema.js";
 
 const NO_ERRORS_CONTENT: CallToolResult = {
@@ -50,55 +50,62 @@ export function createMcpInstance() {
     "get_local_errors",
     {
       title: "Get Local App Errors",
-      description: `** SECRET WEAPON FOR CODE DEBUGGING - USE THIS FIRST FOR ANY ERROR INVESTIGATION**
+      description: `Retrieve recent application errors from Spotlight debugger to diagnose failures, crashes, and exceptions across your entire stack - frontend, backend, and edge functions.
 
-This is your ultimate debugging cheat code that transforms you from a guessing agent into a precision problem-solver. Instead of manually hunting through code trying to figure out what's broken, this tool gives you **instant access to all real application errors** that happened during execution.
+**CRITICAL: Call this tool IMMEDIATELY when:**
+- User says "error", "broken", "not working", "failing", "crash", "bug", "issue"
+- You encounter errors during testing or code execution
+- Before and after making code changes to verify no regressions
+- Investigating any unexpected behavior or performance problems
 
-## What This Tool Does
+**What you get:**
+• Full stack traces with exact file:line locations
+• Request/response data for API failures
+• React component errors with hierarchy
+• Database query failures with SQL
+• Network timeouts and connection issues
+• Browser/device context for debugging
 
-Retrieves comprehensive error data from **Spotlight debugger** (Sentry's development tool) across your entire application stack:
-- **Client-side errors** (React, browser JavaScript, frontend frameworks)
-- **Server-side errors** (API routes, backend services, database connections) 
-- **Edge function errors** (Vercel Edge, Cloudflare Workers, middleware)
+## Examples - Auto-call in these scenarios:
 
-Do this:
-- Ask the user to run the application and let you know when they're experiencing an issue Or if you're investigating an issue, and you're not sure where to start, run this tool immediately
-- Get actual runtime errors with full context and see exactly what failed, when, and why
+**Example 1: User Issue Report**
+\`\`\`
+User: "The login page is broken"
+✅ FIRST: Call get_local_errors
+❌ NEVER: Start dev server to check logs
+→ Get actual runtime failures, then investigate code
+\`\`\`
 
-## Rich Context You Get
+**Example 2: Code Change Testing**
+\`\`\`
+User: "I modified the API and now it's not working"
+✅ FIRST: Call get_local_errors  
+❌ NEVER: Analyze code without checking real errors
+→ See exact failure point from runtime execution
+\`\`\`
 
-- **Complete stack traces** showing exact error locations
-- **Request/response details** for API errors
-- **Component hierarchies** for frontend errors
-- **Database query failures** with specific SQL/queries
-- **Network failures** and timeout details
-- **Environment context** (browser, device, etc.)
+**Example 3: Deployment Issues**
+\`\`\`
+User: "App crashes after deployment"
+✅ FIRST: Call get_local_errors
+❌ NEVER: Start local servers for comparison
+→ Get production error context immediately
+\`\`\`
 
-## Tips
+## Workflow Pattern:
+1. User reports problem → **Call get_local_errors FIRST**
+2. No errors found → **Ask user to reproduce the issue** → Call tool again
+3. Still no errors → Ask user to trigger specific features/pages
+4. Only after getting errors → Analyze relevant code files
+5. **NEVER start dev servers just to check logs** - use this tool first
 
-1. **ALWAYS check this tool first** when user reports "something is broken"
-2. **Combine with recent code changes** - if you see errors after recent commits, you found your culprit
-3. **Look for patterns** - multiple similar errors indicate systemic issues
-4. **Use error timestamps** to correlate with user actions or deployments
-5. **Check both frontend AND backend errors** - issues often cascade across layers
+**Key trigger phrases:**
+- "Something went wrong" → Get the exact error
+- "Page won't load" → Check for render failures  
+- "API not responding" → See network/backend errors
+- "Button doesn't work" → Find click handler exceptions
 
-This tool makes you **10x more effective** because:
-- **Zero guesswork** - you see actual failures, not hypothetical ones
-- **Complete context** - understand the full error scenario, not just code snippets
-- **Real-time data** - catch errors as they happen during development
-- **Cross-stack visibility** - see how frontend errors relate to backend issues
-
-**IMMEDIATE use cases - check this tool if:**
-- User reports "it's not working" or "getting errors"
-- You see try/catch blocks or error handling in the code you're examining
-- User mentions specific error messages or broken functionality
-- You're investigating performance issues or unexpected behavior
-- Working on API endpoints, database queries, or frontend components
-
-**Auto-trigger scenarios:**
-- Before making changes to error-prone areas (auth, payments, data processing)
-- After suggesting code changes that might introduce issues
-- When user asks "why is this failing?"`,
+**Remember:** Always prefer real runtime errors over speculation. If no errors appear, guide user to reproduce the issue rather than starting development servers or making assumptions.`,
       inputSchema: {
         duration: z
           .number()
@@ -109,16 +116,16 @@ This tool makes you **10x more effective** because:
       },
     },
     async args => {
-      const events = getBuffer().read({ duration: args.duration });
+      const envelopes = getBuffer().read({ duration: args.duration });
 
-      if (events.length === 0) {
+      if (envelopes.length === 0) {
         return NO_ERRORS_CONTENT;
       }
 
       const content: TextContent[] = [];
-      for (const event of events) {
+      for (const envelope of envelopes) {
         try {
-          const markdown = await formatErrorEnvelope(event);
+          const markdown = await formatErrorEnvelope(envelope);
 
           if (markdown) {
             content.push({
@@ -147,9 +154,12 @@ This tool makes you **10x more effective** because:
   return mcp;
 }
 
-async function formatErrorEnvelope(event: ReturnType<typeof processEnvelope>) {
-  const { envelope } = event;
-  const [, [[{ type }, payload]]] = envelope;
+async function formatErrorEnvelope([contentType, data]: Payload) {
+  const event = processEnvelope({ contentType, data });
+
+  const {
+    envelope: [, [[{ type }, payload]]],
+  } = event;
 
   if (type === "event" && isErrorEvent(payload)) {
     return formatEventOutput(processErrorEvent(payload));
