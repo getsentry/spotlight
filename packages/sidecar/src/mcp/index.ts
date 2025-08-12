@@ -3,7 +3,7 @@ import type { CallToolResult, TextContent } from "@modelcontextprotocol/sdk/type
 import type { ErrorEvent } from "@sentry/core";
 import { z } from "zod";
 import { MessageBuffer } from "../messageBuffer.js";
-import type { Payload } from "../utils.js";
+import type { ErrorEventFilter, Payload } from "../utils.js";
 import { formatEventOutput } from "./formatting.js";
 import { processEnvelope } from "./parsing.js";
 import type { ErrorEventSchema } from "./schema.js";
@@ -90,7 +90,7 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
       const content: TextContent[] = [];
       for (const envelope of envelopes) {
         try {
-          const formattedErrors = await formatErrorEnvelope(envelope, eventId);
+          const formattedErrors = await formatErrorEnvelope(envelope, { eventId });
 
           if (formattedErrors?.length) {
             for (const formattedError of formattedErrors) {
@@ -128,7 +128,8 @@ export function createMcpInstance(buffer: MessageBuffer<Payload>) {
   return mcp;
 }
 
-async function formatErrorEnvelope([contentType, data]: Payload, eventId?: string) {
+async function formatErrorEnvelope([contentType, data]: Payload, filter?: ErrorEventFilter) {
+  const { eventId } = filter || {};
   const event = processEnvelope({ contentType, data });
 
   const {
