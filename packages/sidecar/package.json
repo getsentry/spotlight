@@ -49,6 +49,7 @@
   "devDependencies": {
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "fetch-event-stream": "^0.1.5",
     "tsdown": "^0.13.3",
     "typescript": "catalog:",
     "vitest": "catalog:"

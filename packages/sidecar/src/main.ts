@@ -69,7 +69,21 @@ export const app = new Hono<HonoEnv>()
     c.set("transport", transport);
     await next();
   })
-  .all("/mcp", c => c.get("transport").handleRequest(c))
+  .all(
+    "/mcp",
+    async (c, next) => {
+      if (!mcp.isConnected()) {
+        // Connecting the MCP with the transport
+        await mcp.connect(c.get("transport"));
+      }
+
+      await next();
+    },
+    async c => {
+      const response = await c.get("transport").handleRequest(c, await c.req.json());
+      return response;
+    },
+  )
   .get("/health", c => c.text("OK"))
   .use(cors(), async (_c, next) => {
     await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
@@ -190,9 +204,6 @@ async function startServer(
       server.get(url, serveStatic({ root: basePath, path }));
     }
   }
-
-  // Connecting the MCP with the transport
-  await mcp.connect(transport);
 
   const _server = serve(
     {

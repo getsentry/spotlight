@@ -178,7 +178,7 @@ importers:
         version: 4.2.19
       svelte-check:
         specifier: ^3.8.6
-        version: 3.8.6(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.6))(postcss@8.5.6)(svelte@4.2.19)
+        version: 3.8.6(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.3))(postcss@8.5.3)(svelte@4.2.19)
       tslib:
         specifier: ^2.7.0
         version: 2.8.1
@@ -313,7 +313,7 @@ importers:
         version: 4.2.19
       svelte-check:
         specifier: ^3.8.6
-        version: 3.8.6(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.3))(postcss@8.5.3)(svelte@4.2.19)
+        version: 3.8.6(@babel/core@7.27.1)(postcss-load-config@4.0.2(postcss@8.5.6))(postcss@8.5.6)(svelte@4.2.19)
       tslib:
         specifier: ^2.7.0
         version: 2.8.1
@@ -569,6 +569,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.15.28
+      fetch-event-stream:
+        specifier: ^0.1.5
+        version: 0.1.5
       tsdown:
         specifier: ^0.13.3
         version: 0.13.3(typescript@5.9.2)
@@ -5676,6 +5679,9 @@ packages:
     peerDependenciesMeta:
       picomatch:
         optional: true
+
+  fetch-event-stream@0.1.5:
+    resolution: {integrity: sha512-V1PWovkspxQfssq/NnxoEyQo1DV+MRK/laPuPblIZmSjMN8P5u46OhlFQznSr9p/t0Sp8Uc6SbM3yCMfr0KU8g==}
 
   file-entry-cache@6.0.1:
     resolution: {integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==}
@@ -15676,6 +15682,8 @@ snapshots:
   fdir@6.4.4(picomatch@4.0.2):
     optionalDependencies:
       picomatch: 4.0.2
+
+  fetch-event-stream@0.1.5: {}
 
   file-entry-cache@6.0.1:
     dependencies:
