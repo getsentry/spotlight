@@ -13,6 +13,7 @@ import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./const
 import { contextLinesHandler } from "./contextlines.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
 import { createMcpInstance } from "./mcp/index.js";
+import { generateUuidv4 } from "./messageBuffer.js";
 import { streamSSE } from "./streaming.js";
 import { type HonoEnv, type IncomingPayloadCallback, getBuffer } from "./utils.js";
 
@@ -57,7 +58,7 @@ const withTracing =
   (...args: unknown[]) =>
     startSpan({ name: fn.name, ...spanArgs }, () => fn(...args));
 
-const contextId = "some-unique-id";
+const contextId = generateUuidv4();
 const transport = new StreamableHTTPTransport();
 const mcp = createMcpInstance();
 
@@ -66,23 +67,19 @@ export const app = new Hono<HonoEnv>()
     c.header("X-Powered-By", SERVER_IDENTIFIER);
 
     c.set("contextId", contextId);
-    c.set("transport", transport);
     await next();
   })
   .all(
     "/mcp",
-    async (c, next) => {
+    async (_c, next) => {
       if (!mcp.isConnected()) {
         // Connecting the MCP with the transport
-        await mcp.connect(c.get("transport"));
+        await mcp.connect(transport);
       }
 
       await next();
     },
-    async c => {
-      const response = await c.get("transport").handleRequest(c, await c.req.json());
-      return response;
-    },
+    c => transport.handleRequest(c),
   )
   .get("/health", c => c.text("OK"))
   .use(cors(), async (_c, next) => {

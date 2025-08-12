@@ -6,7 +6,7 @@ export class MessageBuffer<T> {
   private timeout = 10;
   private readers = new Map<string, (item: T) => void>();
 
-  constructor(size = 10) {
+  constructor(size = 100) {
     this.size = size;
     this.items = new Array(size);
   }
@@ -94,7 +94,7 @@ type ReadFilter = {
   duration: number;
 };
 
-function generateUuidv4(): string {
+export function generateUuidv4(): string {
   let dt = new Date().getTime();
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
     let rnd = Math.random() * 16;
