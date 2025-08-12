@@ -7,16 +7,22 @@ type RawEventContext = {
 };
 
 export function processEnvelope(rawEvent: RawEventContext) {
-  const buffer =
-    typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
+  let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
 
-  const envelopeHeader = parseJSONFromBuffer(readLine(buffer)) as Envelope[0];
+  function readLine(length?: number) {
+    const cursor = length ?? getLineEnd(buffer);
+    const line = buffer.subarray(0, cursor);
+    buffer = buffer.subarray(cursor + 1);
+    return line;
+  }
+
+  const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
 
   const items: EnvelopeItem[] = [];
   while (buffer.length) {
-    const itemHeader = parseJSONFromBuffer(readLine(buffer)) as EnvelopeItem[0];
+    const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
     const payloadLength = itemHeader.length;
-    const itemPayloadRaw = readLine(buffer, payloadLength);
+    const itemPayloadRaw = readLine(payloadLength);
 
     let itemPayload: EnvelopeItem[1];
     try {
@@ -39,13 +45,6 @@ export function processEnvelope(rawEvent: RawEventContext) {
   return {
     envelope,
   };
-}
-
-function readLine(buffer: Uint8Array, length?: number) {
-  const cursor = length ?? getLineEnd(buffer);
-  const line = buffer.subarray(0, cursor);
-  buffer = buffer.subarray(cursor + 1);
-  return line;
 }
 
 function getLineEnd(data: Uint8Array): number {
