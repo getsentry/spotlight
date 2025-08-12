@@ -224,8 +224,12 @@ jobs:
       - name: Install playwright
         run: pnpx playwright install --with-deps
 
-      - name: Test Demos
-        run: pnpm test:demos
+      - name: Run Xvfb (virtual display)
+        run: |
+          Xvfb :99 -screen 0 1920x1080x24 &
+
+      - name: Set DISPLAY environment variable
+        run: echo "DISPLAY=:99" >> $GITHUB_ENV
 
       - name: Run tests
         run: pnpm test:e2e

@@ -67,21 +67,34 @@ export class MessageBuffer<T> {
     this.readers = new Map<string, (item: T) => void>();
   }
 
-  read(): T[] {
+  read(filters: ReadFilter): T[] {
     const result: T[] = [];
     const start = this.head;
     const end = this.writePos;
-    for (let i = start; i < end; i++) {
+
+    const minTime = Date.now() - filters.duration * 1000;
+
+    for (let i = end - 1; i >= start; i--) {
       const item = this.items[i % this.size];
       if (item !== undefined) {
+        if (item[0] < minTime) {
+          break;
+        }
+
         result.push(item[1]);
       }
     }
+
     return result;
   }
 }
 
-function generateUuidv4(): string {
+type ReadFilter = {
+  // duration in seconds
+  duration: number;
+};
+
+export function generateUuidv4(): string {
   let dt = new Date().getTime();
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
     let rnd = Math.random() * 16;

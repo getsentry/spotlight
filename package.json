@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "turbo dev --filter=@spotlightjs/overlay --filter=@spotlightjs/sidecar",
     "dev:overlay": "turbo dev --filter=@spotlightjs/overlay",
+    "dev:sidecar": "pnpm run --filter=@spotlightjs/sidecar start",
     "dev:website": "turbo dev --filter=@spotlightjs/website",
     "dev:electron": "turbo dev --filter=@spotlightjs/electron",
     "build": "turbo build",
@@ -14,7 +15,6 @@
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",
     "test": "turbo test --filter=./packages/*",
-    "test:demos": "turbo test --filter=./demos/*",
     "test:e2e": "turbo test:e2e",
     "test:evals": "turbo eval --filter=@spotlightjs/evals",
     "yalc:publish": "yalc publish --push --sig --private",
@@ -22,7 +22,7 @@
     "changeset:consume": "pnpm changeset version",
     "changeset:publish": "pnpm changeset publish",
     "clean": "turbo clean",
-    "clean:deps": "rimraf ./packages/*/node_modules demos/*/node_modules node_modules",
+    "clean:deps": "rimraf ./packages/*/node_modules node_modules",
     "clean:all": "pnpm run clean && pnpm run clean:deps && pnpm install"
   },
   "devDependencies": {
