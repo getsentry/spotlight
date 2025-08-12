@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
-import type { IncomingMessage, ServerResponse } from "node:http";
 import * as os from "node:os";
 import * as path from "node:path";
 import { LEAST_UPPER_BOUND, TraceMap, originalPositionFor, sourceContentFor } from "@jridgewell/trace-mapping";
+import type { Handler } from "hono";
 
 type SourceContext = {
   pre_context?: string[];
@@ -124,67 +124,50 @@ function isValidSentryStackFrame(frame: SentryStackFrame): frame is ValidSentryS
   return !!frame.filename && !!frame.lineno && !!frame.colno;
 }
 
-export function contextLinesHandler(req: IncomingMessage, res: ServerResponse) {
-  // We're only interested in handling a PUT request
-  if (req.method !== "PUT") {
-    res.writeHead(405);
-    res.end();
-    return;
+export const contextLinesHandler: Handler = async ctx => {
+  const requestBody = await ctx.req.text();
+
+  const stacktrace = parseStackTrace(requestBody);
+
+  if (!stacktrace) {
+    return ctx.body(null, 500);
   }
 
-  let requestBody = "";
-  req.on("data", chunk => {
-    requestBody += chunk;
-  });
-
-  req.on("end", async () => {
-    const stacktrace = parseStackTrace(requestBody);
-
-    if (!stacktrace) {
-      res.writeHead(500);
-      res.end();
-      return;
+  for (const frame of stacktrace.frames ?? []) {
+    if (
+      !isValidSentryStackFrame(frame) ||
+      // let's ignore dependencies for now with this naive check
+      frame.filename.includes("/node_modules/")
+    ) {
+      continue;
     }
-
-    for (const frame of stacktrace.frames ?? []) {
-      if (
-        !isValidSentryStackFrame(frame) ||
-        // let's ignore dependencies for now with this naive check
-        frame.filename.includes("/node_modules/")
-      ) {
+    const { filename } = frame;
+    // Dirty check to see if this looks like a regular file path or a URL
+    if (filename.includes("://")) {
+      const generatedCode = await getGeneratedCodeFromServer(frame.filename);
+      if (!generatedCode) {
         continue;
       }
-      const { filename } = frame;
-      // Dirty check to see if this looks like a regular file path or a URL
-      if (filename.includes("://")) {
-        const generatedCode = await getGeneratedCodeFromServer(frame.filename);
-        if (!generatedCode) {
-          continue;
-        }
 
-        // Extract the inline source map from the minified code
-        const inlineSourceMapMatch = generatedCode.match(/\/\/# sourceMappingURL=data:application\/json;base64,(.*)/);
+      // Extract the inline source map from the minified code
+      const inlineSourceMapMatch = generatedCode.match(/\/\/# sourceMappingURL=data:application\/json;base64,(.*)/);
 
-        if (inlineSourceMapMatch?.[1]) {
-          const sourceMapBase64 = inlineSourceMapMatch[1];
-          const sourceMapContent = Buffer.from(sourceMapBase64, "base64").toString("utf-8");
-          applySourceContextToFrame(sourceMapContent, frame);
-        }
-      } else if (!filename.includes(":")) {
-        try {
-          const lines = readFileSync(filename, { encoding: "utf-8" }).split(/\r?\n/);
-          addContextLinesToFrame(lines, frame);
-        } catch (err) {
-          if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
-            throw err;
-          }
+      if (inlineSourceMapMatch?.[1]) {
+        const sourceMapBase64 = inlineSourceMapMatch[1];
+        const sourceMapContent = Buffer.from(sourceMapBase64, "base64").toString("utf-8");
+        applySourceContextToFrame(sourceMapContent, frame);
+      }
+    } else if (!filename.includes(":")) {
+      try {
+        const lines = readFileSync(filename, { encoding: "utf-8" }).split(/\r?\n/);
+        addContextLinesToFrame(lines, frame);
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
+          throw err;
         }
       }
     }
+  }
 
-    const responseJson = JSON.stringify(stacktrace);
-
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(responseJson);
-  });
-}
+  return ctx.json(stacktrace);
+};
