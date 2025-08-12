@@ -556,9 +556,6 @@ importers:
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
-      tsx:
-        specifier: ^4.20.3
-        version: 4.20.3
       zod:
         specifier: ^3
         version: 3.24.2
@@ -575,6 +572,9 @@ importers:
       tsdown:
         specifier: ^0.13.3
         version: 0.13.3(typescript@5.9.2)
+      tsx:
+        specifier: ^4.20.3
+        version: 4.20.3
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
