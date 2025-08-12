@@ -16,16 +16,16 @@ export type HonoEnv = {
 
 const contextBasedBuffer = new Map<string, MessageBuffer<Payload>>();
 
-export function getBuffer() {
-  const contextId = getContext<HonoEnv>().get("contextId");
-  if (!contextId) {
+export function getBuffer(contextId?: string) {
+  const ctxId = contextId ?? getContext<HonoEnv>().get("contextId");
+  if (!ctxId) {
     throw new Error("No context ID found");
   }
 
-  let buffer = contextBasedBuffer.get(contextId);
+  let buffer = contextBasedBuffer.get(ctxId);
   if (!buffer) {
     buffer = new MessageBuffer<Payload>();
-    contextBasedBuffer.set(contextId, buffer);
+    contextBasedBuffer.set(ctxId, buffer);
   }
 
   return buffer;

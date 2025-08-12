@@ -379,6 +379,10 @@ export function setupSidecar({
   });
 }
 
+export function clearBuffer(): void {
+  getBuffer(contextId).clear();
+}
+
 let forceShutdown = false;
 export const shutdown = () => {
   if (portInUseRetryTimeout) {
