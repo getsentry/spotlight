@@ -124,13 +124,13 @@ function isValidSentryStackFrame(frame: SentryStackFrame): frame is ValidSentryS
   return !!frame.filename && !!frame.lineno && !!frame.colno;
 }
 
-export const contextLinesHandler: Handler = async c => {
-  const requestBody = await c.req.text();
+export const contextLinesHandler: Handler = async ctx => {
+  const requestBody = await ctx.req.text();
 
   const stacktrace = parseStackTrace(requestBody);
 
   if (!stacktrace) {
-    return c.body(null, 500);
+    return ctx.body(null, 500);
   }
 
   for (const frame of stacktrace.frames ?? []) {
@@ -169,5 +169,5 @@ export const contextLinesHandler: Handler = async c => {
     }
   }
 
-  return c.json(stacktrace);
+  return ctx.json(stacktrace);
 };

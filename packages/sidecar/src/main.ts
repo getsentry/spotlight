@@ -63,13 +63,13 @@ const transport = new StreamableHTTPTransport();
 const mcp = createMcpInstance();
 
 export const app = new Hono<HonoEnv>()
-  .use(contextStorage(), async (c, next) => {
-    c.set("contextId", contextId);
+  .use(contextStorage(), async (ctx, next) => {
+    ctx.set("contextId", contextId);
     await next();
   })
   .all(
     "/mcp",
-    async (_c, next) => {
+    async (_ctx, next) => {
       if (!mcp.isConnected()) {
         // Connecting the MCP with the transport
         await mcp.connect(transport);
@@ -77,21 +77,21 @@ export const app = new Hono<HonoEnv>()
 
       await next();
     },
-    c => transport.handleRequest(c),
+    ctx => transport.handleRequest(ctx),
   )
-  .get("/health", c => c.text("OK"))
+  .get("/health", ctx => ctx.text("OK"))
   .use(cors())
-  .delete("/clear", c => {
+  .delete("/clear", ctx => {
     getBuffer().clear();
-    return c.text("Cleared");
+    return ctx.text("Cleared");
   })
-  .get("/stream", c => {
+  .get("/stream", ctx => {
     const buffer = getBuffer();
 
-    const useBase64 = c.req.query("base64") != null;
+    const useBase64 = ctx.req.query("base64") != null;
     const base64Indicator = useBase64 ? ";base64" : "";
 
-    return streamSSE(c, async stream => {
+    return streamSSE(ctx, async stream => {
       const sub = buffer.subscribe(([payloadType, data]) => {
         logger.debug("🕊️ sending to Spotlight");
         stream.writeSSE({
@@ -105,13 +105,13 @@ export const app = new Hono<HonoEnv>()
       });
     });
   })
-  .on("POST", ["/stream", "/api/:id/envelope"], async c => {
+  .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {
     logger.debug("📩 Received event");
-    const arrayBuffer = await c.req.arrayBuffer();
+    const arrayBuffer = await ctx.req.arrayBuffer();
     const body = Buffer.from(arrayBuffer);
 
-    let contentType = c.req.header("content-type")?.split(";")[0].toLocaleLowerCase();
-    if (c.req.query("sentry_client")?.startsWith("sentry.javascript.browser") && c.req.header("Origin")) {
+    let contentType = ctx.req.header("content-type")?.split(";")[0].toLocaleLowerCase();
+    if (ctx.req.query("sentry_client")?.startsWith("sentry.javascript.browser") && ctx.req.header("Origin")) {
       // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
       contentType = "application/x-sentry-envelope";
     }
@@ -121,7 +121,7 @@ export const app = new Hono<HonoEnv>()
       getBuffer().put([contentType, body]);
     }
 
-    const incomingPayload = c.get("incomingPayload");
+    const incomingPayload = ctx.get("incomingPayload");
 
     if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
       const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
@@ -140,15 +140,15 @@ export const app = new Hono<HonoEnv>()
     }
 
     // 204 would be more appropriate but returning 200 to match what /envelope returns
-    return c.body(null, 200, {
+    return ctx.body(null, 200, {
       "Cache-Control": "no-cache",
       Connection: "keep-alive",
     });
   })
-  .post("/open", async c => {
-    const basePath = c.get("basePath") ?? process.cwd();
+  .post("/open", async ctx => {
+    const basePath = ctx.get("basePath") ?? process.cwd();
 
-    const requestBody = await c.req.text();
+    const requestBody = await ctx.req.text();
     const targetPath = resolve(basePath, requestBody);
     logger.debug(`Launching editor for ${targetPath}`);
     launchEditor(
@@ -160,7 +160,7 @@ export const app = new Hono<HonoEnv>()
         logger.error(`Failed to launch editor for ${fileName}: ${errorMsg}`);
       },
     );
-    return c.body(null, 204);
+    return ctx.body(null, 204);
   })
   .put(CONTEXT_LINES_ENDPOINT, contextLinesHandler);
 
@@ -179,13 +179,13 @@ async function startServer(
   }
 
   const server = new Hono<HonoEnv>()
-    .use(async (c, next) => {
-      c.header("X-Powered-By", SERVER_IDENTIFIER);
+    .use(async (ctx, next) => {
+      ctx.header("X-Powered-By", SERVER_IDENTIFIER);
 
-      c.set("basePath", basePath);
-      c.set("incomingPayload", incomingPayload);
+      ctx.set("basePath", basePath);
+      ctx.set("incomingPayload", incomingPayload);
 
-      if (c.req.path === "/mcp" || c.req.path === "/health") {
+      if (ctx.req.path === "/mcp" || ctx.req.path === "/health") {
         await next();
       } else {
         await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, async () => await next());
