@@ -169,5 +169,5 @@ export const contextLinesHandler: Handler = async c => {
     }
   }
 
-  return c.json(JSON.stringify(stacktrace));
+  return c.json(stacktrace);
 };
