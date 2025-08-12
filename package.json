@@ -15,14 +15,13 @@
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",
     "test": "turbo test --filter=./packages/*",
-    "test:demos": "turbo test --filter=./demos/*",
     "test:e2e": "turbo test:e2e",
     "yalc:publish": "yalc publish --push --sig --private",
     "changeset:add": "pnpm changeset",
     "changeset:consume": "pnpm changeset version",
     "changeset:publish": "pnpm changeset publish",
     "clean": "turbo clean",
-    "clean:deps": "rimraf ./packages/*/node_modules demos/*/node_modules node_modules",
+    "clean:deps": "rimraf ./packages/*/node_modules node_modules",
     "clean:all": "pnpm run clean && pnpm run clean:deps && pnpm install"
   },
   "devDependencies": {

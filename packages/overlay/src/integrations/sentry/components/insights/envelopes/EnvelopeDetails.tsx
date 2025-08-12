@@ -1,10 +1,10 @@
 import type { Envelope } from "@sentry/core";
 import { useState } from "react";
 import { ReactComponent as Download } from "~/assets/download.svg";
+import JsonViewer from "~/components/JsonViewer";
 import type { RawEventContext } from "~/integrations/integration";
 import { parseStringFromBuffer } from "~/integrations/sentry/utils/bufferParsers";
 import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
-import JsonViewer from "../../../../../components/JsonViewer";
 
 export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; rawEnvelope: RawEventContext } }) {
   const [showRawJSON, setShowRawJSON] = useState<boolean>(false);
