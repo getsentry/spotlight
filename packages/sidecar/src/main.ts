@@ -1,9 +1,8 @@
-import { createWriteStream } from "node:fs";
+import { createWriteStream, readFileSync } from "node:fs";
 import { get } from "node:http";
-import { resolve } from "node:path";
+import { extname, join, resolve } from "node:path";
 import { StreamableHTTPTransport } from "@hono/mcp";
 import { type ServerType, serve } from "@hono/node-server";
-import { serveStatic } from "@hono/node-server/serve-static";
 import { addEventProcessor, captureException, startSpan } from "@sentry/node";
 import { Hono } from "hono";
 import { contextStorage } from "hono/context-storage";
@@ -37,7 +36,7 @@ type SideCarOptions = {
    */
   basePath?: string;
 
-  filesToServe?: string[];
+  filesToServe?: Record<string, Buffer>;
 
   /**
    * More verbose logging.
@@ -168,14 +167,23 @@ function logSpotlightUrl(port: number): void {
   logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
 }
 
+const extensionsToContentType: Record<string, string | undefined> = {
+  ".js": "text/javascript",
+  ".css": "text/css",
+  ".json": "application/json",
+};
+
 async function startServer(
   port: number,
   basePath?: string,
-  filesToServe?: string[],
+  filesToServe?: Record<string, Buffer>,
   incomingPayload?: IncomingPayloadCallback,
 ): Promise<ServerType> {
   if (basePath && !filesToServe) {
-    filesToServe = ["/src/index.html", "/assets/main.js"];
+    filesToServe = {
+      "/src/index.html": readFileSync(join(basePath, "src/index.html")),
+      "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
+    };
   }
 
   const server = new Hono<HonoEnv>()
@@ -194,14 +202,23 @@ async function startServer(
     .route("/", app);
 
   if (filesToServe) {
-    for (const path of filesToServe) {
+    for (const [path, content] of Object.entries(filesToServe)) {
       let url = path;
 
       if (url === "/src/index.html") {
         url = "/";
       }
 
-      server.get(url, serveStatic({ root: basePath, path }));
+      const extName = extname(path);
+      const contentType = extensionsToContentType[extName] ?? "text/html";
+
+      server.get(url, c => {
+        // Enable profiling in browser
+        c.header("Document-Policy", "js-profiling");
+        c.header("Content-Type", contentType);
+
+        return c.body(content);
+      });
     }
   }
 
