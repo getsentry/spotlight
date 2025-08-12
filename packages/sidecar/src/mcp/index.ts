@@ -1,44 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { CallToolResult, TextContent } from "@modelcontextprotocol/sdk/types.js";
-import type { ErrorEvent } from "@sentry/core";
+import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import { type Payload, getBuffer } from "../utils.js";
-import { formatEventOutput } from "./formatting.js";
-import { processEnvelope } from "./parsing.js";
-import type { ErrorEventSchema } from "./schema.js";
-
-const NO_ERRORS_CONTENT: CallToolResult = {
-  content: [
-    {
-      type: "text",
-      text: `**No errors detected in Spotlight** (last 60 seconds)
-
-**This means:**
-- Application is currently running without runtime failures
-- No crashes, exceptions, or critical issues in the recent timeframe
-- System appears stable at the moment
-
-**Next debugging steps:**
-
-1. **If user reports a specific issue:**
-   - Ask them to reproduce the problem (click the button, submit the form, navigate to the page)
-   - Run this tool again immediately after they reproduce it
-   - Errors will appear in real-time as they happen
-
-2. **If investigating existing code:**
-   - Check application logs separately
-   - Look for TODO comments, error handling gaps, or potential edge cases in the code
-   - Consider testing error scenarios (invalid inputs, network failures, etc.)
-
-3. **Proactive error detection:**
-   - Have user interact with recently changed features
-   - Test API endpoints or database operations that might be fragile
-   - Check pages/features mentioned in recent commits
-
-** Pro tip:** Absence of errors doesn't mean absence of bugs - it just means no runtime failures occurred recently. The issue might be logical errors, UI problems, or dormant bugs waiting for specific conditions.`,
-    },
-  ],
-};
+import { getBuffer } from "../utils.js";
+import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
+import { formatErrorEnvelope, formatLogEnvelope } from "./utils/index.js";
 
 export function createMcpInstance() {
   const mcp = new McpServer({
@@ -125,13 +90,13 @@ User: "App crashes after deployment"
       const content: TextContent[] = [];
       for (const envelope of envelopes) {
         try {
-          const formattedErrors = await formatErrorEnvelope(envelope);
+          const formattedEvents = await formatErrorEnvelope(envelope);
 
-          if (formattedErrors?.length) {
-            for (const formattedError of formattedErrors) {
+          if (formattedEvents?.length) {
+            for (const formattedEvent of formattedEvents) {
               content.push({
                 type: "text",
-                text: formattedError,
+                text: formattedEvent,
               });
             }
           }
@@ -150,86 +115,54 @@ User: "App crashes after deployment"
     },
   );
 
-  // TODO: Add tool for performance tracing
-  // TODO: Add tool for profiling data
+  mcp.registerTool(
+    "get_local_logs",
+    {
+      title: "Get Local App Logs",
+      description: "",
+      inputSchema: {
+        duration: z
+          .number()
+          .default(60)
+          .describe(
+            "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
+          ),
+      },
+    },
+    async args => {
+      const envelopes = getBuffer().read({ duration: args.duration });
+
+      if (envelopes.length === 0) {
+        return NO_LOGS_CONTENT;
+      }
+
+      const content: TextContent[] = [];
+      for (const envelope of envelopes) {
+        try {
+          const formattedEvents = await formatLogEnvelope(envelope);
+
+          if (formattedEvents?.length) {
+            for (const formattedEvent of formattedEvents) {
+              content.push({
+                type: "text",
+                text: formattedEvent,
+              });
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      if (content.length === 0) {
+        return NO_LOGS_CONTENT;
+      }
+
+      return {
+        content,
+      };
+    },
+  );
 
   return mcp;
-}
-
-async function formatErrorEnvelope([contentType, data]: Payload) {
-  const event = processEnvelope({ contentType, data });
-
-  const {
-    envelope: [, items],
-  } = event;
-
-  const formattedErrors: string[] = [];
-  for (const item of items) {
-    const [{ type }, payload] = item;
-
-    if (type === "event" && isErrorEvent(payload)) {
-      formattedErrors.push(formatEventOutput(processErrorEvent(payload)));
-    }
-  }
-
-  return formattedErrors;
-}
-
-function isErrorEvent(payload: unknown): payload is ErrorEvent {
-  return typeof payload === "object" && payload !== null && "exception" in payload;
-}
-
-export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventSchema> {
-  const entries = [];
-
-  if (event.exception) {
-    entries.push({
-      type: "exception",
-      data: event.exception,
-    });
-  }
-
-  if (event.request) {
-    entries.push({
-      type: "request",
-      data: event.request,
-    });
-  }
-
-  if (event.breadcrumbs) {
-    entries.push({
-      type: "breadcrumbs",
-      data: event.breadcrumbs,
-    });
-  }
-
-  if (event.spans) {
-    entries.push({
-      type: "spans",
-      data: event.spans,
-    });
-  }
-
-  if (event.threads) {
-    entries.push({
-      type: "threads",
-      data: event.threads,
-    });
-  }
-
-  return {
-    message: event.message ?? "",
-    id: event.event_id ?? "",
-    type: "error",
-    tags: Object.entries(event.tags ?? {}).map(([key, value]) => ({
-      key,
-      value: String(value),
-    })),
-    dateCreated: event.timestamp ? new Date(event.timestamp).toISOString() : new Date().toISOString(),
-    title: event.message ?? "",
-    entries,
-    // @ts-expect-error
-    contexts: event.contexts,
-    platform: event.platform,
-  };
 }
