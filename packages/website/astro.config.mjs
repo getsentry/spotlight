@@ -47,7 +47,6 @@ export default defineConfig({
         Header: "./src/components/Header.astro",
         ThemeProvider: "./src/components/ThemeProvider.astro",
       },
-
       head: [
         {
           tag: "meta",
@@ -101,56 +100,9 @@ export default defineConfig({
         },
         {
           label: "Setup",
-          items: [
-            {
-              label: "Spotlight",
-              link: "/setup/",
-            },
-            {
-              label: "For Django",
-              link: "/setup/django/",
-            },
-            {
-              label: "For Laravel",
-              link: "/setup/laravel/",
-            },
-            {
-              label: "For Astro",
-              link: "/setup/astro/",
-            },
-            {
-              label: "For Next.js",
-              link: "/setup/nextjs/",
-            },
-            {
-              label: "For Remix",
-              link: "/setup/remix/",
-            },
-            {
-              label: "For SvelteKit",
-              link: "/setup/sveltekit/",
-            },
-            {
-              label: "For Vite",
-              link: "/setup/vite/",
-            },
-            {
-              label: "Just HTML",
-              link: "/setup/html/",
-            },
-            {
-              label: "For Headless Environments",
-              link: "/setup/headless/",
-            },
-            {
-              label: "For Other Frameworks",
-              link: "/setup/other/",
-            },
-            {
-              label: "Migration Guide",
-              link: "/setup/migration/",
-            },
-          ],
+          autogenerate: {
+            directory: "setup",
+          },
         },
         {
           label: "Sidecar",
