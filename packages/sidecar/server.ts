@@ -43,10 +43,23 @@ Examples:
 }
 
 // Handle legacy positional argument for port (backwards compatibility)
-const port = positionals.length > 0 ? Number(positionals[0]) : Number(values.port);
+const portInput = positionals.length > 0 ? positionals[0] : values.port;
+const port = Number(portInput);
+
+// Validate port number
+if (Number.isNaN(port)) {
+  console.error(`Error: Invalid port number '${portInput}'`);
+  console.error("Port must be a valid number between 1 and 65535");
+  process.exit(1);
+}
+
+if (port < 1 || port > 65535) {
+  console.error(`Error: Port ${port} is out of valid range (1-65535)`);
+  process.exit(1);
+}
 
 setupSidecar({
-  port: Number.isNaN(port) ? undefined : port,
+  port,
   debug: values.debug,
   isStandalone: true,
 });
