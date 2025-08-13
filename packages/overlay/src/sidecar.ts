@@ -1,5 +1,27 @@
 import { log } from "./lib/logger";
 
+// Version should match package.json
+const OVERLAY_VERSION = "3.2.0";
+
+/**
+ * Extracts browser name from User-Agent
+ */
+function getBrowserName(userAgent: string): string {
+  if (userAgent.includes("Chrome/") && !userAgent.includes("Edg/")) {
+    return "Chrome";
+  }
+  if (userAgent.includes("Firefox/")) {
+    return "Firefox";
+  }
+  if (userAgent.includes("Safari/") && !userAgent.includes("Chrome")) {
+    return "Safari";
+  }
+  if (userAgent.includes("Edg/")) {
+    return "Edge";
+  }
+  return "Unknown";
+}
+
 export function connectToSidecar(
   sidecarUrl: string,
   // Content Type to listener
@@ -9,6 +31,28 @@ export function connectToSidecar(
   log("Connecting to sidecar at", sidecarUrl);
   const sidecarStreamUrl = new URL("/stream", sidecarUrl);
   sidecarStreamUrl.searchParams.append("base64", "1");
+
+  // Build client identifier in user-agent format
+  // Format: spotlight-overlay/version (Browser; hostname)
+  let clientId = `spotlight-overlay/${OVERLAY_VERSION}`;
+
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    const userAgent = window.navigator.userAgent;
+    const browserName = getBrowserName(userAgent);
+
+    // Add platform info in parentheses
+    const platformParts = [browserName];
+    if (hostname && hostname !== "localhost") {
+      platformParts.push(hostname);
+    }
+
+    if (platformParts.length > 0) {
+      clientId += ` (${platformParts.join("; ")})`;
+    }
+  }
+
+  sidecarStreamUrl.searchParams.append("client", clientId);
   const source = new EventSource(sidecarStreamUrl.href);
 
   for (const [contentType, listener] of Object.entries(contentTypeListeners)) {
@@ -17,7 +61,7 @@ export function connectToSidecar(
 
   source.addEventListener("open", () => {
     setOnline(true);
-    log("Sidecar connected.");
+    log(`Sidecar connected as: ${clientId}`);
   });
 
   source.addEventListener("error", err => {

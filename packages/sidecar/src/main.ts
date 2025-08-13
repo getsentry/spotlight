@@ -11,10 +11,13 @@ import { cors } from "hono/cors";
 import launchEditor from "launch-editor";
 import { CONTEXT_LINES_ENDPOINT, DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { contextLinesHandler } from "./contextlines.js";
+import { logIncomingEvent, logOutgoingEvent } from "./debugLogging.js";
+import { EventContainer } from "./eventContainer.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
 import { createMcpInstance } from "./mcp/index.js";
 import { generateUuidv4 } from "./messageBuffer.js";
 import { streamSSE } from "./streaming.js";
+import { parseBrowserFromUserAgent } from "./userAgent.js";
 import { type HonoEnv, type IncomingPayloadCallback, getBuffer } from "./utils.js";
 
 type SideCarOptions = {
@@ -98,12 +101,20 @@ export const app = new Hono<HonoEnv>()
     const useBase64 = ctx.req.query("base64") != null;
     const base64Indicator = useBase64 ? ";base64" : "";
 
+    // Capture client information for debug logging
+    let clientId = ctx.req.query("client");
+    if (!clientId) {
+      // Fallback to parsing User-Agent if no client param
+      const userAgent = ctx.req.header("User-Agent") || "unknown";
+      clientId = parseBrowserFromUserAgent(userAgent);
+    }
+
     return streamSSE(ctx, async stream => {
-      const sub = buffer.subscribe(([payloadType, data]) => {
-        logger.debug("🕊️ sending to Spotlight");
+      const sub = buffer.subscribe(container => {
+        logOutgoingEvent(container, clientId);
         stream.writeSSE({
-          event: `${payloadType}${base64Indicator}`,
-          data: data.toString(useBase64 ? "base64" : "utf-8"),
+          event: `${container.getContentType()}${base64Indicator}`,
+          data: container.getData().toString(useBase64 ? "base64" : "utf-8"),
         });
       });
 
@@ -113,7 +124,6 @@ export const app = new Hono<HonoEnv>()
     });
   })
   .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {
-    logger.debug("📩 Received event");
     const arrayBuffer = await ctx.req.arrayBuffer();
     let body = Buffer.from(arrayBuffer);
 
@@ -129,10 +139,17 @@ export const app = new Hono<HonoEnv>()
       // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
       contentType = "application/x-sentry-envelope";
     }
+
     if (!contentType) {
       logger.warn("No content type, skipping payload...");
     } else {
-      getBuffer().put([contentType, body]);
+      // Create event container and add to buffer
+      const container = new EventContainer(contentType, body);
+
+      // Log incoming event details when debug is enabled
+      logIncomingEvent(container);
+
+      getBuffer().put(container);
     }
 
     const incomingPayload = ctx.get("incomingPayload");

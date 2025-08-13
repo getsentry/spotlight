@@ -1,8 +1,8 @@
 import type { StreamableHTTPTransport } from "@hono/mcp";
 import { getContext } from "hono/context-storage";
+import type { EventContainer } from "./eventContainer.js";
 import { MessageBuffer } from "./messageBuffer.js";
 
-export type Payload = [string, Buffer];
 export type IncomingPayloadCallback = (body: string) => void;
 
 export type HonoEnv = {
@@ -14,7 +14,7 @@ export type HonoEnv = {
   };
 };
 
-const contextBasedBuffer = new Map<string, MessageBuffer<Payload>>();
+const contextBasedBuffer = new Map<string, MessageBuffer<EventContainer>>();
 
 export function getBuffer(contextId?: string) {
   const ctxId = contextId ?? getContext<HonoEnv>().get("contextId");
@@ -24,7 +24,7 @@ export function getBuffer(contextId?: string) {
 
   let buffer = contextBasedBuffer.get(ctxId);
   if (!buffer) {
-    buffer = new MessageBuffer<Payload>();
+    buffer = new MessageBuffer<EventContainer>();
     contextBasedBuffer.set(ctxId, buffer);
   }
 
