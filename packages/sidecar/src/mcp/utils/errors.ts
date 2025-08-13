@@ -12,16 +12,16 @@ export async function formatErrorEnvelope([contentType, data]: Payload) {
     envelope: [, items],
   } = event;
 
-  const formattedErrors: string[] = [];
+  const formatted: string[] = [];
   for (const item of items) {
     const [{ type }, payload] = item;
 
     if (type === "event" && isErrorEvent(payload)) {
-      formattedErrors.push(formatEventOutput(processErrorEvent(payload)));
+      formatted.push(formatEventOutput(processErrorEvent(payload)));
     }
   }
 
-  return formattedErrors;
+  return formatted;
 }
 
 function isErrorEvent(payload: unknown): payload is ErrorEvent {

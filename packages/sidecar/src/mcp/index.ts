@@ -90,13 +90,13 @@ User: "App crashes after deployment"
       const content: TextContent[] = [];
       for (const envelope of envelopes) {
         try {
-          const formattedEvents = await formatErrorEnvelope(envelope);
+          const events = await formatErrorEnvelope(envelope);
 
-          if (formattedEvents?.length) {
-            for (const formattedEvent of formattedEvents) {
+          if (events?.length) {
+            for (const event of events) {
               content.push({
                 type: "text",
-                text: formattedEvent,
+                text: event,
               });
             }
           }
@@ -139,13 +139,13 @@ User: "App crashes after deployment"
       const content: TextContent[] = [];
       for (const envelope of envelopes) {
         try {
-          const formattedEvents = await formatLogEnvelope(envelope);
+          const events = await formatLogEnvelope(envelope);
 
-          if (formattedEvents?.length) {
-            for (const formattedEvent of formattedEvents) {
+          if (events?.length) {
+            for (const event of events) {
               content.push({
                 type: "text",
-                text: formattedEvent,
+                text: event,
               });
             }
           }
