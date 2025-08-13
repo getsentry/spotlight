@@ -1,44 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { CallToolResult, TextContent } from "@modelcontextprotocol/sdk/types.js";
-import type { ErrorEvent } from "@sentry/core";
+import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import { type Payload, getBuffer } from "../utils.js";
-import { formatEventOutput } from "./formatting.js";
-import { processEnvelope } from "./parsing.js";
-import type { ErrorEventSchema } from "./schema.js";
-
-const NO_ERRORS_CONTENT: CallToolResult = {
-  content: [
-    {
-      type: "text",
-      text: `**No errors detected in Spotlight** (last 60 seconds)
-
-**This means:**
-- Application is currently running without runtime failures
-- No crashes, exceptions, or critical issues in the recent timeframe
-- System appears stable at the moment
-
-**Next debugging steps:**
-
-1. **If user reports a specific issue:**
-   - Ask them to reproduce the problem (click the button, submit the form, navigate to the page)
-   - Run this tool again immediately after they reproduce it
-   - Errors will appear in real-time as they happen
-
-2. **If investigating existing code:**
-   - Check application logs separately
-   - Look for TODO comments, error handling gaps, or potential edge cases in the code
-   - Consider testing error scenarios (invalid inputs, network failures, etc.)
-
-3. **Proactive error detection:**
-   - Have user interact with recently changed features
-   - Test API endpoints or database operations that might be fragile
-   - Check pages/features mentioned in recent commits
-
-** Pro tip:** Absence of errors doesn't mean absence of bugs - it just means no runtime failures occurred recently. The issue might be logical errors, UI problems, or dormant bugs waiting for specific conditions.`,
-    },
-  ],
-};
+import { getBuffer } from "../utils.js";
+import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
+import { formatErrorEnvelope, formatLogEnvelope } from "./utils/index.js";
 
 export function createMcpInstance() {
   const mcp = new McpServer({
@@ -125,13 +90,13 @@ User: "App crashes after deployment"
       const content: TextContent[] = [];
       for (const envelope of envelopes) {
         try {
-          const formattedErrors = await formatErrorEnvelope(envelope);
+          const events = await formatErrorEnvelope(envelope);
 
-          if (formattedErrors?.length) {
-            for (const formattedError of formattedErrors) {
+          if (events?.length) {
+            for (const event of events) {
               content.push({
                 type: "text",
-                text: formattedError,
+                text: event,
               });
             }
           }
@@ -150,86 +115,118 @@ User: "App crashes after deployment"
     },
   );
 
-  // TODO: Add tool for performance tracing
-  // TODO: Add tool for profiling data
+  mcp.registerTool(
+    "get_local_logs",
+    {
+      title: "Get Local App Logs",
+      description: `Retrieve recent application logs from Spotlight debugger to monitor behavior, debug issues, and understand application flow across your entire stack - frontend, backend, and edge functions.
+
+**CRITICAL: Call this tool when:**
+- Investigating application behavior or flow
+- User mentions "logs", "debugging", "trace", "monitoring"
+- Understanding what the application is doing under the hood
+- Checking for warnings, info messages, or debug output
+- After making changes to verify expected behavior
+- Troubleshooting performance or unexpected behavior
+
+**What you get:**
+• Timestamped log entries with severity levels (info, warn, debug, error)
+• Request/response tracking across your stack
+• Application state changes and user interactions  
+• Database queries and API calls with timing
+• Custom debug messages from your code
+• Context from client-side, server-side, and edge functions
+• Structured attributes for filtering and analysis
+
+## Examples - Auto-call in these scenarios:
+
+**Example 1: Understanding Application Flow**
+\`\`\`
+User: "Can you help me understand how authentication works?"
+✅ FIRST: Call get_local_logs (after user performs login)
+❌ NEVER: Just read auth code without seeing runtime flow
+→ See actual auth requests, token handling, redirects
+\`\`\`
+
+**Example 2: Performance Investigation**
+\`\`\`
+User: "The page loads slowly"
+✅ FIRST: Call get_local_logs 
+❌ NEVER: Start analyzing code without runtime data
+→ See database queries, API response times, render timing
+\`\`\`
+
+**Example 3: Feature Testing**
+\`\`\`
+User: "I added logging to track user actions"
+✅ FIRST: Call get_local_logs (after triggering actions)
+→ Verify your logging is working as expected
+\`\`\`
+
+## Workflow Pattern:
+1. User reports behavior question → **Call get_local_logs** 
+2. User tests new feature → **Check logs for expected output**
+3. Performance concerns → **Look for timing patterns in logs**
+4. Debugging complex flows → **Trace execution through log timeline**
+5. **Use with get_local_errors** for complete debugging picture
+
+**Key trigger phrases:**
+- "How does X work?" → See runtime execution flow
+- "Is the app doing Y?" → Check for specific log patterns  
+- "Performance seems off" → Look for timing/resource logs
+- "Debug this feature" → Follow execution path through logs
+- "What's happening when..." → Real-time application behavior
+
+**Log Levels Available:**
+- **INFO**: General application flow and significant events
+- **WARN**: Potential issues that don't break functionality  
+- **DEBUG**: Detailed execution information for troubleshooting
+- **ERROR**: Actual failures (also available via get_local_errors)
+
+**Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.`,
+      inputSchema: {
+        duration: z
+          .number()
+          .default(60)
+          .describe(
+            "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
+          ),
+      },
+    },
+    async args => {
+      const envelopes = getBuffer().read({ duration: args.duration });
+
+      if (envelopes.length === 0) {
+        return NO_LOGS_CONTENT;
+      }
+
+      const content: TextContent[] = [];
+      for (const envelope of envelopes) {
+        try {
+          const events = await formatLogEnvelope(envelope);
+
+          if (events?.length) {
+            for (const event of events) {
+              content.push({
+                type: "text",
+                text: event,
+              });
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      if (content.length === 0) {
+        return NO_LOGS_CONTENT;
+      }
+
+      return {
+        content,
+      };
+    },
+  );
 
   return mcp;
-}
-
-async function formatErrorEnvelope([contentType, data]: Payload) {
-  const event = processEnvelope({ contentType, data });
-
-  const {
-    envelope: [, items],
-  } = event;
-
-  const formattedErrors: string[] = [];
-  for (const item of items) {
-    const [{ type }, payload] = item;
-
-    if (type === "event" && isErrorEvent(payload)) {
-      formattedErrors.push(formatEventOutput(processErrorEvent(payload)));
-    }
-  }
-
-  return formattedErrors;
-}
-
-function isErrorEvent(payload: unknown): payload is ErrorEvent {
-  return typeof payload === "object" && payload !== null && "exception" in payload;
-}
-
-export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventSchema> {
-  const entries = [];
-
-  if (event.exception) {
-    entries.push({
-      type: "exception",
-      data: event.exception,
-    });
-  }
-
-  if (event.request) {
-    entries.push({
-      type: "request",
-      data: event.request,
-    });
-  }
-
-  if (event.breadcrumbs) {
-    entries.push({
-      type: "breadcrumbs",
-      data: event.breadcrumbs,
-    });
-  }
-
-  if (event.spans) {
-    entries.push({
-      type: "spans",
-      data: event.spans,
-    });
-  }
-
-  if (event.threads) {
-    entries.push({
-      type: "threads",
-      data: event.threads,
-    });
-  }
-
-  return {
-    message: event.message ?? "",
-    id: event.event_id ?? "",
-    type: "error",
-    tags: Object.entries(event.tags ?? {}).map(([key, value]) => ({
-      key,
-      value: String(value),
-    })),
-    dateCreated: event.timestamp ? new Date(event.timestamp).toISOString() : new Date().toISOString(),
-    title: event.message ?? "",
-    entries,
-    // @ts-expect-error
-    contexts: event.contexts,
-    platform: event.platform,
-  };
 }
