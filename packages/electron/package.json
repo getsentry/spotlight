@@ -16,7 +16,9 @@
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
-    "build:mac": "./electron-builder.js"
+    "build:mac": "./electron-builder.js",
+    "pretest:e2e": "playwright install --with-deps",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@sentry/electron": "^5.6.0",
@@ -27,6 +29,7 @@
   },
   "devDependencies": {
     "@electron/notarize": "^2.5.0",
+    "@playwright/test": "^1.54.2",
     "@sentry/vite-plugin": "^2.22.5",
     "dotenv": "^16.4.5",
     "electron": "^31.6.0",
