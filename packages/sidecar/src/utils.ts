@@ -3,6 +3,7 @@ import { getContext } from "hono/context-storage";
 import { MessageBuffer } from "./messageBuffer.js";
 
 export type Payload = [string, Buffer];
+
 export type IncomingPayloadCallback = (body: string) => void;
 
 export type HonoEnv = {

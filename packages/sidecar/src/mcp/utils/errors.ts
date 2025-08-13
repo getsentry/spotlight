@@ -4,8 +4,9 @@ import type { Payload } from "../../utils.js";
 import { formatEventOutput } from "../formatting.js";
 import { processEnvelope } from "../parsing.js";
 import type { ErrorEventSchema } from "../schema.js";
+import type { ErrorEventFilter } from "../types.js";
 
-export async function formatErrorEnvelope([contentType, data]: Payload) {
+export async function formatErrorEnvelope([contentType, data]: Payload, filter?: ErrorEventFilter) {
   const event = processEnvelope({ contentType, data });
 
   const {
@@ -17,6 +18,9 @@ export async function formatErrorEnvelope([contentType, data]: Payload) {
     const [{ type }, payload] = item;
 
     if (type === "event" && isErrorEvent(payload)) {
+      if (filter?.eventId && payload.event_id !== filter.eventId) {
+        continue;
+      }
       formatted.push(formatEventOutput(processErrorEvent(payload)));
     }
   }

@@ -228,5 +228,122 @@ User: "I added logging to track user actions"
     },
   );
 
+  mcp.registerTool(
+    "get_local_error_by_id",
+    {
+      title: "Get Local App Error by Event ID",
+      description: `Retrieve a specific application error by its event ID from Spotlight debugger. This tool is essential when you have a specific error ID and need to investigate the exact details of that failure.
+
+**CRITICAL: Call this tool when:**
+- You have a specific error event ID from logs, monitoring, or user reports
+- Investigating a particular error that was previously identified
+- Need to get detailed context about a specific failure
+- Following up on error notifications or alerts
+- Debugging issues that reference specific event IDs
+
+**What you get:**
+• Complete error details for the specific event ID
+• Full stack traces with exact file:line locations
+• Request/response data for the specific failure
+• Breadcrumbs leading up to the error
+• Thread information and context
+• All associated metadata and tags
+
+## Examples - Auto-call in these scenarios:
+
+**Example 1: Error Investigation**
+\`\`\`
+User: "I got Error Event ID abc123, what happened?"
+✅ FIRST: Call get_local_error_by_id with that ID
+❌ NEVER: Start general error investigation without the specific context
+→ Get exact details of what went wrong
+\`\`\`
+
+**Example 2: Follow-up Debugging**
+\`\`\`
+User: "Can you look into the error from yesterday?"
+✅ FIRST: Ask for the Error Event ID, then call get_local_error_by_id
+→ Focus investigation on the specific failure
+\`\`\`
+
+**Example 3: Error Correlation**
+\`\`\`
+User: "This error keeps happening with Event ID xyz789"
+✅ FIRST: Call get_local_error_by_id to see the pattern
+→ Understand the root cause and context
+\`\`\`
+
+## Workflow Pattern:
+1. User provides error ID → **Call get_local_error_by_id immediately**
+2. No error found → **Check if ID is correct or if error is too old**
+3. Error found → **Analyze specific failure details**
+4. Use with other tools → **Get broader context if needed**
+
+**Key trigger phrases:**
+- "Error Event ID is..." → Get specific error details
+- "Look at this error..." → Retrieve by ID
+- "Investigate error..." → Need specific ID first
+- "What happened with..." → Reference specific event
+
+**Remember:** This tool requires a valid event ID. If you don't have one, use get_local_errors first to see recent errors and get their IDs.`,
+      inputSchema: {
+        eventId: z.string().describe("The specific event ID of the error to retrieve"),
+        duration: z
+          .number()
+          .default(300)
+          .describe(
+            "Look back this many seconds for the error. Use higher values (300+) for older errors. Default is 300 seconds (5 minutes).",
+          ),
+      },
+    },
+    async args => {
+      const envelopes = getBuffer().read({ duration: args.duration });
+
+      if (envelopes.length === 0) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `No envelopes found in the last ${args.duration} seconds. The error with ID "${args.eventId}" may be too old or the ID may be incorrect.`,
+            },
+          ],
+        };
+      }
+
+      const content: TextContent[] = [];
+      for (const envelope of envelopes) {
+        try {
+          const events = await formatErrorEnvelope(envelope, { eventId: args.eventId });
+
+          if (events?.length) {
+            for (const event of events) {
+              content.push({
+                type: "text",
+                text: event,
+              });
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      if (content.length === 0) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `No error found with event ID "${args.eventId}" in the last ${args.duration} seconds. The error may be too old, the ID may be incorrect, or there may be no matching errors in the buffer.`,
+            },
+          ],
+        };
+      }
+
+      return {
+        content,
+      };
+    },
+  );
+
   return mcp;
 }
