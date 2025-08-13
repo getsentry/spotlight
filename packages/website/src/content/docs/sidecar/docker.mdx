@@ -4,11 +4,9 @@ sidebar:
   order: 50
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components';
+## Run System-wide
 
-## Docker
-
-We provide a Docker container which runs the Sidecar (including the overlay).
+Run Spotlight as a system-wide service that can be shared across all your local projects:
 
 ```shell
 docker run --rm \
@@ -19,23 +17,13 @@ docker run --rm \
     ghcr.io/getsentry/spotlight:latest
 ```
 
-## Docker Compose
+Once running, configure your SDKs to use `http://localhost:8969/stream`.
 
-If you're already using Docker Compose, we recommend adding Spotlight to your `docker-compose.yml` file:
+## Update to Latest Version
 
-```yaml
-services:
-  # ...
-  spotlight:
-    image: ghcr.io/getsentry/spotlight:latest
-    restart: on-failure
-    pull_policy: always
-    ports:
-      - "8969:8969"
+```shell
+docker stop spotlight
+docker rm spotlight
+docker pull ghcr.io/getsentry/spotlight:latest
+docker run --rm --name spotlight -d -p 8969:8969/tcp ghcr.io/getsentry/spotlight:latest
 ```
-
-Once you add Spotlight to your `docker-compose.yml`, don't forget to set the spotlight URL in the SDKs to
-`http://spotlight:8969/stream`. You can do this by either setting the `spotlight` config setting to this value
-or by setting `SENTRY_SPOTLIGHT` env variable to `http://spotlight:8969/stream` for your application[^1].
-
-[^1]: This environment variable is supported by Node, Python, Ruby, and PHP SDKs.
