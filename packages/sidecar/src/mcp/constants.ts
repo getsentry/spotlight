@@ -4,7 +4,7 @@ export const NO_ERRORS_CONTENT: CallToolResult = {
   content: [
     {
       type: "text",
-      text: `**No errors detected in Spotlight** (last 60 seconds)
+      text: `**No errors detected in Spotlight**
 
 **This means:**
 - Application is currently running without runtime failures
@@ -37,7 +37,41 @@ export const NO_LOGS_CONTENT: CallToolResult = {
   content: [
     {
       type: "text",
-      text: "**No Logs**",
+      text: `**No logs detected in Spotlight**
+
+**This means:**
+- Application hasn't generated any log messages in the recent timeframe
+- No debug, info, warning, or trace messages were captured
+- Application might be idle or not actively processing requests
+
+**Next debugging steps:**
+
+1. **If investigating application behavior:**
+   - Have user interact with the application (navigate pages, submit forms, trigger features)
+   - Run this tool again after user activity to capture runtime logs
+   - Logs appear in real-time as your application executes
+
+2. **If checking for specific functionality:**
+   - Trigger the feature or workflow you're investigating
+   - Look for custom logging statements in your code
+   - Consider adding more logging to critical paths if needed
+
+3. **If monitoring general health:**
+   - Check that logging is properly configured in your application
+   - Verify that Spotlight is correctly capturing your log output
+   - Test with known log-generating actions (API calls, database operations)
+
+4. **Expand search timeframe:**
+   - Use a longer duration (300+ seconds) to capture older log entries
+   - Consider that some operations might generate logs less frequently
+
+**Log Levels to expect:**
+- **INFO**: General application flow and significant events
+- **WARN**: Potential issues or important notices
+- **DEBUG**: Detailed execution information
+- **ERROR**: Failures (also check get_local_errors tool)
+
+**Pro tip:** Absence of logs doesn't mean your application isn't working - it might just be running quietly. Many applications only log during significant events, errors, or when explicitly configured for verbose logging.`,
     },
   ],
 };

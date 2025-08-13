@@ -119,7 +119,71 @@ User: "App crashes after deployment"
     "get_local_logs",
     {
       title: "Get Local App Logs",
-      description: "",
+      description: `Retrieve recent application logs from Spotlight debugger to monitor behavior, debug issues, and understand application flow across your entire stack - frontend, backend, and edge functions.
+
+**CRITICAL: Call this tool when:**
+- Investigating application behavior or flow
+- User mentions "logs", "debugging", "trace", "monitoring"
+- Understanding what the application is doing under the hood
+- Checking for warnings, info messages, or debug output
+- After making changes to verify expected behavior
+- Troubleshooting performance or unexpected behavior
+
+**What you get:**
+• Timestamped log entries with severity levels (info, warn, debug, error)
+• Request/response tracking across your stack
+• Application state changes and user interactions  
+• Database queries and API calls with timing
+• Custom debug messages from your code
+• Context from client-side, server-side, and edge functions
+• Structured attributes for filtering and analysis
+
+## Examples - Auto-call in these scenarios:
+
+**Example 1: Understanding Application Flow**
+\`\`\`
+User: "Can you help me understand how authentication works?"
+✅ FIRST: Call get_local_logs (after user performs login)
+❌ NEVER: Just read auth code without seeing runtime flow
+→ See actual auth requests, token handling, redirects
+\`\`\`
+
+**Example 2: Performance Investigation**
+\`\`\`
+User: "The page loads slowly"
+✅ FIRST: Call get_local_logs 
+❌ NEVER: Start analyzing code without runtime data
+→ See database queries, API response times, render timing
+\`\`\`
+
+**Example 3: Feature Testing**
+\`\`\`
+User: "I added logging to track user actions"
+✅ FIRST: Call get_local_logs (after triggering actions)
+→ Verify your logging is working as expected
+\`\`\`
+
+## Workflow Pattern:
+1. User reports behavior question → **Call get_local_logs** 
+2. User tests new feature → **Check logs for expected output**
+3. Performance concerns → **Look for timing patterns in logs**
+4. Debugging complex flows → **Trace execution through log timeline**
+5. **Use with get_local_errors** for complete debugging picture
+
+**Key trigger phrases:**
+- "How does X work?" → See runtime execution flow
+- "Is the app doing Y?" → Check for specific log patterns  
+- "Performance seems off" → Look for timing/resource logs
+- "Debug this feature" → Follow execution path through logs
+- "What's happening when..." → Real-time application behavior
+
+**Log Levels Available:**
+- **INFO**: General application flow and significant events
+- **WARN**: Potential issues that don't break functionality  
+- **DEBUG**: Detailed execution information for troubleshooting
+- **ERROR**: Actual failures (also available via get_local_errors)
+
+**Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.`,
       inputSchema: {
         duration: z
           .number()
