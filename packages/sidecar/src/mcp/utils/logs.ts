@@ -1,9 +1,9 @@
 import type { SerializedLog, SerializedLogContainer } from "@sentry/core";
-import type { Payload } from "../../utils.js";
+import type { EventContainer } from "../../eventContainer.js";
 import { processEnvelope } from "../parsing.js";
 
-export async function formatLogEnvelope([contentType, data]: Payload) {
-  const event = processEnvelope({ contentType, data });
+export async function formatLogEnvelope(container: EventContainer) {
+  const event = processEnvelope({ contentType: container.getContentType(), data: container.getData() });
 
   const {
     envelope: [, items],

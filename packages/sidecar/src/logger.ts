@@ -23,6 +23,10 @@ export function enableDebugLogging(debug: boolean): void {
   debugEnabled = debug;
 }
 
+export function isDebugEnabled(): boolean {
+  return debugEnabled;
+}
+
 export const logger = {
   info: (message: string) => (injectedLogger || defaultLogger).info(message),
   warn: (message: string) => (injectedLogger || defaultLogger).warn(message),

@@ -1,12 +1,12 @@
 import type { ErrorEvent } from "@sentry/core";
 import type { z } from "zod";
-import type { Payload } from "../../utils.js";
+import type { EventContainer } from "../../eventContainer.js";
 import { formatEventOutput } from "../formatting.js";
 import { processEnvelope } from "../parsing.js";
 import type { ErrorEventSchema } from "../schema.js";
 
-export async function formatErrorEnvelope([contentType, data]: Payload) {
-  const event = processEnvelope({ contentType, data });
+export async function formatErrorEnvelope(container: EventContainer) {
+  const event = processEnvelope({ contentType: container.getContentType(), data: container.getData() });
 
   const {
     envelope: [, items],
