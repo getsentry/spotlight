@@ -302,6 +302,14 @@ export function buildSpanTree(trace: TraceSummary): SpanNode[] {
     }
   }
 
+  // Helper function to recursively update levels
+  function updateLevels(node: SpanNode, newLevel: number) {
+    node.level = newLevel;
+    for (const child of node.children) {
+      updateLevels(child, newLevel + 1);
+    }
+  }
+
   // Create orphan parent spans for grouped orphans (like the UI does)
   for (const [parentId, orphans] of orphanedByParentId) {
     const orphanParent: SpanNode = {
@@ -317,14 +325,13 @@ export function buildSpanTree(trace: TraceSummary): SpanNode[] {
     const parentRoot = rootSpans.length === 1 ? rootSpans[0] : null;
     if (parentRoot) {
       parentRoot.children.push(orphanParent);
-      orphanParent.level = 1;
-      // Update orphan children levels
-      for (const orphan of orphans) {
-        orphan.level = 2;
-      }
+      // Update levels recursively relative to parent
+      updateLevels(orphanParent, parentRoot.level + 1);
     } else {
       // No single root - add as a root itself
       rootSpans.push(orphanParent);
+      // Update levels recursively for all children
+      updateLevels(orphanParent, 0);
     }
   }
 
@@ -350,6 +357,10 @@ export function buildSpanTree(trace: TraceSummary): SpanNode[] {
       level: 0,
       duration: trace.duration,
     };
+    // Update all root spans to be level 1 under synthetic root
+    for (const root of rootSpans) {
+      updateLevels(root, 1);
+    }
     return [syntheticRoot];
   }
 
