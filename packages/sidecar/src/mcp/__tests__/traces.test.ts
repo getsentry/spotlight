@@ -14,7 +14,7 @@ function createMockEventContainer(event: any): EventContainer {
   };
 
   const itemHeader = {
-    type: event.type || "event",
+    type: event.type === "transaction" ? "transaction" : "event",
     length: JSON.stringify(event).length,
   };
 
@@ -176,7 +176,7 @@ describe("Trace utilities", () => {
       expect(rendered).toMatchInlineSnapshot(`
         [
           "missing or unknown parent span [ce75b8fe · orphan · unknown]",
-          "   └─ /api/users [99b1b00f · 18ms]",
+          "   └─ /api/users [99b1b00f · 23ms]",
           "      ├─ GET /external-api/profile [def01234 · http.client · 20ms]",
           "      └─ SELECT * FROM users WHERE id = ? [abc12345 · db.query · 10ms]",
         ]
@@ -221,8 +221,8 @@ describe("Trace utilities", () => {
       // When we have multiple roots, we create a synthetic trace root
       expect(rendered).toMatchInlineSnapshot(`
         [
-          "Trace 71a8c5e4 [71a8c5e4 · trace · 77ms]",
-          "   ├─ /api/users [root1 · 18ms]",
+          "Trace 71a8c5e4 [71a8c5e4 · trace · 100ms]",
+          "   ├─ /api/users [root1 · 23ms]",
           "   ├─ /api/products [root2 · unknown]",
           "   └─ missing or unknown parent span [99b1b00f · orphan · unknown]",
           "      ├─ SELECT * FROM users WHERE id = ? [abc12345 · db.query · 10ms]",
@@ -282,7 +282,7 @@ describe("Trace utilities", () => {
       // No orphan parent should be created since this is a true root
       expect(rendered).toMatchInlineSnapshot(`
         [
-          "/api/checkout [root123 · 40ms]",
+          "/api/checkout [root123 · 50ms]",
           "   ├─ SELECT * FROM orders [child1 · db.query · 15ms]",
           "   └─ redis.set order:123 [child2 · cache.set · 5ms]",
         ]
@@ -292,6 +292,199 @@ describe("Trace utilities", () => {
     it("should handle empty span tree", () => {
       const rendered = renderSpanTree([]);
       expect(rendered).toEqual([]);
+    });
+  });
+
+  describe("edge cases", () => {
+    it("should handle transaction with missing start_timestamp", () => {
+      const transactionWithoutStartTime = {
+        event_id: "no-start-time",
+        type: "transaction",
+        transaction: "/api/test",
+        timestamp: 1754524400.5, // Only has end timestamp
+        // start_timestamp is missing
+        contexts: {
+          trace: {
+            trace_id: "edgecase1234567890abcdef1234567890abcdef",
+            span_id: "nostart123",
+            parent_span_id: undefined,
+          },
+        },
+        spans: [],
+      };
+
+      const containers = [createMockEventContainer(transactionWithoutStartTime)];
+      const traces = extractTracesFromEnvelopes(containers);
+      const trace = traces.get("edgecase1234567890abcdef1234567890abcdef")!;
+
+      expect(trace).toBeDefined();
+      expect(trace.start_timestamp).toBe(1754524400.5); // Falls back to timestamp
+
+      const spanTree = buildSpanTree(trace);
+      const rendered = renderSpanTree(spanTree);
+
+      // Should render but with unknown duration
+      expect(rendered[0]).toContain("unknown");
+    });
+
+    it("should handle spans with calculated duration when duration field is missing", () => {
+      const eventWithSpansNoDuration = {
+        event_id: "calc-duration-event",
+        type: "transaction",
+        transaction: "/api/calc",
+        timestamp: 1754524400.2,
+        start_timestamp: 1754524400.1,
+        contexts: {
+          trace: {
+            trace_id: "calc1234567890abcdef1234567890abcdef",
+            span_id: "calc123",
+            parent_span_id: undefined,
+          },
+        },
+        spans: [
+          {
+            span_id: "span-calc-1",
+            parent_span_id: "calc123",
+            trace_id: "calc1234567890abcdef1234567890abcdef",
+            op: "http.request",
+            description: "GET /api/data",
+            start_timestamp: 1754524400.12,
+            timestamp: 1754524400.15,
+            // duration is missing - should be calculated
+            status: "ok",
+          },
+        ],
+      };
+
+      const containers = [createMockEventContainer(eventWithSpansNoDuration)];
+      const traces = extractTracesFromEnvelopes(containers);
+      const trace = traces.get("calc1234567890abcdef1234567890abcdef")!;
+
+      const spanTree = buildSpanTree(trace);
+      const httpSpan = spanTree[0].children[0]; // First child should be the http span
+
+      // Duration should be calculated as (timestamp - start_timestamp) * 1000
+      expect(httpSpan.duration).toBeCloseTo(30, 0); // (0.15 - 0.12) * 1000 = 30ms
+    });
+
+    it("should handle deeply nested orphans correctly", () => {
+      const deeplyNestedEvent = {
+        event_id: "deep-nested",
+        type: "transaction",
+        transaction: "/api/nested",
+        timestamp: 1754524400.3,
+        start_timestamp: 1754524400.1,
+        contexts: {
+          trace: {
+            trace_id: "nested1234567890abcdef1234567890abcdef",
+            span_id: "deepspan1",
+            parent_span_id: "missing-parent-1", // Parent doesn't exist
+          },
+        },
+        spans: [
+          {
+            span_id: "deepspan2",
+            parent_span_id: "missing-parent-2", // Different missing parent
+            trace_id: "nested1234567890abcdef1234567890abcdef",
+            op: "db.query",
+            description: "SELECT * FROM nested",
+            duration: 10,
+          },
+          {
+            span_id: "deepspan3",
+            parent_span_id: "deepspan2", // Parent is also an orphan
+            trace_id: "nested1234567890abcdef1234567890abcdef",
+            op: "cache.get",
+            description: "redis.get nested:key",
+            duration: 5,
+          },
+        ],
+      };
+
+      const containers = [createMockEventContainer(deeplyNestedEvent)];
+      const traces = extractTracesFromEnvelopes(containers);
+      const trace = traces.get("nested1234567890abcdef1234567890abcdef")!;
+
+      const spanTree = buildSpanTree(trace);
+      const rendered = renderSpanTree(spanTree);
+
+      // Should create orphan parents for both missing parents
+      const orphanCount = rendered.filter(line => line.includes("orphan")).length;
+      expect(orphanCount).toBeGreaterThanOrEqual(2);
+    });
+
+    it("should handle circular parent references gracefully", () => {
+      // This is a malformed trace but shouldn't crash
+      const circularEvent = {
+        event_id: "circular-event",
+        type: "transaction",
+        transaction: "/api/circular",
+        timestamp: 1754524400.2,
+        start_timestamp: 1754524400.1,
+        contexts: {
+          trace: {
+            trace_id: "circular1234567890abcdef1234567890abcdef",
+            span_id: "circ1",
+            parent_span_id: "circ2", // Points to child - circular reference
+          },
+        },
+        spans: [
+          {
+            span_id: "circ2",
+            parent_span_id: "circ1", // Points back to parent - circular
+            trace_id: "circular1234567890abcdef1234567890abcdef",
+            op: "http",
+            description: "Circular span",
+            duration: 10,
+          },
+        ],
+      };
+
+      const containers = [createMockEventContainer(circularEvent)];
+
+      // Should not throw
+      expect(() => {
+        const traces = extractTracesFromEnvelopes(containers);
+        const trace = traces.get("circular1234567890abcdef1234567890abcdef")!;
+        const spanTree = buildSpanTree(trace);
+        renderSpanTree(spanTree);
+      }).not.toThrow();
+    });
+
+    it("should handle trace with only error events (no transactions)", () => {
+      const errorOnlyEvent = {
+        event_id: "error-only",
+        type: "error",
+        message: "Something went wrong",
+        timestamp: 1754524400.1,
+        contexts: {
+          trace: {
+            trace_id: "error1234567890abcdef1234567890abcdef",
+            span_id: "errorspan1",
+            parent_span_id: undefined,
+          },
+        },
+        exception: {
+          values: [
+            {
+              type: "Error",
+              value: "Test error",
+            },
+          ],
+        },
+      };
+
+      const containers = [createMockEventContainer(errorOnlyEvent)];
+      const traces = extractTracesFromEnvelopes(containers);
+      const trace = traces.get("error1234567890abcdef1234567890abcdef")!;
+
+      expect(trace).toBeDefined();
+      expect(trace.error_count).toBe(1);
+      expect(trace.root_transaction).toBeUndefined();
+
+      const spanTree = buildSpanTree(trace);
+      expect(spanTree.length).toBeGreaterThan(0);
+      expect(spanTree[0].op).toBe("error");
     });
   });
 

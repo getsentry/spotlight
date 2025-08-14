@@ -24,6 +24,7 @@ export interface TraceEvent {
   event_id: string;
   type: string;
   timestamp?: number;
+  start_timestamp?: number;
   transaction?: string;
   trace_context?: TraceContext;
   spans?: SpanData[];
@@ -89,9 +90,11 @@ export function extractTracesFromEnvelopes(containers: EventContainer[]): Map<st
           trace.root_transaction = event.transaction;
         }
 
-        if (event.timestamp) {
-          if (!trace.start_timestamp || event.timestamp < trace.start_timestamp) {
-            trace.start_timestamp = event.timestamp;
+        // Use start_timestamp if available (for transactions), otherwise fall back to timestamp
+        const eventStartTime = event.start_timestamp || event.timestamp;
+        if (eventStartTime) {
+          if (!trace.start_timestamp || eventStartTime < trace.start_timestamp) {
+            trace.start_timestamp = eventStartTime;
           }
         }
       }
@@ -130,10 +133,19 @@ function extractTraceEventsFromContainer(container: EventContainer): TraceEvent[
 
         // Only include events that have trace context
         if (event.contexts?.trace?.trace_id) {
+          // Determine event type - error events have exception or level === "error"
+          let eventType = "unknown";
+          if (event.exception || event.level === "error") {
+            eventType = "error";
+          } else if (event.type) {
+            eventType = event.type;
+          }
+
           events.push({
             event_id: event.event_id || "",
-            type: event.type || "unknown",
+            type: eventType,
             timestamp: event.timestamp,
+            start_timestamp: event.start_timestamp,
             transaction: event.transaction,
             trace_context: event.contexts.trace,
             spans: event.spans,
@@ -154,6 +166,7 @@ function extractTraceEventsFromContainer(container: EventContainer): TraceEvent[
             event_id: transaction.event_id || "",
             type: "transaction",
             timestamp: transaction.timestamp,
+            start_timestamp: transaction.start_timestamp,
             transaction: transaction.transaction,
             trace_context: transaction.contexts.trace,
             spans: transaction.spans,
@@ -230,9 +243,7 @@ export function buildSpanTree(trace: TraceSummary): SpanNode[] {
         level: 0,
         event_id: event.event_id,
         duration:
-          event.timestamp && event.spans?.[0]?.start_timestamp
-            ? (event.timestamp - event.spans[0].start_timestamp) * 1000
-            : undefined,
+          event.timestamp && event.start_timestamp ? (event.timestamp - event.start_timestamp) * 1000 : undefined,
       };
 
       allSpans.push(eventSpan);
@@ -250,7 +261,12 @@ export function buildSpanTree(trace: TraceSummary): SpanNode[] {
           parent_span_id: span.parent_span_id || event.trace_context?.span_id, // Default to event's span as parent
           op: span.op,
           description: span.description || "unnamed",
-          duration: span.duration,
+          duration:
+            span.duration !== undefined
+              ? span.duration
+              : span.timestamp && span.start_timestamp
+                ? (span.timestamp - span.start_timestamp) * 1000
+                : undefined,
           status: span.status,
           children: [],
           level: 0,
