@@ -72,6 +72,10 @@ export function parseEnvelope(body: Buffer): ParsedEnvelope | null {
 
         // Use length field to read exact payload bytes
         if (itemHeader.length !== undefined && itemHeader.length > 0) {
+          // Validate length is reasonable (max 10MB for safety)
+          if (itemHeader.length > 10 * 1024 * 1024) {
+            break; // Unreasonably large payload, skip
+          }
           const payloadEnd = offset + itemHeader.length;
           if (payloadEnd > body.length) break; // Invalid length
 

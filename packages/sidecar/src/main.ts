@@ -108,6 +108,11 @@ export const app = new Hono<HonoEnv>()
       const userAgent = ctx.req.header("User-Agent") || "unknown";
       clientId = parseBrowserFromUserAgent(userAgent);
     }
+    // Sanitize to prevent log injection - keep only safe printable characters
+    // Allow alphanumeric, spaces, dots, dashes, underscores, slashes, parentheses
+    clientId = clientId.replace(/[^\w\s.\-/()]/g, "");
+    // Ensure we always have a non-empty clientId
+    if (!clientId) clientId = "unknown";
 
     return streamSSE(ctx, async stream => {
       const sub = buffer.subscribe(container => {

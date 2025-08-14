@@ -17,8 +17,13 @@ export function logIncomingEvent(container: EventContainer): void {
       // Still log something useful even if parsing failed
       const data = container.getData();
       const size = data.length;
-      const preview = data.length > 100 ? `${data.toString("utf-8", 0, 100)}...` : data.toString("utf-8");
-      logger.debug(`→ envelope (parse error, ${size} bytes) | ${preview.replace(/\n/g, "\\n")}`);
+      // Only show first line of envelope header for safety (should be JSON metadata, not user data)
+      const firstNewline = data.indexOf("\n");
+      const headerPreview =
+        firstNewline > 0 && firstNewline < 200
+          ? data.toString("utf-8", 0, firstNewline).replace(/\n/g, "\\n")
+          : "header not found";
+      logger.debug(`→ envelope (parse error, ${size} bytes) | ${headerPreview}`);
       return;
     }
 
