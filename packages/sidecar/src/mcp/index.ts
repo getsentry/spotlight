@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getBuffer } from "../utils.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
 import { formatErrorEnvelope, formatLogEnvelope } from "./utils/index.js";
+import { buildSpanTree, extractTracesFromEnvelopes, formatTraceSummary, renderSpanTree } from "./utils/traces.js";
 
 export function createMcpInstance() {
   const mcp = new McpServer({
@@ -72,7 +73,7 @@ User: "App crashes after deployment"
 
 **Remember:** Always prefer real runtime errors over speculation. If no errors appear, guide user to reproduce the issue rather than starting development servers or making assumptions.`,
       inputSchema: {
-        duration: z
+        timeWindow: z
           .number()
           .default(60)
           .describe(
@@ -81,7 +82,7 @@ User: "App crashes after deployment"
       },
     },
     async args => {
-      const envelopes = getBuffer().read({ duration: args.duration });
+      const envelopes = getBuffer().read({ duration: args.timeWindow });
 
       if (envelopes.length === 0) {
         return NO_ERRORS_CONTENT;
@@ -185,16 +186,16 @@ User: "I added logging to track user actions"
 
 **Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.`,
       inputSchema: {
-        duration: z
+        timeWindow: z
           .number()
           .default(60)
           .describe(
-            "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
+            "Look back this many seconds for logs. Use 300+ for broader investigation. Use 30 for recent logs only. For debugging, use 10. For most cases, use 60.",
           ),
       },
     },
     async args => {
-      const envelopes = getBuffer().read({ duration: args.duration });
+      const envelopes = getBuffer().read({ duration: args.timeWindow });
 
       if (envelopes.length === 0) {
         return NO_LOGS_CONTENT;
@@ -224,6 +225,175 @@ User: "I added logging to track user actions"
 
       return {
         content,
+      };
+    },
+  );
+
+  mcp.registerTool(
+    "get_local_traces",
+    {
+      title: "Get Local Traces",
+      description: `Retrieve recent trace summaries from Spotlight debugger to identify performance patterns and trace flows across your application.
+
+**USE THIS TOOL WHEN:**
+- Investigating application performance and request flows
+- User mentions "traces", "performance", "slow requests", "tracing"
+- Looking for distributed tracing data or transaction flows
+- Need to see high-level trace patterns before diving into details
+
+**What you get:**
+• List of recent traces with trace IDs, durations, and span counts
+• Root transaction names and timing information
+• Error counts per trace for quick issue identification
+• Trace timestamps for debugging specific time periods
+
+**Next Steps:**
+After identifying a trace of interest, use \`get_events_for_trace\` with the trace ID to see the full span tree and detailed timing breakdown.
+
+**Key trigger phrases:**
+- "Show me recent traces" → Get trace overview
+- "Performance issues" → Look for slow traces
+- "Request flows" → See transaction patterns
+- "Distributed tracing" → View trace summaries`,
+      inputSchema: {
+        timeWindow: z
+          .number()
+          .default(300)
+          .describe(
+            "Look back this many seconds for traces. Use 600+ for broader investigation. Use 60 for recent traces only. For most cases, use 300.",
+          ),
+      },
+    },
+    async args => {
+      const envelopes = getBuffer().read({ duration: args.timeWindow });
+
+      if (envelopes.length === 0) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: "No traces found in the specified time period. Make sure your application is instrumented with Sentry performance monitoring and try triggering some requests or transactions.",
+            },
+          ],
+        };
+      }
+
+      const traces = extractTracesFromEnvelopes(envelopes);
+
+      if (traces.size === 0) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: "No traces with trace context found. Ensure your Sentry SDK has performance monitoring enabled and is generating transaction events.",
+            },
+          ],
+        };
+      }
+
+      const content: TextContent[] = [];
+
+      // Sort traces by start time (most recent first)
+      const sortedTraces = Array.from(traces.values()).sort(
+        (a, b) => (b.start_timestamp || 0) - (a.start_timestamp || 0),
+      );
+
+      content.push({
+        type: "text",
+        text: `# Local Traces (${sortedTraces.length} found)\n\nRecent traces from your application:\n`,
+      });
+
+      for (const trace of sortedTraces.slice(0, 20)) {
+        // Limit to 20 most recent
+        content.push({
+          type: "text",
+          text: formatTraceSummary(trace),
+        });
+      }
+
+      content.push({
+        type: "text",
+        text: "\n**Next Steps:**\nUse `get_events_for_trace` with a trace ID (e.g., first 8 characters shown above) to see the full span tree and detailed timing breakdown for any specific trace.",
+      });
+
+      return { content };
+    },
+  );
+
+  mcp.registerTool(
+    "get_events_for_trace",
+    {
+      title: "Get Events for Trace",
+      description: `Get detailed information about a specific trace including full span tree, timing breakdown, and errors.
+
+**USE THIS TOOL WHEN:**
+- User provides a specific trace ID from \`get_local_traces\`
+- Want to see detailed span hierarchy and timing for a trace
+- Investigating performance bottlenecks within a specific request flow
+- Need to understand the complete execution path of a transaction
+
+**What you get:**
+• Complete hierarchical span tree with parent-child relationships
+• Individual span durations and operation details
+• Error context within the trace timeline
+• Chronological flow of operations and timing breakdowns
+
+**Input:**
+Provide the trace ID (full 32-character hex string or first 8 characters) obtained from \`get_local_traces\`.
+
+**Example Usage:**
+\`\`\`
+get_events_for_trace(traceId: "71a8c5e4")  // Using short ID
+get_events_for_trace(traceId: "71a8c5e41ae1044dee67f50a07538fe7")  // Using full ID
+\`\`\``,
+      inputSchema: {
+        traceId: z
+          .string()
+          .describe(
+            "The trace ID to get details for. Can be the full 32-character hex string or just the first 8 characters.",
+          ),
+      },
+    },
+    async args => {
+      const envelopes = getBuffer().read({ duration: 600 }); // Look back further for trace details
+      const traces = extractTracesFromEnvelopes(envelopes);
+
+      // Find trace by full ID or partial ID match
+      let targetTrace = traces.get(args.traceId);
+
+      if (!targetTrace && args.traceId.length < 32) {
+        // Try to find by partial ID
+        for (const [traceId, trace] of traces) {
+          if (traceId.startsWith(args.traceId)) {
+            targetTrace = trace;
+            break;
+          }
+        }
+      }
+
+      if (!targetTrace) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Trace \`${args.traceId}\` not found. Use \`get_local_traces\` to see available traces, or try expanding the time window if the trace is older.`,
+            },
+          ],
+        };
+      }
+
+      const spanTree = buildSpanTree(targetTrace);
+
+      // Just render the full span tree
+      const treeLines = renderSpanTree(spanTree);
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: treeLines.join("\n"),
+          },
+        ],
       };
     },
   );
