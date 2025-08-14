@@ -1,8 +1,5 @@
 import { log } from "./lib/logger";
 
-// Version should match package.json
-const OVERLAY_VERSION = "3.2.0";
-
 /**
  * Extracts browser name from User-Agent
  */
@@ -33,8 +30,8 @@ export function connectToSidecar(
   sidecarStreamUrl.searchParams.append("base64", "1");
 
   // Build client identifier in user-agent format
-  // Format: spotlight-overlay/version (Browser; hostname)
-  let clientId = `spotlight-overlay/${OVERLAY_VERSION}`;
+  // Format: spotlight-overlay (Browser; hostname)
+  let clientId = "spotlight-overlay";
 
   if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
