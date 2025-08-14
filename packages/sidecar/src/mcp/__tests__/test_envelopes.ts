@@ -358,3 +358,100 @@ export const envelopeFetchRequestError: ErrorEvent = {
   ],
   type: undefined,
 };
+
+export const envelopeTransactionEvent = {
+  event_id: "abc123def456789a",
+  type: "transaction",
+  transaction: "/api/users",
+  timestamp: 1754524400.123,
+  start_timestamp: 1754524400.1,
+  platform: "javascript",
+  contexts: {
+    trace: {
+      trace_id: "71a8c5e41ae1044dee67f50a07538fe7",
+      span_id: "99b1b00fd587005d",
+      parent_span_id: "ce75b8fe4d8e2b1d",
+    },
+  },
+  spans: [
+    {
+      span_id: "abc123456789def0",
+      parent_span_id: "99b1b00fd587005d",
+      trace_id: "71a8c5e41ae1044dee67f50a07538fe7",
+      op: "db.query",
+      description: "SELECT * FROM users WHERE id = ?",
+      start_timestamp: 1754524400.105,
+      timestamp: 1754524400.115,
+      duration: 10,
+      status: "ok",
+      data: {
+        "db.statement": "SELECT * FROM users WHERE id = ?",
+        "db.system": "postgresql",
+      },
+    },
+    {
+      span_id: "def0123456789abc",
+      parent_span_id: "99b1b00fd587005d",
+      trace_id: "71a8c5e41ae1044dee67f50a07538fe7",
+      op: "http.client",
+      description: "GET /external-api/profile",
+      start_timestamp: 1754524400.12,
+      timestamp: 1754524400.14,
+      duration: 20,
+      status: "ok",
+      data: {
+        "http.method": "GET",
+        "http.url": "/external-api/profile",
+        "http.status_code": 200,
+      },
+    },
+  ],
+  sdk: {
+    name: "sentry.javascript.nextjs",
+    version: "9.42.1",
+  },
+};
+
+export const envelopeSecondTransactionEvent = {
+  event_id: "xyz789abc123def4",
+  type: "transaction",
+  transaction: "/api/orders",
+  timestamp: 1754524401.2,
+  start_timestamp: 1754524401.15,
+  platform: "javascript",
+  contexts: {
+    trace: {
+      trace_id: "a1b2c3d4e5f6789012345678901234567890abcd",
+      span_id: "1234567890abcdef",
+      parent_span_id: undefined,
+    },
+  },
+  spans: [
+    {
+      span_id: "fedcba0987654321",
+      parent_span_id: "1234567890abcdef",
+      trace_id: "a1b2c3d4e5f6789012345678901234567890abcd",
+      op: "db.query",
+      description: "INSERT INTO orders (user_id, total) VALUES (?, ?)",
+      start_timestamp: 1754524401.155,
+      timestamp: 1754524401.165,
+      duration: 10,
+      status: "ok",
+    },
+    {
+      span_id: "9876543210fedcba",
+      parent_span_id: "fedcba0987654321",
+      trace_id: "a1b2c3d4e5f6789012345678901234567890abcd",
+      op: "cache.get",
+      description: "redis.get user_preferences:123",
+      start_timestamp: 1754524401.17,
+      timestamp: 1754524401.175,
+      duration: 5,
+      status: "ok",
+    },
+  ],
+  sdk: {
+    name: "sentry.javascript.nextjs",
+    version: "9.42.1",
+  },
+};
