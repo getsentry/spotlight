@@ -14,7 +14,11 @@ export function logIncomingEvent(container: EventContainer): void {
 
   if (contentType === "application/x-sentry-envelope") {
     if (!envelope) {
-      logger.debug("→ envelope (parse error)");
+      // Still log something useful even if parsing failed
+      const data = container.getData();
+      const size = data.length;
+      const preview = data.length > 100 ? `${data.toString("utf-8", 0, 100)}...` : data.toString("utf-8");
+      logger.debug(`→ envelope (parse error, ${size} bytes) | ${preview.replace(/\n/g, "\\n")}`);
       return;
     }
 
@@ -44,5 +48,12 @@ export function logOutgoingEvent(container: EventContainer, clientId: string): v
 
   // Use the container's event type string (which uses cached parsed data)
   const typeInfo = container.getEventTypesString();
-  logger.debug(`← ${typeInfo} to ${clientId}`);
+
+  // If it's an envelope that failed to parse, add size info
+  if (typeInfo === "envelope" && container.getContentType() === "application/x-sentry-envelope") {
+    const size = container.getData().length;
+    logger.debug(`← envelope (${size} bytes) to ${clientId}`);
+  } else {
+    logger.debug(`← ${typeInfo} to ${clientId}`);
+  }
 }
