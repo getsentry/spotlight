@@ -37,36 +37,63 @@ export interface ParsedEnvelope {
 }
 
 /**
- * Parses envelope lines into structured data
+ * Parses envelope bytes into structured data
+ * Properly handles length-based payloads according to Sentry envelope format
  */
 export function parseEnvelope(body: Buffer): ParsedEnvelope | null {
   try {
-    const lines = body.toString("utf-8").split("\n");
-    if (lines.length < 1) return null;
-
-    const header = JSON.parse(lines[0]) as EnvelopeHeader;
+    let offset = 0;
     const items: ParsedEnvelope["items"] = [];
 
-    // Parse item headers and payloads (skip envelope header at index 0)
-    for (let i = 1; i < lines.length; i += 2) {
-      if (!lines[i]) continue;
+    // Find and parse envelope header (first line)
+    const headerEnd = body.indexOf("\n", offset);
+    if (headerEnd === -1) return null;
+
+    const header = JSON.parse(body.toString("utf-8", offset, headerEnd)) as EnvelopeHeader;
+    offset = headerEnd + 1;
+
+    // Parse items using length field
+    while (offset < body.length) {
+      // Find item header line
+      const itemHeaderEnd = body.indexOf("\n", offset);
+      if (itemHeaderEnd === -1) break;
+
+      // Skip empty lines
+      if (itemHeaderEnd === offset) {
+        offset = itemHeaderEnd + 1;
+        continue;
+      }
 
       try {
-        const itemHeader = JSON.parse(lines[i]) as ItemHeader;
+        const itemHeader = JSON.parse(body.toString("utf-8", offset, itemHeaderEnd)) as ItemHeader;
+        offset = itemHeaderEnd + 1;
+
         let payload: EventPayload | undefined;
 
-        // Try to parse the payload if it's an event
-        if (itemHeader.type === "event" && lines[i + 1]) {
-          try {
-            payload = JSON.parse(lines[i + 1]) as EventPayload;
-          } catch {
-            // Payload parsing failed, continue without it
+        // Use length field to read exact payload bytes
+        if (itemHeader.length !== undefined && itemHeader.length > 0) {
+          const payloadEnd = offset + itemHeader.length;
+          if (payloadEnd > body.length) break; // Invalid length
+
+          // Try to parse JSON payload for event types
+          if (itemHeader.type === "event") {
+            try {
+              const payloadStr = body.toString("utf-8", offset, payloadEnd);
+              payload = JSON.parse(payloadStr) as EventPayload;
+            } catch {
+              // Payload parsing failed, continue without it
+            }
           }
+
+          offset = payloadEnd;
         }
 
         items.push({ header: itemHeader, payload });
       } catch {
-        // Skip malformed items
+        // Skip malformed items, try to find next newline
+        const nextLine = body.indexOf("\n", offset);
+        if (nextLine === -1) break;
+        offset = nextLine + 1;
       }
     }
 
