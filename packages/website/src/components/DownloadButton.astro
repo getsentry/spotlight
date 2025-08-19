@@ -2,7 +2,7 @@
 import { Fragment } from 'react';
 
 let response = await fetch('https://api.github.com/repos/getsentry/spotlight/releases');
-const releases = (await response.json()).filter((release:any) => release.name.startsWith('@spotlightjs/electron@'));
+const releases = (await response.json()).filter((release:any) => release.name.startsWith('@spotlightjs/electron@')|| release.name.startsWith('@spotlightjs/spotlight@'));
 
 let assets = releases[0]?.assets || [];
 let version = null;
