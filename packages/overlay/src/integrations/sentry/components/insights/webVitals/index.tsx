@@ -7,7 +7,7 @@ import { useSentryEvents } from "~/integrations/sentry/data/useSentryEvents";
 import useSort from "~/integrations/sentry/hooks/useSort";
 import type { SentryEventWithPerformanceData } from "~/integrations/sentry/types";
 import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import Table from "~/ui/table";
 import { normalizePerformanceScore } from "../../../utils/webVitals";
 
@@ -80,13 +80,13 @@ const WebVitals = () => {
               <th
                 key={header.id}
                 scope="col"
-                className={classNames(
+                className={cn(
                   "text-primary-100 px-6 py-3.5 text-sm font-semibold",
                   header.primary ? "w-2/5" : "w-[15%]",
                 )}
               >
                 <div
-                  className={classNames(
+                  className={cn(
                     "flex cursor-pointer select-none items-center gap-1",
                     header.primary ? "justify-start" : "justify-end",
                   )}
@@ -97,7 +97,7 @@ const WebVitals = () => {
                     <SortDown
                       width={12}
                       height={12}
-                      className={classNames(
+                      className={cn(
                         "fill-primary-300",
                         sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                       )}

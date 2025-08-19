@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
 import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import Breadcrumbs from "~/ui/breadcrumbs";
 import Table from "~/ui/table";
 import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from "../../constants";
@@ -84,13 +84,13 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
               <th
                 key={header.id}
                 scope="col"
-                className={classNames(
+                className={cn(
                   "text-primary-100 px-6 py-3.5 text-sm font-semibold",
                   header.primary ? "w-2/5" : "w-[15%]",
                 )}
               >
                 <div
-                  className={classNames(
+                  className={cn(
                     "flex cursor-pointer select-none items-center gap-1",
                     header.primary ? "justify-start" : "justify-end",
                   )}
@@ -101,7 +101,7 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
                     <SortDown
                       width={12}
                       height={12}
-                      className={classNames(
+                      className={cn(
                         "fill-primary-300",
                         sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                       )}

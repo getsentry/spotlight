@@ -1,5 +1,5 @@
 import { type HTMLAttributes, type MouseEventHandler, type ReactNode, useRef } from "react";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import { getSpotlightContainer } from "~/utils/dom";
 
 export type ResizeDirection = "column" | "row";
@@ -85,7 +85,7 @@ export default function Resizer({
 
   return (
     <div
-      className={classNames("resizer", isResizing ? "is-resizing" : "", className)}
+      className={cn("resizer", isResizing ? "is-resizing" : "", className)}
       style={style}
       onClick={e => e.preventDefault()}
       onMouseDown={handleMouseDown}

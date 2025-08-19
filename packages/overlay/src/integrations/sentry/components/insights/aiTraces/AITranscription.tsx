@@ -5,7 +5,7 @@ import useSearchInput from "~/integrations/sentry/hooks/useSearchInput";
 import useSentryStore from "~/integrations/sentry/store";
 import type { SpotlightAITrace } from "~/integrations/sentry/types";
 import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import DateTime from "../../shared/DateTime";
 import { createAITraceFromSpan, extractAllAIRootSpans } from "./sdks/aiLibraries";
 
@@ -148,7 +148,7 @@ function ConversationBubble({
 
   const bubbleContent = (
     <div
-      className={classNames(
+      className={cn(
         "max-w-[80%] rounded-lg border p-3",
         isUser
           ? "border-blue-500/30 bg-blue-600/20 text-blue-100"
@@ -224,7 +224,7 @@ function ConversationBubble({
   );
 
   return (
-    <div className={classNames("mb-2 flex w-full", isUser ? "justify-end" : "justify-start")}>
+    <div className={cn("mb-2 flex w-full", isUser ? "justify-end" : "justify-start")}>
       {isUser ? (
         bubbleContent
       ) : (

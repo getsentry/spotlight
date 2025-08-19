@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import JsonViewer from "~/components/JsonViewer";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import Time from "../../../../components/Time";
 import type { Breadcrumb, SentryEvent } from "../../types";
 
@@ -48,7 +48,7 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
               <JsonViewer data={crumb.data} />
             ) : (
               <pre
-                className={classNames(
+                className={cn(
                   "flex grow items-center whitespace-pre-line p-2 font-mono!",
                   crumbIdx === 0 ? "border-t-0!" : "",
                 )}

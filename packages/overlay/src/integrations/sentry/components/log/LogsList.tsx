@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
 import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
 import CardList from "~/components/CardList";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import { useSpotlightContext } from "~/lib/useSpotlightContext";
 import Table from "~/ui/table";
 import { LOGS_HEADERS, LOGS_SORT_KEYS, LOG_LEVEL_COLORS } from "../../constants";
@@ -79,7 +79,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                   <th
                     key={header.id}
                     scope="col"
-                    className={classNames(
+                    className={cn(
                       "text-primary-100 py-3.5 text-sm font-semibold",
                       !header.stretch && "w-[20%]",
                       header.primary && "w-[50%]",
@@ -88,7 +88,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                     )}
                   >
                     <div
-                      className={classNames(
+                      className={cn(
                         "flex cursor-pointer select-none items-center gap-1",
                         `justify-${header.align === "right" ? "end" : "start"}`,
                       )}
@@ -100,7 +100,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                           <SortDown
                             width={12}
                             height={12}
-                            className={classNames(
+                            className={cn(
                               "fill-primary-300",
                               sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                             )}

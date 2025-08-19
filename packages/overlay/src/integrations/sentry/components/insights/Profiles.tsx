@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
 import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import Table from "~/ui/table";
 import { AGGREGATE_CALL_PROFILES_SORT_KEYS, AGGREGATE_PROFILES_HEADERS } from "../../constants";
 import useSort from "../../hooks/useSort";
@@ -52,13 +52,10 @@ function Profiles() {
             <th
               key={header.id}
               scope="col"
-              className={classNames(
-                "text-primary-100 px-6 py-3.5 text-sm font-semibold",
-                header.primary ? "w-2/5" : "w-[15%]",
-              )}
+              className={cn("text-primary-100 px-6 py-3.5 text-sm font-semibold", header.primary ? "w-2/5" : "w-[15%]")}
             >
               <div
-                className={classNames(
+                className={cn(
                   "flex cursor-pointer select-none items-center gap-1",
                   header.primary ? "justify-start" : "justify-end",
                 )}
@@ -69,7 +66,7 @@ function Profiles() {
                   <SortDown
                     width={12}
                     height={12}
-                    className={classNames(
+                    className={cn(
                       "fill-primary-300",
                       sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                     )}

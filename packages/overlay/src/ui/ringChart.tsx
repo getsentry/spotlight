@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useMemo } from "react";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 
 export type RingChartProps = React.HTMLAttributes<SVGSVGElement> & {
   backgroundColors: string[];
@@ -77,7 +77,7 @@ function RingChart({
           onFocus={() => onHoverActions?.[index]()}
           onMouseLeave={() => onBlur?.()}
           onBlur={() => onBlur?.()}
-          className={classNames(backgroundColors[index])}
+          className={cn(backgroundColors[index])}
           style={{
             fill: "none",
             strokeWidth: barWidth,
@@ -98,7 +98,7 @@ function RingChart({
           onFocus={() => onHoverActions?.[index]()}
           onMouseLeave={() => onBlur?.()}
           onBlur={() => onBlur?.()}
-          className={classNames(segmentColors[index])}
+          className={cn(segmentColors[index])}
           style={{
             fill: "none",
             strokeWidth: barWidth,
@@ -135,10 +135,7 @@ function RingChart({
       >
         {text !== undefined ? (
           <div
-            className={classNames(
-              "text-primary-100 flex h-full w-full items-center justify-center text-xl font-bold",
-              textCss,
-            )}
+            className={cn("text-primary-100 flex h-full w-full items-center justify-center text-xl font-bold", textCss)}
           >
             {text}
           </div>

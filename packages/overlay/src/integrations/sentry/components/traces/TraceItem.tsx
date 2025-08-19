@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
+import { cn } from "~/lib/cn";
 import { Badge } from "~/ui/badge";
 import TimeSince from "../../../../components/TimeSince";
-import classNames from "../../../../lib/classNames";
 import { isLocalTrace } from "../../store/helpers";
 import type { Span, Trace } from "../../types";
 import { getFormattedSpanDuration } from "../../utils/duration";
@@ -38,7 +38,7 @@ export function TraceStatusBadge({ trace }: { trace: Trace }) {
 
   return (
     <>
-      <div className={classNames(status === "ok" ? "text-green-400" : status ? "text-red-400" : "")}>{status}</div>
+      <div className={cn(status === "ok" ? "text-green-400" : status ? "text-red-400" : "")}>{status}</div>
       <div>&mdash;</div>
     </>
   );
@@ -80,7 +80,7 @@ export default function TraceItem({ trace, className }: TraceItemProps) {
   //       https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
   return (
     <Link
-      className={classNames(
+      className={cn(
         "hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2",
         isSelected && "bg-primary-800",
         className,

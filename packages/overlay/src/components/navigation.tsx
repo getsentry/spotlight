@@ -4,7 +4,7 @@ import { ReactComponent as DeleteIcon } from "~/assets/deleteIcon.svg";
 import { ReactComponent as Logo } from "~/assets/glyph.svg";
 import type { IntegrationPanel } from "~/integrations/integration";
 import { getSpotlightEventTarget } from "~/lib/eventTarget";
-import classNames from "../lib/classNames";
+import { cn } from "../lib/cn";
 import useKeyPress from "../lib/useKeyPress";
 
 export type Props = {
@@ -84,7 +84,7 @@ export default function Navigation({ panels, setOpen, isOnline, showClearEventsB
                 key={panel.id}
                 replace={true}
                 className={({ isActive }) =>
-                  classNames(
+                  cn(
                     isActive
                       ? "text-primary-100 [&>.count]:bg-primary-100 [&>.count]:text-primary-600"
                       : "text-primary-400 hover:text-primary-100 [&>.count]:bg-primary-700 [&>.count]:text-primary-200",
@@ -108,7 +108,7 @@ export default function Navigation({ panels, setOpen, isOnline, showClearEventsB
                       key={childPanel.id}
                       replace={true}
                       className={({ isActive }) =>
-                        classNames(
+                        cn(
                           isActive
                             ? "text-primary-100 [&>.count]:bg-primary-100 [&>.count]:text-primary-600"
                             : "text-primary-400 hover:text-primary-100 [&>.count]:bg-primary-700 [&>.count]:text-primary-200",
@@ -185,12 +185,9 @@ export default function Navigation({ panels, setOpen, isOnline, showClearEventsB
                 <span className="text-sm">Clear Events</span>
               </button>
             )}
-            <div className={classNames("flex items-center gap-x-2 text-xs", isOnline ? "" : "text-red-400")}>
+            <div className={cn("flex items-center gap-x-2 text-xs", isOnline ? "" : "text-red-400")}>
               <div
-                className={classNames(
-                  " block h-2 w-2 rounded-full",
-                  isOnline ? "bg-green-400" : "animate-pulse bg-red-400",
-                )}
+                className={cn(" block h-2 w-2 rounded-full", isOnline ? "bg-green-400" : "animate-pulse bg-red-400")}
               />
               {isOnline ? "Connected to Sidecar" : "Not connected to Sidecar"}
             </div>

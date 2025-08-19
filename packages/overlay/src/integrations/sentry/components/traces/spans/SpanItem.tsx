@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ReactComponent as ChevronIcon } from "~/assets/chevronDown.svg";
 import { useSearch } from "~/integrations/sentry/context/SearchContext";
-import classNames from "../../../../../lib/classNames";
+import { cn } from "~/lib/cn";
 import type { Span, TraceContext } from "../../../types";
 import { getFormattedDuration, getSpanDurationClassName } from "../../../utils/duration";
 import PlatformIcon from "../../shared/PlatformIcon";
@@ -57,7 +57,7 @@ const SpanItem = ({
   return (
     <li key={span.span_id} ref={containerRef}>
       <Link
-        className={classNames(
+        className={cn(
           "hover:bg-primary-700 group flex rounded-xs text-sm",
           isQueried ? "bg-primary-200/20" : "",
           spanId === span.span_id ? "bg-primary-900" : "",
@@ -69,7 +69,7 @@ const SpanItem = ({
         to={`/traces/${span.trace_id}/spans/${span.span_id}`}
       >
         <div
-          className={classNames(
+          className={cn(
             "node",
             "group-hover:bg-primary-700",
             "rounded-xs",
@@ -94,7 +94,7 @@ const SpanItem = ({
               <ChevronIcon
                 width={12}
                 height={12}
-                className={classNames("transition", isItemCollapsed ? "rotate-0" : "rotate-180")}
+                className={cn("transition", isItemCollapsed ? "rotate-0" : "rotate-180")}
               />
             </div>
           )}
@@ -110,7 +110,7 @@ const SpanItem = ({
           </span>
         </div>
         <div
-          className={classNames(
+          className={cn(
             "waterfall group-hover:bg-primary-700 rounded-xs overflow-hidden",
             isQueried ? "bg-transparent!" : "",
           )}
@@ -127,7 +127,7 @@ const SpanItem = ({
               width: `max(1px, ${(spanDuration / totalDuration) * 95}%)`,
             }}
           >
-            <span className={classNames("whitespace-nowrap", getSpanDurationClassName(spanDuration))}>
+            <span className={cn("whitespace-nowrap", getSpanDurationClassName(spanDuration))}>
               {getFormattedDuration(spanDuration)}
             </span>
           </div>

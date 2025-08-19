@@ -2,7 +2,7 @@ import { useState } from "react";
 import CopyToClipboard from "~/components/CopyToClipboard";
 import OpenInEditor from "~/components/OpenInEditor";
 import type { EventFrame, FrameVars } from "~/integrations/sentry/types";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import { renderValue } from "~/lib/values";
 import Table from "~/ui/table";
 
@@ -76,7 +76,7 @@ export default function Frame({
   const fileName = platform === "java" ? frame.module : frame.filename || frame.module;
   return (
     <li
-      className={classNames(
+      className={cn(
         hasSource ? "cursor-pointer" : "",
         !isOpen && hasSource ? "hover:bg-primary-900" : "",
         "bg-primary-950 border-primary-900 my-1 overflow-hidden rounded-md border",
@@ -87,10 +87,7 @@ export default function Frame({
       onKeyDown={e => e.key === "Enter" && hasSource && setOpen(!isOpen)}
     >
       <div
-        className={classNames(
-          "text-primary-400 flex items-center justify-between px-2 py-1",
-          isOpen ? "bg-primary-900" : "",
-        )}
+        className={cn("text-primary-400 flex items-center justify-between px-2 py-1", isOpen ? "bg-primary-900" : "")}
         onClick={hasSource ? () => setOpen(!isOpen) : undefined}
       >
         <div>
@@ -131,7 +128,7 @@ export default function Frame({
           })}
           {frame.context_line && (
             <div
-              className={classNames(
+              className={cn(
                 frame.pre_context || frame.post_context ? "bg-primary-600" : "bg-primary-900",
                 "flex items-center",
               )}
