@@ -231,7 +231,7 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install playwright
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        if: ${{ steps.playwright-cache.outputs.cache-hit != 'true' }}
         run: pnpx playwright install --with-deps
 
       - name: Run Xvfb (virtual display)
