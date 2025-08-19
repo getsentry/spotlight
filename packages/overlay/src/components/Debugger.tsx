@@ -1,6 +1,6 @@
 import type { Integration, IntegrationData } from "~/integrations/integration";
 import type { NotificationCount } from "~/types";
-import classNames from "../lib/classNames";
+import { cn } from "../lib/cn";
 import Overview from "./Overview";
 
 function FullscreenBlur({
@@ -19,7 +19,7 @@ function FullscreenBlur({
   }
   return (
     <div
-      className={classNames("spotlight-fullscreen-blur", isOpen ? "" : "hidden!")}
+      className={cn("spotlight-fullscreen-blur", isOpen ? "" : "hidden!")}
       onClick={e => {
         if (e.target === e.currentTarget) {
           setOpen(false);
@@ -55,7 +55,7 @@ export default function Debugger({
   return (
     <FullscreenBlur isOpen={isOpen} setOpen={setOpen} fullPage={fullPage}>
       <div
-        className={classNames(
+        className={cn(
           // Used for targeting. DO NOT REMOVE.
           "spotlight-debugger",
           "from-primary-900 to-primary-950 flex h-full flex-col overflow-hidden rounded-lg bg-gradient-to-br from-0% to-20% font-sans text-white shadow-xl",

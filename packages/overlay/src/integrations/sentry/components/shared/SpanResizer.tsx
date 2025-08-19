@@ -1,5 +1,5 @@
 import { useState } from "react";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import Resizer, { type ResizeDirection } from "./Resizer";
 
 type SpanResizerProps = {
@@ -24,7 +24,7 @@ export default function SpanResizer({
       isResizing={isResizing}
       setIsResizing={setIsResizing}
       direction={direction}
-      className={classNames(
+      className={cn(
         "span-resizer absolute left-0 top-0 h-full w-1",
         direction === "column" ? "cursor-col-resize" : "cursor-row-resize",
         isResizing || isHovered ? "bg-primary-500" : "bg-transparent",

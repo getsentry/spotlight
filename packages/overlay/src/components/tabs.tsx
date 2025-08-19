@@ -1,6 +1,6 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import type { IntegrationPanel } from "~/integrations/integration";
-import classNames from "../lib/classNames";
+import { cn } from "../lib/cn";
 import useKeyPress from "../lib/useKeyPress";
 
 export type Props = {
@@ -76,7 +76,7 @@ export default function Tabs({ tabs, nested, setOpen }: Props) {
               key={tab.id}
               replace={true}
               className={({ isActive }) =>
-                classNames(
+                cn(
                   isActive
                     ? "border-primary-200 text-primary-100 [&>.count]:bg-primary-100 [&>.count]:text-primary-600"
                     : "text-primary-400 hover:border-primary-400 hover:text-primary-100 [&>.count]:bg-primary-700 [&>.count]:text-primary-200 border-transparent",

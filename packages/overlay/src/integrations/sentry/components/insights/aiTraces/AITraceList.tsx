@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
 import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
 import type { SpotlightAITrace } from "~/integrations/sentry/types";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import Table from "~/ui/table";
 import { AI_TRACES_HEADERS, AI_TRACES_SORT_KEYS } from "../../../constants";
 import { SearchProvider } from "../../../context/SearchContext";
@@ -69,13 +69,13 @@ export default function AITraceList() {
               <th
                 key={header.id}
                 scope="col"
-                className={classNames(
+                className={cn(
                   "text-primary-100 px-6 py-3.5 text-sm font-semibold",
                   header.id === "duration" || header.id === "tokens" ? "text-right" : "text-left",
                 )}
               >
                 <div
-                  className={classNames(
+                  className={cn(
                     "flex cursor-pointer select-none items-center gap-1",
                     header.id === "duration" || header.id === "tokens" ? "justify-end" : "",
                   )}
@@ -93,7 +93,7 @@ export default function AITraceList() {
                     <SortDown
                       width={12}
                       height={12}
-                      className={classNames(
+                      className={cn(
                         "fill-primary-300",
                         sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                       )}

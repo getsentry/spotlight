@@ -90,10 +90,10 @@ export default function ComponentName({
 #### Styling Patterns
 
 - Uses Tailwind CSS with custom utilities
-- Custom `classNames()` utility function for conditional classes:
+- Custom `cn()` utility function for conditional classes:
 
   ```typescript
-  className={classNames(
+  className={cn(
     'base-classes',
     condition ? 'conditional-classes' : '',
     variable === 'value' ? 'variant-classes' : 'default-classes'

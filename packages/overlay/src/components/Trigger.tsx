@@ -1,7 +1,7 @@
 import type { ComponentPropsWithoutRef } from "react";
 import { ReactComponent as Logo } from "~/assets/glyph.svg";
 import { DEFAULT_ANCHOR } from "~/constants";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import type { AnchorConfig, NotificationCount } from "~/types";
 
 function getAnchorClasses(anchor: AnchorConfig) {
@@ -37,7 +37,7 @@ function ToolbarItem({
 
       {count ? (
         <span
-          className={classNames(
+          className={cn(
             severe ? "bg-red-500" : "bg-primary-500",
             "absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full font-sans text-[0.65rem] font-medium",
           )}
@@ -66,7 +66,7 @@ export default function Trigger({
   return (
     <button
       type="button"
-      className={classNames(
+      className={cn(
         "z-999999",
         "fixed inline-flex items-center rounded-sm font-medium",
         "font-raleway bg-primary-700 cursor-pointer text-white",

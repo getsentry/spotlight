@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import CardList from "~/components/CardList";
 import TimeSince from "~/components/TimeSince";
 import { isLocalTrace } from "~/integrations/sentry/store/helpers";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import { Badge } from "~/ui/badge";
 import { useSentryEnvelopes } from "../../../data/useSentryEnvelopes";
 import useSentryStore from "../../../store";
@@ -39,7 +39,7 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
               return (
                 <Link key={envelopeId} to={`/insights/envelopes/${envelopeId}`}>
                   <div
-                    className={classNames(
+                    className={cn(
                       "hover:bg-primary-900 border-b-primary-900 flex cursor-pointer items-center gap-4 border-b px-6 py-2 transition-all",
                       selectedEnvelopeId === envelopeId ? "bg-primary-900" : "",
                     )}

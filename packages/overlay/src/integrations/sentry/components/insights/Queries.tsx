@@ -8,7 +8,7 @@ import { useSentrySpans } from "~/integrations/sentry/data/useSentrySpans";
 import useSort from "~/integrations/sentry/hooks/useSort";
 import type { Span } from "~/integrations/sentry/types";
 import { getFormattedDuration, getSpanDurationClassName } from "~/integrations/sentry/utils/duration";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import Table from "~/ui/table";
 
 type QueryInfo = {
@@ -81,14 +81,14 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
             <th
               key={header.id}
               scope="col"
-              className={classNames(
+              className={cn(
                 "text-primary-100 select-none px-6 py-3.5 text-sm font-semibold",
                 header.primary ? "w-2/5" : "w-[15%]",
               )}
             >
               <button
                 type="button"
-                className={classNames(
+                className={cn(
                   "flex cursor-pointer items-center gap-1",
                   header.primary ? "justify-start" : "justify-end",
                 )}
@@ -100,7 +100,7 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
                   <SortDown
                     width={12}
                     height={12}
-                    className={classNames(
+                    className={cn(
                       "fill-primary-300",
                       sort.asc ? "-translate-y-0.5 rotate-0" : "translate-y-0.5 rotate-180",
                     )}

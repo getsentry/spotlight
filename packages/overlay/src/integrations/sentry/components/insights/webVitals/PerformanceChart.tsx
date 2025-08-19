@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import type { MetricScoreProps, MetricWeightsProps } from "~/integrations/sentry/types";
 import { calculateLabelCoordinates } from "~/integrations/sentry/utils/webVitals";
-import classNames from "~/lib/classNames";
+import { cn } from "~/lib/cn";
 import RingChart from "~/ui/ringChart";
 import type { WebVitals } from "../../../constants";
 import useMouseTracking from "../../../hooks/useMouseTracking";
@@ -88,7 +88,7 @@ const PerformanceChart = ({
     <div ref={containerRef} {...mouseTrackingProps}>
       {webVitalTooltip && (
         <div
-          className={classNames(
+          className={cn(
             "bg-primary-900 border-primary-400 absolute flex w-40 items-center justify-between rounded-lg border p-3 shadow-lg",
           )}
           style={{
