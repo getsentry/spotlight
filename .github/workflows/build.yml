@@ -220,8 +220,18 @@ jobs:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
 
-      # do this separately so e2e tests can run in parallel
+      - name: Cache playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: Install playwright
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpx playwright install --with-deps
 
       - name: Run Xvfb (virtual display)
