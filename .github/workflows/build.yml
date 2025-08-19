@@ -187,7 +187,7 @@ jobs:
     name: E2E Tests
     needs: build
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright:v ${{needs.build.outputs.playwright-version}}-noble
+    container: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
     strategy:
       matrix:
         node_version: [20, 22]
