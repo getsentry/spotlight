@@ -226,9 +226,7 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
+          key: ${{ runner.os }}-playwright-
 
       - name: Install Playwright Browsers
         run: pnpx playwright install --with-deps
@@ -239,7 +237,7 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ github.sha }}
+          key: ${{ runner.os }}-playwright-
 
       - name: Run Xvfb (virtual display)
         run: |
