@@ -220,24 +220,9 @@ jobs:
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
 
-      - name: Restore cache - playwright binaries
-        uses: actions/cache/restore@v4
-        id: playwright-cache
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-
-
-      - name: Install Playwright Browsers
+      # do this separately so e2e tests can run in parallel
+      - name: Install playwright
         run: pnpx playwright install --with-deps
-
-      - name: Save cache - playwright binaries
-        if: always() && steps.playwright-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-
 
       - name: Run Xvfb (virtual display)
         run: |
