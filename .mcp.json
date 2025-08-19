@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
+    },
+    "spotlight": {
+      "type": "http",
+      "url": "http://localhost:8969/mcp"
+    }
+  }
+}

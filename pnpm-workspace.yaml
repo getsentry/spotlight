@@ -1,7 +1,5 @@
 packages:
   - 'packages/*'
-  - 'demos/*'
-  - 'e2e-tests/*'
 
 catalog:
   "@fontsource/raleway": ^5.1.0
@@ -10,8 +8,8 @@ catalog:
   "@types/react": ^18.3.11
   "@types/react-dom": ^18.3.0
   "@sentry/astro": ^8.49.0
-  "@sentry/core": 9.22.0
-  "@sentry/node": ^8.49.0
+  "@sentry/core": ^10
+  "@sentry/node": ^10
   react: ^18.3.1
   react-dom: ^18.3.1
   tailwindcss: ^4.1.10

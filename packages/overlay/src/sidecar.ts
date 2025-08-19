@@ -9,6 +9,10 @@ export function connectToSidecar(
   log("Connecting to sidecar at", sidecarUrl);
   const sidecarStreamUrl = new URL("/stream", sidecarUrl);
   sidecarStreamUrl.searchParams.append("base64", "1");
+
+  // TODO: Include version number once we have a reliable way to get it at runtime
+  const clientId = "spotlight-overlay";
+  sidecarStreamUrl.searchParams.append("client", clientId);
   const source = new EventSource(sidecarStreamUrl.href);
 
   for (const [contentType, listener] of Object.entries(contentTypeListeners)) {
@@ -17,7 +21,7 @@ export function connectToSidecar(
 
   source.addEventListener("open", () => {
     setOnline(true);
-    log("Sidecar connected.");
+    log("Sidecar connected");
   });
 
   source.addEventListener("error", err => {

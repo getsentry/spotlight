@@ -44,7 +44,7 @@ export class MessageBuffer<T> {
     const cb = this.readers.get(readerId);
     if (!cb) return;
 
-    let atReadPos = readPos;
+    let atReadPos = readPos < this.head ? this.head : readPos;
     let item: [number, T] | undefined;
     /* eslint-disable no-constant-condition */
     while (true) {
@@ -60,28 +60,54 @@ export class MessageBuffer<T> {
     setTimeout(() => this.stream(readerId, atReadPos), 500);
   }
 
+  /**
+   * hard reset: drops items and subscribers and resets cursors.
+   */
   clear(): void {
-    this.items = new Array(this.size);
     this.writePos = 0;
-    this.head = 0;
-    this.readers = new Map<string, (item: T) => void>();
+    this.reset();
+    this.readers.clear();
   }
 
-  read(): T[] {
+  /**
+   * soft reset: clears buffered items but preserves subscribers
+   * do not set head or writePos to `0` as subscribers retain their
+   * readPos which would mess things up if we suddenly reset everything
+   * to 0.
+   */
+  reset(): void {
+    this.items = new Array(this.size);
+    this.head = this.writePos;
+  }
+
+  read(filters: ReadFilter): T[] {
     const result: T[] = [];
     const start = this.head;
     const end = this.writePos;
-    for (let i = start; i < end; i++) {
+
+    const minTime = Date.now() - filters.duration * 1000;
+
+    for (let i = end - 1; i >= start; i--) {
       const item = this.items[i % this.size];
       if (item !== undefined) {
+        if (item[0] < minTime) {
+          break;
+        }
+
         result.push(item[1]);
       }
     }
+
     return result;
   }
 }
 
-function generateUuidv4(): string {
+type ReadFilter = {
+  // duration in seconds
+  duration: number;
+};
+
+export function generateUuidv4(): string {
   let dt = new Date().getTime();
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
     let rnd = Math.random() * 16;
