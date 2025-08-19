@@ -230,11 +230,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
 
-      - name: Install dependencies
-        run: pnpm install
-
       - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
+        run: pnpx playwright install --with-deps
 
       - name: Save cache - playwright binaries
         if: always() && steps.playwright-cache.outputs.cache-hit != 'true'
