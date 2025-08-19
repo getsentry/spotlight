@@ -224,14 +224,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      - name: Restore build cache
-        uses: actions/cache/restore@v4
-        with:
-          enableCrossOsArchive: true
-          fail-on-cache-miss: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
-      
       - name: Run Xvfb (virtual display)
         run: |
           Xvfb :99 -screen 0 1920x1080x24 &
