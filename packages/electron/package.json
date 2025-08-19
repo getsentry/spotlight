@@ -17,7 +17,6 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "build:mac": "./electron-builder.js",
-    "pretest:e2e": "playwright install --with-deps",
     "test:e2e": "playwright test"
   },
   "dependencies": {

@@ -23,6 +23,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    outputs:
+      playwright-version: ${{ steps.playwright-version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -120,6 +122,15 @@ jobs:
           enableCrossOsArchive: true
           path: ${{ env.CACHED_BUILD_PATHS }}
           key: ${{ env.BUILD_CACHE_KEY }}
+      
+      # This will be used for the base image name in e2e tests below
+      # which depends on the build job, hence why we do this here
+      - name: Playwright Version
+        id: playwright-version
+        working-directory: packages/electron
+        run: |
+          # Playwright outputs something like `Version 1.54.2` so we cut the "crap" at the beginning
+          echo "version=$(pnpm exec playwright --version | cut -c 9-)" >> $GITHUB_OUTPUT
 
   test-unit:
     name: Unit Tests
@@ -176,6 +187,7 @@ jobs:
     name: E2E Tests
     needs: build
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
     strategy:
       matrix:
         node_version: [20, 22]
@@ -212,24 +224,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      - name: Restore build cache
-        uses: actions/cache/restore@v4
-        with:
-          enableCrossOsArchive: true
-          fail-on-cache-miss: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
-
-      # do this separately so e2e tests can run in parallel
-      - name: Install playwright
-        run: pnpx playwright install --with-deps
-
       - name: Run Xvfb (virtual display)
         run: |
           Xvfb :99 -screen 0 1920x1080x24 &
-
-      - name: Set DISPLAY environment variable
-        run: echo "DISPLAY=:99" >> $GITHUB_ENV
+          echo "DISPLAY=:99" >> $GITHUB_ENV
 
       - name: Run tests
         run: pnpm test:e2e
@@ -240,6 +238,7 @@ jobs:
         with:
           name: test-results
           path: e2e-tests/**/test-results/**
+
   docker:
     name: Docker Image
     needs: build
