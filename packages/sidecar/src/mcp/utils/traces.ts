@@ -1,5 +1,5 @@
+import { processEnvelope } from "@spotlightjs/core/sentry";
 import type { EventContainer } from "../../eventContainer.js";
-import { processEnvelope } from "../parsing.js";
 
 export interface TraceContext {
   trace_id: string;
@@ -118,12 +118,12 @@ function extractTraceEventsFromContainer(container: EventContainer): TraceEvent[
   const events: TraceEvent[] = [];
 
   try {
-    const parsed = processEnvelope({
+    const { event: envelope } = processEnvelope({
       contentType: container.getContentType(),
       data: container.getData(),
     });
 
-    const [, items] = parsed.envelope;
+    const [, items] = envelope;
 
     for (const item of items) {
       const [{ type }, payload] = item;

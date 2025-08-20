@@ -21,10 +21,6 @@ export async function formatLogEnvelope(container: EventContainer) {
   return formatted;
 }
 
-// function isLogEvent(payload: unknown): payload is SerializedLogContainer {
-//   return typeof payload === "object" && payload !== null && "items" in payload;
-// }
-
 export function processLogEvent(event: SerializedLog): string {
   let attr = "";
   for (const [key, property] of Object.entries(event.attributes ?? {})) {
