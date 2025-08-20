@@ -1,5 +1,5 @@
+import type { Span, Trace } from "@spotlightjs/core/sentry";
 import { log } from "../../../lib/logger";
-import type { Span, Trace } from "../types";
 
 // mutates spans in place and adds children, as well as returns the top level tree
 export function groupSpans(spans: Map<string, Span>): Span[] {

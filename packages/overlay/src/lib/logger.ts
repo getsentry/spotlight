@@ -1,23 +1,19 @@
-export const SPOTLIGHT_PREFIX = "🔎 [Spotlight]";
-
-const noop = (..._args: unknown[]) => {}; // eslint-disable-line @typescript-eslint/no-unused-vars
-let _log = noop;
-let _warn = noop;
+import { SPOTLIGHT_PREFIX, enableLogging, getLogger } from "@spotlightjs/core";
 
 export function activateLogger() {
-  _log = (...args: unknown[]) => console.log(SPOTLIGHT_PREFIX, ...args);
-  _warn = (...args: unknown[]) => console.warn(SPOTLIGHT_PREFIX, ...args);
+  enableLogging(true);
 }
 
 export function deactivateLogger() {
-  _log = noop;
-  _warn = noop;
+  enableLogging(false);
 }
 
 export function log(...args: unknown[]) {
-  _log(...args);
+  getLogger().info(...args);
 }
 
 export function warn(...args: unknown[]) {
-  _warn(...args);
+  getLogger().warn(...args);
 }
+
+export { SPOTLIGHT_PREFIX };

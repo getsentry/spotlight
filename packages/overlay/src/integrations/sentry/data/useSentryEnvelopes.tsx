@@ -1,7 +1,7 @@
+import type { Trace } from "@spotlightjs/core/sentry";
 import { useContext } from "react";
 import useSentryStore from "../store";
 import { isLocalTrace } from "../store/helpers";
-import type { Trace } from "../types";
 import { SentryEventsContext } from "./sentryEventsContext";
 
 export const useSentryEnvelopes = () => {

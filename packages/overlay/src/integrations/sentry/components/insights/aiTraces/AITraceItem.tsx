@@ -1,5 +1,5 @@
-import type { SpotlightAITrace } from "~/integrations/sentry/types";
-import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
+import { getFormattedDuration } from "@spotlightjs/core";
+import type { SpotlightAITrace } from "@spotlightjs/core/sentry";
 import DateTime from "../../shared/DateTime";
 interface AITraceItemProps {
   trace: SpotlightAITrace;

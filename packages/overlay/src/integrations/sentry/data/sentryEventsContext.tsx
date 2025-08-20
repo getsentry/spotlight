@@ -1,7 +1,7 @@
+import type { SentryEvent } from "@spotlightjs/core/sentry";
 import type { ReactNode } from "react";
 import React, { useEffect, useReducer } from "react";
 import useSentryStore from "../store";
-import type { SentryEvent } from "../types";
 
 interface SetEventsAction {
   e: SentryEvent | SentryEvent[];

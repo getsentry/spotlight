@@ -1,3 +1,5 @@
+import { getFormattedDuration } from "@spotlightjs/core";
+import type { Span } from "@spotlightjs/core/sentry";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
@@ -6,10 +8,9 @@ import { TimeBar } from "~/integrations/sentry/components/shared/TimeBar";
 import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from "~/integrations/sentry/constants";
 import { useSentrySpans } from "~/integrations/sentry/data/useSentrySpans";
 import useSort from "~/integrations/sentry/hooks/useSort";
-import type { Span } from "~/integrations/sentry/types";
-import { getFormattedDuration, getSpanDurationClassName } from "~/integrations/sentry/utils/duration";
 import { cn } from "~/lib/cn";
 import Table from "~/ui/table";
+import { getSpanDurationClassName } from "../../utils/duration";
 
 type QueryInfo = {
   avgDuration: number;

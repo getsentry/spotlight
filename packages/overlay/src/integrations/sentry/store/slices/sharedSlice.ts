@@ -1,6 +1,6 @@
+import type { SentryErrorEvent } from "@spotlightjs/core/sentry";
 import type { StateCreator } from "zustand";
 import type { SentryStore, SharedSliceActions } from "~/integrations/sentry/store/types";
-import type { SentryErrorEvent } from "~/integrations/sentry/types";
 import { getNativeFetchImplementation } from "~/integrations/sentry/utils/fetch";
 import { log } from "~/lib/logger";
 

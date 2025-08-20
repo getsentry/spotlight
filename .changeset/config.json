@@ -7,12 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": [
-    "@spotlightjs/website",
-    "@spotlightjs/demo-astro",
-    "@spotlightjs/demo-sveltekit",
-    "@spotlightjs/e2e-tests-astro",
-    "@spotlightjs/e2e-tests-nextjs",
-    "@spotlightjs/e2e-tests-sveltekit"
-  ]
+  "ignore": ["@spotlightjs/website"]
 }

@@ -1,3 +1,4 @@
+import { isErrorEvent } from "@spotlightjs/core/sentry";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSpotlightContext } from "~/lib/useSpotlightContext";
@@ -6,7 +7,6 @@ import CardList from "../../../../components/CardList";
 import TimeSince from "../../../../components/TimeSince";
 import { useSentryEvents } from "../../data/useSentryEvents";
 import { isLocalTrace } from "../../store/helpers";
-import { isErrorEvent } from "../../utils/sentry";
 import { truncateId } from "../../utils/text";
 import HiddenItemsButton from "../shared/HiddenItemsButton";
 import PlatformIcon from "../shared/PlatformIcon";

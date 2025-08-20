@@ -1,3 +1,5 @@
+import { getFormattedDuration } from "@spotlightjs/core";
+import type { SentryEventWithPerformanceData } from "@spotlightjs/core/sentry";
 import { type KeyboardEvent, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
@@ -5,8 +7,6 @@ import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
 import { PERFORMANCE_SCORE_PROFILES, WEB_VITALS_HEADERS, WEB_VITALS_SORT_KEYS } from "~/integrations/sentry/constants";
 import { useSentryEvents } from "~/integrations/sentry/data/useSentryEvents";
 import useSort from "~/integrations/sentry/hooks/useSort";
-import type { SentryEventWithPerformanceData } from "~/integrations/sentry/types";
-import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 import { cn } from "~/lib/cn";
 import Table from "~/ui/table";
 import { normalizePerformanceScore } from "../../../utils/webVitals";

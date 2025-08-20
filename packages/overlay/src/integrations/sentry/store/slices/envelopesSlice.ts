@@ -1,10 +1,8 @@
 import type { Envelope } from "@sentry/core";
+import { generateUuidv4 } from "@spotlightjs/core";
+import type { RawEventContext } from "@spotlightjs/core/sentry";
+import { SUPPORTED_EVENT_TYPES, type Sdk, type SentryEvent, sdkToPlatform } from "@spotlightjs/core/sentry";
 import type { StateCreator } from "zustand";
-import type { RawEventContext } from "~/integrations/integration";
-import { generateUuidv4 } from "~/lib/uuid";
-import { SUPPORTED_EVENT_TYPES } from "../../constants/sentry";
-import type { Sdk, SentryEvent } from "../../types";
-import { sdkToPlatform } from "../../utils/sdkToPlatform";
 import type { EnvelopesSliceActions, EnvelopesSliceState, SentryStore } from "../types";
 
 const initialEnvelopesState: EnvelopesSliceState = {

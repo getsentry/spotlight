@@ -1,9 +1,8 @@
+import { type Trace, getFormattedSpanDuration } from "@spotlightjs/core/sentry";
 import { useState } from "react";
 import { SearchProvider, useSearch } from "~/integrations/sentry/context/SearchContext";
 import useSearchInput from "~/integrations/sentry/hooks/useSearchInput";
 import useSentryStore from "~/integrations/sentry/store";
-import type { Trace } from "~/integrations/sentry/types";
-import { getFormattedSpanDuration } from "../../../../utils/duration";
 
 import { ReactComponent as X } from "~/assets/cross.svg";
 import { ReactComponent as Search } from "~/assets/search.svg";

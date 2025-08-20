@@ -3,12 +3,11 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Tabs from "~/components/tabs";
 import { createTab } from "~/integrations/sentry/utils/tabs";
 
+import { getFormattedDuration } from "@spotlightjs/core";
+import { type Trace, isErrorEvent } from "@spotlightjs/core/sentry";
 import { useSentryEvents } from "~/integrations/sentry/data/useSentryEvents";
 import { isLocalTrace } from "~/integrations/sentry/store/helpers";
 import useSentryStore from "~/integrations/sentry/store/store";
-import type { Trace } from "~/integrations/sentry/types";
-import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
-import { isErrorEvent } from "~/integrations/sentry/utils/sentry";
 import EventContexts from "../../events/EventContexts";
 import EventList from "../../events/EventList";
 import AITraceSplitView from "../../insights/aiTraces/AITraceSplitView";

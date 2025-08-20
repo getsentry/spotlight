@@ -1,3 +1,4 @@
+import type { RawEventContext } from "@spotlightjs/core/sentry";
 import type { ComponentType } from "react";
 import type { ExperimentsConfig, NotificationCount } from "../types";
 
@@ -115,22 +116,6 @@ export type ProcessedEventContainer<T> = {
 export type IntegrationData<T> = Record<string, ProcessedEventContainer<T>[]>;
 
 export type Severity = "default" | "severe";
-
-export type RawEventContext = {
-  /**
-   * The content-type header of the event
-   */
-  contentType: string;
-
-  /**
-   * The raw data in string form of the request.
-   * Use this function to parse and process the raw data it to whatever data structure
-   * you expect for the given `contentType`.
-   *
-   * Return the processed object or undefined if the event should be ignored.
-   */
-  data: string | Uint8Array;
-};
 
 type TeardownFunction = () => void | Promise<() => void>;
 

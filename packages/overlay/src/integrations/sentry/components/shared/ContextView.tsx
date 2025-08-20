@@ -1,5 +1,5 @@
+import type { Tags as TagsType } from "@spotlightjs/core/sentry";
 import JsonViewer from "~/components/JsonViewer";
-import type { Tags as TagsType } from "~/integrations/sentry/types";
 import Tags from "./Tags";
 
 export function ContextView({

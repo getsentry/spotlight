@@ -1,11 +1,23 @@
-// This file is a copy of utils from @spotlightjs/overlay to parse envelopes from Buffer
 import type { Envelope, EnvelopeItem } from "@sentry/core";
+import { getLogger } from "../../lib";
+import { parseJSONFromBuffer } from "../../utils/buffer";
+import type { RawEventContext } from "../types";
 
-type RawEventContext = {
-  contentType: string;
-  data: string | Uint8Array;
-};
+function getLineEnd(data: Uint8Array): number {
+  let end = data.indexOf(0xa);
+  if (end === -1) {
+    end = data.length;
+  }
 
+  return end;
+}
+
+/**
+ * Implements parser for
+ * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
+ * @param rawEvent Envelope data
+ * @returns parsed envelope
+ */
 export function processEnvelope(rawEvent: RawEventContext) {
   let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
 
@@ -34,7 +46,8 @@ export function processEnvelope(rawEvent: RawEventContext) {
       }
     } catch (err) {
       itemPayload = itemPayloadRaw;
-      console.error(err);
+      const logger = getLogger();
+      logger.error(`Error parsing envelope item: ${err}`);
     }
 
     items.push([itemHeader, itemPayload] as EnvelopeItem);
@@ -43,24 +56,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
   const envelope = [envelopeHeader, items] as Envelope;
 
   return {
-    envelope,
+    event: envelope,
+    rawEvent: rawEvent,
   };
-}
-
-function getLineEnd(data: Uint8Array): number {
-  let end = data.indexOf(0xa);
-  if (end === -1) {
-    end = data.length;
-  }
-
-  return end;
-}
-
-export function parseJSONFromBuffer<T = unknown>(data: Uint8Array): T {
-  try {
-    return JSON.parse(new TextDecoder().decode(data)) as T;
-  } catch (err) {
-    console.error(err);
-    return {} as T;
-  }
 }

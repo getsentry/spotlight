@@ -1,8 +1,8 @@
+import type { SpotlightAITrace } from "@spotlightjs/core/sentry";
 import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
 import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
-import type { SpotlightAITrace } from "~/integrations/sentry/types";
 import { cn } from "~/lib/cn";
 import Table from "~/ui/table";
 import { AI_TRACES_HEADERS, AI_TRACES_SORT_KEYS } from "../../../constants";

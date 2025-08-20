@@ -4,7 +4,7 @@ import type { Integration, IntegrationData } from "~/integrations/integration";
 import { log } from "~/lib/logger";
 import type { NotificationCount } from "~/types";
 import { getPanelsFromIntegrations } from "../integrations/utils/extractPanelsFromIntegrations";
-import { getRouteStorageKey } from "../overlay/utils/routePersistence";
+import { getRouteStorageKey } from "../utils/routePersistence";
 import Navigation from "./navigation";
 
 export default function Overview({

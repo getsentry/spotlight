@@ -1,4 +1,4 @@
-import type { Trace } from "~/integrations/sentry/types";
+import type { Trace } from "@spotlightjs/core/sentry";
 import { getRootTransactionMethod, getRootTransactionName } from "~/integrations/sentry/utils/traces";
 import Tag from "~/ui/tag";
 

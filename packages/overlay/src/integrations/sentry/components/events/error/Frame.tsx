@@ -1,7 +1,7 @@
+import type { EventFrame, FrameVars } from "@spotlightjs/core/sentry";
 import { useState } from "react";
 import CopyToClipboard from "~/components/CopyToClipboard";
 import OpenInEditor from "~/components/OpenInEditor";
-import type { EventFrame, FrameVars } from "~/integrations/sentry/types";
 import { cn } from "~/lib/cn";
 import { renderValue } from "~/lib/values";
 import Table from "~/ui/table";
