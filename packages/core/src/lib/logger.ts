@@ -21,7 +21,7 @@ const defaultLogger: BaseLogger = {
   debug: (...args: unknown[]) => console.debug(SPOTLIGHT_PREFIX, ...args),
 };
 
-let isLoggingEnabled = true;
+let isLoggingEnabled = false;
 let currentLogger: BaseLogger = defaultLogger;
 
 export function enableLogging(enabled: boolean): void {
