@@ -1,3 +1,5 @@
+import { enableLogging } from "@spotlightjs/core";
+
 export type SidecarLogger = {
   info: (message: string) => void;
   warn: (message: string) => void;
@@ -21,6 +23,7 @@ export function activateLogger(logger: SidecarLogger): void {
 
 export function enableDebugLogging(debug: boolean): void {
   debugEnabled = debug;
+  enableLogging(debug);
 }
 
 export function isDebugEnabled(): boolean {

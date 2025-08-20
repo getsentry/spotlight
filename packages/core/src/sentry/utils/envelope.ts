@@ -1,4 +1,5 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
+import { getLogger } from "../../lib";
 import { parseJSONFromBuffer } from "../../utils/buffer";
 import type { RawEventContext } from "../types";
 
@@ -17,7 +18,7 @@ function getLineEnd(data: Uint8Array): number {
  * @param rawEvent Envelope data
  * @returns parsed envelope
  */
-export function processEnvelope(rawEvent: RawEventContext, log?: any) {
+export function processEnvelope(rawEvent: RawEventContext) {
   let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
 
   function readLine(length?: number) {
@@ -45,8 +46,8 @@ export function processEnvelope(rawEvent: RawEventContext, log?: any) {
       }
     } catch (err) {
       itemPayload = itemPayloadRaw;
-      if (log) log(err);
-      else console.error(err);
+      const logger = getLogger();
+      logger.error(`Error parsing envelope item: ${err}`);
     }
 
     items.push([itemHeader, itemPayload] as EnvelopeItem);

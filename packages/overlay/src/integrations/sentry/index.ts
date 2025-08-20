@@ -126,7 +126,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
 }
 
 export function handleProcessEnvelope(_event: RawEventContext) {
-  const { event, rawEvent } = processEnvelope(_event, log);
+  const { event, rawEvent } = processEnvelope(_event);
   useSentryStore.getState().pushEnvelope({ envelope: event, rawEnvelope: rawEvent });
   return { rawEvent, event };
 }

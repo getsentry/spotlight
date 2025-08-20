@@ -1,3 +1,5 @@
+import { generateUuidv4 } from "@spotlightjs/core";
+
 export class MessageBuffer<T> {
   private size: number;
   private items: [number, T][];
@@ -106,13 +108,3 @@ type ReadFilter = {
   // duration in seconds
   duration: number;
 };
-
-export function generateUuidv4(): string {
-  let dt = new Date().getTime();
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
-    let rnd = Math.random() * 16;
-    rnd = ((dt + rnd) % 16) | 0;
-    dt = Math.floor(dt / 16);
-    return (c === "x" ? rnd : (rnd & 0x3) | 0x8).toString(16);
-  });
-}
