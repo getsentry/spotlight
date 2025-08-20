@@ -1,6 +1,6 @@
+import type { EventFrame } from "@spotlightjs/core/sentry";
 import type { ColorValue } from "nanovis";
 import { FRAME_COLOR } from "../constants/profile";
-import type { EventFrame } from "../types";
 
 /**
  * Checks if the current frame is an application frame based on the given platform.

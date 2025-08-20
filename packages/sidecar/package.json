@@ -52,7 +52,8 @@
     "tsdown": "^0.13.3",
     "tsx": "^4.20.3",
     "typescript": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "@spotlightjs/core": "workspace:*"
   },
   "volta": {
     "extends": "../../package.json"

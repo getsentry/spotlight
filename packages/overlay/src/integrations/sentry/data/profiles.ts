@@ -1,8 +1,8 @@
+import { generateUuidv4 } from "@spotlightjs/core";
+import type { EventFrame, Span, Trace } from "@spotlightjs/core/sentry";
 import { log } from "~/lib/logger";
-import { generateUuidv4 } from "../../../lib/uuid";
 import useSentryStore from "../store";
 import type { SentryProfileWithTraceMeta } from "../store/types";
-import type { EventFrame, Span, Trace } from "../types";
 import { compareSpans } from "../utils/traces";
 
 const _FUNCTION_NAME_FROM_FRAME_CACHE = new Map<EventFrame, string>();

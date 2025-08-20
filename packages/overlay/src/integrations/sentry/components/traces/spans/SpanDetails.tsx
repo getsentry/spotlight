@@ -1,13 +1,12 @@
+import { getFormattedDuration } from "@spotlightjs/core";
+import { type Span, isErrorEvent } from "@spotlightjs/core/sentry";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { format as formatSQL } from "sql-formatter";
 import Tabs from "~/components/tabs";
-import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
-import { isErrorEvent } from "~/integrations/sentry/utils/sentry";
 import { createTab } from "~/integrations/sentry/utils/tabs";
 import JsonViewer from "../../../../../components/JsonViewer";
 import { DB_SPAN_REGEX } from "../../../constants";
 import useSentryStore from "../../../store";
-import type { Span } from "../../../types";
 import EventList from "../../events/EventList";
 import LogsList from "../../log/LogsList";
 import { ContextView } from "../../shared/ContextView";

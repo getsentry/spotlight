@@ -1,13 +1,11 @@
-import type { SerializedLog, SerializedLogContainer } from "@sentry/core";
+import type { SerializedLog } from "@sentry/core";
+import { isLogEvent, processEnvelope } from "@spotlightjs/core/sentry";
 import type { EventContainer } from "../../eventContainer.js";
-import { processEnvelope } from "../parsing.js";
 
 export async function formatLogEnvelope(container: EventContainer) {
-  const event = processEnvelope({ contentType: container.getContentType(), data: container.getData() });
+  const { event: envelope } = processEnvelope({ contentType: container.getContentType(), data: container.getData() });
 
-  const {
-    envelope: [, items],
-  } = event;
+  const [, items] = envelope;
 
   const formatted: string[] = [];
   for (const item of items) {
@@ -23,9 +21,9 @@ export async function formatLogEnvelope(container: EventContainer) {
   return formatted;
 }
 
-function isLogEvent(payload: unknown): payload is SerializedLogContainer {
-  return typeof payload === "object" && payload !== null && "items" in payload;
-}
+// function isLogEvent(payload: unknown): payload is SerializedLogContainer {
+//   return typeof payload === "object" && payload !== null && "items" in payload;
+// }
 
 export function processLogEvent(event: SerializedLog): string {
   let attr = "";

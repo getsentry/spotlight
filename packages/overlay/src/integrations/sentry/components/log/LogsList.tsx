@@ -1,3 +1,5 @@
+import { formatTimestamp } from "@spotlightjs/core";
+import type { SentryLogEventItem } from "@spotlightjs/core/sentry";
 import { type KeyboardEvent, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
@@ -9,8 +11,6 @@ import Table from "~/ui/table";
 import { LOGS_HEADERS, LOGS_SORT_KEYS, LOG_LEVEL_COLORS } from "../../constants";
 import { useSentryLogs } from "../../data/useSentryLogs";
 import useSort from "../../hooks/useSort";
-import type { SentryLogEventItem } from "../../types";
-import { formatTimestamp } from "../../utils/duration";
 import HiddenItemsButton from "../shared/HiddenItemsButton";
 import LogDetails from "./LogDetail";
 

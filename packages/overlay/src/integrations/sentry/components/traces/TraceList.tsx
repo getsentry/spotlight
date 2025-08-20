@@ -1,8 +1,8 @@
+import type { Trace } from "@spotlightjs/core/sentry";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import CardList from "../../../../components/CardList";
 import { TraceSplitViewLayout } from "../../tabs/TracesTab";
-import type { Trace } from "../../types";
 import HiddenItemsButton from "../shared/HiddenItemsButton";
 import TraceItem from "./TraceItem";
 

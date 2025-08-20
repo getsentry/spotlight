@@ -1,6 +1,6 @@
+import type { Span, SpotlightAITrace } from "@spotlightjs/core/sentry";
 import { useMemo } from "react";
 import { aiLibraries } from "../components/insights/aiTraces/sdks/aiLibraries";
-import type { Span, SpotlightAITrace } from "../types";
 import { useSentryTraces } from "./useSentrySpans";
 
 // get all AI trace root spans across all AI frameworks

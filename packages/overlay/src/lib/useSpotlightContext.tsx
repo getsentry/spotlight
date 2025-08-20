@@ -1,6 +1,7 @@
+import { DEFAULT_SIDECAR_URL } from "@spotlightjs/core";
 import type React from "react";
 import { type ReactNode, createContext, useContext } from "react";
-import { DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from "../constants";
+import { DEFAULT_EXPERIMENTS } from "../constants";
 import type { SpotlightContext } from "../integrations/integration";
 
 const Context = createContext<SpotlightContext>({

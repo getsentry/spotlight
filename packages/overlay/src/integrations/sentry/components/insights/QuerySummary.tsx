@@ -1,3 +1,5 @@
+import { getFormattedDuration } from "@spotlightjs/core";
+import type { Span } from "@spotlightjs/core/sentry";
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
@@ -8,8 +10,7 @@ import Table from "~/ui/table";
 import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from "../../constants";
 import { useSentrySpans } from "../../data/useSentrySpans";
 import useSort from "../../hooks/useSort";
-import type { Span } from "../../types";
-import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
+import { getSpanDurationClassName } from "../../utils/duration";
 import { truncateId } from "../../utils/text";
 import { TimeBar } from "../shared/TimeBar";
 

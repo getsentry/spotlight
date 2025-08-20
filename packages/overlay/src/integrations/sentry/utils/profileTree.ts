@@ -1,8 +1,9 @@
+import { getFormattedDuration, getFormattedNumber } from "@spotlightjs/core";
+import type { EventFrame } from "@spotlightjs/core/sentry";
 import type { ColorValue } from "nanovis";
 import { SAMPLE_EMPTY_PROFILE_FRAME } from "../constants";
 import type { SentryProfileWithTraceMeta } from "../store/types";
-import type { EventFrame, NanovisTreeNode } from "../types";
-import { getFormattedDuration, getFormattedNumber } from "./duration";
+import type { NanovisTreeNode } from "../types";
 import { getFrameColors } from "./frame";
 
 interface FlamegraphUtilOptions {

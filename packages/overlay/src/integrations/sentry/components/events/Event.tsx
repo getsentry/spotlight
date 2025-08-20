@@ -1,4 +1,4 @@
-import type { SentryEvent } from "../../types";
+import type { SentryEvent } from "@spotlightjs/core/sentry";
 import { ErrorItem, ErrorSummary, ErrorTitle } from "./error/Error";
 
 function getEventMessage(event: SentryEvent) {

@@ -1,6 +1,6 @@
+import type { AggregateCallData, TraceId } from "@spotlightjs/core/sentry";
 import type { StateCreator } from "zustand";
 import { getFunctionNameFromFrame } from "../../data/profiles";
-import type { AggregateCallData, TraceId } from "../../types";
 import type { ProfilesSliceActions, ProfilesSliceState, SentryStore } from "../types";
 
 const initialProfilesState: ProfilesSliceState = {

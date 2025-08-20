@@ -1,5 +1,5 @@
+import type { AILibraryHandler, AIToolCall, Span, SpotlightAITrace } from "@spotlightjs/core/sentry";
 import { getAllSpansInTree } from "~/integrations/sentry/store/helpers";
-import type { AILibraryHandler, AIToolCall, Span, SpotlightAITrace } from "~/integrations/sentry/types";
 
 // https://ai-sdk.dev/docs/ai-sdk-core/telemetry
 // Core AI operation constants

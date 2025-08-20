@@ -1,10 +1,10 @@
+import { getFormattedDuration } from "@spotlightjs/core";
+import type { SpotlightAITrace } from "@spotlightjs/core/sentry";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ReactComponent as CrossIcon } from "~/assets/cross.svg";
 import useSearchInput from "~/integrations/sentry/hooks/useSearchInput";
 import useSentryStore from "~/integrations/sentry/store";
-import type { SpotlightAITrace } from "~/integrations/sentry/types";
-import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 import { cn } from "~/lib/cn";
 import DateTime from "../../shared/DateTime";
 import { createAITraceFromSpan, extractAllAIRootSpans } from "./sdks/aiLibraries";

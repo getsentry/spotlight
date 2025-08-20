@@ -181,6 +181,7 @@ export const TRANSACTION_SUMMARY_TABLE_HEADERS = [
     title: "Trace Id",
   },
 ];
+
 export const QUERY_SUMMARY_SORT_KEYS = {
   foundIn: "FOUND_IN",
   spanId: "SPAN_ID",

@@ -1,6 +1,6 @@
+import { generateUuidv4 } from "@spotlightjs/core";
+import type { Span } from "@spotlightjs/core/sentry";
 import { describe, expect, test } from "vitest";
-import { generateUuidv4 } from "../../../lib/uuid";
-import type { Span } from "../types";
 import { groupSpans } from "./traces";
 
 function mockSpan({ duration, ...span }: Partial<Span> & { duration?: number } = {}): Span {

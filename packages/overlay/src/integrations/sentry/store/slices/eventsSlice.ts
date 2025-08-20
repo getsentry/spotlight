@@ -1,15 +1,18 @@
+import { generateUuidv4 } from "@spotlightjs/core";
+import {
+  type ProfileSample,
+  type SentryEvent,
+  type SentryLogEventItem,
+  type SentryProfileTransactionInfo,
+  type SentryTransactionEvent,
+  type Span,
+  isErrorEvent,
+  isLogEvent,
+  isProfileEvent,
+  isTraceEvent,
+} from "@spotlightjs/core/sentry";
 import type { StateCreator } from "zustand";
-import { generateUuidv4 } from "~/lib/uuid";
 import { graftProfileSpans } from "../../data/profiles";
-import type {
-  ProfileSample,
-  SentryEvent,
-  SentryLogEventItem,
-  SentryProfileTransactionInfo,
-  SentryTransactionEvent,
-  Span,
-} from "../../types";
-import { isErrorEvent, isLogEvent, isProfileEvent, isTraceEvent } from "../../utils/sentry";
 import { compareSpans, groupSpans } from "../../utils/traces";
 import type { EventsSliceActions, EventsSliceState, SentryStore } from "../types";
 import { relativeNsToTimestamp, toTimestamp } from "../utils";

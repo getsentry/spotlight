@@ -1,7 +1,7 @@
+import { sdkToPlatform } from "@spotlightjs/core/sentry";
 import CardList from "~/components/CardList";
 import TimeSince from "~/components/TimeSince";
 import { useSentrySdks } from "~/integrations/sentry/data/useSentrySdks";
-import { sdkToPlatform } from "~/integrations/sentry/utils/sdkToPlatform";
 import PlatformIcon from "../../shared/PlatformIcon";
 
 export default function SdkList() {

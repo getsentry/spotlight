@@ -1,20 +1,24 @@
-import type { Client, Envelope, EnvelopeItem } from "@sentry/core";
+import type { Client, Envelope } from "@sentry/core";
 import { removeURLSuffix } from "~/lib/removeURLSuffix";
 import { off, on } from "../../lib/eventTarget";
 import { log, warn } from "../../lib/logger";
-import type { Integration, RawEventContext } from "../integration";
+import type { Integration } from "../integration";
 import { spotlightIntegration } from "./sentry-integration";
 import useSentryStore from "./store";
 import ErrorsTab from "./tabs/ErrorsTab";
 import InsightsTab from "./tabs/InsightsTab";
 
 import { spotlightBrowserIntegration } from "@sentry/browser";
+import {
+  type RawEventContext,
+  type SentryErrorEvent,
+  type SentryEvent,
+  isErrorEvent,
+  processEnvelope,
+} from "@spotlightjs/core/sentry";
 import { getLocalTraces, isLocalTrace } from "./store/helpers";
 import LogsTab from "./tabs/LogsTab";
 import TracesTab from "./tabs/TracesTab";
-import type { SentryErrorEvent, SentryEvent } from "./types";
-import { parseJSONFromBuffer } from "./utils/bufferParsers";
-import { isErrorEvent } from "./utils/sentry";
 import { createTab } from "./utils/tabs";
 
 const HEADER = "application/x-sentry-envelope";
@@ -64,7 +68,7 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
       };
     },
 
-    processEvent: (event: RawEventContext) => processEnvelope(event),
+    processEvent: (event: RawEventContext) => handleProcessEnvelope(event),
 
     panels: () => {
       const store = useSentryStore.getState();
@@ -121,62 +125,10 @@ export default function sentryIntegration(options: SentryIntegrationOptions = {}
   } satisfies Integration<Envelope>;
 }
 
-function getLineEnd(data: Uint8Array): number {
-  let end = data.indexOf(0xa);
-  if (end === -1) {
-    end = data.length;
-  }
-
-  return end;
-}
-
-/**
- * Implements parser for
- * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
- * @param rawEvent Envelope data
- * @returns parsed envelope
- */
-export function processEnvelope(rawEvent: RawEventContext) {
-  let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
-
-  function readLine(length?: number) {
-    const cursor = length ?? getLineEnd(buffer);
-    const line = buffer.subarray(0, cursor);
-    buffer = buffer.subarray(cursor + 1);
-    return line;
-  }
-
-  const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
-
-  const items: EnvelopeItem[] = [];
-  while (buffer.length) {
-    const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
-    const payloadLength = itemHeader.length;
-    const itemPayloadRaw = readLine(payloadLength);
-
-    let itemPayload: EnvelopeItem[1];
-    try {
-      itemPayload = parseJSONFromBuffer(itemPayloadRaw);
-      // data sanitization
-      if (itemHeader.type) {
-        // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
-        itemPayload.type = itemHeader.type;
-      }
-    } catch (err) {
-      itemPayload = itemPayloadRaw;
-      log(err);
-    }
-
-    items.push([itemHeader, itemPayload] as EnvelopeItem);
-  }
-
-  const envelope = [envelopeHeader, items] as Envelope;
-  useSentryStore.getState().pushEnvelope({ envelope, rawEnvelope: rawEvent });
-
-  return {
-    event: envelope,
-    rawEvent: rawEvent,
-  };
+export function handleProcessEnvelope(_event: RawEventContext) {
+  const { event, rawEvent } = processEnvelope(_event, log);
+  useSentryStore.getState().pushEnvelope({ envelope: event, rawEnvelope: rawEvent });
+  return { rawEvent, event };
 }
 
 type V8Carrier = {

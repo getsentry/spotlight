@@ -1,11 +1,11 @@
+import { getFormattedDuration } from "@spotlightjs/core";
+import type { AILibraryHandler, SpotlightAITrace } from "@spotlightjs/core/sentry";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   createAITraceFromSpan,
   detectAILibraryHandler,
 } from "~/integrations/sentry/components/insights/aiTraces/sdks/aiLibraries";
-import type { AILibraryHandler, SpotlightAITrace } from "~/integrations/sentry/types";
-import { getFormattedDuration } from "~/integrations/sentry/utils/duration";
 import { Badge } from "~/ui/badge";
 import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
 import Table from "~/ui/table";

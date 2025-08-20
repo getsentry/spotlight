@@ -1,14 +1,10 @@
 import fontStyles from "@fontsource/raleway/index.css?inline";
+import { DEFAULT_SIDECAR_STREAM_URL } from "@spotlightjs/core";
 import { CONTEXT_LINES_ENDPOINT } from "@spotlightjs/sidecar/constants";
 import { MemoryRouter } from "react-router-dom";
 import colors from "tailwindcss/colors";
 import App from "./App";
-import {
-  DEFAULT_ANCHOR,
-  DEFAULT_EXPERIMENTS,
-  DEFAULT_SIDECAR_STREAM_URL,
-  SPOTLIGHT_OPEN_CLASS_NAME,
-} from "./constants";
+import { DEFAULT_ANCHOR, DEFAULT_EXPERIMENTS, SPOTLIGHT_OPEN_CLASS_NAME } from "./constants";
 import globalStyles from "./index.css?inline";
 import { type SpotlightContext, initIntegrations } from "./integrations/integration";
 import { default as sentry } from "./integrations/sentry/index";

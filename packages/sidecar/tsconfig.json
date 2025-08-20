@@ -6,10 +6,10 @@
     "paths": {
       "~/*": ["src/*"]
     },
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "esModuleInterop": false,
     "target": "esnext",
-    "module": "nodenext",
+    "module": "ESNext",
     /* paths */
     "outDir": "dist",
     "rootDir": "src"

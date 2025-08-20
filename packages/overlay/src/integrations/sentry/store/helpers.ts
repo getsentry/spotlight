@@ -1,5 +1,5 @@
+import type { Span } from "@spotlightjs/core/sentry";
 import useSentryStore from ".";
-import type { Span } from "../types";
 
 export function isLocalTrace(traceId: string) {
   const localTraceIds = useSentryStore.getState().localTraceIds;

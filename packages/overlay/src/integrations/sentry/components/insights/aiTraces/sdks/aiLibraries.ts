@@ -1,4 +1,4 @@
-import type { AILibraryHandler, Span, SpotlightAITrace, Trace } from "~/integrations/sentry/types";
+import type { AILibraryHandler, Span, SpotlightAITrace, Trace } from "@spotlightjs/core/sentry";
 import { vercelAISDKHandler } from "./vercelAISDK";
 
 // Registry of supported AI libraries

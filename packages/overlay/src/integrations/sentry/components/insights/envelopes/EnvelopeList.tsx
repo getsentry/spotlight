@@ -1,4 +1,5 @@
 import type { Envelope } from "@sentry/core";
+import { sdkToPlatform } from "@spotlightjs/core/sentry";
 import { Link, useParams } from "react-router-dom";
 import CardList from "~/components/CardList";
 import TimeSince from "~/components/TimeSince";
@@ -7,7 +8,6 @@ import { cn } from "~/lib/cn";
 import { Badge } from "~/ui/badge";
 import { useSentryEnvelopes } from "../../../data/useSentryEnvelopes";
 import useSentryStore from "../../../store";
-import { sdkToPlatform } from "../../../utils/sdkToPlatform";
 import { truncateId } from "../../../utils/text";
 import PlatformIcon from "../../shared/PlatformIcon";
 import EnvelopeDetails from "./EnvelopeDetails";

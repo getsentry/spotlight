@@ -1,3 +1,5 @@
+import { formatBytes, getFormattedDuration } from "@spotlightjs/core";
+import type { Span } from "@spotlightjs/core/sentry";
 import { useMemo } from "react";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
 import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
@@ -7,9 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/ui/t
 import { RESOURCES_SORT_KEYS, RESOURCE_HEADERS } from "../../constants";
 import { useSentrySpans } from "../../data/useSentrySpans";
 import useSort from "../../hooks/useSort";
-import type { Span } from "../../types";
-import { formatBytes } from "../../utils/bytes";
-import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
+import { getSpanDurationClassName } from "../../utils/duration";
 
 type ResourceInfo = {
   avgDuration: number;

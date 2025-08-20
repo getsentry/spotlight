@@ -1,4 +1,4 @@
-import type { SentryEvent } from "~/integrations/sentry/types";
+import type { SentryEvent } from "@spotlightjs/core/sentry";
 import type { WebVitals } from "../constants";
 
 const SQRT_2 = Math.sqrt(2);
