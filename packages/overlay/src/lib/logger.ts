@@ -8,8 +8,8 @@ export function activateLogger() {
   enableLogging(true);
   const logger = getLogger();
 
-  _log = (...args: unknown[]) => logger.info(args.map(arg => String(arg)).join(" "));
-  _warn = (...args: unknown[]) => logger.warn(args.map(arg => String(arg)).join(" "));
+  _log = (...args: unknown[]) => logger.info(...args);
+  _warn = (...args: unknown[]) => logger.warn(...args);
 }
 
 export function deactivateLogger() {
@@ -25,5 +25,4 @@ export function log(...args: unknown[]) {
 export function warn(...args: unknown[]) {
   _warn(...args);
 }
-
 export { SPOTLIGHT_PREFIX };

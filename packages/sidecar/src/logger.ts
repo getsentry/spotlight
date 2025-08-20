@@ -1,17 +1,10 @@
-import { enableLogging, getLoggingState } from "@spotlightjs/core";
+import { enableLogging, getLogger, getLoggingState } from "@spotlightjs/core";
 
 export type SidecarLogger = {
-  info: (message: string) => void;
-  warn: (message: string) => void;
-  error: (message: string) => void;
-  debug: (message: string) => void;
-};
-
-const defaultLogger: SidecarLogger = {
-  info: (message: string) => console.log("🔎 [Spotlight]", message),
-  warn: (message: string) => console.warn("🔎 [Spotlight]", message),
-  error: (message: string) => console.error("🔎 [Spotlight]", message),
-  debug: (message: string) => getLoggingState() && console.debug("🔎 [Spotlight]", message),
+  info: (...args: unknown[]) => void;
+  warn: (...args: unknown[]) => void;
+  error: (...args: unknown[]) => void;
+  debug: (...args: unknown[]) => void;
 };
 
 let injectedLogger: SidecarLogger | undefined = undefined;
@@ -28,9 +21,17 @@ export function isDebugEnabled(): boolean {
   return getLoggingState();
 }
 
+function routeLog(method: keyof SidecarLogger, ...args: unknown[]): void {
+  if (injectedLogger) {
+    injectedLogger[method](...args);
+  } else {
+    getLogger()[method](...args);
+  }
+}
+
 export const logger = {
-  info: (message: string) => (injectedLogger || defaultLogger).info(message),
-  warn: (message: string) => (injectedLogger || defaultLogger).warn(message),
-  error: (message: string) => (injectedLogger || defaultLogger).error(message),
-  debug: (message: string) => (injectedLogger || defaultLogger).debug(message),
+  info: (...args: unknown[]) => routeLog("info", ...args),
+  warn: (...args: unknown[]) => routeLog("warn", ...args),
+  error: (...args: unknown[]) => routeLog("error", ...args),
+  debug: (...args: unknown[]) => routeLog("debug", ...args),
 };

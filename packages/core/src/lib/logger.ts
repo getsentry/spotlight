@@ -1,10 +1,10 @@
 export const SPOTLIGHT_PREFIX = "🔎 [Spotlight]";
 
 export interface BaseLogger {
-  info: (message: string) => void;
-  warn: (message: string) => void;
-  error: (message: string) => void;
-  debug: (message: string) => void;
+  info: (...args: unknown[]) => void;
+  warn: (...args: unknown[]) => void;
+  error: (...args: unknown[]) => void;
+  debug: (...args: unknown[]) => void;
 }
 
 const noopLogger: BaseLogger = {
@@ -15,10 +15,10 @@ const noopLogger: BaseLogger = {
 };
 
 const defaultLogger: BaseLogger = {
-  info: (message: string) => console.log(SPOTLIGHT_PREFIX, message),
-  warn: (message: string) => console.warn(SPOTLIGHT_PREFIX, message),
-  error: (message: string) => console.error(SPOTLIGHT_PREFIX, message),
-  debug: (message: string) => console.debug(SPOTLIGHT_PREFIX, message),
+  info: (...args: unknown[]) => console.log(SPOTLIGHT_PREFIX, ...args),
+  warn: (...args: unknown[]) => console.warn(SPOTLIGHT_PREFIX, ...args),
+  error: (...args: unknown[]) => console.error(SPOTLIGHT_PREFIX, ...args),
+  debug: (...args: unknown[]) => console.debug(SPOTLIGHT_PREFIX, ...args),
 };
 
 let isLoggingEnabled = true;
