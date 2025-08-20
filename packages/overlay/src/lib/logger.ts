@@ -8,12 +8,8 @@ export function activateLogger() {
   enableLogging(true);
   const logger = getLogger();
 
-  _log = (...args: unknown[]) => {
-    logger.info(args.map(arg => String(arg)).join(" "));
-  };
-  _warn = (...args: unknown[]) => {
-    logger.warn(args.map(arg => String(arg)).join(" "));
-  };
+  _log = (...args: unknown[]) => logger.info(args.map(arg => String(arg)).join(" "));
+  _warn = (...args: unknown[]) => logger.warn(args.map(arg => String(arg)).join(" "));
 }
 
 export function deactivateLogger() {
@@ -30,5 +26,4 @@ export function warn(...args: unknown[]) {
   _warn(...args);
 }
 
-// Re-export the prefix for backward compatibility
 export { SPOTLIGHT_PREFIX };

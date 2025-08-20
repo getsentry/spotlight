@@ -1,4 +1,4 @@
-import { enableLogging } from "@spotlightjs/core";
+import { enableLogging, getLoggingState } from "@spotlightjs/core";
 
 export type SidecarLogger = {
   info: (message: string) => void;
@@ -11,23 +11,21 @@ const defaultLogger: SidecarLogger = {
   info: (message: string) => console.log("🔎 [Spotlight]", message),
   warn: (message: string) => console.warn("🔎 [Spotlight]", message),
   error: (message: string) => console.error("🔎 [Spotlight]", message),
-  debug: (message: string) => debugEnabled && console.debug("🔎 [Spotlight]", message),
+  debug: (message: string) => getLoggingState() && console.debug("🔎 [Spotlight]", message),
 };
 
 let injectedLogger: SidecarLogger | undefined = undefined;
-let debugEnabled = false;
 
 export function activateLogger(logger: SidecarLogger): void {
   injectedLogger = logger;
 }
 
 export function enableDebugLogging(debug: boolean): void {
-  debugEnabled = debug;
   enableLogging(debug);
 }
 
 export function isDebugEnabled(): boolean {
-  return debugEnabled;
+  return getLoggingState();
 }
 
 export const logger = {
