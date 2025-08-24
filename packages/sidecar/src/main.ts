@@ -14,11 +14,14 @@ import { contextLinesHandler } from "./contextlines.js";
 import { logIncomingEvent, logOutgoingEvent } from "./debugLogging.js";
 import { EventContainer } from "./eventContainer.js";
 import { type SidecarLogger, activateLogger, enableDebugLogging, logger } from "./logger.js";
+import { SIDECAR_MCP_CONTENT_TYPE } from "./mcp/constants.js";
 import { createMcpInstance } from "./mcp/index.js";
+import { getSidecarMcpBuffer, trackConnectionClose } from "./mcp/tracking.js";
 import { generateUuidv4 } from "./messageBuffer.js";
+import { McpConnectionManager } from "./services/McpConnectionManager.js";
 import { streamSSE } from "./streaming.js";
 import { parseBrowserFromUserAgent } from "./userAgent.js";
-import { type HonoEnv, type IncomingPayloadCallback, getBuffer } from "./utils.js";
+import { type HonoEnv, type IncomingPayloadCallback, createClientAwareTransport, getBuffer } from "./utils.js";
 
 type SideCarOptions = {
   /**
@@ -70,7 +73,10 @@ const withTracing =
 
 const contextId = generateUuidv4();
 const transport = new StreamableHTTPTransport();
+
 const mcp = createMcpInstance();
+const connectionManager = new McpConnectionManager(mcp, transport);
+const clientAwareTransport = createClientAwareTransport(mcp, transport);
 
 export const app = new Hono<HonoEnv>()
   .use(contextStorage(), async (ctx, next) => {
@@ -80,23 +86,23 @@ export const app = new Hono<HonoEnv>()
   .all(
     "/mcp",
     async (_ctx, next) => {
-      if (!mcp.isConnected()) {
-        // Connecting the MCP with the transport
-        await mcp.connect(transport);
-      }
-
+      await connectionManager.ensureConnection();
       await next();
     },
-    ctx => transport.handleRequest(ctx),
+    ctx => {
+      return clientAwareTransport.handleRequest(ctx);
+    },
   )
   .get("/health", ctx => ctx.text("OK"))
   .use(cors())
   .delete("/clear", ctx => {
     getBuffer().clear();
+    getSidecarMcpBuffer().clear();
     return ctx.text("Cleared");
   })
   .get("/stream", ctx => {
     const buffer = getBuffer();
+    const mcpBuffer = getSidecarMcpBuffer();
 
     const useBase64 = ctx.req.query("base64") != null;
     const base64Indicator = useBase64 ? ";base64" : "";
@@ -123,8 +129,16 @@ export const app = new Hono<HonoEnv>()
         });
       });
 
+      const mcpSub = mcpBuffer.subscribe(interaction => {
+        stream.writeSSE({
+          event: `${SIDECAR_MCP_CONTENT_TYPE}${base64Indicator}`,
+          data: useBase64 ? Buffer.from(JSON.stringify(interaction)).toString("base64") : JSON.stringify(interaction),
+        });
+      });
+
       stream.onAbort(() => {
         buffer.unsubscribe(sub);
+        mcpBuffer.unsubscribe(mcpSub);
       });
     });
   })
@@ -428,6 +442,16 @@ export const shutdown = () => {
   if (portInUseRetryTimeout) {
     clearTimeout(portInUseRetryTimeout);
   }
+
+  // Track MCP connection closure on shutdown
+  if (mcp.isConnected()) {
+    trackConnectionClose("mcp-server", "server_shutdown", {
+      transport: "http",
+      timestamp: new Date().toISOString(),
+      reason: "server_shutdown",
+    });
+  }
+
   if (forceShutdown || !serverInstance) {
     logger.info("Bye.");
     process.exit(0);
@@ -444,3 +468,14 @@ export const shutdown = () => {
 
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
+
+// Track MCP connection  on unexpected process exit
+process.on("exit", () => {
+  if (mcp.isConnected()) {
+    trackConnectionClose("mcp-server", "process_exit", {
+      transport: "http",
+      timestamp: new Date().toISOString(),
+      reason: "process_exit",
+    });
+  }
+});

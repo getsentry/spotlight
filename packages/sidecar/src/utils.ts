@@ -1,7 +1,11 @@
 import type { StreamableHTTPTransport } from "@hono/mcp";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { getContext } from "hono/context-storage";
 import type { EventContainer } from "./eventContainer.js";
 import { MessageBuffer } from "./messageBuffer.js";
+
+import { HttpClientInfoExtractor } from "./services/ClientInfoExtractor.js";
+import { ClientAwareMcpTransport } from "./services/TrackedMcpTransport.js";
 
 export type IncomingPayloadCallback = (body: string) => void;
 
@@ -29,4 +33,12 @@ export function getBuffer(contextId?: string) {
   }
 
   return buffer;
+}
+
+export function createClientAwareTransport(
+  _mcp: McpServer,
+  transport: StreamableHTTPTransport,
+): ClientAwareMcpTransport {
+  const clientExtractor = new HttpClientInfoExtractor();
+  return new ClientAwareMcpTransport(transport, clientExtractor);
 }

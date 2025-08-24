@@ -12,6 +12,7 @@ import {
 import globalStyles from "./index.css?inline";
 import { type SpotlightContext, initIntegrations } from "./integrations/integration";
 import { default as sentry } from "./integrations/sentry/index";
+import sidecarMcpIntegration from "./integrations/sidecar-mcp";
 import { getPanelsFromIntegrations } from "./integrations/utils/extractPanelsFromIntegrations";
 import { off, on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
@@ -24,6 +25,7 @@ import type { SpotlightOverlayOptions, WindowWithSpotlight } from "./types";
 export { default as hydrationError } from "./integrations/hydration-error/index";
 export { default as sentry } from "./integrations/sentry/index";
 export { default as viteInspect } from "./integrations/vite-inspect/index";
+export { default as sidecarMcp } from "./integrations/sidecar-mcp";
 export type { SpotlightOverlayOptions, WindowWithSpotlight } from "./types";
 export {
   SPOTLIGHT_OPEN_CLASS_NAME,
@@ -140,7 +142,10 @@ export async function init(initOptions: SpotlightOverlayOptions = {}) {
   const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };
 
   // Sentry is enabled by default
-  const defaultIntegrations = () => [sentry({ injectIntoSDK: !isLoadedFromSidecar && !fullPage })];
+  const defaultIntegrations = () => [
+    sentry({ injectIntoSDK: !isLoadedFromSidecar && !fullPage }),
+    sidecarMcpIntegration(),
+  ];
 
   const context: SpotlightContext = {
     open: openSpotlight,

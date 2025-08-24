@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
 import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
+import useSort from "~/integrations/hooks/useSort";
 import { cn } from "~/lib/cn";
 import Table from "~/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/ui/tooltip";
 import { RESOURCES_SORT_KEYS, RESOURCE_HEADERS } from "../../constants";
 import { useSentrySpans } from "../../data/useSentrySpans";
-import useSort from "../../hooks/useSort";
 import type { Span } from "../../types";
 import { formatBytes } from "../../utils/bytes";
 import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";

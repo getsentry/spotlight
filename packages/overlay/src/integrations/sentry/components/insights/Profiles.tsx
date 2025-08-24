@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
 import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
+import useSort from "~/integrations/hooks/useSort";
 import { cn } from "~/lib/cn";
 import Table from "~/ui/table";
 import { AGGREGATE_CALL_PROFILES_SORT_KEYS, AGGREGATE_PROFILES_HEADERS } from "../../constants";
-import useSort from "../../hooks/useSort";
 import useSentryStore from "../../store";
 import type { AggregateCallData } from "../../types";
 import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
