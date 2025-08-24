@@ -468,14 +468,3 @@ export const shutdown = () => {
 
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
-
-// Track MCP connection  on unexpected process exit
-process.on("exit", () => {
-  if (mcp.isConnected()) {
-    trackConnectionClose("mcp-server", "process_exit", {
-      transport: "http",
-      timestamp: new Date().toISOString(),
-      reason: "process_exit",
-    });
-  }
-});

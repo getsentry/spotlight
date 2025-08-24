@@ -46,8 +46,6 @@ export default function SidecarMcpTabList() {
   const { sort, toggleSortOrder } = useSort({ defaultSortType: SIDECAR_MCP_SORT_KEYS.timestamp, defaultAsc: false });
   const [showOnlyToolCalls, setShowOnlyToolCalls] = useState(false);
 
-  console.log(params);
-
   const handleRowClick = (interaction: SidecarMcpInteraction) => {
     navigate(`${interaction.id}`);
   };
