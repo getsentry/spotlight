@@ -9,11 +9,11 @@ import ErrorsTab from "./tabs/ErrorsTab";
 import InsightsTab from "./tabs/InsightsTab";
 
 import { spotlightBrowserIntegration } from "@sentry/browser";
+import { parseJSONFromBuffer } from "../utils/bufferParsers";
 import { getLocalTraces, isLocalTrace } from "./store/helpers";
 import LogsTab from "./tabs/LogsTab";
 import TracesTab from "./tabs/TracesTab";
 import type { SentryErrorEvent, SentryEvent } from "./types";
-import { parseJSONFromBuffer } from "./utils/bufferParsers";
 import { isErrorEvent } from "./utils/sentry";
 import { createTab } from "./utils/tabs";
 

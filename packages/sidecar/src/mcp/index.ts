@@ -3,14 +3,17 @@ import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { getBuffer } from "../utils.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
+import { wrapMcpServerWithTracking } from "./tracking.js";
 import { formatErrorEnvelope, formatLogEnvelope } from "./utils/index.js";
 import { buildSpanTree, extractTracesFromEnvelopes, formatTraceSummary, renderSpanTree } from "./utils/traces.js";
 
 export function createMcpInstance() {
-  const mcp = new McpServer({
-    name: "spotlight-mcp",
-    version: String(process.env.npm_package_version),
-  });
+  const mcp = wrapMcpServerWithTracking(
+    new McpServer({
+      name: "spotlight-mcp",
+      version: String(process.env.npm_package_version),
+    }),
+  );
 
   mcp.registerTool(
     "get_local_errors",
