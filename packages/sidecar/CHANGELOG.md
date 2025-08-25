@@ -1,5 +1,13 @@
 # @spotlightjs/sidecar
 
+## 1.12.1
+
+### Patch Changes
+
+- - To check all items in an envelope for errors. ([#880](https://github.com/getsentry/spotlight/pull/880))
+
+- To add a soft reset buffer when its cleared. ([#895](https://github.com/getsentry/spotlight/pull/895))
+
 ## 1.12.0
 
 ### Minor Changes
