@@ -4,7 +4,7 @@ import useSentryStore from "../../store";
 import type { SentryErrorEvent, SentryEvent } from "../../types";
 import { createTab } from "../../utils/tabs";
 import PlatformIcon from "../shared/PlatformIcon";
-import AIFixButtons from "./AIFixButtons";
+import AICopyButton from "./AICopyButton";
 import Event, { EventTitle } from "./Event";
 import EventBreadcrumbs from "./EventBreadcrumbs";
 import EventContexts from "./EventContexts";
@@ -42,7 +42,7 @@ export default function EventDetails() {
         <PlatformIcon event={event} className="rounded-md" />
         <h1 className="max-w-full flex-1 truncate text-2xl">{renderEventTitle(event)}</h1>
         <div className="flex items-center gap-4">
-          {isErrorEvent && <AIFixButtons event={event as SentryErrorEvent} />}
+          {isErrorEvent && <AICopyButton event={event as SentryErrorEvent} />}
           {traceCtx && (
             <div className="text-primary-300 font-mono">
               <div>

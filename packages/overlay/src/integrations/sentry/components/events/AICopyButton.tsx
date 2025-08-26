@@ -7,12 +7,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/ui/t
 import type { SentryErrorEvent } from "../../types";
 import { formatErrorForAI } from "../../utils/aiFormatting";
 
-interface AIFixButtonsProps {
+interface AICopyButtonProps {
   event: SentryErrorEvent;
 }
 
-function AICopyButton({ prompt }: { prompt: string }) {
+export default function AICopyButton({ event }: AICopyButtonProps) {
+  const errorContext = formatErrorForAI(event);
+
   const [isCopied, setIsCopied] = useState(false);
+
+  const prompt = `Please help me fix this error:\n\n${errorContext}\n\nPlease provide:\n1. Root cause analysis\n2. Specific fix recommendations\n3. Code examples if applicable`;
 
   const handleClick = useCallback(
     (evt: React.MouseEvent) => {
@@ -50,16 +54,4 @@ function AICopyButton({ prompt }: { prompt: string }) {
       </Tooltip>
     </TooltipProvider>
   );
-}
-
-export default function AIFixButtons({ event }: AIFixButtonsProps) {
-  const errorContext = formatErrorForAI(event);
-
-  if (!errorContext.trim()) {
-    return null;
-  }
-
-  const prompt = `Please help me fix this error:\n\n${errorContext}\n\nPlease provide:\n1. Root cause analysis\n2. Specific fix recommendations\n3. Code examples if applicable`;
-
-  return <AICopyButton prompt={prompt} />;
 }
