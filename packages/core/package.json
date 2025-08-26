@@ -1,0 +1,49 @@
+{
+  "name": "@spotlightjs/core",
+  "description": "Core types, parsers, formatters, and shared utilities for Spotlight.",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "clean": "rimraf dist"
+  },
+  "files": ["dist"],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./sentry": {
+      "types": "./dist/sentry/index.d.ts",
+      "import": "./dist/sentry/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "sentry": ["./dist/sentry/index.d.ts"],
+      "sentry/*": ["./dist/sentry/*"]
+    }
+  },
+  "dependencies": {
+    "@sentry/core": "catalog:"
+  },
+  "devDependencies": {
+    "dayjs": "^1.11.13",
+    "@spotlightjs/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "^3.9.1"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

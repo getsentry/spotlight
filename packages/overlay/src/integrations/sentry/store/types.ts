@@ -1,5 +1,5 @@
 import type { Envelope } from "@sentry/core";
-import type { RawEventContext } from "~/integrations/integration";
+import type { RawEventContext } from "@spotlightjs/core/sentry";
 import type {
   AggregateCallData,
   Sdk,
@@ -8,7 +8,7 @@ import type {
   SentryLogEventItem,
   SentryProcessedProfile,
   Trace,
-} from "../types";
+} from "@spotlightjs/core/sentry";
 
 export type SentryProfileWithTraceMeta = SentryProcessedProfile & {
   timestamp: number;

@@ -34,6 +34,7 @@
     "@sentry/browser": "^10",
     "@sentry/core": "catalog:",
     "@sentry/react": "^10",
+    "@spotlightjs/core": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
     "@spotlightjs/tsconfig": "workspace:*",
     "@tailwindcss/vite": "catalog:",

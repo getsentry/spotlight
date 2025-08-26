@@ -1,8 +1,8 @@
+import type { Breadcrumb, SentryEvent } from "@spotlightjs/core/sentry";
 import { Fragment } from "react";
 import JsonViewer from "~/components/JsonViewer";
 import { cn } from "~/lib/cn";
 import Time from "../../../../components/Time";
-import type { Breadcrumb, SentryEvent } from "../../types";
 
 const EXAMPLE_BREADCRUMB = `Sentry.addBreadcrumb({
   category: "auth",

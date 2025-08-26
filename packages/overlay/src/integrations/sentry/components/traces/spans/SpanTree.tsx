@@ -1,7 +1,7 @@
+import type { Span, TraceContext } from "@spotlightjs/core/sentry";
 import { useMemo } from "react";
 import { useSearch } from "~/integrations/sentry/context/SearchContext";
 import { cn } from "~/lib/cn";
-import type { Span, TraceContext } from "../../../types";
 import SpanItem from "./SpanItem";
 
 export default function SpanTree({

@@ -1,10 +1,10 @@
+import type { Span, Trace } from "@spotlightjs/core/sentry";
+import { getFormattedSpanDuration } from "@spotlightjs/core/sentry";
 import { Link, useParams } from "react-router-dom";
 import { cn } from "~/lib/cn";
 import { Badge } from "~/ui/badge";
 import TimeSince from "../../../../components/TimeSince";
 import { isLocalTrace } from "../../store/helpers";
-import type { Span, Trace } from "../../types";
-import { getFormattedSpanDuration } from "../../utils/duration";
 import { truncateId } from "../../utils/text";
 import { hasAISpans } from "../insights/aiTraces/sdks/aiLibraries";
 import { TraceRootTxnName } from "./TraceDetails/components/TraceRootTxnName";

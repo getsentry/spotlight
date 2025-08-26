@@ -1,5 +1,5 @@
+import type { MetricScoreProps, MetricWeightsProps } from "@spotlightjs/core/sentry";
 import { useRef, useState } from "react";
-import type { MetricScoreProps, MetricWeightsProps } from "~/integrations/sentry/types";
 import { calculateLabelCoordinates } from "~/integrations/sentry/utils/webVitals";
 import { cn } from "~/lib/cn";
 import RingChart from "~/ui/ringChart";

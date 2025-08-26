@@ -1,9 +1,9 @@
 import type { Envelope } from "@sentry/core";
+import { parseStringFromBuffer } from "@spotlightjs/core";
+import type { RawEventContext } from "@spotlightjs/core/sentry";
 import { useState } from "react";
 import { ReactComponent as Download } from "~/assets/download.svg";
 import JsonViewer from "~/components/JsonViewer";
-import type { RawEventContext } from "~/integrations/integration";
-import { parseStringFromBuffer } from "~/integrations/sentry/utils/bufferParsers";
 import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
 
 export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; rawEnvelope: RawEventContext } }) {

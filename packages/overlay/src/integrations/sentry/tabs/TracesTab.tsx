@@ -1,3 +1,4 @@
+import type { Span, Trace } from "@spotlightjs/core/sentry"; // Ensure Trace type is available
 import { useCallback, useRef, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { cn } from "~/lib/cn";
@@ -14,7 +15,6 @@ import SpanDetails from "../components/traces/spans/SpanDetails";
 import { SentryEventsContextProvider } from "../data/sentryEventsContext";
 import { useSentryTraces } from "../data/useSentrySpans";
 import useTraceFiltering from "../hooks/useTraceFiltering";
-import type { Span, Trace } from "../types"; // Ensure Trace type is available
 
 const MIN_PANEL_WIDTH_PERCENT = 20;
 const MAX_PANEL_WIDTH_PERCENT = 80;

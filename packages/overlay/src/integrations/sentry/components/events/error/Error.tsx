@@ -1,4 +1,4 @@
-import type { EventException, EventExceptionValue, SentryErrorEvent } from "../../../types";
+import type { EventException, EventExceptionValue, SentryErrorEvent } from "@spotlightjs/core/sentry";
 import Frame from "./Frame";
 
 export function ErrorTitle({ event }: { event: SentryErrorEvent }) {

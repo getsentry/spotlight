@@ -1,5 +1,5 @@
+import type { Span } from "@spotlightjs/core/sentry";
 import { type ReactNode, createContext, useCallback, useContext, useState } from "react";
-import type { Span } from "../types";
 type SearchContextType = {
   query: string;
   setQuery: (query: string) => void;
