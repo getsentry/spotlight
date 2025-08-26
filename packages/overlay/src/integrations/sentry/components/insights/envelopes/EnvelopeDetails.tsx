@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ReactComponent as Download } from "~/assets/download.svg";
 import JsonViewer from "~/components/JsonViewer";
 import type { RawEventContext } from "~/integrations/integration";
-import { parseStringFromBuffer } from "~/integrations/sentry/utils/bufferParsers";
+import { parseStringFromBuffer } from "~/integrations/utils/bufferParsers";
 import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
 
 export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; rawEnvelope: RawEventContext } }) {

@@ -75,3 +75,22 @@ export const NO_LOGS_CONTENT: CallToolResult = {
     },
   ],
 };
+
+export const SIDECAR_MCP_CONTENT_TYPE = "spotlight-sidecar-mcp";
+
+export const SIDECAR_MCP_BUFFER_SIZE = 1000;
+
+export const SIDECAR_MCP_INTERACTION_TYPES = {
+  TOOL_CALL_SUCCESS: "tool_call_success",
+  TOOL_CALL_ERROR: "tool_call_error",
+
+  CONNECTION_OPEN: "connection_open",
+  CONNECTION_CLOSE: "connection_close",
+  CONNECTION_ERROR: "connection_error",
+
+  REQUEST: "mcp_request",
+  RESPONSE: "mcp_response",
+} as const;
+
+export type SidecarMcpInteractionType =
+  (typeof SIDECAR_MCP_INTERACTION_TYPES)[keyof typeof SIDECAR_MCP_INTERACTION_TYPES];
