@@ -1,6 +1,6 @@
 ---
-import { Fragment } from 'react';
-import ButtonLink from './ButtonLink.astro';
+import { Fragment } from "react";
+import ButtonLink from "./ButtonLink.astro";
 
 // Used to override the default hero component
 ---
@@ -52,7 +52,7 @@ import ButtonLink from './ButtonLink.astro';
     animation:
       fade-in 1s ease-in-out 0s forwards,
       fade-in-neon 1s ease-out 0.25s forwards;
-    font-family: 'Raleway', sans-serif;
+    font-family: "Raleway", sans-serif;
   }
 
   .sub-heading {
@@ -87,11 +87,14 @@ import ButtonLink from './ButtonLink.astro';
 
 <div class="wrapper">
   <h1 class="neon-header">Debuggability Elevated</h1>
-  <div class="sub-heading mb-4">Spotlight is a debugging tool that can be embedded in your web app</div>
+  <div class="sub-heading mb-4">
+    Spotlight is a debugging tool that can be embedded in your web app
+  </div>
   <div class="cta flex items-center justify-center gap-2 py-4 mb-4">
-    <button class="px-3 py-3 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 cursor-pointer"
-    onclick="Spotlight.openSpotlight()">Checkout Live</button>
-    or
-    <ButtonLink href="/about/">Learn More</ButtonLink>
+    <ButtonLink
+      href="/about/"
+      class="px-3 py-3 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 cursor-pointer"
+      >Learn More</ButtonLink
+    >
   </div>
 </div>

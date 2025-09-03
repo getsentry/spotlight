@@ -73,13 +73,6 @@ export default defineConfig({
               "Spotlight is Sentry for Development. Inspired by an old project, Django Debug Toolbar, Spotlight brings a rich debug overlay into development environments, and it does it by leveraging the existing power of Sentry's SDKs.",
           },
         },
-        {
-          tag: "script",
-          attrs: {
-            src: "https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.iife.js",
-            crossOrigin: "anonymous",
-          },
-        },
       ],
       sidebar: [
         {
@@ -101,67 +94,14 @@ export default defineConfig({
         },
         {
           label: "Setup",
-          items: [
-            {
-              label: "Spotlight",
-              link: "/setup/",
-            },
-            {
-              label: "For Django",
-              link: "/setup/django/",
-            },
-            {
-              label: "For Laravel",
-              link: "/setup/laravel/",
-            },
-            {
-              label: "For Astro",
-              link: "/setup/astro/",
-            },
-            {
-              label: "For Next.js",
-              link: "/setup/nextjs/",
-            },
-            {
-              label: "For Remix",
-              link: "/setup/remix/",
-            },
-            {
-              label: "For SvelteKit",
-              link: "/setup/sveltekit/",
-            },
-            {
-              label: "For Vite",
-              link: "/setup/vite/",
-            },
-            {
-              label: "Just HTML",
-              link: "/setup/html/",
-            },
-            {
-              label: "For Headless Environments",
-              link: "/setup/headless/",
-            },
-            {
-              label: "For Other Frameworks",
-              link: "/setup/other/",
-            },
-            {
-              label: "Migration Guide",
-              link: "/setup/migration/",
-            },
-          ],
+          autogenerate: {
+            directory: "setup",
+          },
         },
         {
           label: "Sidecar",
           autogenerate: {
             directory: "sidecar",
-          },
-        },
-        {
-          label: "Integrations",
-          autogenerate: {
-            directory: "integrations",
           },
         },
         {
