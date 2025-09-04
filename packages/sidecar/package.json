@@ -40,7 +40,7 @@
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
-    "hono": "^4.8.10",
+    "hono": "^4.9.6",
     "kleur": "^4.1.5",
     "launch-editor": "^2.9.1",
     "zod": "^3"

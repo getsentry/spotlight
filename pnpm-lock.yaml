@@ -272,10 +272,10 @@ importers:
     dependencies:
       '@hono/mcp':
         specifier: ^0.1.1
-        version: 0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.8.12)
+        version: 0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.9.6)
       '@hono/node-server':
         specifier: ^1.18.0
-        version: 1.18.0(hono@4.8.12)
+        version: 1.18.0(hono@4.9.6)
       '@jridgewell/trace-mapping':
         specifier: ^0.3.25
         version: 0.3.25
@@ -289,8 +289,8 @@ importers:
         specifier: 'catalog:'
         version: 10.5.0
       hono:
-        specifier: ^4.8.10
-        version: 4.8.12
+        specifier: ^4.9.6
+        version: 4.9.6
       kleur:
         specifier: ^4.1.5
         version: 4.1.5
@@ -5143,8 +5143,8 @@ packages:
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
 
-  hono@4.8.12:
-    resolution: {integrity: sha512-MQSKk1Mg7b74k8l+A025LfysnLtXDKkE4pLaSsYRQC5iy85lgZnuyeQ1Wynair9mmECzoLu+FtJtqNZSoogBDQ==}
+  hono@4.9.6:
+    resolution: {integrity: sha512-doVjXhSFvYZ7y0dNokjwwSahcrAfdz+/BCLvAMa/vHLzjj8+CFyV5xteThGUsKdkaasgN+gF2mUxao+SGLpUeA==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -9206,14 +9206,14 @@ snapshots:
 
   '@fontsource/raleway@5.2.5': {}
 
-  '@hono/mcp@0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.8.12)':
+  '@hono/mcp@0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.9.6)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.16.0
-      hono: 4.8.12
+      hono: 4.9.6
 
-  '@hono/node-server@1.18.0(hono@4.8.12)':
+  '@hono/node-server@1.18.0(hono@4.9.6)':
     dependencies:
-      hono: 4.8.12
+      hono: 4.9.6
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -13773,7 +13773,7 @@ snapshots:
     dependencies:
       react-is: 16.13.1
 
-  hono@4.8.12: {}
+  hono@4.9.6: {}
 
   hookable@5.5.3: {}
 
