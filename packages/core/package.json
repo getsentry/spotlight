@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/core",
   "description": "Core types, parsers, formatters, and shared utilities for Spotlight.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
