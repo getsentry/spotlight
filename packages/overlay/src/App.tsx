@@ -10,9 +10,9 @@ import * as db from "./lib/db";
 import { getSpotlightEventTarget } from "./lib/eventTarget";
 import { log } from "./lib/logger";
 import useKeyPress from "./lib/useKeyPress";
-import { getRouteStorageKey } from "./overlay/utils/routePersistence";
 import { connectToSidecar } from "./sidecar";
 import type { NotificationCount, SpotlightOverlayOptions } from "./types";
+import { getRouteStorageKey } from "./utils/routePersistence";
 
 type AppProps = Omit<SpotlightOverlayOptions, "debug" | "injectImmediately"> &
   Required<Pick<SpotlightOverlayOptions, "sidecarUrl">>;

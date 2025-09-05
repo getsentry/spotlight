@@ -1,5 +1,5 @@
+import type { SentryEvent } from "@spotlightjs/core/sentry";
 import type { Nullable } from "vitest";
-import type { SentryEvent } from "../../types";
 import { ContextView } from "../shared/ContextView";
 
 const EXAMPLE_CONTEXT = `Sentry.setContext("character", {

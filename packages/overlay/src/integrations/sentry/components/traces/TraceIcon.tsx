@@ -1,5 +1,4 @@
-import type { Trace } from "../../types";
-import { sdkToPlatform } from "../../utils/sdkToPlatform";
+import { type Trace, sdkToPlatform } from "@spotlightjs/core/sentry";
 import PlatformIcon from "../shared/PlatformIcon";
 
 export type TraceIconProps = {

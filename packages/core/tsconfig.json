@@ -1,0 +1,16 @@
+{
+  "extends": "@spotlightjs/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"]
+    },
+    "moduleResolution": "bundler",
+    "target": "esnext",
+    "module": "ESNext",
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src/*"]
+}

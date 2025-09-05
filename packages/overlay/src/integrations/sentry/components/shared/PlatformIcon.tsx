@@ -1,3 +1,4 @@
+import type { SentryEvent } from "@spotlightjs/core/sentry";
 import { ReactComponent as AstroIcon } from "platformicons/svg/astro.svg";
 import { ReactComponent as DefaultIcon } from "platformicons/svg/default.svg";
 import { ReactComponent as DotNetIcon } from "platformicons/svg/dotnet.svg";
@@ -15,7 +16,6 @@ import { ReactComponent as RemixIcon } from "platformicons/svg/remix.svg";
 import { ReactComponent as RubyIcon } from "platformicons/svg/ruby.svg";
 import { ReactComponent as SafariIcon } from "platformicons/svg/safari.svg";
 import { ReactComponent as PhpSymfonyIcon } from "platformicons/svg/symfony.svg";
-import type { SentryEvent } from "../../types";
 
 import type { ComponentPropsWithoutRef } from "react";
 
