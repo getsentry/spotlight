@@ -65,7 +65,11 @@ export default function TelemetrySidebar({
     <div className="bg-primary-900 flex flex-col" style={{ width: "240px", minWidth: "240px" }}>
       <header className="flex items-center gap-x-2 p-4">
         <h1 className="text-2xl font-bold">Spotlight</h1>
-        {!isOnline && (
+        {isOnline ? (
+          <Badge variant="default" className="bg-green-600 border-green-600 text-white">
+            Connected
+          </Badge>
+        ) : (
           <Badge variant="outline" className="text-red-400 border-red-400">
             Offline
           </Badge>
@@ -91,7 +95,11 @@ export default function TelemetrySidebar({
 
       {showClearEventsButton && (
         <footer className="p-4 border-t border-primary-800">
-          <Button onClick={clearEvents} variant="outline" className="w-full">
+          <Button
+            onClick={clearEvents}
+            variant="outline"
+            className="w-full bg-primary-800 border-primary-600 text-primary-100 hover:bg-primary-700 hover:text-white"
+          >
             Clear Events
           </Button>
         </footer>
