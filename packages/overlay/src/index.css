@@ -20,25 +20,6 @@
   --color-frame-unknown: #f3f4f6;
 }
 
-.spotlight-fullscreen-blur {
-  @apply fixed flex h-screen w-screen flex-col overflow-hidden bg-black/50 backdrop-blur-xs backdrop-filter;
-  z-index: 999998;
-}
-
-.spotlight-sidepanel {
-  -webkit-app-region: no-drag;
-  animation: sidepanel 100ms ease-in;
-}
-
-@keyframes sidepanel {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
 ul.tree {
   position: relative;
 }
