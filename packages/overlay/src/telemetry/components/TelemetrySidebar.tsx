@@ -64,7 +64,7 @@ export default function TelemetrySidebar({
   };
 
   return (
-    <div className="bg-primary-900 flex flex-col" style={{ width: "240px", minWidth: "240px" }}>
+    <nav className="bg-primary-900 flex flex-col" style={{ width: "240px", minWidth: "240px" }} aria-label="Navigation">
       <header className="p-4 border-b border-primary-700">
         <div className="text-primary-200 flex flex-col gap-x-2">
           <div className="inline-flex items-center gap-x-2">
@@ -85,7 +85,7 @@ export default function TelemetrySidebar({
         </div>
       </header>
 
-      <nav className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto">
         <NavigationLink
           to="/traces"
           title="Traces"
@@ -100,7 +100,7 @@ export default function TelemetrySidebar({
         />
         <NavigationLink to="/logs" title="Logs" isActive={isActive("/logs")} />
         <NavigationLink to="/insights" title="Insights" isActive={isActive("/insights")} />
-      </nav>
+      </div>
 
       <footer className="p-4 border-t border-primary-700">
         {/* GitHub and Discord links */}
@@ -147,6 +147,6 @@ export default function TelemetrySidebar({
           {isOnline ? "Connected to Sidecar" : "Not connected to Sidecar"}
         </div>
       </footer>
-    </div>
+    </nav>
   );
 }
