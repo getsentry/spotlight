@@ -117,7 +117,7 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
     sidecarUrl: sidecarBaseUrl,
   };
 
-  function renderApp() {
+  function startApp() {
     if (document.getElementById("spotlight-root")) {
       log("Spotlight already rendered, skipping re-initialization");
       return;
@@ -141,8 +141,8 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   }
 
   if (document.readyState === "complete") {
-    renderApp();
+    startApp();
   } else {
-    window.addEventListener("load", renderApp);
+    window.addEventListener("load", startApp);
   }
 }
