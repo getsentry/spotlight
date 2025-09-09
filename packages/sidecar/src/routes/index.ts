@@ -9,7 +9,7 @@ import mcpRouter from "./mcp/index.js";
 import openRouter from "./open.js";
 import streamRouter from "./stream/index.js";
 
-export const CONTEXT_ID = generateUuidv4();
+const CONTEXT_ID = generateUuidv4();
 const router = new Hono().use(contextStorage(), async (ctx, next) => {
   ctx.set("contextId", CONTEXT_ID);
 

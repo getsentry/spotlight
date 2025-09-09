@@ -7,7 +7,7 @@ import { cors } from "hono/cors";
 import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { serveFilesHandler } from "./handlers/index.js";
 import { activateLogger, enableDebugLogging, logger } from "./logger.js";
-import routes, { CONTEXT_ID } from "./routes/index.js";
+import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
 
@@ -150,7 +150,7 @@ export function setupSidecar({
 }
 
 export function clearBuffer(): void {
-  getBuffer(CONTEXT_ID).reset();
+  getBuffer().reset();
 }
 
 let forceShutdown = false;
