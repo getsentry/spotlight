@@ -1,7 +1,7 @@
 import { brotliCompressSync, deflateSync, gzipSync } from "node:zlib";
 import { events } from "fetch-event-stream";
 import { describe, expect, it } from "vitest";
-import { app } from "../main.js";
+import app from "../index.js";
 import { envelopeReactClientSideError } from "../mcp/__tests__/test_envelopes.js";
 
 describe("generic endpoints", () => {

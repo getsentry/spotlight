@@ -1,8 +1,6 @@
-import { readFileSync } from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { LEAST_UPPER_BOUND, TraceMap, originalPositionFor, sourceContentFor } from "@jridgewell/trace-mapping";
-import type { Handler } from "hono";
 
 type SourceContext = {
   pre_context?: string[];
@@ -22,7 +20,7 @@ type SentryStackTrace = {
   frames?: SentryStackFrame[];
 };
 
-async function getGeneratedCodeFromServer(filename: string): Promise<string | undefined> {
+export async function getGeneratedCodeFromServer(filename: string): Promise<string | undefined> {
   try {
     const generatedCodeResponse = await fetch(filename);
     return generatedCodeResponse.text();
@@ -31,7 +29,7 @@ async function getGeneratedCodeFromServer(filename: string): Promise<string | un
   }
 }
 
-function parseStackTrace(requestBody: string): SentryStackTrace | undefined {
+export function parseStackTrace(requestBody: string): SentryStackTrace | undefined {
   try {
     return JSON.parse(requestBody) as SentryStackTrace;
   } catch {
@@ -39,7 +37,7 @@ function parseStackTrace(requestBody: string): SentryStackTrace | undefined {
   }
 }
 
-function applySourceContextToFrame(sourceMapContent: string, frame: ValidSentryStackFrame) {
+export function applySourceContextToFrame(sourceMapContent: string, frame: ValidSentryStackFrame) {
   const tracer = new TraceMap(JSON.parse(sourceMapContent));
 
   const originalPosition = originalPositionFor(tracer, {
@@ -62,7 +60,7 @@ function applySourceContextToFrame(sourceMapContent: string, frame: ValidSentryS
   return originalPosition;
 }
 
-function addContextLinesToFrame(lines: string[], frame: ValidSentryStackFrame, linesOfContext = 5): void {
+export function addContextLinesToFrame(lines: string[], frame: ValidSentryStackFrame, linesOfContext = 5): void {
   const maxLines = lines.length;
   const sourceLine = Math.max(Math.min(maxLines - 1, frame.lineno - 1), 0);
 
@@ -120,54 +118,6 @@ function snipLine(line: string, colno: number): string {
   return newLine;
 }
 
-function isValidSentryStackFrame(frame: SentryStackFrame): frame is ValidSentryStackFrame {
+export function isValidSentryStackFrame(frame: SentryStackFrame): frame is ValidSentryStackFrame {
   return !!frame.filename && !!frame.lineno && !!frame.colno;
 }
-
-export const contextLinesHandler: Handler = async ctx => {
-  const requestBody = await ctx.req.text();
-
-  const stacktrace = parseStackTrace(requestBody);
-
-  if (!stacktrace) {
-    return ctx.body(null, 500);
-  }
-
-  for (const frame of stacktrace.frames ?? []) {
-    if (
-      !isValidSentryStackFrame(frame) ||
-      // let's ignore dependencies for now with this naive check
-      frame.filename.includes("/node_modules/")
-    ) {
-      continue;
-    }
-    const { filename } = frame;
-    // Dirty check to see if this looks like a regular file path or a URL
-    if (filename.includes("://")) {
-      const generatedCode = await getGeneratedCodeFromServer(frame.filename);
-      if (!generatedCode) {
-        continue;
-      }
-
-      // Extract the inline source map from the minified code
-      const inlineSourceMapMatch = generatedCode.match(/\/\/# sourceMappingURL=data:application\/json;base64,(.*)/);
-
-      if (inlineSourceMapMatch?.[1]) {
-        const sourceMapBase64 = inlineSourceMapMatch[1];
-        const sourceMapContent = Buffer.from(sourceMapBase64, "base64").toString("utf-8");
-        applySourceContextToFrame(sourceMapContent, frame);
-      }
-    } else if (!filename.includes(":")) {
-      try {
-        const lines = readFileSync(filename, { encoding: "utf-8" }).split(/\r?\n/);
-        addContextLinesToFrame(lines, frame);
-      } catch (err) {
-        if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
-          throw err;
-        }
-      }
-    }
-  }
-
-  return ctx.json(stacktrace);
-};

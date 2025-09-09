@@ -1,5 +1,5 @@
-import { type ParsedEnvelope, parseEnvelope } from "./envelopeParser.js";
-import { isDebugEnabled } from "./logger.js";
+import { type ParsedEnvelope, parseEnvelope } from "../envelopeParser.js";
+import { isDebugEnabled } from "../logger.js";
 
 /**
  * Container for events that flow through the sidecar

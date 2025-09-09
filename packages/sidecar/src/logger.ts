@@ -1,9 +1,4 @@
-export type SidecarLogger = {
-  info: (message: string) => void;
-  warn: (message: string) => void;
-  error: (message: string) => void;
-  debug: (message: string) => void;
-};
+import type { SidecarLogger } from "./types/index.js";
 
 const defaultLogger: SidecarLogger = {
   info: (message: string) => console.log("🔎 [Spotlight]", message),

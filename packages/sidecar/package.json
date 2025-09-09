@@ -24,10 +24,6 @@
       "import": "./dist/src/main.js",
       "types": "./dist/src/main.d.ts"
     },
-    "./vite-plugin": {
-      "import": "./dist/src/vite-plugin.js",
-      "types": "./dist/src/vite-plugin.d.ts"
-    },
     "./constants": {
       "import": "./dist/src/constants.js",
       "types": "./dist/src/constants.d.ts"

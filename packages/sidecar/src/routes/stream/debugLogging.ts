@@ -1,6 +1,6 @@
-import { formatEnvelopeMetadata, formatErrorDetails } from "./envelopeParser.js";
-import type { EventContainer } from "./eventContainer.js";
-import { isDebugEnabled, logger } from "./logger.js";
+import { formatEnvelopeMetadata, formatErrorDetails } from "../../envelopeParser.js";
+import { isDebugEnabled, logger } from "../../logger.js";
+import type { EventContainer } from "../../utils/eventContainer.js";
 
 /**
  * Logs incoming event details when debug mode is enabled
