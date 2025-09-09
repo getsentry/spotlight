@@ -100,6 +100,25 @@ export class MessageBuffer<T> {
 
     return result;
   }
+
+  /**
+   * Get all available items in the buffer regardless of age
+   * @returns Array of all items currently in the buffer
+   */
+  getAll(): T[] {
+    const result: T[] = [];
+    const start = this.head;
+    const end = this.writePos;
+
+    for (let i = end - 1; i >= start; i--) {
+      const item = this.items[i % this.size];
+      if (item !== undefined) {
+        result.push(item[1]);
+      }
+    }
+
+    return result;
+  }
 }
 
 type ReadFilter = {

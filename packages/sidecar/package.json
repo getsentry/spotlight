@@ -31,6 +31,14 @@
     "./constants": {
       "import": "./dist/src/constants.js",
       "types": "./dist/src/constants.d.ts"
+    },
+    "./formatting": {
+      "import": "./dist/src/formatting.js",
+      "types": "./dist/src/formatting.d.ts"
+    },
+    "./processing": {
+      "import": "./dist/src/processing.js",
+      "types": "./dist/src/processing.d.ts"
     }
   },
   "dependencies": {
