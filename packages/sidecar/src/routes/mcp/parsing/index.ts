@@ -40,10 +40,10 @@ export function processEnvelope(rawEvent: RawEventContext) {
     items.push([itemHeader, itemPayload] as EnvelopeItem);
   }
 
-  const envelope = [envelopeHeader, items] as Envelope;
+  const event = [envelopeHeader, items] as Envelope;
 
   return {
-    envelope,
+    event,
   };
 }
 
