@@ -7,7 +7,7 @@ import { getSpotlightEventTarget } from "./lib/eventTarget";
 import { log } from "./lib/logger";
 import { connectToSidecar } from "./sidecar";
 import { processEnvelope } from "./telemetry";
-import Debugger from "./telemetry/components/Debugger";
+import TelemetryView from "./telemetry/components/TelemetryView";
 import sentryStore from "./telemetry/store";
 import type { RawEventContext } from "./types";
 
@@ -184,5 +184,5 @@ export default function App({ sidecarUrl, showClearEventsButton = true, initialE
     }
   }, [startFrom, navigate]);
 
-  return <Debugger isOnline={isOnline} showClearEventsButton={showClearEventsButton} contextId={contextId} />;
+  return <TelemetryView isOnline={isOnline} showClearEventsButton={showClearEventsButton} contextId={contextId} />;
 }

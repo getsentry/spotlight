@@ -49,7 +49,7 @@ export default function TelemetryView({
   const localTraceCount = getLocalTraces().length;
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="spotlight-debugger from-primary-900 to-primary-950 flex h-full overflow-hidden bg-gradient-to-br from-0% to-20% font-sans text-white">
       <TelemetrySidebar
         errorCount={errorCount}
         traceCount={localTraceCount}
