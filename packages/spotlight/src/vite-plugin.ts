@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import type { ServerResponse } from "node:http";
 
 // Cannot use import.meta.resolve -- @see https://github.com/vitejs/vite/discussions/15871
-import type { SpotlightOverlayOptions } from "@spotlightjs/overlay";
+import type { SpotlightInitOptions as BaseSpotlightInitOptions } from "@spotlightjs/overlay";
 import { resolve } from "import-meta-resolve";
 import type { Connect, ErrorPayload, PluginOption, ViteDevServer } from "vite";
 
@@ -29,35 +29,26 @@ export type SpotlightIntegration = "sentry" | "viteInspect";
 
 export type SpotlightInitOptions = {
   importPath?: string;
-  integrationNames?: SpotlightIntegration[];
   port?: number;
   /**
    * Additional debug options.
    * WARNING: These options are not part of the public API and may change at any time.
    */
   __debugOptions?: Record<string, unknown>;
-} & SpotlightOverlayOptions;
+} & BaseSpotlightInitOptions;
 
-const serverOptions = new Set(["importPath", "integrationNames", "port"]);
+const serverOptions = new Set(["importPath", "port"]);
 
 export function buildClientInit(options: SpotlightInitOptions) {
   const clientOptions = Object.fromEntries(
     Object.entries(options).filter(([key]) => !key.startsWith("_") && !serverOptions.has(key)),
   );
-  let initOptions = JSON.stringify({
-    ...clientOptions,
-    showTriggerButton: options.showTriggerButton !== false,
-    injectImmediately: options.injectImmediately !== false,
-  });
-
-  const integrationOptions = JSON.stringify({ openLastError: true });
-  const integrations = (options.integrationNames || ["sentry"]).map(i => `Spotlight.${i}(${integrationOptions})`);
-  initOptions = `{integrations: [${integrations.join(", ")}], ${initOptions.slice(1)}`;
+  const initOptions = JSON.stringify(clientOptions);
 
   return [
     `import * as Spotlight from ${JSON.stringify(`/@fs${options.importPath || getSpotlightClientModulePath()}`)};`,
     `Spotlight.init(${initOptions});`,
-    "window.createErrorOverlay=function createErrorOverlay(err) { Spotlight.openSpotlight(); };",
+    "window.createErrorOverlay=function createErrorOverlay(err) { console.error('Vite build error:', err); };",
   ].join("\n");
 }
 

@@ -1,60 +1,59 @@
+import type { Envelope } from "@sentry/core";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import Debugger from "./components/Debugger";
-import Trigger from "./components/Trigger";
-import { SPOTLIGHT_OPEN_CLASS_NAME } from "./constants";
-import type { Integration, IntegrationData } from "./integrations/integration";
-import { getPanelsFromIntegrations } from "./integrations/utils/extractPanelsFromIntegrations";
+import { useNavigate } from "react-router-dom";
 import { base64Decode } from "./lib/base64";
 import * as db from "./lib/db";
 import { getSpotlightEventTarget } from "./lib/eventTarget";
 import { log } from "./lib/logger";
-import useKeyPress from "./lib/useKeyPress";
-import { getRouteStorageKey } from "./overlay/utils/routePersistence";
 import { connectToSidecar } from "./sidecar";
-import type { NotificationCount, SpotlightOverlayOptions } from "./types";
+import { processEnvelope } from "./telemetry";
+import TelemetryView from "./telemetry/components/TelemetryView";
+import sentryStore from "./telemetry/store";
+import type { RawEventContext } from "./types";
 
-type AppProps = Omit<SpotlightOverlayOptions, "debug" | "injectImmediately"> &
-  Required<Pick<SpotlightOverlayOptions, "sidecarUrl">>;
+type AppProps = {
+  sidecarUrl: string;
+  showClearEventsButton?: boolean;
+  initialEvents?: Record<string, (string | Uint8Array)[]>;
+  startFrom?: string;
+};
 
 type EventData = { contentType: string; data: string | Uint8Array };
 
-const processEvent = (contentType: string, event: { data: string | Uint8Array }, integration: Integration) =>
-  integration.processEvent
-    ? integration.processEvent({
-        contentType,
-        data: event.data,
-      })
-    : { event };
+type ProcessedEnvelope = {
+  event: Envelope;
+  rawEvent: RawEventContext;
+};
 
-function processInitialEvents(
-  integrations: Integration[],
-  initialEvents: Record<string, (string | Uint8Array)[]>,
-): IntegrationData<unknown> {
-  const result: IntegrationData<unknown> = {};
+const SENTRY_CONTENT_TYPE = "application/x-sentry-envelope";
 
-  for (const integration of integrations) {
-    result[integration.name] = [];
+function processSentryEvent(contentType: string, event: { data: string | Uint8Array }): ProcessedEnvelope {
+  return processEnvelope({
+    contentType,
+    data: event.data,
+  });
+}
 
-    for (const contentType in initialEvents) {
-      const contentTypeBits = contentType.split(";");
-      const contentTypeWithoutEncoding = contentTypeBits[0];
+function processInitialEvents(initialEvents: Record<string, (string | Uint8Array)[]>): ProcessedEnvelope[] {
+  const result: ProcessedEnvelope[] = [];
 
-      if (!integration.forwardedContentType?.includes(contentTypeWithoutEncoding)) {
-        continue;
-      }
+  for (const contentType in initialEvents) {
+    const contentTypeBits = contentType.split(";");
+    const contentTypeWithoutEncoding = contentTypeBits[0];
 
-      const shouldUseBase64 = contentTypeBits[contentTypeBits.length - 1] === "base64";
+    if (contentTypeWithoutEncoding !== SENTRY_CONTENT_TYPE) {
+      continue;
+    }
 
-      for (const data of initialEvents[contentTypeWithoutEncoding]) {
-        const processedEvent = processEvent(
-          contentTypeWithoutEncoding,
-          { data: shouldUseBase64 ? base64Decode(data as string) : data },
-          integration,
-        );
-        if (processedEvent) {
-          result[integration.name].push(processedEvent);
-        }
+    const shouldUseBase64 = contentTypeBits[contentTypeBits.length - 1] === "base64";
+
+    for (const data of initialEvents[contentTypeWithoutEncoding]) {
+      const processedEvent = processSentryEvent(
+        contentTypeWithoutEncoding,
+        shouldUseBase64 ? { data: base64Decode(data as string) } : { data },
+      );
+      if (processedEvent) {
+        result.push(processedEvent);
       }
     }
   }
@@ -62,67 +61,32 @@ function processInitialEvents(
   return result;
 }
 
-export default function App({
-  openOnInit = false,
-  showTriggerButton = true,
-  integrations = [],
-  sidecarUrl,
-  anchor,
-  fullPage = false,
-  showClearEventsButton = true,
-  initialEvents = {},
-}: AppProps) {
-  const [integrationData, setIntegrationData] = useState<IntegrationData<unknown>>(() =>
-    processInitialEvents(integrations, initialEvents),
+export default function App({ sidecarUrl, showClearEventsButton = true, initialEvents = {}, startFrom }: AppProps) {
+  const [sentryEvents, setSentryEvents] = useState<ProcessedEnvelope[]>(() =>
+    processInitialEvents(initialEvents || {}),
   );
   const [isOnline, setOnline] = useState(false);
-  const [triggerButtonCount, setTriggerButtonCount] = useState<NotificationCount>({ count: 0, severe: false });
-  const [isOpen, setOpen] = useState(openOnInit);
-  log("App rerender", integrationData, isOnline, triggerButtonCount, isOpen);
+  log("App rerender", sentryEvents, isOnline);
 
   const contentTypeListeners = useMemo(() => {
-    // Map that holds the information which kind of content type should be dispatched to which integration(s)
-    const contentTypeToIntegrations = new Map<string, Integration[]>();
-    for (const integration of integrations) {
-      if (!integration.forwardedContentType) continue;
+    const listener = (event: { data: string | Uint8Array }): void => {
+      log(`Received new ${SENTRY_CONTENT_TYPE} event`);
+      const processedEvent = processSentryEvent(SENTRY_CONTENT_TYPE, event);
 
-      for (const contentType of integration.forwardedContentType) {
-        let integrationsForContentType = contentTypeToIntegrations.get(contentType);
-        if (!integrationsForContentType) {
-          integrationsForContentType = [];
-          contentTypeToIntegrations.set(contentType, integrationsForContentType);
-        }
-        integrationsForContentType.push(integration);
+      if (!processedEvent) {
+        return;
       }
-    }
+
+      setSentryEvents(prev => [...prev, processedEvent]);
+    };
+
+    log("Adding listener for", SENTRY_CONTENT_TYPE);
 
     const result: Record<string, (event: { data: string | Uint8Array }) => void> = Object.create(null);
-    for (const [contentType, integrations] of contentTypeToIntegrations.entries()) {
-      const listener = (event: { data: string | Uint8Array }): void => {
-        log(`Received new ${contentType} event`);
-        for (const integration of integrations) {
-          const newIntegrationData = processEvent(contentType, event, integration);
-
-          if (!newIntegrationData) {
-            continue;
-          }
-
-          const integrationName = integration.name;
-          setIntegrationData(prev => ({
-            ...prev,
-            [integrationName]: [...(prev[integrationName] || []), newIntegrationData],
-          }));
-        }
-      };
-
-      log("Adding listener for", contentType);
-
-      // `contentType` could for example be "application/x-sentry-envelope"
-      result[contentType] = listener;
-      result[`${contentType};base64`] = ({ data }) => listener({ data: base64Decode(data as string) });
-    }
+    result[SENTRY_CONTENT_TYPE] = listener;
+    result[`${SENTRY_CONTENT_TYPE};base64`] = event => listener({ data: base64Decode(event.data as string) });
     return result;
-  }, [integrations]);
+  }, []);
 
   useEffect(
     () => connectToSidecar(sidecarUrl, contentTypeListeners, setOnline) as () => undefined,
@@ -136,16 +100,18 @@ export default function App({
       const contentTypeBits = contentType.split(";");
       const contentTypeWithoutEncoding = contentTypeBits[0];
 
-      const listener = contentTypeListeners[contentTypeWithoutEncoding];
-      if (!listener) {
+      if (contentTypeWithoutEncoding !== SENTRY_CONTENT_TYPE) {
         log("Got event for unknown content type:", contentTypeWithoutEncoding);
         return;
       }
-      if (contentTypeBits[contentTypeBits.length - 1] === "base64") {
-        listener({ data: base64Decode(data as string) });
-      } else {
-        listener({ data });
+
+      const listener = contentTypeListeners[contentTypeWithoutEncoding];
+      if (!listener) {
+        return;
       }
+      const event =
+        contentTypeBits[contentTypeBits.length - 1] === "base64" ? { data: base64Decode(data as string) } : { data };
+      listener(event);
     },
     [contentTypeListeners],
   );
@@ -159,22 +125,10 @@ export default function App({
     });
   }, [dispatchToContentTypeListener]);
 
-  // Note that `useNavigate()` relies on `useLocation()` which
-  // causes a full re-render here every time we change the location
-  // We can fix this by doing `const router = createMemoryRouter()`
-  // and using `router.navigate()` but that requires a larger refactor
-  // as our <Route>s are scattered around a bit
-  // See https://github.com/remix-run/react-router/issues/7634
   const navigate = useNavigate();
-  const location = useLocation();
 
   // contextId for namespacing of routes in sessionStorage
   const contextId = sidecarUrl;
-
-  // helper to get valid panel routes
-  const getValidRoutes = useCallback(() => {
-    return new Set(getPanelsFromIntegrations(integrations, integrationData).map(panel => `/${panel.id}`));
-  }, [integrationData, integrations]);
 
   const clearEvents = useCallback(async () => {
     try {
@@ -190,49 +144,9 @@ export default function App({
       return;
     }
 
-    for (const integration of integrations) {
-      setIntegrationData(prev => ({ ...prev, [integration.name]: [] }));
-      if (integration.reset) integration.reset();
-    }
-  }, [integrations, sidecarUrl]);
-
-  const onOpen = useCallback(
-    (
-      e: CustomEvent<{
-        path: string | undefined;
-      }>,
-    ) => {
-      log("Open");
-      setOpen(true);
-      if (e.detail.path) {
-        navigate(e.detail.path);
-      } else {
-        try {
-          const lastRoute = sessionStorage.getItem(getRouteStorageKey(contextId));
-          const validRoutes = getValidRoutes();
-          if (lastRoute && lastRoute !== location.pathname && validRoutes.has(lastRoute)) {
-            navigate(lastRoute);
-          }
-        } catch (error) {
-          log("Failed to retrieve or navigate to the last route from browser storage", {
-            error,
-            currentPath: location.pathname,
-          });
-        }
-      }
-    },
-    [navigate, location.pathname, contextId, integrationData, integrations],
-  );
-
-  const onClose = useCallback(() => {
-    log("Close");
-    setOpen(false);
-  }, []);
-
-  const onToggle = useCallback(() => {
-    log("Toggle");
-    setOpen(prev => !prev);
-  }, []);
+    setSentryEvents([]);
+    sentryStore.getState().resetData();
+  }, [sidecarUrl]);
 
   const onNavigate = useCallback(
     (e: CustomEvent<string>) => {
@@ -250,60 +164,25 @@ export default function App({
     [dispatchToContentTypeListener],
   );
 
-  useKeyPress("F12", ["ctrlKey"], onToggle);
-
   useEffect(() => {
     log("useEffect: Adding event listeners");
-    spotlightEventTarget.addEventListener("open", onOpen as EventListener);
-    spotlightEventTarget.addEventListener("close", onClose);
     spotlightEventTarget.addEventListener("navigate", onNavigate as EventListener);
     spotlightEventTarget.addEventListener("clearEvents", clearEvents as EventListener);
     spotlightEventTarget.addEventListener("event", onEvent as EventListener);
 
     return (): undefined => {
       log("useEffect[destructor]: Removing event listeners");
-      spotlightEventTarget.removeEventListener("open", onOpen as EventListener);
-      spotlightEventTarget.removeEventListener("close", onClose);
       spotlightEventTarget.removeEventListener("navigate", onNavigate as EventListener);
       spotlightEventTarget.removeEventListener("clearEvents", clearEvents as EventListener);
       spotlightEventTarget.removeEventListener("event", onEvent as EventListener);
     };
-  }, [spotlightEventTarget, onOpen, onClose, onNavigate, clearEvents, onEvent]);
+  }, [spotlightEventTarget, onNavigate, clearEvents, onEvent]);
 
   useEffect(() => {
-    if (!isOpen) {
-      spotlightEventTarget.dispatchEvent(new CustomEvent("closed"));
-      document.body.classList.remove(SPOTLIGHT_OPEN_CLASS_NAME);
-    } else {
-      spotlightEventTarget.dispatchEvent(new CustomEvent("opened"));
-      document.body.classList.add(SPOTLIGHT_OPEN_CLASS_NAME);
+    if (startFrom) {
+      navigate(startFrom);
     }
-  }, [isOpen, spotlightEventTarget]);
+  }, [startFrom, navigate]);
 
-  useEffect(() => {
-    if (triggerButtonCount.severe) {
-      spotlightEventTarget.dispatchEvent(
-        new CustomEvent("severeEventCount", { detail: { count: triggerButtonCount.count } }),
-      );
-    }
-  }, [triggerButtonCount, spotlightEventTarget]);
-
-  return (
-    <>
-      {showTriggerButton && (
-        <Trigger isOpen={isOpen} setOpen={setOpen} notificationCount={triggerButtonCount} anchor={anchor} />
-      )}
-      <Debugger
-        isOpen={fullPage || isOpen}
-        setOpen={setOpen}
-        isOnline={isOnline}
-        integrations={integrations}
-        integrationData={integrationData}
-        setTriggerButtonCount={setTriggerButtonCount}
-        fullPage={fullPage}
-        showClearEventsButton={showClearEventsButton}
-        contextId={contextId}
-      />
-    </>
-  );
+  return <TelemetryView isOnline={isOnline} showClearEventsButton={showClearEventsButton} contextId={contextId} />;
 }
