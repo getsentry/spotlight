@@ -1,18 +1,7 @@
-import type { StreamableHTTPTransport } from "@hono/mcp";
 import { getContext } from "hono/context-storage";
+import type { HonoEnv } from "~/types/index.js";
+import { MessageBuffer } from "../messageBuffer.js";
 import type { EventContainer } from "./eventContainer.js";
-import { MessageBuffer } from "./messageBuffer.js";
-
-export type IncomingPayloadCallback = (body: string) => void;
-
-export type HonoEnv = {
-  Variables: {
-    contextId: string;
-    transport: StreamableHTTPTransport;
-    basePath?: string;
-    incomingPayload?: IncomingPayloadCallback;
-  };
-};
 
 const contextBasedBuffer = new Map<string, MessageBuffer<EventContainer>>();
 
