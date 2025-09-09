@@ -4,6 +4,7 @@ import { CONTEXT_LINES_ENDPOINT } from "~/constants.js";
 import { generateUuidv4 } from "~/messageBuffer.js";
 import clearRouter from "./clear.js";
 import contextLinesRouter from "./contextlines/index.js";
+import errorRouter from "./error.js";
 import healthRouter from "./health.js";
 import mcpRouter from "./mcp/index.js";
 import openRouter from "./open.js";
@@ -19,6 +20,7 @@ const router = new Hono().use(contextStorage(), async (ctx, next) => {
 router.route("/mcp", mcpRouter);
 router.route("/health", healthRouter);
 router.route("/clear", clearRouter);
+router.route("/error", errorRouter);
 router.route("/", streamRouter);
 router.route("/open", openRouter);
 router.route(CONTEXT_LINES_ENDPOINT, contextLinesRouter);

@@ -13,8 +13,8 @@ import type {
   MessageEntrySchema,
   RequestEntrySchema,
   ThreadsEntrySchema,
-} from "./schema.js";
-import type { Event } from "./types.js";
+} from "~/routes/mcp/schema.js";
+import type { Event } from "~/routes/mcp/types.js";
 
 // Language detection mappings
 const LANGUAGE_EXTENSIONS: Record<string, string> = {
