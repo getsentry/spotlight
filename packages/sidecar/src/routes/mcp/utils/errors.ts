@@ -1,6 +1,6 @@
 import type { ErrorEvent } from "@sentry/core";
 import type { z } from "zod";
-import type { EventContainer } from "../../eventContainer.js";
+import type { EventContainer } from "../../../utils/eventContainer.js";
 import { formatEventOutput } from "../formatting.js";
 import { processEnvelope } from "../parsing.js";
 import type { ErrorEventSchema } from "../schema.js";

@@ -1,5 +1,5 @@
 import type { SerializedLog, SerializedLogContainer } from "@sentry/core";
-import type { EventContainer } from "../../eventContainer.js";
+import type { EventContainer } from "../../../utils/eventContainer.js";
 import { processEnvelope } from "../parsing.js";
 
 export async function formatLogEnvelope(container: EventContainer) {

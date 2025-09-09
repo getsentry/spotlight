@@ -1,4 +1,4 @@
-import type { EventContainer } from "../../eventContainer.js";
+import type { EventContainer } from "../../../utils/eventContainer.js";
 import { processEnvelope } from "../parsing.js";
 
 export interface TraceContext {
