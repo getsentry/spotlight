@@ -3,7 +3,6 @@ import { join } from "node:path";
 import { type ServerType, serve } from "@hono/node-server";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import { Hono } from "hono";
-import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
 import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { serveFilesHandler } from "./handlers/index.js";
