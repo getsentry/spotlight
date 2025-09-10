@@ -1,5 +1,5 @@
-import type { EventContainer } from "../../../utils/eventContainer.js";
-import { processEnvelope } from "../parsing.js";
+import type { EventContainer } from "~/utils/eventContainer.js";
+import { processEnvelope } from "../parsing/index.js";
 
 export interface TraceContext {
   trace_id: string;
@@ -123,7 +123,7 @@ function extractTraceEventsFromContainer(container: EventContainer): TraceEvent[
       data: container.getData(),
     });
 
-    const [, items] = parsed.envelope;
+    const [, items] = parsed.event;
 
     for (const item of items) {
       const [{ type }, payload] = item;
