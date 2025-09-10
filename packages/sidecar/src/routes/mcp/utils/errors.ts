@@ -1,7 +1,7 @@
 import type { ErrorEvent } from "@sentry/core";
 import type { z } from "zod";
 import { isErrorEvent } from "~/parser/index.js";
-import type { EventContainer } from "~/utils/eventContainer.js";
+import type { EventContainer } from "~/utils/index.js";
 import { formatEventOutput } from "../formatting.js";
 import type { ErrorEventSchema } from "../schema.js";
 
