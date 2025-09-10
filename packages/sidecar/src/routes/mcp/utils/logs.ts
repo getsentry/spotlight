@@ -1,6 +1,6 @@
-import type { SerializedLog, SerializedLogContainer } from "@sentry/core";
+import type { SerializedLog } from "@sentry/core";
+import { isLogEvent, processEnvelope } from "~/parsing/index.js";
 import type { EventContainer } from "~/utils/eventContainer.js";
-import { processEnvelope } from "../parsing/index.js";
 
 export async function formatLogEnvelope(container: EventContainer) {
   const event = processEnvelope({ contentType: container.getContentType(), data: container.getData() });
@@ -21,10 +21,6 @@ export async function formatLogEnvelope(container: EventContainer) {
   }
 
   return formatted;
-}
-
-function isLogEvent(payload: unknown): payload is SerializedLogContainer {
-  return typeof payload === "object" && payload !== null && "items" in payload;
 }
 
 export function processLogEvent(event: SerializedLog): string {
