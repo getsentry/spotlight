@@ -1,54 +1,52 @@
 ---
-title: Setup Spotlight
-description: A guide how to setup Spotlight in your environment
+title: Using Spotlight
+description: Use Spotlight as a standalone application
 ---
+import DownloadButton from '../../../components/DownloadButton.astro';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-import { LinkCard } from "@astrojs/starlight/components";
+Spotlight provides an Electron app that can be used to run the Sidecar as well as a dedicated instance of the overlay.
 
-Spotlight is language and framework agnostic, but we've made it work even better with your favorite JavaScript frameworks.
+## Installation
 
-<LinkCard
-  title="Django"
-  href="./django/"
-  description="Spotlight integrates automatically with Django."
-/>
-<LinkCard
-  title="Laravel"
-  href="./laravel/"
-  description="Setup Spotlight in Laravel."
-/>
-<LinkCard
-  title="Astro"
-  href="./astro/"
-  description="Spotlight integrates automatically with Astro's Dev Toolbar."
-/>
-<LinkCard
-  title="Next.js"
-  href="./nextjs/"
-  description="Setup Spotlight in Next.js."
-/>
-<LinkCard
-  title="Remix"
-  href="./remix/"
-  description="Setup Spotlight in Remix."
-/>
-<LinkCard
-  title="SvelteKit"
-  href="./sveltekit/"
-  description="Setup Spotlight in Sveltekit."
-/>
-<LinkCard
-  title="Vite"
-  href="./vite/"
-  description="Spotlight integrates automatically with anything that uses Vite for building."
-/>
-<LinkCard
-  title="Vanilla (Native JS)"
-  href="./html/"
-  description="Setup Spotlight using a standard script tag."
-/>
-<LinkCard
-  title="Other"
-  href="./other/"
-  description="Setup Spotlight in another language or framework."
-/>
+Get started by downloading the latest version of the Electron app for your platform.
+
+<DownloadButton>Download for Mac</DownloadButton>
+
+### Other ways
+
+If Electron apps are not your thing or you are not using a Mac we have some more ways to run Spotlight with it's web UI:
+
+<Tabs>
+  <TabItem label="npx">
+  ```shell
+  npx @spotlightjs/spotlight
+  ```
+  </TabItem>
+  <TabItem label="docker">
+  ```shell
+  docker run --rm -p 8969 ghcr.io/getsentry/spotlight:latest
+  ```
+  </TabItem>
+  <TabItem label="binary">
+  ```shell
+  curl -q https://spotlightjs.com/install.sh | sh
+  ```
+  </TabItem>
+</Tabs>
+
+## SDK Setup
+
+In addition to loading the application, make sure you've enabled spotlight in the relevant Sentry SDKs (e.g. via `spotlight: true`):
+
+For front-end applications, you need to enable the `spotlightBrowserIntegration` for it to work. This is to only include this bit of the code for the users of Spotlight:
+
+```javascript
+import * as Sentry from '@sentry/browser';
+
+Sentry.init({
+  dsn: '___DSN___',
+  integrations: [Sentry.spotlightBrowserIntegration()],
+  // ...other Sentry options
+});
+```

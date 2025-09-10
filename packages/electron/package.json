@@ -31,7 +31,7 @@
     "@playwright/test": "^1.54.2",
     "@sentry/vite-plugin": "^2.22.5",
     "dotenv": "^16.4.5",
-    "electron": "^31.6.0",
+    "electron": "^35.7.5",
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
     "rollup-plugin-sourcemaps2": "^0.4.1"
