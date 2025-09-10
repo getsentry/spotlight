@@ -36,6 +36,10 @@
     "./parser": {
       "import": "./dist/src/parser/index.js",
       "types": "./dist/src/parser/index.d.ts"
+    },
+    "./format": {
+      "import": "./dist/src/format/index.js",
+      "types": "./dist/src/format/index.d.ts"
     }
   },
   "dependencies": {
