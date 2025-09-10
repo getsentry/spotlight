@@ -37,10 +37,14 @@ const router = new Hono<HonoEnv>()
     return streamSSE(ctx, async stream => {
       const sub = buffer.subscribe(container => {
         logOutgoingEvent(container, clientId);
-        stream.writeSSE({
-          event: `${container.getContentType()}${base64Indicator}`,
-          data: container.getData().toString(useBase64 ? "base64" : "utf-8"),
-        });
+
+        const parsedEnvelope = container.getParsedEnvelope();
+        if (parsedEnvelope) {
+          stream.writeSSE({
+            event: `${container.getContentType()}${base64Indicator}`,
+            data: JSON.stringify(parsedEnvelope.event),
+          });
+        }
       });
 
       stream.onAbort(() => {

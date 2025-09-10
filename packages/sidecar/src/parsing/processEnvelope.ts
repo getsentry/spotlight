@@ -2,13 +2,18 @@ import type { Envelope, EnvelopeItem } from "@sentry/core";
 import { logger } from "~/logger.js";
 import type { RawEventContext } from "./types.js";
 
+export type ParsedEnvelope = {
+  event: Envelope;
+  rawEvent: RawEventContext;
+};
+
 /**
  * Implements parser for
  * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
  * @param rawEvent Envelope data
  * @returns parsed envelope
  */
-export function processEnvelope(rawEvent: RawEventContext) {
+export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
   let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
 
   function readLine(length?: number) {

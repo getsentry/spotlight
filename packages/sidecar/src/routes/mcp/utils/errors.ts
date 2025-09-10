@@ -1,16 +1,16 @@
 import type { ErrorEvent } from "@sentry/core";
 import type { z } from "zod";
-import { isErrorEvent, processEnvelope } from "~/parsing/index.js";
+import { isErrorEvent } from "~/parsing/index.js";
 import type { EventContainer } from "~/utils/eventContainer.js";
 import { formatEventOutput } from "../formatting.js";
 import type { ErrorEventSchema } from "../schema.js";
 
 export async function formatErrorEnvelope(container: EventContainer) {
-  const event = processEnvelope({ contentType: container.getContentType(), data: container.getData() });
+  const processedEnvelope = container.getParsedEnvelope();
 
   const {
     event: [, items],
-  } = event;
+  } = processedEnvelope;
 
   const formatted: string[] = [];
   for (const item of items) {

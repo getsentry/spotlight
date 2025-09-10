@@ -1,4 +1,4 @@
-import { type ParsedEnvelope, parseEnvelope } from "../envelopeParser.js";
+import { type ParsedEnvelope, processEnvelope } from "~/parsing/index.js";
 import { isDebugEnabled } from "../logger.js";
 
 /**
@@ -8,7 +8,7 @@ import { isDebugEnabled } from "../logger.js";
 export class EventContainer {
   private contentType: string;
   private data: Buffer;
-  private parsedEnvelope?: ParsedEnvelope | null;
+  private parsedEnvelope?: ParsedEnvelope;
   private isParsed = false;
 
   constructor(contentType: string, data: Buffer) {
@@ -32,26 +32,18 @@ export class EventContainer {
 
   /**
    * Get parsed envelope data (lazy parsing)
-   * Only parses if in debug mode and is a Sentry envelope
    */
-  getParsedEnvelope(): ParsedEnvelope | null {
-    // Only parse if we're in debug mode
-    if (!isDebugEnabled()) {
-      return null;
-    }
-
-    // Only parse Sentry envelopes
-    if (this.contentType !== "application/x-sentry-envelope") {
-      return null;
-    }
-
+  getParsedEnvelope(): ParsedEnvelope {
     // Parse once and cache the result
     if (!this.isParsed) {
-      this.parsedEnvelope = parseEnvelope(this.data);
+      this.parsedEnvelope = processEnvelope({
+        contentType: this.contentType,
+        data: this.data,
+      });
       this.isParsed = true;
     }
 
-    return this.parsedEnvelope || null;
+    return this.parsedEnvelope!;
   }
 
   /**
@@ -62,7 +54,7 @@ export class EventContainer {
     const envelope = this.getParsedEnvelope();
     if (!envelope) return null;
 
-    return envelope.items.map(item => item.header.type).filter(Boolean) as string[];
+    return envelope.event[1].map(item => item[0].type).filter(Boolean) as string[];
   }
 
   /**
