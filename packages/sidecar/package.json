@@ -33,9 +33,9 @@
       "import": "./dist/src/constants.js",
       "types": "./dist/src/constants.d.ts"
     },
-    "./parsing": {
-      "import": "./dist/src/parsing/index.js",
-      "types": "./dist/src/parsing/index.d.ts"
+    "./parser": {
+      "import": "./dist/src/parser/index.js",
+      "types": "./dist/src/parser/index.d.ts"
     }
   },
   "dependencies": {
