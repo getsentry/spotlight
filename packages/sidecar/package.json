@@ -32,6 +32,10 @@
     "./constants": {
       "import": "./dist/src/constants.js",
       "types": "./dist/src/constants.d.ts"
+    },
+    "./parsing": {
+      "import": "./dist/src/parsing/index.js",
+      "types": "./dist/src/parsing/index.d.ts"
     }
   },
   "dependencies": {
