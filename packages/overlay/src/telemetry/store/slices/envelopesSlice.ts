@@ -1,7 +1,6 @@
 import type { Envelope } from "@sentry/core";
 import type { StateCreator } from "zustand";
 import { generateUuidv4 } from "~/lib/uuid";
-import type { RawEventContext } from "~/types";
 import { SUPPORTED_EVENT_TYPES } from "../../constants/sentry";
 import type { Sdk, SentryEvent } from "../../types";
 import { sdkToPlatform } from "../../utils/sdkToPlatform";
@@ -16,7 +15,7 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
   get,
 ) => ({
   ...initialEnvelopesState,
-  pushEnvelope: ({ envelope, rawEnvelope }: { envelope: Envelope; rawEnvelope: RawEventContext }) => {
+  pushEnvelope: ({ envelope, rawEnvelope }: { envelope: Envelope; rawEnvelope: string }) => {
     const [header, items] = envelope;
     const lastSeen = new Date(header.sent_at as string).getTime();
     let sdk: Sdk;

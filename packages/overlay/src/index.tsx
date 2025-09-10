@@ -48,7 +48,7 @@ export function sentry(options: { injectIntoSDK?: boolean } = {}) {
 export type SpotlightInitOptions = {
   sidecarUrl?: string;
   showClearEventsButton?: boolean;
-  initialEvents?: Record<string, (string | Uint8Array)[]>;
+  initialEvents?: Record<string, string>;
   startFrom?: string;
   debug?: boolean;
   experiments?: Record<string, boolean>;

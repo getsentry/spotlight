@@ -1,8 +1,7 @@
-import type { Client, Envelope, EnvelopeItem } from "@sentry/core";
+import type { Client } from "@sentry/core";
 import { off, on } from "~/lib/eventTarget";
 import { log, warn } from "~/lib/logger";
 import { removeURLSuffix } from "~/lib/removeURLSuffix";
-import type { RawEventContext } from "~/types";
 import { spotlightIntegration } from "./sentry-integration";
 import useSentryStore from "./store";
 import ErrorsTab from "./tabs/ErrorsTab";
@@ -13,7 +12,6 @@ import { getLocalTraces, isLocalTrace } from "./store/helpers";
 import LogsTab from "./tabs/LogsTab";
 import TracesTab from "./tabs/TracesTab";
 import type { SentryErrorEvent, SentryEvent } from "./types";
-import { parseJSONFromBuffer } from "./utils/bufferParsers";
 import { isErrorEvent } from "./utils/sentry";
 import { createTab } from "./utils/tabs";
 
@@ -64,7 +62,7 @@ export default function initTelemetry(options: TelemetryOptions = {}) {
       };
     },
 
-    processEvent: (event: RawEventContext) => processEnvelope(event),
+    processEvent: processEnvelope,
 
     panels: () => {
       const store = useSentryStore.getState();
@@ -121,56 +119,14 @@ export default function initTelemetry(options: TelemetryOptions = {}) {
   };
 }
 
-function getLineEnd(data: Uint8Array): number {
-  let end = data.indexOf(0xa);
-  if (end === -1) {
-    end = data.length;
-  }
-
-  return end;
-}
-
 /**
  * Implements parser for
  * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
  * @param rawEvent Envelope data
  * @returns parsed envelope
  */
-export function processEnvelope(rawEvent: RawEventContext) {
-  let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
-
-  function readLine(length?: number) {
-    const cursor = length ?? getLineEnd(buffer);
-    const line = buffer.subarray(0, cursor);
-    buffer = buffer.subarray(cursor + 1);
-    return line;
-  }
-
-  const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
-
-  const items: EnvelopeItem[] = [];
-  while (buffer.length) {
-    const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
-    const payloadLength = itemHeader.length;
-    const itemPayloadRaw = readLine(payloadLength);
-
-    let itemPayload: EnvelopeItem[1];
-    try {
-      itemPayload = parseJSONFromBuffer(itemPayloadRaw);
-      // data sanitization
-      if (itemHeader.type) {
-        // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
-        itemPayload.type = itemHeader.type;
-      }
-    } catch (err) {
-      itemPayload = itemPayloadRaw;
-      log(err);
-    }
-
-    items.push([itemHeader, itemPayload] as EnvelopeItem);
-  }
-
-  const envelope = [envelopeHeader, items] as Envelope;
+export function processEnvelope(rawEvent: string) {
+  const envelope = JSON.parse(rawEvent);
   useSentryStore.getState().pushEnvelope({ envelope, rawEnvelope: rawEvent });
 
   return {
