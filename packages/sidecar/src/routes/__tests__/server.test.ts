@@ -177,9 +177,8 @@ describe("mcp", () => {
     expect(parsed.result.content.length).toBeGreaterThan(0);
     expect(parsed.result.content[0].type).toBe("text");
 
-    const markdown = parsed.result.content[0].text;
-
-    console.log(markdown);
+    // const markdown = parsed.result.content[0].text;
+    // console.log(markdown);
 
     // TODO: Need to improve the sample data to make this work
     // expect(markdown).toContain("app/page.tsx");
