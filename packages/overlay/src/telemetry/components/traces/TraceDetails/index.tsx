@@ -4,7 +4,6 @@ import { createTab } from "~/telemetry/utils/tabs";
 import TelemetryTabs from "../../TelemetryTabs";
 
 import { useSentryEvents } from "~/telemetry/data/useSentryEvents";
-import { isLocalTrace } from "~/telemetry/store/helpers";
 import useSentryStore from "~/telemetry/store/store";
 import type { Trace } from "~/telemetry/types";
 import { getFormattedDuration } from "~/telemetry/utils/duration";
@@ -69,14 +68,7 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
 
   const events = useSentryEvents(trace.trace_id);
   const profile = useSentryStore.getState().getProfileByTraceId(trace.trace_id);
-  const errorCount = useMemo(
-    () =>
-      events.filter(
-        e =>
-          isErrorEvent(e) && (e.contexts?.trace?.trace_id ? isLocalTrace(e.contexts?.trace?.trace_id) : null) !== false,
-      ).length,
-    [events],
-  );
+  const errorCount = useMemo(() => events.filter(e => isErrorEvent(e)).length, [events]);
 
   const tabs = [
     createTab("context", "Context"),

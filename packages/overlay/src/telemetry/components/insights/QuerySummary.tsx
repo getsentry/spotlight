@@ -31,8 +31,8 @@ const COMPARATORS: Record<QuerySummarySortTypes, SpanInfoComparator> = {
   [QUERY_SUMMARY_SORT_KEYS.totalTime]: (a, b) => a.timestamp - a.start_timestamp - (b.timestamp - b.start_timestamp),
 };
 
-const QuerySummary = ({ showAll }: { showAll: boolean }) => {
-  const { allSpans, localSpans } = useSentrySpans();
+const QuerySummary = () => {
+  const { allSpans } = useSentrySpans();
   const { type } = useParams();
   const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERY_SUMMARY_SORT_KEYS.totalTime });
 
@@ -43,13 +43,13 @@ const QuerySummary = ({ showAll }: { showAll: boolean }) => {
     if (!decodedType) {
       return [];
     }
-    const spans = showAll ? allSpans : localSpans;
+    const spans = allSpans;
     const compareSpanInfo = COMPARATORS[sort.active] || COMPARATORS[QUERY_SUMMARY_SORT_KEYS.totalTime];
 
     return spans
       .filter(span => span.description === decodedType)
       .sort((a, b) => (sort.asc ? compareSpanInfo(a, b) : compareSpanInfo(b, a)));
-  }, [allSpans, localSpans, showAll, sort, decodedType]);
+  }, [allSpans, sort, decodedType]);
 
   if (!filteredDBSpans || !filteredDBSpans.length) {
     return <p className="text-primary-300 px-6 py-4">Query not found.</p>;

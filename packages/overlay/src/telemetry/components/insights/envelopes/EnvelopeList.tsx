@@ -3,8 +3,6 @@ import { Link, useParams } from "react-router-dom";
 import { cn } from "~/lib/cn";
 import CardList from "~/telemetry/components/shared/CardList";
 import TimeSince from "~/telemetry/components/shared/TimeSince";
-import { isLocalTrace } from "~/telemetry/store/helpers";
-import { Badge } from "~/ui/badge";
 import { useSentryEnvelopes } from "../../../data/useSentryEnvelopes";
 import useSentryStore from "../../../store";
 import { sdkToPlatform } from "../../../utils/sdkToPlatform";
@@ -12,9 +10,9 @@ import { truncateId } from "../../../utils/text";
 import PlatformIcon from "../../shared/PlatformIcon";
 import EnvelopeDetails from "./EnvelopeDetails";
 
-export default function EnvelopeList({ showAll }: { showAll: boolean }) {
+export default function EnvelopeList() {
   const { id: selectedEnvelopeId } = useParams();
-  const { allEnvelopes, localEnvelopes } = useSentryEnvelopes();
+  const { allEnvelopes } = useSentryEnvelopes();
   const { getEnvelopeById } = useSentryStore();
 
   const selectedEnvelope = selectedEnvelopeId ? getEnvelopeById(selectedEnvelopeId) : null;
@@ -24,13 +22,12 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
       <>
         <CardList>
           <div className="flex flex-col">
-            {(showAll ? allEnvelopes : localEnvelopes).map(({ envelope }: { envelope: Envelope }) => {
+            {allEnvelopes.map(({ envelope }: { envelope: Envelope }) => {
               const header: Envelope[0] = envelope[0];
               const envelopeId: string | unknown = header.__spotlight_envelope_id;
               if (typeof envelopeId !== "string") {
                 return null;
               }
-              const { trace_id } = (header?.trace as { trace_id?: string }) || {};
               const envelopeItems = envelope[1] || [];
               const itemTypes = new Set<string | undefined>(envelopeItems.map(item => item?.[0].type));
               itemTypes.delete(undefined);
@@ -49,9 +46,6 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
                       <h2 className="text-primary-50 text-xs">Envelope Id</h2>
                       <div className="flex items-center gap-x-2">
                         <div>{truncateId(envelopeId)}</div>
-                        {trace_id && isLocalTrace(trace_id) ? (
-                          <Badge title="This trace is part of your local session.">Local</Badge>
-                        ) : null}
                       </div>
                     </div>
 

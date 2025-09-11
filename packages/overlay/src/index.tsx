@@ -2,7 +2,7 @@ import fontStyles from "@fontsource/raleway/index.css?inline";
 import { CONTEXT_LINES_ENDPOINT } from "@spotlightjs/sidecar/constants";
 import { MemoryRouter } from "react-router-dom";
 import App from "./App";
-import { DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_STREAM_URL } from "./constants";
+import { DEFAULT_SIDECAR_STREAM_URL } from "./constants";
 import globalStyles from "./index.css?inline";
 import { on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
@@ -14,14 +14,7 @@ import initTelemetry from "./telemetry";
 import type { WindowWithSpotlight } from "./types";
 
 export type { WindowWithSpotlight } from "./types";
-export {
-  CONTEXT_LINES_ENDPOINT,
-  DEFAULT_EXPERIMENTS,
-  DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL,
-  React,
-  ReactDOM,
-  trigger,
-};
+export { CONTEXT_LINES_ENDPOINT, DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL, React, ReactDOM, trigger };
 
 /**
  * Send an event to spotlight without the sidecar
@@ -51,7 +44,6 @@ export type SpotlightInitOptions = {
   initialEvents?: Record<string, (string | Uint8Array)[]>;
   startFrom?: string;
   debug?: boolean;
-  experiments?: Record<string, boolean>;
 };
 
 export async function init(initOptions: SpotlightInitOptions = {}) {
@@ -67,7 +59,6 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
 
   const {
     sidecarUrl = DEFAULT_SIDECAR_STREAM_URL,
-    experiments = DEFAULT_EXPERIMENTS,
     showClearEventsButton = true,
     initialEvents = undefined,
     startFrom = undefined,
@@ -79,7 +70,6 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   }
 
   const sidecarBaseUrl = removeURLSuffix(sidecarUrl, "/stream");
-  const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };
 
   const telemetry = initTelemetry({
     injectIntoSDK: true,
@@ -113,7 +103,6 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   }
 
   const context = {
-    experiments: finalExperiments,
     sidecarUrl: sidecarBaseUrl,
   };
 
