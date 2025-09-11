@@ -275,13 +275,11 @@ store.onDidChange("sentry-send-envelopes", newValue => {
 const showErrorMessage = () => {
   if (win) {
     win.webContents.executeJavaScript(`
-      const sentryRoot = document.getElementById('sentry-spotlight-root');
-      const errorScreen = document.getElementById('error-screen');
-      if(sentryRoot){
-        sentryRoot.style.display = 'none';
+      if (document.getElementById('sentry-spotlight-root')) {
+        document.getElementById('sentry-spotlight-root').style.display = 'none';
       }
-      if(errorScreen){
-        errorScreen.style.display = 'block';
+      if (document.getElementById('error-screen')) {
+        document.getElementById('error-screen').style.display = 'block';
       }
     `);
   }

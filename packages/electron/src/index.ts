@@ -20,10 +20,10 @@ Sentry.init({
 });
 
 Spotlight.init({
-  fullPage: true,
-  injectImmediately: true,
-  showTriggerButton: false,
-  integrations: [Spotlight.sentry({ injectIntoSDK: false })],
+  // fullPage: true,
+  // injectImmediately: true,
+  // showTriggerButton: false,
+  // integrations: [Spotlight.sentry({ injectIntoSDK: false })],
   showClearEventsButton: false,
 });
 
