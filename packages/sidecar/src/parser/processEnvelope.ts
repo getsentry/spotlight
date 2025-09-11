@@ -1,6 +1,6 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
+import { uuidv7 } from "uuidv7";
 import { logger } from "~/logger.js";
-import { generateUuidv4 } from "~/utils/index.js";
 import type { RawEventContext } from "./types.js";
 
 export type ParsedEnvelope = {
@@ -26,7 +26,7 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
 
   const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
 
-  const envelopeId = generateUuidv4();
+  const envelopeId = uuidv7();
   envelopeHeader.__spotlight_envelope_id = envelopeId;
 
   const items: EnvelopeItem[] = [];

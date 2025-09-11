@@ -1,5 +1,5 @@
+import { uuidv7 } from "uuidv7";
 import type { EventContainer } from "./utils/eventContainer.js";
-import { generateUuidv4 } from "./utils/index.js";
 
 export class MessageBuffer<T> {
   private size: number;
@@ -33,7 +33,7 @@ export class MessageBuffer<T> {
   }
 
   subscribe(callback: (item: T) => void): string {
-    const readerId = generateUuidv4();
+    const readerId = uuidv7();
     this.readers.set(readerId, callback);
     setTimeout(() => this.stream(readerId));
     return readerId;
