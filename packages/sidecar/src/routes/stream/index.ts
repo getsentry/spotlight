@@ -52,7 +52,7 @@ const router = new Hono<HonoEnv>()
       });
     });
   })
-  .get("/stream/:id", ctx => {
+  .get("/envelope/:id", ctx => {
     const buffer = getBuffer();
 
     const envelopeId = ctx.req.param("id");

@@ -13,7 +13,7 @@ export default function EnvelopeDetails({ envelope }: { envelope: Envelope }) {
 
   const envelopeId: string | unknown = header.__spotlight_envelope_id;
 
-  const downloadUrl = getSidecarUrl(`/stream/${envelopeId}`);
+  const downloadUrl = getSidecarUrl(`/envelope/${envelopeId}`);
   return (
     <SidePanel backto="/insights/envelopes">
       <SidePanelHeader
