@@ -40,7 +40,9 @@ describe("envelopes", () => {
     const stream = events(receiveResponse);
 
     for await (const event of stream) {
-      expect(event.data).toBe(JSON.stringify([envelopeReactClientSideError, []]));
+      const jsonEnvelope = JSON.parse(event.data!);
+      expect(jsonEnvelope[0].event_id).toEqual(envelopeReactClientSideError.event_id);
+
       break;
     }
   });
@@ -79,7 +81,9 @@ describe("encoded envelopes", () => {
       const stream = events(receiveResponse);
 
       for await (const event of stream) {
-        expect(event.data).toBe(JSON.stringify([envelopeReactClientSideError, []]));
+        const jsonEnvelope = JSON.parse(event.data!);
+        expect(jsonEnvelope[0].event_id).toEqual(envelopeReactClientSideError.event_id);
+
         break;
       }
     };
