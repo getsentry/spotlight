@@ -1,16 +1,19 @@
 import type { Envelope } from "@sentry/core";
 import { useState } from "react";
 import { ReactComponent as Download } from "~/assets/download.svg";
+import { useSpotlightContext } from "~/lib/useSpotlightContext";
 import JsonViewer from "~/telemetry/components/shared/JsonViewer";
 import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
 
 export default function EnvelopeDetails({ envelope }: { envelope: Envelope }) {
   const [showRawJSON, setShowRawJSON] = useState<boolean>(false);
+  const { getSidecarUrl } = useSpotlightContext();
 
   const [header, items] = envelope;
 
   const envelopeId: string | unknown = header.__spotlight_envelope_id;
-  const downloadUrl = `http://localhost:8969/stream/${envelopeId}`;
+
+  const downloadUrl = getSidecarUrl(`/stream/${envelopeId}`);
   return (
     <SidePanel backto="/insights/envelopes">
       <SidePanelHeader
