@@ -48,7 +48,7 @@ export default function TraceList({ traceData, onShowAll }: TraceListProps) {
           const ref = isSelected ? selectedTraceRef : null;
 
           return (
-            <div key={trace.trace_id} ref={ref}>
+            <div key={trace.trace_id} id={trace.trace_id} ref={ref}>
               {isSelected ? (
                 <TraceSplitViewLayout
                   trace={trace}

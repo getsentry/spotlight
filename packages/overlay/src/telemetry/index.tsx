@@ -7,7 +7,6 @@ import * as db from "../lib/db";
 import { getSpotlightEventTarget } from "../lib/eventTarget";
 import { log } from "../lib/logger";
 import { connectToSidecar } from "../sidecar";
-import sentryStore from "../telemetry/store";
 import type { RawEventContext } from "../types";
 import TelemetryView from "./components/TelemetryView";
 import useSentryStore from "./store";
@@ -219,7 +218,7 @@ export function Telemetry({ sidecarUrl, showClearEventsButton, initialEvents = {
     }
 
     setSentryEvents([]);
-    sentryStore.getState().resetData();
+    useSentryStore.getState().resetData();
   }, [sidecarUrl]);
 
   const onNavigate = useCallback(
