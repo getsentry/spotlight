@@ -1,16 +1,13 @@
-import type { Envelope, EnvelopeItem } from "@sentry/core";
+import type { Envelope } from "@sentry/core";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { removeURLSuffix } from "~/lib/removeURLSuffix";
-import { base64Decode } from "../lib/base64";
 import * as db from "../lib/db";
 import { getSpotlightEventTarget } from "../lib/eventTarget";
 import { log } from "../lib/logger";
 import { connectToSidecar } from "../sidecar";
-import type { RawEventContext } from "../types";
 import TelemetryView from "./components/TelemetryView";
 import useSentryStore from "./store";
-import { parseJSONFromBuffer } from "./utils/bufferParsers";
 
 export function setSidecarUrl(url: string) {
   const store = useSentryStore.getState();
@@ -19,117 +16,30 @@ export function setSidecarUrl(url: string) {
   log("Set sidecar URL for telemetry:", baseSidecarUrl);
 }
 
-function getLineEnd(data: Uint8Array): number {
-  let end = data.indexOf(0xa);
-  if (end === -1) {
-    end = data.length;
-  }
-
-  return end;
-}
-
 /**
  * Implements parser for
  * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
  * @param rawEvent Envelope data
  * @returns parsed envelope
  */
-export function processEnvelope(rawEvent: RawEventContext) {
-  let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
+export function processEnvelope(rawEvent: string) {
+  const envelope = JSON.parse(rawEvent);
+  useSentryStore.getState().pushEnvelope(envelope);
 
-  function readLine(length?: number) {
-    const cursor = length ?? getLineEnd(buffer);
-    const line = buffer.subarray(0, cursor);
-    buffer = buffer.subarray(cursor + 1);
-    return line;
-  }
-
-  const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
-
-  const items: EnvelopeItem[] = [];
-  while (buffer.length) {
-    const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
-    const payloadLength = itemHeader.length;
-    const itemPayloadRaw = readLine(payloadLength);
-
-    let itemPayload: EnvelopeItem[1];
-    try {
-      itemPayload = parseJSONFromBuffer(itemPayloadRaw);
-      // data sanitization
-      if (itemHeader.type) {
-        // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
-        itemPayload.type = itemHeader.type;
-      }
-    } catch (err) {
-      itemPayload = itemPayloadRaw;
-      log(err);
-    }
-
-    items.push([itemHeader, itemPayload] as EnvelopeItem);
-  }
-
-  const envelope = [envelopeHeader, items] as Envelope;
-  useSentryStore.getState().pushEnvelope({ envelope, rawEnvelope: rawEvent });
-
-  return {
-    event: envelope,
-    rawEvent: rawEvent,
-  };
+  return envelope as Envelope;
 }
 
 type TelemetryRouteProps = {
   sidecarUrl: string;
   showClearEventsButton: boolean;
-  initialEvents?: Record<string, (string | Uint8Array)[]>;
 };
 
-type EventData = { contentType: string; data: string | Uint8Array };
-
-type ProcessedEnvelope = {
-  event: Envelope;
-  rawEvent: RawEventContext;
-};
+type EventData = { contentType: string; data: string };
 
 const SENTRY_CONTENT_TYPE = "application/x-sentry-envelope";
 
-function processSentryEvent(contentType: string, event: { data: string | Uint8Array }): ProcessedEnvelope {
-  return processEnvelope({
-    contentType,
-    data: event.data,
-  });
-}
-
-function processInitialEvents(initialEvents: Record<string, (string | Uint8Array)[]>): ProcessedEnvelope[] {
-  const result: ProcessedEnvelope[] = [];
-
-  for (const contentType in initialEvents) {
-    const contentTypeBits = contentType.split(";");
-    const contentTypeWithoutEncoding = contentTypeBits[0];
-
-    if (contentTypeWithoutEncoding !== SENTRY_CONTENT_TYPE) {
-      continue;
-    }
-
-    const shouldUseBase64 = contentTypeBits[contentTypeBits.length - 1] === "base64";
-
-    for (const data of initialEvents[contentTypeWithoutEncoding]) {
-      const processedEvent = processSentryEvent(
-        contentTypeWithoutEncoding,
-        shouldUseBase64 ? { data: base64Decode(data as string) } : { data },
-      );
-      if (processedEvent) {
-        result.push(processedEvent);
-      }
-    }
-  }
-
-  return result;
-}
-
-export function Telemetry({ sidecarUrl, showClearEventsButton, initialEvents = {} }: TelemetryRouteProps) {
-  const [sentryEvents, setSentryEvents] = useState<ProcessedEnvelope[]>(() =>
-    processInitialEvents(initialEvents || {}),
-  );
+export function Telemetry({ sidecarUrl, showClearEventsButton }: TelemetryRouteProps) {
+  const [sentryEvents, setSentryEvents] = useState<Envelope[]>([]);
   const [isOnline, setOnline] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const navigate = useNavigate();
@@ -144,9 +54,9 @@ export function Telemetry({ sidecarUrl, showClearEventsButton, initialEvents = {
   }, [isInitialized, sidecarUrl]);
 
   const contentTypeListeners = useMemo(() => {
-    const listener = (event: { data: string | Uint8Array }): void => {
+    const listener = (event: string): void => {
       log(`Received new ${SENTRY_CONTENT_TYPE} event`);
-      const processedEvent = processSentryEvent(SENTRY_CONTENT_TYPE, event);
+      const processedEvent = processEnvelope(event);
 
       if (!processedEvent) {
         return;
@@ -157,9 +67,9 @@ export function Telemetry({ sidecarUrl, showClearEventsButton, initialEvents = {
 
     log("Adding listener for", SENTRY_CONTENT_TYPE);
 
-    const result: Record<string, (event: { data: string | Uint8Array }) => void> = Object.create(null);
+    const result: Record<string, (event: string) => void> = Object.create(null);
     result[SENTRY_CONTENT_TYPE] = listener;
-    result[`${SENTRY_CONTENT_TYPE};base64`] = event => listener({ data: base64Decode(event.data as string) });
+    result[`${SENTRY_CONTENT_TYPE};base64`] = event => listener(event);
     return result;
   }, []);
 
@@ -184,9 +94,7 @@ export function Telemetry({ sidecarUrl, showClearEventsButton, initialEvents = {
       if (!listener) {
         return;
       }
-      const event =
-        contentTypeBits[contentTypeBits.length - 1] === "base64" ? { data: base64Decode(data as string) } : { data };
-      listener(event);
+      listener(data);
     },
     [contentTypeListeners],
   );

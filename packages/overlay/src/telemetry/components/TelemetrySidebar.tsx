@@ -61,7 +61,7 @@ export default function TelemetrySidebar({
   const isActive = (path: string) => {
     // case for primary path
     if (path === "traces") {
-      return pathname === "/telemetry" || pathname.endsWith("/telemetry") || pathname.startsWith("/telemetry/traces");
+      return pathname === "/telemetry" || pathname.startsWith("/telemetry/traces");
     }
     // case for all other paths
     return pathname.startsWith(`/telemetry/${path}`);

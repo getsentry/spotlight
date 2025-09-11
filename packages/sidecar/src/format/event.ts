@@ -14,7 +14,8 @@ import type {
   RequestEntrySchema,
   ThreadsEntrySchema,
 } from "./schema.js";
-import type { Event } from "./types.js";
+
+export type Event = z.infer<typeof EventSchema>;
 
 // Language detection mappings
 const LANGUAGE_EXTENSIONS: Record<string, string> = {
@@ -69,11 +70,7 @@ function detectLanguage(frame: z.infer<typeof FrameInterface>, platform?: string
  * @param platform - Optional platform hint for language detection fallback
  * @returns Formatted stack frame string
  */
-export function formatFrameHeader(
-  frame: z.infer<typeof FrameInterface>,
-  frameIndex?: number,
-  platform?: string | null,
-) {
+function formatFrameHeader(frame: z.infer<typeof FrameInterface>, frameIndex?: number, platform?: string | null) {
   const language = detectLanguage(frame, platform);
 
   switch (language) {

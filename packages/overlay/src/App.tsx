@@ -5,10 +5,9 @@ import { Telemetry } from "./telemetry";
 type AppProps = {
   sidecarUrl: string;
   showClearEventsButton?: boolean;
-  initialEvents?: Record<string, (string | Uint8Array)[]>;
 };
 
-export default function App({ sidecarUrl, showClearEventsButton = true, initialEvents = {} }: AppProps) {
+export default function App({ sidecarUrl, showClearEventsButton = true }: AppProps) {
   return (
     <Routes>
       {/* Default route redirects to telemetry */}
@@ -16,13 +15,7 @@ export default function App({ sidecarUrl, showClearEventsButton = true, initialE
 
       <Route
         path="/telemetry/*"
-        element={
-          <Telemetry
-            sidecarUrl={sidecarUrl}
-            showClearEventsButton={showClearEventsButton}
-            initialEvents={initialEvents}
-          />
-        }
+        element={<Telemetry sidecarUrl={sidecarUrl} showClearEventsButton={showClearEventsButton} />}
       />
     </Routes>
   );

@@ -1,12 +1,20 @@
-// This file is a copy of utils from @spotlightjs/overlay to parse envelopes from Buffer
 import type { Envelope, EnvelopeItem } from "@sentry/core";
+import { uuidv7 } from "uuidv7";
+import { logger } from "~/logger.js";
+import type { RawEventContext } from "./types.js";
 
-type RawEventContext = {
-  contentType: string;
-  data: string | Uint8Array;
+export type ParsedEnvelope = {
+  event: Envelope;
+  rawEvent: RawEventContext;
 };
 
-export function processEnvelope(rawEvent: RawEventContext) {
+/**
+ * Implements parser for
+ * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
+ * @param rawEvent Envelope data
+ * @returns parsed envelope
+ */
+export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
   let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
 
   function readLine(length?: number) {
@@ -17,6 +25,9 @@ export function processEnvelope(rawEvent: RawEventContext) {
   }
 
   const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
+
+  const envelopeId = uuidv7();
+  envelopeHeader.__spotlight_envelope_id = envelopeId;
 
   const items: EnvelopeItem[] = [];
   while (buffer.length) {
@@ -34,7 +45,7 @@ export function processEnvelope(rawEvent: RawEventContext) {
       }
     } catch (err) {
       itemPayload = itemPayloadRaw;
-      console.error(err);
+      logger.error(err);
     }
 
     items.push([itemHeader, itemPayload] as EnvelopeItem);
@@ -43,7 +54,8 @@ export function processEnvelope(rawEvent: RawEventContext) {
   const envelope = [envelopeHeader, items] as Envelope;
 
   return {
-    envelope,
+    event: envelope,
+    rawEvent: rawEvent,
   };
 }
 
@@ -56,11 +68,11 @@ function getLineEnd(data: Uint8Array): number {
   return end;
 }
 
-export function parseJSONFromBuffer<T = unknown>(data: Uint8Array): T {
+function parseJSONFromBuffer<T = unknown>(data: Uint8Array): T {
   try {
     return JSON.parse(new TextDecoder().decode(data)) as T;
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     return {} as T;
   }
 }

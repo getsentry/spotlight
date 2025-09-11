@@ -1,16 +1,16 @@
 import type { ErrorEvent } from "@sentry/core";
 import type { z } from "zod";
-import type { EventContainer } from "~/utils/eventContainer.js";
-import { formatEventOutput } from "../formatting.js";
-import { processEnvelope } from "../parsing/index.js";
-import type { ErrorEventSchema } from "../schema.js";
+import { isErrorEvent } from "~/parser/index.js";
+import type { EventContainer } from "~/utils/index.js";
+import { formatEventOutput } from "./event.js";
+import type { ErrorEventSchema } from "./schema.js";
 
 export async function formatErrorEnvelope(container: EventContainer) {
-  const event = processEnvelope({ contentType: container.getContentType(), data: container.getData() });
+  const processedEnvelope = container.getParsedEnvelope();
 
   const {
     event: [, items],
-  } = event;
+  } = processedEnvelope;
 
   const formatted: string[] = [];
   for (const item of items) {
@@ -22,10 +22,6 @@ export async function formatErrorEnvelope(container: EventContainer) {
   }
 
   return formatted;
-}
-
-function isErrorEvent(payload: unknown): payload is ErrorEvent {
-  return typeof payload === "object" && payload !== null && "exception" in payload;
 }
 
 export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventSchema> {
