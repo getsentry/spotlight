@@ -9,7 +9,6 @@ import ErrorsTab from "./tabs/ErrorsTab";
 import InsightsTab from "./tabs/InsightsTab";
 
 import { spotlightBrowserIntegration } from "@sentry/browser";
-import { getLocalTraces, isLocalTrace } from "./store/helpers";
 import LogsTab from "./tabs/LogsTab";
 import TracesTab from "./tabs/TracesTab";
 import type { SentryErrorEvent, SentryEvent } from "./types";
@@ -69,24 +68,14 @@ export default function initTelemetry(options: TelemetryOptions = {}) {
     panels: () => {
       const store = useSentryStore.getState();
 
-      const errorCount = store
-        .getEvents()
-        .reduce(
-          (sum, e) =>
-            sum +
-            Number(
-              isErrorEvent(e) &&
-                (e.contexts?.trace?.trace_id ? isLocalTrace(e.contexts?.trace?.trace_id) : null) !== false,
-            ),
-          0,
-        );
+      const errorCount = store.getEvents().reduce((sum, e) => sum + Number(isErrorEvent(e)), 0);
 
-      const localTraceCount = getLocalTraces().length;
+      const traceCount = store.getTraces().length;
 
       return [
         createTab("traces", "Traces", {
           notificationCount: {
-            count: localTraceCount,
+            count: traceCount,
           },
           content: TracesTab,
         }),

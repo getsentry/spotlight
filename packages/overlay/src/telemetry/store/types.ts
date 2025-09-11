@@ -31,11 +31,9 @@ export interface EventsSliceActions {
 
 export interface TracesSliceState {
   tracesById: Map<string, Trace>;
-  localTraceIds: Set<string>;
 }
 
 export interface TracesSliceActions {
-  trackLocalTrace: (traceId: string) => void;
   getTraces: () => Trace[];
 }
 
