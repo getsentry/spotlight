@@ -24,7 +24,8 @@
     "@spotlightjs/overlay": "workspace:*",
     "@spotlightjs/sidecar": "workspace:*",
     "electron-store": "^10.0.0",
-    "electron-updater": "^6.3.9"
+    "electron-updater": "^6.3.9",
+    "update-electron-app": "^3.1.1"
   },
   "devDependencies": {
     "@electron/notarize": "^2.5.0",

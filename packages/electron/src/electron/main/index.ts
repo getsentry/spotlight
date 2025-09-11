@@ -3,8 +3,25 @@ import * as Sentry from "@sentry/electron/main";
 import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
 import { BrowserWindow, Menu, app, dialog, ipcMain, shell } from "electron";
 import Store from "electron-store";
+import { autoUpdater } from "electron-updater";
 
 const store = new Store();
+
+autoUpdater.setFeedURL(
+  `https://update.electronjs.org/getsentry/spotlight/${process.platform}-${process.arch}/${app.getVersion()}`,
+);
+
+const ONE_HOUR = 60 * 60 * 1000;
+
+app.on("ready", () => {
+  const updateInterval = setInterval(() => {
+    autoUpdater.checkForUpdates();
+  }, ONE_HOUR);
+
+  app.on("before-quit", () => {
+    clearInterval(updateInterval);
+  });
+});
 
 Sentry.init({
   dsn: "https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976",
