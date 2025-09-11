@@ -52,6 +52,35 @@ const router = new Hono<HonoEnv>()
       });
     });
   })
+  .get("/stream/:id", ctx => {
+    const buffer = getBuffer();
+
+    // Capture client information for debug logging
+    let clientId = ctx.req.query("client");
+    if (!clientId) {
+      // Fallback to parsing User-Agent if no client param
+      const userAgent = ctx.req.header("User-Agent") || "unknown";
+      clientId = parseBrowserFromUserAgent(userAgent);
+    }
+    // Sanitize to prevent log injection - keep only safe printable characters
+    // Allow alphanumeric, spaces, dots, dashes, underscores, slashes, parentheses
+    clientId = clientId.replace(/[^\w\s.\-/()]/g, "");
+    // Ensure we always have a non-empty clientId
+    if (!clientId) clientId = "unknown";
+
+    const envelopeId = ctx.req.param("id");
+    const container = buffer.read({ envelopeId });
+
+    if (container.length === 0) {
+      return ctx.notFound();
+    }
+
+    return ctx.body(container[0].getData(), 200, {
+      "Content-Type": container[0].getContentType(),
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    });
+  })
   .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {
     const arrayBuffer = await ctx.req.arrayBuffer();
     let body = Buffer.from(arrayBuffer);

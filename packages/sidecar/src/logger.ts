@@ -1,10 +1,12 @@
 import type { SidecarLogger } from "./types/index.js";
 
+const SPOTLIGHT_PREFIX = "🔎 [Spotlight]";
+
 const defaultLogger: SidecarLogger = {
-  info: message => console.log("🔎 [Spotlight]", message),
-  warn: message => console.warn("🔎 [Spotlight]", message),
-  error: message => console.error("🔎 [Spotlight]", message),
-  debug: message => debugEnabled && console.debug("🔎 [Spotlight]", message),
+  info: message => console.log(SPOTLIGHT_PREFIX, message),
+  warn: message => console.warn(SPOTLIGHT_PREFIX, message),
+  error: message => console.error(SPOTLIGHT_PREFIX, message),
+  debug: message => debugEnabled && console.debug(SPOTLIGHT_PREFIX, message),
 };
 
 let injectedLogger: SidecarLogger | undefined = undefined;

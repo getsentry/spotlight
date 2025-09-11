@@ -4,16 +4,13 @@ import { ReactComponent as Download } from "~/assets/download.svg";
 import JsonViewer from "~/telemetry/components/shared/JsonViewer";
 import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
 
-export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; rawEnvelope: string } }) {
+export default function EnvelopeDetails({ envelope }: { envelope: Envelope }) {
   const [showRawJSON, setShowRawJSON] = useState<boolean>(false);
-  const { envelope, rawEnvelope } = data;
 
-  const header = envelope[0];
-  const items = envelope[1];
+  const [header, items] = envelope;
 
   const envelopeId: string | unknown = header.__spotlight_envelope_id;
-  const downloadUrl = URL.createObjectURL(new Blob([rawEnvelope], { type: "application/json" }));
-  const downloadName = `${envelopeId}-application/json.json`;
+  const downloadUrl = `http://localhost:8969/stream/${envelopeId}`;
   return (
     <SidePanel backto="/insights/envelopes">
       <SidePanelHeader
@@ -23,7 +20,6 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
             Event Id <span className="text-primary-500">&mdash;</span>{" "}
             <a
               href={downloadUrl}
-              download={downloadName}
               className="inline-flex items-center gap-1 group"
               title="Download"
               aria-label="Download envelope"

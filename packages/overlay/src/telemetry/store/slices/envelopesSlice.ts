@@ -15,7 +15,7 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
   get,
 ) => ({
   ...initialEnvelopesState,
-  pushEnvelope: ({ envelope, rawEnvelope }: { envelope: Envelope; rawEnvelope: string }) => {
+  pushEnvelope: (envelope: Envelope) => {
     const [header, items] = envelope;
     const lastSeen = new Date(header.sent_at as string).getTime();
     let sdk: Sdk;
@@ -38,9 +38,6 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
 
     get().storeSdkRecord(sdk);
 
-    const envelopeId = generateUuidv4();
-    header.__spotlight_envelope_id = envelopeId;
-
     const traceContext = header.trace;
 
     for (const [itemHeader, itemData] of items) {
@@ -60,7 +57,7 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
 
     const { envelopes } = get();
     const newEnvelopes = new Map(envelopes);
-    newEnvelopes.set(envelopeId, { envelope, rawEnvelope });
+    newEnvelopes.set(header.__spotlight_envelope_id as string, envelope);
     set({ envelopes: newEnvelopes });
     return newEnvelopes.size;
   },

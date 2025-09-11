@@ -12,56 +12,22 @@ import sentryStore from "./telemetry/store";
 type AppProps = {
   sidecarUrl: string;
   showClearEventsButton?: boolean;
-  initialEvents?: Record<string, string>;
   startFrom?: string;
 };
 
 type EventData = { contentType: string; data: string };
 
-type ProcessedEnvelope = {
-  event: Envelope;
-  rawEvent: string;
-};
-
 const SENTRY_CONTENT_TYPE = "application/x-sentry-envelope";
 
-function processSentryEvent(data: string): ProcessedEnvelope {
-  return processEnvelope(data);
-}
-
-function processInitialEvents(initialEvents: Record<string, string>): ProcessedEnvelope[] {
-  const result: ProcessedEnvelope[] = [];
-
-  for (const contentType in initialEvents) {
-    const contentTypeBits = contentType.split(";");
-    const contentTypeWithoutEncoding = contentTypeBits[0];
-
-    if (contentTypeWithoutEncoding !== SENTRY_CONTENT_TYPE) {
-      continue;
-    }
-
-    for (const data of initialEvents[contentTypeWithoutEncoding]) {
-      const processedEvent = processSentryEvent(data);
-      if (processedEvent) {
-        result.push(processedEvent);
-      }
-    }
-  }
-
-  return result;
-}
-
-export default function App({ sidecarUrl, showClearEventsButton = true, initialEvents = {}, startFrom }: AppProps) {
-  const [sentryEvents, setSentryEvents] = useState<ProcessedEnvelope[]>(() =>
-    processInitialEvents(initialEvents || {}),
-  );
+export default function App({ sidecarUrl, showClearEventsButton = true, startFrom }: AppProps) {
+  const [sentryEvents, setSentryEvents] = useState<Envelope[]>([]);
   const [isOnline, setOnline] = useState(false);
   log("App rerender", sentryEvents, isOnline);
 
   const contentTypeListeners = useMemo(() => {
     const listener = (event: string): void => {
       log(`Received new ${SENTRY_CONTENT_TYPE} event`);
-      const processedEvent = processSentryEvent(event);
+      const processedEvent = processEnvelope(event);
 
       if (!processedEvent) {
         return;

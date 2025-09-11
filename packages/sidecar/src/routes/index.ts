@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { contextStorage } from "hono/context-storage";
 import { CONTEXT_LINES_ENDPOINT } from "~/constants.js";
-import { generateUuidv4 } from "~/messageBuffer.js";
+import { generateUuidv4 } from "~/utils/index.js";
 import clearRouter from "./clear.js";
 import contextLinesRouter from "./contextlines/index.js";
 import healthRouter from "./health.js";

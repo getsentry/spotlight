@@ -53,7 +53,14 @@ export class EventContainer {
     const envelope = this.getParsedEnvelope();
     if (!envelope) return null;
 
-    return envelope.event[1].map(item => item[0].type).filter(Boolean) as string[];
+    const eventTypes: string[] = [];
+    for (const item of envelope.event[1]) {
+      if (item[0].type) {
+        eventTypes.push(item[0].type);
+      }
+    }
+
+    return eventTypes;
   }
 
   /**

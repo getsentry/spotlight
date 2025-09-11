@@ -1,4 +1,4 @@
-import type { Client } from "@sentry/core";
+import type { Client, Envelope } from "@sentry/core";
 import { off, on } from "~/lib/eventTarget";
 import { log, warn } from "~/lib/logger";
 import { removeURLSuffix } from "~/lib/removeURLSuffix";
@@ -127,12 +127,9 @@ export default function initTelemetry(options: TelemetryOptions = {}) {
  */
 export function processEnvelope(rawEvent: string) {
   const envelope = JSON.parse(rawEvent);
-  useSentryStore.getState().pushEnvelope({ envelope, rawEnvelope: rawEvent });
+  useSentryStore.getState().pushEnvelope(envelope);
 
-  return {
-    event: envelope,
-    rawEvent: rawEvent,
-  };
+  return envelope as Envelope;
 }
 
 type V8Carrier = {

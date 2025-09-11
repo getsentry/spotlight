@@ -1,3 +1,6 @@
+import type { EventContainer } from "./utils/eventContainer.js";
+import { generateUuidv4 } from "./utils/index.js";
+
 export class MessageBuffer<T> {
   private size: number;
   private items: [number, T][];
@@ -85,13 +88,16 @@ export class MessageBuffer<T> {
     const start = this.head;
     const end = this.writePos;
 
-    const minTime = Date.now() - filters.duration * 1000;
-
     for (let i = end - 1; i >= start; i--) {
       const item = this.items[i % this.size];
+
       if (item !== undefined) {
-        if (item[0] < minTime) {
-          break;
+        // Apply all filters
+        const isValid = Object.keys(filters).every(key => this.filterHandlers[key](item, filters));
+
+        // Check if the item passes all filters
+        if (!isValid) {
+          continue;
         }
 
         result.push(item[1]);
@@ -100,19 +106,29 @@ export class MessageBuffer<T> {
 
     return result;
   }
+
+  filterHandlers: Record<keyof ReadFilter | string, (item: [number, T], value: ReadFilter) => boolean> = {
+    duration: (item, value) => {
+      if (value.duration == null) {
+        return true;
+      }
+
+      return item[0] > Date.now() - value.duration * 1000;
+    },
+    envelopeId: (item, value) => {
+      if (value.envelopeId == null) {
+        return true;
+      }
+
+      const data = (item[1] as EventContainer).getParsedEnvelope();
+
+      return data.event[0].__spotlight_envelope_id === value.envelopeId;
+    },
+  };
 }
 
 type ReadFilter = {
   // duration in seconds
-  duration: number;
+  duration?: number;
+  envelopeId?: string;
 };
-
-export function generateUuidv4(): string {
-  let dt = new Date().getTime();
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
-    let rnd = Math.random() * 16;
-    rnd = ((dt + rnd) % 16) | 0;
-    dt = Math.floor(dt / 16);
-    return (c === "x" ? rnd : (rnd & 0x3) | 0x8).toString(16);
-  });
-}
