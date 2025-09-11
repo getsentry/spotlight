@@ -22,7 +22,7 @@
     "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "astro": "^5.12.8",
+    "astro": "^5.13.1",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sharp": "^0.33.5",
