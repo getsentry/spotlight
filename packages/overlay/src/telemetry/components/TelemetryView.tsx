@@ -58,12 +58,12 @@ export default function TelemetryView({
       />
       <div className="flex-1 overflow-auto">
         <Routes>
-          <Route path="/not-found" element={<p>Not Found - How'd you manage to get here?</p>} key="not-found" />
-          <Route path="/traces/*" element={<TracesTab />} key="traces" />
-          <Route path="/errors/*" element={<ErrorsTab />} key="errors" />
-          <Route path="/logs/*" element={<LogsTab />} key="logs" />
-          <Route path="/insights/*" element={<InsightsTab />} key="insights" />
-          <Route path="/" element={<TracesTab />} key="default" />
+          <Route path="not-found" element={<p>Not Found - How'd you manage to get here?</p>} key="not-found" />
+          <Route path="traces/*" element={<TracesTab />} key="traces" />
+          <Route path="errors/*" element={<ErrorsTab />} key="errors" />
+          <Route path="logs/*" element={<LogsTab />} key="logs" />
+          <Route path="insights/*" element={<InsightsTab />} key="insights" />
+          <Route path="" element={<TracesTab />} key="default" />
         </Routes>
       </div>
     </div>

@@ -51,7 +51,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
   }, [allLogs, localLogs, showAll, sort.active, sort.asc]);
 
   const handleRowClick = (log: SentryLogEventItem) => {
-    navigate(`${log.id}`);
+    navigate(`/telemetry/logs/${log.id}`);
   };
 
   const handleRowKeyDown = (e: KeyboardEvent<HTMLTableRowElement>, log: SentryLogEventItem) => {

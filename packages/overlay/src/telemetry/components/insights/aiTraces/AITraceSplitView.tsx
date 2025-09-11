@@ -31,7 +31,7 @@ export default function AITraceSplitView({ trace }: AITraceSplitViewProps) {
   // auto-navigate to first AI span when no span is selected
   useEffect(() => {
     if (!spanId && firstAISpanId) {
-      navigate(`/traces/${traceId}/spans/${firstAISpanId}`, { replace: true });
+      navigate(`/telemetry/traces/${traceId}/spans/${firstAISpanId}`, { replace: true });
     }
   }, [spanId, firstAISpanId, traceId, navigate]);
 

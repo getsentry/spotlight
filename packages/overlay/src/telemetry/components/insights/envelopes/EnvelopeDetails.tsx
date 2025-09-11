@@ -22,7 +22,7 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
   const downloadUrl = URL.createObjectURL(new Blob([rawEnvelope.data as BlobPart], { type: rawEnvelope.contentType }));
   const downloadName = `${envelopeId}-${rawEnvelope.contentType}.bin`;
   return (
-    <SidePanel backto="/insights/envelopes">
+    <SidePanel backto="/telemetry/insights/envelopes">
       <SidePanelHeader
         title="Envelope Details"
         subtitle={
@@ -40,7 +40,7 @@ export default function EnvelopeDetails({ data }: { data: { envelope: Envelope; 
             </a>
           </>
         }
-        backto="/insights/envelopes"
+        backto="/telemetry/insights/envelopes"
       />
       <label htmlFor="json-toggle" className="mb-8 flex cursor-pointer items-center">
         <div className="relative flex h-4 items-center gap-2">
