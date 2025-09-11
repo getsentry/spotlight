@@ -1,6 +1,5 @@
 import type { Envelope } from "@sentry/core";
 import type { StateCreator } from "zustand";
-import { generateUuidv4 } from "~/lib/uuid";
 import { SUPPORTED_EVENT_TYPES } from "../../constants/sentry";
 import type { Sdk, SentryEvent } from "../../types";
 import { sdkToPlatform } from "../../utils/sdkToPlatform";
