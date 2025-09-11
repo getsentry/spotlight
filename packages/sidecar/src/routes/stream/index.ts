@@ -65,6 +65,7 @@ const router = new Hono<HonoEnv>()
     return ctx.body(container[0].getData(), 200, {
       "Content-Type": container[0].getContentType(),
       "Cache-Control": "no-cache",
+      "Content-Disposition": `attachment; filename="${envelopeId}.txt"`,
       Connection: "keep-alive",
     });
   })
