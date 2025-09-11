@@ -1,4 +1,3 @@
-import type { Envelope } from "@sentry/core";
 import { Link, useParams } from "react-router-dom";
 import { cn } from "~/lib/cn";
 import CardList from "~/telemetry/components/shared/CardList";
@@ -24,14 +23,13 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
       <>
         <CardList>
           <div className="flex flex-col">
-            {(showAll ? allEnvelopes : localEnvelopes).map(({ envelope }: { envelope: Envelope }) => {
-              const header: Envelope[0] = envelope[0];
+            {(showAll ? allEnvelopes : localEnvelopes).map(envelope => {
+              const [header, envelopeItems = []] = envelope;
               const envelopeId: string | unknown = header.__spotlight_envelope_id;
               if (typeof envelopeId !== "string") {
                 return null;
               }
               const { trace_id } = (header?.trace as { trace_id?: string }) || {};
-              const envelopeItems = envelope[1] || [];
               const itemTypes = new Set<string | undefined>(envelopeItems.map(item => item?.[0].type));
               itemTypes.delete(undefined);
               const itemTypesList = Array.from(itemTypes).join(",");
@@ -73,7 +71,7 @@ export default function EnvelopeList({ showAll }: { showAll: boolean }) {
             })}
           </div>
         </CardList>
-        {selectedEnvelope && <EnvelopeDetails data={selectedEnvelope} />}
+        {selectedEnvelope && <EnvelopeDetails envelope={selectedEnvelope} />}
       </>
     );
   }

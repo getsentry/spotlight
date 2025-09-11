@@ -32,6 +32,14 @@
     "./constants": {
       "import": "./dist/src/constants.js",
       "types": "./dist/src/constants.d.ts"
+    },
+    "./parser": {
+      "import": "./dist/src/parser/index.js",
+      "types": "./dist/src/parser/index.d.ts"
+    },
+    "./format": {
+      "import": "./dist/src/format/index.js",
+      "types": "./dist/src/format/index.d.ts"
     }
   },
   "dependencies": {
@@ -42,8 +50,8 @@
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
     "hono": "^4.9.6",
-    "kleur": "^4.1.5",
     "launch-editor": "^2.9.1",
+    "uuidv7": "^1.0.2",
     "zod": "^3"
   },
   "devDependencies": {
