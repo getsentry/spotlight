@@ -20,7 +20,7 @@ export default function EnvelopeDetails({ envelope }: { envelope: Envelope }) {
         title="Envelope Details"
         subtitle={
           <>
-            Event Id <span className="text-primary-500">&mdash;</span>{" "}
+            Envelope Id <span className="text-primary-500">&mdash;</span>{" "}
             <a
               href={downloadUrl}
               className="inline-flex items-center gap-1 group"

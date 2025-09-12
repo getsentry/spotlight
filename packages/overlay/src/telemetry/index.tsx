@@ -22,8 +22,8 @@ export function setSidecarUrl(url: string) {
  * @param rawEvent Envelope data
  * @returns parsed envelope
  */
-export function processEnvelope(rawEvent: string) {
-  const envelope = JSON.parse(rawEvent);
+export function processEnvelope(rawEvent: string | Envelope) {
+  const envelope = typeof rawEvent === "string" ? JSON.parse(rawEvent) : rawEvent;
   useSentryStore.getState().pushEnvelope(envelope);
 
   return envelope as Envelope;
