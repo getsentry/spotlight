@@ -2,7 +2,7 @@ import fontStyles from "@fontsource/raleway/index.css?inline";
 import { CONTEXT_LINES_ENDPOINT } from "@spotlightjs/sidecar/constants";
 import { MemoryRouter } from "react-router-dom";
 import App from "./App";
-import { DEFAULT_SIDECAR_STREAM_URL } from "./constants";
+import { DEFAULT_INITIAL_TAB, DEFAULT_SIDECAR_STREAM_URL } from "./constants";
 import globalStyles from "./index.css?inline";
 import { on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
@@ -41,7 +41,6 @@ export function sentry(options: { injectIntoSDK?: boolean } = {}) {
 export type SpotlightInitOptions = {
   sidecarUrl?: string;
   showClearEventsButton?: boolean;
-  startFrom?: string;
   debug?: boolean;
 };
 
@@ -59,7 +58,6 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   const {
     sidecarUrl = DEFAULT_SIDECAR_STREAM_URL,
     showClearEventsButton = true,
-    startFrom = undefined,
     debug = document.location.hash.endsWith("debug"),
   } = initOptions;
 
@@ -109,12 +107,11 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
 
     document.body.innerHTML = "";
     document.body.appendChild(appRoot);
-    const initialTab = startFrom || "/traces";
 
     ReactDOM.createRoot(appRoot).render(
-      <MemoryRouter initialEntries={[initialTab]}>
+      <MemoryRouter initialEntries={[DEFAULT_INITIAL_TAB]}>
         <SpotlightContextProvider context={context}>
-          <App sidecarUrl={sidecarUrl} showClearEventsButton={showClearEventsButton} startFrom={startFrom} />
+          <App sidecarUrl={sidecarUrl} showClearEventsButton={showClearEventsButton} />
         </SpotlightContextProvider>
       </MemoryRouter>,
     );

@@ -58,6 +58,6 @@ export default function initSentry() {
   });
 
   if (hasTraceParent && sentryClient) {
-    Sentry.startBrowserTracingPageLoadSpan(sentryClient, { name: "initialTab" }, sentryTraceParent);
+    Sentry.startBrowserTracingPageLoadSpan(sentryClient, { name: "pageload" }, sentryTraceParent);
   }
 }
