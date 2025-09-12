@@ -62,7 +62,7 @@ const Queries = () => {
   const maxTime = Math.max(...queriesData.map(query => query.totalTime));
 
   const handleRowClick = (query: QueryInfo) => {
-    navigate(`/insights/queries/${btoa(query.description)}`);
+    navigate(`/telemetry/insights/queries/${btoa(query.description)}`);
   };
 
   if (!queriesData?.length) {

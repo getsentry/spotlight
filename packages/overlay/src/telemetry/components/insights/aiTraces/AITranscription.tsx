@@ -228,7 +228,7 @@ function ConversationBubble({
       {isUser ? (
         bubbleContent
       ) : (
-        <Link to={`/traces/${traceId}/spans/${message.spanId}`} className="max-w-[80%]">
+        <Link to={`/telemetry/traces/${traceId}/spans/${message.spanId}`} className="max-w-[80%]">
           {bubbleContent}
         </Link>
       )}

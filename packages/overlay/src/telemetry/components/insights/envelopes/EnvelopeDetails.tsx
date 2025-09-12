@@ -15,7 +15,7 @@ export default function EnvelopeDetails({ envelope }: { envelope: Envelope }) {
 
   const downloadUrl = getSidecarUrl(`/envelope/${envelopeId}`);
   return (
-    <SidePanel backto="/insights/envelopes">
+    <SidePanel backto="/telemetry/insights/envelopes">
       <SidePanelHeader
         title="Envelope Details"
         subtitle={
@@ -32,7 +32,7 @@ export default function EnvelopeDetails({ envelope }: { envelope: Envelope }) {
             </a>
           </>
         }
-        backto="/insights/envelopes"
+        backto="/telemetry/insights/envelopes"
       />
       <label htmlFor="json-toggle" className="mb-8 flex cursor-pointer items-center">
         <div className="relative flex h-4 items-center gap-2">

@@ -14,7 +14,7 @@ import useSentryStore from "../../../store";
 import DateTime from "../../shared/DateTime";
 import SpanTree from "../../traces/spans/SpanTree";
 
-const AI_TRACES_ROUTE = "/insights/aitraces";
+const AI_TRACES_ROUTE = "/telemetry/insights/aitraces";
 
 interface ToolCallDetailProps {
   toolCall: {

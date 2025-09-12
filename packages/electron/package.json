@@ -34,7 +34,8 @@
     "electron": "^35.7.5",
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
-    "rollup-plugin-sourcemaps2": "^0.4.1"
+    "rollup-plugin-sourcemaps2": "^0.4.1",
+    "@types/node": "catalog:"
   },
   "volta": {
     "extends": "../../package.json"

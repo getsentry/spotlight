@@ -24,7 +24,7 @@ export default function InsightsTabDetails() {
           <Route path="profiles" element={<Profiles />} />
           <Route path="aitraces/*" element={<AItracesTab />} />
           {/* Default tab */}
-          <Route path="*" element={<Navigate to="/insights/queries" replace />} />
+          <Route path="*" element={<Navigate to="queries" replace />} />
         </Routes>
         <Outlet />
       </div>
