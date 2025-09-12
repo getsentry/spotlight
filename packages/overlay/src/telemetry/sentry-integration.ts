@@ -1,5 +1,4 @@
 import type { Client, Envelope, Event, Integration } from "@sentry/core";
-import { serializeEnvelope } from "@sentry/core";
 import { trigger } from "~/lib/eventTarget";
 import { log } from "~/lib/logger";
 import useSentryStore from "./store";
@@ -39,7 +38,10 @@ export const spotlightIntegration = () => {
     },
     afterAllSetup: (client: Client) =>
       client.on("beforeEnvelope", (envelope: Envelope) =>
-        trigger("event", { contentType: "application/x-sentry-envelope", data: serializeEnvelope(envelope) }),
+        trigger("event", {
+          contentType: "application/x-sentry-envelope",
+          data: JSON.stringify(envelope),
+        }),
       ),
   } satisfies Integration;
 };
