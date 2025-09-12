@@ -12,14 +12,13 @@ import sentryStore from "./telemetry/store";
 type AppProps = {
   sidecarUrl: string;
   showClearEventsButton?: boolean;
-  startFrom?: string;
 };
 
 type EventData = { contentType: string; data: string };
 
 const SENTRY_CONTENT_TYPE = "application/x-sentry-envelope";
 
-export default function App({ sidecarUrl, showClearEventsButton = true, startFrom }: AppProps) {
+export default function App({ sidecarUrl, showClearEventsButton = true }: AppProps) {
   const [sentryEvents, setSentryEvents] = useState<Envelope[]>([]);
   const [isOnline, setOnline] = useState(false);
   log("App rerender", sentryEvents, isOnline);
@@ -131,12 +130,6 @@ export default function App({ sidecarUrl, showClearEventsButton = true, startFro
       spotlightEventTarget.removeEventListener("event", onEvent as EventListener);
     };
   }, [spotlightEventTarget, onNavigate, clearEvents, onEvent]);
-
-  useEffect(() => {
-    if (startFrom) {
-      navigate(startFrom);
-    }
-  }, [startFrom, navigate]);
 
   return <TelemetryView isOnline={isOnline} showClearEventsButton={showClearEventsButton} contextId={contextId} />;
 }

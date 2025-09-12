@@ -2,7 +2,6 @@ import { Link, useParams } from "react-router-dom";
 import { cn } from "~/lib/cn";
 import TimeSince from "~/telemetry/components/shared/TimeSince";
 import { Badge } from "~/ui/badge";
-import { isLocalTrace } from "../../store/helpers";
 import type { Span, Trace } from "../../types";
 import { getFormattedSpanDuration } from "../../utils/duration";
 import { truncateId } from "../../utils/text";
@@ -71,7 +70,6 @@ export default function TraceItem({ trace, className }: TraceItemProps) {
   const { traceId, spanId } = useParams<{ traceId: string; spanId: string }>();
   const isSelected = traceId === trace.trace_id;
   const truncatedId = truncateId(trace.trace_id);
-  const isLocal = isLocalTrace(trace.trace_id);
   const span = spanId && trace.spans.get(spanId);
 
   // TODO: if (spanId && !span) -> error
@@ -91,7 +89,6 @@ export default function TraceItem({ trace, className }: TraceItemProps) {
       <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
         <div className="flex items-center gap-x-2">
           <div>{truncatedId}</div>
-          {isLocal && <Badge title="This trace is part of your local session.">Local</Badge>}
         </div>
         <TimeSince date={trace.start_timestamp} />
       </div>

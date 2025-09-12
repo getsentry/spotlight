@@ -1,7 +1,6 @@
 import type { Client, Envelope, Event, Integration } from "@sentry/core";
 import { trigger } from "~/lib/eventTarget";
 import { log } from "~/lib/logger";
-import useSentryStore from "./store";
 
 /**
  * A Sentry integration for Spotlight integration that the Overlay will inject automatically.
@@ -27,11 +26,6 @@ export const spotlightIntegration = () => {
       if (isSpotlightInteraction(event)) {
         log("Dropping transaction created from Spotlight interaction");
         return null;
-      }
-
-      const traceId = event.contexts?.trace?.trace_id;
-      if (traceId) {
-        useSentryStore.getState().trackLocalTrace(traceId);
       }
 
       return event;
