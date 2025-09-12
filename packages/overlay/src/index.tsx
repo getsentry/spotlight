@@ -2,7 +2,7 @@ import fontStyles from "@fontsource/raleway/index.css?inline";
 import { CONTEXT_LINES_ENDPOINT } from "@spotlightjs/sidecar/constants";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
-import { DEFAULT_INITIAL_TAB, DEFAULT_SIDECAR_STREAM_URL } from "./constants";
+import { DEFAULT_SIDECAR_STREAM_URL } from "./constants";
 import globalStyles from "./index.css?inline";
 import { on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
