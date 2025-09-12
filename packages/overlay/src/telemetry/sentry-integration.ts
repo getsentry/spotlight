@@ -40,7 +40,7 @@ export const spotlightIntegration = () => {
       client.on("beforeEnvelope", (envelope: Envelope) =>
         trigger("event", {
           contentType: "application/x-sentry-envelope",
-          data: JSON.stringify(envelope),
+          data: envelope,
         }),
       ),
   } satisfies Integration;
