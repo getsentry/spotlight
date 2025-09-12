@@ -2,7 +2,7 @@ import fontStyles from "@fontsource/raleway/index.css?inline";
 import { CONTEXT_LINES_ENDPOINT } from "@spotlightjs/sidecar/constants";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
-import { DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_STREAM_URL } from "./constants";
+import { DEFAULT_INITIAL_TAB, DEFAULT_SIDECAR_STREAM_URL } from "./constants";
 import globalStyles from "./index.css?inline";
 import { on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
@@ -13,14 +13,7 @@ import { React, ReactDOM } from "./react-instance";
 import type { WindowWithSpotlight } from "./types";
 
 export type { WindowWithSpotlight } from "./types";
-export {
-  CONTEXT_LINES_ENDPOINT,
-  DEFAULT_EXPERIMENTS,
-  DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL,
-  React,
-  ReactDOM,
-  trigger,
-};
+export { CONTEXT_LINES_ENDPOINT, DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL, React, ReactDOM, trigger };
 
 /**
  * Send an event to spotlight without the sidecar
@@ -40,9 +33,7 @@ export async function onSevereEvent(cb: (count: number) => void) {
 export type SpotlightInitOptions = {
   sidecarUrl?: string;
   showClearEventsButton?: boolean;
-  startFrom?: string;
   debug?: boolean;
-  experiments?: Record<string, boolean>;
 };
 
 export async function init(initOptions: SpotlightInitOptions = {}) {
@@ -58,9 +49,7 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
 
   const {
     sidecarUrl = DEFAULT_SIDECAR_STREAM_URL,
-    experiments = DEFAULT_EXPERIMENTS,
     showClearEventsButton = true,
-    startFrom = undefined,
     debug = document.location.hash.endsWith("debug"),
   } = initOptions;
 
@@ -69,7 +58,6 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   }
 
   const sidecarBaseUrl = removeURLSuffix(sidecarUrl, "/stream");
-  const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };
 
   const appRoot = document.createElement("div");
   appRoot.id = "spotlight-root";
@@ -81,20 +69,12 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   styleElement.textContent = `${fontStyles}\n${globalStyles}`;
   document.head.appendChild(styleElement);
 
-  const initialTab = startFrom || "/telemetry";
-  log("Starting from", initialTab);
-
   const isLoadedFromSidecar = new URL(sidecarUrl).origin === document.location.origin;
   if (isLoadedFromSidecar || document.location.hash.startsWith("#spotlight")) {
-    initSentry(initialTab, { debug });
-  }
-
-  if (window.location.pathname === "/" && initialTab !== "/") {
-    window.history.replaceState(null, "", initialTab);
+    initSentry();
   }
 
   const context = {
-    experiments: finalExperiments,
     sidecarUrl: sidecarBaseUrl,
   };
 

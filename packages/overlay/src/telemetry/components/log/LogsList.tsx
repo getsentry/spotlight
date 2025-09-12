@@ -1,9 +1,8 @@
-import { type KeyboardEvent, useMemo, useState } from "react";
+import { type KeyboardEvent, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ReactComponent as Sort } from "~/assets/sort.svg";
 import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
 import { cn } from "~/lib/cn";
-import { useSpotlightContext } from "~/lib/useSpotlightContext";
 import CardList from "~/telemetry/components/shared/CardList";
 import Table from "~/ui/table";
 import { LOGS_HEADERS, LOGS_SORT_KEYS, LOG_LEVEL_COLORS } from "../../constants";
@@ -11,7 +10,6 @@ import { useSentryLogs } from "../../data/useSentryLogs";
 import useSort from "../../hooks/useSort";
 import type { SentryLogEventItem } from "../../types";
 import { formatTimestamp } from "../../utils/duration";
-import HiddenItemsButton from "../shared/HiddenItemsButton";
 import LogDetails from "./LogDetail";
 
 type LogsComparator = (a: SentryLogEventItem, b: SentryLogEventItem) => number;
@@ -33,22 +31,16 @@ const COMPARATORS: Record<LogsSortTypes, LogsComparator> = {
 const LogsList = ({ traceId }: { traceId?: string }) => {
   const { id: selectedLogId } = useParams();
   const navigate = useNavigate();
-  const context = useSpotlightContext();
-  const { allLogs, localLogs } = useSentryLogs(traceId);
+  const { allLogs } = useSentryLogs(traceId);
   const { sort, toggleSortOrder } = useSort({ defaultSortType: LOGS_SORT_KEYS.timestamp });
-
-  const [showAll, setShowAll] = useState(!context.experiments["sentry:focus-local-events"]);
-
-  const hiddenItemCount = allLogs.length - localLogs.length;
 
   const logsData = useMemo(() => {
     const compareLogData = COMPARATORS[sort.active] || COMPARATORS[LOGS_SORT_KEYS.timestamp];
-    const logs = showAll ? allLogs : localLogs;
 
-    return logs.sort((a, b) => {
+    return allLogs.sort((a, b) => {
       return sort.asc ? compareLogData(a, b) : compareLogData(b, a);
     });
-  }, [allLogs, localLogs, showAll, sort.active, sort.asc]);
+  }, [allLogs, sort.active, sort.asc]);
 
   const handleRowClick = (log: SentryLogEventItem) => {
     navigate(`/telemetry/logs/${log.id}`);
@@ -62,14 +54,6 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
 
   return (
     <CardList>
-      {!showAll && hiddenItemCount > 0 && (
-        <HiddenItemsButton
-          itemCount={hiddenItemCount}
-          onClick={() => {
-            setShowAll(true);
-          }}
-        />
-      )}
       {logsData.length ? (
         <>
           <Table variant="detail">

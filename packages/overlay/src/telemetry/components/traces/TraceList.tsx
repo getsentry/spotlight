@@ -3,20 +3,16 @@ import { useParams } from "react-router-dom";
 import CardList from "~/telemetry/components/shared/CardList";
 import { TraceSplitViewLayout } from "../../tabs/TracesTab";
 import type { Trace } from "../../types";
-import HiddenItemsButton from "../shared/HiddenItemsButton";
 import TraceItem from "./TraceItem";
 
 type TraceListProps = {
   traceData: {
     filtered: Trace[];
     all: Trace[];
-    visible: Trace[];
-    hiddenItemCount: number;
   };
-  onShowAll: () => void;
 };
 
-export default function TraceList({ traceData, onShowAll }: TraceListProps) {
+export default function TraceList({ traceData }: TraceListProps) {
   const [aiMode, setAiMode] = useState(false);
   const onToggle = useCallback(() => {
     setAiMode(prev => !prev);
@@ -39,9 +35,6 @@ export default function TraceList({ traceData, onShowAll }: TraceListProps) {
 
   return (
     <CardList>
-      {traceData.hiddenItemCount > 0 ? (
-        <HiddenItemsButton itemCount={traceData.hiddenItemCount} onClick={onShowAll} />
-      ) : null}
       {traceData.filtered.length > 0 ? (
         traceData.filtered.map(trace => {
           const isSelected = traceId === trace.trace_id;

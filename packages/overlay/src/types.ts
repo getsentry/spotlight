@@ -1,7 +1,3 @@
-export type ExperimentName = "sentry:focus-local-events";
-
-export type ExperimentsConfig = Record<ExperimentName, boolean>;
-
 export type NotificationCount = {
   /**
    * Numbers of notifications
@@ -58,6 +54,5 @@ export type WindowWithSpotlight = Window & {
 };
 
 export type SpotlightContext = {
-  experiments: ExperimentsConfig;
   sidecarUrl: string;
 };

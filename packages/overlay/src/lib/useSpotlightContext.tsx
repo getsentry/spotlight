@@ -1,10 +1,9 @@
 import type React from "react";
 import { type ReactNode, createContext, useContext } from "react";
 import type { SpotlightContext } from "~/types";
-import { DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_URL } from "../constants";
+import { DEFAULT_SIDECAR_URL } from "../constants";
 
 const Context = createContext<SpotlightContext>({
-  experiments: DEFAULT_EXPERIMENTS,
   sidecarUrl: DEFAULT_SIDECAR_URL,
 });
 
