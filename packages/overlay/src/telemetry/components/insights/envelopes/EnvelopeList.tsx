@@ -23,7 +23,7 @@ export default function EnvelopeList() {
         <CardList>
           <div className="flex flex-col">
             {allEnvelopes.map((envelope: Envelope) => {
-              const [header, envelopeItems] = envelope;
+              const [header, envelopeItems = []] = envelope;
               const envelopeId: string | unknown = header.__spotlight_envelope_id;
               if (typeof envelopeId !== "string") {
                 return null;
