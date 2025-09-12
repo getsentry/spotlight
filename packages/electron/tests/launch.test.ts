@@ -1,5 +1,9 @@
 import { _electron as electron, expect, test } from "@playwright/test";
 
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 test("launch app", async () => {
   const app = await electron.launch({ args: ["./out/main/index.js", "--no-sandbox"] });
 
@@ -14,7 +18,15 @@ test("launch app", async () => {
   // Wait for the first BrowserWindow to open
   // and return its Page object
   const window = await app.firstWindow();
-  await window.getByRole("navigation", { name: "Navigation" }).getByText("Spotlight").waitFor({ state: "visible" });
+
+  const sidebar = window.getByRole("navigation", { name: "Navigation" });
+
+  await sidebar.getByText("Spotlight").waitFor({ state: "visible" });
+
+  await sleep(2000);
+
+  expect(sidebar.getByText("Traces").first()).toHaveText("Traces1");
+  expect(sidebar.getByText("Errors").first()).toHaveText("Errors");
 
   // close app
   await app.close();
