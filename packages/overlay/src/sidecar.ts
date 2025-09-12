@@ -3,7 +3,7 @@ import { log } from "./lib/logger";
 export function connectToSidecar(
   sidecarUrl: string,
   // Content Type to listener
-  contentTypeListeners: Record<string, (event: { data: string | Uint8Array }) => void>,
+  contentTypeListeners: Record<string, (event: string) => void>,
   setOnline: (online: boolean) => void,
 ): () => void {
   log("Connecting to sidecar at", sidecarUrl);
@@ -16,7 +16,7 @@ export function connectToSidecar(
   const source = new EventSource(sidecarStreamUrl.href);
 
   for (const [contentType, listener] of Object.entries(contentTypeListeners)) {
-    source.addEventListener(`${contentType}`, listener);
+    source.addEventListener(`${contentType}`, (event: MessageEvent<string>) => listener(event.data));
   }
 
   source.addEventListener("open", () => {
@@ -32,7 +32,7 @@ export function connectToSidecar(
   return () => {
     log("Removing all content type listeners");
     for (const [contentType, listener] of Object.entries(contentTypeListeners)) {
-      source.removeEventListener(contentType, listener);
+      source.removeEventListener(contentType, (event: MessageEvent<string>) => listener(event.data));
       log("Removed listener for type", contentType);
     }
   };

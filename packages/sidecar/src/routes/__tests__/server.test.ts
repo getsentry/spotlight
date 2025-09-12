@@ -1,8 +1,8 @@
 import { brotliCompressSync, deflateSync, gzipSync } from "node:zlib";
 import { events } from "fetch-event-stream";
 import { describe, expect, it } from "vitest";
+import { envelopeReactClientSideError } from "~/format/__tests__/test_envelopes.js";
 import app from "../index.js";
-import { envelopeReactClientSideError } from "../mcp/__tests__/test_envelopes.js";
 
 describe("generic endpoints", () => {
   it("should return 200 on health check", async () => {
@@ -40,7 +40,9 @@ describe("envelopes", () => {
     const stream = events(receiveResponse);
 
     for await (const event of stream) {
-      expect(event.data).toBe(JSON.stringify(envelopeReactClientSideError));
+      const jsonEnvelope = JSON.parse(event.data!);
+      expect(jsonEnvelope[0].event_id).toEqual(envelopeReactClientSideError.event_id);
+
       break;
     }
   });
@@ -79,7 +81,9 @@ describe("encoded envelopes", () => {
       const stream = events(receiveResponse);
 
       for await (const event of stream) {
-        expect(event.data).toBe(JSON.stringify(envelopeReactClientSideError));
+        const jsonEnvelope = JSON.parse(event.data!);
+        expect(jsonEnvelope[0].event_id).toEqual(envelopeReactClientSideError.event_id);
+
         break;
       }
     };
@@ -176,10 +180,6 @@ describe("mcp", () => {
 
     expect(parsed.result.content.length).toBeGreaterThan(0);
     expect(parsed.result.content[0].type).toBe("text");
-
-    const markdown = parsed.result.content[0].text;
-
-    console.log(markdown);
 
     // TODO: Need to improve the sample data to make this work
     // expect(markdown).toContain("app/page.tsx");

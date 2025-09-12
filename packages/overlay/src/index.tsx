@@ -41,7 +41,6 @@ export function sentry(options: { injectIntoSDK?: boolean } = {}) {
 export type SpotlightInitOptions = {
   sidecarUrl?: string;
   showClearEventsButton?: boolean;
-  initialEvents?: Record<string, (string | Uint8Array)[]>;
   startFrom?: string;
   debug?: boolean;
 };
@@ -60,7 +59,6 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   const {
     sidecarUrl = DEFAULT_SIDECAR_STREAM_URL,
     showClearEventsButton = true,
-    initialEvents = undefined,
     startFrom = undefined,
     debug = document.location.hash.endsWith("debug"),
   } = initOptions;
@@ -118,12 +116,7 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
     ReactDOM.createRoot(appRoot).render(
       <MemoryRouter initialEntries={[initialTab]}>
         <SpotlightContextProvider context={context}>
-          <App
-            sidecarUrl={sidecarUrl}
-            showClearEventsButton={showClearEventsButton}
-            initialEvents={initialEvents}
-            startFrom={startFrom}
-          />
+          <App sidecarUrl={sidecarUrl} showClearEventsButton={showClearEventsButton} startFrom={startFrom} />
         </SpotlightContextProvider>
       </MemoryRouter>,
     );

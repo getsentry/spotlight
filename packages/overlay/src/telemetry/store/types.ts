@@ -1,5 +1,4 @@
 import type { Envelope } from "@sentry/core";
-import type { RawEventContext } from "~/types";
 import type {
   AggregateCallData,
   Sdk,
@@ -63,13 +62,13 @@ export interface SettingsSliceActions {
 }
 
 export interface EnvelopesSliceState {
-  envelopes: Map<string, { envelope: Envelope; rawEnvelope: RawEventContext }>;
+  envelopes: Map<string, Envelope>;
 }
 
 export interface EnvelopesSliceActions {
-  pushEnvelope: (params: { envelope: Envelope; rawEnvelope: RawEventContext }) => number;
-  getEnvelopeById: (id: string) => { envelope: Envelope; rawEnvelope: RawEventContext } | undefined;
-  getEnvelopes: () => Array<{ envelope: Envelope; rawEnvelope: RawEventContext }>;
+  pushEnvelope: (params: Envelope) => number;
+  getEnvelopeById: (id: string) => Envelope | undefined;
+  getEnvelopes: () => Array<Envelope>;
 }
 
 export interface SDKsSliceState {
