@@ -23,12 +23,11 @@ export default function EnvelopeList() {
         <CardList>
           <div className="flex flex-col">
             {allEnvelopes.map((envelope: Envelope) => {
-              const header: Envelope[0] = envelope[0];
+              const [header, envelopeItems] = envelope;
               const envelopeId: string | unknown = header.__spotlight_envelope_id;
               if (typeof envelopeId !== "string") {
                 return null;
               }
-              const envelopeItems = envelope[1] || [];
               const itemTypes = new Set<string | undefined>(envelopeItems.map(item => item?.[0].type));
               itemTypes.delete(undefined);
               const itemTypesList = Array.from(itemTypes).join(",");

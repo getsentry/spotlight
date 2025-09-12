@@ -92,12 +92,9 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   styleElement.textContent = `${fontStyles}\n${globalStyles}`;
   document.head.appendChild(styleElement);
 
-  const initialTab = startFrom || "/traces";
-  log("Starting from", initialTab);
-
   const isLoadedFromSidecar = new URL(sidecarUrl).origin === document.location.origin;
   if (isLoadedFromSidecar || document.location.hash.startsWith("#spotlight")) {
-    initSentry(initialTab, { debug });
+    initSentry();
   }
 
   const context = {
@@ -112,6 +109,7 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
 
     document.body.innerHTML = "";
     document.body.appendChild(appRoot);
+    const initialTab = startFrom || "/traces";
 
     ReactDOM.createRoot(appRoot).render(
       <MemoryRouter initialEntries={[initialTab]}>
