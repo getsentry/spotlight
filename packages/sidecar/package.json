@@ -49,7 +49,7 @@
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
-    "hono": "^4.9.6",
+    "hono": "^4.9.7",
     "launch-editor": "^2.9.1",
     "uuidv7": "^1.0.2",
     "zod": "^3"
