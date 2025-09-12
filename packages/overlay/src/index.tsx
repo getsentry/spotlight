@@ -1,9 +1,9 @@
 import fontStyles from "@fontsource/raleway/index.css?inline";
 import { CONTEXT_LINES_ENDPOINT } from "@spotlightjs/sidecar/constants";
-import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { DEFAULT_SIDECAR_STREAM_URL } from "./constants";
 import globalStyles from "./index.css?inline";
+import { Router } from "./lib/Router";
 import { on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
 import { activateLogger, log } from "./lib/logger";
@@ -88,11 +88,11 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
     document.body.appendChild(appRoot);
 
     ReactDOM.createRoot(appRoot).render(
-      <BrowserRouter>
+      <Router>
         <SpotlightContextProvider context={context}>
           <App sidecarUrl={sidecarUrl} showClearEventsButton={showClearEventsButton} />
         </SpotlightContextProvider>
-      </BrowserRouter>,
+      </Router>,
     );
   }
 
