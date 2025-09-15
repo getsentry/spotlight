@@ -1,3 +1,4 @@
+import { isErrorEvent } from "@spotlightjs/sidecar/parser";
 import { Link, Outlet, Route, Routes, useParams } from "react-router-dom";
 import useSentryStore from "../../store";
 import type { SentryErrorEvent, SentryEvent } from "../../types";
@@ -34,14 +35,14 @@ export default function EventDetails() {
   ];
 
   const traceCtx = event.contexts?.trace;
-  const isErrorEvent = "exception" in event;
+  const isError = isErrorEvent(event);
 
   return (
     <div className="w-full flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
       <div className="bg-primary-950 flex items-center gap-x-2 px-6 py-4">
         <PlatformIcon event={event} className="rounded-md" />
         <h1 className="max-w-full flex-1 truncate text-2xl">{renderEventTitle(event)}</h1>
-        {isErrorEvent && <AICopyButton event={event as SentryErrorEvent} />}
+        {isError && window.isSecureContext && <AICopyButton event={event as SentryErrorEvent} />}
         {traceCtx && (
           <div className="text-primary-300 font-mono">
             <div>
