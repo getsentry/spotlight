@@ -1,5 +1,5 @@
 import { formatEventOutput, processErrorEvent } from "@spotlightjs/sidecar/format";
-import { type MouseEvent, useCallback, useState } from "react";
+import { type MouseEvent, useCallback, useEffect, useState } from "react";
 import { ReactComponent as CheckIcon } from "~/assets/check.svg";
 import { ReactComponent as CopyIcon } from "~/assets/copy.svg";
 import { Button } from "~/ui/button";
@@ -13,6 +13,17 @@ interface AICopyButtonProps {
 export default function AICopyButton({ event }: AICopyButtonProps) {
   const [isCopied, setIsCopied] = useState(false);
 
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (isCopied) {
+      timeout = setTimeout(() => {
+        setIsCopied(false);
+      }, 1000);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [isCopied]);
+
   const handleClick = useCallback(
     async (evt: MouseEvent) => {
       evt.stopPropagation();
@@ -23,10 +34,6 @@ export default function AICopyButton({ event }: AICopyButtonProps) {
       } catch (err) {
         console.error(err);
       }
-
-      setTimeout(() => {
-        setIsCopied(false);
-      }, 1000);
     },
     [event],
   );
