@@ -1,9 +1,10 @@
 import { Link, Outlet, Route, Routes, useParams } from "react-router-dom";
 import useSentryStore from "../../store";
-import type { SentryEvent } from "../../types";
+import type { SentryErrorEvent, SentryEvent } from "../../types";
 import { createTab } from "../../utils/tabs";
 import TelemetryTabs from "../TelemetryTabs";
 import PlatformIcon from "../shared/PlatformIcon";
+import AICopyButton from "./AICopyButton";
 import Event, { EventTitle } from "./Event";
 import EventBreadcrumbs from "./EventBreadcrumbs";
 import EventContexts from "./EventContexts";
@@ -33,11 +34,14 @@ export default function EventDetails() {
   ];
 
   const traceCtx = event.contexts?.trace;
+  const isErrorEvent = "exception" in event;
+
   return (
     <div className="w-full flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
       <div className="bg-primary-950 flex items-center gap-x-2 px-6 py-4">
         <PlatformIcon event={event} className="rounded-md" />
         <h1 className="max-w-full flex-1 truncate text-2xl">{renderEventTitle(event)}</h1>
+        {isErrorEvent && <AICopyButton event={event as SentryErrorEvent} />}
         {traceCtx && (
           <div className="text-primary-300 font-mono">
             <div>
