@@ -2,24 +2,59 @@ import path from "node:path";
 import * as Sentry from "@sentry/electron/main";
 import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
 import { BrowserWindow, Menu, app, dialog, ipcMain, shell } from "electron";
+import { autoUpdater as nativeUpdater } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
 
 const store = new Store();
 
-autoUpdater.setFeedURL(
-  `https://update.electronjs.org/getsentry/spotlight/${process.platform}-${process.arch}/${app.getVersion()}`,
-);
+autoUpdater.forceDevUpdateConfig = true;
 
-const ONE_HOUR = 60 * 60 * 1000;
+const ONE_HOUR = 1 * 60 * 1000;
+
+function installAndRestart() {
+  /**
+   * On macOS 15+ auto-update / relaunch issues:
+   * - https://github.com/electron-userland/electron-builder/issues/8795
+   * - https://github.com/electron-userland/electron-builder/issues/8997
+   */
+  if (process.platform === "darwin") {
+    app.removeAllListeners("before-quit");
+    app.removeAllListeners("window-all-closed");
+
+    for (const win of BrowserWindow.getAllWindows()) {
+      if (win.isDestroyed()) continue;
+      win.removeAllListeners("close");
+      win.close();
+    }
+
+    nativeUpdater.once("before-quit-for-update", () => {
+      console.log("This was called!");
+      app.exit();
+    });
+  }
+
+  autoUpdater.quitAndInstall();
+}
 
 app.on("ready", () => {
   const updateInterval = setInterval(() => {
     autoUpdater.checkForUpdates();
   }, ONE_HOUR);
 
-  app.on("before-quit", () => {
-    clearInterval(updateInterval);
+  autoUpdater.on("update-downloaded", () => {
+    dialog
+      .showMessageBox({
+        type: "question",
+        message: "A new update has been downloaded. It will be installed on restart.",
+        buttons: ["Restart", "Later"],
+      })
+      .then(result => {
+        if (result.response === 0) {
+          clearInterval(updateInterval);
+          installAndRestart();
+        }
+      });
   });
 });
 
@@ -103,6 +138,7 @@ const template: Electron.MenuItemConstructorOptions[] = [
           role: "appMenu",
           submenu: [
             { role: "about" },
+            { label: "Check for Updates", click: () => autoUpdater.checkForUpdates() },
             { type: "separator" },
             { role: "services" },
             { type: "separator" },

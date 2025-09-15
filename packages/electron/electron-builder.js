@@ -16,6 +16,21 @@ let mac = {
   entitlementsInherit: "build/entitlements.mac.plist",
   cscLink: process.env.CSC_LINK,
   cscKeyPassword: process.env.CSC_KEY_PASSWORD,
+  extendInfo: {
+    NSAppTransportSecurity: {
+      NSAllowsArbitraryLoads: true,
+      NSAllowsLocalNetworking: true,
+      NSExceptionDomains: {
+        localhost: {
+          NSTemporaryExceptionAllowsInsecureHTTPSLoads: false,
+          NSIncludesSubdomains: false,
+          NSTemporaryExceptionAllowsInsecureHTTPLoads: true,
+          NSTemporaryExceptionMinimumTLSVersion: "1.0",
+          NSTemporaryExceptionRequiresForwardSecrecy: false,
+        },
+      },
+    },
+  },
 };
 let afterSign = "scripts/notarize.js";
 
@@ -49,8 +64,7 @@ const config = {
   ],
   mac,
   publish: {
-    provider: "generic",
-    url: "https://example.com/auto-updates",
+    provider: "github",
   },
 };
 
