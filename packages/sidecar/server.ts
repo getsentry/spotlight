@@ -14,6 +14,10 @@ const { values, positionals } = parseArgs({
       short: "d",
       default: false,
     },
+    "stdio-mcp": {
+      type: "boolean",
+      default: false,
+    },
     help: {
       type: "boolean",
       short: "h",
@@ -31,6 +35,7 @@ Usage: spotlight-sidecar [options]
 
 Options:
   -p, --port <port>    Port to listen on (default: 8969)
+  --stdio-mcp          Enable MCP stdio transport
   -d, --debug          Enable debug logging
   -h, --help           Show this help message
 
@@ -62,4 +67,5 @@ setupSidecar({
   port,
   debug: values.debug,
   isStandalone: true,
+  stdioMCP: values["stdio-mcp"],
 });

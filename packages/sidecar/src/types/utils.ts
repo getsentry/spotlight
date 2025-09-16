@@ -41,8 +41,10 @@ export type SideCarOptions = {
   incomingPayload?: IncomingPayloadCallback;
 
   isStandalone?: boolean;
+
+  stdioMCP?: boolean;
 };
 
-export type StartServerOptions = Pick<SideCarOptions, "basePath" | "filesToServe" | "incomingPayload"> & {
+export type StartServerOptions = Pick<SideCarOptions, "basePath" | "filesToServe" | "incomingPayload" | "stdioMCP"> & {
   port: number;
 };

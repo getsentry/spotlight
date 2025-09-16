@@ -1,12 +1,14 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { type ServerType, serve } from "@hono/node-server";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { serveFilesHandler } from "./handlers/index.js";
 import { activateLogger, enableDebugLogging, logger } from "./logger.js";
+import { createMCPInstance } from "./mcp/mcp.js";
 import routes, { CONTEXT_ID } from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
@@ -15,14 +17,14 @@ let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
 function startServer(options: StartServerOptions): ServerType {
-  let filesToServe = options.filesToServe;
-
-  if (options.basePath && !filesToServe) {
-    filesToServe = {
-      "/src/index.html": readFileSync(join(options.basePath, "src/index.html")),
-      "/assets/main.js": readFileSync(join(options.basePath, "assets/main.js")),
-    };
-  }
+  const { port, basePath } = options;
+  const filesToServe =
+    basePath && !options.filesToServe
+      ? {
+          "/src/index.html": readFileSync(join(basePath, "src/index.html")),
+          "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
+        }
+      : options.filesToServe;
 
   const app = new Hono<HonoEnv>().use(cors());
 
@@ -78,9 +80,14 @@ function startServer(options: StartServerOptions): ServerType {
   const sidecarServer = serve(
     {
       fetch: app.fetch,
-      port: options.port,
+      port,
     },
-    () => handleServerListen(options.port, options.basePath),
+    () => {
+      logger.info(`Sidecar listening on ${port}`);
+      if (basePath) {
+        logSpotlightUrl(port);
+      }
+    },
   );
 
   sidecarServer.addListener("error", handleServerError);
@@ -97,11 +104,8 @@ function startServer(options: StartServerOptions): ServerType {
     }
   }
 
-  function handleServerListen(port: number, basePath?: string): void {
-    logger.info(`Sidecar listening on ${port}`);
-    if (basePath) {
-      logSpotlightUrl(port);
-    }
+  if (options.stdioMCP) {
+    createMCPInstance().connect(new StdioServerTransport());
   }
 
   return sidecarServer;
@@ -115,18 +119,19 @@ export function setupSidecar({
   debug,
   incomingPayload,
   isStandalone,
+  stdioMCP,
 }: SideCarOptions = {}): void {
   if (!isStandalone) {
     addEventProcessor(event => (event.spans?.some(span => span.op?.startsWith("sidecar.")) ? null : event));
   }
   let sidecarPort = DEFAULT_PORT;
 
-  if (customLogger) {
-    activateLogger(customLogger);
-  }
-
   if (debug || process.env.SPOTLIGHT_DEBUG) {
     enableDebugLogging(true);
+  }
+
+  if (customLogger) {
+    activateLogger(customLogger);
   }
 
   if (port && !isValidPort(port)) {
@@ -144,13 +149,13 @@ export function setupSidecar({
         logSpotlightUrl(sidecarPort);
       }
     } else if (!serverInstance) {
-      serverInstance = startServer({ port: sidecarPort, basePath, filesToServe, incomingPayload });
+      serverInstance = startServer({ port: sidecarPort, basePath, filesToServe, incomingPayload, stdioMCP });
     }
   });
 }
 
 export function clearBuffer(): void {
-  getBuffer(CONTEXT_ID).reset();
+  getBuffer().reset();
 }
 
 let forceShutdown = false;
