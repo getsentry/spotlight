@@ -8,7 +8,7 @@ import { autoUpdater } from "electron-updater";
 
 const store = new Store();
 
-autoUpdater.forceDevUpdateConfig = true;
+autoUpdater.forceDevUpdateConfig = process.env.NODE_ENV === "development";
 
 const ONE_HOUR = 60 * 60 * 1000;
 
