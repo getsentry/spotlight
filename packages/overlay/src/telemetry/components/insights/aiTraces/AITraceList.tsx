@@ -56,7 +56,7 @@ export default function AITraceList() {
 
   const handleTraceClick = (trace: SpotlightAITrace) => {
     if (trace.id) {
-      navigate(`../${trace.id}`);
+      navigate(`/telemetry/insights/aitraces/${trace.id}`);
     }
   };
 

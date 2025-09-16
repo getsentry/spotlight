@@ -83,7 +83,7 @@ export default function TraceItem({ trace, className }: TraceItemProps) {
         isSelected && "bg-primary-800",
         className,
       )}
-      to={isSelected && !spanId ? `../#${trace.trace_id}` : `/traces/${trace.trace_id}/context`}
+      to={isSelected && !spanId ? `/telemetry/traces#${trace.trace_id}` : `/telemetry/traces/${trace.trace_id}/context`}
     >
       <TraceIcon trace={trace} />
       <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">

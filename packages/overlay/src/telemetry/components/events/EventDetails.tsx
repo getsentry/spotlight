@@ -47,13 +47,16 @@ export default function EventDetails() {
           <div className="text-primary-300 font-mono">
             <div>
               T:{" "}
-              <Link className="cursor-pointer underline" to={`/traces/${traceCtx.trace_id}`}>
+              <Link className="cursor-pointer underline" to={`/telemetry/traces/${traceCtx.trace_id}`}>
                 {traceCtx.trace_id}
               </Link>
             </div>
             <div>
               S:{" "}
-              <Link className="cursor-pointer underline" to={`/traces/${traceCtx.trace_id}/spans/${traceCtx.span_id}`}>
+              <Link
+                className="cursor-pointer underline"
+                to={`/telemetry/traces/${traceCtx.trace_id}/spans/${traceCtx.span_id}`}
+              >
                 {traceCtx.span_id}
               </Link>
             </div>

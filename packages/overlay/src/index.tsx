@@ -1,16 +1,15 @@
 import fontStyles from "@fontsource/raleway/index.css?inline";
 import { CONTEXT_LINES_ENDPOINT } from "@spotlightjs/sidecar/constants";
-import { MemoryRouter } from "react-router-dom";
 import App from "./App";
-import { DEFAULT_INITIAL_TAB, DEFAULT_SIDECAR_STREAM_URL } from "./constants";
+import { DEFAULT_SIDECAR_STREAM_URL } from "./constants";
 import globalStyles from "./index.css?inline";
+import { Router } from "./lib/Router";
 import { on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
 import { activateLogger, log } from "./lib/logger";
 import { removeURLSuffix } from "./lib/removeURLSuffix";
 import { SpotlightContextProvider } from "./lib/useSpotlightContext";
 import { React, ReactDOM } from "./react-instance";
-import initTelemetry from "./telemetry";
 import type { WindowWithSpotlight } from "./types";
 
 export type { WindowWithSpotlight } from "./types";
@@ -29,13 +28,6 @@ export async function sendEvent(contentType: string, data: string | Uint8Array) 
  */
 export async function onSevereEvent(cb: (count: number) => void) {
   on("severeEventCount", e => cb((e as CustomEvent).detail?.count ?? 1));
-}
-
-/**
- * Sentry telemetry configuration for Spotlight.
- */
-export function sentry(options: { injectIntoSDK?: boolean } = {}) {
-  return initTelemetry(options);
 }
 
 export type SpotlightInitOptions = {
@@ -67,19 +59,6 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
 
   const sidecarBaseUrl = removeURLSuffix(sidecarUrl, "/stream");
 
-  const telemetry = initTelemetry({
-    injectIntoSDK: true,
-  });
-
-  if (telemetry.setup) {
-    await telemetry.setup({
-      navigate: (path?: string) => {
-        trigger("navigate", path || "/");
-      },
-      sidecarUrl: sidecarBaseUrl,
-    });
-  }
-
   const appRoot = document.createElement("div");
   appRoot.id = "spotlight-root";
   appRoot.style.height = "100vh";
@@ -89,11 +68,7 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   const styleElement = document.createElement("style");
   styleElement.textContent = `${fontStyles}\n${globalStyles}`;
   document.head.appendChild(styleElement);
-
-  const isLoadedFromSidecar = new URL(sidecarUrl).origin === document.location.origin;
-  if (isLoadedFromSidecar || document.location.hash.startsWith("#spotlight")) {
-    initSentry();
-  }
+  initSentry();
 
   const context = {
     sidecarUrl: sidecarBaseUrl,
@@ -109,11 +84,11 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
     document.body.appendChild(appRoot);
 
     ReactDOM.createRoot(appRoot).render(
-      <MemoryRouter initialEntries={[DEFAULT_INITIAL_TAB]}>
+      <Router>
         <SpotlightContextProvider context={context}>
           <App sidecarUrl={sidecarUrl} showClearEventsButton={showClearEventsButton} />
         </SpotlightContextProvider>
-      </MemoryRouter>,
+      </Router>,
     );
   }
 

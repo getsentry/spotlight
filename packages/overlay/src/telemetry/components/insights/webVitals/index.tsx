@@ -56,7 +56,7 @@ const WebVitals = () => {
   }, [events, sort]);
 
   const handleRowClick = (measurementEvent: SentryEventWithPerformanceData) => {
-    navigate(`/insights/webvitals/${measurementEvent.event_id}`);
+    navigate(`/telemetry/insights/webvitals/${measurementEvent.event_id}`);
   };
 
   const handleRowKeyDown = (
