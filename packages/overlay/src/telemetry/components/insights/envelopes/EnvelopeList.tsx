@@ -12,7 +12,7 @@ import EnvelopeDetails from "./EnvelopeDetails";
 
 export default function EnvelopeList() {
   const { id: selectedEnvelopeId } = useParams();
-  const { allEnvelopes } = useSentryEnvelopes();
+  const allEnvelopes = useSentryEnvelopes();
   const { getEnvelopeById } = useSentryStore();
 
   const selectedEnvelope = selectedEnvelopeId ? getEnvelopeById(selectedEnvelopeId) : null;
