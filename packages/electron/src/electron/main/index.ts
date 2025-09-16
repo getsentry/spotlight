@@ -29,7 +29,6 @@ function installAndRestart() {
     }
 
     nativeUpdater.once("before-quit-for-update", () => {
-      console.log("This was called!");
       app.exit();
     });
   }
