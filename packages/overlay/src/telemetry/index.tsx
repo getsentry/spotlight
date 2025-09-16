@@ -1,6 +1,5 @@
 import type { Envelope } from "@sentry/core";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { removeURLSuffix } from "~/lib/removeURLSuffix";
 import * as db from "../lib/db";
 import { getSpotlightEventTarget } from "../lib/eventTarget";
@@ -9,7 +8,7 @@ import { connectToSidecar } from "../sidecar";
 import TelemetryView from "./components/TelemetryView";
 import useSentryStore from "./store";
 
-export function setSidecarUrl(url: string) {
+export function setSidecarUrlInStore(url: string) {
   const store = useSentryStore.getState();
   const baseSidecarUrl = removeURLSuffix(url, "/stream");
   store.setSidecarUrl(baseSidecarUrl);
@@ -41,17 +40,8 @@ const SENTRY_CONTENT_TYPE = "application/x-sentry-envelope";
 export function Telemetry({ sidecarUrl, showClearEventsButton }: TelemetryRouteProps) {
   const [sentryEvents, setSentryEvents] = useState<Envelope[]>([]);
   const [isOnline, setOnline] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const navigate = useNavigate();
 
-  log("TelemetryRoute render", { isInitialized, sentryEvents: sentryEvents.length, isOnline });
-
-  useEffect(() => {
-    if (!isInitialized) {
-      setSidecarUrl(sidecarUrl);
-      setIsInitialized(true);
-    }
-  }, [isInitialized, sidecarUrl]);
+  log("TelemetryRoute render", { sentryEvents: sentryEvents.length, isOnline });
 
   const contentTypeListeners = useMemo(() => {
     const listener = (event: string): void => {
@@ -72,11 +62,6 @@ export function Telemetry({ sidecarUrl, showClearEventsButton }: TelemetryRouteP
     result[`${SENTRY_CONTENT_TYPE};base64`] = event => listener(event);
     return result;
   }, []);
-
-  useEffect(
-    () => connectToSidecar(sidecarUrl, contentTypeListeners, setOnline) as () => undefined,
-    [sidecarUrl, contentTypeListeners],
-  );
 
   const spotlightEventTarget = useMemo(() => getSpotlightEventTarget(), []);
 
@@ -99,16 +84,6 @@ export function Telemetry({ sidecarUrl, showClearEventsButton }: TelemetryRouteP
     [contentTypeListeners],
   );
 
-  useEffect(() => {
-    // Populate from DB
-    db.getEntries().then(entries => {
-      for (const detail of entries as EventData[]) {
-        dispatchToContentTypeListener(detail);
-      }
-    });
-  }, [dispatchToContentTypeListener]);
-
-  // contextId for namespacing of routes in sessionStorage
   const contextId = sidecarUrl;
 
   const clearEvents = useCallback(async () => {
@@ -129,14 +104,6 @@ export function Telemetry({ sidecarUrl, showClearEventsButton }: TelemetryRouteP
     useSentryStore.getState().resetData();
   }, [sidecarUrl]);
 
-  const onNavigate = useCallback(
-    (e: CustomEvent<string>) => {
-      log("Navigate");
-      navigate(e.detail);
-    },
-    [navigate],
-  );
-
   const onEvent = useCallback(
     ({ detail }: CustomEvent<EventData>) => {
       dispatchToContentTypeListener(detail);
@@ -146,18 +113,33 @@ export function Telemetry({ sidecarUrl, showClearEventsButton }: TelemetryRouteP
   );
 
   useEffect(() => {
+    setSidecarUrlInStore(sidecarUrl);
+  }, [sidecarUrl]);
+
+  useEffect(
+    () => connectToSidecar(sidecarUrl, contentTypeListeners, setOnline) as () => undefined,
+    [sidecarUrl, contentTypeListeners],
+  );
+
+  useEffect(() => {
+    db.getEntries().then(entries => {
+      for (const detail of entries as EventData[]) {
+        dispatchToContentTypeListener(detail);
+      }
+    });
+  }, [dispatchToContentTypeListener]);
+
+  useEffect(() => {
     log("useEffect: Adding event listeners");
-    spotlightEventTarget.addEventListener("navigate", onNavigate as EventListener);
     spotlightEventTarget.addEventListener("clearEvents", clearEvents as EventListener);
     spotlightEventTarget.addEventListener("event", onEvent as EventListener);
 
     return (): undefined => {
       log("useEffect[destructor]: Removing event listeners");
-      spotlightEventTarget.removeEventListener("navigate", onNavigate as EventListener);
       spotlightEventTarget.removeEventListener("clearEvents", clearEvents as EventListener);
       spotlightEventTarget.removeEventListener("event", onEvent as EventListener);
     };
-  }, [spotlightEventTarget, onNavigate, clearEvents, onEvent]);
+  }, [spotlightEventTarget, clearEvents, onEvent]);
 
   return <TelemetryView isOnline={isOnline} showClearEventsButton={showClearEventsButton} contextId={contextId} />;
 }

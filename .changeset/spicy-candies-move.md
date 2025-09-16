@@ -1,6 +1,8 @@
 ---
-"@spotlightjs/overlay": patch
+"@spotlightjs/overlay": minor
+"@spotlightjs/electron": patch
 ---
 
-- Replace MemoryRouter with BrowserRouter in overlay for url based routing.
-- Removed sentry-integration
+- Implement URL-based routing in overlay with BrowserRouter for web apps and HashRouter for Electron
+- Remove sentry-integration.ts and simplify telemetry implementation
+- Moved telemetry logic from App.tsx to dedicated Telemetry component
