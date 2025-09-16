@@ -40,10 +40,14 @@ app.on("ready", () => {
   let updateInfo: UpdateCheckResult | null = null;
 
   async function checkForUpdates() {
-    updateInfo = await autoUpdater.checkForUpdates();
+    try {
+      updateInfo = await autoUpdater.checkForUpdates();
 
-    if (!updateInfo?.isUpdateAvailable) {
-      setTimeout(checkForUpdates, ONE_HOUR);
+      if (!updateInfo?.isUpdateAvailable) {
+        setTimeout(checkForUpdates, ONE_HOUR);
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
