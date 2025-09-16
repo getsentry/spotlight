@@ -4,13 +4,11 @@ import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
 import { BrowserWindow, Menu, app, dialog, ipcMain, shell } from "electron";
 import { autoUpdater as nativeUpdater } from "electron";
 import Store from "electron-store";
-import { autoUpdater } from "electron-updater";
+import { type UpdateCheckResult, autoUpdater } from "electron-updater";
 
 const store = new Store();
 
 autoUpdater.forceDevUpdateConfig = process.env.NODE_ENV === "development";
-
-const ONE_HOUR = 60 * 60 * 1000;
 
 function installAndRestart() {
   /**
@@ -36,10 +34,20 @@ function installAndRestart() {
   autoUpdater.quitAndInstall();
 }
 
+const ONE_HOUR = 60 * 60 * 1000;
+
 app.on("ready", () => {
-  const updateInterval = setInterval(() => {
-    autoUpdater.checkForUpdates();
-  }, ONE_HOUR);
+  let updateInfo: UpdateCheckResult | null = null;
+
+  async function checkForUpdates() {
+    updateInfo = await autoUpdater.checkForUpdates();
+
+    if (!updateInfo?.isUpdateAvailable) {
+      setTimeout(checkForUpdates, ONE_HOUR);
+    }
+  }
+
+  checkForUpdates();
 
   autoUpdater.on("update-downloaded", () => {
     dialog
@@ -50,7 +58,6 @@ app.on("ready", () => {
       })
       .then(result => {
         if (result.response === 0) {
-          clearInterval(updateInterval);
           installAndRestart();
         }
       });
