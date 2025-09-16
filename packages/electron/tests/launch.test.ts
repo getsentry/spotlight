@@ -25,7 +25,7 @@ test("launch app", async () => {
 
   await sleep(2000);
 
-  expect(sidebar.getByText("Traces").first()).toHaveText("Traces1");
+  expect(sidebar.getByText("Traces").first()).toHaveText("Traces");
   expect(sidebar.getByText("Errors").first()).toHaveText("Errors");
 
   // close app

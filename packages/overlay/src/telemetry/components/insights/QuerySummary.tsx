@@ -124,7 +124,7 @@ const QuerySummary = () => {
                   title={span.trace_id}
                   className="text-lime-500"
                 >
-                  <Link className="truncate hover:underline" to={`/traces/${span.trace_id}`}>
+                  <Link className="truncate hover:underline" to={`/telemetry/traces/${span.trace_id}`}>
                     {truncateId(span.trace_id)}
                   </Link>
                 </TimeBar>
@@ -135,7 +135,10 @@ const QuerySummary = () => {
                 </span>
               </td>
               <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                <Link className="truncate hover:underline" to={`/traces/${span.trace_id}/spans/${span.span_id}`}>
+                <Link
+                  className="truncate hover:underline"
+                  to={`/telemetry/traces/${span.trace_id}/spans/${span.span_id}`}
+                >
                   {truncateId(span.span_id)}
                 </Link>
               </td>

@@ -19,7 +19,7 @@ export default function EventList({ traceId }: { traceId?: string }) {
           <Link
             className="hover:bg-primary-900 flex cursor-pointer items-center gap-x-4 px-6 py-2"
             key={e.event_id}
-            to={`/errors/${e.event_id}/details`}
+            to={`/telemetry/errors/${e.event_id}/details`}
           >
             <PlatformIcon event={e} className="text-primary-300 rounded-md" />
             <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">

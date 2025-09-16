@@ -66,7 +66,7 @@ const SpanItem = ({
         style={{
           pointerEvents: isResizing ? "none" : "auto",
         }}
-        to={`/traces/${span.trace_id}/spans/${span.span_id}`}
+        to={`/telemetry/traces/${span.trace_id}/spans/${span.span_id}`}
       >
         <div
           className={cn(
