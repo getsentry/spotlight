@@ -1,7 +1,6 @@
 import type { Envelope } from "@sentry/core";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { removeURLSuffix } from "~/lib/removeURLSuffix";
-import * as db from "../lib/db";
 import { getSpotlightEventTarget } from "../lib/eventTarget";
 import { log } from "../lib/logger";
 import { connectToSidecar } from "../sidecar";
@@ -90,7 +89,6 @@ export function Telemetry({ sidecarUrl, showClearEventsButton }: TelemetryRouteP
     try {
       const clearEventsUrl: string = new URL("/clear", sidecarUrl).href;
 
-      await db.reset();
       await fetch(clearEventsUrl, {
         method: "DELETE",
         mode: "cors",
@@ -107,7 +105,6 @@ export function Telemetry({ sidecarUrl, showClearEventsButton }: TelemetryRouteP
   const onEvent = useCallback(
     ({ detail }: CustomEvent<EventData>) => {
       dispatchToContentTypeListener(detail);
-      db.add(detail);
     },
     [dispatchToContentTypeListener],
   );
@@ -120,14 +117,6 @@ export function Telemetry({ sidecarUrl, showClearEventsButton }: TelemetryRouteP
     () => connectToSidecar(sidecarUrl, contentTypeListeners, setOnline) as () => undefined,
     [sidecarUrl, contentTypeListeners],
   );
-
-  useEffect(() => {
-    db.getEntries().then(entries => {
-      for (const detail of entries as EventData[]) {
-        dispatchToContentTypeListener(detail);
-      }
-    });
-  }, [dispatchToContentTypeListener]);
 
   useEffect(() => {
     log("useEffect: Adding event listeners");
