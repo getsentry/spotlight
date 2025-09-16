@@ -68,11 +68,7 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   const styleElement = document.createElement("style");
   styleElement.textContent = `${fontStyles}\n${globalStyles}`;
   document.head.appendChild(styleElement);
-
-  const isLoadedFromSidecar = new URL(sidecarUrl).origin === document.location.origin;
-  if (isLoadedFromSidecar || document.location.hash.startsWith("#spotlight")) {
-    initSentry();
-  }
+  initSentry();
 
   const context = {
     sidecarUrl: sidecarBaseUrl,
