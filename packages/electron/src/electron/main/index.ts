@@ -45,9 +45,15 @@ app.on("ready", () => {
 
       if (!updateInfo?.isUpdateAvailable) {
         setTimeout(checkForUpdates, ONE_HOUR);
+      } else {
+        // Check again in 24 hours
+        setTimeout(checkForUpdates, 24 * ONE_HOUR);
       }
     } catch (error) {
       console.error(error);
+
+      // Check again in 24 hours
+      setTimeout(checkForUpdates, 24 * ONE_HOUR);
     }
   }
 
