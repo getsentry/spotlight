@@ -10,7 +10,7 @@ const store = new Store();
 
 autoUpdater.forceDevUpdateConfig = true;
 
-const ONE_HOUR = 1 * 60 * 1000;
+const ONE_HOUR = 60 * 60 * 1000;
 
 function installAndRestart() {
   /**
