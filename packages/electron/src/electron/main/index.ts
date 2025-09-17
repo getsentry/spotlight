@@ -8,7 +8,7 @@ import { type UpdateCheckResult, autoUpdater } from "electron-updater";
 
 const store = new Store();
 
-autoUpdater.forceDevUpdateConfig = process.env.NODE_ENV === "development";
+autoUpdater.forceDevUpdateConfig = true;
 
 function installAndRestart() {
   /**
