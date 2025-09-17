@@ -47,7 +47,6 @@ const createWindow = () => {
       sandbox: false,
     },
     backgroundColor: "#1e1b4b",
-    ...(process.platform !== "darwin" ? { titleBarOverlay: true } : {}),
   });
 
   // win.webContents.openDevTools();
