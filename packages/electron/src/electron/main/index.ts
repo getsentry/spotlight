@@ -10,6 +10,9 @@ const store = new Store();
 
 autoUpdater.forceDevUpdateConfig = true;
 
+const ONE_HOUR = 60 * 60 * 1000;
+let updateInfo: UpdateCheckResult | null;
+
 function installAndRestart() {
   /**
    * On macOS 15+ auto-update / relaunch issues:
@@ -34,29 +37,22 @@ function installAndRestart() {
   autoUpdater.quitAndInstall();
 }
 
-const ONE_HOUR = 60 * 60 * 1000;
+async function checkForUpdates() {
+  let timeout = 24 * ONE_HOUR;
+  try {
+    updateInfo = await autoUpdater.checkForUpdates();
+
+    if (!updateInfo?.isUpdateAvailable) {
+      timeout = 3 * ONE_HOUR;
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setTimeout(checkForUpdates, timeout);
+  }
+}
 
 app.on("ready", () => {
-  let updateInfo: UpdateCheckResult | null = null;
-
-  async function checkForUpdates() {
-    try {
-      updateInfo = await autoUpdater.checkForUpdates();
-
-      if (!updateInfo?.isUpdateAvailable) {
-        setTimeout(checkForUpdates, ONE_HOUR);
-      } else {
-        // Check again in 24 hours
-        setTimeout(checkForUpdates, 24 * ONE_HOUR);
-      }
-    } catch (error) {
-      console.error(error);
-
-      // Check again in 24 hours
-      setTimeout(checkForUpdates, 24 * ONE_HOUR);
-    }
-  }
-
   checkForUpdates();
 
   autoUpdater.on("update-downloaded", () => {
@@ -145,6 +141,9 @@ app.on("window-all-closed", () => {
 
 const isMac = process.platform === "darwin";
 
+// @ts-expect-error updateInfo is initialized in the app.on("ready") event
+const isUpdateAvailable = updateInfo?.isUpdateAvailable;
+
 const template: Electron.MenuItemConstructorOptions[] = [
   // { role: 'appMenu' }
   ...((isMac
@@ -154,7 +153,16 @@ const template: Electron.MenuItemConstructorOptions[] = [
           role: "appMenu",
           submenu: [
             { role: "about" },
-            { label: "Check for Updates", click: () => autoUpdater.checkForUpdates() },
+            {
+              label: isUpdateAvailable ? "Download Update" : "Check for Updates",
+              click: () => {
+                if (isUpdateAvailable) {
+                  installAndRestart();
+                } else {
+                  checkForUpdates();
+                }
+              },
+            },
             { type: "separator" },
             { role: "services" },
             { type: "separator" },
