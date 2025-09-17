@@ -77,10 +77,25 @@ const createWindow = () => {
 
   win.webContents.on("did-finish-load", () => {
     win.webContents.executeJavaScript(
-      `const firstChild = document.querySelector('#sentry-spotlight-root')?.shadowRoot?.querySelector('.spotlight-fullscreen > :first-child');
-        if(firstChild) {
-          firstChild.style.cssText = 'padding-top: 34px; -webkit-app-region:drag;'
-        }`,
+      `const spotlightRoot = document.getElementById('spotlight-root');
+       if (spotlightRoot) {
+         const dragHandle = document.createElement('div');
+         dragHandle.style.cssText = \`
+           position: fixed;
+           top: 0;
+           left: 0;
+           right: 0;
+           height: 32px;
+           -webkit-app-region: drag;
+           z-index: 9999;
+           background: transparent;
+         \`;
+         dragHandle.id = 'electron-drag-handle';
+         
+         if (!document.getElementById('electron-drag-handle')) {
+           document.body.appendChild(dragHandle);
+         }
+       }`,
     );
   });
 };
@@ -308,7 +323,7 @@ store.onDidChange("sentry-send-envelopes", newValue => {
 const showErrorMessage = () => {
   if (win) {
     win.webContents.executeJavaScript(`{
-      const sentryRoot = document.getElementById('sentry-spotlight-root');
+      const sentryRoot = document.getElementById('spotlight-root');
       const errorScreen = document.getElementById('error-screen');
       if (sentryRoot) {
         sentryRoot.style.display = 'none';
