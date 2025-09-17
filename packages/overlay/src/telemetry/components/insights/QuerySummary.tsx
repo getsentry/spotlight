@@ -32,7 +32,7 @@ const COMPARATORS: Record<QuerySummarySortTypes, SpanInfoComparator> = {
 };
 
 const QuerySummary = () => {
-  const { allSpans } = useSentrySpans();
+  const allSpans = useSentrySpans();
   const { type } = useParams();
   const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERY_SUMMARY_SORT_KEYS.totalTime });
 

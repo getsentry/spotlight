@@ -8,9 +8,7 @@ export const useSentryLogs = (traceId?: string) => {
 
   const allLogs = Array.from(traceId ? getLogsByTraceId(traceId) : getLogs());
 
-  return {
-    allLogs,
-  };
+  return allLogs;
 };
 
 export const useSentryLog = (id: string) => {

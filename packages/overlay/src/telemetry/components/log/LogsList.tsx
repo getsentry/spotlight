@@ -31,7 +31,7 @@ const COMPARATORS: Record<LogsSortTypes, LogsComparator> = {
 const LogsList = ({ traceId }: { traceId?: string }) => {
   const { id: selectedLogId } = useParams();
   const navigate = useNavigate();
-  const { allLogs } = useSentryLogs(traceId);
+  const allLogs = useSentryLogs(traceId);
   const { sort, toggleSortOrder } = useSort({ defaultSortType: LOGS_SORT_KEYS.timestamp });
 
   const logsData = useMemo(() => {
