@@ -61,7 +61,7 @@ async function checkForUpdates() {
       }
     }
   } catch (error) {
-    console.error(error, error.stack);
+    console.error(error);
     Sentry.captureException(error);
   }
 
