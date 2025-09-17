@@ -2,7 +2,6 @@ import path from "node:path";
 import * as Sentry from "@sentry/electron/main";
 import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
 import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, shell } from "electron";
-import { autoUpdater as nativeUpdater } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
 
@@ -27,48 +26,19 @@ function installAndRestart() {
       win.removeAllListeners("close");
       win.close();
     }
-
-    nativeUpdater.once("before-quit-for-update", () => {
-      app.exit();
-    });
   }
 
   autoUpdater.quitAndInstall();
 }
 
 async function checkForUpdates() {
-  const menuItem = isMac ? { ...template[0].submenu?.[1] } : undefined;
-
   try {
-    const updateInfo = await autoUpdater.checkForUpdates();
-
-    const isUpdateAvailable = updateInfo?.isUpdateAvailable;
-
-    if (isUpdateAvailable) {
-      if (menuItem) {
-        menuItem.label = "Restart to Update";
-        menuItem.click = () => {
-          installAndRestart();
-        };
-      }
-    } else {
-      if (menuItem) {
-        menuItem.label = "Check for Updates";
-        menuItem.click = () => {
-          checkForUpdates();
-        };
-      }
-    }
+    await autoUpdater.checkForUpdates();
   } catch (error) {
     console.error(error);
     Sentry.captureException(error);
   }
 
-  if (menuItem) {
-    const _template = [...template];
-    if (_template[0].submenu?.[1].id === "check-for-updates") _template[0].submenu[1] = menuItem;
-    Menu.setApplicationMenu(Menu.buildFromTemplate(_template));
-  }
   setTimeout(checkForUpdates, ONE_HOUR);
 }
 
@@ -85,6 +55,21 @@ app.on("ready", () => {
     if (result.response === 0) {
       installAndRestart();
     }
+  });
+
+  autoUpdater.on("update-downloaded", () => {
+    const menuItem = isMac ? { ...template[0].submenu?.[1] } : undefined;
+
+    if (!menuItem) return;
+
+    menuItem.label = "Restart to Update";
+    menuItem.click = () => {
+      installAndRestart();
+    };
+
+    const _template = [...template];
+    if (_template[0].submenu?.[1].id === "check-for-updates") _template[0].submenu[1] = menuItem;
+    Menu.setApplicationMenu(Menu.buildFromTemplate(_template));
   });
 
   autoUpdater.on("error", error => {

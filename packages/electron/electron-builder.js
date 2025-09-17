@@ -3,12 +3,12 @@ require("dotenv").config();
 const builder = require("electron-builder");
 
 let mac = {
-  target: [
-    {
-      target: "zip",
-      arch: ["x64", "arm64"],
-    },
-  ],
+  // target: [
+  //   {
+  //     target: "zip",
+  //     arch: ["x64", "arm64"],
+  //   },
+  // ],
   icon: "resources/icons/mac/icon.icns",
   hardenedRuntime: true,
   gatekeeperAssess: false,
@@ -28,12 +28,12 @@ let afterSign = "scripts/notarize.js";
 if (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD) {
   mac = {
     ...mac,
-    target: [
-      {
-        target: "zip",
-        arch: ["arm64"],
-      },
-    ],
+    // target: [
+    //   {
+    //     target: "zip",
+    //     arch: ["arm64"],
+    //   },
+    // ],
     identity: null,
     extendInfo: {
       ...mac.extendInfo,
