@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { notarize } = require("@electron/notarize");
-const Sentry = require("@sentry/electron");
+const Sentry = require("@sentry/core");
 
 exports.default = async function notarizing(context) {
   const { electronPlatformName, appOutDir } = context;
