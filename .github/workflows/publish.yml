@@ -186,7 +186,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: packages/electron/dist/{*.zip,*.dmg,latest*.yml}
+          file: packages/electron/dist/*
           tag: ${{ steps.latest_release_info.outputs.tag_name }}
           file_glob: true
           make_latest: false
