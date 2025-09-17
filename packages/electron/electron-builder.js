@@ -36,11 +36,6 @@ if (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD) {
       },
     ],
     identity: null,
-    extendInfo: {
-      ...mac.extendInfo,
-      // Add quarantine override for development builds
-      LSFileQuarantineEnabled: false,
-    },
   };
   afterSign = undefined;
 }
