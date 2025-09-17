@@ -9,12 +9,62 @@ import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { serveFilesHandler } from "./handlers/index.js";
 import { activateLogger, enableDebugLogging, logger } from "./logger.js";
 import { createMCPInstance } from "./mcp/mcp.js";
-import routes, { CONTEXT_ID } from "./routes/index.js";
+import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
+import { parseArgs } from "node:util";
 
 let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
+
+export function parseCLIArgs(): { port: number; debug: boolean; stdioMCP: boolean; help: boolean } {
+  const { values, positionals } = parseArgs({
+    options: {
+      port: {
+        type: "string",
+        short: "p",
+        default: DEFAULT_PORT.toString(),
+      },
+      debug: {
+        type: "boolean",
+        short: "d",
+        default: false,
+      },
+      "stdio-mcp": {
+        type: "boolean",
+        default: false,
+      },
+      help: {
+        type: "boolean",
+        short: "h",
+        default: false,
+      },
+    },
+    allowPositionals: true,
+  });
+
+  // Handle legacy positional argument for port (backwards compatibility)
+  const portInput = positionals.length > 0 ? positionals[0] : values.port;
+  const port = Number(portInput);
+
+  // Validate port number
+  if (Number.isNaN(port)) {
+    console.error(`Error: Invalid port number '${portInput}'`);
+    console.error("Port must be a valid number between 1 and 65535");
+    process.exit(1);
+  }
+
+  if (port < 1 || port > 65535) {
+    console.error(`Error: Port ${port} is out of valid range (1-65535)`);
+    process.exit(1);
+  }
+
+  return {
+    ...values,
+    stdioMCP: values["stdio-mcp"],
+    port,
+  };
+}
 
 function startServer(options: StartServerOptions): ServerType {
   const { port, basePath } = options;
@@ -105,6 +155,7 @@ function startServer(options: StartServerOptions): ServerType {
   }
 
   if (options.stdioMCP) {
+    logger.info("Starting MCP over stdio too...");
     createMCPInstance().connect(new StdioServerTransport());
   }
 

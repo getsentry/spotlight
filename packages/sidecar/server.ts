@@ -1,33 +1,9 @@
 #!/usr/bin/env node
-import { parseArgs } from "node:util";
-import { setupSidecar } from "./src/main.js";
+import { parseCLIArgs, setupSidecar } from "./src/main.js";
 
-const { values, positionals } = parseArgs({
-  options: {
-    port: {
-      type: "string",
-      short: "p",
-      default: "8969",
-    },
-    debug: {
-      type: "boolean",
-      short: "d",
-      default: false,
-    },
-    "stdio-mcp": {
-      type: "boolean",
-      default: false,
-    },
-    help: {
-      type: "boolean",
-      short: "h",
-      default: false,
-    },
-  },
-  allowPositionals: true,
-});
+const args = parseCLIArgs();
 
-if (values.help) {
+if (args.help) {
   console.log(`
 Spotlight Sidecar - Development proxy server for Spotlight
 
@@ -47,25 +23,7 @@ Examples:
   process.exit(0);
 }
 
-// Handle legacy positional argument for port (backwards compatibility)
-const portInput = positionals.length > 0 ? positionals[0] : values.port;
-const port = Number(portInput);
-
-// Validate port number
-if (Number.isNaN(port)) {
-  console.error(`Error: Invalid port number '${portInput}'`);
-  console.error("Port must be a valid number between 1 and 65535");
-  process.exit(1);
-}
-
-if (port < 1 || port > 65535) {
-  console.error(`Error: Port ${port} is out of valid range (1-65535)`);
-  process.exit(1);
-}
-
 setupSidecar({
-  port,
-  debug: values.debug,
+  ...args,
   isStandalone: true,
-  stdioMCP: values["stdio-mcp"],
 });

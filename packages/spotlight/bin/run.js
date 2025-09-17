@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { inflateRawSync } from "node:zlib";
 import { setContext, startSpan } from "@sentry/node";
-import { setupSidecar } from "@spotlightjs/sidecar";
+import { parseCLIArgs, setupSidecar } from "@spotlightjs/sidecar";
 import "./instrument.js";
 const require = Module.createRequire(import.meta.url);
 let sea = null;
@@ -21,40 +21,47 @@ const homeDir = process.env.HOME || process.env.USERPROFILE;
 setContext("CLI", {
   sea: sea.isSea(),
   // TODO: Be less naive with path obscuring
-  argv: process.argv.map(arg => arg.replace(homeDir, "~")),
+  argv: process.argv.map((arg) => arg.replace(homeDir, "~")),
 });
 
 const withTracing =
   (fn, spanArgs = {}) =>
   (...args) =>
-    startSpan({ name: fn.name, attributes: { args }, ...spanArgs }, () => fn(...args));
+    startSpan({ name: fn.name, attributes: { args }, ...spanArgs }, () =>
+      fn(...args)
+    );
 
 const readAsset = withTracing(
   sea.isSea()
-    ? name => Buffer.from(sea.getRawAsset(name))
+    ? (name) => Buffer.from(sea.getRawAsset(name))
     : (() => {
-        const ASSET_DIR = join(fileURLToPath(import.meta.url), "../../dist/overlay/");
+        const ASSET_DIR = join(
+          fileURLToPath(import.meta.url),
+          "../../dist/overlay/"
+        );
 
-        return name => readFileSync(join(ASSET_DIR, name));
+        return (name) => readFileSync(join(ASSET_DIR, name));
       })(),
-  { name: "readAsset", op: "cli.asset.read" },
+  { name: "readAsset", op: "cli.asset.read" }
 );
 
 startSpan({ name: "Spotlight CLI", op: "cli" }, () => {
   startSpan({ name: "ASCII Art", op: "cli.art.ascii" }, () => {
-    const MAX_COLS = process.stdout.columns;
-    if (!process.stdout.isTTY || MAX_COLS < 35) return;
-    let stdoutBuffer = "";
+    const MAX_COLS = process.stderr.columns;
+    if (!process.stderr.isTTY || MAX_COLS < 35) return;
+    let stderrBuffer = "";
 
-    const data = startSpan({ name: "Inflate ASCII Art Data", op: "cli.art.ascii.inflate" }, () =>
-      Uint8Array.from(
-        inflateRawSync(
-          Buffer.from(
-            "bY7LCgMxFEK9L5MwDDSL9P//1DJMKGXowoUcUaFZOk8dU2Op9+qZVkYQoFsaEqA6PZxxma1AoMG+TiONTgcfAd741YxxVf8gCzCgWcYB7OSj9sjW7t2/eKxKAxkIYv8NqL3FpVY25CmjrBSuDw==",
-            "base64",
-          ),
-        ),
-      ),
+    const data = startSpan(
+      { name: "Inflate ASCII Art Data", op: "cli.art.ascii.inflate" },
+      () =>
+        Uint8Array.from(
+          inflateRawSync(
+            Buffer.from(
+              "bY7LCgMxFEK9L5MwDDSL9P//1DJMKGXowoUcUaFZOk8dU2Op9+qZVkYQoFsaEqA6PZxxma1AoMG+TiONTgcfAd741YxxVf8gCzCgWcYB7OSj9sjW7t2/eKxKAxkIYv8NqL3FpVY25CmjrBSuDw==",
+              "base64"
+            )
+          )
+        )
     );
     const E = "\x1b[";
     const C = `${E}38;5;`;
@@ -71,7 +78,7 @@ startSpan({ name: "Spotlight CLI", op: "cli" }, () => {
     let r = 0;
     for (let p of data) {
       if (p === 255) {
-        stdoutBuffer += NL;
+        stderrBuffer += NL;
         c = col = 0;
         if (line++ === 5) {
           factor = factor / -3;
@@ -81,39 +88,59 @@ startSpan({ name: "Spotlight CLI", op: "cli" }, () => {
       } else {
         while (p-- >= 0 && col < MAX_COLS) {
           if (col < lim - 1) {
-            stdoutBuffer += M_COL;
+            stderrBuffer += M_COL;
           } else if (col === lim - 1) {
-            stdoutBuffer += F_COL;
+            stderrBuffer += F_COL;
           } else if (col === lim + r) {
-            stdoutBuffer += `${RESET}${BOLD}`;
+            stderrBuffer += `${RESET}${BOLD}`;
           }
-          stdoutBuffer += c ? (col >= 35 ? "#" : "s") : " ";
+          stderrBuffer += c ? (col >= 35 ? "#" : "s") : " ";
           col++;
         }
         c = !c;
       }
     }
-    stdoutBuffer += NL;
-    process.stdout.write(stdoutBuffer);
+    stderrBuffer += NL;
+    process.stderr.write(stderrBuffer);
   });
 
   startSpan({ name: "Setup Sidecar", op: "cli.setup.sidecar" }, () => {
-    const port = process.argv.length >= 3 ? Number(process.argv[2]) : undefined;
+    const args = parseCLIArgs();
+    if (args.help) {
+      console.log(`
+Usage: spotlight [options]
+
+Options:
+  -p, --port <port>    Port to listen on (default: 8969)
+  --stdio-mcp          Enable MCP stdio transport
+  -d, --debug          Enable debug logging
+  -h, --help           Show this help message
+
+Examples:
+  spotlight                    # Start on default port 8969
+  spotlight --port 3000        # Start on port 3000
+  spotlight -p 3000 -d         # Start on port 3000 with debug logging
+`);
+      process.exit(0);
+    }
     const MANIFEST_NAME = "manifest.json";
     const ENTRY_POINT_NAME = "src/index.html";
     const basePath = process.cwd();
     const filesToServe = Object.create(null);
 
-    startSpan({ name: "Setup Server Assets", op: "cli.setup.sidecar.assets" }, () => {
-      // Following the guide here: https://vite.dev/guide/backend-integration.html
-      const manifest = JSON.parse(readAsset(MANIFEST_NAME));
-      filesToServe[ENTRY_POINT_NAME] = readAsset(ENTRY_POINT_NAME);
-      const entries = Object.values(manifest);
-      for (const entry of entries) {
-        filesToServe[entry.file] = readAsset(entry.file);
+    startSpan(
+      { name: "Setup Server Assets", op: "cli.setup.sidecar.assets" },
+      () => {
+        // Following the guide here: https://vite.dev/guide/backend-integration.html
+        const manifest = JSON.parse(readAsset(MANIFEST_NAME));
+        filesToServe[ENTRY_POINT_NAME] = readAsset(ENTRY_POINT_NAME);
+        const entries = Object.values(manifest);
+        for (const entry of entries) {
+          filesToServe[entry.file] = readAsset(entry.file);
+        }
       }
-    });
+    );
 
-    setupSidecar({ port, basePath, filesToServe, isStandalone: true });
+    setupSidecar({ ...args, basePath, filesToServe, isStandalone: true });
   });
 });
