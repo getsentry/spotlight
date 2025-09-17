@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import * as Sentry from "@sentry/electron/main";
 import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
