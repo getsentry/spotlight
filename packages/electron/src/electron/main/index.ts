@@ -16,7 +16,7 @@ Sentry.init({
 });
 
 let alwaysOnTop = false;
-let win: BrowserWindow;
+let win: BrowserWindow | null = null;
 let tray: Tray;
 let isQuitting = false;
 
@@ -68,6 +68,10 @@ const createWindow = () => {
       event.preventDefault();
       win.hide();
     }
+  });
+
+  win.on("closed", () => {
+    win = null;
   });
 
   win.webContents.on("did-start-loading", () => {
@@ -409,13 +413,18 @@ function storeIncomingPayload(body: string) {
 }
 
 function showOrCreateWindow() {
-  if (!win) {
-    createWindow();
-  } else {
-    if (win.isMinimized()) win.restore();
-    win.show();
-    win.focus();
+  if (isQuitting) {
+    return;
   }
+
+  if (!win || win.isDestroyed()) {
+    createWindow();
+    return;
+  }
+
+  if (win.isMinimized()) win.restore();
+  if (!win.isVisible()) win.show();
+  win.focus();
 }
 
 function createTray() {
