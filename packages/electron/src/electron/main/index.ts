@@ -89,7 +89,7 @@ app.on("ready", () => {
   });
 
   autoUpdater.on("error", error => {
-    console.error(error);
+    Sentry.captureException(error);
   });
 });
 
