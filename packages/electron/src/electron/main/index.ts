@@ -77,10 +77,28 @@ const createWindow = () => {
 
   win.webContents.on("did-finish-load", () => {
     win.webContents.executeJavaScript(
-      `const firstChild = document.querySelector('#sentry-spotlight-root')?.shadowRoot?.querySelector('.spotlight-fullscreen > :first-child');
-        if(firstChild) {
-          firstChild.style.cssText = 'padding-top: 34px; -webkit-app-region:drag;'
-        }`,
+      `// Create a draggable header bar at the top of the window
+      const spotlightDebugger = document.querySelector('.spotlight-debugger');
+      if (spotlightDebugger) {
+        const dragHandle = document.createElement('div');
+        dragHandle.style.cssText = \`
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 32px;
+          -webkit-app-region: drag;
+          z-index: 9999;
+          background: transparent;
+        \`;
+        dragHandle.id = 'electron-drag-handle';
+        
+        if (!document.getElementById('electron-drag-handle')) {
+          document.body.appendChild(dragHandle);
+        }
+        
+        spotlightDebugger.style.paddingTop = '32px';
+      }`,
     );
   });
 };
