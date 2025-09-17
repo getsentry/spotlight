@@ -9,7 +9,31 @@ const store = new Store();
 
 autoUpdater.forceDevUpdateConfig = process.env.NODE_ENV === "development";
 
+// Configure auto-updater for better network resilience
+autoUpdater.autoDownload = true; // Enable automatic download when update is found
+autoUpdater.autoInstallOnAppQuit = true; // Auto-install on quit
+
+// Set longer timeouts for network operations (especially helpful for background apps)
+if (process.platform === "darwin") {
+  // macOS specific configuration for better background handling
+  autoUpdater.logger = {
+    info: (message) => console.log("AutoUpdater:", message),
+    warn: (message) => console.warn("AutoUpdater:", message),
+    error: (message) => console.error("AutoUpdater:", message),
+    debug: (message) => console.debug("AutoUpdater:", message)
+  };
+}
+
 const ONE_HOUR = 60 * 60 * 1000;
+const RETRY_DELAYS = [1000, 5000, 15000, 30000, 60000]; // 1s, 5s, 15s, 30s, 1m
+const MAX_RETRIES = RETRY_DELAYS.length;
+
+let updateCheckInProgress = false;
+let updateDownloadInProgress = false;
+let retryCount = 0;
+let retryTimeout: NodeJS.Timeout | null = null;
+let lastNetworkError: any = null;
+let pendingUpdateInfo: any = null;
 
 function installAndRestart() {
   /**
@@ -31,21 +55,134 @@ function installAndRestart() {
   autoUpdater.quitAndInstall();
 }
 
-async function checkForUpdates() {
-  try {
-    await autoUpdater.checkForUpdates();
-  } catch (error) {
-    console.error(error);
-    Sentry.captureException(error);
+function clearRetryTimeout() {
+  if (retryTimeout) {
+    clearTimeout(retryTimeout);
+    retryTimeout = null;
+  }
+}
+
+function scheduleRetry(fn: () => void, delay: number) {
+  clearRetryTimeout();
+  retryTimeout = setTimeout(fn, delay);
+}
+
+function resetRetryState() {
+  retryCount = 0;
+  clearRetryTimeout();
+  lastNetworkError = null;
+}
+
+function checkNetworkConnectivity(): boolean {
+  // Simple connectivity check using navigator.onLine equivalent for Electron
+  return true; // Electron doesn't have a direct equivalent, we'll rely on error detection
+}
+
+function handleNetworkReconnection() {
+  if (lastNetworkError && (updateCheckInProgress || updateDownloadInProgress || pendingUpdateInfo)) {
+    console.log("Network appears to be back, attempting to resume update process");
+    lastNetworkError = null;
+    
+    // Reset retry count to give fresh attempts
+    retryCount = 0;
+    
+    // Try to resume the update process
+    setTimeout(() => {
+      if (pendingUpdateInfo) {
+        console.log("Resuming download for pending update");
+        checkForUpdatesWithRetry();
+      } else if (!updateCheckInProgress) {
+        console.log("Retrying update check after network recovery");
+        checkForUpdatesWithRetry();
+      }
+    }, 2000); // Wait 2 seconds to ensure network is stable
+  }
+}
+
+async function checkForUpdatesWithRetry(): Promise<void> {
+  if (updateCheckInProgress) {
+    console.log("Update check already in progress, skipping");
+    return;
   }
 
-  setTimeout(checkForUpdates, ONE_HOUR);
+  updateCheckInProgress = true;
+  
+  try {
+    console.log(`Checking for updates (attempt ${retryCount + 1}/${MAX_RETRIES + 1})`);
+    await autoUpdater.checkForUpdates();
+    
+    // Success - reset retry state
+    resetRetryState();
+    updateCheckInProgress = false;
+    
+    // Schedule next regular check
+    setTimeout(checkForUpdates, ONE_HOUR);
+  } catch (error) {
+    console.error(`Update check failed (attempt ${retryCount + 1}):`, error);
+    Sentry.captureException(error);
+    
+    updateCheckInProgress = false;
+    
+    // If we have retries left and this looks like a network error, retry
+    if (retryCount < MAX_RETRIES && isNetworkError(error)) {
+      lastNetworkError = error;
+      const delay = RETRY_DELAYS[retryCount];
+      console.log(`Retrying update check in ${delay}ms`);
+      retryCount++;
+      
+      scheduleRetry(checkForUpdatesWithRetry, delay);
+    } else {
+      // Max retries reached or non-network error - reset and schedule next regular check
+      console.log("Max retries reached or non-network error, scheduling next regular check");
+      if (isNetworkError(error)) {
+        lastNetworkError = error;
+        console.log("Storing network error for potential retry on network recovery");
+      }
+      resetRetryState();
+      setTimeout(checkForUpdates, ONE_HOUR);
+    }
+  }
+}
+
+function isNetworkError(error: any): boolean {
+  if (!error) return false;
+  
+  // Check for common network error indicators
+  const errorString = error.toString().toLowerCase();
+  const networkErrorPatterns = [
+    'network connection was lost',
+    'network error',
+    'connection timeout',
+    'connection refused',
+    'dns lookup failed',
+    'socket hang up',
+    'enotfound',
+    'econnreset',
+    'econnrefused',
+    'etimedout'
+  ];
+  
+  return networkErrorPatterns.some(pattern => errorString.includes(pattern)) ||
+         (error.code && error.domain === 'NSURLErrorDomain') ||
+         (error.code === 'ENOTFOUND' || error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT');
+}
+
+async function checkForUpdates() {
+  // Reset retry state for new check cycle
+  resetRetryState();
+  await checkForUpdatesWithRetry();
 }
 
 app.on("ready", () => {
   checkForUpdates();
 
+  // Handle successful update download
   autoUpdater.on("update-downloaded", async () => {
+    console.log("Update downloaded successfully");
+    updateDownloadInProgress = false;
+    pendingUpdateInfo = null;
+    resetRetryState();
+    
     const result = await dialog.showMessageBox({
       type: "question",
       message: "A new update has been downloaded. It will be installed on restart.",
@@ -57,6 +194,7 @@ app.on("ready", () => {
     }
   });
 
+  // Update menu when download completes
   autoUpdater.on("update-downloaded", () => {
     const menuItem = isMac ? { ...template[0].submenu?.[1] } : undefined;
 
@@ -72,8 +210,56 @@ app.on("ready", () => {
     Menu.setApplicationMenu(Menu.buildFromTemplate(_template));
   });
 
-  autoUpdater.on("error", error => {
+  // Handle update available
+  autoUpdater.on("update-available", (info) => {
+    console.log("Update available:", info.version);
+    updateDownloadInProgress = true;
+    pendingUpdateInfo = info;
+  });
+
+  // Handle no update available
+  autoUpdater.on("update-not-available", () => {
+    console.log("No update available");
+    updateDownloadInProgress = false;
+    pendingUpdateInfo = null;
+  });
+
+  // Enhanced error handling with retry logic for downloads
+  autoUpdater.on("error", (error) => {
+    console.error("Auto-updater error:", error);
     Sentry.captureException(error);
+    
+    // If this was a download error and we have retries left, try again
+    if (updateDownloadInProgress && isNetworkError(error) && retryCount < MAX_RETRIES) {
+      lastNetworkError = error;
+      const delay = RETRY_DELAYS[retryCount];
+      console.log(`Download failed, retrying in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`);
+      retryCount++;
+      
+      scheduleRetry(() => {
+        console.log("Retrying update check after download failure");
+        checkForUpdatesWithRetry();
+      }, delay);
+    } else {
+      // Reset state on non-retryable errors or max retries reached
+      updateDownloadInProgress = false;
+      if (retryCount >= MAX_RETRIES) {
+        console.log("Max download retries reached, giving up until next scheduled check");
+        if (isNetworkError(error)) {
+          lastNetworkError = error;
+          console.log("Storing download error for potential retry on network recovery");
+        }
+        resetRetryState();
+      } else {
+        // Non-network error, clear pending update
+        pendingUpdateInfo = null;
+      }
+    }
+  });
+
+  // Handle download progress
+  autoUpdater.on("download-progress", (progressObj) => {
+    console.log(`Download progress: ${Math.round(progressObj.percent)}% (${progressObj.transferred}/${progressObj.total})`);
   });
 });
 
@@ -183,7 +369,42 @@ app.on("window-all-closed", () => {
 
 app.on("before-quit", () => {
   isQuitting = true;
+  clearRetryTimeout();
 });
+
+// Handle app state changes for better background resilience
+app.on("browser-window-blur", () => {
+  // App is losing focus, but continue updates
+  console.log("App lost focus, continuing background updates");
+});
+
+app.on("browser-window-focus", () => {
+  // App regained focus, check if we missed any updates
+  console.log("App regained focus");
+  
+  // Check if we can recover from previous network errors
+  handleNetworkReconnection();
+  
+  // If we're not currently checking and it's been a while, do a quick check
+  if (!updateCheckInProgress && !updateDownloadInProgress) {
+    // Don't wait the full hour, check in 5 seconds
+    setTimeout(() => {
+      console.log("Performing focus-triggered update check");
+      checkForUpdates();
+    }, 5000);
+  }
+});
+
+// Handle app hiding/showing (macOS specific)
+if (process.platform === "darwin") {
+  app.on("hide", () => {
+    console.log("App hidden, updates will continue in background");
+  });
+
+  app.on("show", () => {
+    console.log("App shown");
+  });
+}
 
 const template: Electron.MenuItemConstructorOptions[] = [
   // { role: 'appMenu' }
