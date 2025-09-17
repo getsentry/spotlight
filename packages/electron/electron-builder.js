@@ -14,6 +14,12 @@ let mac = {
   gatekeeperAssess: false,
   entitlements: "build/entitlements.mac.plist",
   entitlementsInherit: "build/entitlements.mac.plist",
+  // Additional entitlements for auto-updater compatibility
+  extendInfo: {
+    LSUIElement: false,
+    NSSupportsAutomaticGraphicsSwitching: true,
+    ITSAppUsesNonExemptEncryption: false,
+  },
   cscLink: process.env.CSC_LINK,
   cscKeyPassword: process.env.CSC_KEY_PASSWORD,
 };
@@ -29,6 +35,11 @@ if (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD) {
       },
     ],
     identity: null,
+    extendInfo: {
+      ...mac.extendInfo,
+      // Add quarantine override for development builds
+      LSFileQuarantineEnabled: false,
+    },
   };
   afterSign = undefined;
 }
