@@ -1,7 +1,8 @@
+import fs from "node:fs";
 import path from "node:path";
 import * as Sentry from "@sentry/electron/main";
 import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
-import { BrowserWindow, Menu, app, dialog, ipcMain, shell } from "electron";
+import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, shell } from "electron";
 import { autoUpdater as nativeUpdater } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
@@ -102,6 +103,11 @@ Sentry.init({
 
 let alwaysOnTop = false;
 let win: BrowserWindow;
+let tray: Tray;
+let isQuitting = false;
+
+const isMac = process.platform === "darwin";
+const isLinux = process.platform === "linux";
 
 const createWindow = () => {
   win = new BrowserWindow({
@@ -142,6 +148,14 @@ const createWindow = () => {
     win.focus();
   });
 
+  win.on("close", event => {
+    // Linux: always quit when window is closed, some desktop environments don't support tray apps like gnome
+    if (!isQuitting && !isLinux) {
+      event.preventDefault();
+      win.hide();
+    }
+  });
+
   win.webContents.on("did-start-loading", () => {
     clearBuffer();
     app.setBadgeCount(0);
@@ -157,11 +171,16 @@ const createWindow = () => {
   });
 };
 
+// only quit on linux as trays may not be available on all desktop environments
 app.on("window-all-closed", () => {
-  app.quit();
+  if (isLinux) {
+    app.quit();
+  }
 });
 
-const isMac = process.platform === "darwin";
+app.on("before-quit", () => {
+  isQuitting = true;
+});
 
 const template: Electron.MenuItemConstructorOptions[] = [
   // { role: 'appMenu' }
@@ -330,6 +349,20 @@ const template: Electron.MenuItemConstructorOptions[] = [
           }
         },
       },
+      { type: "separator" },
+      {
+        label: "Start at Login",
+        id: "start-at-login",
+        type: "checkbox",
+        checked: app.getLoginItemSettings().openAtLogin,
+        click: () => {
+          const currentSetting = app.getLoginItemSettings().openAtLogin;
+          app.setLoginItemSettings({
+            openAtLogin: !currentSetting,
+            openAsHidden: true,
+          });
+        },
+      },
     ],
   },
   {
@@ -367,16 +400,16 @@ store.onDidChange("sentry-send-envelopes", newValue => {
 
 const showErrorMessage = () => {
   if (win) {
-    win.webContents.executeJavaScript(`
+    win.webContents.executeJavaScript(`{
       const sentryRoot = document.getElementById('sentry-spotlight-root');
       const errorScreen = document.getElementById('error-screen');
-      if(sentryRoot){
+      if (sentryRoot) {
         sentryRoot.style.display = 'none';
       }
-      if(errorScreen){
+      if (errorScreen) {
         errorScreen.style.display = 'block';
       }
-    `);
+    }`);
   }
 };
 
@@ -453,11 +486,74 @@ function storeIncomingPayload(body: string) {
   }
 }
 
-app.whenReady().then(() => {
-  createWindow();
+function showOrCreateWindow() {
+  if (!win) {
+    createWindow();
+  } else {
+    if (win.isMinimized()) win.restore();
+    win.show();
+    win.focus();
+  }
+}
 
+function createTray() {
+  const iconPath = path.join(__dirname, "../../resources/tray/tray.png");
+  const trayIcon = nativeImage.createFromPath(iconPath);
+  tray = new Tray(trayIcon);
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Open Spotlight",
+      click: () => showOrCreateWindow(),
+    },
+    {
+      label: "Sidecar Status",
+      enabled: false,
+      sublabel: "Running on port 8969",
+    },
+    { type: "separator" },
+    {
+      label: "Start at Login",
+      type: "checkbox",
+      checked: app.getLoginItemSettings().openAtLogin,
+      click: () => {
+        const currentSetting = app.getLoginItemSettings().openAtLogin;
+        app.setLoginItemSettings({
+          openAtLogin: !currentSetting,
+          openAsHidden: true,
+        });
+      },
+    },
+    { type: "separator" },
+    {
+      label: "Quit Spotlight",
+      click: () => {
+        isQuitting = true;
+        app.quit();
+      },
+    },
+  ]);
+
+  tray.setToolTip("Spotlight - Sidecar is running");
+  tray.setContextMenu(contextMenu);
+
+  tray.on("click", () => {
+    showOrCreateWindow();
+  });
+
+  tray.on("double-click", () => {
+    showOrCreateWindow();
+  });
+}
+
+app.whenReady().then(() => {
+  if (!isLinux) {
+    createTray();
+  }
+
+  createWindow();
   app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    showOrCreateWindow();
   });
 
   ipcMain.on("set-badge-count", handleBadgeCount);

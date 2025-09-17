@@ -21,6 +21,7 @@ let afterSign = "scripts/notarize.js";
 
 if (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD) {
   mac = {
+    ...mac,
     target: [
       {
         target: "zip",

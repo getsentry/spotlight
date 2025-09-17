@@ -1,10 +1,16 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
+import {
+  buildSpanTree,
+  extractTracesFromEnvelopes,
+  formatErrorEnvelope,
+  formatLogEnvelope,
+  formatTraceSummary,
+  renderSpanTree,
+} from "~/format/index.js";
 import { getBuffer } from "~/utils/index.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
-import { formatErrorEnvelope, formatLogEnvelope } from "./utils/index.js";
-import { buildSpanTree, extractTracesFromEnvelopes, formatTraceSummary, renderSpanTree } from "./utils/traces.js";
 
 export function createMcpInstance() {
   const mcp = new McpServer({

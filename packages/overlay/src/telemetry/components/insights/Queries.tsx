@@ -42,14 +42,14 @@ const calculateQueryInfo = ({ query, spanData }: { query: string; spanData: Span
   };
 };
 
-const Queries = ({ showAll }: { showAll: boolean }) => {
+const Queries = () => {
   const navigate = useNavigate();
-  const { allSpans, localSpans } = useSentrySpans();
+  const allSpans = useSentrySpans();
   const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERIES_SORT_KEYS.totalTime });
 
   const queriesData: QueryInfo[] = useMemo(() => {
     const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.totalTime];
-    const spans = showAll ? allSpans : localSpans;
+    const spans = allSpans;
     const onlyDBSpans = spans.filter((span: Span) => DB_SPAN_REGEX.test(span.op || ""));
     const uniqueSpansSet = new Set(onlyDBSpans.map(span => String(span?.description).trim()));
     // Clear out empty ones (they collapse as a single empty string since this is a set)
@@ -57,12 +57,12 @@ const Queries = ({ showAll }: { showAll: boolean }) => {
     return [...uniqueSpansSet]
       .map(query => calculateQueryInfo({ query, spanData: onlyDBSpans }))
       .sort((a, b) => (sort.asc ? compareQueryInfo(a, b) : compareQueryInfo(b, a)));
-  }, [allSpans, localSpans, showAll, sort]);
+  }, [allSpans, sort]);
 
   const maxTime = Math.max(...queriesData.map(query => query.totalTime));
 
   const handleRowClick = (query: QueryInfo) => {
-    navigate(`/insights/queries/${btoa(query.description)}`);
+    navigate(`/telemetry/insights/queries/${btoa(query.description)}`);
   };
 
   if (!queriesData?.length) {

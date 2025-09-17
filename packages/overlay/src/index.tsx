@@ -1,27 +1,19 @@
 import fontStyles from "@fontsource/raleway/index.css?inline";
 import { CONTEXT_LINES_ENDPOINT } from "@spotlightjs/sidecar/constants";
-import { MemoryRouter } from "react-router-dom";
 import App from "./App";
-import { DEFAULT_EXPERIMENTS, DEFAULT_SIDECAR_STREAM_URL } from "./constants";
+import { DEFAULT_SIDECAR_STREAM_URL } from "./constants";
 import globalStyles from "./index.css?inline";
+import { Router } from "./lib/Router";
 import { on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
 import { activateLogger, log } from "./lib/logger";
 import { removeURLSuffix } from "./lib/removeURLSuffix";
 import { SpotlightContextProvider } from "./lib/useSpotlightContext";
 import { React, ReactDOM } from "./react-instance";
-import initTelemetry from "./telemetry";
 import type { WindowWithSpotlight } from "./types";
 
 export type { WindowWithSpotlight } from "./types";
-export {
-  CONTEXT_LINES_ENDPOINT,
-  DEFAULT_EXPERIMENTS,
-  DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL,
-  React,
-  ReactDOM,
-  trigger,
-};
+export { CONTEXT_LINES_ENDPOINT, DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL, React, ReactDOM, trigger };
 
 /**
  * Send an event to spotlight without the sidecar
@@ -38,20 +30,10 @@ export async function onSevereEvent(cb: (count: number) => void) {
   on("severeEventCount", e => cb((e as CustomEvent).detail?.count ?? 1));
 }
 
-/**
- * Sentry telemetry configuration for Spotlight.
- */
-export function sentry(options: { injectIntoSDK?: boolean } = {}) {
-  return initTelemetry(options);
-}
-
 export type SpotlightInitOptions = {
   sidecarUrl?: string;
   showClearEventsButton?: boolean;
-  initialEvents?: Record<string, (string | Uint8Array)[]>;
-  startFrom?: string;
   debug?: boolean;
-  experiments?: Record<string, boolean>;
 };
 
 export async function init(initOptions: SpotlightInitOptions = {}) {
@@ -67,10 +49,7 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
 
   const {
     sidecarUrl = DEFAULT_SIDECAR_STREAM_URL,
-    experiments = DEFAULT_EXPERIMENTS,
     showClearEventsButton = true,
-    initialEvents = undefined,
-    startFrom = undefined,
     debug = document.location.hash.endsWith("debug"),
   } = initOptions;
 
@@ -79,20 +58,6 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   }
 
   const sidecarBaseUrl = removeURLSuffix(sidecarUrl, "/stream");
-  const finalExperiments = { ...DEFAULT_EXPERIMENTS, ...experiments };
-
-  const telemetry = initTelemetry({
-    injectIntoSDK: true,
-  });
-
-  if (telemetry.setup) {
-    await telemetry.setup({
-      navigate: (path?: string) => {
-        trigger("navigate", path || "/");
-      },
-      sidecarUrl: sidecarBaseUrl,
-    });
-  }
 
   const appRoot = document.createElement("div");
   appRoot.id = "spotlight-root";
@@ -103,17 +68,9 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   const styleElement = document.createElement("style");
   styleElement.textContent = `${fontStyles}\n${globalStyles}`;
   document.head.appendChild(styleElement);
-
-  const initialTab = startFrom || "/traces";
-  log("Starting from", initialTab);
-
-  const isLoadedFromSidecar = new URL(sidecarUrl).origin === document.location.origin;
-  if (isLoadedFromSidecar || document.location.hash.startsWith("#spotlight")) {
-    initSentry(initialTab, { debug });
-  }
+  initSentry();
 
   const context = {
-    experiments: finalExperiments,
     sidecarUrl: sidecarBaseUrl,
   };
 
@@ -127,16 +84,11 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
     document.body.appendChild(appRoot);
 
     ReactDOM.createRoot(appRoot).render(
-      <MemoryRouter initialEntries={[initialTab]}>
+      <Router>
         <SpotlightContextProvider context={context}>
-          <App
-            sidecarUrl={sidecarUrl}
-            showClearEventsButton={showClearEventsButton}
-            initialEvents={initialEvents}
-            startFrom={startFrom}
-          />
+          <App sidecarUrl={sidecarUrl} showClearEventsButton={showClearEventsButton} />
         </SpotlightContextProvider>
-      </MemoryRouter>,
+      </Router>,
     );
   }
 

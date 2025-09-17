@@ -1,7 +1,3 @@
-export type ExperimentName = "sentry:focus-local-events";
-
-export type ExperimentsConfig = Record<ExperimentName, boolean>;
-
 export type NotificationCount = {
   /**
    * Numbers of notifications
@@ -13,22 +9,6 @@ export type NotificationCount = {
    * (This has impact on the UI, e.g. the notification count badge will be red)
    */
   severe?: boolean;
-};
-
-export type RawEventContext = {
-  /**
-   * The content-type header of the event
-   */
-  contentType: string;
-
-  /**
-   * The raw data in string form of the request.
-   * Use this function to parse and process the raw data it to whatever data structure
-   * you expect for the given `contentType`.
-   *
-   * Return the processed object or undefined if the event should be ignored.
-   */
-  data: string | Uint8Array;
 };
 
 export type TabPanel<T> = {
@@ -74,6 +54,5 @@ export type WindowWithSpotlight = Window & {
 };
 
 export type SpotlightContext = {
-  experiments: ExperimentsConfig;
   sidecarUrl: string;
 };

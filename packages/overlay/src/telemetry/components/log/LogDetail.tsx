@@ -15,11 +15,11 @@ export default function LogDetails({ id }: { id: string }) {
   const { timestamp, trace_id, body, attributes, level, severity_number } = logData;
 
   return (
-    <SidePanel backto="/logs">
+    <SidePanel backto="/telemetry/logs">
       <SidePanelHeader
         title="Log Details"
         subtitle=<span className={LOG_LEVEL_COLORS[level] || "text-primary-500"}>{level.toUpperCase()}</span>
-        backto="/logs"
+        backto="/telemetry/logs"
       />
 
       <div className="space-y-6">
@@ -35,7 +35,7 @@ export default function LogDetails({ id }: { id: string }) {
 
         <div>
           <h2 className="mb-2 font-bold uppercase">Trace ID</h2>
-          <Link className="underline" to={`/traces/${trace_id}`}>
+          <Link className="underline" to={`/telemetry/traces/${trace_id}`}>
             {trace_id}
           </Link>
         </div>

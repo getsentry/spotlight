@@ -37,15 +37,36 @@ const router = new Hono<HonoEnv>()
     return streamSSE(ctx, async stream => {
       const sub = buffer.subscribe(container => {
         logOutgoingEvent(container, clientId);
-        stream.writeSSE({
-          event: `${container.getContentType()}${base64Indicator}`,
-          data: container.getData().toString(useBase64 ? "base64" : "utf-8"),
-        });
+
+        const parsedEnvelope = container.getParsedEnvelope();
+        if (parsedEnvelope) {
+          stream.writeSSE({
+            event: `${container.getContentType()}${base64Indicator}`,
+            data: JSON.stringify(parsedEnvelope.event),
+          });
+        }
       });
 
       stream.onAbort(() => {
         buffer.unsubscribe(sub);
       });
+    });
+  })
+  .get("/envelope/:id", ctx => {
+    const buffer = getBuffer();
+
+    const envelopeId = ctx.req.param("id");
+    const container = buffer.read({ envelopeId });
+
+    if (container.length === 0) {
+      return ctx.notFound();
+    }
+
+    return ctx.body(container[0].getData(), 200, {
+      "Content-Type": container[0].getContentType(),
+      "Cache-Control": "no-cache",
+      "Content-Disposition": `attachment; filename="${envelopeId}.bin"`,
+      Connection: "keep-alive",
     });
   })
   .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {

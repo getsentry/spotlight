@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import useSentryStore from "../store";
-import { isLocalTrace } from "../store/helpers";
 import { SentryEventsContext } from "./sentryEventsContext";
 
 export const useSentryLogs = (traceId?: string) => {
@@ -8,12 +7,8 @@ export const useSentryLogs = (traceId?: string) => {
   const { getLogs, getLogsByTraceId } = useSentryStore();
 
   const allLogs = Array.from(traceId ? getLogsByTraceId(traceId) : getLogs());
-  const localLogs = allLogs.filter(item => item.trace_id && isLocalTrace(item.trace_id));
 
-  return {
-    allLogs,
-    localLogs,
-  };
+  return allLogs;
 };
 
 export const useSentryLog = (id: string) => {

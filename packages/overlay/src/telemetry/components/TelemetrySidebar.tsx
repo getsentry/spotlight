@@ -59,13 +59,15 @@ export default function TelemetrySidebar({
   };
 
   const isActive = (path: string) => {
-    if (path === "/traces") {
-      return pathname === "/" || pathname.startsWith("/traces");
+    // case for primary path
+    if (path === "traces") {
+      return pathname === "/telemetry" || pathname.startsWith("/telemetry/traces");
     }
-    return pathname.startsWith(path);
+    // case for all other paths
+    return pathname.startsWith(`/telemetry/${path}`);
   };
 
-  const isInsightsActive = pathname.startsWith("/insights");
+  const isInsightsActive = pathname.startsWith("/telemetry/insights");
 
   return (
     <nav
@@ -95,18 +97,18 @@ export default function TelemetrySidebar({
 
       <div className="flex-1 overflow-y-auto">
         <NavigationLink
-          to="/traces"
+          to="traces"
           title="Traces"
           notificationCount={{ count: traceCount }}
-          isActive={isActive("/traces")}
+          isActive={isActive("traces")}
         />
         <NavigationLink
-          to="/errors"
+          to="errors"
           title="Errors"
           notificationCount={{ count: errorCount, severe: errorCount > 0 }}
-          isActive={isActive("/errors")}
+          isActive={isActive("errors")}
         />
-        <NavigationLink to="/logs" title="Logs" isActive={isActive("/logs")} />
+        <NavigationLink to="logs" title="Logs" isActive={isActive("logs")} />
 
         {/* Insights section */}
         <div
@@ -116,28 +118,18 @@ export default function TelemetrySidebar({
         >
           Insights
         </div>
-        <NavigationLink to="/insights/queries" title="Queries" isActive={isActive("/insights/queries")} isSubItem />
+        <NavigationLink to="insights/queries" title="Queries" isActive={isActive("insights/queries")} isSubItem />
         <NavigationLink
-          to="/insights/webvitals"
+          to="insights/webvitals"
           title="Web Vitals"
-          isActive={isActive("/insights/webvitals")}
+          isActive={isActive("insights/webvitals")}
           isSubItem
         />
-        <NavigationLink
-          to="/insights/resources"
-          title="Resources"
-          isActive={isActive("/insights/resources")}
-          isSubItem
-        />
-        <NavigationLink to="/insights/profiles" title="Profiles" isActive={isActive("/insights/profiles")} isSubItem />
-        <NavigationLink
-          to="/insights/envelopes"
-          title="Envelopes"
-          isActive={isActive("/insights/envelopes")}
-          isSubItem
-        />
-        <NavigationLink to="/insights/sdks" title="SDKs" isActive={isActive("/insights/sdks")} isSubItem />
-        <NavigationLink to="/insights/aitraces" title="AI Traces" isActive={isActive("/insights/aitraces")} isSubItem />
+        <NavigationLink to="insights/resources" title="Resources" isActive={isActive("insights/resources")} isSubItem />
+        <NavigationLink to="insights/profiles" title="Profiles" isActive={isActive("insights/profiles")} isSubItem />
+        <NavigationLink to="insights/envelopes" title="Envelopes" isActive={isActive("insights/envelopes")} isSubItem />
+        <NavigationLink to="insights/sdks" title="SDKs" isActive={isActive("insights/sdks")} isSubItem />
+        <NavigationLink to="insights/aitraces" title="AI Traces" isActive={isActive("insights/aitraces")} isSubItem />
       </div>
 
       <footer className="p-4 border-t border-primary-700">

@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { cn } from "~/lib/cn";
-import { useSpotlightContext } from "~/lib/useSpotlightContext";
 import AITranscription from "../components/insights/aiTraces/AITranscription";
 import { hasAISpans } from "../components/insights/aiTraces/sdks/aiLibraries";
 import Resizer from "../components/shared/Resizer";
@@ -142,21 +141,14 @@ export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLa
 }
 
 export default function TracesTab() {
-  const context = useSpotlightContext();
-  const { allTraces, localTraces } = useSentryTraces();
-  const [showAll, setShowAll] = useState(() => !context.experiments["sentry:focus-local-events"]);
-  const onShowAll = useCallback(() => setShowAll(true), []);
-  const visibleTraces = showAll ? allTraces : localTraces;
+  const allTraces = useSentryTraces();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const { TRACE_FILTER_CONFIGS, filteredTraces } = useTraceFiltering(visibleTraces, activeFilters, searchQuery);
-  const hiddenItemCount = allTraces.length - visibleTraces.length;
+  const { TRACE_FILTER_CONFIGS, filteredTraces } = useTraceFiltering(allTraces, activeFilters, searchQuery);
 
   const traceData = {
     filtered: filteredTraces,
     all: allTraces,
-    visible: visibleTraces,
-    hiddenItemCount: hiddenItemCount,
   };
 
   return (
@@ -171,13 +163,10 @@ export default function TracesTab() {
         />
         <div className="flex-1 overflow-auto">
           <Routes>
-            <Route
-              path="/:traceId/spans/:spanId/*"
-              element={<TraceList traceData={traceData} onShowAll={onShowAll} />}
-            />
-            <Route path="/:traceId/spans/:spanId" element={<TraceList traceData={traceData} onShowAll={onShowAll} />} />
-            <Route path="/:traceId/*" element={<TraceList traceData={traceData} onShowAll={onShowAll} />} />
-            <Route path="/" element={<TraceList traceData={traceData} onShowAll={onShowAll} />} />
+            <Route path="/:traceId/spans/:spanId/*" element={<TraceList traceData={traceData} />} />
+            <Route path="/:traceId/spans/:spanId" element={<TraceList traceData={traceData} />} />
+            <Route path="/:traceId/*" element={<TraceList traceData={traceData} />} />
+            <Route path="/" element={<TraceList traceData={traceData} />} />
           </Routes>
         </div>
       </div>

@@ -68,12 +68,12 @@ const COMPARATORS: Record<ResourceSortTypes, ResourceInfoComparator> = {
   [RESOURCES_SORT_KEYS.totalTime]: (a, b) => a.totalTime - b.totalTime,
 };
 
-const Resources = ({ showAll }: { showAll: boolean }) => {
-  const { allSpans, localSpans } = useSentrySpans();
+const Resources = () => {
+  const allSpans = useSentrySpans();
   const { sort, toggleSortOrder } = useSort({ defaultSortType: RESOURCES_SORT_KEYS.totalTime });
 
   const resources = useMemo(() => {
-    const filteredResourceSpans = getResourceSpans(showAll ? allSpans : localSpans, { regex: /resource\.[A-Za-z]+/ });
+    const filteredResourceSpans = getResourceSpans(allSpans, { regex: /resource\.[A-Za-z]+/ });
     const uniqueResourceDescriptionsSet = new Set(filteredResourceSpans.map(span => String(span?.description).trim()));
     // Clear out empty ones (they collapse as a single empty string since this is a set)
     uniqueResourceDescriptionsSet.delete("");
@@ -85,7 +85,7 @@ const Resources = ({ showAll }: { showAll: boolean }) => {
       .sort((a, b) => {
         return sort.asc ? compareResourceInfo(a, b) : compareResourceInfo(b, a);
       });
-  }, [sort, showAll, allSpans, localSpans]);
+  }, [sort, allSpans]);
 
   if (!resources?.length) {
     return <p className="text-primary-300 px-6 py-4">No Resource found.</p>;

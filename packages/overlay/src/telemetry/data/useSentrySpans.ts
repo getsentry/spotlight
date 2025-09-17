@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import useSentryStore from "../store";
-import { getLocalTraces } from "../store/helpers";
 import type { Span, Trace } from "../types";
 import { SentryEventsContext } from "./sentryEventsContext";
 
@@ -8,9 +7,8 @@ export function useSentryTraces() {
   useContext(SentryEventsContext);
   const { getTraces } = useSentryStore();
   const allTraces = getTraces();
-  const localTraces = getLocalTraces();
 
-  return { allTraces, localTraces };
+  return allTraces;
 }
 
 function spanReducer(acc: Span[], trace: Trace) {
@@ -25,17 +23,15 @@ function spanCountReducer(sum: number, trace: Trace) {
 }
 
 export const useSentrySpans = () => {
-  const { allTraces, localTraces } = useSentryTraces();
+  const allTraces = useSentryTraces();
   const allSpans: Span[] = allTraces.reduce(spanReducer, []);
-  const localSpans: Span[] = localTraces.reduce(spanReducer, []);
-  return { allSpans, localSpans };
+  return allSpans;
 };
 
 export const useSentrySpanCounts = () => {
-  const { allTraces, localTraces } = useSentryTraces();
+  const allTraces = useSentryTraces();
 
   return {
     allSpans: allTraces.reduce(spanCountReducer, 0),
-    localSpans: localTraces.reduce(spanCountReducer, 0),
   };
 };

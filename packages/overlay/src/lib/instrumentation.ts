@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
 import { useEffect } from "../react-instance";
 
-export default function initSentry(initialTab: string, options: Sentry.BrowserOptions = {}) {
+export default function initSentry() {
   const sentryTraceParent: Record<string, string> = {};
   const navTiming = performance.getEntriesByType("navigation");
   if (navTiming.length > 0) {
@@ -55,10 +55,9 @@ export default function initSentry(initialTab: string, options: Sentry.BrowserOp
     // https://docs.sentry.io/platforms/javascript/session-replay/configuration/#general-integration-configuration
     replaysSessionSampleRate: 0.01,
     replaysOnErrorSampleRate: 1.0,
-    ...options,
   });
 
   if (hasTraceParent && sentryClient) {
-    Sentry.startBrowserTracingPageLoadSpan(sentryClient, { name: initialTab }, sentryTraceParent);
+    Sentry.startBrowserTracingPageLoadSpan(sentryClient, { name: "pageload" }, sentryTraceParent);
   }
 }

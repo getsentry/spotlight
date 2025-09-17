@@ -1,56 +1,12 @@
 import { randomBytes } from "node:crypto";
 import type { ServerResponse } from "node:http";
-
-// Cannot use import.meta.resolve -- @see https://github.com/vitejs/vite/discussions/15871
-import type { SpotlightInitOptions as BaseSpotlightInitOptions } from "@spotlightjs/overlay";
-import { resolve } from "import-meta-resolve";
 import type { Connect, ErrorPayload, PluginOption, ViteDevServer } from "vite";
-
-import * as packageJson from "../package.json";
 import { setupSidecar } from "./sidecar";
 
-const FILE_PROTOCOL_PREFIX_LENGTH = "file://".length;
-
-export function getSpotlightClientModulePath({
-  server,
-  module = packageJson.name,
-}: { server?: ViteDevServer; module?: string } = {}): string {
-  const modulePath = resolve(module, import.meta.url)
-    .slice(FILE_PROTOCOL_PREFIX_LENGTH)
-    .split("?", 1)[0];
-  if (server) {
-    server.config.server.fs.allow.push(modulePath);
-  }
-
-  return modulePath;
-}
-
-export type SpotlightIntegration = "sentry" | "viteInspect";
-
 export type SpotlightInitOptions = {
-  importPath?: string;
   port?: number;
-  /**
-   * Additional debug options.
-   * WARNING: These options are not part of the public API and may change at any time.
-   */
-  __debugOptions?: Record<string, unknown>;
-} & BaseSpotlightInitOptions;
-
-const serverOptions = new Set(["importPath", "port"]);
-
-export function buildClientInit(options: SpotlightInitOptions) {
-  const clientOptions = Object.fromEntries(
-    Object.entries(options).filter(([key]) => !key.startsWith("_") && !serverOptions.has(key)),
-  );
-  const initOptions = JSON.stringify(clientOptions);
-
-  return [
-    `import * as Spotlight from ${JSON.stringify(`/@fs${options.importPath || getSpotlightClientModulePath()}`)};`,
-    `Spotlight.init(${initOptions});`,
-    "window.createErrorOverlay=function createErrorOverlay(err) { console.error('Vite build error:', err); };",
-  ].join("\n");
-}
+  sidecarUrl?: string;
+};
 
 async function sendErrorToSpotlight(err: ErrorPayload["err"], spotlightUrl = "http://localhost:8969/stream") {
   if (!err.errors) {
@@ -123,25 +79,12 @@ async function sendErrorToSpotlight(err: ErrorPayload["err"], spotlightUrl = "ht
 }
 
 export default function spotlight(options: SpotlightInitOptions = {}): PluginOption {
-  let spotlightPath: string;
-
   return {
     name: "spotlight",
     apply: "serve",
-    transform(code: string, id: string /*, _opts = {}*/) {
-      // Only modify Vite's special client script
-      // The magic value below comes from vite/constants:CLIENT_ENTRY
-      if (!id.endsWith("vite/dist/client/client.mjs")) return;
-
-      return `${buildClientInit({ ...options, importPath: spotlightPath })}${code}`;
-    },
     configureServer(server: ViteDevServer) {
       setupSidecar({ port: options.port });
 
-      spotlightPath = getSpotlightClientModulePath({ server });
-
-      // We gotta use the "Injecting Post Middleware" trick from https://vitejs.dev/guide/api-plugin.html#configureserver
-      // because error handlers can only come last per https://expressjs.com/en/guide/error-handling.html#writing-error-handlers
       return () =>
         server.middlewares.use(async function viteErrorToSpotlight(
           err: ErrorPayload["err"],
@@ -151,7 +94,6 @@ export default function spotlight(options: SpotlightInitOptions = {}): PluginOpt
         ) {
           await sendErrorToSpotlight(err, options.sidecarUrl);
 
-          // The following part is per https://expressjs.com/en/guide/error-handling.html#the-default-error-handler
           if (res.headersSent) {
             return next(err);
           }

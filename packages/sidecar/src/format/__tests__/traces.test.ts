@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { EventContainer } from "../../../utils/eventContainer.js";
-import { buildSpanTree, extractTracesFromEnvelopes, formatTraceSummary, renderSpanTree } from "../utils/traces.js";
+import { describe, expect, it } from "vitest";
+import { EventContainer } from "~/utils/index.js";
+import { buildSpanTree, extractTracesFromEnvelopes, formatTraceSummary, renderSpanTree } from "../traces.js";
 import { envelopeSecondTransactionEvent, envelopeTransactionEvent } from "./test_envelopes.js";
 
 function createMockEventContainer(event: any): EventContainer {
