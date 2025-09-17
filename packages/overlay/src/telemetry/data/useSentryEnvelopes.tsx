@@ -15,5 +15,5 @@ export const useSentryEnvelopes = () => {
     return 0;
   });
 
-  return { allEnvelopes };
+  return allEnvelopes;
 };

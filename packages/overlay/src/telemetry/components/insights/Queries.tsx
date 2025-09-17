@@ -44,7 +44,7 @@ const calculateQueryInfo = ({ query, spanData }: { query: string; spanData: Span
 
 const Queries = () => {
   const navigate = useNavigate();
-  const { allSpans } = useSentrySpans();
+  const allSpans = useSentrySpans();
   const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERIES_SORT_KEYS.totalTime });
 
   const queriesData: QueryInfo[] = useMemo(() => {

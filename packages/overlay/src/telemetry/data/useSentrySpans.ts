@@ -8,7 +8,7 @@ export function useSentryTraces() {
   const { getTraces } = useSentryStore();
   const allTraces = getTraces();
 
-  return { allTraces };
+  return allTraces;
 }
 
 function spanReducer(acc: Span[], trace: Trace) {
@@ -23,13 +23,13 @@ function spanCountReducer(sum: number, trace: Trace) {
 }
 
 export const useSentrySpans = () => {
-  const { allTraces } = useSentryTraces();
+  const allTraces = useSentryTraces();
   const allSpans: Span[] = allTraces.reduce(spanReducer, []);
-  return { allSpans };
+  return allSpans;
 };
 
 export const useSentrySpanCounts = () => {
-  const { allTraces } = useSentryTraces();
+  const allTraces = useSentryTraces();
 
   return {
     allSpans: allTraces.reduce(spanCountReducer, 0),

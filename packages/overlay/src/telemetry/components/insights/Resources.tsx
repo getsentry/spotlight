@@ -69,7 +69,7 @@ const COMPARATORS: Record<ResourceSortTypes, ResourceInfoComparator> = {
 };
 
 const Resources = () => {
-  const { allSpans } = useSentrySpans();
+  const allSpans = useSentrySpans();
   const { sort, toggleSortOrder } = useSort({ defaultSortType: RESOURCES_SORT_KEYS.totalTime });
 
   const resources = useMemo(() => {

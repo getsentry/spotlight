@@ -4,7 +4,7 @@ import type { Span, SpotlightAITrace } from "../types";
 import { useSentryTraces } from "./useSentrySpans";
 
 export function useAITraces(): Span[] {
-  const { allTraces } = useSentryTraces();
+  const allTraces = useSentryTraces();
 
   return useMemo(() => {
     const rootSpans: Span[] = [];

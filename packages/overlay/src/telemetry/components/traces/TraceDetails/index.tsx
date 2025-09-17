@@ -68,7 +68,7 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
 
   const events = useSentryEvents(trace.trace_id);
   const profile = useSentryStore.getState().getProfileByTraceId(trace.trace_id);
-  const errorCount = useMemo(() => events.filter(e => isErrorEvent(e)).length, [events]);
+  const errorCount = useMemo(() => events.reduce((len, e) => (isErrorEvent(e) ? len + 1 : len), 0), [events]);
 
   const tabs = [
     createTab("context", "Context"),
