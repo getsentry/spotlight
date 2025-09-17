@@ -1,6 +1,5 @@
 require("dotenv").config();
 const { notarize } = require("@electron/notarize");
-const Sentry = require("@sentry/core");
 
 exports.default = async function notarizing(context) {
   const { electronPlatformName, appOutDir } = context;
@@ -18,6 +17,5 @@ exports.default = async function notarizing(context) {
     teamId: process.env.TEAMID,
   }).catch(error => {
     console.error(error);
-    Sentry.captureException(error);
   });
 };
