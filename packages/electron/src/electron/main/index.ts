@@ -4,14 +4,13 @@ import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
 import { BrowserWindow, Menu, app, dialog, ipcMain, shell } from "electron";
 import { autoUpdater as nativeUpdater } from "electron";
 import Store from "electron-store";
-import { type UpdateCheckResult, autoUpdater } from "electron-updater";
+import { autoUpdater } from "electron-updater";
 
 const store = new Store();
 
-autoUpdater.forceDevUpdateConfig = true;
+autoUpdater.forceDevUpdateConfig = process.env.NODE_ENV === "development";
 
 const ONE_HOUR = 60 * 60 * 1000;
-let updateInfo: UpdateCheckResult | null;
 
 function installAndRestart() {
   /**
@@ -38,35 +37,58 @@ function installAndRestart() {
 }
 
 async function checkForUpdates() {
-  let timeout = 24 * ONE_HOUR;
-  try {
-    updateInfo = await autoUpdater.checkForUpdates();
+  const menuItem = isMac ? { ...template[0].submenu?.[1] } : undefined;
 
-    if (!updateInfo?.isUpdateAvailable) {
-      timeout = 3 * ONE_HOUR;
+  try {
+    const updateInfo = await autoUpdater.checkForUpdates();
+
+    const isUpdateAvailable = updateInfo?.isUpdateAvailable;
+
+    if (isUpdateAvailable) {
+      if (menuItem) {
+        menuItem.label = "Restart to Update";
+        menuItem.click = () => {
+          installAndRestart();
+        };
+      }
+    } else {
+      if (menuItem) {
+        menuItem.label = "Check for Updates";
+        menuItem.click = () => {
+          checkForUpdates();
+        };
+      }
     }
   } catch (error) {
-    console.error(error);
-  } finally {
-    setTimeout(checkForUpdates, timeout);
+    console.error(error, error.stack);
+    Sentry.captureException(error);
   }
+
+  if (menuItem) {
+    const _template = [...template];
+    if (_template[0].submenu?.[1].id === "check-for-updates") _template[0].submenu[1] = menuItem;
+    Menu.setApplicationMenu(Menu.buildFromTemplate(_template));
+  }
+  setTimeout(checkForUpdates, ONE_HOUR);
 }
 
 app.on("ready", () => {
   checkForUpdates();
 
-  autoUpdater.on("update-downloaded", () => {
-    dialog
-      .showMessageBox({
-        type: "question",
-        message: "A new update has been downloaded. It will be installed on restart.",
-        buttons: ["Restart", "Later"],
-      })
-      .then(result => {
-        if (result.response === 0) {
-          installAndRestart();
-        }
-      });
+  autoUpdater.on("update-downloaded", async () => {
+    const result = await dialog.showMessageBox({
+      type: "question",
+      message: "A new update has been downloaded. It will be installed on restart.",
+      buttons: ["Restart", "Later"],
+    });
+
+    if (result.response === 0) {
+      installAndRestart();
+    }
+  });
+
+  autoUpdater.on("error", error => {
+    console.error(error);
   });
 });
 
@@ -141,9 +163,6 @@ app.on("window-all-closed", () => {
 
 const isMac = process.platform === "darwin";
 
-// @ts-expect-error updateInfo is initialized in the app.on("ready") event
-const isUpdateAvailable = updateInfo?.isUpdateAvailable;
-
 const template: Electron.MenuItemConstructorOptions[] = [
   // { role: 'appMenu' }
   ...((isMac
@@ -154,13 +173,10 @@ const template: Electron.MenuItemConstructorOptions[] = [
           submenu: [
             { role: "about" },
             {
-              label: isUpdateAvailable ? "Download Update" : "Check for Updates",
+              id: "check-for-updates",
+              label: "Check for Updates",
               click: () => {
-                if (isUpdateAvailable) {
-                  installAndRestart();
-                } else {
-                  checkForUpdates();
-                }
+                checkForUpdates();
               },
             },
             { type: "separator" },
