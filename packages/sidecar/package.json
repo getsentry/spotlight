@@ -44,13 +44,14 @@
   },
   "dependencies": {
     "@hono/mcp": "^0.1.1",
-    "@hono/node-server": "^1.18.0",
+    "@hono/node-server": "^1.19.3",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
     "hono": "^4.9.7",
     "launch-editor": "^2.9.1",
+    "mcp-proxy": "^5.6.0",
     "uuidv7": "^1.0.2",
     "zod": "^3"
   },
