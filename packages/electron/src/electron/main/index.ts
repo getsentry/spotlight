@@ -46,6 +46,19 @@ app.on("ready", () => {
   checkForUpdates();
 
   autoUpdater.on("update-downloaded", async () => {
+    const menuItem = isMac ? { ...template[0].submenu?.[1] } : undefined;
+
+    if (menuItem) {
+      menuItem.label = "Restart to Update";
+      menuItem.click = () => {
+        installAndRestart();
+      };
+
+      const _template = [...template];
+      if (_template[0].submenu?.[1].id === "check-for-updates") _template[0].submenu[1] = menuItem;
+      Menu.setApplicationMenu(Menu.buildFromTemplate(_template));
+    }
+
     const result = await dialog.showMessageBox({
       type: "question",
       message: "A new update has been downloaded. It will be installed on restart.",
@@ -57,24 +70,7 @@ app.on("ready", () => {
     }
   });
 
-  autoUpdater.on("update-downloaded", () => {
-    const menuItem = isMac ? { ...template[0].submenu?.[1] } : undefined;
-
-    if (!menuItem) return;
-
-    menuItem.label = "Restart to Update";
-    menuItem.click = () => {
-      installAndRestart();
-    };
-
-    const _template = [...template];
-    if (_template[0].submenu?.[1].id === "check-for-updates") _template[0].submenu[1] = menuItem;
-    Menu.setApplicationMenu(Menu.buildFromTemplate(_template));
-  });
-
-  autoUpdater.on("error", error => {
-    Sentry.captureException(error);
-  });
+  autoUpdater.on("error", error => Sentry.captureException(error));
 });
 
 Sentry.init({
