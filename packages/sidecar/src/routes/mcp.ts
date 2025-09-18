@@ -1,9 +1,9 @@
 import { StreamableHTTPTransport } from "@hono/mcp";
 import { Hono } from "hono";
-import { createMcpInstance } from "./mcp.js";
+import { createMCPInstance } from "../mcp/mcp.js";
 
 const transport = new StreamableHTTPTransport();
-const mcp = createMcpInstance();
+const mcp = createMCPInstance();
 
 const router = new Hono();
 

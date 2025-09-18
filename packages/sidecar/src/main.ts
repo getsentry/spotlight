@@ -1,28 +1,80 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { type ServerType, serve } from "@hono/node-server";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { serveFilesHandler } from "./handlers/index.js";
 import { activateLogger, enableDebugLogging, logger } from "./logger.js";
-import routes, { CONTEXT_ID } from "./routes/index.js";
+import { createMCPInstance } from "./mcp/mcp.js";
+import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
+import { parseArgs } from "node:util";
 
 let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
-function startServer(options: StartServerOptions): ServerType {
-  let filesToServe = options.filesToServe;
+export function parseCLIArgs(): { port: number; debug: boolean; stdioMCP: boolean; help: boolean } {
+  const { values, positionals } = parseArgs({
+    options: {
+      port: {
+        type: "string",
+        short: "p",
+        default: DEFAULT_PORT.toString(),
+      },
+      debug: {
+        type: "boolean",
+        short: "d",
+        default: false,
+      },
+      "stdio-mcp": {
+        type: "boolean",
+        default: false,
+      },
+      help: {
+        type: "boolean",
+        short: "h",
+        default: false,
+      },
+    },
+    allowPositionals: true,
+  });
 
-  if (options.basePath && !filesToServe) {
-    filesToServe = {
-      "/src/index.html": readFileSync(join(options.basePath, "src/index.html")),
-      "/assets/main.js": readFileSync(join(options.basePath, "assets/main.js")),
-    };
+  // Handle legacy positional argument for port (backwards compatibility)
+  const portInput = positionals.length > 0 ? positionals[0] : values.port;
+  const port = Number(portInput);
+
+  // Validate port number
+  if (Number.isNaN(port)) {
+    console.error(`Error: Invalid port number '${portInput}'`);
+    console.error("Port must be a valid number between 1 and 65535");
+    process.exit(1);
   }
+
+  if (port < 1 || port > 65535) {
+    console.error(`Error: Port ${port} is out of valid range (1-65535)`);
+    process.exit(1);
+  }
+
+  return {
+    ...values,
+    stdioMCP: values["stdio-mcp"],
+    port,
+  };
+}
+
+function startServer(options: StartServerOptions): ServerType {
+  const { port, basePath } = options;
+  const filesToServe =
+    basePath && !options.filesToServe
+      ? {
+          "/src/index.html": readFileSync(join(basePath, "src/index.html")),
+          "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
+        }
+      : options.filesToServe;
 
   const app = new Hono<HonoEnv>().use(cors());
 
@@ -78,9 +130,14 @@ function startServer(options: StartServerOptions): ServerType {
   const sidecarServer = serve(
     {
       fetch: app.fetch,
-      port: options.port,
+      port,
     },
-    () => handleServerListen(options.port, options.basePath),
+    () => {
+      logger.info(`Sidecar listening on ${port}`);
+      if (basePath) {
+        logSpotlightUrl(port);
+      }
+    },
   );
 
   sidecarServer.addListener("error", handleServerError);
@@ -97,11 +154,9 @@ function startServer(options: StartServerOptions): ServerType {
     }
   }
 
-  function handleServerListen(port: number, basePath?: string): void {
-    logger.info(`Sidecar listening on ${port}`);
-    if (basePath) {
-      logSpotlightUrl(port);
-    }
+  if (options.stdioMCP) {
+    logger.info("Starting MCP over stdio too...");
+    createMCPInstance().connect(new StdioServerTransport());
   }
 
   return sidecarServer;
@@ -115,18 +170,19 @@ export function setupSidecar({
   debug,
   incomingPayload,
   isStandalone,
+  stdioMCP,
 }: SideCarOptions = {}): void {
   if (!isStandalone) {
     addEventProcessor(event => (event.spans?.some(span => span.op?.startsWith("sidecar.")) ? null : event));
   }
   let sidecarPort = DEFAULT_PORT;
 
-  if (customLogger) {
-    activateLogger(customLogger);
-  }
-
   if (debug || process.env.SPOTLIGHT_DEBUG) {
     enableDebugLogging(true);
+  }
+
+  if (customLogger) {
+    activateLogger(customLogger);
   }
 
   if (port && !isValidPort(port)) {
@@ -144,13 +200,13 @@ export function setupSidecar({
         logSpotlightUrl(sidecarPort);
       }
     } else if (!serverInstance) {
-      serverInstance = startServer({ port: sidecarPort, basePath, filesToServe, incomingPayload });
+      serverInstance = startServer({ port: sidecarPort, basePath, filesToServe, incomingPayload, stdioMCP });
     }
   });
 }
 
 export function clearBuffer(): void {
-  getBuffer(CONTEXT_ID).reset();
+  getBuffer().reset();
 }
 
 let forceShutdown = false;
