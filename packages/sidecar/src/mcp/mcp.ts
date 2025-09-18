@@ -12,7 +12,7 @@ import {
 import { getBuffer } from "~/utils/index.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
 
-export function createMcpInstance() {
+export function createMCPInstance() {
   const mcp = new McpServer({
     name: "spotlight-mcp",
     version: String(process.env.npm_package_version),

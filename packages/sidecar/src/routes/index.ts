@@ -5,7 +5,7 @@ import { CONTEXT_LINES_ENDPOINT } from "~/constants.js";
 import clearRouter from "./clear.js";
 import contextLinesRouter from "./contextlines/index.js";
 import healthRouter from "./health.js";
-import mcpRouter from "./mcp/index.js";
+import mcpRouter from "./mcp.js";
 import openRouter from "./open.js";
 import streamRouter from "./stream/index.js";
 
