@@ -31,15 +31,20 @@ function installAndRestart() {
   autoUpdater.quitAndInstall();
 }
 
+let checkingForUpdatesTimeout: NodeJS.Timeout | null = null;
 async function checkForUpdates() {
   try {
+    if (checkingForUpdatesTimeout) {
+      clearTimeout(checkingForUpdatesTimeout);
+    }
+
     await autoUpdater.checkForUpdates();
   } catch (error) {
     console.error(error);
     Sentry.captureException(error);
   }
 
-  setTimeout(checkForUpdates, ONE_HOUR);
+  checkingForUpdatesTimeout = setTimeout(checkForUpdates, ONE_HOUR);
 }
 
 app.on("ready", () => {
@@ -393,7 +398,7 @@ store.onDidChange("sentry-send-envelopes", newValue => {
   }
 });
 
-const showErrorMessage = () => {
+const _showErrorMessage = () => {
   if (win) {
     win.webContents.executeJavaScript(`{
       const sentryRoot = document.getElementById('spotlight-root');
@@ -409,7 +414,7 @@ const showErrorMessage = () => {
 };
 
 async function askForPermissionToSendToSentry(event: Sentry.Event, hint: Sentry.EventHint) {
-  showErrorMessage();
+  // showErrorMessage();
   if (store.get("sentry-enabled") === false) {
     return null;
   }
