@@ -36,6 +36,7 @@ async function checkForUpdates() {
   try {
     if (checkingForUpdatesTimeout) {
       clearTimeout(checkingForUpdatesTimeout);
+      checkingForUpdatesTimeout = null;
     }
 
     await autoUpdater.checkForUpdates();
@@ -168,7 +169,21 @@ const createWindow = () => {
          if (!document.getElementById('electron-drag-handle')) {
            document.body.appendChild(dragHandle);
          }
-       }`,
+       }
+         
+       // Creating the error component
+       const errorScreen = document.createElement('div');
+       errorScreen.id = 'error-screen';
+       errorScreen.style.display = 'none';
+       errorScreen.innerHTML = \`
+        <div class="error-page-navbar">
+        <img alt="spotlight-icon" src="./resources/sized.png" width="50" height="50" />
+        <p class="spotlight-title">Spotlight</p>
+      </div>
+      <h1 class="error header">Oops! An error occurred.</h1>
+      <p class="error description">Press Cmd + R to reload the app.</p>
+       \`;
+       document.body.appendChild(errorScreen);`,
     );
   });
 };
@@ -398,7 +413,7 @@ store.onDidChange("sentry-send-envelopes", newValue => {
   }
 });
 
-const _showErrorMessage = () => {
+const showErrorMessage = () => {
   if (win) {
     win.webContents.executeJavaScript(`{
       const sentryRoot = document.getElementById('spotlight-root');
@@ -414,7 +429,7 @@ const _showErrorMessage = () => {
 };
 
 async function askForPermissionToSendToSentry(event: Sentry.Event, hint: Sentry.EventHint) {
-  // showErrorMessage();
+  showErrorMessage();
   if (store.get("sentry-enabled") === false) {
     return null;
   }
