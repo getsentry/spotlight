@@ -50,9 +50,7 @@ app.on("ready", () => {
 
     if (menuItem) {
       menuItem.label = "Restart to Update";
-      menuItem.click = () => {
-        installAndRestart();
-      };
+      menuItem.click = () => installAndRestart();
 
       const _template = [...template];
       if (_template[0].submenu?.[1].id === "check-for-updates") _template[0].submenu[1] = menuItem;
@@ -193,9 +191,7 @@ const template: Electron.MenuItemConstructorOptions[] = [
             {
               id: "check-for-updates",
               label: "Check for Updates",
-              click: () => {
-                checkForUpdates();
-              },
+              click: () => checkForUpdates(),
             },
             { type: "separator" },
             { role: "services" },

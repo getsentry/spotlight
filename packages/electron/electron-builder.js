@@ -10,17 +10,10 @@ let mac = {
     },
   ],
   icon: "resources/icons/mac/icon.icns",
-  type: "distribution",
   hardenedRuntime: true,
   gatekeeperAssess: false,
   entitlements: "build/entitlements.mac.plist",
   entitlementsInherit: "build/entitlements.mac.plist",
-  // Additional entitlements for auto-updater compatibility
-  extendInfo: {
-    LSUIElement: false,
-    NSSupportsAutomaticGraphicsSwitching: true,
-    ITSAppUsesNonExemptEncryption: false,
-  },
   cscLink: process.env.CSC_LINK,
   cscKeyPassword: process.env.CSC_KEY_PASSWORD,
 };
@@ -56,20 +49,6 @@ const config = {
     "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}",
   ],
   mac,
-  dmg: {
-    contents: [
-      {
-        x: 130,
-        y: 220,
-      },
-      {
-        x: 410,
-        y: 220,
-        type: "link",
-        path: "/Applications",
-      },
-    ],
-  },
   publish: {
     provider: "github",
   },
