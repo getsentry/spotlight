@@ -277,8 +277,8 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.9.7)
       '@hono/node-server':
-        specifier: ^1.18.0
-        version: 1.18.0(hono@4.9.7)
+        specifier: ^1.19.3
+        version: 1.19.3(hono@4.9.7)
       '@jridgewell/trace-mapping':
         specifier: ^0.3.25
         version: 0.3.25
@@ -297,6 +297,9 @@ importers:
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
+      mcp-proxy:
+        specifier: ^5.6.0
+        version: 5.6.0
       uuidv7:
         specifier: ^1.0.2
         version: 1.0.2
@@ -1367,8 +1370,8 @@ packages:
       '@modelcontextprotocol/sdk': ^1.12.0
       hono: '>=4.0.0'
 
-  '@hono/node-server@1.18.0':
-    resolution: {integrity: sha512-CJ0H3/ouk/JWnyiuYOJLdpuWhO2D2BTNigHaFixnW3CrwZb+E+4s/KoFkcikHXcVmXoxaLJx1nlGa3JChEFtFA==}
+  '@hono/node-server@1.19.3':
+    resolution: {integrity: sha512-Fjyxfux0rMPXMSob79OmddfpK5ArJa2xLkLCV+zamHkbeXQtSNKOi0keiBKyHZ/hCRKjigjmKGp4AJnDFq8PUw==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -5737,6 +5740,10 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
+  mcp-proxy@5.6.0:
+    resolution: {integrity: sha512-sms4GHO/sX2d0uTdiUVOLXJMpNRc+4VZAdIRpj+DUZJovGXtXaYwF4YM1BTcQeCKEJkfwGPHoO24AQlR0TWOqA==}
+    hasBin: true
+
   mdast-util-definitions@6.0.0:
     resolution: {integrity: sha512-scTllyX6pnYNZH/AIp/0ePz6s4cZtARxImwoPJ7kS42n+MnVsI4XbnG6d4ibehRIldYMWM2LD7ImQblVhUejVQ==}
 
@@ -9218,7 +9225,7 @@ snapshots:
       '@modelcontextprotocol/sdk': 1.16.0
       hono: 4.9.7
 
-  '@hono/node-server@1.18.0(hono@4.9.7)':
+  '@hono/node-server@1.19.3(hono@4.9.7)':
     dependencies:
       hono: 4.9.7
 
@@ -14307,6 +14314,8 @@ snapshots:
     optional: true
 
   math-intrinsics@1.1.0: {}
+
+  mcp-proxy@5.6.0: {}
 
   mdast-util-definitions@6.0.0:
     dependencies:

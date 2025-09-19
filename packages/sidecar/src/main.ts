@@ -13,6 +13,7 @@ import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
 import { parseArgs } from "node:util";
+import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 
 let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
@@ -198,6 +199,13 @@ export function setupSidecar({
       const hasSpotlightUI = (filesToServe && "/src/index.html" in filesToServe) || (!filesToServe && basePath);
       if (hasSpotlightUI) {
         logSpotlightUrl(sidecarPort);
+      }
+      if (stdioMCP) {
+        logger.info("Connecting to existing MCP instance with stdio proxy...");
+        await startStdioServer({
+          serverType: ProxyServerType.HTTPStream,
+          url: `http://localhost:${sidecarPort}/mcp`,
+        });
       }
     } else if (!serverInstance) {
       serverInstance = startServer({ port: sidecarPort, basePath, filesToServe, incomingPayload, stdioMCP });
