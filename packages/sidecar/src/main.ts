@@ -14,6 +14,7 @@ import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
 import { parseArgs } from "node:util";
 import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
+import { rejects } from "node:assert";
 
 let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
@@ -128,7 +129,7 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
     app.get("/*", serveFilesHandler(filesToServe));
   }
 
-  const { resolve, promise } = Promise.withResolvers<ServerType>();
+  const { resolve, reject, promise } = Promise.withResolvers<ServerType>();
   const sidecarServer = serve(
     {
       fetch: app.fetch,
@@ -154,6 +155,7 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
       }, 5000);
     } else {
       captureException(e);
+      reject(e);
     }
   }
 
