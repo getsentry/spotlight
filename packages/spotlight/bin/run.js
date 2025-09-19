@@ -45,7 +45,7 @@ const readAsset = withTracing(
   { name: "readAsset", op: "cli.asset.read" }
 );
 
-await startSpan({ name: "Spotlight CLI", op: "cli" }, async () => {
+startSpan({ name: "Spotlight CLI", op: "cli" }, async () => {
   startSpan({ name: "ASCII Art", op: "cli.art.ascii" }, () => {
     const MAX_COLS = process.stderr.columns;
     if (!process.stderr.isTTY || MAX_COLS < 35) return;

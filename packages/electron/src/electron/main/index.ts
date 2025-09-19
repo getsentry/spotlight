@@ -580,22 +580,22 @@ function createTray() {
   });
 }
 
-await Promise.all([
+Promise.all([
   setupSidecar({
     port: 8969,
     incomingPayload: storeIncomingPayload,
     isStandalone: true,
   }),
   app.whenReady(),
-]);
+]).then(() => {
+  if (!isLinux) {
+    createTray();
+  }
 
-if (!isLinux) {
-  createTray();
-}
+  createWindow();
+  app.on("activate", () => {
+    showOrCreateWindow();
+  });
 
-createWindow();
-app.on("activate", () => {
-  showOrCreateWindow();
+  ipcMain.on("set-badge-count", handleBadgeCount);
 });
-
-ipcMain.on("set-badge-count", handleBadgeCount);
