@@ -23,7 +23,7 @@ Examples:
   process.exit(0);
 }
 
-setupSidecar({
+await setupSidecar({
   ...args,
   isStandalone: true,
 });

@@ -4,8 +4,8 @@ export default function spotlightSidecar(port?: number | string) {
   return {
     name: "spotlightjs-sidecar",
 
-    configureServer() {
-      setupSidecar({ port });
+    async configureServer() {
+      await setupSidecar({ port });
     },
   };
 }

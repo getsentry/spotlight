@@ -82,8 +82,8 @@ export default function spotlight(options: SpotlightInitOptions = {}): PluginOpt
   return {
     name: "spotlight",
     apply: "serve",
-    configureServer(server: ViteDevServer) {
-      setupSidecar({ port: options.port });
+    async configureServer(server: ViteDevServer) {
+      await setupSidecar({ port: options.port });
 
       return () =>
         server.middlewares.use(async function viteErrorToSpotlight(
