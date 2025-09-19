@@ -15,7 +15,7 @@
   },
   "files": ["dist", "bin"],
   "bin": {
-    "spotlight": "./bin/run.js"
+    "spotlight": "./bin/run.mjs"
   },
   "main": "./dist/overlay.cjs",
   "module": "./dist/overlay.js",
