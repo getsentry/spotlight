@@ -67,7 +67,7 @@ export function parseCLIArgs(): { port: number; debug: boolean; stdioMCP: boolea
   };
 }
 
-function startServer(options: StartServerOptions): ServerType {
+async function startServer(options: StartServerOptions): Promise<ServerType> {
   const { port, basePath } = options;
   const filesToServe =
     basePath && !options.filesToServe
@@ -128,6 +128,7 @@ function startServer(options: StartServerOptions): ServerType {
     app.get("/*", serveFilesHandler(filesToServe));
   }
 
+  const { resolve, promise } = Promise.withResolvers<ServerType>();
   const sidecarServer = serve(
     {
       fetch: app.fetch,
@@ -138,6 +139,7 @@ function startServer(options: StartServerOptions): ServerType {
       if (basePath) {
         logSpotlightUrl(port);
       }
+      resolve(sidecarServer);
     },
   );
 
@@ -157,13 +159,13 @@ function startServer(options: StartServerOptions): ServerType {
 
   if (options.stdioMCP) {
     logger.info("Starting MCP over stdio too...");
-    createMCPInstance().connect(new StdioServerTransport());
+    await createMCPInstance().connect(new StdioServerTransport());
   }
 
-  return sidecarServer;
+  return promise;
 }
 
-export function setupSidecar({
+export async function setupSidecar({
   port,
   logger: customLogger,
   basePath,
@@ -172,7 +174,7 @@ export function setupSidecar({
   incomingPayload,
   isStandalone,
   stdioMCP,
-}: SideCarOptions = {}): void {
+}: SideCarOptions = {}): Promise<void> {
   if (!isStandalone) {
     addEventProcessor(event => (event.spans?.some(span => span.op?.startsWith("sidecar.")) ? null : event));
   }
@@ -193,24 +195,22 @@ export function setupSidecar({
     sidecarPort = typeof port === "string" ? Number(port) : port;
   }
 
-  isSidecarRunning(sidecarPort).then(async (isRunning: boolean) => {
-    if (isRunning) {
-      logger.info(`Sidecar is already running on port ${sidecarPort}`);
-      const hasSpotlightUI = (filesToServe && "/src/index.html" in filesToServe) || (!filesToServe && basePath);
-      if (hasSpotlightUI) {
-        logSpotlightUrl(sidecarPort);
-      }
-      if (stdioMCP) {
-        logger.info("Connecting to existing MCP instance with stdio proxy...");
-        await startStdioServer({
-          serverType: ProxyServerType.HTTPStream,
-          url: `http://localhost:${sidecarPort}/mcp`,
-        });
-      }
-    } else if (!serverInstance) {
-      serverInstance = startServer({ port: sidecarPort, basePath, filesToServe, incomingPayload, stdioMCP });
+  if (await isSidecarRunning(sidecarPort)) {
+    logger.info(`Sidecar is already running on port ${sidecarPort}`);
+    const hasSpotlightUI = (filesToServe && "/src/index.html" in filesToServe) || (!filesToServe && basePath);
+    if (hasSpotlightUI) {
+      logSpotlightUrl(sidecarPort);
     }
-  });
+    if (stdioMCP) {
+      logger.info("Connecting to existing MCP instance with stdio proxy...");
+      await startStdioServer({
+        serverType: ProxyServerType.HTTPStream,
+        url: `http://localhost:${sidecarPort}/mcp`,
+      });
+    }
+  } else if (!serverInstance) {
+    serverInstance = await startServer({ port: sidecarPort, basePath, filesToServe, incomingPayload, stdioMCP });
+  }
 }
 
 export function clearBuffer(): void {

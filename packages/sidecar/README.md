@@ -16,7 +16,7 @@ npm install @spotlightjs/sidecar
 import { setupSidecar } from '@spotlightjs/sidecar';
 
 // When you start your dev server
-setupSidecar();
+await setupSidecar();
 ```
 
 ### As a CLI

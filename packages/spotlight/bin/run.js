@@ -45,7 +45,7 @@ const readAsset = withTracing(
   { name: "readAsset", op: "cli.asset.read" }
 );
 
-startSpan({ name: "Spotlight CLI", op: "cli" }, () => {
+await startSpan({ name: "Spotlight CLI", op: "cli" }, async () => {
   startSpan({ name: "ASCII Art", op: "cli.art.ascii" }, () => {
     const MAX_COLS = process.stderr.columns;
     if (!process.stderr.isTTY || MAX_COLS < 35) return;
@@ -104,10 +104,12 @@ startSpan({ name: "Spotlight CLI", op: "cli" }, () => {
     process.stderr.write(stderrBuffer);
   });
 
-  startSpan({ name: "Setup Sidecar", op: "cli.setup.sidecar" }, () => {
-    const args = parseCLIArgs();
-    if (args.help) {
-      console.log(`
+  await startSpan(
+    { name: "Setup Sidecar", op: "cli.setup.sidecar" },
+    async () => {
+      const args = parseCLIArgs();
+      if (args.help) {
+        console.log(`
 Usage: spotlight [options]
 
 Options:
@@ -121,26 +123,32 @@ Examples:
   spotlight --port 3000        # Start on port 3000
   spotlight -p 3000 -d         # Start on port 3000 with debug logging
 `);
-      process.exit(0);
-    }
-    const MANIFEST_NAME = "manifest.json";
-    const ENTRY_POINT_NAME = "src/index.html";
-    const basePath = process.cwd();
-    const filesToServe = Object.create(null);
-
-    startSpan(
-      { name: "Setup Server Assets", op: "cli.setup.sidecar.assets" },
-      () => {
-        // Following the guide here: https://vite.dev/guide/backend-integration.html
-        const manifest = JSON.parse(readAsset(MANIFEST_NAME));
-        filesToServe[ENTRY_POINT_NAME] = readAsset(ENTRY_POINT_NAME);
-        const entries = Object.values(manifest);
-        for (const entry of entries) {
-          filesToServe[entry.file] = readAsset(entry.file);
-        }
+        process.exit(0);
       }
-    );
+      const MANIFEST_NAME = "manifest.json";
+      const ENTRY_POINT_NAME = "src/index.html";
+      const basePath = process.cwd();
+      const filesToServe = Object.create(null);
 
-    setupSidecar({ ...args, basePath, filesToServe, isStandalone: true });
-  });
+      startSpan(
+        { name: "Setup Server Assets", op: "cli.setup.sidecar.assets" },
+        () => {
+          // Following the guide here: https://vite.dev/guide/backend-integration.html
+          const manifest = JSON.parse(readAsset(MANIFEST_NAME));
+          filesToServe[ENTRY_POINT_NAME] = readAsset(ENTRY_POINT_NAME);
+          const entries = Object.values(manifest);
+          for (const entry of entries) {
+            filesToServe[entry.file] = readAsset(entry.file);
+          }
+        }
+      );
+
+      await setupSidecar({
+        ...args,
+        basePath,
+        filesToServe,
+        isStandalone: true,
+      });
+    }
+  );
 });
