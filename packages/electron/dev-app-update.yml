@@ -1,0 +1,4 @@
+owner: getsentry
+repo: spotlight
+provider: github
+updaterCacheDirName: spotlight-dev-updater

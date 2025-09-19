@@ -5,7 +5,7 @@ const builder = require("electron-builder");
 let mac = {
   target: [
     {
-      target: "zip",
+      target: "default",
       arch: ["x64", "arm64"],
     },
   ],
@@ -24,7 +24,7 @@ if (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD) {
     ...mac,
     target: [
       {
-        target: "zip",
+        target: "default",
         arch: ["arm64"],
       },
     ],
@@ -50,8 +50,7 @@ const config = {
   ],
   mac,
   publish: {
-    provider: "generic",
-    url: "https://example.com/auto-updates",
+    provider: "github",
   },
 };
 

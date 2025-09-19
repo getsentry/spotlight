@@ -1,11 +1,88 @@
-import fs from "node:fs";
 import path from "node:path";
 import * as Sentry from "@sentry/electron/main";
 import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
 import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, shell } from "electron";
 import Store from "electron-store";
+import { autoUpdater } from "electron-updater";
 
 const store = new Store();
+
+autoUpdater.forceDevUpdateConfig = process.env.NODE_ENV === "development";
+
+const ONE_HOUR = 60 * 60 * 1000;
+
+function installAndRestart() {
+  /**
+   * On macOS 15+ auto-update / relaunch issues:
+   * - https://github.com/electron-userland/electron-builder/issues/8795
+   * - https://github.com/electron-userland/electron-builder/issues/8997
+   */
+  if (process.platform === "darwin") {
+    app.removeAllListeners("before-quit");
+    app.removeAllListeners("window-all-closed");
+
+    for (const win of BrowserWindow.getAllWindows()) {
+      if (win.isDestroyed()) continue;
+      win.removeAllListeners("close");
+      win.close();
+    }
+  }
+
+  autoUpdater.quitAndInstall();
+}
+
+let checkingForUpdatesTimeout: NodeJS.Timeout | null = null;
+let isCheckingForUpdates = false;
+async function checkForUpdates() {
+  if (isCheckingForUpdates) {
+    return;
+  }
+
+  isCheckingForUpdates = true;
+  if (checkingForUpdatesTimeout) {
+    clearTimeout(checkingForUpdatesTimeout);
+    checkingForUpdatesTimeout = null;
+  }
+
+  try {
+    await autoUpdater.checkForUpdates();
+  } catch (error) {
+    console.error(error);
+    Sentry.captureException(error);
+  }
+
+  isCheckingForUpdates = false;
+  checkingForUpdatesTimeout = setTimeout(checkForUpdates, ONE_HOUR);
+}
+
+app.on("ready", () => {
+  checkForUpdates();
+
+  autoUpdater.on("update-downloaded", async () => {
+    const menuItem = isMac ? { ...template[0].submenu?.[1] } : undefined;
+
+    if (menuItem) {
+      menuItem.label = "Restart to Update";
+      menuItem.click = () => installAndRestart();
+
+      const _template = [...template];
+      if (_template[0].submenu?.[1].id === "check-for-updates") _template[0].submenu[1] = menuItem;
+      Menu.setApplicationMenu(Menu.buildFromTemplate(_template));
+    }
+
+    const result = await dialog.showMessageBox({
+      type: "question",
+      message: "A new update has been downloaded. It will be installed on restart.",
+      buttons: ["Restart", "Later"],
+    });
+
+    if (result.response === 0) {
+      installAndRestart();
+    }
+  });
+
+  autoUpdater.on("error", error => Sentry.captureException(error));
+});
 
 Sentry.init({
   dsn: "https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976",
@@ -16,7 +93,7 @@ Sentry.init({
 });
 
 let alwaysOnTop = false;
-let win: BrowserWindow;
+let win: BrowserWindow | null = null;
 let tray: Tray;
 let isQuitting = false;
 
@@ -70,12 +147,23 @@ const createWindow = () => {
     }
   });
 
+  win.on("closed", () => {
+    win = null;
+  });
+
   win.webContents.on("did-start-loading", () => {
     clearBuffer();
     app.setBadgeCount(0);
   });
 
   win.webContents.on("did-finish-load", () => {
+    /**
+     * Need to create these elements here as Spotlight.init() function
+     * replaces the body content with the app root. This runs after the app
+     * is loaded.
+     *
+     * We need the error-screen to be in the tree to show when an error occurs.
+     */
     win.webContents.executeJavaScript(
       `const spotlightRoot = document.getElementById('spotlight-root');
        if (spotlightRoot) {
@@ -95,7 +183,21 @@ const createWindow = () => {
          if (!document.getElementById('electron-drag-handle')) {
            document.body.appendChild(dragHandle);
          }
-       }`,
+       }
+         
+       // Creating the error component
+       const errorScreen = document.createElement('div');
+       errorScreen.id = 'error-screen';
+       errorScreen.style.display = 'none';
+       errorScreen.innerHTML = \`
+        <div class="error-page-navbar">
+        <img alt="spotlight-icon" src="./resources/sized.png" width="50" height="50" />
+        <p class="spotlight-title">Spotlight</p>
+      </div>
+      <h1 class="error header">Oops! An error occurred.</h1>
+      <p class="error description">Press Cmd + R to reload the app.</p>
+       \`;
+       document.body.appendChild(errorScreen);`,
     );
   });
 };
@@ -120,6 +222,11 @@ const template: Electron.MenuItemConstructorOptions[] = [
           role: "appMenu",
           submenu: [
             { role: "about" },
+            {
+              id: "check-for-updates",
+              label: "Check for Updates",
+              click: () => checkForUpdates(),
+            },
             { type: "separator" },
             { role: "services" },
             { type: "separator" },
@@ -409,13 +516,18 @@ function storeIncomingPayload(body: string) {
 }
 
 function showOrCreateWindow() {
-  if (!win) {
-    createWindow();
-  } else {
-    if (win.isMinimized()) win.restore();
-    win.show();
-    win.focus();
+  if (isQuitting) {
+    return;
   }
+
+  if (!win || win.isDestroyed()) {
+    createWindow();
+    return;
+  }
+
+  if (win.isMinimized()) win.restore();
+  if (!win.isVisible()) win.show();
+  win.focus();
 }
 
 function createTray() {
