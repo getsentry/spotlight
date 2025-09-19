@@ -137,7 +137,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node_version: [20, 22]
+        node_version: [22, 24]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -190,7 +190,7 @@ jobs:
     container: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
     strategy:
       matrix:
-        node_version: [20, 22]
+        node_version: [22, 24]
     steps:
       - uses: actions/checkout@v4
         with:
