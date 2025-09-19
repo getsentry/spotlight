@@ -32,19 +32,26 @@ function installAndRestart() {
 }
 
 let checkingForUpdatesTimeout: NodeJS.Timeout | null = null;
+let isCheckingForUpdates = false;
 async function checkForUpdates() {
-  try {
-    if (checkingForUpdatesTimeout) {
-      clearTimeout(checkingForUpdatesTimeout);
-      checkingForUpdatesTimeout = null;
-    }
+  if (isCheckingForUpdates) {
+    return;
+  }
 
+  isCheckingForUpdates = true;
+  if (checkingForUpdatesTimeout) {
+    clearTimeout(checkingForUpdatesTimeout);
+    checkingForUpdatesTimeout = null;
+  }
+
+  try {
     await autoUpdater.checkForUpdates();
   } catch (error) {
     console.error(error);
     Sentry.captureException(error);
   }
 
+  isCheckingForUpdates = false;
   checkingForUpdatesTimeout = setTimeout(checkForUpdates, ONE_HOUR);
 }
 
@@ -150,6 +157,13 @@ const createWindow = () => {
   });
 
   win.webContents.on("did-finish-load", () => {
+    /**
+     * Need to create these elements here as Spotlight.init() function
+     * replaces the body content with the app root. This runs after the app
+     * is loaded.
+     *
+     * We need the error-screen to be in the tree to show when an error occurs.
+     */
     win.webContents.executeJavaScript(
       `const spotlightRoot = document.getElementById('spotlight-root');
        if (spotlightRoot) {
