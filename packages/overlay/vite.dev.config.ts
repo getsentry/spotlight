@@ -1,4 +1,3 @@
-import spotlightSidecar from "@spotlightjs/sidecar/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import dts from "vite-plugin-dts";
@@ -9,7 +8,6 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [
-    spotlightSidecar(),
     react(),
     dts({
       insertTypesEntry: true,

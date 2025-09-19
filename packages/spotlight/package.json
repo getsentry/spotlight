@@ -30,11 +30,6 @@
       "types": "./dist/sidecar.d.ts",
       "import": "./dist/sidecar.js",
       "require": "./dist/sidecar.cjs"
-    },
-    "./vite-plugin": {
-      "types": "./dist/vite-plugin.d.ts",
-      "import": "./dist/vite-plugin.js",
-      "require": "./dist/vite-plugin.cjs"
     }
   },
   "dependencies": {

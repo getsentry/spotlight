@@ -180,7 +180,6 @@ src/
 ├── logger.ts            # Logging utilities
 ├── messageBuffer.ts     # Event buffering system
 ├── contextlines.ts      # Source code context handling
-└── vite-plugin.ts       # Vite integration
 ```
 
 ### Server Architecture
@@ -235,7 +234,6 @@ const middlewareName = (handler: RequestHandler): RequestHandler =>
 
 ```
 src/
-├── vite-plugin.ts       # Vite plugin implementation
 ├── overlay.ts           # Re-export overlay
 ├── sidecar.ts           # Re-export sidecar
 └── index.html           # Standalone HTML page

@@ -1,5 +1,4 @@
 import { resolve, sep } from "node:path";
-import spotlightSidecar from "@spotlightjs/sidecar/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import type { RenderedChunk } from "rollup";
@@ -10,7 +9,6 @@ import svgr from "vite-plugin-svgr";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    spotlightSidecar(),
     react(),
     dts({
       insertTypesEntry: true,
