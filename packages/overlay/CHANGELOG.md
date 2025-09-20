@@ -1,5 +1,25 @@
 # @spotlightjs/core
 
+## 4.0.0
+
+### Major Changes
+
+- Remove integrations architecture in favour of fixed telemetry features and remove the ability to use the package as an overlay on top of apps. ([#917](https://github.com/getsentry/spotlight/pull/917))
+
+- Remove all vite-plugins as they are deprecated ([#937](https://github.com/getsentry/spotlight/pull/937))
+
+### Minor Changes
+
+- - Implement URL-based routing in overlay with BrowserRouter for web apps and HashRouter for Electron ([#921](https://github.com/getsentry/spotlight/pull/921))
+  - Remove sentry-integration.ts and simplify telemetry implementation
+  - Moved telemetry logic from App.tsx to dedicated Telemetry component
+
+### Patch Changes
+
+- Remove local resource handling and vite plugin as overlay feature is not supported ([#924](https://github.com/getsentry/spotlight/pull/924))
+
+- Refactor to remove object destructuring from hooks returning only one value ([#930](https://github.com/getsentry/spotlight/pull/930))
+
 ## 3.2.0
 
 ### Minor Changes
