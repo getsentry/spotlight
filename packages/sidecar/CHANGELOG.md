@@ -1,5 +1,29 @@
 # @spotlightjs/sidecar
 
+## 2.0.0
+
+### Major Changes
+
+- Make `setupSidecar` async as it should be ([#936](https://github.com/getsentry/spotlight/pull/936))
+
+- Remove all vite-plugins as they are deprecated ([#937](https://github.com/getsentry/spotlight/pull/937))
+
+### Minor Changes
+
+- Add support for multiple stdio MCP servers to run, as a proxy for the existing main sidecar ([#935](https://github.com/getsentry/spotlight/pull/935))
+
+- Adds stdio based MCP server via a `--stdio-mcp` CLI argument. Also removes the context-based message buffers to be able to achieve this as there's no context-id for the stdio transport. This feature was not used anyway. ([#933](https://github.com/getsentry/spotlight/pull/933))
+
+  Moves all log messages to stderr as they should have been to avoid clobbering the MCP stdio transport.
+
+### Patch Changes
+
+- - To check all items in an envelope for errors. ([#880](https://github.com/getsentry/spotlight/pull/880))
+
+- restructured the sidecar server and minor improvements ([#918](https://github.com/getsentry/spotlight/pull/918))
+
+- To add a soft reset buffer when its cleared. ([#895](https://github.com/getsentry/spotlight/pull/895))
+
 ## 1.12.0
 
 ### Minor Changes

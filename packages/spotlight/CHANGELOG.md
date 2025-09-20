@@ -1,5 +1,29 @@
 # @spotlightjs/spotlight
 
+## 4.0.0
+
+### Major Changes
+
+- Make `setupSidecar` async as it should be ([#936](https://github.com/getsentry/spotlight/pull/936))
+
+- Remove all vite-plugins as they are deprecated ([#937](https://github.com/getsentry/spotlight/pull/937))
+
+### Minor Changes
+
+- Add support for multiple stdio MCP servers to run, as a proxy for the existing main sidecar ([#935](https://github.com/getsentry/spotlight/pull/935))
+
+- Adds stdio based MCP server via a `--stdio-mcp` CLI argument. Also removes the context-based message buffers to be able to achieve this as there's no context-id for the stdio transport. This feature was not used anyway. ([#933](https://github.com/getsentry/spotlight/pull/933))
+
+  Moves all log messages to stderr as they should have been to avoid clobbering the MCP stdio transport.
+
+### Patch Changes
+
+- Remove local resource handling and vite plugin as overlay feature is not supported ([#924](https://github.com/getsentry/spotlight/pull/924))
+
+- Updated dependencies [[`2fe54bb`](https://github.com/getsentry/spotlight/commit/2fe54bb80cb6736aab4b5a7754e9319c1a5ac2ed), [`20783d0`](https://github.com/getsentry/spotlight/commit/20783d0382644cc5fa866f909b71631e8899795b), [`48c6753`](https://github.com/getsentry/spotlight/commit/48c6753ef4a74ac394cbc503c89dbfc8e71a2707), [`65f4e9f`](https://github.com/getsentry/spotlight/commit/65f4e9f2d3f74b9927f6e614173bf4237991c9b3), [`bb85759`](https://github.com/getsentry/spotlight/commit/bb85759dffa8c426f2c227b0a4d0a4fe24bda722), [`1f2096e`](https://github.com/getsentry/spotlight/commit/1f2096e807507b607ae44df2905ad2f2a1211243), [`cec5457`](https://github.com/getsentry/spotlight/commit/cec5457e2722600fe06367d147b4725db290a5ba), [`5670dd4`](https://github.com/getsentry/spotlight/commit/5670dd43477748e5431e83d66e8ac48d2423d46c), [`605b1e1`](https://github.com/getsentry/spotlight/commit/605b1e171e48cb6368d77c02b98ec73fc2d18b72), [`69bfd17`](https://github.com/getsentry/spotlight/commit/69bfd173a30a422138ef87179da6e25ecabc0423), [`3d56a55`](https://github.com/getsentry/spotlight/commit/3d56a55fdbed418a6b6cc1d85e0ff5a7dc330ce2)]:
+  - @spotlightjs/sidecar@2.0.0
+  - @spotlightjs/overlay@4.0.0
+
 ## 3.0.2
 
 ### Patch Changes
