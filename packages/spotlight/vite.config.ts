@@ -15,7 +15,6 @@ export default defineConfig({
       entry: {
         overlay: resolve(__dirname, "src/overlay.ts"),
         sidecar: resolve(__dirname, "src/sidecar.ts"),
-        "vite-plugin": resolve(__dirname, "src/vite-plugin.ts"),
       },
     },
     rollupOptions: {
