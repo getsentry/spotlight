@@ -43,7 +43,6 @@ export default defineConfig({
         github: "https://github.com/getsentry/spotlight",
       },
       components: {
-        Hero: "./src/components/Hero.astro",
         Header: "./src/components/Header.astro",
         ThemeProvider: "./src/components/ThemeProvider.astro",
       },
