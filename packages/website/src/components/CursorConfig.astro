@@ -1,0 +1,212 @@
+---
+---
+
+<style>
+  .config-container {
+    margin: 3rem 0;
+    scroll-margin-top: 2rem;
+  }
+
+  .config-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    text-align: center;
+  }
+
+  .config-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .config-steps {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .step {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(165, 180, 252, 0.2);
+    border-radius: 8px;
+    padding: 0.875rem 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .step:hover {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(165, 180, 252, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .step-number {
+    display: none;
+  }
+
+  .step-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #a5b4fc;
+  }
+
+  .step-description {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+    font-size: 0.875rem;
+  }
+
+  .config-box {
+    background: #0a0a0a;
+    border: 1px solid rgba(165, 180, 252, 0.3);
+    border-radius: 12px;
+    padding: 1.25rem;
+    position: relative;
+    margin-top: 1.5rem;
+  }
+
+  .config-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .config-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: monospace;
+  }
+
+  .copy-config-btn {
+    background: rgba(165, 180, 252, 0.1);
+    border: 1px solid rgba(165, 180, 252, 0.3);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+  }
+
+  .copy-config-btn:hover {
+    background: rgba(165, 180, 252, 0.2);
+    border-color: rgba(165, 180, 252, 0.5);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .copy-config-btn.copied {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: rgba(34, 197, 94, 0.5);
+    color: rgb(34, 197, 94);
+  }
+
+  .config-content {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #e0e0e0;
+    overflow-x: auto;
+  }
+
+  .json-key {
+    color: #a5b4fc;
+  }
+
+  .json-string {
+    color: #86efac;
+  }
+
+  .json-bracket {
+    color: #94a3b8;
+  }
+
+  .highlight-box {
+    background: linear-gradient(135deg, rgba(165, 180, 252, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+    border: 1px solid rgba(165, 180, 252, 0.3);
+    border-radius: 8px;
+    padding: 0.875rem;
+    margin: 1.5rem 0;
+    text-align: center;
+  }
+
+  .highlight-text {
+    font-size: 1rem;
+    color: #a5b4fc;
+    font-weight: 500;
+  }
+</style>
+
+<div class="config-container" id="cursor-config">
+  <h2 class="config-title">Configure Cursor with Spotlight MCP</h2>
+  <p class="config-subtitle">Set up Spotlight as an MCP server in your Cursor IDE for AI-powered debugging</p>
+
+  <div class="config-steps">
+    <div class="step">
+      <h3 class="step-title">1. Open MCP Settings</h3>
+      <p class="step-description">Press <code>Cmd+Shift+P</code> (Mac) or <code>Ctrl+Shift+P</code> (Windows/Linux) and search for "Open MCP Settings"</p>
+    </div>
+    
+    <div class="step">
+      <h3 class="step-title">2. Add Configuration</h3>
+      <p class="step-description">Copy the configuration below and paste it into your MCP settings file</p>
+    </div>
+  </div>
+
+  <div class="config-box">
+    <div class="config-header">
+      <span class="config-label">~/.cursor/mcp.json</span>
+      <button class="copy-config-btn" id="copy-config">Copy Configuration</button>
+    </div>
+    <pre class="config-content" id="config-content"><span class="json-bracket">{</span>
+  <span class="json-key">"mcpServers"</span>: <span class="json-bracket">{</span>
+    <span class="json-key">"spotlight"</span>: <span class="json-bracket">{</span>
+      <span class="json-key">"command"</span>: <span class="json-string">"npx"</span>,
+      <span class="json-key">"args"</span>: <span class="json-bracket">[</span><span class="json-string">"@spotlightjs/spotlight"</span>, <span class="json-string">"--stdio-mcp"</span><span class="json-bracket">]</span>
+    <span class="json-bracket">}</span>
+  <span class="json-bracket">}</span>
+<span class="json-bracket">}</span></pre>
+  </div>
+
+  <div class="highlight-box">
+    <p class="highlight-text">✨ Once configured, your AI assistant can help debug errors, analyze traces, and inspect logs directly from your local Spotlight data!</p>
+  </div>
+</div>
+
+<script>
+  const copyBtn = document.getElementById('copy-config');
+  const configContent = document.getElementById('config-content');
+  
+  if (copyBtn && configContent) {
+    copyBtn.addEventListener('click', () => {
+      const config = `{
+  "mcpServers": {
+    "spotlight": {
+      "command": "npx",
+      "args": ["@spotlightjs/spotlight", "--stdio-mcp"]
+    }
+  }
+}`;
+      
+      navigator.clipboard.writeText(config).then(() => {
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy Configuration';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+  }
+</script>
