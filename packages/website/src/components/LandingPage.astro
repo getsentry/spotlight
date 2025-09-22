@@ -1,86 +1,107 @@
 ---
-import FeatureCard from './FeatureCard.astro';
-import Section from './Section.astro';
-import Highlight from './Highlight.astro';
-import Spotlight from './Spotlight.astro';
-import Footer from './Footer.astro';
-import DocsCta from './DocsCta.astro';
+import ButtonLink from "./ButtonLink.astro";
+import Footer from "./Footer.astro";
+import GetStarted from "./GetStarted.astro";
+import MCPHero from "./MCPHero.astro";
+import FeatureGrid from "./FeatureGrid.astro";
 ---
 
 <style>
-  img.centered {
-    margin: 0 auto !important;
+  .landing-container {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .section {
+    padding: 2rem 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 2.5rem auto;
+    max-width: 1200px;
+  }
+
+  .tagline {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    margin: 1.5rem auto 2.5rem;
+    max-width: 600px;
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cta-section {
+    text-align: center;
+    padding: 4rem 0 3rem;
+    background: radial-gradient(
+      circle at center,
+      rgba(165, 180, 252, 0.1) 0%,
+      transparent 70%
+    );
+  }
+
+  .cta-title {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .cta-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
   }
 </style>
 
-<Highlight />
+<div class="landing-container">
+  <MCPHero />
 
-<Section title="Your perfect dev companion">
-  <FeatureCard
-    title="Embedded in your frontend"
-    description="Notifies you of errors and other signals as they happen. No more context switching."
-    linkUrl="/architecture/"
-    linkText="How?"
-    reverse
-  >
-    <Spotlight />
-  </FeatureCard>
-</Section>
+  <div class="divider"></div>
 
-<Section title="Works Everywhere">
-  <FeatureCard
-    title="Compatible with Sentry's universal SDKs"
-    description="Take the power of Sentry's telemetry and bring that into your development environment with Errors and Traces in both Frontend and Backend."
-    reverse
-    linkUrl="/integrations/sentry/"
-    linkText="Configure with Sentry"
-  >
-    <img class="block rounded-lg" src="/images/error.png" width="100%" style={{ maxWidth: 'unset' }} />
-  </FeatureCard>
-</Section>
+  <div class="section">
+    <GetStarted />
+  </div>
 
-<Section title="Adapts to your needs">
-  <FeatureCard
-    title="Extendable overlay to support your use cases"
-    description="The powerful overlay and event proxy make it easy to extend Spotlight to other concepts including first-party concerns."
-    linkUrl="/integrations/"
-    linkText="Customize"
-  >
-  <img class="block rounded-lg" src="/images/integrations.png" width="100%" style={{ maxWidth: 'unset' }} />
-  </FeatureCard>
-</Section>
+  <div class="divider"></div>
 
-<DocsCta />
+  <div class="section">
+    <FeatureGrid />
+  </div>
 
-<Footer />
-<script is:inline>
-  (function spotlightGlow() {
-    const host = document.querySelector('#sentry-spotlight-root');
-    const trigger = host?.shadowRoot.querySelector('#spotlight-overlay-trigger');
-    if (!host || !trigger) {
-      setTimeout(spotlightGlow, 500);
-      return;
-    }
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync( `
-      .shadow-pulse {
-        animation: pulse 4s 10;
-      }
-      @keyframes pulse {
-        0% {
-          box-shadow: 0 0 0 0 rgba(0,0,0,0);
-        }
-        40% {
-            box-shadow: 0 0 105px 35px rgba(79, 70, 229, 1);
-        }
-        100% {
-            box-shadow: 0 0 0 0 rgba(0,0,0,0);
-        }
-    `)
-    host.shadowRoot.adoptedStyleSheets.push(sheet);
-    Spotlight.onOpen(() => {
-      trigger.classList.remove('shadow-pulse');
-    });
-    trigger.classList.add('shadow-pulse');
-  })();
-</script>
+  <div class="cta-section">
+    <h2 class="cta-title">Ready to debug like a pro?</h2>
+    <p class="cta-subtitle">
+      Join developers using Spotlight to fix bugs faster
+    </p>
+    <div
+      style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;"
+    >
+      <ButtonLink href="/about/" variant="primary" size="large">
+        Learn More
+      </ButtonLink>
+      <ButtonLink
+        href="https://github.com/getsentry/spotlight"
+        variant="secondary"
+        size="large"
+      >
+        View on GitHub
+      </ButtonLink>
+    </div>
+  </div>
+
+  <Footer />
+</div>

@@ -1,4 +1,5 @@
 ---
+
 ---
 
 <style>
@@ -42,10 +43,11 @@
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    margin: 0 !important;
   }
 
   .feature-card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -132,36 +134,64 @@
 
 <div class="features-container" id="features">
   <h2 class="features-title">Powerful Features for Local Debugging</h2>
-  <p class="features-subtitle">Everything you need to debug faster and ship with confidence</p>
+  <p class="features-subtitle">
+    Everything you need to debug faster and ship with confidence
+  </p>
 
   <div class="features-grid">
     <!-- Real-time Error Tracking -->
     <div class="feature-card">
-      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+      <svg
+        class="feature-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+        ></path>
         <line x1="12" y1="9" x2="12" y2="13"></line>
         <line x1="12" y1="17" x2="12.01" y2="17"></line>
       </svg>
       <h3 class="feature-title">Real-time Error Tracking</h3>
       <p class="feature-description">
-        Catch errors as they happen with instant notifications in your browser. 
+        Catch errors as they happen with instant notifications in your browser.
         No need to check logs or refresh pages.
       </p>
       <ul class="feature-highlights">
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           Stack traces with source maps
         </li>
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           Browser and device context
         </li>
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           User actions breadcrumbs
@@ -171,29 +201,53 @@
 
     <!-- Performance Monitoring -->
     <div class="feature-card">
-      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        class="feature-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
       </svg>
       <h3 class="feature-title">Performance Tracing</h3>
       <p class="feature-description">
-        Visualize the complete flow of your application with distributed tracing 
+        Visualize the complete flow of your application with distributed tracing
         across frontend and backend.
       </p>
       <ul class="feature-highlights">
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           Database query timing
         </li>
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           API request waterfall
         </li>
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           Component render times
@@ -203,30 +257,54 @@
 
     <!-- Console & Logs -->
     <div class="feature-card">
-      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        class="feature-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <polyline points="4 17 10 11 4 5"></polyline>
         <line x1="12" y1="19" x2="20" y2="19"></line>
       </svg>
       <h3 class="feature-title">Unified Console & Logs</h3>
       <p class="feature-description">
-        Capture console logs, warnings, and errors alongside your application events 
-        for complete debugging context.
+        Capture console logs, warnings, and errors alongside your application
+        events for complete debugging context.
       </p>
       <ul class="feature-highlights">
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           Console.log integration
         </li>
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           Network request logs
         </li>
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           Custom debug messages
@@ -236,38 +314,62 @@
 
     <!-- AI-Powered Debugging -->
     <div class="feature-card">
-      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+      <svg
+        class="feature-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+        ></path>
         <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
         <line x1="12" y1="22.08" x2="12" y2="12"></line>
       </svg>
       <h3 class="feature-title">AI-Assisted Debugging</h3>
       <p class="feature-description">
-        Connect Spotlight to your AI coding assistant through MCP for intelligent 
-        error analysis and fix suggestions.
+        Connect Spotlight to your AI coding assistant through MCP for
+        intelligent error analysis and fix suggestions.
       </p>
       <ul class="feature-highlights">
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           MCP server integration
         </li>
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           Cursor IDE support
         </li>
         <li class="feature-highlight">
-          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <svg
+            class="check-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          >
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           Automated root cause analysis
         </li>
       </ul>
     </div>
-
-
   </div>
 </div>
