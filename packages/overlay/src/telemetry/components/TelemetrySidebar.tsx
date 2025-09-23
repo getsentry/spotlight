@@ -10,7 +10,6 @@ interface TelemetrySidebarProps {
   errorCount: number;
   traceCount: number;
   isOnline: boolean;
-  showClearEventsButton: boolean;
 }
 
 function NavigationLink({
@@ -41,12 +40,7 @@ function NavigationLink({
   );
 }
 
-export default function TelemetrySidebar({
-  errorCount,
-  traceCount,
-  isOnline,
-  showClearEventsButton,
-}: TelemetrySidebarProps) {
+export default function TelemetrySidebar({ errorCount, traceCount, isOnline }: TelemetrySidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -160,16 +154,14 @@ export default function TelemetrySidebar({
         </div>
 
         {/* Clear Events Button */}
-        {showClearEventsButton && (
-          <button
-            className="bg-primary-800 text-primary-100 hover:bg-primary-700 mb-3 flex w-full items-center gap-2 rounded-md px-3 py-2 transition-colors"
-            type="button"
-            onClick={clearEvents}
-          >
-            <DeleteIcon width={16} height={16} className="fill-red-400 stroke-red-400" />
-            <span className="text-sm">Clear Events</span>
-          </button>
-        )}
+        <button
+          className="bg-primary-800 text-primary-100 hover:bg-primary-700 mb-3 flex w-full items-center gap-2 rounded-md px-3 py-2 transition-colors"
+          type="button"
+          onClick={clearEvents}
+        >
+          <DeleteIcon width={16} height={16} className="fill-red-400 stroke-red-400" />
+          <span className="text-sm">Clear Events</span>
+        </button>
 
         {/* Connection Status */}
         <div className={cn("flex items-center gap-x-2 text-xs", isOnline ? "" : "text-red-400")}>

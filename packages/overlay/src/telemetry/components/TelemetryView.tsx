@@ -12,11 +12,9 @@ import TelemetrySidebar from "./TelemetrySidebar";
 
 export default function TelemetryView({
   isOnline,
-  showClearEventsButton,
   contextId,
 }: {
   isOnline: boolean;
-  showClearEventsButton: boolean;
   contextId: string;
 }) {
   const location = useLocation();
@@ -40,12 +38,7 @@ export default function TelemetryView({
 
   return (
     <div className="spotlight-debugger from-primary-900 to-primary-950 flex h-full overflow-hidden bg-gradient-to-br from-0% to-20% font-sans text-white">
-      <TelemetrySidebar
-        errorCount={errorCount}
-        traceCount={traceCount}
-        isOnline={isOnline}
-        showClearEventsButton={showClearEventsButton}
-      />
+      <TelemetrySidebar errorCount={errorCount} traceCount={traceCount} isOnline={isOnline} />
       <div className="flex-1 overflow-auto">
         <Routes>
           <Route path="not-found" element={<p>Not Found - How'd you manage to get here?</p>} key="not-found" />

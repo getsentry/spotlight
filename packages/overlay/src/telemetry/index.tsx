@@ -29,14 +29,13 @@ export function processEnvelope(rawEvent: string | Envelope) {
 
 type TelemetryRouteProps = {
   sidecarUrl: string;
-  showClearEventsButton: boolean;
 };
 
 type EventData = { contentType: string; data: string };
 
 const SENTRY_CONTENT_TYPE = "application/x-sentry-envelope";
 
-export function Telemetry({ sidecarUrl, showClearEventsButton }: TelemetryRouteProps) {
+export function Telemetry({ sidecarUrl }: TelemetryRouteProps) {
   const [sentryEvents, setSentryEvents] = useState<Envelope[]>([]);
   const [isOnline, setOnline] = useState(false);
 
@@ -130,5 +129,5 @@ export function Telemetry({ sidecarUrl, showClearEventsButton }: TelemetryRouteP
     };
   }, [spotlightEventTarget, clearEvents, onEvent]);
 
-  return <TelemetryView isOnline={isOnline} showClearEventsButton={showClearEventsButton} contextId={contextId} />;
+  return <TelemetryView isOnline={isOnline} contextId={contextId} />;
 }
