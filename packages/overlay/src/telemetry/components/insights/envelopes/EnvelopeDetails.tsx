@@ -4,6 +4,7 @@ import { ReactComponent as Download } from "~/assets/download.svg";
 import { useSpotlightContext } from "~/lib/useSpotlightContext";
 import JsonViewer from "~/telemetry/components/shared/JsonViewer";
 import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
+import Attachment from "./Attachment";
 
 export default function EnvelopeDetails({ envelope }: { envelope: Envelope }) {
   const [showRawJSON, setShowRawJSON] = useState<boolean>(false);
@@ -62,9 +63,15 @@ export default function EnvelopeDetails({ envelope }: { envelope: Envelope }) {
 
           <div className="flex flex-col gap-2">
             <h2 className="mb-2 text-xl font-semibold">Items</h2>
-            {items.map((item, ind) => (
-              <JsonViewer key={`${ind}-${item[0]?.type}`} data={item} />
-            ))}
+            {items.map((item, ind) => {
+              if (item[0].type === "attachment") {
+                // @ts-expect-error -- we are going to fix the types for attachments later
+                const data = item[1].data as string;
+                return <Attachment key={`${ind}-${item[0]?.type}`} header={item[0]} attachment={data} />;
+              }
+
+              return <JsonViewer key={`${ind}-${item[0]?.type}`} data={item} />;
+            })}
           </div>
         </div>
       )}

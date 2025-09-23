@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "tsx --watch ./server.ts",
-    "dev": "tsdown --watch",
+    "dev": "tsx --watch ./server.ts",
     "build": "tsdown",
     "clean": "rimraf dist",
     "sample": "node _fixtures/send_to_sidecar.cjs",

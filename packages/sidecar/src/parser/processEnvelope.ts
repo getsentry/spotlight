@@ -37,11 +37,16 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
 
     let itemPayload: EnvelopeItem[1];
     try {
-      itemPayload = parseJSONFromBuffer(itemPayloadRaw);
-      // data sanitization
-      if (itemHeader.type) {
-        // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
-        itemPayload.type = itemHeader.type;
+      if (itemHeader.type === "attachment") {
+        const rawPayload = itemPayloadRaw as Buffer;
+        itemPayload = { data: rawPayload.toString(itemHeader.content_type === "text/plain" ? "utf-8" : "base64") };
+      } else {
+        itemPayload = parseJSONFromBuffer(itemPayloadRaw);
+        // data sanitization
+        if (itemHeader.type) {
+          // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
+          itemPayload.type = itemHeader.type;
+        }
       }
     } catch (err) {
       itemPayload = itemPayloadRaw;
