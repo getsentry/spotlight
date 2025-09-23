@@ -65,7 +65,7 @@ export default function EnvelopeDetails({ envelope }: { envelope: Envelope }) {
             <h2 className="mb-2 text-xl font-semibold">Items</h2>
             {items.map((item, ind) => {
               if (item[0].type === "attachment") {
-                return <Attachment key={`${ind}-${item[0]?.type}`} header={item[0]} attachment={item[1].data} />;
+                return <Attachment key={`${ind}-${item[0]?.type}`} header={item[0]} attachment={item[1]} />;
               }
 
               return <JsonViewer key={`${ind}-${item[0]?.type}`} data={item} />;
