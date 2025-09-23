@@ -9,7 +9,7 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
     );
   }
 
-  const src = `data:${header.content_type};base64,${atob(attachment)}`;
+  const src = `data:${header.content_type};base64,${attachment}`;
 
   return <img src={src} alt="Attachment" className="w-full h-full object-contain" />;
 }
