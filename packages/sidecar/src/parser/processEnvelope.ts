@@ -38,11 +38,8 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
     let itemPayload: EnvelopeItem[1];
     try {
       if (itemHeader.type === "attachment") {
-        if (itemHeader.content_type === "text/plain") {
-          itemPayload = { data: (itemPayloadRaw as Buffer).toString() };
-        } else {
-          itemPayload = { data: (itemPayloadRaw as Buffer).toString("base64") };
-        }
+        const rawPayload = itemPayloadRaw as Buffer;
+        itemPayload = { data: rawPayload.toString(itemHeader.content_type === "text/plain" ? "utf-8" : "base64") };
       } else {
         itemPayload = parseJSONFromBuffer(itemPayloadRaw);
         // data sanitization
