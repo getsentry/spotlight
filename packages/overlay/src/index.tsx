@@ -32,7 +32,6 @@ export async function onSevereEvent(cb: (count: number) => void) {
 
 export type SpotlightInitOptions = {
   sidecarUrl?: string;
-  showClearEventsButton?: boolean;
   debug?: boolean;
 };
 
@@ -47,11 +46,7 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
     return;
   }
 
-  const {
-    sidecarUrl = DEFAULT_SIDECAR_STREAM_URL,
-    showClearEventsButton = true,
-    debug = document.location.hash.endsWith("debug"),
-  } = initOptions;
+  const { sidecarUrl = DEFAULT_SIDECAR_STREAM_URL, debug = document.location.hash.endsWith("debug") } = initOptions;
 
   if (debug) {
     activateLogger();
@@ -86,7 +81,7 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
     ReactDOM.createRoot(appRoot).render(
       <Router>
         <SpotlightContextProvider context={context}>
-          <App sidecarUrl={sidecarUrl} showClearEventsButton={showClearEventsButton} />
+          <App sidecarUrl={sidecarUrl} />
         </SpotlightContextProvider>
       </Router>,
     );

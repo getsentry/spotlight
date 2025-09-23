@@ -19,9 +19,7 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
 });
 
-Spotlight.init({
-  showClearEventsButton: false,
-});
+Spotlight.init();
 
 Spotlight.onSevereEvent(count => {
   window.electronAPI.setBadgeCount(count);
