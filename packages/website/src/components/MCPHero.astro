@@ -1,4 +1,5 @@
 ---
+
 ---
 
 <style>
@@ -35,7 +36,7 @@
     border-radius: 8px;
     padding: 0.75rem 1rem;
     padding-right: 3.5rem;
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", monospace;
     font-size: 0.95rem;
     color: #a5b4fc;
     position: relative;
@@ -118,7 +119,8 @@
   }
 
   @keyframes pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -176,18 +178,15 @@
     background: rgba(165, 180, 252, 0.1);
     border-color: rgba(165, 180, 252, 0.2);
   }
-
 </style>
 
 <div class="hero-container">
-  <h1 class="hero-title">
-    Debug locally with the power of Sentry
-  </h1>
-      
-  <p class="tagline">
-    Spotlight brings the power of Sentry into your local development environment. 
-    Debug faster with real-time error tracking, traces, and logs—right where you code.
-  </p>
+  <img
+    src="images/spotlight.png"
+    alt="Spotlight in action"
+    class="hero-image"
+    style="width: 100%; height: auto; margin-bottom: 1.5rem;"
+  />
 
   <div class="command-box" id="mcp-command">
     <span class="terminal-prompt">$</span>
@@ -205,27 +204,27 @@
 </div>
 
 <script>
-  const copyBtn = document.getElementById('copy-btn');
-  const commandBox = document.getElementById('mcp-command');
-  
+  const copyBtn = document.getElementById("copy-btn");
+  const commandBox = document.getElementById("mcp-command");
+
   if (copyBtn && commandBox) {
     const copyCommand = () => {
-      const commandText = 'npx @spotlightjs/spotlight --stdio-mcp';
+      const commandText = "npx @spotlightjs/spotlight --stdio-mcp";
       navigator.clipboard.writeText(commandText).then(() => {
-        copyBtn.textContent = 'Copied!';
-        copyBtn.classList.add('copied');
+        copyBtn.textContent = "Copied!";
+        copyBtn.classList.add("copied");
         setTimeout(() => {
-          copyBtn.textContent = 'Copy';
-          copyBtn.classList.remove('copied');
+          copyBtn.textContent = "Copy";
+          copyBtn.classList.remove("copied");
         }, 2000);
       });
     };
 
-    copyBtn.addEventListener('click', (e) => {
+    copyBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       copyCommand();
     });
 
-    commandBox.addEventListener('click', copyCommand);
+    commandBox.addEventListener("click", copyCommand);
   }
 </script>
