@@ -4,19 +4,15 @@ import { Telemetry } from "./telemetry";
 
 type AppProps = {
   sidecarUrl: string;
-  showClearEventsButton?: boolean;
 };
 
-export default function App({ sidecarUrl, showClearEventsButton = true }: AppProps) {
+export default function App({ sidecarUrl }: AppProps) {
   return (
     <Routes>
       {/* Default route redirects to telemetry */}
       <Route path="/" element={<Navigate to="/telemetry" replace />} />
 
-      <Route
-        path="/telemetry/*"
-        element={<Telemetry sidecarUrl={sidecarUrl} showClearEventsButton={showClearEventsButton} />}
-      />
+      <Route path="/telemetry/*" element={<Telemetry sidecarUrl={sidecarUrl} />} />
     </Routes>
   );
 }
