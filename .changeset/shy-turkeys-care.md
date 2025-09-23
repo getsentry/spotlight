@@ -1,6 +1,6 @@
 ---
-"@spotlightjs/overlay": patch
-"@spotlightjs/sidecar": patch
+"@spotlightjs/overlay": minor
+"@spotlightjs/sidecar": minor
 ---
 
 Added support for processing attachments
