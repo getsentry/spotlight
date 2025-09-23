@@ -1,0 +1,273 @@
+---
+---
+
+<style>
+  .features-container {
+    margin: 3rem 0;
+    scroll-margin-top: 2rem;
+  }
+
+  .features-title {
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.75rem;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .features-subtitle {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(165, 180, 252, 0.15);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #a5b4fc, transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .feature-card:hover {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(165, 180, 252, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .feature-card:hover::before {
+    opacity: 1;
+  }
+
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: rgba(165, 180, 252, 0.1);
+    border-radius: 10px;
+    color: #a5b4fc;
+  }
+
+  .feature-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+
+  .feature-description {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .feature-highlights {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .feature-highlight {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.825rem;
+  }
+
+  .check-icon {
+    width: 16px;
+    height: 16px;
+    color: #86efac;
+    flex-shrink: 0;
+  }
+
+  .integration-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+
+  .badge {
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+</style>
+
+<div class="features-container" id="features">
+  <h2 class="features-title">Powerful Features for Local Debugging</h2>
+  <p class="features-subtitle">Everything you need to debug faster and ship with confidence</p>
+
+  <div class="features-grid">
+    <!-- Real-time Error Tracking -->
+    <div class="feature-card">
+      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+      <h3 class="feature-title">Real-time Error Tracking</h3>
+      <p class="feature-description">
+        Catch errors as they happen with instant notifications in your browser. 
+        No need to check logs or refresh pages.
+      </p>
+      <ul class="feature-highlights">
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Stack traces with source maps
+        </li>
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Browser and device context
+        </li>
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          User actions breadcrumbs
+        </li>
+      </ul>
+    </div>
+
+    <!-- Performance Monitoring -->
+    <div class="feature-card">
+      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+      </svg>
+      <h3 class="feature-title">Performance Tracing</h3>
+      <p class="feature-description">
+        Visualize the complete flow of your application with distributed tracing 
+        across frontend and backend.
+      </p>
+      <ul class="feature-highlights">
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Database query timing
+        </li>
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          API request waterfall
+        </li>
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Component render times
+        </li>
+      </ul>
+    </div>
+
+    <!-- Console & Logs -->
+    <div class="feature-card">
+      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="4 17 10 11 4 5"></polyline>
+        <line x1="12" y1="19" x2="20" y2="19"></line>
+      </svg>
+      <h3 class="feature-title">Unified Console & Logs</h3>
+      <p class="feature-description">
+        Capture console logs, warnings, and errors alongside your application events 
+        for complete debugging context.
+      </p>
+      <ul class="feature-highlights">
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Console.log integration
+        </li>
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Network request logs
+        </li>
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Custom debug messages
+        </li>
+      </ul>
+    </div>
+
+    <!-- AI-Powered Debugging -->
+    <div class="feature-card">
+      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+      </svg>
+      <h3 class="feature-title">AI-Assisted Debugging</h3>
+      <p class="feature-description">
+        Connect Spotlight to your AI coding assistant through MCP for intelligent 
+        error analysis and fix suggestions.
+      </p>
+      <ul class="feature-highlights">
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          MCP server integration
+        </li>
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Cursor IDE support
+        </li>
+        <li class="feature-highlight">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Automated root cause analysis
+        </li>
+      </ul>
+    </div>
+
+
+  </div>
+</div>
