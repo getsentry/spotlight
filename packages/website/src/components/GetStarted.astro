@@ -1,4 +1,5 @@
 ---
+
 ---
 
 <style>
@@ -99,10 +100,6 @@
     line-height: 1.5;
   }
 
-  .steps-container {
-    margin-top: 2rem;
-  }
-
   .step-card {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 12px;
@@ -129,7 +126,11 @@
     justify-content: center;
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, rgba(165, 180, 252, 0.3) 0%, rgba(147, 51, 234, 0.3) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(165, 180, 252, 0.3) 0%,
+      rgba(147, 51, 234, 0.3) 100%
+    );
     border-radius: 50%;
     font-weight: 700;
     color: #fff;
@@ -139,6 +140,7 @@
     font-size: 1.125rem;
     font-weight: 600;
     color: #fff;
+    margin: 0 !important;
   }
 
   .step-content {
@@ -153,7 +155,7 @@
     border-radius: 8px;
     padding: 1rem;
     margin: 1rem 0;
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", monospace;
     font-size: 0.9rem;
     overflow-x: auto;
   }
@@ -187,14 +189,15 @@
   }
 
   .pro-tip {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(34, 197, 94, 0.1) 0%,
+      rgba(16, 185, 129, 0.1) 100%
+    );
     border: 1px solid rgba(34, 197, 94, 0.3);
     border-radius: 8px;
     padding: 0.875rem;
     margin-top: 1.5rem;
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-start;
   }
 
   .pro-tip-icon {
@@ -208,18 +211,20 @@
   .pro-tip-content {
     color: rgba(255, 255, 255, 0.9);
     line-height: 1.5;
+    margin: 1rem;
+  }
+  .pro-tip-list {
+    padding-left: 3rem;
+    list-style-type: decimal;
   }
 </style>
 
 <div class="get-started-container" id="get-started">
   <h2 class="section-title">Get Started with Spotlight</h2>
-  
+
   <div class="two-column">
-    
-    
     <!-- Quick Start Column -->
     <div class="column">
-    
       <div class="steps-container">
         <div class="step-card">
           <div class="step-header">
@@ -227,7 +232,13 @@
             <h4 class="step-title">Install a Sentry SDK</h4>
           </div>
           <div class="step-content">
-            <p>If you don't have one already, install a Sentry SDK for your framework.</p>
+            <p>
+              If you don't have one already, <a
+                href="https://docs.sentry.io/platforms/"
+                target="_blank">install a Sentry SDK for your framework</a
+              >.
+            </p>
+          </div>
         </div>
 
         <div class="step-card">
@@ -236,54 +247,65 @@
             <h4 class="step-title">Configure Sentry.init()</h4>
           </div>
           <div class="step-content">
-            <p>Add Spotlight to your Sentry configuration:</p>
-            <div class="code-snippet">
-              <span class="code-function">Sentry.init</span>({'{'}<br>
-              &nbsp;&nbsp;<span class="code-key">dsn</span>: <span class="code-value">"your-dsn"</span>,<br>
-              &nbsp;&nbsp;<span class="code-key">spotlight</span>: <span class="code-value">true</span>, <span class="code-comment">// Enable Spotlight</span><br>
-              &nbsp;&nbsp;<span class="code-key">integrations</span>: [<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">// For frontend apps, add:</span><br>
-              &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-function">Sentry.browserApiErrorsIntegration</span>(),<br>
-              &nbsp;&nbsp;],<br>
-              {'}'});
-            </div>
-            <p style="margin-top: 1rem;">
-              For frontend frameworks, consider adding the 
-              <a href="/reference/console/" class="link">Console Integration</a> 
-              to capture console logs.
+            <p>
+              Add Spotlight to your Sentry configuration and enable all the
+              features:
             </p>
-          </div>
-        </div>
-
-        <div class="step-card">
-          <div class="step-header">
-            <div class="step-number">3</div>
-            <h4 class="step-title">Enable Logging</h4>
-          </div>
-          <div class="step-content">
-            <p>To get the most out of Spotlight, enable logging in your SDK:</p>
             <div class="code-snippet">
-              <span class="code-function">Sentry.init</span>({'{'}<br>
-              &nbsp;&nbsp;<span class="code-comment">// ... other config</span><br>
-              &nbsp;&nbsp;<span class="code-key">tracesSampleRate</span>: <span class="code-value">1.0</span>, <span class="code-comment">// Capture all traces in dev</span><br>
-              &nbsp;&nbsp;<span class="code-key">debug</span>: <span class="code-value">true</span>, <span class="code-comment">// Enable debug mode</span><br>
-              {'}'});
+              <span class="code-function">Sentry.init</span>({"{"}<br />
+              &nbsp;&nbsp;<span class="code-comment"
+                >// your existing config</span
+              ><br />
+              &nbsp;&nbsp;...(process.env.NODE_ENV !== "production" ? {"{"}<br
+              />
+              &nbsp;&nbsp;<span class="code-key">spotlight</span>: <span
+                class="code-value">true</span
+              >, <span class="code-comment">// Enable Spotlight</span><br />
+              &nbsp;&nbsp;<span class="code-key">sampleRate</span>: <span
+                class="code-value">1.0</span
+              >, <span class="code-comment">// Capture all errors in dev</span
+              ><br />
+              &nbsp;&nbsp;<span class="code-key">tracesSampleRate</span>: <span
+                class="code-value">1.0</span
+              >, <span class="code-comment">// Capture all traces in dev</span
+              ><br />
+              &nbsp;&nbsp;<span class="code-key">enableLogs</span>: <span
+                class="code-value">true</span
+              >,<br />
+              &nbsp;&nbsp;<span class="code-key">integrations</span>: [<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-function"
+                >Sentry.consoleLoggingIntegration</span
+              >({"{"}
+              <span class="code-key">levels</span>: ["log", "warn", "error"] {
+                "}"
+              }),<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"
+                >// For frontend apps, add:</span
+              ><br />
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-function"
+                >Sentry.spotlightBrowserIntegration</span
+              >(),<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-function"
+                >Sentry.browserTracingIntegration</span
+              >(),<br />
+              &nbsp;&nbsp;],<br />
+              {"}"} : {"{"}{"}"}));
             </div>
-            <p style="margin-top: 1rem;">
-              Learn more about 
-              <a href="/reference/sentry/#enabling-logs" class="link">enabling logs in your SDK</a>.
-            </p>
+            <div class="pro-tip">
+              <h4 class="step-title">
+                <span class="pro-tip-icon">❓</span> Other languages
+              </h4>
+              <p class="pro-tip-content">
+                This is for JS/TS but the logic is similar for other languages:<br
+                />
+                <ol class="pro-tip-list">
+                  <li>Set spotlight to true</li>
+                  <li>Enable all features, especially logging</li>
+                  <li>Make sure these are only done for development</li>
+                </ol>
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <div class="pro-tip">
-        <svg class="pro-tip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-        </svg>
-        <div class="pro-tip-content">
-          <strong>Pro Tip:</strong> Spotlight runs automatically when you use <code>npx @spotlightjs/spotlight --stdio-mcp</code>. 
-          The overlay will appear in your browser when errors or traces are captured!
         </div>
       </div>
     </div>

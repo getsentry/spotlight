@@ -6,7 +6,7 @@
   .hero-container {
     min-height: 45vh;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     padding: 2.5rem 2rem;
@@ -35,7 +35,6 @@
     border: 1px solid rgba(165, 180, 252, 0.3);
     border-radius: 8px;
     padding: 0.75rem 1rem;
-    padding-right: 3.5rem;
     font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", monospace;
     font-size: 0.95rem;
     color: #a5b4fc;
@@ -45,7 +44,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    margin: 1.5em 0.5em !important;
   }
 
   .command-box:hover {
@@ -61,9 +60,6 @@
   }
 
   .copy-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
     right: 0.5rem;
     background: rgba(165, 180, 252, 0.1);
     border: 1px solid rgba(165, 180, 252, 0.3);
@@ -74,6 +70,7 @@
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.7rem;
     white-space: nowrap;
+    align: right;
   }
 
   .copy-button:hover {
@@ -144,6 +141,7 @@
 
   .toc-section {
     margin-top: 0;
+    flex-basis: 100%;
   }
 
   .toc-title {
@@ -181,6 +179,24 @@
 </style>
 
 <div class="hero-container">
+  <div class="command-box">
+    <a
+      href="cursor://anysphere.cursor-deeplink/mcp/install?name=Sentry%20Spotlight&config=eyJjb21tYW5kIjoibnB4IC15IEBzcG90bGlnaHRqcy9zcG90bGlnaHQgLS1zdGRpbi1tY3AifQ%3D%3D"
+      ><img
+        src="https://cursor.com/deeplink/mcp-install-dark.svg"
+        alt="Add Sentry Spotlight MCP server to Cursor"
+        height="32"
+      /></a
+    >
+  </div>
+  <div class="command-box">
+    <span class="terminal-prompt">$</span>
+    <span class="command-text"
+      >claude mcp add sentry-spotlight -- npx -y @spotlightjs/spotlight
+      --stdio-mcp</span
+    >
+    <button class="copy-button" type="button">Copy</button>
+  </div>
   <img
     src="images/spotlight.png"
     alt="Spotlight in action"
@@ -188,43 +204,40 @@
     style="width: 100%; height: auto; margin-bottom: 1.5rem;"
   />
 
-  <div class="command-box" id="mcp-command">
+  <div class="command-box">
     <span class="terminal-prompt">$</span>
-    <span class="command-text">npx @spotlightjs/spotlight --stdio-mcp</span>
-    <button class="copy-button" id="copy-btn">Copy</button>
+    <span class="command-text">npx -y @spotlightjs/spotlight</span>
+    <button class="copy-button" type="button">Copy</button>
   </div>
 
   <div class="toc-section">
     <nav class="toc-links">
-      <a href="#cursor-config" class="toc-link">Configure Cursor</a>
       <a href="#get-started" class="toc-link">Get Started</a>
       <a href="#features" class="toc-link">Features</a>
     </nav>
   </div>
+
+  <script>
+    const commandBoxes = document.querySelectorAll(".command-box");
+
+    for (const commandBox of commandBoxes) {
+      const commandText =
+        commandBox.querySelector(".command-text")?.textContent;
+      const copyBtn = commandText && commandBox.querySelector(".copy-button");
+      if (copyBtn) {
+        const handler = (e) => {
+          e.stopPropagation();
+          navigator.clipboard.writeText(commandText).then(() => {
+            copyBtn.textContent = "Copied!";
+            copyBtn.classList.add("copied");
+            setTimeout(() => {
+              copyBtn.textContent = "Copy";
+              copyBtn.classList.remove("copied");
+            }, 2000);
+          });
+        };
+        commandBox.addEventListener("click", handler);
+      }
+    }
+  </script>
 </div>
-
-<script>
-  const copyBtn = document.getElementById("copy-btn");
-  const commandBox = document.getElementById("mcp-command");
-
-  if (copyBtn && commandBox) {
-    const copyCommand = () => {
-      const commandText = "npx @spotlightjs/spotlight --stdio-mcp";
-      navigator.clipboard.writeText(commandText).then(() => {
-        copyBtn.textContent = "Copied!";
-        copyBtn.classList.add("copied");
-        setTimeout(() => {
-          copyBtn.textContent = "Copy";
-          copyBtn.classList.remove("copied");
-        }, 2000);
-      });
-    };
-
-    copyBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      copyCommand();
-    });
-
-    commandBox.addEventListener("click", copyCommand);
-  }
-</script>
