@@ -42,7 +42,9 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
     for (const [itemHeader, itemData] of items) {
       if (SUPPORTED_EVENT_TYPES.has(itemHeader.type)) {
         const item = itemData as SentryEvent;
-        item.platform = sdkToPlatform(sdk.name);
+        if (itemHeader.type !== "attachment") {
+          item.platform = sdkToPlatform(sdk.name);
+        }
         if (traceContext) {
           if (!item.contexts) {
             item.contexts = {};

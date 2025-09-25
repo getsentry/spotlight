@@ -9,6 +9,8 @@ export type ParsedEnvelope = {
   rawEvent: RawEventContext;
 };
 
+const TEXT_CONTENT_TYPES = new Set(["text/plain", "application/json"]);
+
 /**
  * Implements parser for
  * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
@@ -49,14 +51,13 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
           itemHeader.content_type = "text/plain";
         }
         itemPayload = {
-          data: rawPayload.toString(itemHeader.content_type === "text/plain" ? "utf-8" : "base64"),
+          data: rawPayload.toString(TEXT_CONTENT_TYPES.has(itemHeader.content_type as string) ? "utf-8" : "base64"),
         };
       } else {
         itemPayload = parseJSONFromBuffer(itemPayloadRaw);
         if (!itemPayload) {
           logger.error(itemHeader);
-        }
-        if (itemHeader.type && itemPayload) {
+        } else if (itemHeader.type) {
           // data sanitization
           // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
           itemPayload.type = itemHeader.type;
