@@ -17,7 +17,7 @@ const TEXT_CONTENT_TYPES = new Set(["text/plain", "application/json"]);
  * @param rawEvent Envelope data
  * @returns parsed envelope
  */
-export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
+export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope | null {
   let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
 
   function readLine(length?: number) {
@@ -28,6 +28,10 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
   }
 
   const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
+  if (!envelopeHeader) {
+    logger.error("Malformed envelope header, skipping...");
+    return null;
+  }
 
   const envelopeId = uuidv7();
   envelopeHeader.__spotlight_envelope_id = envelopeId;
