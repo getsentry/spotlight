@@ -194,7 +194,10 @@
   </div>
   <div class="command-box">
     <span class="terminal-prompt">$</span>
-    <span class="command-text">claude mcp add sentry-spotlight -- npx -y @spotlightjs/spotlight --stdio-mcp</span>
+    <span class="command-text"
+      >claude mcp add sentry-spotlight -- npx -y @spotlightjs/spotlight
+      --stdio-mcp</span
+    >
     <button class="copy-button" type="button">Copy</button>
   </div>
   <img
@@ -221,8 +224,10 @@
     const commandBoxes = document.querySelectorAll(".command-box");
 
     for (const commandBox of commandBoxes) {
-      const commandText =
-        commandBox.querySelector(".command-text")?.textContent;
+      const commandText = commandBox
+        .querySelector(".command-text")
+        ?.textContent.replace(/\r?\n */g, " ")
+        .trim();
       const copyBtn = commandText && commandBox.querySelector(".copy-button");
       if (copyBtn) {
         const handler = (e) => {
