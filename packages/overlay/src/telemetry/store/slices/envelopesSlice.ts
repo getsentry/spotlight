@@ -4,6 +4,7 @@ import { SUPPORTED_EVENT_TYPES } from "../../constants/sentry";
 import type { Sdk, SentryEvent } from "../../types";
 import { sdkToPlatform } from "../../utils/sdkToPlatform";
 import type { EnvelopesSliceActions, EnvelopesSliceState, SentryStore } from "../types";
+import { RAW_TYPES } from "@spotlightjs/sidecar/constants";
 
 const initialEnvelopesState: EnvelopesSliceState = {
   envelopes: new Map(),
@@ -42,7 +43,9 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
     for (const [itemHeader, itemData] of items) {
       if (SUPPORTED_EVENT_TYPES.has(itemHeader.type)) {
         const item = itemData as SentryEvent;
-        item.platform = sdkToPlatform(sdk.name);
+        if (!RAW_TYPES.has(itemHeader.type)) {
+          item.platform = sdkToPlatform(sdk.name);
+        }
         if (traceContext) {
           if (!item.contexts) {
             item.contexts = {};

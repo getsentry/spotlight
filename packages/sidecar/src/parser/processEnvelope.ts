@@ -1,3 +1,4 @@
+import { RAW_TYPES } from "~/constants.js";
 import type { Envelope, EnvelopeItem } from "@sentry/core";
 import { uuidv7 } from "uuidv7";
 import { logger } from "~/logger.js";
@@ -8,13 +9,15 @@ export type ParsedEnvelope = {
   rawEvent: RawEventContext;
 };
 
+const TEXT_CONTENT_TYPES = new Set(["text/plain", "application/json"]);
+
 /**
  * Implements parser for
  * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
  * @param rawEvent Envelope data
  * @returns parsed envelope
  */
-export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
+export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope | null {
   let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
 
   function readLine(length?: number) {
@@ -25,6 +28,10 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
   }
 
   const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
+  if (!envelopeHeader) {
+    logger.error("Malformed envelope header, skipping...");
+    return null;
+  }
 
   const envelopeId = uuidv7();
   envelopeHeader.__spotlight_envelope_id = envelopeId;
@@ -37,13 +44,25 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
 
     let itemPayload: EnvelopeItem[1];
     try {
-      if (itemHeader.type === "attachment") {
+      if (RAW_TYPES.has(itemHeader.type)) {
         const rawPayload = itemPayloadRaw as Buffer;
-        itemPayload = { data: rawPayload.toString(itemHeader.content_type === "text/plain" ? "utf-8" : "base64") };
+        if (
+          !itemHeader.content_type &&
+          // @ts-expect-error -- statsd is an old and deprecated event type but have envelopes for that
+          itemHeader.type === "statsd"
+        ) {
+          // @ts-expect-error -- same as above
+          itemHeader.content_type = "text/plain";
+        }
+        itemPayload = {
+          data: rawPayload.toString(TEXT_CONTENT_TYPES.has(itemHeader.content_type as string) ? "utf-8" : "base64"),
+        };
       } else {
         itemPayload = parseJSONFromBuffer(itemPayloadRaw);
-        // data sanitization
-        if (itemHeader.type) {
+        if (!itemPayload) {
+          logger.error(itemHeader);
+        } else if (itemHeader.type) {
+          // data sanitization
           // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
           itemPayload.type = itemHeader.type;
         }
@@ -78,6 +97,6 @@ function parseJSONFromBuffer<T = unknown>(data: Uint8Array): T {
     return JSON.parse(new TextDecoder().decode(data)) as T;
   } catch (err) {
     logger.error(err);
-    return {} as T;
+    return null as T;
   }
 }
