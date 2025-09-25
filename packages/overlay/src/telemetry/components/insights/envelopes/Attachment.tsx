@@ -13,6 +13,17 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
     );
   } else if (header.content_type === "application/json") {
     content = <JsonViewer data={JSON.parse(attachment)} />;
+  } else {
+    // we don't know what this is to just provide a download button
+    const downloadUrl = URL.createObjectURL(
+      new Blob([atob(attachment)], { type: (header.content_type as string) || "application/octet-stream" }),
+    );
+    const downloadName = `${name}.bin`;
+    content = (
+      <a href={downloadUrl} download={downloadName}>
+        Download
+      </a>
+    );
   }
 
   return (
