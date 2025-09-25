@@ -40,14 +40,24 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
     try {
       if (RAW_TYPES.has(itemHeader.type)) {
         const rawPayload = itemPayloadRaw as Buffer;
-        itemPayload = { data: rawPayload.toString(itemHeader.content_type === "text/plain" ? "utf-8" : "base64") };
+        if (
+          !itemHeader.content_type &&
+          // @ts-expect-error -- statsd is an old and deprecated event type but have envelopes for that
+          itemHeader.type === "statsd"
+        ) {
+          // @ts-expect-error -- same as above
+          itemHeader.content_type = "text/plain";
+        }
+        itemPayload = {
+          data: rawPayload.toString(itemHeader.content_type === "text/plain" ? "utf-8" : "base64"),
+        };
       } else {
         itemPayload = parseJSONFromBuffer(itemPayloadRaw);
         if (!itemPayload) {
           logger.error(itemHeader);
         }
-        // data sanitization
-        if (itemHeader.type) {
+        if (itemHeader.type && itemPayload) {
+          // data sanitization
           // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
           itemPayload.type = itemHeader.type;
         }

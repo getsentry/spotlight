@@ -4,9 +4,6 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
   let text: string | null = null;
   if (header.content_type === "text/plain") {
     text = attachment;
-    // @ts-expect-error ts(2367) -- statsd is an old and deprecated event type
-  } else if (header.type! === "statsd") {
-    text = atob(attachment);
   }
 
   return text != null ? (
