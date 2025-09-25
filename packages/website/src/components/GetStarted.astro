@@ -4,7 +4,6 @@
 
 <style>
   .get-started-container {
-    margin: 3rem 0;
     scroll-margin-top: 2rem;
   }
 
@@ -21,9 +20,10 @@
 
   .two-column {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
     gap: 2rem;
     margin-bottom: 3rem;
+    overflow: hidden;
   }
 
   .column {
@@ -144,7 +144,7 @@
   }
 
   .step-content {
-    margin-left: 3.25rem;
+    /* margin-left: 3.25rem; */
     color: rgba(255, 255, 255, 0.8);
     line-height: 1.6;
   }
