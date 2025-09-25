@@ -1,3 +1,4 @@
+import { RAW_TYPES } from "~/constants.js";
 import type { Envelope, EnvelopeItem } from "@sentry/core";
 import { uuidv7 } from "uuidv7";
 import { logger } from "~/logger.js";
@@ -37,11 +38,14 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope {
 
     let itemPayload: EnvelopeItem[1];
     try {
-      if (itemHeader.type === "attachment") {
+      if (RAW_TYPES.has(itemHeader.type)) {
         const rawPayload = itemPayloadRaw as Buffer;
         itemPayload = { data: rawPayload.toString(itemHeader.content_type === "text/plain" ? "utf-8" : "base64") };
       } else {
         itemPayload = parseJSONFromBuffer(itemPayloadRaw);
+        if (!itemPayload) {
+          logger.error(itemHeader);
+        }
         // data sanitization
         if (itemHeader.type) {
           // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
@@ -78,6 +82,6 @@ function parseJSONFromBuffer<T = unknown>(data: Uint8Array): T {
     return JSON.parse(new TextDecoder().decode(data)) as T;
   } catch (err) {
     logger.error(err);
-    return {} as T;
+    return null as T;
   }
 }
