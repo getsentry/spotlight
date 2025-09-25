@@ -8,6 +8,7 @@ export class MessageBuffer<T> {
   private head = 0;
   private timeout = 10;
   private readers = new Map<string, (item: T) => void>();
+  private timeoutKeys = new Map<string, NodeJS.Timeout>();
 
   constructor(size = 100) {
     this.size = size;
@@ -60,16 +61,25 @@ export class MessageBuffer<T> {
       atReadPos += 1;
     }
 
-    setTimeout(() => this.stream(readerId, atReadPos), 500);
+    const timeoutKey = setTimeout(() => this.stream(readerId, atReadPos), 500);
+    this.timeoutKeys.set(readerId, timeoutKey);
   }
 
   /**
-   * hard reset: drops items and subscribers and resets cursors.
+   * hard reset: drops items and resets cursors.
    */
   clear(): void {
     this.writePos = 0;
     this.reset();
-    this.readers.clear();
+
+    for (const readerId of this.readers.keys()) {
+      const timeoutKey = this.timeoutKeys.get(readerId);
+      if (timeoutKey) {
+        clearTimeout(timeoutKey);
+      }
+
+      setTimeout(() => this.stream(readerId));
+    }
   }
 
   /**
