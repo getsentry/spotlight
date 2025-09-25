@@ -61,6 +61,8 @@ export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceAct
       tracesById: new Map(),
       sdks: new Map(),
       profilesByTraceId: new Map(),
+      logsById: new Map(),
+      logsByTraceId: new Map(),
     });
   },
 });
