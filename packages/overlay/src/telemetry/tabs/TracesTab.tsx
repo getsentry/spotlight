@@ -141,14 +141,14 @@ export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLa
 }
 
 export default function TracesTab() {
-  const allTraces = useSentryTraces();
+  const traces = useSentryTraces().sort((a, b) => b.start_timestamp - a.start_timestamp);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const { TRACE_FILTER_CONFIGS, filteredTraces } = useTraceFiltering(allTraces, activeFilters, searchQuery);
+  const { TRACE_FILTER_CONFIGS, filteredTraces } = useTraceFiltering(traces, activeFilters, searchQuery);
 
   const traceData = {
     filtered: filteredTraces,
-    all: allTraces,
+    all: traces,
   };
 
   return (
