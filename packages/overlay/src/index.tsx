@@ -1,7 +1,7 @@
 import fontStyles from "@fontsource/raleway/index.css?inline";
 import { CONTEXT_LINES_ENDPOINT } from "@spotlightjs/sidecar/constants";
 import App from "./App";
-import { DEFAULT_SIDECAR_STREAM_URL } from "./constants";
+import { DEFAULT_SIDECAR_STREAM_URL, DEFAULT_SIDECAR_URL } from "./constants";
 import globalStyles from "./index.css?inline";
 import { Router } from "./lib/Router";
 import { on, trigger } from "./lib/eventTarget";
@@ -11,6 +11,7 @@ import { removeURLSuffix } from "./lib/removeURLSuffix";
 import { SpotlightContextProvider } from "./lib/useSpotlightContext";
 import { React, ReactDOM } from "./react-instance";
 import type { WindowWithSpotlight } from "./types";
+import { getDataFromServerTiming } from "./lib/serverTimingMeta";
 
 export type { WindowWithSpotlight } from "./types";
 export { CONTEXT_LINES_ENDPOINT, DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL, React, ReactDOM, trigger };
@@ -46,12 +47,15 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
     return;
   }
 
-  const { sidecarUrl = DEFAULT_SIDECAR_STREAM_URL, debug = document.location.hash.endsWith("debug") } = initOptions;
-
-  if (debug) {
+  if (initOptions.debug ?? document.location.hash.endsWith("debug")) {
     activateLogger();
   }
 
+  const customSidecarPort = getDataFromServerTiming("sentrySpotlightPort");
+  const sidecarUrl =
+    initOptions.sidecarUrl ??
+    (customSidecarPort ? `http://localhost:${customSidecarPort}/stream` : DEFAULT_SIDECAR_URL);
+  log("Using sidecar URL:", sidecarUrl);
   const sidecarBaseUrl = removeURLSuffix(sidecarUrl, "/stream");
 
   const appRoot = document.createElement("div");
