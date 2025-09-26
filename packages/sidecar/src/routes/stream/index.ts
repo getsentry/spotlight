@@ -96,6 +96,11 @@ const router = new Hono<HonoEnv>()
       logIncomingEvent(container);
 
       getBuffer().put(container);
+
+      const onEnvelope = ctx.get("onEnvelope");
+      if (onEnvelope) {
+        onEnvelope(container.getParsedEnvelope().event);
+      }
     }
 
     const incomingPayload = ctx.get("incomingPayload");

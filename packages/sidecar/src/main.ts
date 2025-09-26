@@ -16,10 +16,19 @@ import { parseArgs } from "node:util";
 import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 
+export type CLIArgs = {
+  port: number;
+  debug: boolean;
+  stdioMCP: boolean;
+  help: boolean;
+  _positionals: string[];
+  _extra: Record<string, string>;
+};
+
 let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
-export function parseCLIArgs(): { port: number; debug: boolean; stdioMCP: boolean; help: boolean } {
+export function parseCLIArgs(): CLIArgs {
   const { values, positionals } = parseArgs({
     options: {
       port: {
@@ -43,10 +52,11 @@ export function parseCLIArgs(): { port: number; debug: boolean; stdioMCP: boolea
       },
     },
     allowPositionals: true,
+    strict: false,
   });
 
   // Handle legacy positional argument for port (backwards compatibility)
-  const portInput = positionals.length > 0 ? positionals[0] : values.port;
+  const portInput = positionals.length === 1 && /^\d{1,5}$/.test(positionals[0]) ? positionals[0] : values.port;
   const port = Number(portInput);
 
   // Validate port number
@@ -61,11 +71,17 @@ export function parseCLIArgs(): { port: number; debug: boolean; stdioMCP: boolea
     process.exit(1);
   }
 
-  return {
-    ...values,
-    stdioMCP: values["stdio-mcp"],
+  const result: CLIArgs = {
+    debug: values.debug as boolean,
+    stdioMCP: values["stdio-mcp"] as boolean,
+    help: values.help as boolean,
     port,
+    _positionals: positionals.length > 0 && positionals[0] !== portInput ? positionals : [],
   };
+  const keys = new Set(Object.keys(result));
+  result._extra = Object.fromEntries(Object.entries(values).filter(([key]) => !keys.has(key)));
+
+  return result;
 }
 
 async function startServer(options: StartServerOptions): Promise<ServerType> {
@@ -86,6 +102,7 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
 
       ctx.set("basePath", options.basePath);
       ctx.set("incomingPayload", options.incomingPayload);
+      ctx.set("onEnvelope", options.onEnvelope);
 
       const host = ctx.req.header("Host") || "localhost";
       const path = ctx.req.path;
@@ -178,6 +195,7 @@ export async function setupSidecar({
   basePath,
   filesToServe,
   debug,
+  onEnvelope,
   incomingPayload,
   isStandalone,
   stdioMCP,
@@ -267,7 +285,14 @@ export async function setupSidecar({
       await startMCPStdioHTTPProxy();
     }
   } else if (!serverInstance) {
-    serverInstance = await startServer({ port: sidecarPort, basePath, filesToServe, incomingPayload, stdioMCP });
+    serverInstance = await startServer({
+      port: sidecarPort,
+      basePath,
+      filesToServe,
+      incomingPayload,
+      onEnvelope,
+      stdioMCP,
+    });
   }
 }
 
