@@ -90,6 +90,10 @@ export class MessageBuffer<T> {
     this.reset();
 
     for (const readerInfo of this.readers.values()) {
+      if (readerInfo.tid) {
+        clearTimeout(readerInfo.tid);
+      }
+
       readerInfo.tid = undefined;
       readerInfo.pos = this.head;
     }
