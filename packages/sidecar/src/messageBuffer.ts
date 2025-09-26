@@ -32,7 +32,7 @@ export class MessageBuffer<T> {
     }
 
     for (const readerId of this.readers.keys()) {
-      this.stream(readerId);
+      setImmediate(() => this.stream(readerId));
     }
   }
 
