@@ -1,5 +1,21 @@
 # @spotlightjs/core
 
+## 4.1.0
+
+### Minor Changes
+
+- Added support for processing attachments ([#941](https://github.com/getsentry/spotlight/pull/941))
+
+- More attachment type support: suppresses JSON parse errors from statsd and replay_video event types and displays statsd data as text ([#946](https://github.com/getsentry/spotlight/pull/946))
+
+### Patch Changes
+
+- Always sort traces and envelopes in reverse-chronological order ([#950](https://github.com/getsentry/spotlight/pull/950))
+
+- Fix Spotlight UI was always using the default port even when `--port/-p` option was used ([#952](https://github.com/getsentry/spotlight/pull/952))
+
+- Always showing the Clear Events Button ([#939](https://github.com/getsentry/spotlight/pull/939))
+
 ## 4.0.0
 
 ### Major Changes
