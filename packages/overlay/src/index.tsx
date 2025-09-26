@@ -54,7 +54,7 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   const customSidecarPort = getDataFromServerTiming("sentrySpotlightPort");
   const sidecarUrl =
     initOptions.sidecarUrl ??
-    (customSidecarPort ? `http://localhost:${customSidecarPort}/stream` : DEFAULT_SIDECAR_URL);
+    (customSidecarPort ? `http://localhost:${customSidecarPort}/stream` : DEFAULT_SIDECAR_STREAM_URL);
   log("Using sidecar URL:", sidecarUrl);
   const sidecarBaseUrl = removeURLSuffix(sidecarUrl, "/stream");
 
