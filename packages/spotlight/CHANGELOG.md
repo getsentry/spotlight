@@ -1,5 +1,28 @@
 # @spotlightjs/spotlight
 
+## 4.1.0
+
+### Minor Changes
+
+- Automatically recover when the upstream sidecar stops/goes away in MCP stdio proxy mode ([#938](https://github.com/getsentry/spotlight/pull/938))
+
+  - Tries to reconnect in case it was a blip or another server just took over
+  - If the reconnection fails, switches itself to be the main sidecar process
+
+  Caveat: it does not carry over the old events, we may wanna look into this in the future
+
+- More attachment type support: suppresses JSON parse errors from statsd and replay_video event types and displays statsd data as text ([#946](https://github.com/getsentry/spotlight/pull/946))
+
+### Patch Changes
+
+- Fix Spotlight UI was always using the default port even when `--port/-p` option was used ([#952](https://github.com/getsentry/spotlight/pull/952))
+
+- Fix engines fields in package.json for proper `pnpx` usage ([#944](https://github.com/getsentry/spotlight/pull/944))
+
+- Updated dependencies [[`f07068a`](https://github.com/getsentry/spotlight/commit/f07068ac903f917bea9cfb199e8384d94684eabb), [`f8aa213`](https://github.com/getsentry/spotlight/commit/f8aa2130f06ad1806312dc6ca915dd6009df38ae), [`81c7d08`](https://github.com/getsentry/spotlight/commit/81c7d08b3bae9f1b9150d847accf3a28e0d67f03), [`7b47c71`](https://github.com/getsentry/spotlight/commit/7b47c71236d884c737c1bc79227c41753f9bee5e), [`915659e`](https://github.com/getsentry/spotlight/commit/915659e3ab66408b81e1ed776dbc973edce33a50), [`896879e`](https://github.com/getsentry/spotlight/commit/896879e97bbff288c90941a0b50e3948b45d8c2a), [`dbc1fd2`](https://github.com/getsentry/spotlight/commit/dbc1fd2d950ab69135c28e2af91f126987fe68cc), [`1716197`](https://github.com/getsentry/spotlight/commit/1716197b4376b7a12e9bdd66eef4381a11922c5b)]:
+  - @spotlightjs/overlay@4.1.0
+  - @spotlightjs/sidecar@2.1.0
+
 ## 4.0.0
 
 ### Major Changes
