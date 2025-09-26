@@ -36,10 +36,7 @@ export class MessageBuffer<T> {
   subscribe(callback: (item: T) => void): string {
     const readerId = uuidv7();
     this.readers.set(readerId, callback);
-
-    this.subscribersReadPositions.set(readerId, this.head);
     setTimeout(() => this.stream(readerId));
-
     return readerId;
   }
 
@@ -48,7 +45,8 @@ export class MessageBuffer<T> {
     this.subscribersReadPositions.delete(readerId);
   }
 
-  stream(readerId: string, readPos = this.subscribersReadPositions.get(readerId) ?? this.head): void {
+  stream(readerId: string): void {
+    const readPos = this.subscribersReadPositions.get(readerId) ?? this.head;
     const cb = this.readers.get(readerId);
     if (!cb) return;
 
