@@ -8,7 +8,7 @@ export class MessageBuffer<T> {
   private head = 0;
   private timeout = 10;
   private readers = new Map<string, (item: T) => void>();
-  private timeoutKeys = new Map<string, NodeJS.Timeout>();
+  private subscribersReadPositions = new Map<string, number>();
 
   constructor(size = 100) {
     this.size = size;
@@ -36,7 +36,10 @@ export class MessageBuffer<T> {
   subscribe(callback: (item: T) => void): string {
     const readerId = uuidv7();
     this.readers.set(readerId, callback);
+
+    this.subscribersReadPositions.set(readerId, this.head);
     setTimeout(() => this.stream(readerId));
+
     return readerId;
   }
 
@@ -44,7 +47,7 @@ export class MessageBuffer<T> {
     this.readers.delete(readerId);
   }
 
-  stream(readerId: string, readPos = this.head): void {
+  stream(readerId: string, readPos = this.subscribersReadPositions.get(readerId) ?? this.head): void {
     const cb = this.readers.get(readerId);
     if (!cb) return;
 
@@ -61,8 +64,8 @@ export class MessageBuffer<T> {
       atReadPos += 1;
     }
 
-    const timeoutKey = setTimeout(() => this.stream(readerId, atReadPos), 500);
-    this.timeoutKeys.set(readerId, timeoutKey);
+    this.subscribersReadPositions.set(readerId, atReadPos);
+    setTimeout(() => this.stream(readerId), 500);
   }
 
   /**
@@ -73,12 +76,7 @@ export class MessageBuffer<T> {
     this.reset();
 
     for (const readerId of this.readers.keys()) {
-      const timeoutKey = this.timeoutKeys.get(readerId);
-      if (timeoutKey) {
-        clearTimeout(timeoutKey);
-      }
-
-      setTimeout(() => this.stream(readerId));
+      this.subscribersReadPositions.delete(readerId);
     }
   }
 
