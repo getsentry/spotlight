@@ -45,6 +45,7 @@ export class MessageBuffer<T> {
 
   unsubscribe(readerId: string): void {
     this.readers.delete(readerId);
+    this.subscribersReadPositions.delete(readerId);
   }
 
   stream(readerId: string, readPos = this.subscribersReadPositions.get(readerId) ?? this.head): void {
