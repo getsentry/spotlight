@@ -1,4 +1,7 @@
+import type { ParsedEnvelope } from "~/parser/processEnvelope.js";
+
 export type IncomingPayloadCallback = (body: string) => void;
+export type OnEnvelopeCallback = (envelope: ParsedEnvelope["event"]) => void;
 
 export type SidecarLogger = {
   info: (message: any) => void;
@@ -40,11 +43,21 @@ export type SideCarOptions = {
    */
   incomingPayload?: IncomingPayloadCallback;
 
+  /**
+   * A callback that will be called with the parsed envelope every
+   * time an envelope is received. This will me mainly used for the
+   * CLI for streaming data but can be used by other tools as well.
+   */
+  onEnvelope?: OnEnvelopeCallback;
+
   isStandalone?: boolean;
 
   stdioMCP?: boolean;
 };
 
-export type StartServerOptions = Pick<SideCarOptions, "basePath" | "filesToServe" | "incomingPayload" | "stdioMCP"> & {
+export type StartServerOptions = Pick<
+  SideCarOptions,
+  "basePath" | "filesToServe" | "incomingPayload" | "onEnvelope" | "stdioMCP"
+> & {
   port: number;
 };
