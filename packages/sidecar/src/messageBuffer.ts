@@ -52,6 +52,12 @@ export class MessageBuffer<T> {
   }
 
   unsubscribe(readerId: string): void {
+    const readerInfo = this.readers.get(readerId);
+    // Clearing any pending timeouts
+    if (readerInfo?.tid) {
+      clearTimeout(readerInfo.tid);
+    }
+
     this.readers.delete(readerId);
   }
 
