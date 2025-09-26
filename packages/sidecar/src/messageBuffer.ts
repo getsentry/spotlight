@@ -39,8 +39,7 @@ export class MessageBuffer<T> {
         clearTimeout(readerInfo.tid);
       }
 
-      const tid = setTimeout(() => this.stream(readerId), 100);
-      readerInfo.tid = tid;
+      readerInfo.tid = setTimeout(() => this.stream(readerId), 100);
     }
   }
 
@@ -91,6 +90,7 @@ export class MessageBuffer<T> {
     this.reset();
 
     for (const readerInfo of this.readers.values()) {
+      readerInfo.tid = undefined;
       readerInfo.pos = this.head;
     }
   }
