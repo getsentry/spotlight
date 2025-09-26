@@ -46,7 +46,10 @@ export class MessageBuffer<T> {
   subscribe(callback: (item: T) => void): string {
     const readerId = uuidv7();
     this.readers.set(readerId, { pos: this.head, callback });
-    setImmediate(() => this.stream(readerId));
+
+    const readerInfo = this.readers.get(readerId)!;
+    readerInfo.tid = setImmediate(() => this.stream(readerId));
+
     return readerId;
   }
 
