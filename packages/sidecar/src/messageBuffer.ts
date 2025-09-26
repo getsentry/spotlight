@@ -30,6 +30,10 @@ export class MessageBuffer<T> {
       if (atItem[0] > minTime) break;
       this.head += 1;
     }
+
+    for (const readerId of this.readers.keys()) {
+      this.stream(readerId);
+    }
   }
 
   subscribe(callback: (item: T) => void): string {
@@ -63,10 +67,6 @@ export class MessageBuffer<T> {
 
     // No need to `this.readers.set` again, as `readerInfo` is a reference
     readerInfo.pos = atReadPos;
-
-    // Processing the next batch of messages async to avoid blocking the main thread
-    // TODO: consider adding a batch size limit to avoid lock ups
-    setImmediate(() => this.stream(readerId));
   }
 
   /**
