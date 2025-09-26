@@ -224,22 +224,22 @@
     const commandBoxes = document.querySelectorAll(".command-box");
 
     for (const commandBox of commandBoxes) {
-      const commandText = commandBox
-        .querySelector(".command-text")
-        ?.textContent.replace(/\r?\n */g, " ")
-        .trim();
+      const commandText =
+        commandBox.querySelector(".command-text")?.textContent;
       const copyBtn = commandText && commandBox.querySelector(".copy-button");
       if (copyBtn) {
         const handler = (e) => {
           e.stopPropagation();
-          navigator.clipboard.writeText(commandText).then(() => {
-            copyBtn.textContent = "Copied!";
-            copyBtn.classList.add("copied");
-            setTimeout(() => {
-              copyBtn.textContent = "Copy";
-              copyBtn.classList.remove("copied");
-            }, 2000);
-          });
+          navigator.clipboard
+            .writeText(commandText.replace(/\r?\n */g, " ").trim())
+            .then(() => {
+              copyBtn.textContent = "Copied!";
+              copyBtn.classList.add("copied");
+              setTimeout(() => {
+                copyBtn.textContent = "Copy";
+                copyBtn.classList.remove("copied");
+              }, 2000);
+            });
         };
         commandBox.addEventListener("click", handler);
       }
