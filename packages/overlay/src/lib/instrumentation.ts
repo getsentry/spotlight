@@ -1,21 +1,14 @@
 import * as Sentry from "@sentry/react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
 import { useEffect } from "../react-instance";
+import { getDataFromServerTiming } from "./serverTimingMeta";
+
+const TRACE_PARENT_KEYS = ["sentryTrace", "baggage"];
 
 export default function initSentry() {
-  const sentryTraceParent: Record<string, string> = {};
-  const navTiming = performance.getEntriesByType("navigation");
-  if (navTiming.length > 0) {
-    const serverTiming = (navTiming[0] as PerformanceNavigationTiming).serverTiming;
-    if (serverTiming && serverTiming.length > 0) {
-      for (const { name, description } of serverTiming) {
-        if (name === "sentryTrace" || name === "baggage") {
-          sentryTraceParent[name] = description;
-        }
-      }
-    }
-  }
-  const hasTraceParent = Object.keys(sentryTraceParent).length === 2;
+  const traceParentData = TRACE_PARENT_KEYS.map(key => [key, getDataFromServerTiming(key)]);
+
+  const hasTraceParent = traceParentData.every(([, value]) => Boolean(value));
   const integrations = [
     // See docs for support of different versions of variation of react router
     // https://docs.sentry.io/platforms/javascript/guides/react/configuration/integrations/react-router/
@@ -58,6 +51,6 @@ export default function initSentry() {
   });
 
   if (hasTraceParent && sentryClient) {
-    Sentry.startBrowserTracingPageLoadSpan(sentryClient, { name: "pageload" }, sentryTraceParent);
+    Sentry.startBrowserTracingPageLoadSpan(sentryClient, { name: "pageload" }, Object.fromEntries(traceParentData));
   }
 }
