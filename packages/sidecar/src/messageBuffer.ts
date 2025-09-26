@@ -64,6 +64,8 @@ export class MessageBuffer<T> {
     }
 
     this.subscribersReadPositions.set(readerId, atReadPos);
+
+    // Processing the next batch of messages after a delay to avoid blocking the main thread
     setTimeout(() => this.stream(readerId), 500);
   }
 
