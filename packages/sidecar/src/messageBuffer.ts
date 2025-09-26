@@ -7,7 +7,7 @@ export class MessageBuffer<T> {
   private writePos = 0;
   private head = 0;
   private timeout = 10;
-  private readers = new Map<string, (item: T) => void>();
+  private readers = new Map<string, { pos: number; callback: (item: T) => void }>();
 
   constructor(size = 100) {
     this.size = size;
@@ -34,8 +34,8 @@ export class MessageBuffer<T> {
 
   subscribe(callback: (item: T) => void): string {
     const readerId = uuidv7();
-    this.readers.set(readerId, callback);
-    setTimeout(() => this.stream(readerId));
+    this.readers.set(readerId, { pos: this.head, callback });
+    setImmediate(() => this.stream(readerId));
     return readerId;
   }
 
@@ -43,11 +43,12 @@ export class MessageBuffer<T> {
     this.readers.delete(readerId);
   }
 
-  stream(readerId: string, readPos = this.head): void {
-    const cb = this.readers.get(readerId);
-    if (!cb) return;
+  stream(readerId: string): void {
+    const readerInfo = this.readers.get(readerId);
+    if (!readerInfo) return;
+    const { pos, callback } = readerInfo;
 
-    let atReadPos = readPos < this.head ? this.head : readPos;
+    let atReadPos = pos < this.head ? this.head : pos;
     let item: [number, T] | undefined;
     /* eslint-disable no-constant-condition */
     while (true) {
@@ -56,20 +57,28 @@ export class MessageBuffer<T> {
       if (typeof item === "undefined" || atReadPos >= this.writePos) {
         break;
       }
-      cb(item[1]);
+      callback(item[1]);
       atReadPos += 1;
     }
 
-    setTimeout(() => this.stream(readerId, atReadPos), 500);
+    // No need to `this.readers.set` again, as `readerInfo` is a reference
+    readerInfo.pos = atReadPos;
+
+    // Processing the next batch of messages async to avoid blocking the main thread
+    // TODO: consider adding a batch size limit to avoid lock ups
+    setImmediate(() => this.stream(readerId));
   }
 
   /**
-   * hard reset: drops items and subscribers and resets cursors.
+   * hard reset: drops items and resets cursors.
    */
   clear(): void {
     this.writePos = 0;
     this.reset();
-    this.readers.clear();
+
+    for (const readerInfo of this.readers.values()) {
+      readerInfo.pos = this.head;
+    }
   }
 
   /**
