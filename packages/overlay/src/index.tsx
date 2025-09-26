@@ -1,7 +1,7 @@
 import fontStyles from "@fontsource/raleway/index.css?inline";
 import { CONTEXT_LINES_ENDPOINT } from "@spotlightjs/sidecar/constants";
 import App from "./App";
-import { DEFAULT_SIDECAR_STREAM_URL, DEFAULT_SIDECAR_URL } from "./constants";
+import { DEFAULT_SIDECAR_STREAM_URL } from "./constants";
 import globalStyles from "./index.css?inline";
 import { Router } from "./lib/Router";
 import { on, trigger } from "./lib/eventTarget";
@@ -54,7 +54,7 @@ export async function init(initOptions: SpotlightInitOptions = {}) {
   const customSidecarPort = getDataFromServerTiming("sentrySpotlightPort");
   const sidecarUrl =
     initOptions.sidecarUrl ??
-    (customSidecarPort ? `http://localhost:${customSidecarPort}/stream` : DEFAULT_SIDECAR_URL);
+    (customSidecarPort ? `http://localhost:${customSidecarPort}/stream` : DEFAULT_SIDECAR_STREAM_URL);
   log("Using sidecar URL:", sidecarUrl);
   const sidecarBaseUrl = removeURLSuffix(sidecarUrl, "/stream");
 
