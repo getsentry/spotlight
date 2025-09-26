@@ -7,7 +7,7 @@ export class MessageBuffer<T> {
   private writePos = 0;
   private head = 0;
   private timeout = 10;
-  private readers = new Map<string, { pos: number; callback: (item: T) => void }>();
+  private readers = new Map<string, { tid?: NodeJS.Timeout; pos: number; callback: (item: T) => void }>();
 
   constructor(size = 100) {
     this.size = size;
@@ -32,7 +32,15 @@ export class MessageBuffer<T> {
     }
 
     for (const readerId of this.readers.keys()) {
-      setImmediate(() => this.stream(readerId));
+      const readerInfo = this.readers.get(readerId);
+      if (!readerInfo) continue;
+
+      if (readerInfo.tid) {
+        clearTimeout(readerInfo.tid);
+      }
+
+      const tid = setTimeout(() => this.stream(readerId), 100);
+      readerInfo.tid = tid;
     }
   }
 
