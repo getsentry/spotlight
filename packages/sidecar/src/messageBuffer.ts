@@ -31,10 +31,7 @@ export class MessageBuffer<T> {
       this.head += 1;
     }
 
-    for (const readerId of this.readers.keys()) {
-      const readerInfo = this.readers.get(readerId);
-      if (!readerInfo) continue;
-
+    for (const [readerId, readerInfo] of this.readers.entries()) {
       if (readerInfo.tid) {
         clearImmediate(readerInfo.tid);
       }
@@ -45,10 +42,12 @@ export class MessageBuffer<T> {
 
   subscribe(callback: (item: T) => void): string {
     const readerId = uuidv7();
-    this.readers.set(readerId, { pos: this.head, callback });
-
-    const readerInfo = this.readers.get(readerId)!;
-    readerInfo.tid = setImmediate(() => this.stream(readerId));
+    const readerInfo = {
+      callback,
+      pos: this.head,
+      tid: setImmediate(() => this.stream(readerId)),
+    };
+    this.readers.set(readerId, readerInfo);
 
     return readerId;
   }
