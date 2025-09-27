@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 2.1.1
+
+### Patch Changes
+
+- Drop min Node version requirement to v20 again ([#961](https://github.com/getsentry/spotlight/pull/961))
+
 ## 2.1.0
 
 ### Minor Changes

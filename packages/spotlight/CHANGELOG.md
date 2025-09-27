@@ -1,5 +1,15 @@
 # @spotlightjs/spotlight
 
+## 4.1.1
+
+### Patch Changes
+
+- Drop min Node version requirement to v20 again ([#961](https://github.com/getsentry/spotlight/pull/961))
+
+- Updated dependencies [[`48be8f3`](https://github.com/getsentry/spotlight/commit/48be8f35cc7b6800989237cb2edbd90165a20c99)]:
+  - @spotlightjs/sidecar@2.1.1
+  - @spotlightjs/overlay@4.1.0
+
 ## 4.1.0
 
 ### Minor Changes
