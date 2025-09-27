@@ -2,29 +2,31 @@
 import { Fragment } from 'react';
 
 let response = await fetch('https://api.github.com/repos/getsentry/spotlight/releases');
-const releases = (await response.json()).filter((release:any) => release.name.startsWith('@spotlightjs/electron@')|| release.name.startsWith('@spotlightjs/spotlight@'));
+const releases = await response.json();
 
-let assets = releases[0]?.assets || [];
-let version = null;
+// Find the electron release specifically
+const electronRelease = releases.find((release:any) =>
+  release.tag_name && release.tag_name.includes('@spotlightjs/electron@')
+);
 
-const links = assets.map((asset: any) => {
-  if (asset.name.includes('mac')) {
-    const versionMatch = asset.name.match(/Spotlight-(.*)-.*.zip/);
-    if (versionMatch) {
-      version = versionMatch[1];
-    }
+let assets = electronRelease?.assets || [];
+let version = electronRelease?.tag_name?.replace('@spotlightjs/electron@', '') || null;
+
+const links = assets
+  .filter((asset: any) => asset.name && asset.name.endsWith('.dmg'))
+  .map((asset: any) => {
     if (asset.name.includes('arm64')) {
       return {
         name: 'macOS (Apple Silicon)',
         url: asset.browser_download_url,
       };
     }
-    return {
-      name: 'macOS (Intel)',
-      url: asset.browser_download_url,
-    };
-  }
-}).filter(Boolean);
+      return {
+        name: 'macOS (Intel)',
+        url: asset.browser_download_url,
+      };
+    
+  });
 ---
 
 <style>
@@ -40,16 +42,16 @@ const links = assets.map((asset: any) => {
 </style>
 
 <div class="group relative text-center text-sm">
-  <div>{
-    links.map((link: any) => (
+  <div>
+    {links.map((link: any) => (
       <a
         href={link.url}
         class="downloadButton !mr-1 inline-flex items-center justify-center px-2 py-2 mx-2 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
       >
         {link.name}
       </a>
-    ))
-  }</div>
+    ))}
+  </div>
   <div class="text-xs text-gray-400 mt-2">latest version: {version}</div>
 </div>
 
