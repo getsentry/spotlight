@@ -1,0 +1,47 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<style>
+  @import "tailwindcss";
+
+  /* Landing page specific styles */
+  .landing-page {
+    @apply flex flex-col min-h-screen;
+  }
+
+  .landing-main {
+    @apply flex-1;
+  }
+</style>
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:image" content="/images/trace.png" />
+    <meta property="og:description" content={description} />
+    <meta property="og:title" content={title} />
+
+    <!-- Twitter -->
+    <meta property="twitter:image" content="/images/trace.png" />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:title" content={title} />
+  </head>
+
+  <body class="bg-slate-900 text-white">
+    <slot />
+  </body>
+</html>

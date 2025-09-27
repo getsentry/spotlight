@@ -1,0 +1,75 @@
+---
+---
+
+<div class="border-b-2 border-l-2 border-r-2 border-white px-6 py-16 max-w-7xl mx-auto">
+  <div class="text-center">
+    <!-- Hero Content -->
+    <h1 class="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-300 bg-clip-text text-transparent">
+      Debug locally with the power of Sentry
+    </h1>
+
+    <p class="text-xl text-slate-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+      Spotlight brings the power of Sentry into your local development environment.
+      Debug faster with real-time error tracking, traces, and logs—right where you code.
+    </p>
+
+    <!-- Command Boxes -->
+    <div class="space-y-4 mb-12">
+      <div class="inline-flex items-center gap-3 bg-slate-800/50 border border-blue-400/30 rounded-lg px-4 py-3 text-blue-300 font-mono text-sm hover:bg-slate-800/70 transition-all">
+        <span class="text-slate-400">$</span>
+        <span class="select-all">npx -y @spotlightjs/spotlight</span>
+        <button
+          class="ml-2 px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 rounded text-xs transition-colors copy-btn"
+          data-copy="npx -y @spotlightjs/spotlight"
+        >
+          Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- Screenshot -->
+    <div class="mb-16">
+      <img
+        src="/images/spotlight.png"
+        alt="Spotlight in action"
+        class="rounded-lg shadow-2xl mx-auto max-w-full h-auto"
+      />
+    </div>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      <a
+        href="/docs/about/"
+        class="px-8 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
+      >
+        Learn More
+      </a>
+      <a
+        href="https://github.com/getsentry/spotlight"
+        target="_blank"
+        rel="noreferrer noopener"
+        class="px-8 py-3 border border-slate-600 hover:border-slate-500 rounded-lg font-medium transition-colors"
+      >
+        View on GitHub
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = btn.getAttribute('data-copy');
+      if (text) {
+        await navigator.clipboard.writeText(text);
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('bg-green-500/30');
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('bg-green-500/30');
+        }, 2000);
+      }
+    });
+  });
+</script>
