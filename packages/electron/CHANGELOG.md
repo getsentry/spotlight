@@ -1,5 +1,13 @@
 # @spotlightjs/electron
 
+## 1.9.1
+
+### Patch Changes
+
+- Updated dependencies [[`48be8f3`](https://github.com/getsentry/spotlight/commit/48be8f35cc7b6800989237cb2edbd90165a20c99)]:
+  - @spotlightjs/sidecar@2.1.1
+  - @spotlightjs/overlay@4.1.0
+
 ## 1.9.0
 
 ### Minor Changes
