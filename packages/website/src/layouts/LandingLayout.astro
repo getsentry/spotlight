@@ -29,6 +29,9 @@ const { title, description } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Open Graph -->
     <meta property="og:image" content="/images/trace.png" />
@@ -41,7 +44,7 @@ const { title, description } = Astro.props;
     <meta property="twitter:title" content={title} />
   </head>
 
-  <body class="bg-slate-900 text-white">
+  <body style="background-color: #000000;" class="text-white">
     <slot />
   </body>
 </html>

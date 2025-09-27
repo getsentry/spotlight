@@ -8,6 +8,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        sans: ['Inter', ...defaultTheme.fontFamily.sans],
         raleway: ['Raleway', ...defaultTheme.fontFamily.sans],
       },
       animation: {

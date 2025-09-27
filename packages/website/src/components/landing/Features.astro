@@ -1,9 +1,18 @@
 ---
 ---
 
-<div class="border-b-2 border-l-2 border-r-2 border-white px-6 py-16 max-w-7xl mx-auto">
+<div class="px-6 py-16 max-w-7xl mx-auto" style="border-bottom: 1px solid #191919; border-left: 1px solid #191919; border-right: 1px solid #191919;">
   <div>
-    <h2 class="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-white to-blue-300 bg-clip-text text-transparent">
+    <!-- Screenshot -->
+    <div class="mb-16 text-center">
+      <img
+        src="/images/spotlight.png"
+        alt="Spotlight in action"
+        class="rounded-lg shadow-2xl mx-auto max-w-full h-auto"
+      />
+    </div>
+
+    <h2 class="text-3xl font-bold text-center mb-12 text-white">
       Why Spotlight?
     </h2>
 
@@ -16,7 +25,7 @@
           </svg>
         </div>
         <h3 class="text-xl font-semibold mb-3">Real-time Debugging</h3>
-        <p class="text-slate-300 leading-relaxed">
+        <p class="text-white leading-relaxed">
           See errors, traces, and logs in real-time as they happen in your development environment.
         </p>
       </div>
@@ -28,7 +37,7 @@
           </svg>
         </div>
         <h3 class="text-xl font-semibold mb-3">Powered by Sentry</h3>
-        <p class="text-slate-300 leading-relaxed">
+        <p class="text-white leading-relaxed">
           Leverage the existing power of Sentry's SDKs without needing production monitoring.
         </p>
       </div>
@@ -40,10 +49,28 @@
           </svg>
         </div>
         <h3 class="text-xl font-semibold mb-3">Easy Integration</h3>
-        <p class="text-slate-300 leading-relaxed">
+        <p class="text-white leading-relaxed">
           Simple setup with one command. Works with any web application framework.
         </p>
       </div>
+    </div>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
+      <a
+        href="/docs/about/"
+        class="px-8 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
+      >
+        Learn More
+      </a>
+      <a
+        href="https://github.com/getsentry/spotlight"
+        target="_blank"
+        rel="noreferrer noopener"
+        class="px-8 py-3 border border-slate-600 hover:border-slate-500 rounded-lg font-medium transition-colors"
+      >
+        View on GitHub
+      </a>
     </div>
   </div>
 </div>

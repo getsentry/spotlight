@@ -1,57 +1,36 @@
 ---
 ---
 
-<div class="border-b-2 border-l-2 border-r-2 border-white px-6 py-16 max-w-7xl mx-auto">
+<div class="px-6 py-16 max-w-7xl mx-auto" style="border-bottom: 1px solid #191919; border-left: 1px solid #191919; border-right: 1px solid #191919; background: linear-gradient(to bottom, #191919 0%, #000000 100%);">
   <div class="text-center">
     <!-- Hero Content -->
-    <h1 class="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-300 bg-clip-text text-transparent">
+    <h1 class="text-4xl md:text-6xl max-w-3xl mx-auto font-bold mb-6 text-white">
       Debug locally with the power of Sentry
     </h1>
 
-    <p class="text-xl text-slate-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+    <p class="text-xl text-[#a5a5a5] mb-12 max-w-3xl mx-auto leading-relaxed">
       Spotlight brings the power of Sentry into your local development environment.
       Debug faster with real-time error tracking, traces, and logs—right where you code.
     </p>
 
     <!-- Command Boxes -->
-    <div class="space-y-4 mb-12">
-      <div class="inline-flex items-center gap-3 bg-slate-800/50 border border-blue-400/30 rounded-lg px-4 py-3 text-blue-300 font-mono text-sm hover:bg-slate-800/70 transition-all">
-        <span class="text-slate-400">$</span>
-        <span class="select-all">npx -y @spotlightjs/spotlight</span>
-        <button
-          class="ml-2 px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 rounded text-xs transition-colors copy-btn"
-          data-copy="npx -y @spotlightjs/spotlight"
-        >
-          Copy
+    <div class="space-y-2 mb-12">
+      <div class="inline-flex items-center justify-between max-w-xs w-full mx-auto px-2 rounded-lg font-mono text-sm bg-[#161616] border border-[#1d1d1d]">
+        <div class="flex items-center gap-3">
+          <span class="text-[#a5a5a5]">$</span>
+          <span class="select-all text-white">npx -y @spotlightjs/spotlight</span>
+        </div>
+         <button
+           class="p-2 rounded copy-btn bg-transparent hover:bg-white/10 transition-colors border-0 shadow-none outline-none"
+           data-copy="npx -y @spotlightjs/spotlight"
+           aria-label="Copy command"
+         >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a5a5a5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy w-4 h-4">
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+          </svg>
         </button>
       </div>
-    </div>
-
-    <!-- Screenshot -->
-    <div class="mb-16">
-      <img
-        src="/images/spotlight.png"
-        alt="Spotlight in action"
-        class="rounded-lg shadow-2xl mx-auto max-w-full h-auto"
-      />
-    </div>
-
-    <!-- CTA Buttons -->
-    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-      <a
-        href="/docs/about/"
-        class="px-8 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
-      >
-        Learn More
-      </a>
-      <a
-        href="https://github.com/getsentry/spotlight"
-        target="_blank"
-        rel="noreferrer noopener"
-        class="px-8 py-3 border border-slate-600 hover:border-slate-500 rounded-lg font-medium transition-colors"
-      >
-        View on GitHub
-      </a>
     </div>
   </div>
 </div>
