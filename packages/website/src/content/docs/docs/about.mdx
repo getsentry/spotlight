@@ -6,7 +6,7 @@ sidebar:
   label: What is Spotlight?
   order: 0
 ---
-import DownloadButton from '../../components/DownloadButton.astro';
+import DownloadButton from '../../../components/DownloadButton.astro';
 
 Spotlight started out as a [Hackweek project](https://syntax.fm/show/666/hackweek-projects-realtime-markdown-editor-and-a-hardware-recording-button) at Sentry:
 
@@ -35,4 +35,4 @@ If you are already using Sentry SDKs in your application try the following:
 ---
 
 [^1]: Currently Python, Ruby, PHP, and all JS-based SDKs support this env variable. If your choice of SDK doesn't support it, you can still use Spotlight by enabling the `spotlight` option in its init configuration. Also you can let us know of your interest and we'll add support for the env variable.
-[^2]: If you don't have `npx` around, you can use `docker run -p 8969 ghcr.io/getsentry/spotlight:latest`, or head over to our [GitHub Releases page](https://github.com/getsentry/spotlight/releases/latest) and download a binary for your system. Alternatively, we provide an Electron-based application that can be used to run the Sidecar as well as a dedicated instance of the overlay. There are some limitations to this method, but it is particularly useful [for headless or mobile environments](/setup/headless/). <DownloadButton>Download for Mac</DownloadButton>
+[^2]: If you don't have `npx` around, you can use `docker run -p 8969 ghcr.io/getsentry/spotlight:latest`, or head over to our [GitHub Releases page](https://github.com/getsentry/spotlight/releases/latest) and download a binary for your system. Alternatively, we provide an Electron-based application that can be used to run the Sidecar as well as a dedicated instance of the overlay. There are some limitations to this method, but it is particularly useful [for headless or mobile environments](/docs/setup/headless/). <DownloadButton>Download for Mac</DownloadButton>

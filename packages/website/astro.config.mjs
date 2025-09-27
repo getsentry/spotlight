@@ -79,40 +79,40 @@ export default defineConfig({
           items: [
             {
               label: "What is Spotlight?",
-              link: "/about/",
+              link: "/docs/about/",
             },
             {
               label: "Architecture",
-              link: "/architecture/",
+              link: "/docs/architecture/",
             },
             {
               label: "Roadmap",
-              link: "/roadmap/",
+              link: "/docs/roadmap/",
             },
           ],
         },
         {
           label: "Setup",
           autogenerate: {
-            directory: "setup",
+            directory: "docs/setup",
           },
         },
         {
           label: "Sidecar",
           autogenerate: {
-            directory: "sidecar",
+            directory: "docs/sidecar",
           },
         },
         {
           label: "Contribute",
           autogenerate: {
-            directory: "contribute",
+            directory: "docs/contribute",
           },
         },
         {
           label: "Reference",
           autogenerate: {
-            directory: "reference",
+            directory: "docs/reference",
           },
         },
       ],
