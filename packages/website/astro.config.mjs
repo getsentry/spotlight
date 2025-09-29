@@ -85,10 +85,6 @@ export default defineConfig({
               label: "Architecture",
               link: "/docs/architecture/",
             },
-            {
-              label: "Roadmap",
-              link: "/docs/roadmap/",
-            },
           ],
         },
         {
