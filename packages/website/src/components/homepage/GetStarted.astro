@@ -1,4 +1,20 @@
 ---
+import { Code } from 'astro:components';
+
+const codeSnippet = `Sentry.init({
+  // your existing config
+  ...(process.env.NODE_ENV !== "production" ? {
+  spotlight: true, // Enable Spotlight
+  sampleRate: 1.0, // Capture all errors in dev
+  tracesSampleRate: 1.0, // Capture all traces in dev
+  enableLogs: true,
+  integrations: [
+    Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
+    // For frontend apps, add:
+    Sentry.spotlightBrowserIntegration(),
+    Sentry.browserTracingIntegration(),
+  ],
+} : {}));`;
 ---
 
 <div class="px-6 py-16 max-w-7xl mx-auto" style="border-bottom: 1px solid #191919; border-left: 1px solid #191919; border-right: 1px solid #191919; background: linear-gradient(to bottom, #000000 0%, #191919 100%);">
@@ -38,21 +54,8 @@
         Add Spotlight to your Sentry configuration and enable all the features:
       </p>
 
-      <div class="bg-[#161616] border border-[#1d1d1d] rounded-lg p-4 overflow-x-auto text-left">
-        <pre class="text-sm text-[#a5a5a5] whitespace-pre-wrap"><code>{`Sentry.init({
-  // your existing config
-  ...(process.env.NODE_ENV !== "production" ? {
-  spotlight: true, // Enable Spotlight
-  sampleRate: 1.0, // Capture all errors in dev
-  tracesSampleRate: 1.0, // Capture all traces in dev
-  enableLogs: true,
-  integrations: [
-    Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
-    // For frontend apps, add:
-    Sentry.spotlightBrowserIntegration(),
-    Sentry.browserTracingIntegration(),
-  ],
-} : {}));`}</code></pre>
+      <div class="text-left [&>*]:!overflow-x-auto [&>*]:!max-w-full">
+        <Code code={codeSnippet} lang="javascript" wrap={true} />
       </div>
     </div>
 
