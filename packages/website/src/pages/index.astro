@@ -1,5 +1,5 @@
 ---
-import LandingLayout from '../layouts/LandingLayout.astro';
+import Layout from '../components/homepage/Layout.astro';
 import Header from '../components/homepage/Header.astro';
 import Hero from '../components/homepage/Hero.astro';
 import GetStarted from '../components/homepage/GetStarted.astro';
@@ -8,7 +8,7 @@ import Features from '../components/homepage/Features.astro';
 import Footer from '../components/homepage/Footer.astro';
 ---
 
-<LandingLayout
+<Layout
   title="Spotlight - Debug locally with the power of Sentry"
   description="Spotlight brings the power of Sentry into your local development environment. Debug faster with real-time error tracking, traces, and logs—right where you code."
 >
@@ -22,4 +22,4 @@ import Footer from '../components/homepage/Footer.astro';
     </main>
     <Footer />
   </div>
-</LandingLayout>
+</Layout>
