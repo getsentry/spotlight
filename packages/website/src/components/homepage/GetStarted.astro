@@ -21,7 +21,6 @@ const codeSnippet = `Sentry.init({
   <div class="text-center mb-12">
     <h2 class="text-4xl md:text-6xl font-bold mb-6 text-white">Get Started with Spotlight</h2>
 
-    <!-- Other languages subheader -->
     <div class="max-w-2xl mx-auto mb-8">
       <p class="text-[#a5a5a5] leading-relaxed">
         Instructions below are for JavaScript/TypeScript but the logic is similar for other languages: Set spotlight to true, enable all features (especially logging), and make sure these are only done for development.
@@ -30,7 +29,6 @@ const codeSnippet = `Sentry.init({
   </div>
 
   <div class="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto mb-12">
-    <!-- Step 1 -->
     <div class="text-center">
       <div class="flex justify-center mb-4">
         <div class="w-10 h-10 bg-[#F14499] text-white rounded-full flex items-center justify-center font-bold text-lg">1</div>
@@ -44,7 +42,6 @@ const codeSnippet = `Sentry.init({
       </a>
     </div>
 
-    <!-- Step 2 -->
     <div class="text-center">
       <div class="flex justify-center mb-4">
         <div class="w-10 h-10 bg-[#F14499] text-white rounded-full flex items-center justify-center font-bold text-lg">2</div>
@@ -59,7 +56,6 @@ const codeSnippet = `Sentry.init({
       </div>
     </div>
 
-    <!-- Step 3 -->
     <div class="text-center">
       <div class="flex justify-center mb-4">
         <div class="w-10 h-10 bg-[#F14499] text-white rounded-full flex items-center justify-center font-bold text-lg">3</div>
@@ -69,13 +65,30 @@ const codeSnippet = `Sentry.init({
         Install our UI app, perfect for human-debugging and enhanced visualization.
       </p>
 
-      <!-- Spotlight App Screenshot -->
       <div class="mb-6">
         <img
           src="/images/spotlight.png"
           alt="Spotlight app interface"
-          class="rounded-lg shadow-2xl mx-auto max-w-full h-auto"
+          class="rounded-lg shadow-2xl mx-auto max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+          id="spotlight-image"
         />
+      </div>
+
+      <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden p-4">
+        <div class="relative w-full h-full flex items-center justify-center">
+          <img
+            src="/images/spotlight.png"
+            alt="Spotlight app interface - Full size"
+            class="max-w-full max-h-full object-contain rounded-lg"
+          />
+          <button
+            id="close-modal"
+            class="absolute top-4 right-4 text-white bg-black bg-opacity-50 hover:bg-opacity-75 rounded-full w-10 h-10 flex items-center justify-center transition-all text-xl font-bold border-none outline-none"
+            style="line-height: 1;"
+          >
+            ×
+          </button>
+        </div>
       </div>
 
       <a href="/docs/setup" class="text-[#F14499] hover:underline font-medium">
@@ -84,4 +97,36 @@ const codeSnippet = `Sentry.init({
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const image = document.getElementById('spotlight-image');
+    const modal = document.getElementById('image-modal');
+    const closeBtn = document.getElementById('close-modal');
+
+    image?.addEventListener('click', function() {
+      modal?.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeBtn?.addEventListener('click', function() {
+      modal?.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    });
+
+    modal?.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !modal?.classList.contains('hidden')) {
+        modal?.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+    });
+  });
+</script>
 
