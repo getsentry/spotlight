@@ -168,11 +168,12 @@ export class MessageBuffer<T> {
       return JSON.stringify(data.event).includes(value.search);
     },
     filename: (item, value) => {
-      if (value.filename == null) {
+      const { filename } = value;
+      if (filename == null) {
         return true;
       }
 
-      const filename = value.filename;
+
       const contents = (item[1] as EventContainer).getParsedEnvelope();
 
       for (const [, payload] of contents.event[1]) {
