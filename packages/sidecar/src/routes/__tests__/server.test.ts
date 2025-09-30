@@ -105,7 +105,9 @@ describe("mcp", () => {
         params: {
           name: "get_local_errors",
           arguments: {
-            duration: 60,
+            filters: {
+              timeWindow: 60,
+            },
           },
         },
       }),
@@ -155,7 +157,9 @@ describe("mcp", () => {
         params: {
           name: "get_local_errors",
           arguments: {
-            duration: 60,
+            filters: {
+              timeWindow: 60,
+            },
           },
         },
       }),
