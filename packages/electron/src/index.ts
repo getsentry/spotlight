@@ -13,7 +13,6 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
-  sendDefaultPii: true,
   tracesSampleRate: 1.0,
   profilesSampleRate: 1.0,
   replaysSessionSampleRate: 1.1,
