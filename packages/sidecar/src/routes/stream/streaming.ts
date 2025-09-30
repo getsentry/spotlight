@@ -35,6 +35,10 @@ export const streamSSE = (
   c.header("Cache-Control", "no-cache");
   c.header("Connection", "keep-alive");
 
+  // Send something in the body to trigger the `open` event
+  // This is mostly for Firefox -- see #376
+  stream.writeln("");
+
   run(stream, cb, onError);
 
   return c.newResponse(stream.responseReadable);
