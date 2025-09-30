@@ -12,7 +12,7 @@ import {
 import { getBuffer } from "~/utils/index.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
 
-const filterSchema = {
+const inputSchema = {
   duration: z
     .number()
     .optional()
@@ -21,18 +21,18 @@ const filterSchema = {
     ),
   search: z.string().optional().describe("Search envelopes by content. (e.g. filename, error message, etc.)"),
   filename: z.string().optional().describe("Search envelopes by filename."),
+  pagination: z
+    .object({
+      limit: z.number().describe("Get the last n events."),
+      offset: z.number().default(0).describe("Get events starting from the nth position."),
+    })
+    .optional()
+    .describe("Paginate the results. Don't pass this if you want all results."),
 };
 
-export type FilterSchema = { [K in keyof typeof filterSchema]?: z.infer<(typeof filterSchema)[K]> };
+export type InputSchema = { [K in keyof typeof inputSchema]?: z.infer<(typeof inputSchema)[K]> };
 
-const paginationSchema = z
-  .object({
-    limit: z.number().describe("Get the last n events."),
-    offset: z.number().default(0).describe("Get events starting from the nth position."),
-  })
-  .optional();
-
-function applyPagination<T>(envelopes: T[], pagination?: z.infer<typeof paginationSchema>) {
+function applyPagination<T>(envelopes: T[], pagination: InputSchema["pagination"]) {
   if (pagination == null) {
     return envelopes;
   }
@@ -106,10 +106,7 @@ User: "App crashes after deployment"
 - "Button doesn't work" → Find click handler exceptions
 
 **Remember:** Always prefer real runtime errors over speculation. If no errors appear, guide user to reproduce the issue rather than starting development servers or making assumptions.`,
-      inputSchema: {
-        ...filterSchema,
-        pagination: paginationSchema,
-      },
+      inputSchema,
     },
     async args => {
       const envelopes = getBuffer().read(args);
@@ -215,10 +212,7 @@ User: "I added logging to track user actions"
 - **ERROR**: Actual failures (also available via get_local_errors)
 
 **Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.`,
-      inputSchema: {
-        ...filterSchema,
-        pagination: paginationSchema,
-      },
+      inputSchema,
     },
     async args => {
       const envelopes = getBuffer().read(args);
@@ -281,10 +275,7 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
 - "Performance issues" → Look for slow traces
 - "Request flows" → See transaction patterns
 - "Distributed tracing" → View trace summaries`,
-      inputSchema: {
-        ...filterSchema,
-        pagination: paginationSchema,
-      },
+      inputSchema,
     },
     async args => {
       const envelopes = getBuffer().read(args);

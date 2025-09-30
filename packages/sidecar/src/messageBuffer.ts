@@ -1,5 +1,5 @@
 import { uuidv7 } from "uuidv7";
-import type { FilterSchema } from "./mcp/mcp.js";
+import type { InputSchema } from "./mcp/mcp.js";
 import type { EventContainer } from "./utils/eventContainer.js";
 
 export class MessageBuffer<T> {
@@ -192,6 +192,6 @@ export class MessageBuffer<T> {
   };
 }
 
-export type ReadFilter = FilterSchema & {
+export type ReadFilter = InputSchema & {
   envelopeId?: string;
 };
