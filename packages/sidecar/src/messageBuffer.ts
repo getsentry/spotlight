@@ -114,23 +114,27 @@ export class MessageBuffer<T> {
 
   read(filters: ReadFilter): T[] {
     const result: T[] = [];
-    const start = this.head;
-    const end = this.writePos;
+
+    const filterHandlers = Object.keys(filters)
+      .map(key => this.filterHandlers[key])
+      .filter(Boolean);
+
+    const { limit, offset = 0 } = filters.pagination ?? {};
+    const end = this.writePos - offset;
+    const start = limit ? end - limit : this.head;
 
     for (let i = end - 1; i >= start; i--) {
       const item = this.items[i % this.size];
 
-      if (item !== undefined) {
-        // Apply all filters
-        const isValid = Object.keys(filters).every(key => this.filterHandlers[key](item, filters));
+      if (item === undefined) continue;
 
-        // Check if the item passes all filters
-        if (!isValid) {
-          continue;
-        }
+      // Apply all filters
+      const isValid = filterHandlers.every(handler => handler(item, filters));
 
-        result.push(item[1]);
-      }
+      // Check if the item passes all filters
+      if (!isValid) continue;
+
+      result.push(item[1]);
     }
 
     return result;
@@ -153,11 +157,27 @@ export class MessageBuffer<T> {
 
       return data.event[0].__spotlight_envelope_id === value.envelopeId;
     },
+    filename: (_item, value) => {
+      if (value.filename == null) {
+        return true;
+      }
+
+      // TODO: Implement filename filter
+
+      return true;
+    },
   };
 }
 
-type ReadFilter = {
+export type ReadFilter = {
   // duration in seconds
   duration?: number;
   envelopeId?: string;
+  // Search by filename
+  filename?: string;
+  // Get events based on a limit and offset.
+  pagination?: {
+    limit: number;
+    offset: number;
+  };
 };

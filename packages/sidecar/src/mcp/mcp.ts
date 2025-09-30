@@ -9,8 +9,48 @@ import {
   formatTraceSummary,
   renderSpanTree,
 } from "~/format/index.js";
+import type { ReadFilter } from "~/messageBuffer.js";
 import { getBuffer } from "~/utils/index.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
+
+export const filterSchema = z.union([
+  z.object({
+    duration: z
+      .number()
+      .describe(
+        "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
+      ),
+  }),
+  z
+    .object({
+      limit: z.number().describe("Get the last n events."),
+      offset: z.number().default(0).describe("Get events starting from the nth position."),
+    })
+    .describe(
+      "Get events based on a limit and offset. Eg. get the last 20 events or get events starting from the 10th position.",
+    ),
+  z.object({
+    filename: z.string().describe("Search by filename."),
+  }),
+]);
+
+function getFilterParams(args: z.infer<typeof filterSchema>) {
+  const filter: ReadFilter = {};
+
+  if ("duration" in args) {
+    filter.duration = args.duration;
+  }
+
+  if ("limit" in args) {
+    filter.pagination = { limit: args.limit, offset: args.offset };
+  }
+
+  if ("filename" in args) {
+    filter.filename = args.filename;
+  }
+
+  return filter;
+}
 
 export function createMCPInstance() {
   const mcp = new McpServer({
@@ -79,16 +119,11 @@ User: "App crashes after deployment"
 
 **Remember:** Always prefer real runtime errors over speculation. If no errors appear, guide user to reproduce the issue rather than starting development servers or making assumptions.`,
       inputSchema: {
-        timeWindow: z
-          .number()
-          .default(60)
-          .describe(
-            "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
-          ),
+        filters: filterSchema,
       },
     },
     async args => {
-      const envelopes = getBuffer().read({ duration: args.timeWindow });
+      const envelopes = getBuffer().read(getFilterParams(args.filters));
 
       if (envelopes.length === 0) {
         return NO_ERRORS_CONTENT;
@@ -192,16 +227,11 @@ User: "I added logging to track user actions"
 
 **Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.`,
       inputSchema: {
-        timeWindow: z
-          .number()
-          .default(60)
-          .describe(
-            "Look back this many seconds for logs. Use 300+ for broader investigation. Use 30 for recent logs only. For debugging, use 10. For most cases, use 60.",
-          ),
+        filters: filterSchema,
       },
     },
     async args => {
-      const envelopes = getBuffer().read({ duration: args.timeWindow });
+      const envelopes = getBuffer().read(getFilterParams(args.filters));
 
       if (envelopes.length === 0) {
         return NO_LOGS_CONTENT;
@@ -262,16 +292,11 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
 - "Request flows" → See transaction patterns
 - "Distributed tracing" → View trace summaries`,
       inputSchema: {
-        timeWindow: z
-          .number()
-          .default(300)
-          .describe(
-            "Look back this many seconds for traces. Use 600+ for broader investigation. Use 60 for recent traces only. For most cases, use 300.",
-          ),
+        filters: filterSchema,
       },
     },
     async args => {
-      const envelopes = getBuffer().read({ duration: args.timeWindow });
+      const envelopes = getBuffer().read(getFilterParams(args.filters));
 
       if (envelopes.length === 0) {
         return {
