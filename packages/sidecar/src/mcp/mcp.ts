@@ -20,7 +20,7 @@ const inputSchema = {
       "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
     ),
   search: z.string().optional().describe("Search envelopes by content. (e.g. filename, error message, etc.)"),
-  filename: z.string().optional().describe("Search envelopes by filename."),
+  filename: z.string().optional().describe("Search events by filename."),
   pagination: z
     .object({
       limit: z.number().describe("Get the last n events."),
