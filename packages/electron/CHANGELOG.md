@@ -1,5 +1,29 @@
 # @spotlightjs/electron
 
+## 1.9.1
+
+### Patch Changes
+
+- Updated dependencies [[`48be8f3`](https://github.com/getsentry/spotlight/commit/48be8f35cc7b6800989237cb2edbd90165a20c99)]:
+  - @spotlightjs/sidecar@2.1.1
+  - @spotlightjs/overlay@4.1.0
+
+## 1.9.0
+
+### Minor Changes
+
+- More attachment type support: suppresses JSON parse errors from statsd and replay_video event types and displays statsd data as text ([#946](https://github.com/getsentry/spotlight/pull/946))
+
+### Patch Changes
+
+- Always sort traces and envelopes in reverse-chronological order ([#950](https://github.com/getsentry/spotlight/pull/950))
+
+- Always showing the Clear Events Button ([#939](https://github.com/getsentry/spotlight/pull/939))
+
+- Updated dependencies [[`f07068a`](https://github.com/getsentry/spotlight/commit/f07068ac903f917bea9cfb199e8384d94684eabb), [`f8aa213`](https://github.com/getsentry/spotlight/commit/f8aa2130f06ad1806312dc6ca915dd6009df38ae), [`81c7d08`](https://github.com/getsentry/spotlight/commit/81c7d08b3bae9f1b9150d847accf3a28e0d67f03), [`7b47c71`](https://github.com/getsentry/spotlight/commit/7b47c71236d884c737c1bc79227c41753f9bee5e), [`915659e`](https://github.com/getsentry/spotlight/commit/915659e3ab66408b81e1ed776dbc973edce33a50), [`896879e`](https://github.com/getsentry/spotlight/commit/896879e97bbff288c90941a0b50e3948b45d8c2a), [`dbc1fd2`](https://github.com/getsentry/spotlight/commit/dbc1fd2d950ab69135c28e2af91f126987fe68cc), [`1716197`](https://github.com/getsentry/spotlight/commit/1716197b4376b7a12e9bdd66eef4381a11922c5b)]:
+  - @spotlightjs/overlay@4.1.0
+  - @spotlightjs/sidecar@2.1.0
+
 ## 1.8.0
 
 ### Minor Changes

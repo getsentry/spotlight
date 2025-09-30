@@ -1,5 +1,32 @@
 # @spotlightjs/sidecar
 
+## 2.1.1
+
+### Patch Changes
+
+- Drop min Node version requirement to v20 again ([#961](https://github.com/getsentry/spotlight/pull/961))
+
+## 2.1.0
+
+### Minor Changes
+
+- Automatically recover when the upstream sidecar stops/goes away in MCP stdio proxy mode ([#938](https://github.com/getsentry/spotlight/pull/938))
+
+  - Tries to reconnect in case it was a blip or another server just took over
+  - If the reconnection fails, switches itself to be the main sidecar process
+
+  Caveat: it does not carry over the old events, we may wanna look into this in the future
+
+- Added support for processing attachments ([#941](https://github.com/getsentry/spotlight/pull/941))
+
+- More attachment type support: suppresses JSON parse errors from statsd and replay_video event types and displays statsd data as text ([#946](https://github.com/getsentry/spotlight/pull/946))
+
+### Patch Changes
+
+- Corrected the clear button api ([#951](https://github.com/getsentry/spotlight/pull/951))
+
+- Fix engines fields in package.json for proper `pnpx` usage ([#944](https://github.com/getsentry/spotlight/pull/944))
+
 ## 2.0.0
 
 ### Major Changes

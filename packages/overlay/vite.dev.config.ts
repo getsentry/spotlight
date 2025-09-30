@@ -32,6 +32,7 @@ export default defineConfig({
     headers: {
       "Document-Policy": "js-profiling",
     },
+    historyApiFallback: true,
   },
   build: {
     outDir: resolve(__dirname, "dist", "overlay"),

@@ -129,7 +129,12 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
     app.get("/*", serveFilesHandler(filesToServe));
   }
 
-  const { resolve, reject, promise } = Promise.withResolvers<ServerType>();
+  let resolve: (value: ServerType) => void;
+  let reject: (err: Error) => void;
+  const promise = new Promise<ServerType>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
   const sidecarServer = serve(
     {
       fetch: app.fetch,

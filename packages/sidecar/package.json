@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/sidecar",
   "description": "A small proxy server to capture and forward data from backend services to Spotlight.",
-  "version": "2.0.0",
+  "version": "2.1.1",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
@@ -64,6 +64,6 @@
     "extends": "../../package.json"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=20"
   }
 }

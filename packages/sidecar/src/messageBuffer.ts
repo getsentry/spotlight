@@ -7,7 +7,7 @@ export class MessageBuffer<T> {
   private writePos = 0;
   private head = 0;
   private timeout = 10;
-  private readers = new Map<string, { pos: number; callback: (item: T) => void }>();
+  private readers = new Map<string, { tid?: NodeJS.Immediate; pos: number; callback: (item: T) => void }>();
 
   constructor(size = 100) {
     this.size = size;
@@ -30,16 +30,35 @@ export class MessageBuffer<T> {
       if (atItem[0] > minTime) break;
       this.head += 1;
     }
+
+    for (const [readerId, readerInfo] of this.readers.entries()) {
+      if (readerInfo.tid) {
+        clearImmediate(readerInfo.tid);
+      }
+
+      readerInfo.tid = setImmediate(() => this.stream(readerId));
+    }
   }
 
   subscribe(callback: (item: T) => void): string {
     const readerId = uuidv7();
-    this.readers.set(readerId, { pos: this.head, callback });
-    setImmediate(() => this.stream(readerId));
+    const readerInfo = {
+      callback,
+      pos: this.head,
+      tid: setImmediate(() => this.stream(readerId)),
+    };
+    this.readers.set(readerId, readerInfo);
+
     return readerId;
   }
 
   unsubscribe(readerId: string): void {
+    const readerInfo = this.readers.get(readerId);
+    // Clearing any pending timeouts
+    if (readerInfo?.tid) {
+      clearImmediate(readerInfo.tid);
+    }
+
     this.readers.delete(readerId);
   }
 
@@ -63,10 +82,6 @@ export class MessageBuffer<T> {
 
     // No need to `this.readers.set` again, as `readerInfo` is a reference
     readerInfo.pos = atReadPos;
-
-    // Processing the next batch of messages async to avoid blocking the main thread
-    // TODO: consider adding a batch size limit to avoid lock ups
-    setImmediate(() => this.stream(readerId));
   }
 
   /**
@@ -77,6 +92,11 @@ export class MessageBuffer<T> {
     this.reset();
 
     for (const readerInfo of this.readers.values()) {
+      if (readerInfo.tid) {
+        clearImmediate(readerInfo.tid);
+      }
+
+      readerInfo.tid = undefined;
       readerInfo.pos = this.head;
     }
   }
