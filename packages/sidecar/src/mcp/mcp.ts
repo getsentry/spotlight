@@ -13,43 +13,50 @@ import type { ReadFilter } from "~/messageBuffer.js";
 import { getBuffer } from "~/utils/index.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
 
-export const filterSchema = z.union([
-  z.object({
-    duration: z
-      .number()
-      .describe(
-        "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
-      ),
-  }),
-  z
-    .object({
-      limit: z.number().describe("Get the last n events."),
-      offset: z.number().default(0).describe("Get events starting from the nth position."),
-    })
-    .describe(
-      "Get events based on a limit and offset. Eg. get the last 20 events or get events starting from the 10th position.",
-    ),
-  z.object({
-    filename: z.string().describe("Search by filename."),
-  }),
-]);
+const filterSchema = z
+  .union([
+    z.object({
+      duration: z
+        .number()
+        .describe(
+          "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
+        ),
+    }),
+    z.object({
+      filename: z.string().describe("Search by filename."),
+    }),
+  ])
+  .optional();
 
-function getFilterParams(args: z.infer<typeof filterSchema>) {
+const paginationSchema = z
+  .object({
+    limit: z.number().describe("Get the last n events."),
+    offset: z.number().default(0).describe("Get events starting from the nth position."),
+  })
+  .optional();
+
+function getFilterParams(args?: z.infer<typeof filterSchema>) {
   const filter: ReadFilter = {};
 
-  if ("duration" in args) {
-    filter.duration = args.duration;
-  }
+  if (args != null) {
+    if ("duration" in args) {
+      filter.duration = args.duration;
+    }
 
-  if ("limit" in args) {
-    filter.pagination = { limit: args.limit, offset: args.offset };
-  }
-
-  if ("filename" in args) {
-    filter.filename = args.filename;
+    if ("filename" in args) {
+      filter.filename = args.filename;
+    }
   }
 
   return filter;
+}
+
+function applyPagination<T>(envelopes: T[], pagination?: z.infer<typeof paginationSchema>) {
+  if (pagination == null) {
+    return envelopes;
+  }
+
+  return envelopes.slice(pagination.offset, pagination.offset + pagination.limit);
 }
 
 export function createMCPInstance() {
@@ -120,6 +127,7 @@ User: "App crashes after deployment"
 **Remember:** Always prefer real runtime errors over speculation. If no errors appear, guide user to reproduce the issue rather than starting development servers or making assumptions.`,
       inputSchema: {
         filters: filterSchema,
+        pagination: paginationSchema,
       },
     },
     async args => {
@@ -152,7 +160,7 @@ User: "App crashes after deployment"
       }
 
       return {
-        content,
+        content: applyPagination(content, args.pagination),
       };
     },
   );
@@ -228,6 +236,7 @@ User: "I added logging to track user actions"
 **Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.`,
       inputSchema: {
         filters: filterSchema,
+        pagination: paginationSchema,
       },
     },
     async args => {
@@ -260,7 +269,7 @@ User: "I added logging to track user actions"
       }
 
       return {
-        content,
+        content: applyPagination(content, args.pagination),
       };
     },
   );
@@ -293,6 +302,7 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
 - "Distributed tracing" → View trace summaries`,
       inputSchema: {
         filters: filterSchema,
+        pagination: paginationSchema,
       },
     },
     async args => {
@@ -347,7 +357,7 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
         text: "\n**Next Steps:**\nUse `get_events_for_trace` with a trace ID (e.g., first 8 characters shown above) to see the full span tree and detailed timing breakdown for any specific trace.",
       });
 
-      return { content };
+      return { content: applyPagination(content, args.pagination) };
     },
   );
 
@@ -386,7 +396,8 @@ get_events_for_trace(traceId: "71a8c5e41ae1044dee67f50a07538fe7")  // Using full
       },
     },
     async args => {
-      const envelopes = getBuffer().read({ duration: 600 }); // Look back further for trace details
+      // Getting all the envelopes
+      const envelopes = getBuffer().read();
       const traces = extractTracesFromEnvelopes(envelopes);
 
       // Find trace by full ID or partial ID match

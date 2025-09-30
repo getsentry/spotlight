@@ -112,27 +112,27 @@ export class MessageBuffer<T> {
     this.head = this.writePos;
   }
 
-  read(filters: ReadFilter): T[] {
+  read(filters?: ReadFilter): T[] {
     const result: T[] = [];
+    const start = this.head;
+    const end = this.writePos;
 
-    const filterHandlers = Object.keys(filters)
+    const filterHandlers = Object.keys(filters ?? {})
       .map(key => this.filterHandlers[key])
       .filter(Boolean);
-
-    const { limit, offset = 0 } = filters.pagination ?? {};
-    const end = this.writePos - offset;
-    const start = limit ? end - limit : this.head;
 
     for (let i = end - 1; i >= start; i--) {
       const item = this.items[i % this.size];
 
       if (item === undefined) continue;
 
-      // Apply all filters
-      const isValid = filterHandlers.every(handler => handler(item, filters));
+      if (filters != null) {
+        // Apply all filters
+        const isValid = filterHandlers.every(handler => handler(item, filters));
 
-      // Check if the item passes all filters
-      if (!isValid) continue;
+        // Check if the item passes all filters
+        if (!isValid) continue;
+      }
 
       result.push(item[1]);
     }
@@ -175,9 +175,4 @@ export type ReadFilter = {
   envelopeId?: string;
   // Search by filename
   filename?: string;
-  // Get events based on a limit and offset.
-  pagination?: {
-    limit: number;
-    offset: number;
-  };
 };
