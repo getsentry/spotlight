@@ -113,27 +113,25 @@ export class MessageBuffer<T> {
     this.head = this.writePos;
   }
 
-  read(filters?: ReadFilter): T[] {
+  read(filters: ReadFilter = { duration: 60 }): T[] {
     const result: T[] = [];
     const start = this.head;
     const end = this.writePos;
 
-    const filterHandlers = Object.keys(filters ?? {})
-      .map(key => this.filterHandlers[key])
-      .filter(Boolean);
+    const filterHandlers = [];
+    for (const key in Object.keys(filters)) {
+      if (this.filterHandlers[key]) {
+        filterHandlers.push(this.filterHandlers[key]);
+      }
+    }
 
     for (let i = end - 1; i >= start; i--) {
       const item = this.items[i % this.size];
 
-      if (item === undefined) continue;
+      if (item == null) continue;
 
-      if (filters != null) {
-        // Apply all filters
-        const isValid = filterHandlers.every(handler => handler(item, filters));
-
-        // Check if the item passes all filters
-        if (!isValid) continue;
-      }
+      // Check if the item passes all filters
+      if (!filterHandlers.every(handler => handler(item, filters))) continue;
 
       result.push(item[1]);
     }
@@ -158,37 +156,22 @@ export class MessageBuffer<T> {
 
       return data.event[0].__spotlight_envelope_id === value.envelopeId;
     },
-    search: (item, value) => {
-      if (value.search == null) {
-        return true;
-      }
-
-      const data = (item[1] as EventContainer).getParsedEnvelope();
-
-      return JSON.stringify(data.event).includes(value.search);
-    },
     filename: (item, value) => {
       const { filename } = value;
       if (filename == null) {
         return true;
       }
 
-
       const contents = (item[1] as EventContainer).getParsedEnvelope();
 
-      for (const [, payload] of contents.event[1]) {
-        if (typeof payload === "object" && "exception" in payload && payload.exception) {
-          const found = payload.exception.values?.some(val =>
-            val.stacktrace?.frames?.some(frame => frame.filename?.match(new RegExp(filename, "i"))),
-          );
-
-          if (found) {
-            return true;
-          }
-        }
-      }
-
-      return false;
+      return contents.event[1].some(
+        ([, payload]) =>
+          typeof payload === "object" &&
+          "exception" in payload &&
+          payload.exception?.values?.some(val =>
+            val.stacktrace?.frames?.some(frame => frame.filename?.endsWith(filename)),
+          ),
+      );
     },
   };
 }

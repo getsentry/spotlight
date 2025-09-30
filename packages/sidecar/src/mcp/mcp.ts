@@ -17,9 +17,8 @@ const inputSchema = {
     .number()
     .optional()
     .describe(
-      "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
+      "Look back this many seconds for errors. Use 300+ for broader investigation and something around 60 for most other stuff",
     ),
-  search: z.string().optional().describe("Search envelopes by content. (e.g. filename, error message, etc.)"),
   filename: z.string().optional().describe("Search events by filename."),
   pagination: z
     .object({
@@ -109,7 +108,8 @@ User: "App crashes after deployment"
       inputSchema,
     },
     async args => {
-      const envelopes = getBuffer().read(args);
+      const { pagination, ...filters } = args;
+      const envelopes = getBuffer().read(filters);
 
       if (envelopes.length === 0) {
         return NO_ERRORS_CONTENT;
@@ -138,7 +138,7 @@ User: "App crashes after deployment"
       }
 
       return {
-        content: applyPagination(content, args.pagination),
+        content: applyPagination(content, pagination),
       };
     },
   );
@@ -215,7 +215,8 @@ User: "I added logging to track user actions"
       inputSchema,
     },
     async args => {
-      const envelopes = getBuffer().read(args);
+      const { pagination, ...filters } = args;
+      const envelopes = getBuffer().read(filters);
 
       if (envelopes.length === 0) {
         return NO_LOGS_CONTENT;
@@ -244,7 +245,7 @@ User: "I added logging to track user actions"
       }
 
       return {
-        content: applyPagination(content, args.pagination),
+        content: applyPagination(content, pagination),
       };
     },
   );
@@ -278,7 +279,8 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
       inputSchema,
     },
     async args => {
-      const envelopes = getBuffer().read(args);
+      const { pagination, ...filters } = args;
+      const envelopes = getBuffer().read(filters);
 
       if (envelopes.length === 0) {
         return {
@@ -324,7 +326,7 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
         });
       }
 
-      content = applyPagination(content, args.pagination);
+      content = applyPagination(content, pagination);
 
       content.push({
         type: "text",
@@ -371,7 +373,7 @@ get_events_for_trace(traceId: "71a8c5e41ae1044dee67f50a07538fe7")  // Using full
     },
     async args => {
       // Getting all the envelopes
-      const envelopes = getBuffer().read();
+      const envelopes = getBuffer().read({});
       const traces = extractTracesFromEnvelopes(envelopes);
 
       // Find trace by full ID or partial ID match
