@@ -9,24 +9,21 @@ import {
   formatTraceSummary,
   renderSpanTree,
 } from "~/format/index.js";
-import type { ReadFilter } from "~/messageBuffer.js";
 import { getBuffer } from "~/utils/index.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
 
-const filterSchema = z
-  .union([
-    z.object({
-      duration: z
-        .number()
-        .describe(
-          "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
-        ),
-    }),
-    z.object({
-      filename: z.string().describe("Search by filename."),
-    }),
-  ])
-  .optional();
+const filterSchema = {
+  duration: z
+    .number()
+    .optional()
+    .describe(
+      "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
+    ),
+  search: z.string().optional().describe("Search envelopes by content. (e.g. filename, error message, etc.)"),
+  filename: z.string().optional().describe("Search envelopes by filename."),
+};
+
+export type FilterSchema = { [K in keyof typeof filterSchema]?: z.infer<(typeof filterSchema)[K]> };
 
 const paginationSchema = z
   .object({
@@ -34,22 +31,6 @@ const paginationSchema = z
     offset: z.number().default(0).describe("Get events starting from the nth position."),
   })
   .optional();
-
-function getFilterParams(args?: z.infer<typeof filterSchema>) {
-  const filter: ReadFilter = {};
-
-  if (args != null) {
-    if ("duration" in args) {
-      filter.duration = args.duration;
-    }
-
-    if ("filename" in args) {
-      filter.filename = args.filename;
-    }
-  }
-
-  return filter;
-}
 
 function applyPagination<T>(envelopes: T[], pagination?: z.infer<typeof paginationSchema>) {
   if (pagination == null) {
@@ -126,12 +107,12 @@ User: "App crashes after deployment"
 
 **Remember:** Always prefer real runtime errors over speculation. If no errors appear, guide user to reproduce the issue rather than starting development servers or making assumptions.`,
       inputSchema: {
-        filters: filterSchema,
+        ...filterSchema,
         pagination: paginationSchema,
       },
     },
     async args => {
-      const envelopes = getBuffer().read(getFilterParams(args.filters));
+      const envelopes = getBuffer().read(args);
 
       if (envelopes.length === 0) {
         return NO_ERRORS_CONTENT;
@@ -235,12 +216,12 @@ User: "I added logging to track user actions"
 
 **Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.`,
       inputSchema: {
-        filters: filterSchema,
+        ...filterSchema,
         pagination: paginationSchema,
       },
     },
     async args => {
-      const envelopes = getBuffer().read(getFilterParams(args.filters));
+      const envelopes = getBuffer().read(args);
 
       if (envelopes.length === 0) {
         return NO_LOGS_CONTENT;
@@ -301,12 +282,12 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
 - "Request flows" → See transaction patterns
 - "Distributed tracing" → View trace summaries`,
       inputSchema: {
-        filters: filterSchema,
+        ...filterSchema,
         pagination: paginationSchema,
       },
     },
     async args => {
-      const envelopes = getBuffer().read(getFilterParams(args.filters));
+      const envelopes = getBuffer().read(args);
 
       if (envelopes.length === 0) {
         return {

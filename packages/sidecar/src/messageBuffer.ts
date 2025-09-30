@@ -1,4 +1,5 @@
 import { uuidv7 } from "uuidv7";
+import type { FilterSchema } from "./mcp/mcp.js";
 import type { EventContainer } from "./utils/eventContainer.js";
 
 export class MessageBuffer<T> {
@@ -157,22 +158,40 @@ export class MessageBuffer<T> {
 
       return data.event[0].__spotlight_envelope_id === value.envelopeId;
     },
-    filename: (_item, value) => {
+    search: (item, value) => {
+      if (value.search == null) {
+        return true;
+      }
+
+      const data = (item[1] as EventContainer).getParsedEnvelope();
+
+      return JSON.stringify(data.event).includes(value.search);
+    },
+    filename: (item, value) => {
       if (value.filename == null) {
         return true;
       }
 
-      // TODO: Implement filename filter
+      const filename = value.filename;
+      const contents = (item[1] as EventContainer).getParsedEnvelope();
 
-      return true;
+      for (const [, payload] of contents.event[1]) {
+        if (typeof payload === "object" && "exception" in payload && payload.exception) {
+          const found = payload.exception.values?.some(val =>
+            val.stacktrace?.frames?.some(frame => frame.filename?.match(new RegExp(filename, "i"))),
+          );
+
+          if (found) {
+            return true;
+          }
+        }
+      }
+
+      return false;
     },
   };
 }
 
-export type ReadFilter = {
-  // duration in seconds
-  duration?: number;
+export type ReadFilter = FilterSchema & {
   envelopeId?: string;
-  // Search by filename
-  filename?: string;
 };
