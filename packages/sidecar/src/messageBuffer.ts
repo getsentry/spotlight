@@ -192,6 +192,6 @@ export class MessageBuffer<T> {
   };
 }
 
-export type ReadFilter = InputSchema & {
+export type ReadFilter = Omit<InputSchema, "pagination"> & {
   envelopeId?: string;
 };
