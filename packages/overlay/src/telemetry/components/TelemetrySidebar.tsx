@@ -64,8 +64,7 @@ export default function TelemetrySidebar({ errorCount, traceCount, isOnline }: T
   const isInsightsActive = pathname.startsWith("/telemetry/insights");
 
   // This is used to determine if the overlay is running inside electron
-  // @ts-expect-error - IN_DESKTOP_ENV is not typed
-  const isElectron: boolean = globalThis.IN_DESKTOP_ENV;
+  const isElectron = globalThis.IN_DESKTOP_ENV;
 
   return (
     <nav
