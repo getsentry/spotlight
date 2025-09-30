@@ -11,9 +11,15 @@ export function serveFilesHandler(filesToServe: Record<string, Buffer>): Handler
   return ctx => {
     let filePath = `${ctx.req.path || ctx.req.url}`;
 
-    if (filePath === "/") {
+    
+    // The `/telemetry` route is handled by the React app with the location
+    // router. This is kind of a hack to avoid a 404 when the user refreshes
+    // the page or directly navigates to `/telemetry`. Should probably find
+    // a better way to share routes from the UI to the sidecar later on.
+    if (filePath === "/" || filePath.startsWith("/telemetry")) {
       filePath = "/src/index.html";
     }
+    
     filePath = filePath.slice(1);
 
     const extName = extname(filePath);
