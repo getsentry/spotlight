@@ -26,6 +26,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "sharp": "^0.33.5",
+    "shiki": "^3.13.0",
     "tailwindcss": "catalog:"
   },
   "devDependencies": {
