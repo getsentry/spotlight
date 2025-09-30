@@ -13,13 +13,20 @@ import { getBuffer } from "~/utils/index.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
 
 const inputSchema = {
-  duration: z
+  timeWindow: z
     .number()
     .optional()
     .describe(
-      "Look back this many seconds for errors. Use 300+ for broader investigation and something around 60 for most other stuff",
+      "Look back this many seconds for errors. Use 300+ for broader investigation and something around 60 for everything else",
     ),
   filename: z.string().optional().describe("Search events by filename."),
+  /**
+   * TODO: Need to check, if this approach is better then a cursor based approach,
+   * where the user can pass `events since [event_id]` as "last N events" is a
+   * moving target as events keep coming in.
+   *
+   * https://github.com/getsentry/spotlight/pull/968#discussion_r2391587907
+   */
   pagination: z
     .object({
       limit: z.number().describe("Get the last n events."),

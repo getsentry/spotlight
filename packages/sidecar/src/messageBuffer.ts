@@ -113,13 +113,13 @@ export class MessageBuffer<T> {
     this.head = this.writePos;
   }
 
-  read(filters: ReadFilter = { duration: 60 }): T[] {
+  read(filters: ReadFilter = { timeWindow: 60 }): T[] {
     const result: T[] = [];
     const start = this.head;
     const end = this.writePos;
 
     const filterHandlers = [];
-    for (const key in Object.keys(filters)) {
+    for (const key of Object.keys(filters)) {
       if (this.filterHandlers[key]) {
         filterHandlers.push(this.filterHandlers[key]);
       }
@@ -140,12 +140,12 @@ export class MessageBuffer<T> {
   }
 
   filterHandlers: Record<keyof ReadFilter | string, (item: [number, T], value: ReadFilter) => boolean> = {
-    duration: (item, value) => {
-      if (value.duration == null) {
+    timeWindow: (item, value) => {
+      if (value.timeWindow == null) {
         return true;
       }
 
-      return item[0] > Date.now() - value.duration * 1000;
+      return item[0] > Date.now() - value.timeWindow * 1000;
     },
     envelopeId: (item, value) => {
       if (value.envelopeId == null) {
