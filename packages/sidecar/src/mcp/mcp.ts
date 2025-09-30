@@ -13,13 +13,18 @@ import { getBuffer } from "~/utils/index.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
 
 const inputSchema = {
-  timeWindow: z
-    .number()
-    .optional()
-    .describe(
-      "Look back this many seconds for errors. Use 300+ for broader investigation and something around 60 for everything else",
-    ),
-  filename: z.string().optional().describe("Search events by filename."),
+  filters: z.union([
+    z.object({
+      timeWindow: z
+        .number()
+        .describe(
+          "Look back this many seconds for errors. Use 300+ for broader investigation and something around 60 for everything else",
+        ),
+    }),
+    z.object({
+      filename: z.string().describe("Search events by filename."),
+    }),
+  ]),
   /**
    * TODO: Need to check, if this approach is better then a cursor based approach,
    * where the user can pass `events since [event_id]` as "last N events" is a
@@ -115,7 +120,7 @@ User: "App crashes after deployment"
       inputSchema,
     },
     async args => {
-      const { pagination, ...filters } = args;
+      const { pagination, filters } = args;
       const envelopes = getBuffer().read(filters);
 
       if (envelopes.length === 0) {
@@ -222,7 +227,7 @@ User: "I added logging to track user actions"
       inputSchema,
     },
     async args => {
-      const { pagination, ...filters } = args;
+      const { pagination, filters } = args;
       const envelopes = getBuffer().read(filters);
 
       if (envelopes.length === 0) {
@@ -286,7 +291,7 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
       inputSchema,
     },
     async args => {
-      const { pagination, ...filters } = args;
+      const { pagination, filters } = args;
       const envelopes = getBuffer().read(filters);
 
       if (envelopes.length === 0) {
