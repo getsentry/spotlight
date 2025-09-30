@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 2.1.2
+
+### Patch Changes
+
+- Fix 404 when refreshing on a page with "/telemetry" in the path ([#973](https://github.com/getsentry/spotlight/pull/973))
+
 ## 2.1.1
 
 ### Patch Changes
