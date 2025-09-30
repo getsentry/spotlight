@@ -29,7 +29,7 @@ function NavigationLink({
     <Link
       to={to}
       className={`relative flex items-center gap-x-2 p-3 font-medium transition ${isSubItem ? "pl-6" : ""} ${
-        isActive ? "text-white" : "text-primary-300 hover:bg-primary-800 hover:text-primary-100"
+        isActive ? "text-white bg-primary-600" : "text-primary-300 hover:bg-primary-800 hover:text-primary-100"
       }`}
     >
       {title}
@@ -63,13 +63,16 @@ export default function TelemetrySidebar({ errorCount, traceCount, isOnline }: T
 
   const isInsightsActive = pathname.startsWith("/telemetry/insights");
 
+  // This is used to determine if the overlay is running inside electron
+  const isElectron = globalThis.IN_DESKTOP_ENV;
+
   return (
     <nav
       className="flex flex-col border-r border-primary-700"
       style={{ width: "240px", minWidth: "240px" }}
       aria-label="Navigation"
     >
-      <header className="p-4">
+      <header className={cn("p-4", isElectron && "mt-4")}>
         <div className="text-primary-200 flex flex-col gap-x-2">
           <div className="inline-flex items-center gap-x-2">
             <Logo height={24} width={24} />
