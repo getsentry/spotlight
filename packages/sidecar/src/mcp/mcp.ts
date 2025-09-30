@@ -304,7 +304,7 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
         };
       }
 
-      const content: TextContent[] = [];
+      let content: TextContent[] = [];
 
       // Sort traces by start time (most recent first)
       const sortedTraces = Array.from(traces.values()).sort(
@@ -324,12 +324,14 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
         });
       }
 
+      content = applyPagination(content, args.pagination);
+
       content.push({
         type: "text",
         text: "\n**Next Steps:**\nUse `get_events_for_trace` with a trace ID (e.g., first 8 characters shown above) to see the full span tree and detailed timing breakdown for any specific trace.",
       });
 
-      return { content: applyPagination(content, args.pagination) };
+      return { content };
     },
   );
 
