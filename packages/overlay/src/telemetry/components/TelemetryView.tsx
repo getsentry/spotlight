@@ -37,7 +37,7 @@ export default function TelemetryView({
   const traceCount = store.getTraces().length;
 
   return (
-    <div className="spotlight-debugger from-primary-900 to-primary-950 flex h-full overflow-hidden bg-gradient-to-br from-0% to-20% font-sans text-white">
+    <div className="from-primary-900 to-primary-950 flex h-full overflow-hidden bg-gradient-to-br from-0% to-20% font-sans text-white">
       <TelemetrySidebar errorCount={errorCount} traceCount={traceCount} isOnline={isOnline} />
       <div className="flex-1 overflow-auto">
         <Routes>

@@ -5,7 +5,6 @@ import { useCallback, useMemo } from "react";
 import { Badge } from "~/ui/badge";
 import { Button } from "~/ui/button";
 import { Input } from "~/ui/input";
-import { getSpotlightContainer } from "~/utils/dom";
 import type { FilterConfigs } from "../../hooks/useTraceFiltering";
 import { FilterDropdown } from "../shared/FilterDropdown";
 
@@ -24,8 +23,6 @@ export default function TraceListFilter({
   setActiveFilters,
   filterConfigs,
 }: TraceListFilterProps) {
-  const spotlightContainer = getSpotlightContainer();
-
   const handleFilterChange = useCallback(
     (value: string, checked: boolean, type: "checkbox" | "radio") => {
       if (type === "checkbox") {
@@ -89,7 +86,6 @@ export default function TraceListFilter({
               type={config.type}
               activeFilters={activeFilters}
               onFilterChange={(value, checked) => handleFilterChange(value, checked, config.type)}
-              container={spotlightContainer}
             />
           ))}
         </div>
