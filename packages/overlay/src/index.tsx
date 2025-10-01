@@ -8,10 +8,10 @@ import { on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
 import { activateLogger, log } from "./lib/logger";
 import { removeURLSuffix } from "./lib/removeURLSuffix";
+import { getDataFromServerTiming } from "./lib/serverTimingMeta";
 import { SpotlightContextProvider } from "./lib/useSpotlightContext";
 import { React, ReactDOM } from "./react-instance";
 import type { WindowWithSpotlight } from "./types";
-import { getDataFromServerTiming } from "./lib/serverTimingMeta";
 
 export type { WindowWithSpotlight } from "./types";
 export { CONTEXT_LINES_ENDPOINT, DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL, React, ReactDOM, trigger };
@@ -36,7 +36,17 @@ export type SpotlightInitOptions = {
   debug?: boolean;
 };
 
-export async function init(initOptions: SpotlightInitOptions = {}) {
+/**
+ * @deprecated This function is deprecated and should not be used.
+ */
+export async function init(_initOptions: SpotlightInitOptions = {}) {
+  console.warn("Spotlight has moved away from the embedded UI overlay model so you should not be using this module at all.");
+  console.info("See the new roadmap for Spotlight here: https://github.com/getsentry/spotlight/issues/891");
+  console.info("Our standalone UI along with the Electron app are going stronger than ever so please try those out and share any feedback you have with us.");
+  console.info("Thanks for using Spotlight!");
+}
+
+export async function _init(initOptions: SpotlightInitOptions = {}) {
   // The undefined document guard is to avoid being initialized in a Worker
   // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
   if (typeof document === "undefined") return;
