@@ -139,16 +139,16 @@ export class MessageBuffer<T> {
     return result;
   }
 
-  filterHandlers: Record<keyof ReadFilter | string, (item: [number, T], value: ReadFilter) => boolean> = {
+  filterHandlers: Record<keyof ReadFilter | string, (item: [number, T], value: NonNullable<ReadFilter>) => boolean> = {
     timeWindow: (item, value) => {
-      if (value.timeWindow == null) {
+      if (!("timeWindow" in value)) {
         return true;
       }
 
       return item[0] > Date.now() - value.timeWindow * 1000;
     },
     envelopeId: (item, value) => {
-      if (value.envelopeId == null) {
+      if (!("envelopeId" in value) || value.envelopeId == null) {
         return true;
       }
 
@@ -157,8 +157,7 @@ export class MessageBuffer<T> {
       return data.event[0].__spotlight_envelope_id === value.envelopeId;
     },
     filename: (item, value) => {
-      const { filename } = value;
-      if (filename == null) {
+      if (!("filename" in value)) {
         return true;
       }
 
@@ -169,13 +168,16 @@ export class MessageBuffer<T> {
           typeof payload === "object" &&
           "exception" in payload &&
           payload.exception?.values?.some(val =>
-            val.stacktrace?.frames?.some(frame => frame.filename?.endsWith(filename)),
+            val.stacktrace?.frames?.some(frame => frame.filename?.endsWith(value.filename)),
           ),
       );
     },
   };
 }
 
-export type ReadFilter = InputSchema["filters"] & {
-  envelopeId?: string;
-};
+export type ReadFilter =
+  | InputSchema["filters"]
+  | {
+      envelopeId: string;
+    }
+  | { all: true };

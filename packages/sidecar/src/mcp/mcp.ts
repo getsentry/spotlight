@@ -22,29 +22,36 @@ const inputSchema = {
         ),
     }),
     z.object({
-      filename: z.string().describe("Search events by filename."),
+      filename: z
+        .string()
+        .describe(
+          "Filename to search for in the stack trace. Useful when you want to find errors related to a specific file.",
+        ),
     }),
+    /**
+     * TODO: Need to check, if this approach is better then a cursor based approach,
+     * where the user can pass `events since [event_id]` as "last N events" is a
+     * moving target as events keep coming in.
+     *
+     * https://github.com/getsentry/spotlight/pull/968#discussion_r2391587907
+     */
+    z
+      .object({
+        limit: z.number().describe("The number of events to get"),
+        offset: z
+          .number()
+          .default(0)
+          .describe("The position to start from. This is useful when you want to leave out the first n events"),
+      })
+      .optional()
+      .describe("Get the latest n events, useful when you are unable to get data from the timeWindow filter"),
   ]),
-  /**
-   * TODO: Need to check, if this approach is better then a cursor based approach,
-   * where the user can pass `events since [event_id]` as "last N events" is a
-   * moving target as events keep coming in.
-   *
-   * https://github.com/getsentry/spotlight/pull/968#discussion_r2391587907
-   */
-  pagination: z
-    .object({
-      limit: z.number().describe("Get the last n events."),
-      offset: z.number().default(0).describe("Get events starting from the nth position."),
-    })
-    .optional()
-    .describe("Paginate the results. Don't pass this if you want all results."),
 };
 
-export type InputSchema = { [K in keyof typeof inputSchema]?: z.infer<(typeof inputSchema)[K]> };
+export type InputSchema = { [K in keyof typeof inputSchema]: z.infer<(typeof inputSchema)[K]> };
 
-function applyPagination<T>(envelopes: T[], pagination: InputSchema["pagination"]) {
-  if (pagination == null) {
+function applyPagination<T>(envelopes: T[], pagination: InputSchema["filters"]) {
+  if (pagination == null || !("limit" in pagination)) {
     return envelopes;
   }
 
@@ -120,8 +127,7 @@ User: "App crashes after deployment"
       inputSchema,
     },
     async args => {
-      const { pagination, filters } = args;
-      const envelopes = getBuffer().read(filters);
+      const envelopes = getBuffer().read(args.filters);
 
       if (envelopes.length === 0) {
         return NO_ERRORS_CONTENT;
@@ -150,7 +156,7 @@ User: "App crashes after deployment"
       }
 
       return {
-        content: applyPagination(content, pagination),
+        content: applyPagination(content, args.filters),
       };
     },
   );
@@ -227,8 +233,7 @@ User: "I added logging to track user actions"
       inputSchema,
     },
     async args => {
-      const { pagination, filters } = args;
-      const envelopes = getBuffer().read(filters);
+      const envelopes = getBuffer().read(args.filters);
 
       if (envelopes.length === 0) {
         return NO_LOGS_CONTENT;
@@ -257,7 +262,7 @@ User: "I added logging to track user actions"
       }
 
       return {
-        content: applyPagination(content, pagination),
+        content: applyPagination(content, args.filters),
       };
     },
   );
@@ -291,8 +296,7 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
       inputSchema,
     },
     async args => {
-      const { pagination, filters } = args;
-      const envelopes = getBuffer().read(filters);
+      const envelopes = getBuffer().read(args.filters);
 
       if (envelopes.length === 0) {
         return {
@@ -338,7 +342,7 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
         });
       }
 
-      content = applyPagination(content, pagination);
+      content = applyPagination(content, args.filters);
 
       content.push({
         type: "text",
@@ -385,7 +389,7 @@ get_events_for_trace(traceId: "71a8c5e41ae1044dee67f50a07538fe7")  // Using full
     },
     async args => {
       // Getting all the envelopes
-      const envelopes = getBuffer().read({});
+      const envelopes = getBuffer().read({ all: true });
       const traces = extractTracesFromEnvelopes(envelopes);
 
       // Find trace by full ID or partial ID match
