@@ -40,7 +40,10 @@ export type SpotlightInitOptions = {
  * @deprecated This function is deprecated and should not be used.
  */
 export async function init(_initOptions: SpotlightInitOptions = {}) {
-  console.warn("init is deprecated, and should not be used");
+  console.warn("Spotlight has moved away from the embedded UI overlay model so you should not be using this module at all.");
+  console.info("See the new roadmap for Spotlight here: https://github.com/getsentry/spotlight/issues/891");
+  console.info("Our standalone UI along with the Electron app are going stronger than ever so please try those out and share any feedback you have with us.");
+  console.info("Thanks for using Spotlight!");
 }
 
 export async function _init(initOptions: SpotlightInitOptions = {}) {
