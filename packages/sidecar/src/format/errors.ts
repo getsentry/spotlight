@@ -5,7 +5,7 @@ import type { EventContainer } from "~/utils/index.js";
 import { formatEventOutput } from "./event.js";
 import type { ErrorEventSchema } from "./schema.js";
 
-export async function formatErrorEnvelope(container: EventContainer) {
+export function formatErrorEnvelope(container: EventContainer) {
   const processedEnvelope = container.getParsedEnvelope();
 
   const {
