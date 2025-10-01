@@ -85,7 +85,6 @@ export default function TraceListFilter({
               key={key}
               icon={config.icon}
               label={config.label}
-              tooltip={config.tooltip}
               options={config.options}
               type={config.type}
               activeFilters={activeFilters}
