@@ -110,21 +110,6 @@ input:checked ~ .dot {
 .resizer.is-resizing {
   @apply bg-primary-500;
 }
-.spotlight-debugger.resizing-column .span-resizer,
-.spotlight-debugger.resizing-row .span-resizer {
-  @apply bg-primary-500;
-  transform: translateX(-2px) !important;
-}
-
-.spotlight-debugger.resizing-column,
-.spotlight-debugger.resizing-column * {
-  cursor: col-resize !important;
-}
-
-.spotlight-debugger.resizing-row,
-.spotlight-debugger.resizing-row * {
-  cursor: row-resize !important;
-}
 
 /* custom scrollbar */
 * {

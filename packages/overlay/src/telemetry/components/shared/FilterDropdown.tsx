@@ -23,7 +23,6 @@ interface FilterDropdownProps {
   options: FilterOption[];
   activeFilters: string[];
   onFilterChange: (value: string, checked: boolean) => void;
-  container: HTMLElement | null;
   type: "checkbox" | "radio";
 }
 
@@ -34,7 +33,6 @@ export function FilterDropdown({
   options,
   activeFilters,
   onFilterChange,
-  container,
   type,
 }: FilterDropdownProps) {
   return (
@@ -53,10 +51,7 @@ export function FilterDropdown({
                 <ChevronDown className="ml-1 h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              container={container}
-              className="border-primary-700 bg-primary-950 max-h-52 text-white"
-            >
+            <DropdownMenuContent className="border-primary-700 bg-primary-950 max-h-52 text-white">
               {type === "checkbox" &&
                 options.map(filter => (
                   <DropdownMenuCheckboxItem
