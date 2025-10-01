@@ -36,6 +36,9 @@ export type SpotlightInitOptions = {
   debug?: boolean;
 };
 
+/**
+ * @deprecated This function is deprecated and should not be used.
+ */
 export async function init(_initOptions: SpotlightInitOptions = {}) {
   console.warn("init is deprecated, and should not be used");
 }
