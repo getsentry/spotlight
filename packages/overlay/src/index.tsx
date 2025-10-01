@@ -8,10 +8,10 @@ import { on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
 import { activateLogger, log } from "./lib/logger";
 import { removeURLSuffix } from "./lib/removeURLSuffix";
+import { getDataFromServerTiming } from "./lib/serverTimingMeta";
 import { SpotlightContextProvider } from "./lib/useSpotlightContext";
 import { React, ReactDOM } from "./react-instance";
 import type { WindowWithSpotlight } from "./types";
-import { getDataFromServerTiming } from "./lib/serverTimingMeta";
 
 export type { WindowWithSpotlight } from "./types";
 export { CONTEXT_LINES_ENDPOINT, DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL, React, ReactDOM, trigger };
@@ -36,7 +36,11 @@ export type SpotlightInitOptions = {
   debug?: boolean;
 };
 
-export async function init(initOptions: SpotlightInitOptions = {}) {
+export async function init(_initOptions: SpotlightInitOptions = {}) {
+  console.warn("init is deprecated, and should not be used");
+}
+
+export async function _init(initOptions: SpotlightInitOptions = {}) {
   // The undefined document guard is to avoid being initialized in a Worker
   // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
   if (typeof document === "undefined") return;
