@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+import { formatEnvelope } from "./src/format";
 import { parseCLIArgs, setupSidecar } from "./src/main.js";
-import type { ParsedEnvelope } from "./src/parser/processEnvelope.js";
+import type { EventContainer } from "./src/utils/eventContainer.js";
 
 const args = parseCLIArgs();
 
@@ -24,7 +25,7 @@ Examples:
   process.exit(0);
 }
 
-let onEnvelope: ((envelope: ParsedEnvelope["event"]) => void) | undefined = undefined;
+let onEnvelope: ((envelope: EventContainer) => void) | undefined = undefined;
 const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
   traces: ["transaction", "span"],
   profiles: ["profile"],
@@ -54,26 +55,34 @@ if (args._positionals.length === 1) {
   }
 
   if (eventTypes.some(type => EVERYTHING_MAGIC_WORDS.has(type))) {
-    onEnvelope = (envelope: ParsedEnvelope["event"]) => {
-      console.log(
-        JSON.stringify(
-          envelope[1].map(([h]) => h.type),
-          null,
-          0,
-        ),
-      );
-    };
+    onEnvelope = displayEnvelope;
   } else {
     const types = new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
-    onEnvelope = (envelope: ParsedEnvelope["event"]) => {
-      for (const [header] of envelope[1]) {
+    onEnvelope = envelope => {
+      const { event } = envelope.getParsedEnvelope();
+      for (const [header] of event[1]) {
         if (header.type && types.has(header.type)) {
-          console.log(JSON.stringify(envelope, null, 0));
+          displayEnvelope(envelope);
         }
       }
     };
   }
-} 
+}
+
+const SEPARATOR = Array(10).fill("─").join("");
+
+function displayEnvelope(envelope: EventContainer) {
+  const { event } = envelope.getParsedEnvelope();
+  console.log(`${event[0].event_id} | ${event[1][0][0].type} | ${event[0].sdk?.name}\n\n`);
+  const lines = formatEnvelope(envelope);
+  if (lines.length > 0) {
+    console.log(lines.join(""));
+  } else {
+    console.log("No parser for the given event type");
+  }
+  console.log("\n");
+  console.log(SEPARATOR);
+}
 
 await setupSidecar({
   ...args,

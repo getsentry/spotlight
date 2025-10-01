@@ -2,7 +2,7 @@ import type { SerializedLog } from "@sentry/core";
 import { isLogEvent } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
 
-export async function formatLogEnvelope(container: EventContainer) {
+export function formatLogEnvelope(container: EventContainer) {
   const parsedEnvelope = container.getParsedEnvelope();
 
   const {
