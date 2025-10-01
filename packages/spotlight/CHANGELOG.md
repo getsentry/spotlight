@@ -1,5 +1,15 @@
 # @spotlightjs/spotlight
 
+## 4.1.2
+
+### Patch Changes
+
+- Fix 404 when refreshing on a page with "/telemetry" in the path ([#973](https://github.com/getsentry/spotlight/pull/973))
+
+- Updated dependencies [[`97a8a4f`](https://github.com/getsentry/spotlight/commit/97a8a4f1883d04a66b72ae150e161dde9a8328f4)]:
+  - @spotlightjs/sidecar@2.1.2
+  - @spotlightjs/overlay@4.1.0
+
 ## 4.1.1
 
 ### Patch Changes
