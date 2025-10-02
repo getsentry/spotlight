@@ -265,7 +265,7 @@ export function AITraceDetailsEmbedded({ traceId, spanId }: { traceId: string; s
             <span className="text-primary-400 text-sm">{aiTrace.id}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge color="primary">{handler.getTypeBadge(aiTrace)}</Badge>
+            <Badge color={aiTrace.hasToolCall ? "warning" : "primary"}>{handler.getTypeBadge(aiTrace)}</Badge>
             {aiTrace.metadata.modelId && <Badge color="secondary">{aiTrace.metadata.modelId}</Badge>}
             {aiTrace.metadata.functionId && <Badge color="neutral">{aiTrace.metadata.functionId}</Badge>}
           </div>
