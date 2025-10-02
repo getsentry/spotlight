@@ -1,0 +1,23 @@
+---
+import Layout from '../components/homepage/Layout.astro';
+import Header from '../components/homepage/Header.astro';
+import Hero from '../components/homepage/Hero.astro';
+import GetStarted from '../components/homepage/GetStarted.astro';
+import NewFeatures from '../components/homepage/NewFeatures.astro';
+import Footer from '../components/homepage/Footer.astro';
+---
+
+<Layout
+  title="Spotlight - Debug locally with the power of Sentry"
+  description="Spotlight brings the power of Sentry into your local development environment. Debug faster with real-time error tracking, traces, and logs—right where you code."
+>
+  <div class="landing-page">
+    <Header />
+    <main class="landing-main">
+      <Hero />
+      <GetStarted />
+      <NewFeatures />
+    </main>
+    <Footer />
+  </div>
+</Layout>

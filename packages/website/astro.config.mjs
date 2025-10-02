@@ -43,7 +43,7 @@ export default defineConfig({
         github: "https://github.com/getsentry/spotlight",
       },
       components: {
-        Header: "./src/components/Header.astro",
+        Header: "./src/components/docs/Header.astro",
         ThemeProvider: "./src/components/ThemeProvider.astro",
       },
 
@@ -79,45 +79,41 @@ export default defineConfig({
           items: [
             {
               label: "What is Spotlight?",
-              link: "/about/",
+              link: "/docs/about/",
             },
             {
               label: "Architecture",
-              link: "/architecture/",
-            },
-            {
-              label: "Roadmap",
-              link: "/roadmap/",
+              link: "/docs/architecture/",
             },
           ],
         },
         {
           label: "Setup",
           autogenerate: {
-            directory: "setup",
+            directory: "docs/setup",
           },
         },
         {
           label: "Sidecar",
           autogenerate: {
-            directory: "sidecar",
+            directory: "docs/sidecar",
           },
         },
         {
           label: "Contribute",
           autogenerate: {
-            directory: "contribute",
+            directory: "docs/contribute",
           },
         },
         {
           label: "Reference",
           autogenerate: {
-            directory: "reference",
+            directory: "docs/reference",
           },
         },
       ],
       expressiveCode: {
-        themes: ["starlight-dark"],
+        themes: ["starlight-dark", "starlight-light"],
         useStarlightUiThemeColors: true,
       },
       editLink: {

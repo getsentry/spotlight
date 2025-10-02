@@ -1,0 +1,131 @@
+---
+import { Code } from 'astro:components';
+
+const codeSnippet = `Sentry.init({
+  // your existing config
+  ...(process.env.NODE_ENV !== "production" ? {
+  spotlight: true, // Enable Spotlight
+  sampleRate: 1.0, // Capture all errors in dev
+  tracesSampleRate: 1.0, // Capture all traces in dev
+  enableLogs: true,
+  integrations: [
+    Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
+    // For frontend apps, add:
+    Sentry.spotlightBrowserIntegration(),
+    Sentry.browserTracingIntegration(),
+  ],
+} : {}));`;
+---
+
+<div class="px-6 py-16 max-w-7xl mx-auto" style="border-bottom: 1px solid #191919; border-left: 1px solid #191919; border-right: 1px solid #191919; background: linear-gradient(to bottom, #000000 0%, #191919 100%);">
+  <div class="text-center mb-12">
+    <h2 class="text-4xl md:text-6xl font-bold mb-6 text-white">Get Started with Spotlight</h2>
+
+    <div class="max-w-2xl mx-auto mb-8">
+      <p class="text-[#a5a5a5] leading-relaxed">
+        Instructions below are for JavaScript/TypeScript but the logic is similar for other languages: Set spotlight to true, enable all features (especially logging), and make sure these are only done for development.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto mb-12">
+    <div class="text-center">
+      <div class="flex justify-center mb-4">
+        <div class="w-10 h-10 bg-[#F14499] text-white rounded-full flex items-center justify-center font-bold text-lg">1</div>
+      </div>
+      <h3 class="text-xl font-bold mb-4 text-white">Install a Sentry SDK</h3>
+      <p class="text-[#a5a5a5] leading-relaxed mb-4">
+        If you don't have one already, install a Sentry SDK for your framework.
+      </p>
+      <a href="https://docs.sentry.io/platforms/" target="_blank" rel="noreferrer noopener" class="text-[#F14499] hover:underline font-medium">
+        View Sentry Docs →
+      </a>
+    </div>
+
+    <div class="text-center">
+      <div class="flex justify-center mb-4">
+        <div class="w-10 h-10 bg-[#F14499] text-white rounded-full flex items-center justify-center font-bold text-lg">2</div>
+      </div>
+      <h3 class="text-xl font-bold mb-4 text-white">Configure Sentry.init()</h3>
+      <p class="text-[#a5a5a5] leading-relaxed mb-6">
+        Add Spotlight to your Sentry configuration and enable all the features:
+      </p>
+
+      <div class="text-left [&>*]:!overflow-x-auto [&>*]:!max-w-full [&>pre]:!p-4 [&>pre]:!rounded-lg">
+        <Code code={codeSnippet} lang="javascript" wrap={true} theme="github-dark" />
+      </div>
+    </div>
+
+    <div class="text-center">
+      <div class="flex justify-center mb-4">
+        <div class="w-10 h-10 bg-[#F14499] text-white rounded-full flex items-center justify-center font-bold text-lg">3</div>
+      </div>
+      <h3 class="text-xl font-bold mb-4 text-white">Install Spotlight App</h3>
+      <p class="text-[#a5a5a5] leading-relaxed mb-6">
+        Install our app for better human-debugging and visualization. It includes an AI view to inspect your AI applications, review all messages, tool calls, and more.      </p>
+
+      <div class="mb-6">
+        <img
+          src="/images/spotlight.png"
+          alt="Spotlight app interface"
+          class="rounded-lg shadow-2xl mx-auto max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+          id="spotlight-image"
+        />
+      </div>
+
+      <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden p-4">
+        <div class="relative w-full h-full flex items-center justify-center">
+          <img
+            src="/images/spotlight.png"
+            alt="Spotlight app interface - Full size"
+            class="max-w-full max-h-full object-contain rounded-lg"
+          />
+          <button
+            id="close-modal"
+            class="absolute top-4 right-4 text-white bg-black bg-opacity-50 hover:bg-opacity-75 rounded-full w-10 h-10 flex items-center justify-center transition-all text-xl font-bold border-none outline-none"
+            style="line-height: 1;"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+
+      <a href="/docs/setup" class="text-[#F14499] hover:underline font-medium">
+        Download Spotlight App →
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const image = document.getElementById('spotlight-image');
+    const modal = document.getElementById('image-modal');
+    const closeBtn = document.getElementById('close-modal');
+
+    image?.addEventListener('click', function() {
+      modal?.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeBtn?.addEventListener('click', function() {
+      modal?.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    });
+
+    modal?.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !modal?.classList.contains('hidden')) {
+        modal?.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+    });
+  });
+</script>
+
