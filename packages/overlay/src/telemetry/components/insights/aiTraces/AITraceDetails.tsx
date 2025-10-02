@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import {
   createAITraceFromSpan,
   detectAILibraryHandler,
+  extractAllAIRootSpans,
 } from "~/telemetry/components/insights/aiTraces/sdks/aiLibraries";
 import type { AILibraryHandler, SpotlightAITrace } from "~/telemetry/types";
 import { getFormattedDuration } from "~/telemetry/utils/duration";
@@ -215,7 +216,9 @@ function ToolCallsSection({ trace }: { trace: SpotlightAITrace }) {
 // embedded version for split view
 export function AITraceDetailsEmbedded({ traceId, spanId }: { traceId: string; spanId: string }) {
   const trace = useSentryStore(state => state.getTraceById)(traceId);
-  const span = trace?.spans.get(spanId);
+  const span = trace?.spanTree
+    ? extractAllAIRootSpans(trace.spanTree).find(({ span }) => span.span_id === spanId)?.span
+    : null;
   const [spanNodeWidth, setSpanNodeWidth] = useState<number>(50);
 
   if (!trace || !span) {
@@ -265,9 +268,9 @@ export function AITraceDetailsEmbedded({ traceId, spanId }: { traceId: string; s
             <span className="text-primary-400 text-sm">{aiTrace.id}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge color={aiTrace.hasToolCall ? "warning" : "primary"}>{handler.getTypeBadge(aiTrace)}</Badge>
-            {aiTrace.metadata.modelId && <Badge color="secondary">{aiTrace.metadata.modelId}</Badge>}
-            {aiTrace.metadata.functionId && <Badge color="neutral">{aiTrace.metadata.functionId}</Badge>}
+            <Badge variant={aiTrace.hasToolCall ? "warning" : "primary"}>{handler.getTypeBadge(aiTrace)}</Badge>
+            {aiTrace.metadata.modelId && <Badge variant="secondary">{aiTrace.metadata.modelId}</Badge>}
+            {aiTrace.metadata.functionId && <Badge variant="neutral">{aiTrace.metadata.functionId}</Badge>}
           </div>
         </div>
 
