@@ -68,23 +68,18 @@ const FILTER_TYPES = {
 const FILTER_CONFIG_METADATA = {
   [FILTER_TYPES.TRANSACTION]: {
     label: "Transaction",
-    tooltip: "Filter by transaction type",
   },
   [FILTER_TYPES.METHOD]: {
     label: "Method",
-    tooltip: "Filter by HTTP method",
   },
   [FILTER_TYPES.STATUS]: {
     label: "Status",
-    tooltip: "Filter by response status",
   },
   [FILTER_TYPES.TIME]: {
     label: "Time",
-    tooltip: "Filter by time period",
   },
   [FILTER_TYPES.PERFORMANCE]: {
     label: "Performance",
-    tooltip: "Filter by performance metrics",
   },
 } as const;
 
@@ -104,7 +99,6 @@ interface FilterOption {
 interface FilterConfig {
   icon: ElementType;
   label: string;
-  tooltip: string;
   options: FilterOption[];
   show: boolean;
   type: "checkbox" | "radio";
@@ -286,7 +280,6 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
       [FILTER_TYPES.TRANSACTION]: {
         icon: FILTER_ICONS[FILTER_TYPES.TRANSACTION],
         label: FILTER_CONFIG_METADATA[FILTER_TYPES.TRANSACTION].label,
-        tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.TRANSACTION].tooltip,
         options: filterConfigData.transactionOptions,
         show: filterConfigData.transactionOptions.length > 0,
         type: "checkbox",
@@ -294,7 +287,6 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
       [FILTER_TYPES.METHOD]: {
         icon: FILTER_ICONS[FILTER_TYPES.METHOD],
         label: FILTER_CONFIG_METADATA[FILTER_TYPES.METHOD].label,
-        tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.METHOD].tooltip,
         options: filterConfigData.methodOptions,
         show: filterConfigData.methodOptions.length > 0,
         type: "checkbox",
@@ -302,7 +294,6 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
       [FILTER_TYPES.STATUS]: {
         icon: FILTER_ICONS[FILTER_TYPES.STATUS],
         label: FILTER_CONFIG_METADATA[FILTER_TYPES.STATUS].label,
-        tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.STATUS].tooltip,
         options: filterConfigData.statusOptions,
         show: filterConfigData.statusOptions.length > 0,
         type: "checkbox",
@@ -310,7 +301,6 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
       [FILTER_TYPES.TIME]: {
         icon: FILTER_ICONS[FILTER_TYPES.TIME],
         label: FILTER_CONFIG_METADATA[FILTER_TYPES.TIME].label,
-        tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.TIME].tooltip,
         options: TIME_FILTER_OPTIONS,
         show: true,
         type: "radio",
@@ -318,7 +308,6 @@ const useTraceFiltering = (visibleTraces: Trace[], activeFilters: string[], sear
       [FILTER_TYPES.PERFORMANCE]: {
         icon: FILTER_ICONS[FILTER_TYPES.PERFORMANCE],
         label: FILTER_CONFIG_METADATA[FILTER_TYPES.PERFORMANCE].label,
-        tooltip: FILTER_CONFIG_METADATA[FILTER_TYPES.PERFORMANCE].tooltip,
         options: PERFORMANCE_FILTER_OPTIONS,
         show: true,
         type: "checkbox",
