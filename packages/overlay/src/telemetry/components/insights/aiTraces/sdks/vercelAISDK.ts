@@ -2,42 +2,36 @@ import { getAllSpansInTree } from "~/telemetry/store/helpers";
 import type { AILibraryHandler, AIToolCall, Span, SpotlightAITrace } from "~/telemetry/types";
 
 // https://ai-sdk.dev/docs/ai-sdk-core/telemetry
-// Core AI operation constants
-const AI_SPAN_DESCRIPTION_PREFIX = "ai."; // all vercel ai sdk start with "ai."
-const AI_OPERATION_ID_FIELD = "ai.operationId";
+const AI_SPAN_OP_PREFIX = "gen_ai.";
+const AI_OPERATION_ID_FIELD = "vercel.ai.operationId";
+const AI_OPERATION_NAME_FIELD = "operation.name";
 
-// Tool call related constants
+// Tool call related constants (OpenTelemetry semantic conventions)
 const AI_TOOL_CALL_OPERATION = "ai.toolCall";
-const AI_TOOL_CALL_NAME_FIELD = "ai.toolCall.name";
-const AI_TOOL_CALL_ID_FIELD = "ai.toolCall.id";
-const AI_TOOL_CALL_ARGS_FIELD = "ai.toolCall.args";
-const AI_TOOL_CALL_RESULT_FIELD = "ai.toolCall.result";
+const AI_EXECUTE_TOOL_OPERATION = "gen_ai.execute_tool";
+const GEN_AI_TOOL_NAME_FIELD = "gen_ai.tool.name";
+const GEN_AI_TOOL_CALL_ID_FIELD = "gen_ai.tool.call.id";
+const GEN_AI_TOOL_INPUT_FIELD = "gen_ai.tool.input";
+const GEN_AI_TOOL_OUTPUT_FIELD = "gen_ai.tool.output";
 
-// Model metadata fields
-const AI_MODEL_ID_FIELD = "ai.model.id";
-const AI_MODEL_PROVIDER_FIELD = "ai.model.provider";
+const AI_MODEL_ID_FIELD = "vercel.ai.model.id";
+const AI_MODEL_PROVIDER_FIELD = "vercel.ai.model.provider";
+const AI_SETTINGS_MAX_RETRIES_FIELD = "vercel.ai.settings.maxRetries";
+const AI_SETTINGS_MAX_STEPS_FIELD = "vercel.ai.settings.maxSteps";
+const AI_TELEMETRY_FUNCTION_ID_FIELD = "vercel.ai.telemetry.functionId";
+const AI_TELEMETRY_METADATA_PREFIX = "vercel.ai.telemetry.metadata.";
+const AI_PROMPT_FIELD = "vercel.ai.prompt";
+const AI_PROMPT_MESSAGES_FIELD = "gen_ai.request.messages";
+const AI_RESPONSE_FINISH_REASON_FIELD = "vercel.ai.response.finishReason";
+const GEN_AI_RESPONSE_FINISH_REASONS_FIELD = "gen_ai.response.finish_reasons";
+const AI_RESPONSE_TEXT_FIELD = "gen_ai.response.text";
+const AI_RESPONSE_TOOL_CALLS_FIELD = "vercel.ai.response.toolCalls";
 
-// Settings fields
-const AI_SETTINGS_MAX_RETRIES_FIELD = "ai.settings.maxRetries";
-const AI_SETTINGS_MAX_STEPS_FIELD = "ai.settings.maxSteps";
-
-// Telemetry fields
-const AI_TELEMETRY_FUNCTION_ID_FIELD = "ai.telemetry.functionId";
-const AI_TELEMETRY_METADATA_PREFIX = "ai.telemetry.metadata.";
-
-// Prompt and response fields (matching SpotlightAITrace prompt/response)
-const AI_PROMPT_FIELD = "ai.prompt";
-const AI_RESPONSE_FINISH_REASON_FIELD = "ai.response.finishReason";
-const AI_RESPONSE_TEXT_FIELD = "ai.response.text";
-const AI_RESPONSE_TOOL_CALLS_FIELD = "ai.response.toolCalls";
-
-// Operation types
 const AI_STREAM_TEXT_OPERATION = "ai.streamText";
 const AI_GENERATE_TEXT_OPERATION = "ai.generateText";
 
-// Token usage field constants
-const AI_USAGE_PROMPT_TOKENS_FIELD = "ai.usage.promptTokens";
-const AI_USAGE_COMPLETION_TOKENS_FIELD = "ai.usage.completionTokens";
+const AI_USAGE_PROMPT_TOKENS_FIELD = "vercel.ai.usage.promptTokens";
+const AI_USAGE_COMPLETION_TOKENS_FIELD = "vercel.ai.usage.completionTokens";
 const GEN_AI_USAGE_INPUT_TOKENS_FIELD = "gen_ai.usage.input_tokens";
 const GEN_AI_USAGE_OUTPUT_TOKENS_FIELD = "gen_ai.usage.output_tokens";
 
@@ -55,7 +49,7 @@ export const vercelAISDKHandler: AILibraryHandler = {
   name: "Vercel AI SDK",
 
   canHandleSpan: (span: Span): boolean => {
-    return !!span.description?.toLowerCase().startsWith(AI_SPAN_DESCRIPTION_PREFIX);
+    return !!span.op?.toLowerCase().startsWith(AI_SPAN_OP_PREFIX);
   },
 
   extractRootSpans: (spans: Span[]): Span[] => {
@@ -63,7 +57,7 @@ export const vercelAISDKHandler: AILibraryHandler = {
 
     const findAndCollectAIRoots = (spansToSearch: Span[]) => {
       for (const currentSpan of spansToSearch) {
-        if (currentSpan.description?.toLowerCase().startsWith(AI_SPAN_DESCRIPTION_PREFIX)) {
+        if (currentSpan.op?.toLowerCase().startsWith(AI_SPAN_OP_PREFIX)) {
           resultRoots.push(currentSpan);
         } else if (currentSpan.children?.length) {
           findAndCollectAIRoots(currentSpan.children);
@@ -124,7 +118,7 @@ export const vercelAISDKHandler: AILibraryHandler = {
       return "Generate Text";
     }
 
-    return trace.operation.replace(AI_SPAN_DESCRIPTION_PREFIX, "");
+    return trace.operation.replace(/^(ai\.|gen_ai\.)/, "");
   },
 
   getTokensDisplay: (trace: SpotlightAITrace): string => {
@@ -177,14 +171,13 @@ function determineOperation(
   let foundToolCallAsOperationId = false;
 
   for (const span of spans) {
-    // check for tool call by operation field
-    if (span.op === AI_TOOL_CALL_OPERATION) {
+    if (span.op === AI_TOOL_CALL_OPERATION || span.op === AI_EXECUTE_TOOL_OPERATION) {
       hasToolCall = true;
     }
 
     if (!span.data) continue;
 
-    const operationId = span.data[AI_OPERATION_ID_FIELD] as string | undefined;
+    const operationId = (span.data[AI_OPERATION_ID_FIELD] || span.data[AI_OPERATION_NAME_FIELD]) as string | undefined;
 
     // Handle tool call operation
     if (operationId === AI_TOOL_CALL_OPERATION) {
@@ -192,8 +185,8 @@ function determineOperation(
       foundToolCallAsOperationId = true;
       hasToolCall = true;
 
-      if (span.data[AI_TOOL_CALL_NAME_FIELD]) {
-        toolCallName = String(span.data[AI_TOOL_CALL_NAME_FIELD]);
+      if (span.data[GEN_AI_TOOL_NAME_FIELD]) {
+        toolCallName = String(span.data[GEN_AI_TOOL_NAME_FIELD]);
       }
     }
 
@@ -212,7 +205,7 @@ function determineOperation(
   if (operation === UNKNOWN_OPERATION) {
     if (rootSpan.op) {
       operation = rootSpan.op;
-    } else if (rootSpan.description?.startsWith(AI_SPAN_DESCRIPTION_PREFIX)) {
+    } else if (rootSpan.description) {
       operation = rootSpan.description;
     }
   }
@@ -299,11 +292,22 @@ function extractTelemetryMetadata(span: Span, trace: SpotlightAITrace) {
 function extractPromptData(span: Span, trace: SpotlightAITrace) {
   if (!span.data) return;
 
-  if (span.data[AI_PROMPT_FIELD]) {
+  const promptField = span.data[AI_PROMPT_FIELD];
+  if (promptField) {
     try {
-      trace.prompt = JSON.parse(String(span.data[AI_PROMPT_FIELD]));
+      trace.prompt = JSON.parse(String(promptField));
     } catch {
-      trace.prompt = { messages: [{ role: "unknown", content: String(span.data[AI_PROMPT_FIELD]) }] };
+      trace.prompt = { messages: [{ role: "unknown", content: String(promptField) }] };
+    }
+  }
+
+  const promptMessages = span.data[AI_PROMPT_MESSAGES_FIELD];
+  if (promptMessages && !trace.prompt) {
+    try {
+      const messages = JSON.parse(String(promptMessages));
+      trace.prompt = { messages };
+    } catch {
+      trace.prompt = { messages: [{ role: "unknown", content: String(promptMessages) }] };
     }
   }
 }
@@ -313,45 +317,57 @@ function extractResponseData(span: Span, trace: SpotlightAITrace) {
 
   trace.response = trace.response || {};
 
-  if (span.data[AI_RESPONSE_FINISH_REASON_FIELD]) {
-    trace.response.finishReason = String(span.data[AI_RESPONSE_FINISH_REASON_FIELD]);
+  const finishReason = span.data[AI_RESPONSE_FINISH_REASON_FIELD];
+  if (finishReason) {
+    trace.response.finishReason = String(finishReason);
   }
 
-  if (span.data[AI_RESPONSE_TEXT_FIELD]) {
-    trace.response.text = String(span.data[AI_RESPONSE_TEXT_FIELD]);
+  const finishReasons = span.data[GEN_AI_RESPONSE_FINISH_REASONS_FIELD];
+  if (!trace.response.finishReason && Array.isArray(finishReasons) && finishReasons.length > 0) {
+    trace.response.finishReason = String(finishReasons[0]);
   }
 
-  if (span.data[AI_RESPONSE_TOOL_CALLS_FIELD]) {
-    trace.response.toolCalls = JSON.parse(String(span.data[AI_RESPONSE_TOOL_CALLS_FIELD]));
+  const responseText = span.data[AI_RESPONSE_TEXT_FIELD];
+  if (responseText) {
+    trace.response.text = String(responseText);
+  }
+
+  const toolCalls = span.data[AI_RESPONSE_TOOL_CALLS_FIELD];
+  if (toolCalls) {
+    trace.response.toolCalls = JSON.parse(String(toolCalls));
   }
 }
 
 function extractToolCallData(span: Span, trace: SpotlightAITrace) {
   if (!span.data) return;
 
-  if (span.data[AI_TOOL_CALL_NAME_FIELD] && span.data[AI_TOOL_CALL_ID_FIELD]) {
-    const toolCall: Partial<AIToolCall> = {
-      toolCallId: String(span.data[AI_TOOL_CALL_ID_FIELD]),
-      toolName: String(span.data[AI_TOOL_CALL_NAME_FIELD]),
-      args: {} as Record<string, unknown>,
-    };
+  const toolName = span.data[GEN_AI_TOOL_NAME_FIELD];
+  if (!toolName) return;
 
-    if (span.data[AI_TOOL_CALL_ARGS_FIELD]) {
-      try {
-        toolCall.args = JSON.parse(String(span.data[AI_TOOL_CALL_ARGS_FIELD]));
-      } catch {
-        toolCall.args = { rawArgs: span.data[AI_TOOL_CALL_ARGS_FIELD] };
-      }
+  const toolCallId = span.data[GEN_AI_TOOL_CALL_ID_FIELD];
+  const toolCall: Partial<AIToolCall> = {
+    toolCallId: toolCallId ? String(toolCallId) : span.span_id,
+    toolName: String(toolName),
+    args: {} as Record<string, unknown>,
+  };
+
+  const toolInput = span.data[GEN_AI_TOOL_INPUT_FIELD];
+  if (toolInput) {
+    try {
+      toolCall.args = typeof toolInput === "string" ? JSON.parse(toolInput) : (toolInput as Record<string, unknown>);
+    } catch {
+      toolCall.args = { input: toolInput };
     }
-
-    if (span.data[AI_TOOL_CALL_RESULT_FIELD]) {
-      try {
-        toolCall.result = JSON.parse(String(span.data[AI_TOOL_CALL_RESULT_FIELD]));
-      } catch {
-        toolCall.result = String(span.data[AI_TOOL_CALL_RESULT_FIELD]);
-      }
-    }
-
-    trace.toolCalls.push(toolCall as AIToolCall);
   }
+
+  const toolOutput = span.data[GEN_AI_TOOL_OUTPUT_FIELD];
+  if (toolOutput) {
+    try {
+      toolCall.result = typeof toolOutput === "string" ? JSON.parse(toolOutput) : toolOutput;
+    } catch {
+      toolCall.result = String(toolOutput);
+    }
+  }
+
+  trace.toolCalls.push(toolCall as AIToolCall);
 }
