@@ -134,8 +134,6 @@ export class MessageBuffer<T> {
       if (filterHandlers.every(handler => handler(item, filters))) {
         result.push(item[1]);
       }
-
-      result.push(item[1]);
     }
 
     return result;
@@ -174,6 +172,7 @@ export class MessageBuffer<T> {
           ),
       );
     },
+    all: () => true,
   };
 }
 
