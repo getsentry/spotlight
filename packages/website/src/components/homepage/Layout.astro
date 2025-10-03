@@ -1,4 +1,5 @@
 ---
+import Analytics from '@vercel/analytics/astro';
 export interface Props {
   title: string;
   description: string;
@@ -40,6 +41,7 @@ const { title, description } = Astro.props;
     <meta property="twitter:image" content="/images/trace.png" />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:title" content={title} />
+    <Analytics />
   </head>
 
   <body style="background-color: #000000;" class="text-white">
