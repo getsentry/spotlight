@@ -131,7 +131,9 @@ export class MessageBuffer<T> {
       if (item == null) continue;
 
       // Check if the item passes all filters
-      if (!filterHandlers.every(handler => handler(item, filters))) continue;
+      if (filterHandlers.every(handler => handler(item, filters))) {
+        result.push(item[1]);
+      }
 
       result.push(item[1]);
     }
