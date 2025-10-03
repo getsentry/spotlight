@@ -125,9 +125,5 @@ export default defineConfig({
     react(),
   ],
   output: "static",
-  adapter: vercelStatic({
-    webAnalytics: {
-      enabled: true,
-    },
-  }),
+  adapter: vercelStatic(),
 });
