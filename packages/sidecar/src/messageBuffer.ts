@@ -1,4 +1,5 @@
 import { uuidv7 } from "uuidv7";
+import type { InputSchema } from "./mcp/mcp.js";
 import type { EventContainer } from "./utils/eventContainer.js";
 
 export class MessageBuffer<T> {
@@ -112,23 +113,25 @@ export class MessageBuffer<T> {
     this.head = this.writePos;
   }
 
-  read(filters: ReadFilter): T[] {
+  read(filters: ReadFilter = { timeWindow: 60 }): T[] {
     const result: T[] = [];
     const start = this.head;
     const end = this.writePos;
 
+    const filterHandlers = [];
+    for (const key of Object.keys(filters)) {
+      if (this.filterHandlers[key]) {
+        filterHandlers.push(this.filterHandlers[key]);
+      }
+    }
+
     for (let i = end - 1; i >= start; i--) {
       const item = this.items[i % this.size];
 
-      if (item !== undefined) {
-        // Apply all filters
-        const isValid = Object.keys(filters).every(key => this.filterHandlers[key](item, filters));
+      if (item == null) continue;
 
-        // Check if the item passes all filters
-        if (!isValid) {
-          continue;
-        }
-
+      // Check if the item passes all filters
+      if (filterHandlers.every(handler => handler(item, filters))) {
         result.push(item[1]);
       }
     }
@@ -136,16 +139,16 @@ export class MessageBuffer<T> {
     return result;
   }
 
-  filterHandlers: Record<keyof ReadFilter | string, (item: [number, T], value: ReadFilter) => boolean> = {
-    duration: (item, value) => {
-      if (value.duration == null) {
+  filterHandlers: Record<keyof ReadFilter | string, (item: [number, T], value: NonNullable<ReadFilter>) => boolean> = {
+    timeWindow: (item, value) => {
+      if (!("timeWindow" in value)) {
         return true;
       }
 
-      return item[0] > Date.now() - value.duration * 1000;
+      return item[0] > Date.now() - value.timeWindow * 1000;
     },
     envelopeId: (item, value) => {
-      if (value.envelopeId == null) {
+      if (!("envelopeId" in value) || value.envelopeId == null) {
         return true;
       }
 
@@ -153,11 +156,29 @@ export class MessageBuffer<T> {
 
       return data.event[0].__spotlight_envelope_id === value.envelopeId;
     },
+    filename: (item, value) => {
+      if (!("filename" in value)) {
+        return true;
+      }
+
+      const contents = (item[1] as EventContainer).getParsedEnvelope();
+
+      return contents.event[1].some(
+        ([, payload]) =>
+          typeof payload === "object" &&
+          "exception" in payload &&
+          payload.exception?.values?.some(val =>
+            val.stacktrace?.frames?.some(frame => frame.filename?.endsWith(value.filename)),
+          ),
+      );
+    },
+    all: () => true,
   };
 }
 
-type ReadFilter = {
-  // duration in seconds
-  duration?: number;
-  envelopeId?: string;
-};
+export type ReadFilter =
+  | InputSchema["filters"]
+  | {
+      envelopeId: string;
+    }
+  | { all: true };
