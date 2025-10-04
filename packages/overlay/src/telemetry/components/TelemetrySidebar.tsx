@@ -9,6 +9,7 @@ import { Badge } from "~/ui/badge";
 interface TelemetrySidebarProps {
   errorCount: number;
   traceCount: number;
+  logCount: number;
   isOnline: boolean;
 }
 
@@ -40,7 +41,7 @@ function NavigationLink({
   );
 }
 
-export default function TelemetrySidebar({ errorCount, traceCount, isOnline }: TelemetrySidebarProps) {
+export default function TelemetrySidebar({ errorCount, traceCount, logCount, isOnline }: TelemetrySidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -105,7 +106,7 @@ export default function TelemetrySidebar({ errorCount, traceCount, isOnline }: T
           notificationCount={{ count: errorCount, severe: errorCount > 0 }}
           isActive={isActive("errors")}
         />
-        <NavigationLink to="logs" title="Logs" isActive={isActive("logs")} />
+        <NavigationLink to="logs" title="Logs" notificationCount={{ count: logCount }} isActive={isActive("logs")} />
 
         {/* Insights section */}
         <div

@@ -18,7 +18,7 @@ export default function LogDetails({ id }: { id: string }) {
     <SidePanel backto="/telemetry/logs">
       <SidePanelHeader
         title="Log Details"
-        subtitle=<span className={LOG_LEVEL_COLORS[level] || "text-primary-500"}>{level.toUpperCase()}</span>
+        subtitle={<span className={LOG_LEVEL_COLORS[level] || "text-primary-500"}>{level.toUpperCase()}</span>}
         backto="/telemetry/logs"
       />
 

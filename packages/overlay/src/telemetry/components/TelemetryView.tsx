@@ -36,9 +36,11 @@ export default function TelemetryView({
 
   const traceCount = store.getTraces().length;
 
+  const logCount = store.getLogs().length;
+
   return (
     <div className="from-primary-900 to-primary-950 flex h-full overflow-hidden bg-gradient-to-br from-0% to-20% font-sans text-white">
-      <TelemetrySidebar errorCount={errorCount} traceCount={traceCount} isOnline={isOnline} />
+      <TelemetrySidebar errorCount={errorCount} traceCount={traceCount} logCount={logCount} isOnline={isOnline} />
       <div className="flex-1 overflow-auto">
         <Routes>
           <Route path="not-found" element={<p>Not Found - How'd you manage to get here?</p>} key="not-found" />
