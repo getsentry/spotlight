@@ -1,5 +1,15 @@
 # @spotlightjs/core
 
+## 4.2.0
+
+### Minor Changes
+
+- Fix: support Vercel AI SDK in our AI view ([#981](https://github.com/getsentry/spotlight/pull/981))
+
+### Patch Changes
+
+- added counter in the sidebar for logs and minor changes ([#983](https://github.com/getsentry/spotlight/pull/983))
+
 ## 4.1.0
 
 ### Minor Changes
