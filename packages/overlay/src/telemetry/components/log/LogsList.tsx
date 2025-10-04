@@ -110,7 +110,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                   <td className="ps-6">
                     <span className={LOG_LEVEL_COLORS[log.level] || "text-primary-500"}>{log.level.toUpperCase()}</span>
                   </td>
-                  <td className="text-sm">
+                  <td className="text-sm truncate">
                     <span>{log.body}</span>
                   </td>
                   <td className="text-right">
