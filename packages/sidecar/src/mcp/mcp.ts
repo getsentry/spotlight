@@ -13,6 +13,52 @@ import {
 import { getBuffer } from "~/utils/index.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
 
+const inputSchema = {
+  filters: z.union([
+    z.object({
+      timeWindow: z
+        .number()
+        .describe(
+          "Look back this many seconds for errors. Use 300+ for broader investigation and something around 60 for everything else",
+        ),
+    }),
+    z.object({
+      filename: z
+        .string()
+        .describe(
+          "Filename to search for in the stack trace. Useful when you want to find errors related to a specific file.",
+        ),
+    }),
+    /**
+     * TODO: Need to check, if this approach is better then a cursor based approach,
+     * where the user can pass `events since [event_id]` as "last N events" is a
+     * moving target as events keep coming in.
+     *
+     * https://github.com/getsentry/spotlight/pull/968#discussion_r2391587907
+     */
+    z
+      .object({
+        limit: z.number().describe("The number of events to get"),
+        offset: z
+          .number()
+          .default(0)
+          .describe("The position to start from. This is useful when you want to leave out the first n events"),
+      })
+      .optional()
+      .describe("Get the latest n events, useful when you are unable to get data from the timeWindow filter"),
+  ]),
+};
+
+export type InputSchema = { [K in keyof typeof inputSchema]: z.infer<(typeof inputSchema)[K]> };
+
+function applyPagination<T>(envelopes: T[], pagination: InputSchema["filters"]) {
+  if (pagination == null || !("limit" in pagination)) {
+    return envelopes;
+  }
+
+  return envelopes.slice(pagination.offset, pagination.offset + pagination.limit);
+}
+
 export function createMCPInstance() {
   const mcp = wrapMcpServerWithSentry(
     new McpServer({
@@ -81,17 +127,10 @@ User: "App crashes after deployment"
 - "Button doesn't work" → Find click handler exceptions
 
 **Remember:** Always prefer real runtime errors over speculation. If no errors appear, guide user to reproduce the issue rather than starting development servers or making assumptions.`,
-      inputSchema: {
-        timeWindow: z
-          .number()
-          .default(60)
-          .describe(
-            "Look back this many seconds for errors. Use 300+ for broader investigation. Use 30 for recent errors only. For debugging, use 10. For most cases, use 60.",
-          ),
-      },
+      inputSchema,
     },
     async args => {
-      const envelopes = getBuffer().read({ duration: args.timeWindow });
+      const envelopes = getBuffer().read(args.filters);
 
       if (envelopes.length === 0) {
         return NO_ERRORS_CONTENT;
@@ -120,7 +159,7 @@ User: "App crashes after deployment"
       }
 
       return {
-        content,
+        content: applyPagination(content, args.filters),
       };
     },
   );
@@ -194,17 +233,10 @@ User: "I added logging to track user actions"
 - **ERROR**: Actual failures (also available via get_local_errors)
 
 **Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.`,
-      inputSchema: {
-        timeWindow: z
-          .number()
-          .default(60)
-          .describe(
-            "Look back this many seconds for logs. Use 300+ for broader investigation. Use 30 for recent logs only. For debugging, use 10. For most cases, use 60.",
-          ),
-      },
+      inputSchema,
     },
     async args => {
-      const envelopes = getBuffer().read({ duration: args.timeWindow });
+      const envelopes = getBuffer().read(args.filters);
 
       if (envelopes.length === 0) {
         return NO_LOGS_CONTENT;
@@ -233,7 +265,7 @@ User: "I added logging to track user actions"
       }
 
       return {
-        content,
+        content: applyPagination(content, args.filters),
       };
     },
   );
@@ -264,17 +296,10 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
 - "Performance issues" → Look for slow traces
 - "Request flows" → See transaction patterns
 - "Distributed tracing" → View trace summaries`,
-      inputSchema: {
-        timeWindow: z
-          .number()
-          .default(300)
-          .describe(
-            "Look back this many seconds for traces. Use 600+ for broader investigation. Use 60 for recent traces only. For most cases, use 300.",
-          ),
-      },
+      inputSchema,
     },
     async args => {
-      const envelopes = getBuffer().read({ duration: args.timeWindow });
+      const envelopes = getBuffer().read(args.filters);
 
       if (envelopes.length === 0) {
         return {
@@ -300,7 +325,7 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
         };
       }
 
-      const content: TextContent[] = [];
+      let content: TextContent[] = [];
 
       // Sort traces by start time (most recent first)
       const sortedTraces = Array.from(traces.values()).sort(
@@ -319,6 +344,8 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
           text: formatTraceSummary(trace),
         });
       }
+
+      content = applyPagination(content, args.filters);
 
       content.push({
         type: "text",
@@ -364,7 +391,8 @@ get_events_for_trace(traceId: "71a8c5e41ae1044dee67f50a07538fe7")  // Using full
       },
     },
     async args => {
-      const envelopes = getBuffer().read({ duration: 600 }); // Look back further for trace details
+      // Getting all the envelopes
+      const envelopes = getBuffer().read({ all: true });
       const traces = extractTracesFromEnvelopes(envelopes);
 
       // Find trace by full ID or partial ID match
