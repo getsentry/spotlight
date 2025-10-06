@@ -1,5 +1,7 @@
+import { createEventEnvelope } from "@sentry/core";
 import * as Sentry from "@sentry/react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
+import { sendEvent } from "..";
 import { useEffect } from "../react-instance";
 import { getDataFromServerTiming } from "./serverTimingMeta";
 
@@ -48,6 +50,10 @@ export default function initSentry() {
     // https://docs.sentry.io/platforms/javascript/session-replay/configuration/#general-integration-configuration
     replaysSessionSampleRate: 0.01,
     replaysOnErrorSampleRate: 1.0,
+    beforeSend: event => {
+      sendEvent("application/x-sentry-envelope", JSON.stringify(createEventEnvelope(event)));
+      return event;
+    },
   });
 
   if (hasTraceParent && sentryClient) {

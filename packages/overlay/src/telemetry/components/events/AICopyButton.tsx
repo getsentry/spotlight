@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/core";
 import { formatEventOutput, processErrorEvent } from "@spotlightjs/sidecar/format";
 import { type MouseEvent, useCallback, useEffect, useState } from "react";
 import { ReactComponent as CheckIcon } from "~/assets/check.svg";
@@ -33,6 +34,7 @@ export default function AICopyButton({ event }: AICopyButtonProps) {
         await navigator.clipboard.writeText(formatEventOutput(processErrorEvent(event as any)));
       } catch (err) {
         console.error(err);
+        captureException(err);
       }
     },
     [event],
