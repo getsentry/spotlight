@@ -2,4 +2,4 @@
 "@spotlightjs/overlay": patch
 ---
 
-sending error from the AI Copy Button to UI
+Sending local app errors to the Spotlight UI
