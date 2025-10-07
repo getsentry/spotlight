@@ -3,9 +3,7 @@ import { formatEnvelope } from "./src/format";
 import { parseCLIArgs, setupSidecar } from "./src/main.js";
 import type { EventContainer } from "./src/utils/eventContainer.js";
 
-const args = parseCLIArgs();
-
-if (args.help) {
+const printHelpAndExit = () => {
   console.log(`
 Spotlight Sidecar - Development proxy server for Spotlight
 
@@ -13,7 +11,6 @@ Usage: spotlight-sidecar [options]
 
 Options:
   -p, --port <port>    Port to listen on (default: 8969)
-  --stdio-mcp          Enable MCP stdio transport
   -d, --debug          Enable debug logging
   -h, --help           Show this help message
 
@@ -23,6 +20,13 @@ Examples:
   spotlight-sidecar -p 3000 -d         # Start on port 3000 with debug logging
 `);
   process.exit(0);
+};
+
+const args = parseCLIArgs();
+let stdioMCP = false;
+
+if (args.help) {
+  printHelpAndExit();
 }
 
 let onEnvelope: ((envelope: EventContainer) => void) | undefined = undefined;
@@ -39,33 +43,47 @@ const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
 const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
 export const SUPPORTED_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
 
-if (args._positionals.length > 1) {
-  console.error("Error: Too many positional arguments provided.");
-  process.exit(1);
-}
-
-if (args._positionals.length === 1) {
-  const eventTypes = args._positionals[0].toLowerCase().split(/\s*[,+]\s*/gi);
-  for (const eventType of eventTypes) {
-    if (!SUPPORTED_ARGS.has(eventType)) {
-      console.error(`Error: Unsupported argument "${eventType}".`);
-      console.error(`Supported arguments are: ${[...SUPPORTED_ARGS].join(", ")}`);
-      process.exit(1);
+const cmd = args._positionals[0];
+switch (cmd) {
+  case "help":
+    printHelpAndExit();
+    break;
+  case "mcp":
+    stdioMCP = true;
+    break;
+  case "run":
+    // do crazy stuff
+    break;
+  case undefined:
+  case "":
+    break;
+  default: {
+    if (args._positionals.length > 1) {
+      console.error("Error: Too many positional arguments.");
+      printHelpAndExit();
     }
-  }
-
-  if (eventTypes.some(type => EVERYTHING_MAGIC_WORDS.has(type))) {
-    onEnvelope = displayEnvelope;
-  } else {
-    const types = new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
-    onEnvelope = envelope => {
-      const { event } = envelope.getParsedEnvelope();
-      for (const [header] of event[1]) {
-        if (header.type && types.has(header.type)) {
-          displayEnvelope(envelope);
-        }
+    const eventTypes = cmd.toLowerCase().split(/\s*[,+]\s*/gi);
+    for (const eventType of eventTypes) {
+      if (!SUPPORTED_ARGS.has(eventType)) {
+        console.error(`Error: Unsupported argument "${eventType}".`);
+        console.error(`Supported arguments are: ${[...SUPPORTED_ARGS].join(", ")}`);
+        process.exit(1);
       }
-    };
+    }
+
+    if (eventTypes.some(type => EVERYTHING_MAGIC_WORDS.has(type))) {
+      onEnvelope = displayEnvelope;
+    } else {
+      const types = new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
+      onEnvelope = envelope => {
+        const { event } = envelope.getParsedEnvelope();
+        for (const [header] of event[1]) {
+          if (header.type && types.has(header.type)) {
+            displayEnvelope(envelope);
+          }
+        }
+      };
+    }
   }
 }
 
@@ -86,6 +104,7 @@ function displayEnvelope(envelope: EventContainer) {
 
 await setupSidecar({
   ...args,
+  stdioMCP,
   onEnvelope,
   isStandalone: true,
 });

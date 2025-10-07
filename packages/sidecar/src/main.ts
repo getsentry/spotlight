@@ -19,10 +19,8 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 export type CLIArgs = {
   port: number;
   debug: boolean;
-  stdioMCP: boolean;
   help: boolean;
   _positionals: string[];
-  _extra: Record<string, string>;
 };
 
 let serverInstance: ServerType;
@@ -41,6 +39,7 @@ export function parseCLIArgs(): CLIArgs {
         short: "d",
         default: false,
       },
+      // Deprecated -- use the positional `mcp` argument instead
       "stdio-mcp": {
         type: "boolean",
         default: false,
@@ -56,7 +55,7 @@ export function parseCLIArgs(): CLIArgs {
   });
 
   // Handle legacy positional argument for port (backwards compatibility)
-  const portInput = positionals.length === 1 && /^\d{1,5}$/.test(positionals[0]) ? positionals[0] : values.port;
+  const portInput = positionals.length === 1 && /^\d{1,5}$/.test(positionals[0]) ? positionals.shift() : values.port;
   const port = Number(portInput);
 
   // Validate port number
@@ -71,12 +70,16 @@ export function parseCLIArgs(): CLIArgs {
     process.exit(1);
   }
 
+  if (values["stdio-mcp"]) {
+    positionals.unshift("mcp");
+    console.warn("Warning: --stdio-mcp is deprecated. Please use the positional argument 'mcp' instead.");
+  }
+
   const result: CLIArgs = {
     debug: values.debug as boolean,
-    stdioMCP: values["stdio-mcp"] as boolean,
     help: values.help as boolean,
     port,
-    _positionals: positionals.length > 0 && positionals[0] !== portInput ? positionals : [],
+    _positionals: positionals,
   };
   const keys = new Set(Object.keys(result));
   result._extra = Object.fromEntries(Object.entries(values).filter(([key]) => !keys.has(key)));
@@ -168,22 +171,28 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
 
   sidecarServer.addListener("error", handleServerError);
 
-  function handleServerError(e: { code?: string }): void {
-    if ("code" in e && e.code === "EADDRINUSE") {
+  function handleServerError(err: { code?: string }): void {
+    if ("code" in err && err.code === "EADDRINUSE") {
       logger.info(`Port ${options.port} in use, retrying...`);
       sidecarServer.close();
       portInUseRetryTimeout = setTimeout(() => {
         sidecarServer.listen(options.port);
       }, 5000);
     } else {
-      captureException(e);
-      reject(e);
+      captureException(err);
+      reject(err as Error);
     }
   }
 
   if (options.stdioMCP) {
     logger.info("Starting MCP over stdio too...");
-    await createMCPInstance().connect(new StdioServerTransport());
+    try {
+      await createMCPInstance().connect(new StdioServerTransport());
+    } catch (err) {
+      logger.error(`Failed to connect MCP over stdio: ${(err as Error).message}`);
+      captureException(err);
+      reject(err as Error);
+    }
   }
 
   return promise;
@@ -313,8 +322,6 @@ export const shutdown = () => {
     forceShutdown = true;
     logger.info("Shutting down server gracefully...");
     serverInstance.close();
-    // TODO: This doesn't exist
-    // serverInstance.closeAllConnections();
     serverInstance.unref();
   }
 };

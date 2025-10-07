@@ -13,7 +13,9 @@
     "test": "vitest run",
     "test:dev": "vitest"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "bin": {
     "spotlight-sidecar": "dist/server.js"
   },
@@ -45,6 +47,7 @@
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
+    "eventsource": "^4.0.0",
     "hono": "^4.9.7",
     "launch-editor": "^2.9.1",
     "mcp-proxy": "^5.6.0",
