@@ -6,9 +6,7 @@ import { SentryEventsContext } from "./sentryEventsContext";
 export function useSentryTraces() {
   useContext(SentryEventsContext);
   const { getTraces } = useSentryStore();
-  const allTraces = getTraces();
-
-  return allTraces;
+  return getTraces().sort((a, b) => b.start_timestamp - a.start_timestamp);
 }
 
 function spanReducer(acc: Span[], trace: Trace) {
