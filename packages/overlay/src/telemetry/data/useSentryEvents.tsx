@@ -4,8 +4,9 @@ import { SentryEventsContext } from "./sentryEventsContext";
 
 export const useSentryEvents = (traceId?: string) => {
   useContext(SentryEventsContext);
-  const getEvents = useSentryStore(state => state.getEvents);
-  const getEventsByTrace = useSentryStore(state => state.getEventsByTrace);
-
-  return traceId ? getEventsByTrace(traceId) : getEvents();
+  const events = traceId
+    ? useSentryStore(state => state.getEventsByTrace)(traceId)
+    : useSentryStore(state => state.getEvents)();
+  
+  return events.sort((a, b) => b.timestamp - a.timestamp);
 };

@@ -6,9 +6,7 @@ export const useSentryLogs = (traceId?: string) => {
   useContext(SentryEventsContext);
   const { getLogs, getLogsByTraceId } = useSentryStore();
 
-  const allLogs = Array.from(traceId ? getLogsByTraceId(traceId) : getLogs());
-
-  return allLogs;
+  return Array.from(traceId ? getLogsByTraceId(traceId) : getLogs()).sort((a, b) => b.timestamp - a.timestamp);
 };
 
 export const useSentryLog = (id: string) => {
