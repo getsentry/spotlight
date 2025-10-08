@@ -544,7 +544,7 @@ function createTray() {
     {
       label: "Sidecar Status",
       enabled: false,
-      sublabel: "Running on port 8969",
+      sublabel: `Running on port ${DEFAULT_PORT}`,
     },
     { type: "separator" },
     {
