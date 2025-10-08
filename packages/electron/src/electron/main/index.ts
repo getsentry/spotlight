@@ -1,6 +1,7 @@
 import path from "node:path";
 import * as Sentry from "@sentry/electron/main";
 import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
+import { DEFAULT_PORT } from "@spotlightjs/sidecar/constants";
 import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, shell } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
@@ -580,14 +581,7 @@ function createTray() {
   });
 }
 
-Promise.all([
-  setupSidecar({
-    port: 8969,
-    incomingPayload: storeIncomingPayload,
-    isStandalone: true,
-  }),
-  app.whenReady(),
-]).then(() => {
+app.whenReady().then(() => {
   if (!isLinux) {
     createTray();
   }
@@ -600,7 +594,7 @@ Promise.all([
   ipcMain.on("set-badge-count", handleBadgeCount);
 });
 
-const MAX_RETRIES = 5;
+const MAX_RETRIES = 3;
 const RECHECK_DELAY = 5000;
 const RETRY_DELAY_INCREMENT = 2000;
 
@@ -615,7 +609,7 @@ async function makeSureSidecarIsRunning() {
        * And if not, starting it up
        */
       await setupSidecar({
-        port: 8969,
+        port: DEFAULT_PORT,
         incomingPayload: storeIncomingPayload,
         isStandalone: true,
       });
@@ -624,7 +618,7 @@ async function makeSureSidecarIsRunning() {
       console.error(error);
       retries++;
 
-      if (retries > MAX_RETRIES) {
+      if (retries >= MAX_RETRIES) {
         Sentry.captureException(error);
 
         // Notifying the user that the sidecar is not running
@@ -640,7 +634,7 @@ async function makeSureSidecarIsRunning() {
       subscriber = null;
     }
 
-    if (retries > MAX_RETRIES) {
+    if (retries >= MAX_RETRIES) {
       return;
     }
 
