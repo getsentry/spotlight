@@ -599,3 +599,55 @@ Promise.all([
 
   ipcMain.on("set-badge-count", handleBadgeCount);
 });
+
+const MAX_RETRIES = 5;
+const RECHECK_DELAY = 5000;
+const RETRY_DELAY_INCREMENT = 2000;
+
+async function makeSureSidecarIsRunning() {
+  let retries = 0;
+  let subscriber: NodeJS.Timeout | null = null;
+
+  async function handler() {
+    try {
+      /**
+       * Checking if the sidecar is running
+       * And if not, starting it up
+       */
+      await setupSidecar({
+        port: 8969,
+        incomingPayload: storeIncomingPayload,
+        isStandalone: true,
+      });
+      retries = 0;
+    } catch (error) {
+      console.error(error);
+      retries++;
+
+      if (retries > MAX_RETRIES) {
+        Sentry.captureException(error);
+
+        // Notifying the user that the sidecar is not running
+        dialog.showErrorBox(
+          "Spotlight",
+          "Unable to start Spotlight server. This could happen due to a port (8969) conflict or the server being blocked by a firewall. Try checking your firewall settings and restart the app.",
+        );
+      }
+    }
+
+    if (subscriber) {
+      clearTimeout(subscriber);
+      subscriber = null;
+    }
+
+    if (retries > MAX_RETRIES) {
+      return;
+    }
+
+    subscriber = setTimeout(handler, RECHECK_DELAY + retries * RETRY_DELAY_INCREMENT);
+  }
+
+  handler();
+}
+
+makeSureSidecarIsRunning();
