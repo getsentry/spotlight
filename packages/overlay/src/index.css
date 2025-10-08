@@ -134,3 +134,7 @@ input:checked ~ .dot {
     background: var(--color-primary-900);
   }
 }
+
+.shiki {
+  @apply p-2 rounded-xs;
+}

@@ -28,8 +28,8 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       event.event_id = generateUuidv4();
     }
 
-    const { eventsById } = get();
-    if (eventsById.has(event.event_id)) return;
+    const { eventsById: _eventsById } = get();
+    if (_eventsById.has(event.event_id)) return;
 
     if (isErrorEvent(event)) {
       await get().processStacktrace(event);
@@ -66,6 +66,7 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       }
     }
 
+    const { eventsById } = get();
     const newEventIds = new Map(eventsById);
     newEventIds.set(event.event_id, event);
     set({ eventsById: newEventIds });

@@ -74,5 +74,8 @@
   },
   "volta": {
     "extends": "../../package.json"
+  },
+  "dependencies": {
+    "shiki": "^3.13.0"
   }
 }
