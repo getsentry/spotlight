@@ -6,6 +6,7 @@ import { EventContainer } from "./src/utils/eventContainer.js";
 import { SENTRY_CONTENT_TYPE } from "./src/constants.js";
 import { captureException } from "@sentry/core";
 import { exit } from "process";
+import type { ParsedEnvelope } from "./dist/index-DZj00O3f.js";
 
 const connectUpstream = async (port: number) =>
   new Promise<EventSource>((resolve, reject) => {
@@ -16,10 +17,9 @@ const connectUpstream = async (port: number) =>
 
 const SEPARATOR = Array(10).fill("─").join("");
 
-function displayEnvelope(envelope: EventContainer) {
-  const { event } = envelope.getParsedEnvelope();
+function displayEnvelope(event: ParsedEnvelope["envelope"]) {
   console.log(`${event[0].event_id} | ${event[1][0][0].type} | ${event[0].sdk?.name}\n\n`);
-  const lines = formatEnvelope(envelope);
+  const lines = formatEnvelope(event);
   if (lines.length > 0) {
     console.log(lines.join(""));
   } else {
@@ -57,7 +57,7 @@ if (args.help) {
   printHelp();
 }
 
-let onEnvelope: ((envelope: EventContainer) => void) | undefined = undefined;
+let onEnvelope: ((envelope: ParsedEnvelope["envelope"]) => void) | undefined = undefined;
 const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
   traces: ["transaction", "span"],
   profiles: ["profile"],
@@ -105,8 +105,7 @@ switch (cmd) {
     } else {
       const types = new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
       onEnvelope = envelope => {
-        const { event } = envelope.getParsedEnvelope();
-        for (const [header] of event[1]) {
+        for (const [header] of envelope[1]) {
           if (header.type && types.has(header.type)) {
             displayEnvelope(envelope);
           }
@@ -118,9 +117,7 @@ switch (cmd) {
     try {
       const client = await connectUpstream(args.port);
       runServer = false;
-      client.addEventListener(SENTRY_CONTENT_TYPE, event =>
-        onEnvelope!(new EventContainer(SENTRY_CONTENT_TYPE, event.data)),
-      );
+      client.addEventListener(SENTRY_CONTENT_TYPE, event => onEnvelope!(JSON.parse(event.data)));
     } catch (err) {
       // if we fail, fine then we'll start our own
       if (err instanceof Error && !err.message?.includes(args.port.toString())) {
