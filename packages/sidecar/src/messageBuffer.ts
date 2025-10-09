@@ -2,6 +2,8 @@ import { uuidv7 } from "uuidv7";
 import type { InputSchema } from "./mcp/mcp.js";
 import type { EventContainer } from "./utils/eventContainer.js";
 
+const filenameCache = new Map<string, string[]>();
+
 export class MessageBuffer<T> {
   private size: number;
   private items: [number, T][];
@@ -30,6 +32,29 @@ export class MessageBuffer<T> {
       if (atItem === undefined) break;
       if (atItem[0] > minTime) break;
       this.head += 1;
+    }
+
+    // Update filename cache
+    const envelope = (item as EventContainer).getParsedEnvelope();
+    const spotlightEnvelopeId = envelope.event[0].__spotlight_envelope_id;
+    const events = envelope.event[1];
+
+    for (const event of events) {
+      const [, payload] = event;
+      const values = typeof payload === "object" && "exception" in payload && payload.exception?.values;
+      if (values) {
+        for (const value of values) {
+          const frames = value.stacktrace?.frames;
+          if (frames) {
+            for (const frame of frames) {
+              const filename = frame.filename;
+              if (filename) {
+                filenameCache.set(filename, [...(filenameCache.get(filename) || []), String(spotlightEnvelopeId)]);
+              }
+            }
+          }
+        }
+      }
     }
 
     for (const [readerId, readerInfo] of this.readers.entries()) {
@@ -162,15 +187,15 @@ export class MessageBuffer<T> {
       }
 
       const contents = (item[1] as EventContainer).getParsedEnvelope();
+      const spotlightEnvelopeId = contents.event[0].__spotlight_envelope_id;
 
-      return contents.event[1].some(
-        ([, payload]) =>
-          typeof payload === "object" &&
-          "exception" in payload &&
-          payload.exception?.values?.some(val =>
-            val.stacktrace?.frames?.some(frame => frame.filename?.endsWith(value.filename)),
-          ),
-      );
+      for (const [filename, envelopeIds] of filenameCache.values()) {
+        if (filename.endsWith(value.filename)) {
+          return envelopeIds.includes(String(spotlightEnvelopeId));
+        }
+      }
+
+      return false;
     },
     all: () => true,
   };
