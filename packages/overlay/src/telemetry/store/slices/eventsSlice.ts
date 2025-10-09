@@ -45,15 +45,19 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
     if (isLogEvent(event) && event.items?.length) {
       const { logsById, logsByTraceId } = get();
       for (const logItem of event.items) {
+        const logId = logItem.id || generateUuidv4();
+        if (logsById.has(logId)) {
+          continue;
+        }
         if (logItem.severity_number == null) {
           logItem.severity_number = 0;
         }
         logItem.sdk = logItem.attributes?.["sentry.sdk.name"]?.value as string;
         logItem.timestamp = toTimestamp(logItem.timestamp);
-        logItem.id = generateUuidv4();
-        // TODO: check for id collision?
+        logItem.id = logId;
+
         const newLogsById = new Map(logsById);
-        logsById.set(logItem.id, logItem);
+        newLogsById.set(logItem.id, logItem);
         set({ logsById: newLogsById });
 
         if (logItem.trace_id) {
