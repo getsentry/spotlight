@@ -21,6 +21,7 @@ export type CLIArgs = {
   debug: boolean;
   help: boolean;
   _positionals: string[];
+  _extra: Record<string, string | boolean>;
 };
 
 let serverInstance: ServerType;
