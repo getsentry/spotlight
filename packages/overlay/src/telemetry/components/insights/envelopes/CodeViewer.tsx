@@ -6,7 +6,7 @@ function useShiki() {
 
   useEffect(() => {
     createHighlighter({
-      themes: ["nord"],
+      themes: ["github-dark"],
       langs: ["css", "js", "json", "html"],
     }).then(setHighlighter);
   }, []);
@@ -19,7 +19,7 @@ export function CodeViewer({ code, lang }: { code: string; lang: string }) {
 
   if (highlighter) {
     // biome-ignore lint/security/noDangerouslySetInnerHtml: Need this for shiki
-    return <div dangerouslySetInnerHTML={{ __html: highlighter.codeToHtml(code, { lang, theme: "nord" }) }} />;
+    return <div dangerouslySetInnerHTML={{ __html: highlighter.codeToHtml(code, { lang, theme: "github-dark" }) }} />;
   }
 
   return (
