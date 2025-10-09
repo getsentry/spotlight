@@ -131,10 +131,6 @@ importers:
         version: 0.4.4(@types/node@22.15.28)(rollup@4.50.2)
 
   packages/overlay:
-    dependencies:
-      shiki:
-        specifier: ^3.13.0
-        version: 3.13.0
     devDependencies:
       '@fontsource/raleway':
         specifier: 'catalog:'
@@ -241,6 +237,9 @@ importers:
       react-router-dom:
         specifier: ^6.26.2
         version: 6.30.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      shiki:
+        specifier: ^3.13.0
+        version: 3.13.0
       sql-formatter:
         specifier: ^12.2.4
         version: 12.2.4
