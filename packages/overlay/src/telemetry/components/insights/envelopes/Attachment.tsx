@@ -3,7 +3,7 @@ import { type ReactNode, useEffect, useMemo } from "react";
 import { ReactComponent as Download } from "~/assets/download.svg";
 import { base64Decode } from "~/lib/base64";
 import JsonViewer from "../../shared/JsonViewer";
-import { useShiki } from "./useShiki";
+import { CodeViewer } from "./CodeViewer";
 
 const JSON_CONTENT_TYPES = new Set(["application/json", "text/json", "text/x-json", "application/ld+json"]);
 const IMAGE_CONTENT_TYPES = new Set(["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif"]);
@@ -75,18 +75,5 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
       </h3>
       {content}
     </>
-  );
-}
-
-function CodeViewer({ code, lang }: { code: string; lang: string }) {
-  const highlighter = useShiki();
-  if (highlighter) {
-    // biome-ignore lint/security/noDangerouslySetInnerHtml: Need this for shiki
-    return <div dangerouslySetInnerHTML={{ __html: highlighter.codeToHtml(code, { lang, theme: "nord" }) }} />;
-  }
-  return (
-    <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm p-2 bg-primary-900 rounded-sm">
-      {code}
-    </pre>
   );
 }
