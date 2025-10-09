@@ -1,9 +1,35 @@
 #!/usr/bin/env node
+import { EventSource } from "eventsource";
 import { formatEnvelope } from "./src/format";
 import { parseCLIArgs, setupSidecar } from "./src/main.js";
-import type { EventContainer } from "./src/utils/eventContainer.js";
+import { EventContainer } from "./src/utils/eventContainer.js";
+import { SENTRY_CONTENT_TYPE } from "./src/constants.js";
+import { captureException } from "@sentry/core";
+import { exit } from "process";
 
-const printHelpAndExit = () => {
+const connectUpstream = async (port: number) =>
+  new Promise<EventSource>((resolve, reject) => {
+    const client = new EventSource(`http://localhost:${port}/stream`);
+    client.onerror = reject;
+    client.onopen = () => resolve(client);
+  });
+
+const SEPARATOR = Array(10).fill("─").join("");
+
+function displayEnvelope(envelope: EventContainer) {
+  const { event } = envelope.getParsedEnvelope();
+  console.log(`${event[0].event_id} | ${event[1][0][0].type} | ${event[0].sdk?.name}\n\n`);
+  const lines = formatEnvelope(envelope);
+  if (lines.length > 0) {
+    console.log(lines.join(""));
+  } else {
+    console.log("No parser for the given event type");
+  }
+  console.log("\n");
+  console.log(SEPARATOR);
+}
+
+const printHelp = () => {
   console.log(`
 Spotlight Sidecar - Development proxy server for Spotlight
 
@@ -22,11 +48,13 @@ Examples:
   process.exit(0);
 };
 
+let runServer = true;
 const args = parseCLIArgs();
 let stdioMCP = false;
 
 if (args.help) {
-  printHelpAndExit();
+  runServer = false;
+  printHelp();
 }
 
 let onEnvelope: ((envelope: EventContainer) => void) | undefined = undefined;
@@ -46,7 +74,8 @@ export const SUPPORTED_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...
 const cmd = args._positionals[0];
 switch (cmd) {
   case "help":
-    printHelpAndExit();
+    printHelp();
+    runServer = false;
     break;
   case "mcp":
     stdioMCP = true;
@@ -60,7 +89,7 @@ switch (cmd) {
   default: {
     if (args._positionals.length > 1) {
       console.error("Error: Too many positional arguments.");
-      printHelpAndExit();
+      printHelp();
     }
     const eventTypes = cmd.toLowerCase().split(/\s*[,+]\s*/gi);
     for (const eventType of eventTypes) {
@@ -84,27 +113,30 @@ switch (cmd) {
         }
       };
     }
+
+    // try to connect to an already existing server first
+    try {
+      const client = await connectUpstream(args.port);
+      runServer = false;
+      client.addEventListener(SENTRY_CONTENT_TYPE, event =>
+        onEnvelope!(new EventContainer(SENTRY_CONTENT_TYPE, event.data)),
+      );
+    } catch (err) {
+      // if we fail, fine then we'll start our own
+      if (err instanceof Error && !err.message?.includes(args.port.toString())) {
+        captureException(err);
+        console.error("Error when trying to connect to upstream sidecar:", err);
+        process.exit(1);
+      }
+    }
   }
 }
 
-const SEPARATOR = Array(10).fill("─").join("");
-
-function displayEnvelope(envelope: EventContainer) {
-  const { event } = envelope.getParsedEnvelope();
-  console.log(`${event[0].event_id} | ${event[1][0][0].type} | ${event[0].sdk?.name}\n\n`);
-  const lines = formatEnvelope(envelope);
-  if (lines.length > 0) {
-    console.log(lines.join(""));
-  } else {
-    console.log("No parser for the given event type");
-  }
-  console.log("\n");
-  console.log(SEPARATOR);
+if (runServer) {
+  await setupSidecar({
+    ...args,
+    stdioMCP,
+    onEnvelope,
+    isStandalone: true,
+  });
 }
-
-await setupSidecar({
-  ...args,
-  stdioMCP,
-  onEnvelope,
-  isStandalone: true,
-});
