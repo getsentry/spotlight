@@ -1,6 +1,7 @@
 import type { EnvelopeItem } from "@sentry/core";
 import { type ReactNode, useEffect, useMemo } from "react";
 import { ReactComponent as Download } from "~/assets/download.svg";
+import { base64Decode } from "~/lib/base64";
 import JsonViewer from "../../shared/JsonViewer";
 import { useShiki } from "./useShiki";
 
@@ -10,6 +11,23 @@ const IMAGE_CONTENT_TYPES = new Set(["image/png", "image/jpeg", "image/gif", "im
 export default function Attachment({ header, attachment }: { header: EnvelopeItem[0]; attachment: string }) {
   let content: ReactNode | null = null;
   let extension = "bin";
+
+  const decodedAttachmentUrl = useMemo(
+    () =>
+      IMAGE_CONTENT_TYPES.has(header.content_type as string)
+        ? URL.createObjectURL(
+            new Blob(
+              [
+                // @ts-expect-error
+                base64Decode(attachment).buffer,
+              ],
+              { type: header.content_type as string },
+            ),
+          )
+        : undefined,
+    [attachment, header.content_type],
+  );
+
   if (header.content_type === "text/plain" || header.content_type === "text/csv") {
     extension = header.content_type === "text/plain" ? "txt" : "csv";
     content = (
@@ -31,13 +49,7 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
     content = <CodeViewer code={attachment} lang={extension} />;
   } else if (IMAGE_CONTENT_TYPES.has(header.content_type as string)) {
     extension = "bin";
-    content = (
-      <img
-        className="size-full object-contain"
-        src={`data:${header.content_type};base64,${atob(attachment)}`}
-        alt="Attachment"
-      />
-    );
+    content = <img className="size-full object-contain" src={decodedAttachmentUrl} alt="Attachment" />;
   }
 
   const name = (header.filename as string) || `untitled-attachment.${extension}`;
