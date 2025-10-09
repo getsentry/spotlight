@@ -35,21 +35,23 @@ export class MessageBuffer<T> {
     }
 
     // Update filename cache
-    const envelope = (item as EventContainer).getParsedEnvelope();
-    const spotlightEnvelopeId = envelope.event[0].__spotlight_envelope_id;
-    const events = envelope.event[1];
+    const envelope = (item as EventContainer)?.getParsedEnvelope();
+    if (envelope?.event) {
+      const spotlightEnvelopeId = envelope.event[0].__spotlight_envelope_id;
+      const events = envelope.event[1] ?? [];
 
-    for (const event of events) {
-      const [, payload] = event;
-      const values = typeof payload === "object" && "exception" in payload && payload.exception?.values;
-      if (values) {
-        for (const value of values) {
-          const frames = value.stacktrace?.frames;
-          if (frames) {
-            for (const frame of frames) {
-              const filename = frame.filename;
-              if (filename) {
-                filenameCache.set(filename, [...(filenameCache.get(filename) || []), String(spotlightEnvelopeId)]);
+      for (const event of events) {
+        const [, payload] = event;
+        const values = typeof payload === "object" && "exception" in payload && payload.exception?.values;
+        if (values) {
+          for (const value of values) {
+            const frames = value.stacktrace?.frames;
+            if (frames) {
+              for (const frame of frames) {
+                const filename = frame.filename;
+                if (filename) {
+                  filenameCache.set(filename, [...(filenameCache.get(filename) || []), String(spotlightEnvelopeId)]);
+                }
               }
             }
           }
