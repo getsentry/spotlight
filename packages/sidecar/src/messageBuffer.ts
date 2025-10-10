@@ -2,8 +2,6 @@ import { uuidv7 } from "uuidv7";
 import type { InputSchema } from "./mcp/mcp.js";
 import type { EventContainer } from "./utils/eventContainer.js";
 
-const filenameCache = new Map<string, string[]>();
-
 export class MessageBuffer<T> {
   private size: number;
   private items: [number, T][];
@@ -11,6 +9,7 @@ export class MessageBuffer<T> {
   private head = 0;
   private timeout = 10;
   private readers = new Map<string, { tid?: NodeJS.Immediate; pos: number; callback: (item: T) => void }>();
+  private filenameCache = new Map<string, Set<string>>();
 
   constructor(size = 100) {
     this.size = size;
@@ -50,7 +49,12 @@ export class MessageBuffer<T> {
               for (const frame of frames) {
                 const filename = frame.filename;
                 if (filename) {
-                  filenameCache.set(filename, [...(filenameCache.get(filename) || []), String(spotlightEnvelopeId)]);
+                  const previous = this.filenameCache.get(filename);
+                  if (previous) {
+                    previous.add(String(spotlightEnvelopeId));
+                  } else {
+                    this.filenameCache.set(filename, new Set([String(spotlightEnvelopeId)]));
+                  }
                 }
               }
             }
@@ -140,7 +144,7 @@ export class MessageBuffer<T> {
     this.head = this.writePos;
 
     // Clear filename cache
-    filenameCache.clear();
+    this.filenameCache.clear();
   }
 
   read(filters: ReadFilter = { timeWindow: 60 }): T[] {
@@ -161,7 +165,7 @@ export class MessageBuffer<T> {
       if (item == null) continue;
 
       // Check if the item passes all filters
-      if (filterHandlers.every(handler => handler(item, filters))) {
+      if (filterHandlers.every(handler => handler(item, filters, { filenameCache: this.filenameCache }))) {
         result.push(item[1]);
       }
     }
@@ -169,7 +173,10 @@ export class MessageBuffer<T> {
     return result;
   }
 
-  filterHandlers: Record<keyof ReadFilter | string, (item: [number, T], value: NonNullable<ReadFilter>) => boolean> = {
+  filterHandlers: Record<
+    keyof ReadFilter | string,
+    (item: [number, T], value: NonNullable<ReadFilter>, ctx: { filenameCache: Map<string, Set<string>> }) => boolean
+  > = {
     timeWindow: (item, value) => {
       if (!("timeWindow" in value)) {
         return true;
@@ -186,7 +193,7 @@ export class MessageBuffer<T> {
 
       return data.event[0].__spotlight_envelope_id === value.envelopeId;
     },
-    filename: (item, value) => {
+    filename: (item, value, ctx) => {
       if (!("filename" in value)) {
         return true;
       }
@@ -194,9 +201,9 @@ export class MessageBuffer<T> {
       const contents = (item[1] as EventContainer).getParsedEnvelope();
       const spotlightEnvelopeId = contents.event[0].__spotlight_envelope_id;
 
-      for (const [filename, envelopeIds] of filenameCache.entries()) {
+      for (const [filename, envelopeIds] of ctx.filenameCache.entries()) {
         if (filename.endsWith(value.filename)) {
-          return envelopeIds.includes(String(spotlightEnvelopeId));
+          return envelopeIds.has(String(spotlightEnvelopeId));
         }
       }
 
