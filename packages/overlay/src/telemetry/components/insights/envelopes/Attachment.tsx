@@ -41,7 +41,7 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
         new Blob(
           [
             IMAGE_CONTENT_TYPES.has(header.content_type as string)
-              ? Buffer.from(base64Decode(attachment))
+              ? (base64Decode(attachment).buffer as BlobPart)
               : extension === "bin"
                 ? atob(attachment)
                 : attachment,
