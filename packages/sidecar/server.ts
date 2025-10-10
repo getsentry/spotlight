@@ -31,7 +31,13 @@ const printHelp = () => {
   console.log(`
 Spotlight Sidecar - Development proxy server for Spotlight
 
-Usage: spotlight-sidecar [options]
+Usage: spotlight-sidecar [command] [options]
+
+Commands:
+  help                 Show this help message
+  mcp                  Start in MCP mode
+  run                  Run with custom configuration
+  tail [event-types]   Tail specific event types (traces, profiles, logs, etc.)
 
 Options:
   -p, --port <port>    Port to listen on (default: 8969)
@@ -40,6 +46,9 @@ Options:
 
 Examples:
   spotlight-sidecar                    # Start on default port 8969
+  spotlight-sidecar tail traces        # Tail trace events
+  spotlight-sidecar tail errors,logs   # Tail error and log events
+  spotlight-sidecar tail everything    # Tail all event types
   spotlight-sidecar --port 3000        # Start on port 3000
   spotlight-sidecar -p 3000 -d         # Start on port 3000 with debug logging
 `);
@@ -81,15 +90,12 @@ switch (cmd) {
   case "run":
     // do crazy stuff
     break;
-  case undefined:
-  case "":
-    break;
-  default: {
-    if (args._positionals.length > 1) {
-      console.error("Error: Too many positional arguments.");
+  case "tail": {
+    if (args._positionals.length > 2) {
+      console.error("Error: Too many positional arguments for tail command.");
       printHelp();
     }
-    const eventTypes = cmd.toLowerCase().split(/\s*[,+]\s*/gi);
+    const eventTypes = args._positionals[1]?.toLowerCase().split(/\s*[,+]\s*/gi) || [];
     for (const eventType of eventTypes) {
       if (!SUPPORTED_ARGS.has(eventType)) {
         console.error(`Error: Unsupported argument "${eventType}".`);
@@ -124,6 +130,15 @@ switch (cmd) {
         process.exit(1);
       }
     }
+    break;
+  }
+  case undefined:
+  case "":
+    break;
+  default: {
+    console.error(`Error: Unknown command "${cmd}".`);
+    console.error("Available commands: help, mcp, run, tail");
+    printHelp();
   }
 }
 
