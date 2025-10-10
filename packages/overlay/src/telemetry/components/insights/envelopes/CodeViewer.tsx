@@ -8,7 +8,7 @@ function useShiki() {
   useEffect(() => {
     createHighlighter({
       themes: ["github-dark"],
-      langs: ["css", "js", "json", "html"],
+      langs: ["css", "js", "json", "html", "ts", "py", "tsx", "jsx", "vue"],
     }).then(setHighlighter);
   }, []);
 
