@@ -31,7 +31,12 @@ const printHelp = () => {
   console.log(`
 Spotlight Sidecar - Development proxy server for Spotlight
 
-Usage: spotlight-sidecar [options]
+Usage: spotlight-sidecar [command] [options]
+
+Commands:
+  tail [types...]      Tail Sentry events (default: everything)
+                       Available types: ${[...SUPPORTED_ARGS].join(", ")}
+  help                 Show this help message
 
 Options:
   -p, --port <port>    Port to listen on (default: 8969)
@@ -40,6 +45,9 @@ Options:
 
 Examples:
   spotlight-sidecar                    # Start on default port 8969
+  spotlight-sidecar tail               # Tail all event types
+  spotlight-sidecar tail errors        # Tail only errors
+  spotlight-sidecar tail errors logs   # Tail errors and logs
   spotlight-sidecar --port 3000        # Start on port 3000
   spotlight-sidecar -p 3000 -d         # Start on port 3000 with debug logging
 `);
@@ -82,12 +90,9 @@ switch (cmd) {
     // do crazy stuff
     break;
   case "tail": {
-    const tailArg = args._positionals[1];
-    if (args._positionals.length > 2) {
-      console.error("Error: Too many positional arguments.");
-      printHelp();
-    }
-    const eventTypes = tailArg ? tailArg.toLowerCase().split(/\s*[,+]\s*/gi) : ["everything"];
+    const eventTypes = args._positionals.length > 1 
+      ? args._positionals.slice(1).map(arg => arg.toLowerCase())
+      : ["everything"];
     for (const eventType of eventTypes) {
       if (!SUPPORTED_ARGS.has(eventType)) {
         console.error(`Error: Unsupported argument "${eventType}".`);
