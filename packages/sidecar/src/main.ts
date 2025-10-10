@@ -16,10 +16,18 @@ import { parseArgs } from "node:util";
 import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 
+export type CLIArgs = {
+  port: number;
+  debug: boolean;
+  help: boolean;
+  _positionals: string[];
+  _extra: Record<string, unknown>;
+};
+
 let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
-export function parseCLIArgs(): { port: number; debug: boolean; stdioMCP: boolean; help: boolean } {
+export function parseCLIArgs(): CLIArgs {
   const { values, positionals } = parseArgs({
     options: {
       port: {
@@ -32,6 +40,7 @@ export function parseCLIArgs(): { port: number; debug: boolean; stdioMCP: boolea
         short: "d",
         default: false,
       },
+      // Deprecated -- use the positional `mcp` argument instead
       "stdio-mcp": {
         type: "boolean",
         default: false,
@@ -43,10 +52,11 @@ export function parseCLIArgs(): { port: number; debug: boolean; stdioMCP: boolea
       },
     },
     allowPositionals: true,
+    strict: false,
   });
 
   // Handle legacy positional argument for port (backwards compatibility)
-  const portInput = positionals.length > 0 ? positionals[0] : values.port;
+  const portInput = positionals.length === 1 && /^\d{1,5}$/.test(positionals[0]) ? positionals.shift() : values.port;
   const port = Number(portInput);
 
   // Validate port number
@@ -61,11 +71,22 @@ export function parseCLIArgs(): { port: number; debug: boolean; stdioMCP: boolea
     process.exit(1);
   }
 
-  return {
-    ...values,
-    stdioMCP: values["stdio-mcp"],
+  if (values["stdio-mcp"]) {
+    positionals.unshift("mcp");
+    console.warn("Warning: --stdio-mcp is deprecated. Please use the positional argument 'mcp' instead.");
+  }
+
+  const result: CLIArgs = {
+    debug: values.debug as boolean,
+    help: values.help as boolean,
     port,
+    _positionals: positionals,
+    _extra: {},
   };
+  const keys = new Set(Object.keys(result));
+  result._extra = Object.fromEntries(Object.entries(values).filter(([key]) => !keys.has(key)));
+
+  return result;
 }
 
 async function startServer(options: StartServerOptions): Promise<ServerType> {
@@ -86,6 +107,7 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
 
       ctx.set("basePath", options.basePath);
       ctx.set("incomingPayload", options.incomingPayload);
+      ctx.set("onEnvelope", options.onEnvelope);
 
       const host = ctx.req.header("Host") || "localhost";
       const path = ctx.req.path;
@@ -151,22 +173,28 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
 
   sidecarServer.addListener("error", handleServerError);
 
-  function handleServerError(e: { code?: string }): void {
-    if ("code" in e && e.code === "EADDRINUSE") {
+  function handleServerError(err: { code?: string }): void {
+    if ("code" in err && err.code === "EADDRINUSE") {
       logger.info(`Port ${options.port} in use, retrying...`);
       sidecarServer.close();
       portInUseRetryTimeout = setTimeout(() => {
         sidecarServer.listen(options.port);
       }, 5000);
     } else {
-      captureException(e);
-      reject(e);
+      captureException(err);
+      reject(err as Error);
     }
   }
 
   if (options.stdioMCP) {
     logger.info("Starting MCP over stdio too...");
-    await createMCPInstance().connect(new StdioServerTransport());
+    try {
+      await createMCPInstance().connect(new StdioServerTransport());
+    } catch (err) {
+      logger.error(`Failed to connect MCP over stdio: ${(err as Error).message}`);
+      captureException(err);
+      reject(err as Error);
+    }
   }
 
   return promise;
@@ -178,6 +206,7 @@ export async function setupSidecar({
   basePath,
   filesToServe,
   debug,
+  onEnvelope,
   incomingPayload,
   isStandalone,
   stdioMCP,
@@ -267,7 +296,14 @@ export async function setupSidecar({
       await startMCPStdioHTTPProxy();
     }
   } else if (!serverInstance) {
-    serverInstance = await startServer({ port: sidecarPort, basePath, filesToServe, incomingPayload, stdioMCP });
+    serverInstance = await startServer({
+      port: sidecarPort,
+      basePath,
+      filesToServe,
+      incomingPayload,
+      onEnvelope,
+      stdioMCP,
+    });
   }
 }
 
@@ -288,8 +324,6 @@ export const shutdown = () => {
     forceShutdown = true;
     logger.info("Shutting down server gracefully...");
     serverInstance.close();
-    // TODO: This doesn't exist
-    // serverInstance.closeAllConnections();
     serverInstance.unref();
   }
 };

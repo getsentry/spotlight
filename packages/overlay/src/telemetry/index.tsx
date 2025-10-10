@@ -1,4 +1,5 @@
 import type { Envelope } from "@sentry/core";
+import { SENTRY_CONTENT_TYPE } from "@spotlightjs/sidecar/constants";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { removeURLSuffix } from "~/lib/removeURLSuffix";
 import { getSpotlightEventTarget } from "../lib/eventTarget";
@@ -32,8 +33,6 @@ type TelemetryRouteProps = {
 };
 
 type EventData = { contentType: string; data: string };
-
-const SENTRY_CONTENT_TYPE = "application/x-sentry-envelope";
 
 export function Telemetry({ sidecarUrl }: TelemetryRouteProps) {
   const [sentryEvents, setSentryEvents] = useState<Envelope[]>([]);
