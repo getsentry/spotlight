@@ -20,6 +20,10 @@ function useShiki() {
 export function CodeViewer({ code, lang }: { code: string; lang: string }) {
   const highlighter = useShiki();
 
+  if (code.length === 0) {
+    return <></>;
+  }
+
   if (highlighter && lang in bundledLanguages) {
     return (
       <div
