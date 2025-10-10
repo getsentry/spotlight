@@ -99,7 +99,7 @@ const router = new Hono<HonoEnv>()
 
       const onEnvelope = ctx.get("onEnvelope");
       if (onEnvelope) {
-        onEnvelope(container);
+        onEnvelope(container.getParsedEnvelope().event);
       }
     }
 
