@@ -81,6 +81,7 @@ export function parseCLIArgs(): CLIArgs {
     help: values.help as boolean,
     port,
     _positionals: positionals,
+    _extra: {},
   };
   const keys = new Set(Object.keys(result));
   result._extra = Object.fromEntries(Object.entries(values).filter(([key]) => !keys.has(key)));
