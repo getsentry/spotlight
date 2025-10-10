@@ -30,7 +30,7 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
         <div className="text-primary-300">
           No breadcrumbs available for this event. Try adding some to make debugging easier.
         </div>
-        <CodeViewer code={EXAMPLE_BREADCRUMB} lang="javascript" />
+        <CodeViewer code={EXAMPLE_BREADCRUMB} lang="js" />
       </div>
     );
   }

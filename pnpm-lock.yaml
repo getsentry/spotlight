@@ -131,10 +131,6 @@ importers:
         version: 0.4.4(@types/node@22.15.28)(rollup@4.50.2)
 
   packages/overlay:
-    dependencies:
-      '@shikijs/transformers':
-        specifier: ^3.13.0
-        version: 3.13.0
     devDependencies:
       '@fontsource/raleway':
         specifier: 'catalog:'
@@ -160,6 +156,9 @@ importers:
       '@sentry/react':
         specifier: ^10
         version: 10.5.0(react@18.3.1)
+      '@shikijs/transformers':
+        specifier: ^3.13.0
+        version: 3.13.0
       '@spotlightjs/sidecar':
         specifier: workspace:*
         version: link:../sidecar

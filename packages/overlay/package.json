@@ -33,6 +33,7 @@
     "@sentry/browser": "^10",
     "@sentry/core": "catalog:",
     "@sentry/react": "^10",
+    "@shikijs/transformers": "^3.13.0",
     "@spotlightjs/sidecar": "workspace:*",
     "@spotlightjs/tsconfig": "workspace:*",
     "@tailwindcss/vite": "catalog:",
@@ -75,8 +76,5 @@
   },
   "volta": {
     "extends": "../../package.json"
-  },
-  "dependencies": {
-    "@shikijs/transformers": "^3.13.0"
   }
 }
