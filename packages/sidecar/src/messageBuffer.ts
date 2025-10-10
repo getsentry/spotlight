@@ -154,7 +154,7 @@ export class MessageBuffer<T> {
 
       const data = (item[1] as EventContainer).getParsedEnvelope();
 
-      return data.event[0].__spotlight_envelope_id === value.envelopeId;
+      return data.envelope[0].__spotlight_envelope_id === value.envelopeId;
     },
     filename: (item, value) => {
       if (!("filename" in value)) {
@@ -163,7 +163,7 @@ export class MessageBuffer<T> {
 
       const contents = (item[1] as EventContainer).getParsedEnvelope();
 
-      return contents.event[1].some(
+      return contents.envelope[1].some(
         ([, payload]) =>
           typeof payload === "object" &&
           "exception" in payload &&

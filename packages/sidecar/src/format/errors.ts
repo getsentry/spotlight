@@ -1,6 +1,6 @@
 import type { ErrorEvent } from "@sentry/core";
 import type { z } from "zod";
-import { isErrorEvent } from "~/parser/index.js";
+import { isErrorEvent, type SentryEvent } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
 import { formatEventOutput } from "./event.js";
 import type { ErrorEventSchema } from "./schema.js";
@@ -9,15 +9,15 @@ export function formatErrorEnvelope(container: EventContainer) {
   const processedEnvelope = container.getParsedEnvelope();
 
   const {
-    event: [, items],
+    envelope: [, items],
   } = processedEnvelope;
 
   const formatted: string[] = [];
   for (const item of items) {
     const [{ type }, payload] = item;
 
-    if (type === "event" && isErrorEvent(payload)) {
-      formatted.push(formatEventOutput(processErrorEvent(payload)));
+    if (type === "event" && isErrorEvent(payload as SentryEvent)) {
+      formatted.push(formatEventOutput(processErrorEvent(payload as ErrorEvent)));
     }
   }
 

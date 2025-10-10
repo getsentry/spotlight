@@ -1,20 +1,20 @@
 import type { SerializedLog } from "@sentry/core";
-import { isLogEvent } from "~/parser/index.js";
+import { isLogEvent, type SentryLogEvent, type SentryEvent } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
 
 export function formatLogEnvelope(container: EventContainer) {
   const parsedEnvelope = container.getParsedEnvelope();
 
   const {
-    event: [, items],
+    envelope: [, items],
   } = parsedEnvelope;
 
   const formatted: string[] = [];
   for (const item of items) {
     const [{ type }, payload] = item;
 
-    if (type === "log" && isLogEvent(payload)) {
-      for (const log of payload.items) {
+    if (type === "log" && isLogEvent(payload as SentryEvent)) {
+      for (const log of (payload as SentryLogEvent).items) {
         formatted.push(processLogEvent(log));
       }
     }

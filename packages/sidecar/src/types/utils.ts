@@ -1,7 +1,7 @@
-import type { EventContainer } from "~/utils/eventContainer.js";
+import type { ParsedEnvelope } from "~/parser/processEnvelope.js";
 
 export type IncomingPayloadCallback = (body: string) => void;
-export type OnEnvelopeCallback = (envelope: EventContainer) => void;
+export type OnEnvelopeCallback = (envelope: ParsedEnvelope["envelope"]) => void;
 
 export type SidecarLogger = {
   info: (message: any) => void;

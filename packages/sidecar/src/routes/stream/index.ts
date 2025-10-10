@@ -42,7 +42,7 @@ const router = new Hono<HonoEnv>()
         if (parsedEnvelope) {
           stream.writeSSE({
             event: `${container.getContentType()}${base64Indicator}`,
-            data: JSON.stringify(parsedEnvelope.event),
+            data: JSON.stringify(parsedEnvelope.envelope),
           });
         }
       });
