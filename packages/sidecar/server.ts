@@ -31,7 +31,14 @@ const printHelp = () => {
   console.log(`
 Spotlight Sidecar - Development proxy server for Spotlight
 
-Usage: spotlight-sidecar [options]
+Usage: spotlight-sidecar [command] [options]
+
+Commands:
+  tail [types...]      Tail Sentry events (default: everything)
+                       Available types: ${[...Object.keys(NAME_TO_TYPE_MAPPING)].join(", ")}
+                       Magic words: ${[...EVERYTHING_MAGIC_WORDS].join(", ")}
+  mcp                  Start in MCP (Model Context Protocol) mode
+  help                 Show this help message
 
 Options:
   -p, --port <port>    Port to listen on (default: 8969)
@@ -40,6 +47,10 @@ Options:
 
 Examples:
   spotlight-sidecar                    # Start on default port 8969
+  spotlight-sidecar tail               # Tail all event types
+  spotlight-sidecar tail errors        # Tail only errors
+  spotlight-sidecar tail errors logs   # Tail errors and logs
+  spotlight-sidecar mcp                # Start in MCP mode
   spotlight-sidecar --port 3000        # Start on port 3000
   spotlight-sidecar -p 3000 -d         # Start on port 3000 with debug logging
 `);
@@ -81,15 +92,10 @@ switch (cmd) {
   case "run":
     // do crazy stuff
     break;
-  case undefined:
-  case "":
-    break;
-  default: {
-    if (args._positionals.length > 1) {
-      console.error("Error: Too many positional arguments.");
-      printHelp();
-    }
-    const eventTypes = cmd.toLowerCase().split(/\s*[,+]\s*/gi);
+  case "tail": {
+    const eventTypes = args._positionals.length > 1 
+      ? args._positionals.slice(1).map(arg => arg.toLowerCase())
+      : ["everything"];
     for (const eventType of eventTypes) {
       if (!SUPPORTED_ARGS.has(eventType)) {
         console.error(`Error: Unsupported argument "${eventType}".`);
@@ -124,7 +130,13 @@ switch (cmd) {
         process.exit(1);
       }
     }
+    break;
   }
+  case undefined:
+  case "":
+    break;
+  default:
+    break;
 }
 
 if (runServer) {
