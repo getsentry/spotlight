@@ -194,7 +194,7 @@ export class MessageBuffer<T> {
       const contents = (item[1] as EventContainer).getParsedEnvelope();
       const spotlightEnvelopeId = contents.event[0].__spotlight_envelope_id;
 
-      for (const [filename, envelopeIds] of filenameCache.values()) {
+      for (const [filename, envelopeIds] of filenameCache.entries()) {
         if (filename.endsWith(value.filename)) {
           return envelopeIds.includes(String(spotlightEnvelopeId));
         }
