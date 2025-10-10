@@ -123,7 +123,7 @@ function extractTraceEventsFromContainer(container: EventContainer): TraceEvent[
       data: container.getData(),
     });
 
-    const [, items] = parsed.event;
+    const [, items] = parsed!.envelope;
 
     for (const item of items) {
       const [{ type }, payload] = item;
