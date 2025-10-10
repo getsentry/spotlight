@@ -1,21 +1,6 @@
 import { transformerNotationHighlight } from "@shikijs/transformers";
-import { useEffect, useState } from "react";
-import { type Highlighter, bundledLanguages, createHighlighter } from "shiki/bundle-web.mjs";
-
-const THEME = "github-dark";
-
-function useShiki() {
-  const [highlighter, setHighlighter] = useState<Highlighter | null>(null);
-
-  useEffect(() => {
-    createHighlighter({
-      themes: [THEME],
-      langs: Object.keys(bundledLanguages),
-    }).then(setHighlighter);
-  }, []);
-
-  return highlighter;
-}
+import { bundledLanguages } from "shiki/bundle-web.mjs";
+import { SHIKI_DEFAULT_THEME, useShiki } from "~/ShikiProvider";
 
 export function CodeViewer({ code, lang }: { code: string; lang: string }) {
   const highlighter = useShiki();
@@ -31,7 +16,7 @@ export function CodeViewer({ code, lang }: { code: string; lang: string }) {
         dangerouslySetInnerHTML={{
           __html: highlighter.codeToHtml(code, {
             lang,
-            theme: THEME,
+            theme: SHIKI_DEFAULT_THEME,
             transformers: [transformerNotationHighlight()],
           }),
         }}
