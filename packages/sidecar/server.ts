@@ -81,15 +81,13 @@ switch (cmd) {
   case "run":
     // do crazy stuff
     break;
-  case undefined:
-  case "":
-    break;
-  default: {
-    if (args._positionals.length > 1) {
+  case "tail": {
+    const tailArg = args._positionals[1];
+    if (args._positionals.length > 2) {
       console.error("Error: Too many positional arguments.");
       printHelp();
     }
-    const eventTypes = cmd.toLowerCase().split(/\s*[,+]\s*/gi);
+    const eventTypes = tailArg ? tailArg.toLowerCase().split(/\s*[,+]\s*/gi) : ["everything"];
     for (const eventType of eventTypes) {
       if (!SUPPORTED_ARGS.has(eventType)) {
         console.error(`Error: Unsupported argument "${eventType}".`);
@@ -124,7 +122,13 @@ switch (cmd) {
         process.exit(1);
       }
     }
+    break;
   }
+  case undefined:
+  case "":
+    break;
+  default:
+    break;
 }
 
 if (runServer) {
