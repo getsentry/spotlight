@@ -1,5 +1,6 @@
 import type { Nullable } from "vitest";
 import type { SentryEvent } from "../../types";
+import { CodeViewer } from "../insights/envelopes/CodeViewer";
 import { ContextView } from "../shared/ContextView";
 
 const EXAMPLE_CONTEXT = `Sentry.setContext("character", {
@@ -13,7 +14,7 @@ const exampleContext = (
     <div className="text-primary-300">
       No context available for this event. Try adding some to make debugging easier.
     </div>
-    <pre className="whitespace-pre-wrap">{EXAMPLE_CONTEXT}</pre>
+    <CodeViewer code={EXAMPLE_CONTEXT} lang="js" />
   </div>
 );
 
