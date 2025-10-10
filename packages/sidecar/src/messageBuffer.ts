@@ -138,6 +138,9 @@ export class MessageBuffer<T> {
   reset(): void {
     this.items = new Array(this.size);
     this.head = this.writePos;
+
+    // Clear filename cache
+    filenameCache.clear();
   }
 
   read(filters: ReadFilter = { timeWindow: 60 }): T[] {
