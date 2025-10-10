@@ -75,10 +75,8 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope | nul
     items.push([itemHeader, itemPayload] as EnvelopeItem);
   }
 
-  const envelope = [envelopeHeader, items] as Envelope;
-
   return {
-    event: envelope,
+    envelope: [envelopeHeader, items] as Envelope,
     rawEnvelope: rawEvent,
   };
 }

@@ -15,9 +15,9 @@ const connectUpstream = async (port: number) =>
 
 const SEPARATOR = Array(10).fill("─").join("");
 
-function displayEnvelope(event: ParsedEnvelope["envelope"]) {
-  console.log(`${event[0].event_id} | ${event[1][0][0].type} | ${event[0].sdk?.name}\n\n`);
-  const lines = formatEnvelope(event);
+function displayEnvelope(envelope: ParsedEnvelope["envelope"]) {
+  console.log(`${envelope[0].event_id} | ${envelope[1][0][0].type} | ${envelope[0].sdk?.name}\n\n`);
+  const lines = formatEnvelope(envelope);
   if (lines.length > 0) {
     console.log(lines.join(""));
   } else {

@@ -21,8 +21,8 @@ export const eventHandlers = {
   },
 };
 
-export function formatEnvelope(event: ParsedEnvelope["event"]): string[] {
-  const [, items] = event;
+export function formatEnvelope(envelope: ParsedEnvelope["envelope"]): string[] {
+  const [, items] = envelope;
 
   const formatted: string[] = [];
   for (const item of items) {

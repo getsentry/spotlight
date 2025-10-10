@@ -7,7 +7,7 @@ import { type ParsedEnvelope, processEnvelope } from "~/parser/index.js";
 export class EventContainer {
   private contentType: string;
   private data: Buffer;
-  private parsedEnvelope?: ParsedEnvelope;
+  private parsedEnvelope: ParsedEnvelope | null = null;
   private isParsed = false;
 
   constructor(contentType: string, data: Buffer) {

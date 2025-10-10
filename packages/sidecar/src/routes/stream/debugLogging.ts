@@ -1,5 +1,5 @@
 import { isDebugEnabled, logger } from "~/logger.js";
-import { type ParsedEnvelope, type SentryErrorEvent, isErrorEvent } from "~/parser/index.js";
+import { type ParsedEnvelope, type SentryErrorEvent, type SentryEvent, isErrorEvent } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
 
 /**
@@ -12,9 +12,9 @@ export function logIncomingEvent(container: EventContainer): void {
   const contentType = container.getContentType();
 
   if (contentType === "application/x-sentry-envelope") {
-    const envelope = container.getParsedEnvelope();
+    const parsedEnvelope = container.getParsedEnvelope();
 
-    if (!envelope) {
+    if (!parsedEnvelope) {
       // Still log something useful even if parsing failed
       const data = container.getData();
       const size = data.length;
@@ -29,12 +29,12 @@ export function logIncomingEvent(container: EventContainer): void {
     }
 
     // Build complete log message with all details
-    let logMessage = `→ ${formatEnvelopeMetadata(envelope)}`;
+    let logMessage = `→ ${formatEnvelopeMetadata(parsedEnvelope.envelope)}`;
 
     // Add error event details to the same log message
-    for (const item of envelope.event[1]) {
-      if (isErrorEvent(item[1])) {
-        logMessage += `\n  └ ${formatErrorDetails(item[1])}`;
+    for (const item of parsedEnvelope.envelope[1]) {
+      if (isErrorEvent(item[1] as SentryEvent)) {
+        logMessage += `\n  └ ${formatErrorDetails(item[1] as SentryErrorEvent)}`;
       }
     }
 
@@ -67,12 +67,12 @@ export function logOutgoingEvent(container: EventContainer, clientId: string): v
 /**
  * Formats envelope metadata for logging
  */
-function formatEnvelopeMetadata(envelope: ParsedEnvelope): string {
-  const eventTypes = envelope.event[1].map(item => item[0].type).filter(Boolean);
+function formatEnvelopeMetadata(envelope: ParsedEnvelope["envelope"]): string {
+  const eventTypes = envelope[1].map(item => item[0].type).filter(Boolean);
 
   const typePrefix = eventTypes.length > 0 ? eventTypes.join("+") : "envelope";
-  const sdk = envelope.event[0].sdk?.name || "unknown";
-  const eventId = envelope.event[0].event_id;
+  const sdk = envelope[0].sdk?.name || "unknown";
+  const eventId = envelope[0].event_id;
 
   return `${typePrefix} | sdk: ${sdk}${eventId ? ` | id: ${eventId}` : ""}`;
 }
