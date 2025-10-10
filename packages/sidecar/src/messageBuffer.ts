@@ -18,6 +18,22 @@ export class MessageBuffer<T> {
 
   put(item: T): void {
     const curTime = new Date().getTime();
+
+    // Remove old value from filename cache
+    const oldValue = this.items[this.writePos % this.size];
+    if (oldValue) {
+      const envelope = (oldValue[1] as EventContainer)?.getParsedEnvelope();
+      if (envelope?.event) {
+        const spotlightEnvelopeId = envelope.event[0].__spotlight_envelope_id;
+
+        for (const envelopeIds of this.filenameCache.values()) {
+          if (envelopeIds.has(String(spotlightEnvelopeId))) {
+            envelopeIds.delete(String(spotlightEnvelopeId));
+          }
+        }
+      }
+    }
+
     this.items[this.writePos % this.size] = [curTime, item];
     this.writePos += 1;
     if (this.head === this.writePos) {
@@ -63,6 +79,7 @@ export class MessageBuffer<T> {
       }
     }
 
+    // Calling subscribers
     for (const [readerId, readerInfo] of this.readers.entries()) {
       if (readerInfo.tid) {
         clearImmediate(readerInfo.tid);
