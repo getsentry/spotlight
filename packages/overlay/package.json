@@ -75,5 +75,8 @@
   },
   "volta": {
     "extends": "../../package.json"
+  },
+  "dependencies": {
+    "@shikijs/transformers": "^3.13.0"
   }
 }

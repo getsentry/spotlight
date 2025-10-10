@@ -137,4 +137,8 @@ input:checked ~ .dot {
 
 .shiki {
   @apply p-2 rounded-xs;
+
+  .highlighted {
+    @apply bg-primary-600 py-1 px-2 rounded-xs;
+  }
 }

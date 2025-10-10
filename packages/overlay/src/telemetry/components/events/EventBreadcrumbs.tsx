@@ -3,6 +3,7 @@ import { cn } from "~/lib/cn";
 import JsonViewer from "~/telemetry/components/shared/JsonViewer";
 import Time from "~/telemetry/components/shared/Time";
 import type { Breadcrumb, SentryEvent } from "../../types";
+import { CodeViewer } from "../insights/envelopes/CodeViewer";
 
 const EXAMPLE_BREADCRUMB = `Sentry.addBreadcrumb({
   category: "auth",
@@ -29,7 +30,7 @@ export default function EventBreadcrumbs({ event }: { event: SentryEvent }) {
         <div className="text-primary-300">
           No breadcrumbs available for this event. Try adding some to make debugging easier.
         </div>
-        <pre className="whitespace-pre-wrap ">{EXAMPLE_BREADCRUMB}</pre>
+        <CodeViewer code={EXAMPLE_BREADCRUMB} lang="javascript" />
       </div>
     );
   }

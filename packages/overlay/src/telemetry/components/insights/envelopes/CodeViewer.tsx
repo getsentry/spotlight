@@ -1,3 +1,4 @@
+import { transformerNotationHighlight } from "@shikijs/transformers";
 import { useEffect, useState } from "react";
 import { type Highlighter, createHighlighter } from "shiki";
 
@@ -18,8 +19,18 @@ export function CodeViewer({ code, lang }: { code: string; lang: string }) {
   const highlighter = useShiki();
 
   if (highlighter) {
-    // biome-ignore lint/security/noDangerouslySetInnerHtml: Need this for shiki
-    return <div dangerouslySetInnerHTML={{ __html: highlighter.codeToHtml(code, { lang, theme: "github-dark" }) }} />;
+    return (
+      <div
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Need this for shiki
+        dangerouslySetInnerHTML={{
+          __html: highlighter.codeToHtml(code, {
+            lang,
+            theme: "github-dark",
+            transformers: [transformerNotationHighlight()],
+          }),
+        }}
+      />
+    );
   }
 
   return (

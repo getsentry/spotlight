@@ -6,64 +6,66 @@ import JsonViewer from "../../shared/JsonViewer";
 import { CodeViewer } from "./CodeViewer";
 
 const JSON_CONTENT_TYPES = new Set(["application/json", "text/json", "text/x-json", "application/ld+json"]);
+const CODE_CONTENT_TYPES = new Set(["text/css", "text/html", "text/javascript"]);
 const IMAGE_CONTENT_TYPES = new Set(["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif"]);
+
+const CONTENT_TYPES_TO_EXTENSION = {
+  "text/plain": "txt",
+  "text/csv": "csv",
+  // Code
+  "text/css": "css",
+  "text/html": "html",
+  "text/javascript": "js",
+  // JSON
+  "text/json": "json",
+  "text/x-json": "json",
+  "application/json": "json",
+  "application/ld+json": "json",
+  // Image
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/gif": "gif",
+  "image/webp": "webp",
+  "image/avif": "avif",
+};
 
 export default function Attachment({ header, attachment }: { header: EnvelopeItem[0]; attachment: string }) {
   let content: ReactNode | null = null;
-  let extension = "bin";
-
-  const decodedAttachmentUrl = useMemo(
-    () =>
-      IMAGE_CONTENT_TYPES.has(header.content_type as string)
-        ? URL.createObjectURL(
-            new Blob(
-              [
-                // @ts-expect-error
-                base64Decode(attachment).buffer,
-              ],
-              { type: header.content_type as string },
-            ),
-          )
-        : undefined,
-    [attachment, header.content_type],
-  );
-
-  if (header.content_type === "text/plain" || header.content_type === "text/csv") {
-    extension = header.content_type === "text/plain" ? "txt" : "csv";
-    content = (
-      <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm p-2 bg-primary-900 rounded-sm">
-        {attachment}
-      </pre>
-    );
-  } else if (JSON_CONTENT_TYPES.has(header.content_type as string)) {
-    extension = "json";
-    content = <JsonViewer data={JSON.parse(attachment)} />;
-  } else if (header.content_type === "text/css") {
-    extension = "css";
-    content = <CodeViewer code={attachment} lang={extension} />;
-  } else if (header.content_type === "text/html") {
-    extension = "html";
-    content = <CodeViewer code={attachment} lang={extension} />;
-  } else if (header.content_type === "text/javascript") {
-    extension = "js";
-    content = <CodeViewer code={attachment} lang={extension} />;
-  } else if (IMAGE_CONTENT_TYPES.has(header.content_type as string)) {
-    extension = "bin";
-    content = <img className="size-full object-contain" src={decodedAttachmentUrl} alt="Attachment" />;
-  }
+  const extension = CONTENT_TYPES_TO_EXTENSION[header.content_type as keyof typeof CONTENT_TYPES_TO_EXTENSION] ?? "bin";
 
   const name = (header.filename as string) || `untitled-attachment.${extension}`;
 
   const downloadUrl = useMemo(
     () =>
       URL.createObjectURL(
-        new Blob([extension === "bin" ? atob(attachment) : attachment], {
-          type: (header.content_type as string) || "application/octet-stream",
-        }),
+        new Blob(
+          [
+            IMAGE_CONTENT_TYPES.has(header.content_type as string)
+              ? Buffer.from(base64Decode(attachment))
+              : extension === "bin"
+                ? atob(attachment)
+                : attachment,
+          ],
+          { type: (header.content_type as string) || "application/octet-stream" },
+        ),
       ),
     [attachment, header.content_type, extension],
   );
   useEffect(() => () => URL.revokeObjectURL(downloadUrl), [downloadUrl]);
+
+  if (header.content_type === "text/plain" || header.content_type === "text/csv") {
+    content = (
+      <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm p-2 bg-primary-900 rounded-sm">
+        {attachment}
+      </pre>
+    );
+  } else if (JSON_CONTENT_TYPES.has(header.content_type as string)) {
+    content = <JsonViewer data={JSON.parse(attachment)} />;
+  } else if (CODE_CONTENT_TYPES.has(header.content_type as string)) {
+    content = <CodeViewer code={attachment} lang={extension} />;
+  } else if (IMAGE_CONTENT_TYPES.has(header.content_type as string)) {
+    content = <img className="size-full object-contain" src={downloadUrl} alt="Attachment" />;
+  }
 
   return (
     <>
