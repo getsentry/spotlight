@@ -1,5 +1,15 @@
 # @spotlightjs/sidecar
 
+## 2.1.3
+
+### Patch Changes
+
+- added caching for filename based query ([#1000](https://github.com/getsentry/spotlight/pull/1000))
+
+- Fix memory leak on filenameCache ([#1005](https://github.com/getsentry/spotlight/pull/1005))
+
+- Added more attachment viewers ([#999](https://github.com/getsentry/spotlight/pull/999))
+
 ## 2.1.2
 
 ### Patch Changes
