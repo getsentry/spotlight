@@ -242,7 +242,9 @@ export class MessageBuffer<T> {
 
       for (const [filename, envelopeIds] of ctx.filenameCache.entries()) {
         if (filename.endsWith(value.filename)) {
-          return envelopeIds.has(String(spotlightEnvelopeId));
+          if (envelopeIds.has(String(spotlightEnvelopeId))) {
+            return true;
+          }
         }
       }
 
