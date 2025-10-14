@@ -1,5 +1,19 @@
 # @spotlightjs/core
 
+## 4.3.0
+
+### Minor Changes
+
+- Added more attachment viewers ([#999](https://github.com/getsentry/spotlight/pull/999))
+
+### Patch Changes
+
+- Make sure everything is sorted from most recent to oldest (errors, logs, etc) ([#995](https://github.com/getsentry/spotlight/pull/995))
+
+- Add log deduplication ([#998](https://github.com/getsentry/spotlight/pull/998))
+
+- Report copy button errors to Sentry for observability ([#988](https://github.com/getsentry/spotlight/pull/988))
+
 ## 4.2.0
 
 ### Minor Changes
