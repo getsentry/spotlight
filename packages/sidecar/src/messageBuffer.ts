@@ -46,13 +46,25 @@ export class MessageBuffer<T> {
       atItem = this.items[this.head % this.size];
       if (atItem === undefined) break;
       if (atItem[0] > minTime) break;
+
+      const expiredEnvelope = (atItem[1] as EventContainer)?.getParsedEnvelope();
+      if (expiredEnvelope?.event) {
+        const expiredEnvelopeId = String(expiredEnvelope.event[0].__spotlight_envelope_id);
+
+        for (const envelopeIds of this.filenameCache.values()) {
+          if (envelopeIds.has(expiredEnvelopeId)) {
+            envelopeIds.delete(expiredEnvelopeId);
+          }
+        }
+      }
+
       this.head += 1;
     }
 
     // Update filename cache
     const envelope = (item as EventContainer)?.getParsedEnvelope();
     if (envelope?.event) {
-      const spotlightEnvelopeId = envelope.event[0].__spotlight_envelope_id;
+      const spotlightEnvelopeId = String(envelope.event[0].__spotlight_envelope_id);
       const events = envelope.event[1] ?? [];
 
       for (const event of events) {
@@ -65,9 +77,9 @@ export class MessageBuffer<T> {
               for (const frame of frames) {
                 const filename = frame.filename;
                 if (filename) {
-                  const previous = this.filenameCache.get(filename);
-                  if (previous) {
-                    previous.add(String(spotlightEnvelopeId));
+                  const envelopeIds = this.filenameCache.get(filename);
+                  if (envelopeIds) {
+                    envelopeIds.add(String(spotlightEnvelopeId));
                   } else {
                     this.filenameCache.set(filename, new Set([String(spotlightEnvelopeId)]));
                   }
