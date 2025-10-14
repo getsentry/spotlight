@@ -9,8 +9,8 @@ export class MessageBuffer<T> {
   private head = 0;
   private timeout = 10;
   private readers = new Map<string, { tid?: NodeJS.Immediate; pos: number; callback: (item: T) => void }>();
-  private filenameCache = new Map<string, Set<string>>();
-  private envelopeToFilenames = new Map<string, Set<string>>();
+  private fileIndex = new Map<string, Set<string>>();
+  private envelopeIndex = new Map<string, Set<string>>();
 
   constructor(size = 100) {
     this.size = size;
@@ -27,12 +27,12 @@ export class MessageBuffer<T> {
       if (envelope?.event) {
         const spotlightEnvelopeId = String(envelope.event[0].__spotlight_envelope_id);
 
-        const filenames = this.envelopeToFilenames.get(spotlightEnvelopeId);
+        const filenames = this.envelopeIndex.get(spotlightEnvelopeId);
         if (filenames) {
           for (const filename of filenames) {
-            this.filenameCache.get(filename)?.delete(spotlightEnvelopeId);
+            this.fileIndex.get(filename)?.delete(spotlightEnvelopeId);
           }
-          this.envelopeToFilenames.delete(spotlightEnvelopeId);
+          this.envelopeIndex.delete(spotlightEnvelopeId);
         }
       }
     }
@@ -54,12 +54,12 @@ export class MessageBuffer<T> {
       if (expiredEnvelope?.event) {
         const expiredEnvelopeId = String(expiredEnvelope.event[0].__spotlight_envelope_id);
 
-        const filenames = this.envelopeToFilenames.get(expiredEnvelopeId);
+        const filenames = this.envelopeIndex.get(expiredEnvelopeId);
         if (filenames) {
           for (const filename of filenames) {
-            this.filenameCache.get(filename)?.delete(expiredEnvelopeId);
+            this.fileIndex.get(filename)?.delete(expiredEnvelopeId);
           }
-          this.envelopeToFilenames.delete(expiredEnvelopeId);
+          this.envelopeIndex.delete(expiredEnvelopeId);
         }
       }
 
@@ -83,9 +83,9 @@ export class MessageBuffer<T> {
               for (const frame of frames) {
                 const filename = frame.filename;
                 if (filename) {
-                  const envelopeIds = this.filenameCache.get(filename) ?? new Set<string>();
+                  const envelopeIds = this.fileIndex.get(filename) ?? new Set<string>();
                   envelopeIds.add(spotlightEnvelopeId);
-                  this.filenameCache.set(filename, envelopeIds);
+                  this.fileIndex.set(filename, envelopeIds);
 
                   envelopeFilenames.add(filename);
                 }
@@ -96,7 +96,7 @@ export class MessageBuffer<T> {
       }
 
       if (envelopeFilenames.size > 0) {
-        this.envelopeToFilenames.set(spotlightEnvelopeId, envelopeFilenames);
+        this.envelopeIndex.set(spotlightEnvelopeId, envelopeFilenames);
       }
     }
 
@@ -182,8 +182,8 @@ export class MessageBuffer<T> {
     this.head = this.writePos;
 
     // Clear filename cache
-    this.filenameCache.clear();
-    this.envelopeToFilenames.clear();
+    this.fileIndex.clear();
+    this.envelopeIndex.clear();
   }
 
   read(filters: ReadFilter = { timeWindow: 60 }): T[] {
@@ -204,7 +204,7 @@ export class MessageBuffer<T> {
       if (item == null) continue;
 
       // Check if the item passes all filters
-      if (filterHandlers.every(handler => handler(item, filters, { filenameCache: this.filenameCache }))) {
+      if (filterHandlers.every(handler => handler(item, filters, { fileIndex: this.fileIndex }))) {
         result.push(item[1]);
       }
     }
@@ -214,7 +214,7 @@ export class MessageBuffer<T> {
 
   filterHandlers: Record<
     keyof ReadFilter | string,
-    (item: [number, T], value: NonNullable<ReadFilter>, ctx: { filenameCache: Map<string, Set<string>> }) => boolean
+    (item: [number, T], value: NonNullable<ReadFilter>, ctx: { fileIndex: Map<string, Set<string>> }) => boolean
   > = {
     timeWindow: (item, value) => {
       if (!("timeWindow" in value)) {
@@ -240,7 +240,7 @@ export class MessageBuffer<T> {
       const contents = (item[1] as EventContainer).getParsedEnvelope();
       const spotlightEnvelopeId = contents.event[0].__spotlight_envelope_id;
 
-      for (const [filename, envelopeIds] of ctx.filenameCache.entries()) {
+      for (const [filename, envelopeIds] of ctx.fileIndex.entries()) {
         if (filename.endsWith(value.filename)) {
           if (envelopeIds.has(String(spotlightEnvelopeId))) {
             return true;
