@@ -584,6 +584,7 @@ Promise.all([
   setupSidecar({
     port: 8969,
     incomingPayload: storeIncomingPayload,
+    isStandalone: true,
   }),
   app.whenReady(),
 ]).then(() => {
