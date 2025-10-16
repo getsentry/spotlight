@@ -34,10 +34,11 @@ Spotlight Sidecar - Development proxy server for Spotlight
 Usage: spotlight-sidecar [command] [options]
 
 Commands:
+  tail [types...]      Tail Sentry events (default: everything)
+                       Available types: ${[...Object.keys(NAME_TO_TYPE_MAPPING)].join(", ")}
+                       Magic words: ${[...EVERYTHING_MAGIC_WORDS].join(", ")}
+  mcp                  Start in MCP (Model Context Protocol) mode
   help                 Show this help message
-  mcp                  Start in MCP mode
-  run                  Run with custom configuration
-  tail [event-types]   Tail specific event types (traces, profiles, logs, etc.)
 
 Options:
   -p, --port <port>    Port to listen on (default: 8969)
@@ -46,9 +47,10 @@ Options:
 
 Examples:
   spotlight-sidecar                    # Start on default port 8969
-  spotlight-sidecar tail traces        # Tail trace events
-  spotlight-sidecar tail errors,logs   # Tail error and log events
-  spotlight-sidecar tail everything    # Tail all event types
+  spotlight-sidecar tail               # Tail all event types
+  spotlight-sidecar tail errors        # Tail only errors
+  spotlight-sidecar tail errors logs   # Tail errors and logs
+  spotlight-sidecar mcp                # Start in MCP mode
   spotlight-sidecar --port 3000        # Start on port 3000
   spotlight-sidecar -p 3000 -d         # Start on port 3000 with debug logging
 `);
@@ -91,11 +93,9 @@ switch (cmd) {
     // do crazy stuff
     break;
   case "tail": {
-    if (args._positionals.length > 2) {
-      console.error("Error: Too many positional arguments for tail command.");
-      printHelp();
-    }
-    const eventTypes = args._positionals[1]?.toLowerCase().split(/\s*[,+]\s*/gi) || [];
+    const eventTypes = args._positionals.length > 1 
+      ? args._positionals.slice(1).map(arg => arg.toLowerCase())
+      : ["everything"];
     for (const eventType of eventTypes) {
       if (!SUPPORTED_ARGS.has(eventType)) {
         console.error(`Error: Unsupported argument "${eventType}".`);
@@ -135,11 +135,8 @@ switch (cmd) {
   case undefined:
   case "":
     break;
-  default: {
-    console.error(`Error: Unknown command "${cmd}".`);
-    console.error("Available commands: help, mcp, run, tail");
-    printHelp();
-  }
+  default:
+    break;
 }
 
 if (runServer) {
