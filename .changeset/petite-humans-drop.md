@@ -3,4 +3,4 @@
 "@spotlightjs/spotlight": minor
 ---
 
-Add CLI -- `spotlight logs+errors` etc are now available
+Add CLI -- `spotlight tail logs errors` etc are now available
