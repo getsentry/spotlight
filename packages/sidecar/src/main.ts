@@ -12,55 +12,78 @@ import { createMCPInstance } from "./mcp/mcp.js";
 import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
-import { parseArgs } from "node:util";
+import { inspect, parseArgs } from "node:util";
 import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { util } from "zod";
+
+const PARSE_ARGS_CONFIG = {
+  options: {
+    port: {
+      type: "string",
+      short: "p",
+      default: DEFAULT_PORT.toString(),
+    },
+    debug: {
+      type: "boolean",
+      short: "d",
+      default: false,
+    },
+    // Deprecated -- use the positional `mcp` argument instead
+    "stdio-mcp": {
+      type: "boolean",
+      default: false,
+    },
+    help: {
+      type: "boolean",
+      short: "h",
+      default: false,
+    },
+  },
+  allowPositionals: true,
+  strict: true,
+} as const;
 
 export type CLIArgs = {
   port: number;
   debug: boolean;
   help: boolean;
-  _positionals: string[];
-  _extra: Record<string, unknown>;
+  cmd: string | undefined;
+  cmdArgs: string[];
 };
 
 let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
 export function parseCLIArgs(): CLIArgs {
+  const args = Array.from(process.argv);
+  let cmdArgs: string[] | undefined = undefined;
+  const runIndex = args.findIndex(arg => arg === "run");
+  if (runIndex > -1) {
+    const cutOff = args.findIndex((arg, idx) => idx > runIndex && !arg.startsWith("-"));
+    cmdArgs = cutOff > runIndex ? args.splice(cutOff) : [];
+  }
   const { values, positionals } = parseArgs({
-    options: {
-      port: {
-        type: "string",
-        short: "p",
-        default: DEFAULT_PORT.toString(),
-      },
-      debug: {
-        type: "boolean",
-        short: "d",
-        default: false,
-      },
-      // Deprecated -- use the positional `mcp` argument instead
-      "stdio-mcp": {
-        type: "boolean",
-        default: false,
-      },
-      help: {
-        type: "boolean",
-        short: "h",
-        default: false,
-      },
-    },
-    allowPositionals: true,
-    strict: false,
+    args: args.slice(2),
+    ...PARSE_ARGS_CONFIG,
   });
+
+  if (runIndex > -1 && positionals[0] !== "run") {
+    throw Error(
+      `CLI parse error: ${inspect({
+        argv: process.argv,
+        values,
+        positionals,
+      })}`,
+    );
+  }
 
   // Handle legacy positional argument for port (backwards compatibility)
   const portInput = positionals.length === 1 && /^\d{1,5}$/.test(positionals[0]) ? positionals.shift() : values.port;
   const port = Number(portInput);
 
-  // Validate port number
   if (Number.isNaN(port)) {
+    // Validate port number
     console.error(`Error: Invalid port number '${portInput}'`);
     console.error("Port must be a valid number between 1 and 65535");
     process.exit(1);
@@ -80,11 +103,9 @@ export function parseCLIArgs(): CLIArgs {
     debug: values.debug as boolean,
     help: values.help as boolean,
     port,
-    _positionals: positionals,
-    _extra: {},
+    cmd: positionals[0],
+    cmdArgs: cmdArgs ?? positionals.slice(1),
   };
-  const keys = new Set(Object.keys(result));
-  result._extra = Object.fromEntries(Object.entries(values).filter(([key]) => !keys.has(key)));
 
   return result;
 }
