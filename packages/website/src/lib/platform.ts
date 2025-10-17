@@ -1,6 +1,14 @@
 export function detectPlatform(): { platform: string; variant: string } | null {
   const ua = navigator.userAgent.toLowerCase();
-  if (ua.includes("mac")) return { platform: "macos", variant: "apple-silicon" };
+  if (ua.includes("mac")) {
+    const isAppleSilicon =
+      ua.includes("arm") ||
+      ((navigator as any).userAgentData?.platform === "macOS" &&
+        (navigator as any).userAgentData?.architecture === "arm");
+
+    return { platform: "macos", variant: isAppleSilicon ? "apple-silicon" : "intel" };
+  }
+
   if (ua.includes("win")) return { platform: "windows", variant: "x64" };
   if (ua.includes("linux")) {
     const isArm = ua.includes("arm") || ua.includes("aarch64");
