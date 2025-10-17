@@ -11,7 +11,8 @@ const downloads = getDownloadLinks(assets, version, tag);
       Download the app
     </h2>
     <p class="text-lg text-[#a5a5a5] max-w-2xl mx-auto">
-      Get the Spotlight desktop app for your platform{version && <span>. Latest version: <span class="text-[#F14499]">{version}</span></span>}
+      Get the Spotlight desktop app for your platform{version && <span>. Latest version: <span class="text-[#F14499]">{version}</span></span>}.
+      Want a different platform? <a href="https://github.com/getsentry/spotlight/releases" target="_blank" rel="noopener noreferrer" class="text-[#F14499] hover:underline">View all releases</a>
     </p>
   </div>
 
@@ -29,7 +30,7 @@ const downloads = getDownloadLinks(assets, version, tag);
       <div
         data-platform={link.platform}
         data-variant={link.variant}
-        class="download-section max-w-2xl mx-auto"
+        class="download-section max-w-2xl mx-auto mb-3"
         style="display: none;"
       >
         <div class="text-center">
@@ -43,16 +44,13 @@ const downloads = getDownloadLinks(assets, version, tag);
                 alt={link.platform}
                 class="w-4 h-4"
               />
-              <span>Download for {link.name}</span>
+              <span>Download for {link.name}{link.platform === 'macos' ? ` (${link.variant === 'apple-silicon' ? 'Apple Silicon' : 'Intel'})` : ''}</span>
             </div>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"/>
               <path d="m12 5 7 7-7 7"/>
             </svg>
           </a>
-          <p class="mt-6 text-sm text-[#a5a5a5]">
-            Need a different version? <a href="https://github.com/getsentry/spotlight/releases" target="_blank" rel="noopener noreferrer" class="text-[#F14499] hover:underline">View all releases</a>
-          </p>
         </div>
       </div>
     ))}
@@ -71,11 +69,18 @@ const downloads = getDownloadLinks(assets, version, tag);
   } else {
     const detected = detectPlatform();
     if (detected) {
-      const section = document.querySelector(
-        `.download-section[data-platform="${detected.platform}"][data-variant="${detected.variant}"]`
-      );
-      if (section) {
-        (section as HTMLElement).style.display = 'block';
+      if (detected.platform === 'macos') {
+        const macSections = document.querySelectorAll('.download-section[data-platform="macos"]');
+        macSections.forEach((section) => {
+          (section as HTMLElement).style.display = 'block';
+        });
+      } else {
+        const section = document.querySelector(
+          `.download-section[data-platform="${detected.platform}"][data-variant="${detected.variant}"]`
+        );
+        if (section) {
+          (section as HTMLElement).style.display = 'block';
+        }
       }
     }
   }

@@ -1,12 +1,7 @@
 export function detectPlatform(): { platform: string; variant: string } | null {
   const ua = navigator.userAgent.toLowerCase();
   if (ua.includes("mac")) {
-    const isAppleSilicon =
-      ua.includes("arm") ||
-      ((navigator as any).userAgentData?.platform === "macOS" &&
-        (navigator as any).userAgentData?.architecture === "arm");
-
-    return { platform: "macos", variant: isAppleSilicon ? "apple-silicon" : "intel" };
+    return { platform: "macos", variant: "unknown" };
   }
 
   if (ua.includes("win")) return { platform: "windows", variant: "x64" };
