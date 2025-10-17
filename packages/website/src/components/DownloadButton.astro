@@ -1,68 +1,37 @@
 ---
-import { Fragment } from 'react';
+import { getLatestRelease, getDownloadLinks } from '../lib/releases';
 
-let response = await fetch('https://api.github.com/repos/getsentry/spotlight/releases');
-const releases = await response.json();
-
-// Find the electron release specifically
-const electronRelease = releases.find((release:any) =>
-  release.tag_name && release.tag_name.includes('@spotlightjs/electron@')
-);
-
-let assets = electronRelease?.assets || [];
-let version = electronRelease?.tag_name?.replace('@spotlightjs/electron@', '') || null;
-
-const links = assets
-  .filter((asset: any) => asset.name && asset.name.endsWith('.dmg'))
-  .map((asset: any) => {
-    if (asset.name.includes('arm64')) {
-      return {
-        name: 'macOS (Apple Silicon)',
-        url: asset.browser_download_url,
-      };
-    }
-      return {
-        name: 'macOS (Intel)',
-        url: asset.browser_download_url,
-      };
-    
-  });
+const { version, tag, assets } = await getLatestRelease();
+const downloads = getDownloadLinks(assets, version, tag);
 ---
-
-<style>
-  .dropdown .dropdown-menu {
-    display: none;
-    z-index: 0;
-  }
-
-  .dropdown:hover .dropdown-menu {
-    display: block;
-    z-index: 100;
-  }
-</style>
 
 <div class="group relative text-center text-sm">
   <div>
-    {links.map((link: any) => (
+    {downloads.map((link) => (
       <a
         href={link.url}
-        class="downloadButton !mr-1 inline-flex items-center justify-center px-2 py-2 mx-2 text-base text-s text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
+        data-platform={link.platform}
+        data-variant={link.variant}
+        class="download-button !mr-1 inline-flex items-center justify-center px-4 py-2 mx-2 text-base text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
+        style="display: none;"
       >
-        {link.name}
+        Download for {link.name}
       </a>
     ))}
   </div>
-  <div class="text-xs text-gray-400 mt-2">latest version: {version}</div>
+  {version && <div class="text-xs text-gray-400 mt-2">latest version: {version}</div>}
 </div>
 
 <script>
-  import * as Sentry from '@sentry/astro';
-  function incrementDownload(e) {
-    console.log('incrementing download', e);
-    Sentry.metrics.increment('downloads', 1);
-  }
+  import { detectPlatform } from '../lib/platform';
 
-  document.querySelectorAll('.downloadButton').forEach(button => {
-    button.addEventListener('click', incrementDownload);
-  });
+  const detected = detectPlatform();
+  if (detected) {
+    const button = document.querySelector(
+      `.download-button[data-platform="${detected.platform}"][data-variant="${detected.variant}"]`
+    );
+    if (button) {
+      (button as HTMLElement).style.display = 'inline-flex';
+    }
+  }
 </script>
