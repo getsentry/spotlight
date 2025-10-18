@@ -1,8 +1,8 @@
 ---
 import { getLatestRelease, getDownloadLinks } from '../lib/releases';
 
-const { version, tag, assets } = await getLatestRelease();
-const downloads = getDownloadLinks(assets, version, tag);
+const { version, assets } = await getLatestRelease();
+const downloads = getDownloadLinks(assets);
 ---
 
 <div class="group relative text-center text-sm">
@@ -15,7 +15,7 @@ const downloads = getDownloadLinks(assets, version, tag);
         class="download-button !mr-1 inline-flex items-center justify-center px-4 py-2 mx-2 text-base text-white bg-gray-800 border border-transparent rounded-md hover:bg-gray-700 no-underline"
         style="display: none;"
       >
-        Download for {link.name}
+        Download for {link.name}{link.platform === 'macos' ? ` (${link.variant === 'apple-silicon' ? 'Apple Silicon' : 'Intel'})` : ''}
       </a>
     ))}
   </div>
@@ -27,11 +27,18 @@ const downloads = getDownloadLinks(assets, version, tag);
 
   const detected = detectPlatform();
   if (detected) {
-    const button = document.querySelector(
-      `.download-button[data-platform="${detected.platform}"][data-variant="${detected.variant}"]`
-    );
-    if (button) {
-      (button as HTMLElement).style.display = 'inline-flex';
+    if (detected.platform === 'macos') {
+      const macButtons = document.querySelectorAll('.download-button[data-platform="macos"]');
+      macButtons.forEach((button) => {
+        (button as HTMLElement).style.display = 'inline-flex';
+      });
+    } else {
+      const button = document.querySelector(
+        `.download-button[data-platform="${detected.platform}"][data-variant="${detected.variant}"]`
+      );
+      if (button) {
+        (button as HTMLElement).style.display = 'inline-flex';
+      }
     }
   }
 </script>

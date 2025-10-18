@@ -1,8 +1,8 @@
 ---
 import { getLatestRelease, getDownloadLinks } from '../../lib/releases';
 
-const { version, tag, assets } = await getLatestRelease();
-const downloads = getDownloadLinks(assets, version, tag);
+const { version, assets } = await getLatestRelease();
+const downloads = getDownloadLinks(assets);
 ---
 
 <div id="download" class="px-6 py-20 max-w-7xl mx-auto" style="border-left: 1px solid #191919; border-right: 1px solid #191919;">

@@ -47,47 +47,27 @@ export async function getLatestRelease(): Promise<ReleaseInfo> {
   }
 }
 
-function getDownloadUrl(tag: string, filename: string): string {
-  return `https://github.com/getsentry/spotlight/releases/download/${encodeURIComponent(tag)}/${filename}`;
-}
+export function getDownloadLinks(assets: Array<{ name: string; browser_download_url: string }>): DownloadLink[] {
+  const fallbackUrl = "https://github.com/getsentry/spotlight/releases";
 
-export function getDownloadLinks(
-  assets: Array<{ name: string; browser_download_url: string }>,
-  version: string | null,
-  tag: string,
-): DownloadLink[] {
-  const macOSAppleSilicon = assets.find(a => a.name.includes("arm64") && a.name.endsWith(".dmg")) || {
-    name: `Spotlight-${version}-arm64.dmg`,
-    browser_download_url: getDownloadUrl(tag, `Spotlight-${version}-arm64.dmg`),
-  };
-
+  const macOSAppleSilicon = assets.find(a => a.name.includes("arm64") && a.name.endsWith(".dmg"));
   const macOSIntel = assets.find(
     a => a.name.includes("Spotlight-") && a.name.endsWith(".dmg") && !a.name.includes("arm64"),
-  ) || {
-    name: `Spotlight-${version}.dmg`,
-    browser_download_url: getDownloadUrl(tag, `Spotlight-${version}.dmg`),
-  };
-
-  const linuxX64 = assets.find(a => a.name.includes("linux-x64") && !a.name.endsWith(".zip")) || {
-    name: "spotlight-linux-x64",
-    browser_download_url: getDownloadUrl(tag, "spotlight-linux-x64"),
-  };
-
-  const linuxArm64 = assets.find(a => a.name.includes("linux-arm64") && !a.name.endsWith(".zip")) || {
-    name: "spotlight-linux-arm64",
-    browser_download_url: getDownloadUrl(tag, "spotlight-linux-arm64"),
-  };
-
-  const windowsX64 = assets.find(a => a.name.endsWith(".exe")) || {
-    name: `Spotlight-${version}-x64.exe`,
-    browser_download_url: getDownloadUrl(tag, `Spotlight-${version}-x64.exe`),
-  };
+  );
+  const linuxX64 = assets.find(a => a.name.includes("linux-x64") && !a.name.endsWith(".zip"));
+  const linuxArm64 = assets.find(a => a.name.includes("linux-arm64") && !a.name.endsWith(".zip"));
+  const windowsX64 = assets.find(a => a.name.endsWith(".exe"));
 
   return [
-    { platform: "macos", variant: "apple-silicon", name: "macOS", url: macOSAppleSilicon.browser_download_url },
-    { platform: "macos", variant: "intel", name: "macOS", url: macOSIntel.browser_download_url },
-    { platform: "linux", variant: "x64", name: "Linux", url: linuxX64.browser_download_url },
-    { platform: "linux", variant: "arm64", name: "Linux", url: linuxArm64.browser_download_url },
-    { platform: "windows", variant: "x64", name: "Windows", url: windowsX64.browser_download_url },
+    {
+      platform: "macos",
+      variant: "apple-silicon",
+      name: "macOS",
+      url: macOSAppleSilicon?.browser_download_url || fallbackUrl,
+    },
+    { platform: "macos", variant: "intel", name: "macOS", url: macOSIntel?.browser_download_url || fallbackUrl },
+    { platform: "linux", variant: "x64", name: "Linux", url: linuxX64?.browser_download_url || fallbackUrl },
+    { platform: "linux", variant: "arm64", name: "Linux", url: linuxArm64?.browser_download_url || fallbackUrl },
+    { platform: "windows", variant: "x64", name: "Windows", url: windowsX64?.browser_download_url || fallbackUrl },
   ];
 }
