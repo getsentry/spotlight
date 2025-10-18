@@ -54,6 +54,11 @@ const downloads = getDownloadLinks(assets);
         </div>
       </div>
     ))}
+    <div id="platform-unknown-message" style="display: none;" class="text-center max-w-2xl mx-auto">
+      <p class="text-lg text-[#a5a5a5]">
+        Get downloads for all platforms on <a href="https://github.com/getsentry/spotlight/releases" target="_blank" rel="noopener noreferrer" class="text-[#F14499] hover:underline">GitHub Releases</a>
+      </p>
+    </div>
   </div>
 </div>
 
@@ -68,19 +73,21 @@ const downloads = getDownloadLinks(assets);
     if (desktopDownloads) desktopDownloads.style.display = 'none';
   } else {
     const detected = detectPlatform();
-    if (detected) {
-      if (detected.platform === 'macos') {
-        const macSections = document.querySelectorAll('.download-section[data-platform="macos"]');
-        macSections.forEach((section) => {
-          (section as HTMLElement).style.display = 'block';
-        });
-      } else {
-        const section = document.querySelector(
-          `.download-section[data-platform="${detected.platform}"][data-variant="${detected.variant}"]`
-        );
-        if (section) {
-          (section as HTMLElement).style.display = 'block';
-        }
+    const unknownMessage = document.getElementById('platform-unknown-message');
+
+    if (!detected) {
+      if (unknownMessage) unknownMessage.style.display = 'block';
+    } else if (detected.platform === 'macos') {
+      const macSections = document.querySelectorAll('.download-section[data-platform="macos"]');
+      macSections.forEach((section) => {
+        (section as HTMLElement).style.display = 'block';
+      });
+    } else {
+      const section = document.querySelector(
+        `.download-section[data-platform="${detected.platform}"][data-variant="${detected.variant}"]`
+      );
+      if (section) {
+        (section as HTMLElement).style.display = 'block';
       }
     }
   }
