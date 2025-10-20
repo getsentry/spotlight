@@ -19,7 +19,7 @@ function displayEnvelope(envelope: ParsedEnvelope["envelope"]) {
   console.log(`${envelope[0].event_id} | ${envelope[1][0][0].type} | ${envelope[0].sdk?.name}\n\n`);
   const lines = formatEnvelope(envelope);
   if (lines.length > 0) {
-    console.log(lines.join(""));
+    console.log(lines.join("\n"));
   } else {
     console.log("No parser for the given event type");
   }
@@ -93,9 +93,8 @@ switch (cmd) {
     // do crazy stuff
     break;
   case "tail": {
-    const eventTypes = args._positionals.length > 1 
-      ? args._positionals.slice(1).map(arg => arg.toLowerCase())
-      : ["everything"];
+    const eventTypes =
+      args._positionals.length > 1 ? args._positionals.slice(1).map(arg => arg.toLowerCase()) : ["everything"];
     for (const eventType of eventTypes) {
       if (!SUPPORTED_ARGS.has(eventType)) {
         console.error(`Error: Unsupported argument "${eventType}".`);
