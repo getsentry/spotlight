@@ -28,6 +28,7 @@
     "buildx",
     "codesign",
     "contextlines",
+    "decompressors",
     "Endcaps",
     "fontsource",
     "getsentry",

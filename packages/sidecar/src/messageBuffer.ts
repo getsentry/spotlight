@@ -220,7 +220,7 @@ export class MessageBuffer<T> {
 
       const data = (item[1] as EventContainer).getParsedEnvelope();
 
-      return data.event[0].__spotlight_envelope_id === value.envelopeId;
+      return data.envelope[0].__spotlight_envelope_id === value.envelopeId;
     },
     filename: (item, value, ctx) => {
       if (!("filename" in value)) {
@@ -228,7 +228,7 @@ export class MessageBuffer<T> {
       }
 
       const contents = (item[1] as EventContainer).getParsedEnvelope();
-      const spotlightEnvelopeId = contents.event[0].__spotlight_envelope_id;
+      const spotlightEnvelopeId = contents.envelope[0].__spotlight_envelope_id;
 
       for (const [filename, envelopeIds] of ctx.filenameCache.entries()) {
         if (filename.endsWith(value.filename)) {

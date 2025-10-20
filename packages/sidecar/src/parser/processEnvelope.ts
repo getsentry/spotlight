@@ -5,8 +5,8 @@ import { logger } from "~/logger.js";
 import type { RawEventContext } from "./types.js";
 
 export type ParsedEnvelope = {
-  event: Envelope;
-  rawEvent: RawEventContext;
+  envelope: Envelope;
+  rawEnvelope: RawEventContext;
 };
 
 const TEXT_CONTENT_TYPES = new Set([
@@ -86,11 +86,9 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope | nul
     items.push([itemHeader, itemPayload] as EnvelopeItem);
   }
 
-  const envelope = [envelopeHeader, items] as Envelope;
-
   return {
-    event: envelope,
-    rawEvent: rawEvent,
+    envelope: [envelopeHeader, items] as Envelope,
+    rawEnvelope: rawEvent,
   };
 }
 
