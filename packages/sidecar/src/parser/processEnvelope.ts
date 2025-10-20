@@ -1,6 +1,6 @@
-import { RAW_TYPES } from "~/constants.js";
 import type { Envelope, EnvelopeItem } from "@sentry/core";
 import { uuidv7 } from "uuidv7";
+import { RAW_TYPES } from "~/constants.js";
 import { logger } from "~/logger.js";
 import type { RawEventContext } from "./types.js";
 
@@ -9,7 +9,18 @@ export type ParsedEnvelope = {
   rawEnvelope: RawEventContext;
 };
 
-const TEXT_CONTENT_TYPES = new Set(["text/plain", "application/json"]);
+const TEXT_CONTENT_TYPES = new Set([
+  "text/plain",
+  "text/css",
+  "text/csv",
+  "text/html",
+  "text/javascript",
+  "text/json",
+  "text/x-json",
+  "application/json",
+  "application/ld+json",
+  "application/json",
+]);
 
 /**
  * Implements parser for

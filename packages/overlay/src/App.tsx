@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { ShikiProvider } from "./ShikiProvider";
 // TODO: we'll lazy load this in case of multiple routes
 import { Telemetry } from "./telemetry";
 
@@ -8,11 +9,13 @@ type AppProps = {
 
 export default function App({ sidecarUrl }: AppProps) {
   return (
-    <Routes>
-      {/* Default route redirects to telemetry */}
-      <Route path="/" element={<Navigate to="/telemetry" replace />} />
+    <ShikiProvider>
+      <Routes>
+        {/* Default route redirects to telemetry */}
+        <Route path="/" element={<Navigate to="/telemetry" replace />} />
 
-      <Route path="/telemetry/*" element={<Telemetry sidecarUrl={sidecarUrl} />} />
-    </Routes>
+        <Route path="/telemetry/*" element={<Telemetry sidecarUrl={sidecarUrl} />} />
+      </Routes>
+    </ShikiProvider>
   );
 }

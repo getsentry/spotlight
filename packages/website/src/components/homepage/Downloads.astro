@@ -1,0 +1,94 @@
+---
+import { getLatestRelease, getDownloadLinks } from '../../lib/releases';
+
+const { version, assets } = await getLatestRelease();
+const downloads = getDownloadLinks(assets);
+---
+
+<div id="download" class="px-6 py-20 max-w-7xl mx-auto" style="border-left: 1px solid #191919; border-right: 1px solid #191919;">
+  <div class="text-center mb-12">
+    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+      Download the app
+    </h2>
+    <p class="text-lg text-[#a5a5a5] max-w-2xl mx-auto">
+      Get the Spotlight desktop app for your platform{version && <span>. Latest version: <span class="text-[#F14499]">{version}</span></span>}.
+      Want a different platform? <a href="https://github.com/getsentry/spotlight/releases" target="_blank" rel="noopener noreferrer" class="text-[#F14499] hover:underline">View all releases</a>
+    </p>
+  </div>
+
+  <div id="mobile-message" style="display: none;" class="mb-12">
+    <div class="bg-[#0a0a0a] border border-[#191919] rounded-lg p-8 text-center max-w-2xl mx-auto">
+      <span class="text-6xl mb-4 block">🖥️</span>
+      <p class="text-lg text-[#a5a5a5]">
+        Spotlight app works on Desktop. To download it, please visit this page from a <span class="text-white font-semibold">Windows</span>, <span class="text-white font-semibold">macOS</span>, or <span class="text-white font-semibold">Linux</span> desktop device.
+      </p>
+    </div>
+  </div>
+
+  <div id="desktop-downloads" class="mb-12">
+    {downloads.map((link) => (
+      <div
+        data-platform={link.platform}
+        data-variant={link.variant}
+        class="download-section max-w-2xl mx-auto mb-3"
+        style="display: none;"
+      >
+        <div class="text-center">
+          <a
+            href={link.url}
+            class="inline-flex items-center justify-between gap-3 px-2 py-2 text-sm font-medium text-black bg-white rounded-lg hover:bg-gray-100 transition-all no-underline"
+          >
+            <div class="flex items-center gap-2.5">
+              <img
+                src={`/${link.platform === 'macos' ? 'apple' : link.platform === 'windows' ? 'microsoft' : 'linux'}-logo.svg`}
+                alt={link.platform}
+                class="w-4 h-4"
+              />
+              <span>Download for {link.name}{link.platform === 'macos' ? ` (${link.variant === 'apple-silicon' ? 'Apple Silicon' : 'Intel'})` : ''}</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/>
+              <path d="m12 5 7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    ))}
+    <div id="platform-unknown-message" style="display: none;" class="text-center max-w-2xl mx-auto">
+      <p class="text-lg text-[#a5a5a5]">
+        Get downloads for all platforms on <a href="https://github.com/getsentry/spotlight/releases" target="_blank" rel="noopener noreferrer" class="text-[#F14499] hover:underline">GitHub Releases</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { detectPlatform, isMobile } from '../../lib/platform';
+
+  const mobileMessage = document.getElementById('mobile-message');
+  const desktopDownloads = document.getElementById('desktop-downloads');
+
+  if (isMobile()) {
+    if (mobileMessage) mobileMessage.style.display = 'block';
+    if (desktopDownloads) desktopDownloads.style.display = 'none';
+  } else {
+    const detected = detectPlatform();
+    const unknownMessage = document.getElementById('platform-unknown-message');
+
+    if (!detected) {
+      if (unknownMessage) unknownMessage.style.display = 'block';
+    } else if (detected.platform === 'macos') {
+      const macSections = document.querySelectorAll('.download-section[data-platform="macos"]');
+      macSections.forEach((section) => {
+        (section as HTMLElement).style.display = 'block';
+      });
+    } else {
+      const section = document.querySelector(
+        `.download-section[data-platform="${detected.platform}"][data-variant="${detected.variant}"]`
+      );
+      if (section) {
+        (section as HTMLElement).style.display = 'block';
+      }
+    }
+  }
+</script>

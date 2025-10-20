@@ -18,7 +18,7 @@ overlay into development environments, and it does it by leveraging the existing
 
 ## Resources
 
-- [Contribute](https://spotlightjs.com/contribute/)
-- [Setup Spotlight](https://spotlightjs.com/setup/)
-- [Sidecar](https://spotlightjs.com/sidecar/)
-- [Integrations](https://spotlightjs.com/integrations/)
+- [Contribute](https://spotlightjs.com/docs/contribute/)
+- [Setup Spotlight](https://spotlightjs.com/docs/setup/)
+- [Configuration](https://spotlightjs.com/docs/reference/configuration/)
+- [Sidecar](https://spotlightjs.com/docs/sidecar/)

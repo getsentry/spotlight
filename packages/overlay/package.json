@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/overlay",
   "description": "The overlay of Spotlight to add debug interface to your web app.",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
@@ -33,6 +33,7 @@
     "@sentry/browser": "^10",
     "@sentry/core": "catalog:",
     "@sentry/react": "^10",
+    "@shikijs/transformers": "^3.13.0",
     "@spotlightjs/sidecar": "workspace:*",
     "@spotlightjs/tsconfig": "workspace:*",
     "@tailwindcss/vite": "catalog:",
@@ -52,7 +53,7 @@
     "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.12",
-    "happy-dom": "^15.10.2",
+    "happy-dom": "^20.0.2",
     "magic-string": "^0.30.11",
     "nanovis": "^0.1.3",
     "platformicons": "^7.0.4",
@@ -60,6 +61,7 @@
     "react-diff-viewer-continued": "^3.4.0",
     "react-dom": "catalog:",
     "react-router-dom": "^6.26.2",
+    "shiki": "^3.13.0",
     "sql-formatter": "^12.2.4",
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "catalog:",

@@ -9,6 +9,7 @@ export class MessageBuffer<T> {
   private head = 0;
   private timeout = 10;
   private readers = new Map<string, { tid?: NodeJS.Immediate; pos: number; callback: (item: T) => void }>();
+  private filenameCache = new Map<string, Set<string>>();
 
   constructor(size = 100) {
     this.size = size;
@@ -17,6 +18,22 @@ export class MessageBuffer<T> {
 
   put(item: T): void {
     const curTime = new Date().getTime();
+
+    // Remove old value from filename cache
+    const oldValue = this.items[this.writePos % this.size];
+    if (oldValue) {
+      const envelope = (oldValue[1] as EventContainer)?.getParsedEnvelope();
+      if (envelope?.event) {
+        const spotlightEnvelopeId = envelope.event[0].__spotlight_envelope_id;
+
+        for (const envelopeIds of this.filenameCache.values()) {
+          if (envelopeIds.has(String(spotlightEnvelopeId))) {
+            envelopeIds.delete(String(spotlightEnvelopeId));
+          }
+        }
+      }
+    }
+
     this.items[this.writePos % this.size] = [curTime, item];
     this.writePos += 1;
     if (this.head === this.writePos) {
@@ -29,9 +46,52 @@ export class MessageBuffer<T> {
       atItem = this.items[this.head % this.size];
       if (atItem === undefined) break;
       if (atItem[0] > minTime) break;
+
+      const expiredEnvelope = (atItem[1] as EventContainer)?.getParsedEnvelope();
+      if (expiredEnvelope?.event) {
+        const expiredEnvelopeId = String(expiredEnvelope.event[0].__spotlight_envelope_id);
+
+        for (const envelopeIds of this.filenameCache.values()) {
+          if (envelopeIds.has(expiredEnvelopeId)) {
+            envelopeIds.delete(expiredEnvelopeId);
+          }
+        }
+      }
+
       this.head += 1;
     }
 
+    // Update filename cache
+    const envelope = (item as EventContainer)?.getParsedEnvelope();
+    if (envelope?.event) {
+      const spotlightEnvelopeId = String(envelope.event[0].__spotlight_envelope_id);
+      const events = envelope.event[1] ?? [];
+
+      for (const event of events) {
+        const [, payload] = event;
+        const values = typeof payload === "object" && "exception" in payload && payload.exception?.values;
+        if (values) {
+          for (const value of values) {
+            const frames = value.stacktrace?.frames;
+            if (frames) {
+              for (const frame of frames) {
+                const filename = frame.filename;
+                if (filename) {
+                  const envelopeIds = this.filenameCache.get(filename);
+                  if (envelopeIds) {
+                    envelopeIds.add(String(spotlightEnvelopeId));
+                  } else {
+                    this.filenameCache.set(filename, new Set([String(spotlightEnvelopeId)]));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Calling subscribers
     for (const [readerId, readerInfo] of this.readers.entries()) {
       if (readerInfo.tid) {
         clearImmediate(readerInfo.tid);
@@ -111,6 +171,9 @@ export class MessageBuffer<T> {
   reset(): void {
     this.items = new Array(this.size);
     this.head = this.writePos;
+
+    // Clear filename cache
+    this.filenameCache.clear();
   }
 
   read(filters: ReadFilter = { timeWindow: 60 }): T[] {
@@ -131,7 +194,7 @@ export class MessageBuffer<T> {
       if (item == null) continue;
 
       // Check if the item passes all filters
-      if (filterHandlers.every(handler => handler(item, filters))) {
+      if (filterHandlers.every(handler => handler(item, filters, { filenameCache: this.filenameCache }))) {
         result.push(item[1]);
       }
     }
@@ -139,7 +202,10 @@ export class MessageBuffer<T> {
     return result;
   }
 
-  filterHandlers: Record<keyof ReadFilter | string, (item: [number, T], value: NonNullable<ReadFilter>) => boolean> = {
+  filterHandlers: Record<
+    keyof ReadFilter | string,
+    (item: [number, T], value: NonNullable<ReadFilter>, ctx: { filenameCache: Map<string, Set<string>> }) => boolean
+  > = {
     timeWindow: (item, value) => {
       if (!("timeWindow" in value)) {
         return true;
@@ -156,21 +222,23 @@ export class MessageBuffer<T> {
 
       return data.envelope[0].__spotlight_envelope_id === value.envelopeId;
     },
-    filename: (item, value) => {
+    filename: (item, value, ctx) => {
       if (!("filename" in value)) {
         return true;
       }
 
       const contents = (item[1] as EventContainer).getParsedEnvelope();
+      const spotlightEnvelopeId = contents.envelope[0].__spotlight_envelope_id;
 
-      return contents.envelope[1].some(
-        ([, payload]) =>
-          typeof payload === "object" &&
-          "exception" in payload &&
-          payload.exception?.values?.some(val =>
-            val.stacktrace?.frames?.some(frame => frame.filename?.endsWith(value.filename)),
-          ),
-      );
+      for (const [filename, envelopeIds] of ctx.filenameCache.entries()) {
+        if (filename.endsWith(value.filename)) {
+          if (envelopeIds.has(String(spotlightEnvelopeId))) {
+            return true;
+          }
+        }
+      }
+
+      return false;
     },
     all: () => true,
   };
