@@ -44,8 +44,7 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope | nul
     return null;
   }
 
-  const envelopeId = uuidv7();
-  envelopeHeader.__spotlight_envelope_id = envelopeId;
+  envelopeHeader.__spotlight_envelope_id = uuidv7();
 
   const items: EnvelopeItem[] = [];
   while (buffer.length) {
