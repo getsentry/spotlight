@@ -24,14 +24,20 @@ export class MessageBuffer<T> {
     if (oldValue) {
       const envelope = (oldValue[1] as EventContainer)?.getParsedEnvelope();
       if (envelope?.event) {
-        const spotlightEnvelopeId = envelope.event[0].__spotlight_envelope_id;
-
-        for (const envelopeIds of this.filenameCache.values()) {
-          if (envelopeIds.has(String(spotlightEnvelopeId))) {
-            envelopeIds.delete(String(spotlightEnvelopeId));
+        const deletedEnvelopeId = envelope.event[0].__spotlight_envelope_id;
+        const goneFiles = new Set<string>();
+        for (const [filename, envelopeIds] of this.filenameCache.entries()) {
+          envelopeIds.delete(String(deletedEnvelopeId));
+          if (envelopeIds.size === 0) {
+            goneFiles.add(filename);
           }
         }
+
+        for (const filename of goneFiles) {
+          this.filenameCache.delete(filename);
+        }
       }
+      
     }
 
     this.items[this.writePos % this.size] = [curTime, item];
