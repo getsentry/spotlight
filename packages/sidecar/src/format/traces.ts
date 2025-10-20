@@ -162,17 +162,7 @@ function extractTraceEventsFromContainer(container: EventContainer): TraceEvent[
         const transaction = payload as any;
 
         if (transaction.contexts?.trace?.trace_id) {
-          events.push({
-            event_id: transaction.event_id || "",
-            type: "transaction",
-            timestamp: transaction.timestamp,
-            start_timestamp: transaction.start_timestamp,
-            transaction: transaction.transaction,
-            trace_context: transaction.contexts.trace,
-            spans: transaction.spans,
-            level: transaction.level,
-            platform: transaction.platform,
-          });
+          events.push(convertPayloadToTraceEvent(transaction));
         }
       }
     }
@@ -365,6 +355,56 @@ export function buildSpanTree(trace: TraceSummary): SpanNode[] {
   }
 
   return rootSpans;
+}
+
+/**
+ * Format a transaction payload for CLI output
+ */
+export function formatTransactionEvent(payload: any): string[] {
+  const traceEvent = convertPayloadToTraceEvent(payload);
+  return processTraceEvent(traceEvent);
+}
+
+/**
+ * Convert a transaction payload to TraceEvent
+ */
+function convertPayloadToTraceEvent(payload: any): TraceEvent {
+  return {
+    event_id: payload.event_id || "",
+    type: "transaction",
+    timestamp: payload.timestamp,
+    start_timestamp: payload.start_timestamp,
+    transaction: payload.transaction,
+    trace_context: payload.contexts.trace,
+    spans: payload.spans,
+    level: payload.level,
+    platform: payload.platform,
+  };
+}
+
+/**
+ * Process a single trace event for CLI output
+ */
+export function processTraceEvent(event: TraceEvent): string[] {
+  if (!event.trace_context?.trace_id) {
+    return ["No trace context available"];
+  }
+
+  const trace: TraceSummary = {
+    trace_id: event.trace_context.trace_id,
+    root_transaction: event.transaction,
+    start_timestamp: event.start_timestamp || event.timestamp,
+    span_count: event.spans?.length || 0,
+    error_count: 0,
+    events: [event],
+  };
+
+  calculateTraceDuration(trace);
+
+  const spanTree = buildSpanTree(trace);
+  const lines = renderSpanTree(spanTree);
+
+  return lines;
 }
 
 /**
