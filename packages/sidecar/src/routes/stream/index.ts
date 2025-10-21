@@ -62,7 +62,7 @@ const router = new Hono<HonoEnv>()
       return ctx.notFound();
     }
 
-    return ctx.body(container[0].getData(), 200, {
+    return ctx.body(new Uint8Array(container[0].getData()), 200, {
       "Content-Type": container[0].getContentType(),
       "Cache-Control": "no-cache",
       "Content-Disposition": `attachment; filename="${envelopeId}.bin"`,
