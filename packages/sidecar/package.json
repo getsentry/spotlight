@@ -15,27 +15,27 @@
   },
   "files": ["dist"],
   "bin": {
-    "spotlight-sidecar": "dist/src/server.js"
+    "spotlight-sidecar": "dist/server.js"
   },
-  "main": "dist/src/main.js",
-  "module": "dist/src/main.js",
-  "types": "dist/src/main.d.ts",
+  "main": "dist/main.js",
+  "module": "dist/main.js",
+  "types": "dist/main.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/src/main.js",
-      "types": "./dist/src/main.d.ts"
+      "import": "./dist/main.js",
+      "types": "./dist/main.d.ts"
     },
     "./constants": {
-      "import": "./dist/src/constants.js",
-      "types": "./dist/src/constants.d.ts"
+      "import": "./dist/constants.js",
+      "types": "./dist/constants.d.ts"
     },
     "./parser": {
-      "import": "./dist/src/parser/index.js",
-      "types": "./dist/src/parser/index.d.ts"
+      "import": "./dist/parser/index.js",
+      "types": "./dist/parser/index.d.ts"
     },
     "./format": {
-      "import": "./dist/src/format/index.js",
-      "types": "./dist/src/format/index.d.ts"
+      "import": "./dist/format/index.js",
+      "types": "./dist/format/index.d.ts"
     }
   },
   "dependencies": {

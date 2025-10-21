@@ -8,6 +8,7 @@
     },
     "moduleResolution": "nodenext",
     "esModuleInterop": false,
+    "emitDeclarationOnly": false,
     "target": "esnext",
     "module": "nodenext",
     /* paths */
