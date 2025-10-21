@@ -11,7 +11,6 @@ export function serveFilesHandler(filesToServe: Record<string, Buffer>): Handler
   return ctx => {
     let filePath = `${ctx.req.path || ctx.req.url}`;
 
-    
     // The `/telemetry` route is handled by the React app with the location
     // router. This is kind of a hack to avoid a 404 when the user refreshes
     // the page or directly navigates to `/telemetry`. Should probably find
@@ -19,13 +18,13 @@ export function serveFilesHandler(filesToServe: Record<string, Buffer>): Handler
     if (filePath === "/" || filePath.startsWith("/telemetry")) {
       filePath = "/src/index.html";
     }
-    
+
     filePath = filePath.slice(1);
 
     const extName = extname(filePath);
     const contentType = extensionsToContentType[extName] ?? "text/html";
 
-    if (!Object.hasOwn(filesToServe, filePath)) {
+    if (!Object.hasOwn(filesToServe, filePath) || !filesToServe[filePath]) {
       return ctx.notFound();
     }
 
@@ -33,6 +32,6 @@ export function serveFilesHandler(filesToServe: Record<string, Buffer>): Handler
     ctx.header("Document-Policy", "js-profiling");
     ctx.header("Content-Type", contentType);
 
-    return ctx.body(filesToServe[filePath]);
+    return ctx.body(new Uint8Array(filesToServe[filePath]));
   };
 }

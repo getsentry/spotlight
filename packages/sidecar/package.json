@@ -7,7 +7,8 @@
   "scripts": {
     "start": "tsx --watch ./server.ts",
     "dev": "tsx --watch ./server.ts",
-    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "build": "pnpm typecheck && tsdown",
     "clean": "rimraf dist",
     "sample": "node _fixtures/send_to_sidecar.cjs",
     "test": "vitest run",
