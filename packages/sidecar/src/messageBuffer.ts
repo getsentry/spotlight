@@ -23,8 +23,8 @@ export class MessageBuffer<T> {
     const oldValue = this.items[this.writePos % this.size];
     if (oldValue) {
       const envelope = (oldValue[1] as EventContainer)?.getParsedEnvelope();
-      if (envelope?.event) {
-        const deletedEnvelopeId = envelope.event[0].__spotlight_envelope_id;
+      if (envelope?.envelope) {
+        const deletedEnvelopeId = envelope.envelope[0].__spotlight_envelope_id;
         const goneFiles = new Set<string>();
         for (const [filename, envelopeIds] of this.filenameCache.entries()) {
           envelopeIds.delete(String(deletedEnvelopeId));
@@ -53,8 +53,8 @@ export class MessageBuffer<T> {
       if (atItem[0] > minTime) break;
 
       const expiredEnvelope = (atItem[1] as EventContainer)?.getParsedEnvelope();
-      if (expiredEnvelope?.event) {
-        const expiredEnvelopeId = String(expiredEnvelope.event[0].__spotlight_envelope_id);
+      if (expiredEnvelope?.envelope) {
+        const expiredEnvelopeId = String(expiredEnvelope.envelope[0].__spotlight_envelope_id);
 
         for (const envelopeIds of this.filenameCache.values()) {
           if (envelopeIds.has(expiredEnvelopeId)) {
@@ -68,9 +68,9 @@ export class MessageBuffer<T> {
 
     // Update filename cache
     const envelope = (item as EventContainer)?.getParsedEnvelope();
-    if (envelope?.event) {
-      const spotlightEnvelopeId = String(envelope.event[0].__spotlight_envelope_id);
-      const events = envelope.event[1] ?? [];
+    if (envelope?.envelope) {
+      const spotlightEnvelopeId = String(envelope.envelope[0].__spotlight_envelope_id);
+      const events = envelope.envelope[1] ?? [];
 
       for (const event of events) {
         const [, payload] = event;
