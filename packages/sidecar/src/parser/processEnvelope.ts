@@ -66,7 +66,7 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope | nul
         }
         itemPayload = {
           data: rawPayload.toString(TEXT_CONTENT_TYPES.has(itemHeader.content_type as string) ? "utf-8" : "base64"),
-        };
+        } as EnvelopeItem[1];
       } else {
         itemPayload = parseJSONFromBuffer(itemPayloadRaw);
         if (!itemPayload) {
