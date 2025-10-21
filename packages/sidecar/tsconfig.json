@@ -12,9 +12,7 @@
     "module": "nodenext",
     /* paths */
     "outDir": "dist",
-    "rootDir": ".",
-    "emitDeclarationOnly": false,
-    "sourceMap": true
+    "rootDir": "src"
   },
-  "include": ["src/**/*", "server.ts"]
+  "include": ["src/**/*"]
 }

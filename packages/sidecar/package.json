@@ -5,8 +5,8 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "start": "tsx --watch ./server.ts",
-    "dev": "tsx --watch ./server.ts",
+    "start": "tsx --watch ./src/server.ts",
+    "dev": "tsx --watch ./src/server.ts",
     "build": "tsc",
     "clean": "rimraf dist",
     "sample": "node _fixtures/send_to_sidecar.cjs",
@@ -15,7 +15,7 @@
   },
   "files": ["dist"],
   "bin": {
-    "spotlight-sidecar": "dist/server.js"
+    "spotlight-sidecar": "dist/src/server.js"
   },
   "main": "dist/src/main.js",
   "module": "dist/src/main.js",
