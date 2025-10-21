@@ -7,7 +7,7 @@
   "scripts": {
     "start": "tsx --watch ./server.ts",
     "dev": "tsx --watch ./server.ts",
-    "build": "tsdown",
+    "build": "tsc",
     "clean": "rimraf dist",
     "sample": "node _fixtures/send_to_sidecar.cjs",
     "test": "vitest run",
@@ -56,7 +56,6 @@
     "@spotlightjs/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "fetch-event-stream": "^0.1.5",
-    "tsdown": "^0.13.3",
     "tsx": "^4.20.3",
     "typescript": "catalog:",
     "vitest": "catalog:"
