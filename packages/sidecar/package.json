@@ -7,7 +7,7 @@
   "scripts": {
     "start": "tsx --watch ./src/server.ts",
     "dev": "tsx --watch ./src/server.ts",
-    "build": "tsc",
+    "build": "NODE_ENV=production tsc",
     "clean": "rimraf dist",
     "sample": "node _fixtures/send_to_sidecar.cjs",
     "test": "vitest run",
