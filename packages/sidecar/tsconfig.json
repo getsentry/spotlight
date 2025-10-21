@@ -3,11 +3,9 @@
   "compilerOptions": {
     "lib": ["ES2023"],
     "baseUrl": ".",
-    "paths": {
-      "~/*": ["src/*"]
-    },
     "moduleResolution": "nodenext",
     "esModuleInterop": false,
+    "emitDeclarationOnly": false,
     "target": "esnext",
     "module": "nodenext",
     /* paths */

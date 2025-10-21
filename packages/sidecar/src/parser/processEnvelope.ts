@@ -1,7 +1,7 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
 import { uuidv7 } from "uuidv7";
-import { RAW_TYPES } from "~/constants.js";
-import { logger } from "~/logger.js";
+import { RAW_TYPES } from "../constants.js";
+import { logger } from "../logger.js";
 import type { RawEventContext } from "./types.js";
 
 export type ParsedEnvelope = {
@@ -66,7 +66,7 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope | nul
         }
         itemPayload = {
           data: rawPayload.toString(TEXT_CONTENT_TYPES.has(itemHeader.content_type as string) ? "utf-8" : "base64"),
-        };
+        } as EnvelopeItem[1];
       } else {
         itemPayload = parseJSONFromBuffer(itemPayloadRaw);
         if (!itemPayload) {

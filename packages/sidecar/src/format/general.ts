@@ -7,7 +7,7 @@ import {
   isErrorEvent,
   isLogEvent,
   isTraceEvent,
-} from "~/parser/index.js";
+} from "../parser/index.js";
 import { processErrorEvent } from "./errors.js";
 import { formatEventOutput } from "./event.js";
 import { processLogEvent } from "./logs.js";

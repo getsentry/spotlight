@@ -1,4 +1,4 @@
-import type { ParsedEnvelope } from "~/parser/processEnvelope.js";
+import type { ParsedEnvelope } from "../parser/processEnvelope.js";
 
 export type IncomingPayloadCallback = (body: string) => void;
 export type OnEnvelopeCallback = (envelope: ParsedEnvelope["envelope"]) => void;

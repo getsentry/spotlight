@@ -1,10 +1,13 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { inspect, parseArgs } from "node:util";
 import { type ServerType, serve } from "@hono/node-server";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { serveFilesHandler } from "./handlers/index.js";
 import { activateLogger, enableDebugLogging, logger } from "./logger.js";
@@ -12,9 +15,6 @@ import { createMCPInstance } from "./mcp/mcp.js";
 import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
-import { inspect, parseArgs } from "node:util";
-import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 
 const PARSE_ARGS_CONFIG = {
   options: {
@@ -173,7 +173,7 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
   }
 
   let resolve: (value: ServerType) => void;
-  let reject: (err: Error) => void;
+  let reject!: (err: Error) => void;
   const promise = new Promise<ServerType>((res, rej) => {
     resolve = res;
     reject = rej;

@@ -1,9 +1,9 @@
 import { createWriteStream } from "node:fs";
 import { brotliDecompressSync, gunzipSync, inflateSync } from "node:zlib";
 import { Hono } from "hono";
-import { logger } from "~/logger.js";
-import type { HonoEnv } from "~/types/env.js";
-import { EventContainer, getBuffer } from "~/utils/index.js";
+import { logger } from "../../logger.js";
+import type { HonoEnv } from "../../types/env.js";
+import { EventContainer, getBuffer } from "../../utils/index.js";
 import { logIncomingEvent, logOutgoingEvent } from "./debugLogging.js";
 import { streamSSE } from "./streaming.js";
 import { parseBrowserFromUserAgent } from "./userAgent.js";
@@ -62,7 +62,7 @@ const router = new Hono<HonoEnv>()
       return ctx.notFound();
     }
 
-    return ctx.body(container[0].getData(), 200, {
+    return ctx.body(new Uint8Array(container[0].getData()), 200, {
       "Content-Type": container[0].getContentType(),
       "Cache-Control": "no-cache",
       "Content-Disposition": `attachment; filename="${envelopeId}.bin"`,
@@ -71,7 +71,7 @@ const router = new Hono<HonoEnv>()
   })
   .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {
     const arrayBuffer = await ctx.req.arrayBuffer();
-    let body = Buffer.from(arrayBuffer);
+    let body: Buffer = Buffer.from(arrayBuffer);
 
     // Check for gzip or deflate encoding and create appropriate stream
     const encoding = ctx.req.header("Content-Encoding");
