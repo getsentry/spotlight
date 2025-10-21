@@ -604,15 +604,12 @@ async function makeSureSidecarIsRunning() {
 
   async function handler() {
     try {
-      /**
-       * Checking if the sidecar is running
-       * And if not, starting it up
-       */
       await setupSidecar({
         port: DEFAULT_PORT,
         incomingPayload: storeIncomingPayload,
         isStandalone: true,
       });
+
       retries = 0;
     } catch (error) {
       console.error(error);

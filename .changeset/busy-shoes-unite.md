@@ -1,5 +1,5 @@
 ---
-"@spotlightjs/electron": patch
+"@spotlightjs/electron": minor
 ---
 
 Added restart logic for the sidecar
