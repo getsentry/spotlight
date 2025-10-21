@@ -183,7 +183,7 @@ export class MessageBuffer<T> {
 
   read(filters: ReadFilter = { timeWindow: 60 }): T[] {
     const result: T[] = [];
-    const start = this.head;
+    const start = this.writePos - this.size;
     const end = this.writePos;
 
     const filterHandlers = [];
