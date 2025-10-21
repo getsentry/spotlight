@@ -15,7 +15,6 @@ import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./uti
 import { inspect, parseArgs } from "node:util";
 import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { util } from "zod";
 
 const PARSE_ARGS_CONFIG = {
   options: {
