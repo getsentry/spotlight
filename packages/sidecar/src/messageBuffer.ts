@@ -7,11 +7,11 @@ export class MessageBuffer<T> {
   private items: [number, T][];
   private writePos = 0;
   private head = 0;
-  private timeout = 10;
+  private timeout = 60;
   private readers = new Map<string, { tid?: NodeJS.Immediate; pos: number; callback: (item: T) => void }>();
   private filenameCache = new Map<string, Set<string>>();
 
-  constructor(size = 100) {
+  constructor(size = 500) {
     this.size = size;
     this.items = new Array(size);
   }
@@ -37,7 +37,6 @@ export class MessageBuffer<T> {
           this.filenameCache.delete(filename);
         }
       }
-      
     }
 
     this.items[this.writePos % this.size] = [curTime, item];
