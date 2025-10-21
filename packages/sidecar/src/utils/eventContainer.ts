@@ -1,4 +1,4 @@
-import { type ParsedEnvelope, processEnvelope } from "~/parser/index.js";
+import { type ParsedEnvelope, processEnvelope } from "../parser/index.js";
 
 /**
  * Container for events that flow through the sidecar

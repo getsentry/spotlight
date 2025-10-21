@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
-import { SENTRY_CONTENT_TYPE } from "./src/constants.js";
-import { formatEnvelope } from "./src/format";
-import { parseCLIArgs, setupSidecar } from "./src/main.js";
-import type { ParsedEnvelope } from "./src/parser/processEnvelope.js";
+import { SENTRY_CONTENT_TYPE } from "./constants.js";
+import { formatEnvelope } from "./format/index.js";
+import { parseCLIArgs, setupSidecar } from "./main.js";
+import type { ParsedEnvelope } from "./parser/processEnvelope.js";
 
 const connectUpstream = async (port: number) =>
   new Promise<EventSource>((resolve, reject) => {
