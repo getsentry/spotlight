@@ -1,6 +1,7 @@
 import path from "node:path";
 import * as Sentry from "@sentry/electron/main";
 import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
+import { DEFAULT_PORT } from "@spotlightjs/sidecar/constants";
 import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, shell } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
@@ -543,7 +544,7 @@ function createTray() {
     {
       label: "Sidecar Status",
       enabled: false,
-      sublabel: "Running on port 8969",
+      sublabel: `Running on port ${DEFAULT_PORT}`,
     },
     { type: "separator" },
     {
@@ -580,14 +581,7 @@ function createTray() {
   });
 }
 
-Promise.all([
-  setupSidecar({
-    port: 8969,
-    incomingPayload: storeIncomingPayload,
-    isStandalone: true,
-  }),
-  app.whenReady(),
-]).then(() => {
+app.whenReady().then(() => {
   if (!isLinux) {
     createTray();
   }
@@ -599,3 +593,51 @@ Promise.all([
 
   ipcMain.on("set-badge-count", handleBadgeCount);
 });
+
+const MAX_RETRIES = 3;
+const RECHECK_DELAY = 5000;
+const RETRY_DELAY_INCREMENT = 2000;
+
+async function makeSureSidecarIsRunning() {
+  let retries = 0;
+  let subscriber: NodeJS.Timeout | null = null;
+
+  async function handler() {
+    try {
+      await setupSidecar({
+        port: DEFAULT_PORT,
+        incomingPayload: storeIncomingPayload,
+        isStandalone: true,
+      });
+
+      retries = 0;
+    } catch (error) {
+      console.error(error);
+      retries++;
+
+      if (retries >= MAX_RETRIES) {
+        Sentry.captureException(error);
+
+        dialog.showErrorBox(
+          "Spotlight",
+          `Unable to start Spotlight server. This could happen due to a port (${DEFAULT_PORT}) conflict or the server being blocked by a firewall. Try checking your firewall settings and restart the app.`,
+        );
+      }
+    }
+
+    if (subscriber) {
+      clearTimeout(subscriber);
+      subscriber = null;
+    }
+
+    if (retries >= MAX_RETRIES) {
+      return;
+    }
+
+    subscriber = setTimeout(handler, RECHECK_DELAY + retries * RETRY_DELAY_INCREMENT);
+  }
+
+  handler();
+}
+
+makeSureSidecarIsRunning();
