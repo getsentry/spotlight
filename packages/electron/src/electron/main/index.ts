@@ -621,7 +621,6 @@ async function makeSureSidecarIsRunning() {
       if (retries >= MAX_RETRIES) {
         Sentry.captureException(error);
 
-        // Notifying the user that the sidecar is not running
         dialog.showErrorBox(
           "Spotlight",
           `Unable to start Spotlight server. This could happen due to a port (${DEFAULT_PORT}) conflict or the server being blocked by a firewall. Try checking your firewall settings and restart the app.`,
