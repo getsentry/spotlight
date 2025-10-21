@@ -2,4 +2,4 @@
 "@spotlightjs/sidecar": patch
 ---
 
-Add type checking on build
+Fix type checking and existing errors
