@@ -71,7 +71,7 @@ const router = new Hono<HonoEnv>()
   })
   .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {
     const arrayBuffer = await ctx.req.arrayBuffer();
-    let body = Buffer.from(arrayBuffer);
+    let body: Buffer = Buffer.from(arrayBuffer);
 
     // Check for gzip or deflate encoding and create appropriate stream
     const encoding = ctx.req.header("Content-Encoding");
