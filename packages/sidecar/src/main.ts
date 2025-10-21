@@ -68,6 +68,7 @@ export function parseCLIArgs(): CLIArgs {
   });
 
   if (runIndex > -1 && positionals[0] !== "run") {
+    // TODO: This should never happen, test the code properly to ensure
     throw Error(
       `CLI parse error: ${inspect({
         argv: process.argv,
