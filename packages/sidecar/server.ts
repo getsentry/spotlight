@@ -2,7 +2,7 @@
 import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
 import { SENTRY_CONTENT_TYPE } from "./src/constants.js";
-import { formatEnvelope } from "./src/format";
+import { formatEnvelope } from "./src/format/index.js";
 import { parseCLIArgs, setupSidecar } from "./src/main.js";
 import type { ParsedEnvelope } from "./src/parser/processEnvelope.js";
 
