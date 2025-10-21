@@ -9,8 +9,8 @@ import {
   formatLogEnvelope,
   formatTraceSummary,
   renderSpanTree,
-} from "~/format/index.js";
-import { getBuffer } from "~/utils/index.js";
+} from "../format/index.js";
+import { getBuffer } from "../utils/index.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
 
 const inputSchema = {

@@ -1,8 +1,8 @@
 import { resolve } from "node:path";
 import { Hono } from "hono";
 import launchEditor from "launch-editor";
-import { logger } from "~/logger.js";
-import type { HonoEnv } from "~/types/index.js";
+import { logger } from "../logger.js";
+import type { HonoEnv } from "../types/index.js";
 
 const router = new Hono<HonoEnv>();
 
