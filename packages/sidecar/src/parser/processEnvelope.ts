@@ -1,7 +1,7 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
 import { uuidv7 } from "uuidv7";
-import { RAW_TYPES } from "../constants.js";
-import { logger } from "../logger.js";
+import { RAW_TYPES } from "~/constants.js";
+import { logger } from "~/logger.js";
 import type { RawEventContext } from "./types.js";
 
 export type ParsedEnvelope = {

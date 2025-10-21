@@ -1,6 +1,6 @@
 import { get } from "node:http";
 import { startSpan } from "@sentry/node";
-import { SERVER_IDENTIFIER } from "../constants.js";
+import { SERVER_IDENTIFIER } from "~/constants.js";
 import { logger } from "~/logger.js";
 
 export const withTracing =

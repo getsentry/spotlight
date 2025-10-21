@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { CONTEXT_LINES_ENDPOINT } from "../constants.js";
+import { CONTEXT_LINES_ENDPOINT } from "~/constants.js";
 import clearRouter from "./clear.js";
 import contextLinesRouter from "./contextlines/index.js";
 import healthRouter from "./health.js";
