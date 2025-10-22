@@ -231,7 +231,3 @@ export async function main(filesToServe?: Record<string, Buffer>) {
     });
   }
 }
-
-if ((typeof require !== "undefined" && require.main === module) || process.argv[1] === import.meta.filename) {
-  main();
-}

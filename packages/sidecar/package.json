@@ -5,8 +5,8 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "start": "tsx --watch ./src/cli.ts",
-    "dev": "tsx --watch ./src/cli.ts",
+    "start": "tsx --watch ./src/run.ts",
+    "dev": "tsx --watch ./src/run.ts",
     "build": "NODE_ENV=production tsc",
     "clean": "rimraf dist",
     "sample": "node _fixtures/send_to_sidecar.cjs",
@@ -15,7 +15,7 @@
   },
   "files": ["dist"],
   "bin": {
-    "spotlight-sidecar": "dist/cli.js"
+    "spotlight-sidecar": "dist/run.js"
   },
   "main": "dist/main.js",
   "module": "dist/main.js",

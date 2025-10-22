@@ -124,9 +124,7 @@ startSpan({ name: "Spotlight CLI", op: "cli" }, async () => {
         }
       );
 
-      await main({
-        filesToServe,
-      });
+      await main(filesToServe);
     }
   );
 });
