@@ -25,6 +25,10 @@
       "import": "./dist/main.js",
       "types": "./dist/main.d.ts"
     },
+    "./cli": {
+      "import": "./dist/cli.js",
+      "types": "./dist/cli.d.ts"
+    },
     "./constants": {
       "import": "./dist/constants.js",
       "types": "./dist/constants.d.ts"

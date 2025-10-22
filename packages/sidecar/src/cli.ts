@@ -5,8 +5,24 @@ import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
 import { SENTRY_CONTENT_TYPE } from "./constants.js";
 import { formatEnvelope } from "./format/index.js";
+import { enableDebugLogging, logger } from "./logger.js";
 import { parseCLIArgs, setupSidecar } from "./main.js";
+
 import type { ParsedEnvelope } from "./parser/processEnvelope.js";
+
+const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
+  traces: ["transaction", "span"],
+  // profiles: ["profile"],
+  logs: ["log"],
+  attachments: ["attachment"],
+  errors: ["event"],
+  // sessions: ["session"],
+  // replays: ["replay_video"],
+  // client_report
+});
+const SUPPORTED_ENVELOPE_TYPES = new Set(Object.values(NAME_TO_TYPE_MAPPING).flat());
+const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
+export const SUPPORTED_TAIL_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
 
 const getSpotlightURL = (port: number, host = "localhost") => `http://${host}:${port}/stream`;
 
@@ -61,120 +77,113 @@ Examples:
   process.exit(0);
 };
 
-let runServer = true;
-let { cmd, cmdArgs, help, port, debug } = parseCLIArgs();
-let stdioMCP = false;
-
-if (help) {
-  runServer = false;
-  printHelp();
-}
-
-let onEnvelope: ((envelope: ParsedEnvelope["envelope"]) => void) | undefined = undefined;
-const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
-  traces: ["transaction", "span"],
-  profiles: ["profile"],
-  logs: ["log"],
-  attachments: ["attachment"],
-  errors: ["event"],
-  sessions: ["session"],
-  replays: ["replay_video"],
-  // client_report
-});
-const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
-export const SUPPORTED_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
-
-switch (cmd) {
-  case "help":
-    printHelp();
-    runServer = false;
-    break;
-  case "mcp":
-    stdioMCP = true;
-    break;
-  // @ts-expect-error ts7029 -- fallthrough is intentional
-  case "run": {
-    let shell = false;
-    if (cmdArgs.length === 0) {
-      // try package.json to find default dev command
-      try {
-        const scripts = JSON.parse(readFileSync("package.json", "utf-8")).scripts;
-        cmdArgs = [scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start];
-        shell = true;
-      } catch {
-        // pass
-      }
-    }
-    if (cmdArgs.length === 0) {
-      // try to see if this is a docker-compose project
-      try {
-        // TODO: Check docker-compose.yml existence
-        // TODO: Check docker-compose.yaml existence
-        // TODO: Check `docker compose --version` existence
-        // TODO: Check `docker-compose --version` existence
-      } catch {
-        // pass
-      }
-    }
-    const cmdStr = cmdArgs.join(" ");
-    const runCmd = spawn(cmdArgs[0], cmdArgs.slice(1), {
-      cwd: process.cwd(),
-      shell,
-      windowsVerbatimArguments: true,
-      windowsHide: true,
-      // TODO: Consider using pipe and forwarding output as logs to Spotlight
-      stdio: "ignore",
-      env: {
-        ...process.env,
-        SENTRY_SPOTLIGHT: getSpotlightURL(port),
-        // This is not supported in all SDKs but worth adding
-        // for the ones that support it
-        SENTRY_TRACES_SAMPLE_RATE: "1",
-        //  Consider setting SENTRY_DSN to our hack server too?
-      },
-    });
-    runCmd.on("error", err => {
-      console.error(`Failed to run ${cmdStr}:`, err);
-      process.exit(1);
-    });
-    runCmd.on("close", code => {
-      if (!code) {
-        console.error(`${cmdStr} exited, terminating.`);
-      } else {
-        console.error(`${cmdStr} exited with code ${code}.`);
-      }
-      process.exit(code);
-    });
-    const killRunCmd = () => {
-      runCmd.removeAllListeners();
-      runCmd.kill();
-    };
-    runCmd.on("spawn", () => {
-      runCmd.removeAllListeners("error");
-      process.on("SIGINT", killRunCmd);
-      process.on("SIGTERM", killRunCmd);
-      process.on("beforeExit", killRunCmd);
-    });
-
-    cmd = "tail";
-    cmdArgs = [];
-    // biome-ignore lint/suspicious/noFallthroughSwitchClause:
-    // Intentional fallthrough to start the event streaming after running the command
+export async function main(filesToServe?: Record<string, Buffer>) {
+  let runServer = true;
+  let { cmd, cmdArgs, help, port, debug } = parseCLIArgs();
+  if (debug || process.env.SPOTLIGHT_DEBUG) {
+    enableDebugLogging(true);
   }
-  case "tail": {
-    const eventTypes = cmdArgs.length > 0 ? cmdArgs.map(arg => arg.toLowerCase()) : ["everything"];
-    for (const eventType of eventTypes) {
-      if (!SUPPORTED_ARGS.has(eventType)) {
-        console.error(`Error: Unsupported argument "${eventType}".`);
-        console.error(`Supported arguments are: ${[...SUPPORTED_ARGS].join(", ")}`);
-        process.exit(1);
-      }
-    }
+  let stdioMCP = false;
 
-    if (eventTypes.some(type => EVERYTHING_MAGIC_WORDS.has(type))) {
-      onEnvelope = displayEnvelope;
-    } else {
-      const types = new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
+  if (help) {
+    runServer = false;
+    printHelp();
+  }
+
+  let onEnvelope: ((envelope: ParsedEnvelope["envelope"]) => void) | undefined = undefined;
+
+  switch (cmd) {
+    case "help":
+      printHelp();
+      runServer = false;
+      break;
+    case "mcp":
+      stdioMCP = true;
+      break;
+    // @ts-expect-error ts7029 -- fallthrough is intentional
+    case "run": {
+      let shell = false;
+      if (cmdArgs.length === 0) {
+        // try package.json to find default dev command
+        try {
+          const scripts = JSON.parse(readFileSync("package.json", "utf-8")).scripts;
+          cmdArgs = [scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start];
+          shell = true;
+        } catch {
+          // pass
+        }
+      }
+      if (cmdArgs.length === 0) {
+        // try to see if this is a docker-compose project
+        try {
+          // TODO: Check docker-compose.yml existence
+          // TODO: Check docker-compose.yaml existence
+          // TODO: Check `docker compose --version` existence
+          // TODO: Check `docker-compose --version` existence
+        } catch {
+          // pass
+        }
+      }
+      const cmdStr = cmdArgs.join(" ");
+      logger.info(`Starting command: ${cmdStr}`);
+      const runCmd = spawn(cmdArgs[0], cmdArgs.slice(1), {
+        cwd: process.cwd(),
+        shell,
+        windowsVerbatimArguments: true,
+        windowsHide: true,
+        // TODO: Consider using pipe and forwarding output as logs to Spotlight
+        stdio: "ignore",
+        env: {
+          ...process.env,
+          SENTRY_SPOTLIGHT: getSpotlightURL(port),
+          // This is not supported in all SDKs but worth adding
+          // for the ones that support it
+          SENTRY_TRACES_SAMPLE_RATE: "1",
+          //  Consider setting SENTRY_DSN to our hack server too?
+        },
+      });
+      runCmd.on("error", err => {
+        logger.error(`Failed to run ${cmdStr}:`);
+        logger.error(err);
+        process.exit(1);
+      });
+      runCmd.on("close", code => {
+        if (!code) {
+          logger.error(`${cmdStr} exited, terminating.`);
+        } else {
+          logger.error(`${cmdStr} exited with code ${code}.`);
+        }
+        process.exit(code);
+      });
+      const killRunCmd = () => {
+        runCmd.removeAllListeners();
+        runCmd.kill();
+      };
+      runCmd.on("spawn", () => {
+        runCmd.removeAllListeners("error");
+        process.on("SIGINT", killRunCmd);
+        process.on("SIGTERM", killRunCmd);
+        process.on("beforeExit", killRunCmd);
+      });
+
+      cmd = "tail";
+      cmdArgs = [];
+      // biome-ignore lint/suspicious/noFallthroughSwitchClause:
+      // Intentional fallthrough to start the event streaming after running the command
+    }
+    case "tail": {
+      const eventTypes = cmdArgs.length > 0 ? cmdArgs.map(arg => arg.toLowerCase()) : ["everything"];
+      for (const eventType of eventTypes) {
+        if (!SUPPORTED_TAIL_ARGS.has(eventType)) {
+          logger.error(`Error: Unsupported argument "${eventType}".`);
+          logger.error(`Supported arguments are: ${[...SUPPORTED_TAIL_ARGS].join(", ")}`);
+          process.exit(1);
+        }
+      }
+
+      const types = eventTypes.some(type => EVERYTHING_MAGIC_WORDS.has(type))
+        ? SUPPORTED_ENVELOPE_TYPES
+        : new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
       onEnvelope = envelope => {
         for (const [header] of envelope[1]) {
           if (header.type && types.has(header.type)) {
@@ -182,36 +191,42 @@ switch (cmd) {
           }
         }
       };
-    }
 
-    // try to connect to an already existing server first
-    try {
-      const client = await connectUpstream(port);
-      runServer = false;
-      client.addEventListener(SENTRY_CONTENT_TYPE, event => onEnvelope!(JSON.parse(event.data)));
-    } catch (err) {
-      // if we fail, fine then we'll start our own
-      if (err instanceof Error && !err.message?.includes(port.toString())) {
-        captureException(err);
-        console.error("Error when trying to connect to upstream sidecar:", err);
-        process.exit(1);
+      // try to connect to an already existing server first
+      try {
+        const client = await connectUpstream(port);
+        runServer = false;
+        client.addEventListener(SENTRY_CONTENT_TYPE, event => onEnvelope!(JSON.parse(event.data)));
+      } catch (err) {
+        // if we fail, fine then we'll start our own
+        if (err instanceof Error && !err.message?.includes(port.toString())) {
+          captureException(err);
+          logger.error("Error when trying to connect to upstream sidecar:");
+          logger.error(err);
+          process.exit(1);
+        }
       }
+      break;
     }
-    break;
+    case undefined:
+    case "":
+      break;
+    default:
+      break;
   }
-  case undefined:
-  case "":
-    break;
-  default:
-    break;
+
+  if (runServer) {
+    await setupSidecar({
+      port,
+      stdioMCP,
+      basePath: process.cwd(),
+      filesToServe,
+      onEnvelope,
+      isStandalone: true,
+    });
+  }
 }
 
-if (runServer) {
-  await setupSidecar({
-    port,
-    debug,
-    stdioMCP,
-    onEnvelope,
-    isStandalone: true,
-  });
+if ((typeof require !== "undefined" && require.main === module) || process.argv[1] === import.meta.filename) {
+  main();
 }

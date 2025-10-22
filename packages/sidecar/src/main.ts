@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
-import { join, parse } from "node:path";
-import { inspect, parseArgs } from "node:util";
+import { join } from "node:path";
+import { parseArgs } from "node:util";
 import { type ServerType, serve } from "@hono/node-server";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -10,7 +10,7 @@ import { cors } from "hono/cors";
 import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { serveFilesHandler } from "./handlers/index.js";
-import { activateLogger, enableDebugLogging, logger } from "./logger.js";
+import { activateLogger, logger } from "./logger.js";
 import { createMCPInstance } from "./mcp/mcp.js";
 import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
@@ -106,13 +106,17 @@ export function parseCLIArgs(): CLIArgs {
 
 async function startServer(options: StartServerOptions): Promise<ServerType> {
   const { port, basePath } = options;
-  const filesToServe =
-    basePath && !options.filesToServe
-      ? {
-          "/src/index.html": readFileSync(join(basePath, "src/index.html")),
-          "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
-        }
-      : options.filesToServe;
+  let filesToServe = options.filesToServe;
+  if (!filesToServe && basePath) {
+    try {
+      filesToServe = {
+        "/src/index.html": readFileSync(join(basePath, "src/index.html")),
+        "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
+      };
+    } catch {
+      // pass -- no UI
+    }
+  }
 
   const app = new Hono<HonoEnv>().use(cors());
 
@@ -220,7 +224,6 @@ export async function setupSidecar({
   logger: customLogger,
   basePath,
   filesToServe,
-  debug,
   onEnvelope,
   incomingPayload,
   isStandalone,
@@ -230,10 +233,6 @@ export async function setupSidecar({
     addEventProcessor(event => (event.spans?.some(span => span.op?.startsWith("sidecar.")) ? null : event));
   }
   let sidecarPort = DEFAULT_PORT;
-
-  if (debug || process.env.SPOTLIGHT_DEBUG) {
-    enableDebugLogging(true);
-  }
 
   if (customLogger) {
     activateLogger(customLogger);

@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { inflateRawSync } from "node:zlib";
 import { setContext, startSpan } from "@sentry/node";
-import { parseCLIArgs, setupSidecar } from "@spotlightjs/sidecar";
+import { main } from "@spotlightjs/sidecar/cli";
 import "./instrument.js";
 const require = Module.createRequire(import.meta.url);
 let sea = null;
@@ -107,27 +107,8 @@ startSpan({ name: "Spotlight CLI", op: "cli" }, async () => {
   await startSpan(
     { name: "Setup Sidecar", op: "cli.setup.sidecar" },
     async () => {
-      const args = parseCLIArgs();
-      if (args.help) {
-        console.log(`
-Usage: spotlight [options]
-
-Options:
-  -p, --port <port>    Port to listen on (default: 8969)
-  --stdio-mcp          Enable MCP stdio transport
-  -d, --debug          Enable debug logging
-  -h, --help           Show this help message
-
-Examples:
-  spotlight                    # Start on default port 8969
-  spotlight --port 3000        # Start on port 3000
-  spotlight -p 3000 -d         # Start on port 3000 with debug logging
-`);
-        process.exit(0);
-      }
       const MANIFEST_NAME = "manifest.json";
       const ENTRY_POINT_NAME = "src/index.html";
-      const basePath = process.cwd();
       const filesToServe = Object.create(null);
 
       startSpan(
@@ -143,11 +124,8 @@ Examples:
         }
       );
 
-      await setupSidecar({
-        ...args,
-        basePath,
+      await main({
         filesToServe,
-        isStandalone: true,
       });
     }
   );
