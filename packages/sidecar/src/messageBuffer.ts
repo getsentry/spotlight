@@ -1,13 +1,12 @@
 import { uuidv7 } from "uuidv7";
 import type { InputSchema } from "./mcp/mcp.js";
-import type { EventContainer } from "./utils/eventContainer.js";
+import { EventContainer } from "./utils/eventContainer.js";
 
 export class MessageBuffer<T> {
   private size: number;
   private items: [number, T][];
   private writePos = 0;
   private head = 0;
-  private timeout = 60;
   private readers = new Map<string, { tid?: NodeJS.Immediate; pos: number; callback: (item: T) => void }>();
   private filenameCache = new Map<string, Set<string>>();
 
@@ -21,8 +20,8 @@ export class MessageBuffer<T> {
 
     // Remove old value from filename cache
     const oldValue = this.items[this.writePos % this.size];
-    if (oldValue) {
-      const envelope = (oldValue[1] as EventContainer)?.getParsedEnvelope();
+    if (oldValue && oldValue[1] instanceof EventContainer) {
+      const envelope = oldValue[1].getParsedEnvelope();
       if (envelope?.envelope) {
         const deletedEnvelopeId = envelope.envelope[0].__spotlight_envelope_id;
         const goneFiles = new Set<string>();
@@ -41,52 +40,33 @@ export class MessageBuffer<T> {
 
     this.items[this.writePos % this.size] = [curTime, item];
     this.writePos += 1;
-    if (this.head === this.writePos) {
-      this.head += 1;
-    }
-
-    const minTime = curTime - this.timeout * 1000;
-    let atItem: [number, T] | undefined;
-    while (this.head < this.writePos) {
-      atItem = this.items[this.head % this.size];
-      if (atItem === undefined) break;
-      if (atItem[0] > minTime) break;
-
-      const expiredEnvelope = (atItem[1] as EventContainer)?.getParsedEnvelope();
-      if (expiredEnvelope?.envelope) {
-        const expiredEnvelopeId = String(expiredEnvelope.envelope[0].__spotlight_envelope_id);
-
-        for (const envelopeIds of this.filenameCache.values()) {
-          if (envelopeIds.has(expiredEnvelopeId)) {
-            envelopeIds.delete(expiredEnvelopeId);
-          }
-        }
-      }
-
-      this.head += 1;
+    if (this.writePos - this.head > this.size) {
+      this.head = this.writePos - this.size;
     }
 
     // Update filename cache
-    const envelope = (item as EventContainer)?.getParsedEnvelope();
-    if (envelope?.envelope) {
-      const spotlightEnvelopeId = String(envelope.envelope[0].__spotlight_envelope_id);
-      const events = envelope.envelope[1] ?? [];
+    if (item instanceof EventContainer) {
+      const envelope = item.getParsedEnvelope();
+      if (envelope?.envelope) {
+        const spotlightEnvelopeId = String(envelope.envelope[0].__spotlight_envelope_id);
+        const events = envelope.envelope[1] ?? [];
 
-      for (const event of events) {
-        const [, payload] = event;
-        const values = typeof payload === "object" && "exception" in payload && payload.exception?.values;
-        if (values) {
-          for (const value of values) {
-            const frames = value.stacktrace?.frames;
-            if (frames) {
-              for (const frame of frames) {
-                const filename = frame.filename;
-                if (filename) {
-                  const envelopeIds = this.filenameCache.get(filename);
-                  if (envelopeIds) {
-                    envelopeIds.add(String(spotlightEnvelopeId));
-                  } else {
-                    this.filenameCache.set(filename, new Set([String(spotlightEnvelopeId)]));
+        for (const event of events) {
+          const [, payload] = event;
+          const values = typeof payload === "object" && "exception" in payload && payload.exception?.values;
+          if (values) {
+            for (const value of values) {
+              const frames = value.stacktrace?.frames;
+              if (frames) {
+                for (const frame of frames) {
+                  const filename = frame.filename;
+                  if (filename) {
+                    const envelopeIds = this.filenameCache.get(filename);
+                    if (envelopeIds) {
+                      envelopeIds.add(String(spotlightEnvelopeId));
+                    } else {
+                      this.filenameCache.set(filename, new Set([String(spotlightEnvelopeId)]));
+                    }
                   }
                 }
               }
