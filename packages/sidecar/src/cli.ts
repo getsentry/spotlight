@@ -84,6 +84,8 @@ export async function main(filesToServe?: Record<string, Buffer>) {
   if (debug || process.env.SPOTLIGHT_DEBUG) {
     enableDebugLogging(true);
   }
+  const spotlightVersion = process.env.npm_package_version || "{unknown}";
+  logger.info(`Spotlight by Sentry - v${spotlightVersion}`);
   let stdioMCP = false;
 
   if (help) {
