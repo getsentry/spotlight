@@ -90,13 +90,15 @@ switch (cmd) {
   case "mcp":
     stdioMCP = true;
     break;
+  // @ts-expect-error ts7029 -- fallthrough is intentional
   case "run": {
+    let shell = false;
     if (cmdArgs.length === 0) {
       // try package.json to find default dev command
       try {
         const scripts = JSON.parse(readFileSync("package.json", "utf-8")).scripts;
-        const devCmd = scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start;
-        cmdArgs = devCmd.split(" "); // TODO: fix this, too naive
+        cmdArgs = [scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start];
+        shell = true;
       } catch {
         // pass
       }
@@ -112,10 +114,14 @@ switch (cmd) {
         // pass
       }
     }
-    console.log(cmdArgs);
     const cmdStr = cmdArgs.join(" ");
     const runCmd = spawn(cmdArgs[0], cmdArgs.slice(1), {
       cwd: process.cwd(),
+      shell,
+      windowsVerbatimArguments: true,
+      windowsHide: true,
+      // TODO: Consider using pipe and forwarding output as logs to Spotlight
+      stdio: "ignore",
       env: {
         ...process.env,
         SENTRY_SPOTLIGHT: `http://localhost:${port}/stream`,

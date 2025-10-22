@@ -5,8 +5,8 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "start": "tsx --watch ./src/server.ts",
-    "dev": "tsx --watch ./src/server.ts",
+    "start": "tsx --watch ./src/cli.ts",
+    "dev": "tsx --watch ./src/cli.ts",
     "build": "NODE_ENV=production tsc",
     "clean": "rimraf dist",
     "sample": "node _fixtures/send_to_sidecar.cjs",
