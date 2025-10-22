@@ -124,6 +124,10 @@ export async function main(filesToServe?: Record<string, Buffer>) {
           // pass
         }
       }
+      if (cmdArgs.length === 0) {
+        logger.error("Error: No command specified to run and could not infer the command automatically.");
+        process.exit(1);
+      }
       const cmdStr = cmdArgs.join(" ");
       logger.info(`Starting command: ${cmdStr}`);
       // TODO: Run this _after_ the server is started
