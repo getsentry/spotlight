@@ -62,7 +62,7 @@ Commands:
   help                 Show this help message
 
 Options:
-  -p, --port <port>    Port to listen on (default: 8969)
+  -p, --port <port>    Port to listen on (default: 8969, or 0 for random)
   -d, --debug          Enable debug logging
   -h, --help           Show this help message
 
@@ -78,7 +78,10 @@ Examples:
   process.exit(0);
 };
 
-export async function main(filesToServe?: Record<string, Buffer>) {
+export async function main({
+  basePath,
+  filesToServe,
+}: { basePath?: string; filesToServe?: Record<string, Buffer> } = {}) {
   let runServer = true;
   let { cmd, cmdArgs, help, port, debug } = parseCLIArgs();
   if (debug || process.env.SPOTLIGHT_DEBUG) {
@@ -227,7 +230,7 @@ export async function main(filesToServe?: Record<string, Buffer>) {
     await setupSidecar({
       port,
       stdioMCP,
-      basePath: process.cwd(),
+      basePath,
       filesToServe,
       onEnvelope,
       isStandalone: true,

@@ -15,6 +15,7 @@ import { createMCPInstance } from "./mcp/mcp.js";
 import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
+import type { AddressInfo } from "node:net";
 
 const PARSE_ARGS_CONFIG = {
   options: {
@@ -83,8 +84,8 @@ export function parseCLIArgs(): CLIArgs {
     process.exit(1);
   }
 
-  if (port < 1 || port > 65535) {
-    console.error(`Error: Port ${port} is out of valid range (1-65535)`);
+  if (port < 0 || port > 65535) {
+    console.error(`Error: Port ${port} is out of valid range (1-65535 or 0 for automatic assignment)`);
     process.exit(1);
   }
 
@@ -182,9 +183,10 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
       port,
     },
     () => {
-      logger.info(`Sidecar listening on ${port}`);
+      const realPort = (sidecarServer.address() as AddressInfo).port;
+      logger.info(`Sidecar listening on ${realPort}`);
       if (basePath) {
-        logSpotlightUrl(port);
+        logSpotlightUrl(realPort);
       }
       resolve(sidecarServer);
     },
@@ -219,20 +221,21 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
   return promise;
 }
 
-export async function setupSidecar({
-  port,
-  logger: customLogger,
-  basePath,
-  filesToServe,
-  onEnvelope,
-  incomingPayload,
-  isStandalone,
-  stdioMCP,
-}: SideCarOptions = {}): Promise<void> {
+export async function setupSidecar(
+  {
+    port,
+    logger: customLogger,
+    basePath,
+    filesToServe,
+    onEnvelope,
+    incomingPayload,
+    isStandalone,
+    stdioMCP,
+  }: SideCarOptions = { port: DEFAULT_PORT },
+): Promise<void> {
   if (!isStandalone) {
     addEventProcessor(event => (event.spans?.some(span => span.op?.startsWith("sidecar.")) ? null : event));
   }
-  let sidecarPort = DEFAULT_PORT;
 
   if (customLogger) {
     activateLogger(customLogger);
@@ -241,15 +244,13 @@ export async function setupSidecar({
   if (port && !isValidPort(port)) {
     logger.info("Please provide a valid port.");
     process.exit(1);
-  } else if (port) {
-    sidecarPort = typeof port === "string" ? Number(port) : port;
   }
 
-  if (await isSidecarRunning(sidecarPort)) {
-    logger.info(`Sidecar is already running on port ${sidecarPort}`);
+  if (port > 0 && (await isSidecarRunning(port))) {
+    logger.info(`Sidecar is already running on port ${port}`);
     const hasSpotlightUI = (filesToServe && "/src/index.html" in filesToServe) || (!filesToServe && basePath);
     if (hasSpotlightUI) {
-      logSpotlightUrl(sidecarPort);
+      logSpotlightUrl(port);
     }
     if (stdioMCP) {
       async function startMCPStdioHTTPProxy() {
@@ -283,7 +284,7 @@ export async function setupSidecar({
             return Promise.resolve(client);
           },
           serverType: ProxyServerType.HTTPStream,
-          url: `http://localhost:${sidecarPort}/mcp`,
+          url: `http://localhost:${port}/mcp`,
         });
         server.onclose = async () => {
           logger.info("MCP stdio proxy server closed.");
@@ -292,7 +293,7 @@ export async function setupSidecar({
           } catch (_err) {
             try {
               serverInstance = await startServer({
-                port: sidecarPort,
+                port,
                 basePath,
                 filesToServe,
                 incomingPayload,
@@ -311,7 +312,7 @@ export async function setupSidecar({
     }
   } else if (!serverInstance) {
     serverInstance = await startServer({
-      port: sidecarPort,
+      port,
       basePath,
       filesToServe,
       incomingPayload,

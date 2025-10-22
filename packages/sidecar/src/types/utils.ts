@@ -15,7 +15,7 @@ export type SideCarOptions = {
    * The port on which the sidecar should listen.
    * Defaults to 8969.
    */
-  port?: string | number;
+  port: number;
 
   /**
    * A logger that implements the SidecarLogger interface.
