@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import Module from "node:module";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { inflateRawSync } from "node:zlib";
 import { setContext, startSpan } from "@sentry/node";
 import { main } from "@spotlightjs/sidecar/cli";
 import "./instrument.js";
@@ -46,64 +45,6 @@ const readAsset = withTracing(
 );
 
 startSpan({ name: "Spotlight CLI", op: "cli" }, async () => {
-  startSpan({ name: "ASCII Art", op: "cli.art.ascii" }, () => {
-    const MAX_COLS = process.stderr.columns;
-    if (!process.stderr.isTTY || MAX_COLS < 35) return;
-    let stderrBuffer = "";
-
-    const data = startSpan(
-      { name: "Inflate ASCII Art Data", op: "cli.art.ascii.inflate" },
-      () =>
-        Uint8Array.from(
-          inflateRawSync(
-            Buffer.from(
-              "bY7LCgMxFEK9L5MwDDSL9P//1DJMKGXowoUcUaFZOk8dU2Op9+qZVkYQoFsaEqA6PZxxma1AoMG+TiONTgcfAd741YxxVf8gCzCgWcYB7OSj9sjW7t2/eKxKAxkIYv8NqL3FpVY25CmjrBSuDw==",
-              "base64"
-            )
-          )
-        )
-    );
-    const E = "\x1b[";
-    const C = `${E}38;5;`;
-    const M_COL = `${C}96m`;
-    const F_COL = `${C}61m`;
-    const BOLD = `${E}1m`;
-    const RESET = `${E}0m`;
-    const NL = `${RESET}\n`;
-    let factor = 0.22;
-    let c = 0;
-    let col = 0;
-    let line = 0;
-    let lim = 26;
-    let r = 0;
-    for (let p of data) {
-      if (p === 255) {
-        stderrBuffer += NL;
-        c = col = 0;
-        if (line++ === 5) {
-          factor = factor / -3;
-        }
-        lim = Math.round(lim * (1 + factor));
-        r = Math.round(Math.random() * 18);
-      } else {
-        while (p-- >= 0 && col < MAX_COLS) {
-          if (col < lim - 1) {
-            stderrBuffer += M_COL;
-          } else if (col === lim - 1) {
-            stderrBuffer += F_COL;
-          } else if (col === lim + r) {
-            stderrBuffer += `${RESET}${BOLD}`;
-          }
-          stderrBuffer += c ? (col >= 35 ? "#" : "s") : " ";
-          col++;
-        }
-        c = !c;
-      }
-    }
-    stderrBuffer += NL;
-    process.stderr.write(stderrBuffer);
-  });
-
   await startSpan(
     { name: "Setup Sidecar", op: "cli.setup.sidecar" },
     async () => {
