@@ -126,6 +126,7 @@ export async function main(filesToServe?: Record<string, Buffer>) {
       }
       const cmdStr = cmdArgs.join(" ");
       logger.info(`Starting command: ${cmdStr}`);
+      // TODO: Run this _after_ the server is started
       const runCmd = spawn(cmdArgs[0], cmdArgs.slice(1), {
         cwd: process.cwd(),
         shell,
