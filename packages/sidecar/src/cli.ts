@@ -8,9 +8,11 @@ import { formatEnvelope } from "./format/index.js";
 import { parseCLIArgs, setupSidecar } from "./main.js";
 import type { ParsedEnvelope } from "./parser/processEnvelope.js";
 
+const getSpotlightURL = (port: number, host = "localhost") => `http://${host}:${port}/stream`;
+
 const connectUpstream = async (port: number) =>
   new Promise<EventSource>((resolve, reject) => {
-    const client = new EventSource(`http://localhost:${port}/stream`);
+    const client = new EventSource(getSpotlightURL(port));
     client.onerror = reject;
     client.onopen = () => resolve(client);
   });
@@ -124,7 +126,7 @@ switch (cmd) {
       stdio: "ignore",
       env: {
         ...process.env,
-        SENTRY_SPOTLIGHT: `http://localhost:${port}/stream`,
+        SENTRY_SPOTLIGHT: getSpotlightURL(port),
         // This is not supported in all SDKs but worth adding
         // for the ones that support it
         SENTRY_TRACES_SAMPLE_RATE: "1",

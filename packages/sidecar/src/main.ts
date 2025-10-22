@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, parse } from "node:path";
 import { inspect, parseArgs } from "node:util";
 import { type ServerType, serve } from "@hono/node-server";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -55,28 +55,22 @@ let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
 export function parseCLIArgs(): CLIArgs {
-  const args = Array.from(process.argv);
+  const args = Array.from(process.argv).slice(2);
+  const preParse = parseArgs({
+    ...PARSE_ARGS_CONFIG,
+    strict: false,
+    tokens: true,
+  });
   let cmdArgs: string[] | undefined = undefined;
-  const runIndex = args.findIndex(arg => arg === "run");
-  if (runIndex > -1) {
-    const cutOff = args.findIndex((arg, idx) => idx > runIndex && !arg.startsWith("-"));
-    cmdArgs = cutOff > runIndex ? args.splice(cutOff) : [];
+  const runToken = preParse.tokens.find(token => token.kind === "positional" && token.value === "run");
+  if (runToken) {
+    const cutOff = preParse.tokens.find(token => token.index > runToken.index && token.kind === "positional");
+    cmdArgs = cutOff ? args.splice(cutOff.index) : [];
   }
   const { values, positionals } = parseArgs({
-    args: args.slice(2),
+    args,
     ...PARSE_ARGS_CONFIG,
   });
-
-  if (runIndex > -1 && positionals[0] !== "run") {
-    // TODO: This should never happen, test the code properly to ensure
-    throw Error(
-      `CLI parse error: ${inspect({
-        argv: process.argv,
-        values,
-        positionals,
-      })}`,
-    );
-  }
 
   // Handle legacy positional argument for port (backwards compatibility)
   const portInput = positionals.length === 1 && /^\d{1,5}$/.test(positionals[0]) ? positionals.shift() : values.port;
