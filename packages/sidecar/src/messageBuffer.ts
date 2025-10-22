@@ -41,8 +41,8 @@ export class MessageBuffer<T> {
 
     this.items[this.writePos % this.size] = [curTime, item];
     this.writePos += 1;
-    if (this.head === this.writePos) {
-      this.head += 1;
+    if (this.writePos - this.head > this.size) {
+      this.head = this.writePos - this.size;
     }
 
     const minTime = curTime - this.timeout * 1000;
@@ -197,7 +197,7 @@ export class MessageBuffer<T> {
       }
     }
 
-    for (let i = end - 2; i >= start; i--) {
+    for (let i = end - 1; i >= start; i--) {
       const item = this.items[i % this.size];
 
       if (item == null) continue;
