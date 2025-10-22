@@ -6,13 +6,16 @@ export class MessageBuffer<T> {
   private size: number;
   private items: [number, T][];
   private writePos = 0;
-  private head = 0;
   private readers = new Map<string, { tid?: NodeJS.Immediate; pos: number; callback: (item: T) => void }>();
   private filenameCache = new Map<string, Set<string>>();
 
   constructor(size = 500) {
     this.size = size;
     this.items = new Array(size);
+  }
+
+  private get head() {
+    return Math.max(0, this.writePos - this.size);
   }
 
   put(item: T): void {
@@ -40,9 +43,6 @@ export class MessageBuffer<T> {
 
     this.items[this.writePos % this.size] = [curTime, item];
     this.writePos += 1;
-    if (this.writePos - this.head > this.size) {
-      this.head = this.writePos - this.size;
-    }
 
     // Update filename cache
     if (item instanceof EventContainer) {
@@ -155,7 +155,6 @@ export class MessageBuffer<T> {
    */
   reset(): void {
     this.items = new Array(this.size);
-    this.head = this.writePos;
 
     // Clear filename cache
     this.filenameCache.clear();
