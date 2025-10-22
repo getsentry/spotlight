@@ -62,7 +62,7 @@ Commands:
   help                 Show this help message
 
 Options:
-  -p, --port <port>    Port to listen on (default: 8969)
+  -p, --port <port>    Port to listen on (default: 8969, or 0 for random)
   -d, --debug          Enable debug logging
   -h, --help           Show this help message
 

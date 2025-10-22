@@ -85,7 +85,7 @@ export function parseCLIArgs(): CLIArgs {
   }
 
   if (port < 0 || port > 65535) {
-    console.error(`Error: Port ${port} is out of valid range (1-65535)`);
+    console.error(`Error: Port ${port} is out of valid range (1-65535 or 0 for automatic assignment)`);
     process.exit(1);
   }
 
