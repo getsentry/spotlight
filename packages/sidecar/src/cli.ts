@@ -78,7 +78,10 @@ Examples:
   process.exit(0);
 };
 
-export async function main(filesToServe?: Record<string, Buffer>) {
+export async function main({
+  basePath,
+  filesToServe,
+}: { basePath?: string; filesToServe?: Record<string, Buffer> } = {}) {
   let runServer = true;
   let { cmd, cmdArgs, help, port, debug } = parseCLIArgs();
   if (debug || process.env.SPOTLIGHT_DEBUG) {
@@ -225,7 +228,7 @@ export async function main(filesToServe?: Record<string, Buffer>) {
     await setupSidecar({
       port,
       stdioMCP,
-      basePath: process.cwd(),
+      basePath,
       filesToServe,
       onEnvelope,
       isStandalone: true,
