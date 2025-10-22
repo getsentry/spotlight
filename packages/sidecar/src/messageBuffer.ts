@@ -1,6 +1,6 @@
 import { uuidv7 } from "uuidv7";
 import type { InputSchema } from "./mcp/mcp.js";
-import type { EventContainer } from "./utils/eventContainer.js";
+import { EventContainer } from "./utils/eventContainer.js";
 
 export class MessageBuffer<T> {
   private size: number;
@@ -21,8 +21,8 @@ export class MessageBuffer<T> {
 
     // Remove old value from filename cache
     const oldValue = this.items[this.writePos % this.size];
-    if (oldValue) {
-      const envelope = (oldValue[1] as EventContainer)?.getParsedEnvelope();
+    if (oldValue && oldValue[1] instanceof EventContainer) {
+      const envelope = oldValue[1].getParsedEnvelope();
       if (envelope?.envelope) {
         const deletedEnvelopeId = envelope.envelope[0].__spotlight_envelope_id;
         const goneFiles = new Set<string>();
@@ -52,13 +52,15 @@ export class MessageBuffer<T> {
       if (atItem === undefined) break;
       if (atItem[0] > minTime) break;
 
-      const expiredEnvelope = (atItem[1] as EventContainer)?.getParsedEnvelope();
-      if (expiredEnvelope?.envelope) {
-        const expiredEnvelopeId = String(expiredEnvelope.envelope[0].__spotlight_envelope_id);
+      if (atItem[1] instanceof EventContainer) {
+        const expiredEnvelope = atItem[1].getParsedEnvelope();
+        if (expiredEnvelope?.envelope) {
+          const expiredEnvelopeId = String(expiredEnvelope.envelope[0].__spotlight_envelope_id);
 
-        for (const envelopeIds of this.filenameCache.values()) {
-          if (envelopeIds.has(expiredEnvelopeId)) {
-            envelopeIds.delete(expiredEnvelopeId);
+          for (const envelopeIds of this.filenameCache.values()) {
+            if (envelopeIds.has(expiredEnvelopeId)) {
+              envelopeIds.delete(expiredEnvelopeId);
+            }
           }
         }
       }
@@ -67,26 +69,28 @@ export class MessageBuffer<T> {
     }
 
     // Update filename cache
-    const envelope = (item as EventContainer)?.getParsedEnvelope();
-    if (envelope?.envelope) {
-      const spotlightEnvelopeId = String(envelope.envelope[0].__spotlight_envelope_id);
-      const events = envelope.envelope[1] ?? [];
+    if (item instanceof EventContainer) {
+      const envelope = item.getParsedEnvelope();
+      if (envelope?.envelope) {
+        const spotlightEnvelopeId = String(envelope.envelope[0].__spotlight_envelope_id);
+        const events = envelope.envelope[1] ?? [];
 
-      for (const event of events) {
-        const [, payload] = event;
-        const values = typeof payload === "object" && "exception" in payload && payload.exception?.values;
-        if (values) {
-          for (const value of values) {
-            const frames = value.stacktrace?.frames;
-            if (frames) {
-              for (const frame of frames) {
-                const filename = frame.filename;
-                if (filename) {
-                  const envelopeIds = this.filenameCache.get(filename);
-                  if (envelopeIds) {
-                    envelopeIds.add(String(spotlightEnvelopeId));
-                  } else {
-                    this.filenameCache.set(filename, new Set([String(spotlightEnvelopeId)]));
+        for (const event of events) {
+          const [, payload] = event;
+          const values = typeof payload === "object" && "exception" in payload && payload.exception?.values;
+          if (values) {
+            for (const value of values) {
+              const frames = value.stacktrace?.frames;
+              if (frames) {
+                for (const frame of frames) {
+                  const filename = frame.filename;
+                  if (filename) {
+                    const envelopeIds = this.filenameCache.get(filename);
+                    if (envelopeIds) {
+                      envelopeIds.add(String(spotlightEnvelopeId));
+                    } else {
+                      this.filenameCache.set(filename, new Set([String(spotlightEnvelopeId)]));
+                    }
                   }
                 }
               }
@@ -193,7 +197,7 @@ export class MessageBuffer<T> {
       }
     }
 
-    for (let i = end - 1; i >= start; i--) {
+    for (let i = end - 2; i >= start; i--) {
       const item = this.items[i % this.size];
 
       if (item == null) continue;
