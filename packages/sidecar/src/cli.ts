@@ -9,6 +9,7 @@ import { enableDebugLogging, logger } from "./logger.js";
 import { parseCLIArgs, setupSidecar } from "./main.js";
 
 import type { ParsedEnvelope } from "./parser/processEnvelope.js";
+import * as path from "node:path";
 
 const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
   traces: ["transaction", "span"],
@@ -103,12 +104,21 @@ export async function main(filesToServe?: Record<string, Buffer>) {
     // @ts-expect-error ts7029 -- fallthrough is intentional
     case "run": {
       let shell = false;
+      const env = {
+        ...process.env,
+        SENTRY_SPOTLIGHT: getSpotlightURL(port),
+        // This is not supported in all SDKs but worth adding
+        // for the ones that support it
+        SENTRY_TRACES_SAMPLE_RATE: "1",
+        //  Consider setting SENTRY_DSN to our hack server too?
+      } as { PATH: string; SENTRY_SPOTLIGHT: string; SENTRY_TRACES_SAMPLE_RATE: string; [key: string]: string };
       if (cmdArgs.length === 0) {
         // try package.json to find default dev command
         try {
-          const scripts = JSON.parse(readFileSync("package.json", "utf-8")).scripts;
+          const scripts = JSON.parse(readFileSync("./package.json", "utf-8")).scripts;
           cmdArgs = [scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start];
           shell = true;
+          env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
         } catch {
           // pass
         }
@@ -133,19 +143,12 @@ export async function main(filesToServe?: Record<string, Buffer>) {
       // TODO: Run this _after_ the server is started
       const runCmd = spawn(cmdArgs[0], cmdArgs.slice(1), {
         cwd: process.cwd(),
+        env,
         shell,
         windowsVerbatimArguments: true,
         windowsHide: true,
         // TODO: Consider using pipe and forwarding output as logs to Spotlight
         stdio: "ignore",
-        env: {
-          ...process.env,
-          SENTRY_SPOTLIGHT: getSpotlightURL(port),
-          // This is not supported in all SDKs but worth adding
-          // for the ones that support it
-          SENTRY_TRACES_SAMPLE_RATE: "1",
-          //  Consider setting SENTRY_DSN to our hack server too?
-        },
       });
       runCmd.on("error", err => {
         logger.error(`Failed to run ${cmdStr}:`);
