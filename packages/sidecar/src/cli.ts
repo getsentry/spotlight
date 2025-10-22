@@ -193,10 +193,8 @@ export async function main(filesToServe?: Record<string, Buffer>) {
         ? SUPPORTED_ENVELOPE_TYPES
         : new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
       onEnvelope = envelope => {
-        for (const [header] of envelope[1]) {
-          if (header.type && types.has(header.type)) {
-            displayEnvelope(envelope);
-          }
+        if (envelope[1].some(([header]) => header.type && types.has(header.type))) {
+          displayEnvelope(envelope);
         }
       };
 
