@@ -1,5 +1,17 @@
 # @spotlightjs/spotlight
 
+## 4.2.0
+
+### Minor Changes
+
+- Add CLI -- `spotlight tail logs errors` etc are now available ([#997](https://github.com/getsentry/spotlight/pull/997))
+
+### Patch Changes
+
+- Updated dependencies [[`716600f`](https://github.com/getsentry/spotlight/commit/716600f885bee8508befa1635e7cdd1f589a61a3), [`861f0cb`](https://github.com/getsentry/spotlight/commit/861f0cbcfeb16119e1230208a75898125c48b542), [`f65aff8`](https://github.com/getsentry/spotlight/commit/f65aff8af1a6b698b437107f1ec6ec0d403772ae), [`3378477`](https://github.com/getsentry/spotlight/commit/3378477bc84cdeb33507632fce3006da1d8ffe9c), [`038dd23`](https://github.com/getsentry/spotlight/commit/038dd23654306b21c68f244a02749ada241fae8f)]:
+  - @spotlightjs/sidecar@2.2.0
+  - @spotlightjs/overlay@4.3.0
+
 ## 4.1.4
 
 ### Patch Changes
