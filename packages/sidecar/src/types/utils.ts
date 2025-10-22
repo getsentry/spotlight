@@ -33,11 +33,6 @@ export type SideCarOptions = {
   filesToServe?: Record<string, Buffer>;
 
   /**
-   * More verbose logging.
-   */
-  debug?: boolean;
-
-  /**
    * A callback that will be called with the incoming message.
    * Helpful for debugging.
    */

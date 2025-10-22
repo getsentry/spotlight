@@ -10,57 +10,74 @@ import { cors } from "hono/cors";
 import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
 import { serveFilesHandler } from "./handlers/index.js";
-import { activateLogger, enableDebugLogging, logger } from "./logger.js";
+import { activateLogger, logger } from "./logger.js";
 import { createMCPInstance } from "./mcp/mcp.js";
 import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
 
+const PARSE_ARGS_CONFIG = {
+  options: {
+    port: {
+      type: "string",
+      short: "p",
+      default: DEFAULT_PORT.toString(),
+    },
+    debug: {
+      type: "boolean",
+      short: "d",
+      default: false,
+    },
+    // Deprecated -- use the positional `mcp` argument instead
+    "stdio-mcp": {
+      type: "boolean",
+      default: false,
+    },
+    help: {
+      type: "boolean",
+      short: "h",
+      default: false,
+    },
+  },
+  allowPositionals: true,
+  strict: true,
+} as const;
+
 export type CLIArgs = {
   port: number;
   debug: boolean;
   help: boolean;
-  _positionals: string[];
-  _extra: Record<string, unknown>;
+  cmd: string | undefined;
+  cmdArgs: string[];
 };
 
 let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
 export function parseCLIArgs(): CLIArgs {
-  const { values, positionals } = parseArgs({
-    options: {
-      port: {
-        type: "string",
-        short: "p",
-        default: DEFAULT_PORT.toString(),
-      },
-      debug: {
-        type: "boolean",
-        short: "d",
-        default: false,
-      },
-      // Deprecated -- use the positional `mcp` argument instead
-      "stdio-mcp": {
-        type: "boolean",
-        default: false,
-      },
-      help: {
-        type: "boolean",
-        short: "h",
-        default: false,
-      },
-    },
-    allowPositionals: true,
+  const args = Array.from(process.argv).slice(2);
+  const preParse = parseArgs({
+    ...PARSE_ARGS_CONFIG,
     strict: false,
+    tokens: true,
+  });
+  let cmdArgs: string[] | undefined = undefined;
+  const runToken = preParse.tokens.find(token => token.kind === "positional" && token.value === "run");
+  if (runToken) {
+    const cutOff = preParse.tokens.find(token => token.index > runToken.index && token.kind === "positional");
+    cmdArgs = cutOff ? args.splice(cutOff.index) : [];
+  }
+  const { values, positionals } = parseArgs({
+    args,
+    ...PARSE_ARGS_CONFIG,
   });
 
   // Handle legacy positional argument for port (backwards compatibility)
   const portInput = positionals.length === 1 && /^\d{1,5}$/.test(positionals[0]) ? positionals.shift() : values.port;
   const port = Number(portInput);
 
-  // Validate port number
   if (Number.isNaN(port)) {
+    // Validate port number
     console.error(`Error: Invalid port number '${portInput}'`);
     console.error("Port must be a valid number between 1 and 65535");
     process.exit(1);
@@ -80,24 +97,26 @@ export function parseCLIArgs(): CLIArgs {
     debug: values.debug as boolean,
     help: values.help as boolean,
     port,
-    _positionals: positionals,
-    _extra: {},
+    cmd: positionals[0],
+    cmdArgs: cmdArgs ?? positionals.slice(1),
   };
-  const keys = new Set(Object.keys(result));
-  result._extra = Object.fromEntries(Object.entries(values).filter(([key]) => !keys.has(key)));
 
   return result;
 }
 
 async function startServer(options: StartServerOptions): Promise<ServerType> {
   const { port, basePath } = options;
-  const filesToServe =
-    basePath && !options.filesToServe
-      ? {
-          "/src/index.html": readFileSync(join(basePath, "src/index.html")),
-          "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
-        }
-      : options.filesToServe;
+  let filesToServe = options.filesToServe;
+  if (!filesToServe && basePath) {
+    try {
+      filesToServe = {
+        "/src/index.html": readFileSync(join(basePath, "src/index.html")),
+        "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
+      };
+    } catch {
+      // pass -- no UI
+    }
+  }
 
   const app = new Hono<HonoEnv>().use(cors());
 
@@ -205,7 +224,6 @@ export async function setupSidecar({
   logger: customLogger,
   basePath,
   filesToServe,
-  debug,
   onEnvelope,
   incomingPayload,
   isStandalone,
@@ -215,10 +233,6 @@ export async function setupSidecar({
     addEventProcessor(event => (event.spans?.some(span => span.op?.startsWith("sidecar.")) ? null : event));
   }
   let sidecarPort = DEFAULT_PORT;
-
-  if (debug || process.env.SPOTLIGHT_DEBUG) {
-    enableDebugLogging(true);
-  }
 
   if (customLogger) {
     activateLogger(customLogger);

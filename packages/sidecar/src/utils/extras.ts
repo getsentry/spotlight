@@ -26,7 +26,7 @@ export const isValidPort = withTracing(
 export const isSidecarRunning = withTracing(
   (port: string | number | undefined) =>
     new Promise(_resolve => {
-      logger.info(`Checking if we are already running on port ${port}`);
+      logger.debug(`Checking if we are already running on port ${port}`);
       const options = {
         hostname: "localhost",
         port: port,
