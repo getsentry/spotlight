@@ -7,7 +7,6 @@ export class MessageBuffer<T> {
   private items: [number, T][];
   private writePos = 0;
   private head = 0;
-  private timeout = 60;
   private readers = new Map<string, { tid?: NodeJS.Immediate; pos: number; callback: (item: T) => void }>();
   private filenameCache = new Map<string, Set<string>>();
 
@@ -43,29 +42,6 @@ export class MessageBuffer<T> {
     this.writePos += 1;
     if (this.writePos - this.head > this.size) {
       this.head = this.writePos - this.size;
-    }
-
-    const minTime = curTime - this.timeout * 1000;
-    let atItem: [number, T] | undefined;
-    while (this.head < this.writePos) {
-      atItem = this.items[this.head % this.size];
-      if (atItem === undefined) break;
-      if (atItem[0] > minTime) break;
-
-      if (atItem[1] instanceof EventContainer) {
-        const expiredEnvelope = atItem[1].getParsedEnvelope();
-        if (expiredEnvelope?.envelope) {
-          const expiredEnvelopeId = String(expiredEnvelope.envelope[0].__spotlight_envelope_id);
-
-          for (const envelopeIds of this.filenameCache.values()) {
-            if (envelopeIds.has(expiredEnvelopeId)) {
-              envelopeIds.delete(expiredEnvelopeId);
-            }
-          }
-        }
-      }
-
-      this.head += 1;
     }
 
     // Update filename cache
