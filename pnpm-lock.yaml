@@ -6,18 +6,45 @@ settings:
 
 catalogs:
   default:
+    '@fontsource/raleway':
+      specifier: ^5.1.0
+      version: 5.2.5
+    '@sentry/astro':
+      specifier: ^8.49.0
+      version: 8.55.0
     '@sentry/core':
       specifier: ^10
       version: 10.5.0
     '@sentry/node':
       specifier: ^10
       version: 10.5.0
+    '@tailwindcss/vite':
+      specifier: ^4.1.11
+      version: 4.1.11
     '@types/node':
       specifier: ^22.15.21
       version: 22.15.28
+    '@types/react':
+      specifier: ^18.3.11
+      version: 18.3.20
+    '@types/react-dom':
+      specifier: ^18.3.0
+      version: 18.3.7
+    react:
+      specifier: ^18.3.1
+      version: 18.3.1
+    react-dom:
+      specifier: ^18.3.1
+      version: 18.3.1
+    tailwindcss:
+      specifier: ^4.1.10
+      version: 4.1.11
     typescript:
       specifier: ^5.6.2
       version: 5.9.2
+    vite:
+      specifier: ^5.4.19
+      version: 5.4.19
     vitest:
       specifier: ^0.34.6
       version: 0.34.6
@@ -254,10 +281,10 @@ importers:
     dependencies:
       '@hono/mcp':
         specifier: ^0.1.1
-        version: 0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.9.7)
+        version: 0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.10.2)
       '@hono/node-server':
         specifier: ^1.19.3
-        version: 1.19.3(hono@4.9.7)
+        version: 1.19.3(hono@4.10.2)
       '@jridgewell/trace-mapping':
         specifier: ^0.3.25
         version: 0.3.25
@@ -274,8 +301,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       hono:
-        specifier: ^4.9.7
-        version: 4.9.7
+        specifier: ^4.10.2
+        version: 4.10.2
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
@@ -4550,8 +4577,8 @@ packages:
   devalue@5.3.2:
     resolution: {integrity: sha512-UDsjUbpQn9kvm68slnrs+mfxwFkIflOhkanmyabZ8zOYk8SMEIbJ3TK+88g70hSIeytu4y18f0z/hYHMTrXIWw==}
 
-  devalue@5.4.1:
-    resolution: {integrity: sha512-YtoaOfsqjbZQKGIMRYDWKjUmSB4VJ/RElB+bXZawQAQYAo4xu08GKTMVlsZDTF6R2MbAgjcAQRPI5eIyRAT2OQ==}
+  devalue@5.4.2:
+    resolution: {integrity: sha512-MwPZTKEPK2k8Qgfmqrd48ZKVvzSQjgW0lXLxiIBA8dQjtf/6mw6pggHNLcyDKyf+fI6eXxlQwPsfaCMTU5U+Bw==}
 
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
@@ -5323,8 +5350,8 @@ packages:
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
 
-  hono@4.9.7:
-    resolution: {integrity: sha512-t4Te6ERzIaC48W3x4hJmBwgNlLhmiEdEE5ViYb02ffw4ignHNHa5IBtPjmbKstmtKa8X6C35iWwK4HaqvrzG9w==}
+  hono@4.10.2:
+    resolution: {integrity: sha512-p6fyzl+mQo6uhESLxbF5WlBOAJMDh36PljwlKtP5V1v09NxlqGru3ShK+4wKhSuhuYf8qxMmrivHOa/M7q0sMg==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@4.1.0:
@@ -7199,6 +7226,7 @@ packages:
   sitemap@8.0.0:
     resolution: {integrity: sha512-+AbdxhM9kJsHtruUF39bwS/B0Fytw6Fr1o4ZAIAEqA6cke2xcoO2GleBw9Zw7nRzILVEgz7zBM5GiTJjie1G9A==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    deprecated: 'SECURITY: Multiple vulnerabilities fixed in 8.0.1 (XML injection, path traversal, command injection, protocol injection). Upgrade immediately: npm install sitemap@8.0.1'
     hasBin: true
 
   slash@3.0.0:
@@ -9367,14 +9395,14 @@ snapshots:
 
   '@fontsource/raleway@5.2.5': {}
 
-  '@hono/mcp@0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.9.7)':
+  '@hono/mcp@0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.10.2)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.16.0
-      hono: 4.9.7
+      hono: 4.10.2
 
-  '@hono/node-server@1.19.3(hono@4.9.7)':
+  '@hono/node-server@1.19.3(hono@4.10.2)':
     dependencies:
-      hono: 4.9.7
+      hono: 4.10.2
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -11162,7 +11190,7 @@ snapshots:
       '@sveltejs/vite-plugin-svelte': 5.0.3(svelte@4.2.19)(vite@6.3.6(@types/node@24.7.2)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.1))
       '@types/cookie': 0.6.0
       cookie: 0.6.0
-      devalue: 5.4.1
+      devalue: 5.4.2
       esm-env: 1.2.2
       import-meta-resolve: 4.2.0
       kleur: 4.1.5
@@ -12801,7 +12829,7 @@ snapshots:
 
   devalue@5.3.2: {}
 
-  devalue@5.4.1:
+  devalue@5.4.2:
     optional: true
 
   devlop@1.1.0:
@@ -13967,7 +13995,7 @@ snapshots:
     dependencies:
       react-is: 16.13.1
 
-  hono@4.9.7: {}
+  hono@4.10.2: {}
 
   hosted-git-info@4.1.0:
     dependencies:
