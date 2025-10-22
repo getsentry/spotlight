@@ -1,5 +1,21 @@
 # @spotlightjs/sidecar
 
+## 2.2.0
+
+### Minor Changes
+
+- Add CLI -- `spotlight tail logs errors` etc are now available ([#997](https://github.com/getsentry/spotlight/pull/997))
+
+### Patch Changes
+
+- Fix type checking and existing errors ([#1017](https://github.com/getsentry/spotlight/pull/1017))
+
+- fix envelope type error on messageBuffer ([#1016](https://github.com/getsentry/spotlight/pull/1016))
+
+- Removed the timeout handler and minor changes in the message buffer ([#1022](https://github.com/getsentry/spotlight/pull/1022))
+
+- Use tsc for builds ([#1019](https://github.com/getsentry/spotlight/pull/1019))
+
 ## 2.1.3
 
 ### Patch Changes
