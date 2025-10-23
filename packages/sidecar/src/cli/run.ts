@@ -1,9 +1,9 @@
 import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import * as path from "node:path";
-import { logger } from "src/logger.js";
-import type { CLIHandlerOptions } from "src/types/cli.js";
-import { getSpotlightURL } from "src/utils/extras.js";
+import { logger } from "../logger.js";
+import type { CLIHandlerOptions } from "../types/cli.js";
+import { getSpotlightURL } from "../utils/extras.js";
 import tail from "./tail.js";
 
 export default async function run({ port, cmdArgs, basePath, filesToServe }: CLIHandlerOptions) {

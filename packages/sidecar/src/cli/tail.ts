@@ -1,12 +1,12 @@
 import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
-import { SENTRY_CONTENT_TYPE } from "src/constants.js";
-import { formatEnvelope } from "src/format/index.js";
-import { logger } from "src/logger.js";
-import { setupSidecar } from "src/main.js";
-import type { ParsedEnvelope } from "src/parser/processEnvelope.js";
-import type { CLIHandlerOptions } from "src/types/cli.js";
-import { getSpotlightURL } from "src/utils/extras.js";
+import { SENTRY_CONTENT_TYPE } from "../constants.js";
+import { formatEnvelope } from "../format/index.js";
+import { logger } from "../logger.js";
+import { setupSidecar } from "../main.js";
+import type { ParsedEnvelope } from "../parser/processEnvelope.js";
+import type { CLIHandlerOptions } from "../types/cli.js";
+import { getSpotlightURL } from "../utils/extras.js";
 
 export const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
   traces: ["transaction", "span"],
