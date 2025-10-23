@@ -13,7 +13,7 @@ import type {
   MessageEntrySchema,
   RequestEntrySchema,
   ThreadsEntrySchema,
-} from "./schema.js";
+} from "../schema.js";
 
 export type Event = z.infer<typeof EventSchema>;
 

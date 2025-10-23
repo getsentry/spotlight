@@ -1,3 +1,4 @@
+import type { FormatterType } from "../formatters/types.js";
 import type { SideCarOptions } from "./utils.js";
 
 export type CLIHandlerOptions = {
@@ -6,6 +7,7 @@ export type CLIHandlerOptions = {
   port: SideCarOptions["port"];
   help?: boolean;
   debug?: boolean;
+  format?: FormatterType;
   basePath?: SideCarOptions["basePath"];
   filesToServe?: SideCarOptions["filesToServe"];
 };

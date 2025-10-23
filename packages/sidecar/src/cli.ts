@@ -22,7 +22,7 @@ export async function main({
   basePath,
   filesToServe,
 }: { basePath?: string; filesToServe?: Record<string, Buffer> } = {}) {
-  let { cmd, cmdArgs, help, port, debug } = parseCLIArgs();
+  let { cmd, cmdArgs, help, port, debug, format } = parseCLIArgs();
   if (debug || process.env.SPOTLIGHT_DEBUG) {
     enableDebugLogging(true);
   }
@@ -36,5 +36,5 @@ export async function main({
 
   const handler = CLI_CMD_MAP.get(cmd) || showHelp;
 
-  return await handler({ cmd, cmdArgs, port, help, debug, basePath, filesToServe });
+  return await handler({ cmd, cmdArgs, port, help, debug, format, basePath, filesToServe });
 }

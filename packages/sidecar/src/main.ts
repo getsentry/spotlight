@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import type { AddressInfo } from "node:net";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { type ServerType, serve } from "@hono/node-server";
@@ -9,13 +10,13 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
+import { type FormatterType, VALID_FORMATTERS } from "./formatters/types.js";
 import { serveFilesHandler } from "./handlers/index.js";
 import { activateLogger, logger } from "./logger.js";
 import { createMCPInstance } from "./mcp/mcp.js";
 import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
-import type { AddressInfo } from "node:net";
 
 const PARSE_ARGS_CONFIG = {
   options: {
@@ -28,6 +29,11 @@ const PARSE_ARGS_CONFIG = {
       type: "boolean",
       short: "d",
       default: false,
+    },
+    format: {
+      type: "string",
+      short: "f",
+      default: "logfmt",
     },
     // Deprecated -- use the positional `mcp` argument instead
     "stdio-mcp": {
@@ -48,6 +54,7 @@ export type CLIArgs = {
   port: number;
   debug: boolean;
   help: boolean;
+  format: FormatterType;
   cmd: string | undefined;
   cmdArgs: string[];
 };
@@ -94,9 +101,18 @@ export function parseCLIArgs(): CLIArgs {
     console.warn("Warning: --stdio-mcp is deprecated. Please use the positional argument 'mcp' instead.");
   }
 
+  // Validate format
+  const format = values.format as string;
+  if (!VALID_FORMATTERS.includes(format as FormatterType)) {
+    console.error(`Error: Invalid format '${format}'`);
+    console.error(`Valid formats are: ${VALID_FORMATTERS.join(", ")}`);
+    process.exit(1);
+  }
+
   const result: CLIArgs = {
     debug: values.debug as boolean,
     help: values.help as boolean,
+    format: format as FormatterType,
     port,
     cmd: positionals[0],
     cmdArgs: cmdArgs ?? positionals.slice(1),

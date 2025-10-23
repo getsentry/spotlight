@@ -1,5 +1,5 @@
-import { processEnvelope } from "../parser/index.js";
-import type { EventContainer } from "../utils/index.js";
+import { processEnvelope } from "../../parser/index.js";
+import type { EventContainer } from "../../utils/index.js";
 
 export interface TraceContext {
   trace_id: string;
@@ -363,6 +363,13 @@ export function buildSpanTree(trace: TraceSummary): SpanNode[] {
 export function formatTransactionEvent(payload: any): string[] {
   const traceEvent = convertPayloadToTraceEvent(payload);
   return processTraceEvent(traceEvent);
+}
+
+/**
+ * Format a trace/transaction event to human-readable string
+ */
+export function formatTrace(payload: any): string {
+  return formatTransactionEvent(payload).join("\n");
 }
 
 /**

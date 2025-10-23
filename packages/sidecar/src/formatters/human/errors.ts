@@ -1,9 +1,9 @@
 import type { ErrorEvent } from "@sentry/core";
 import type { z } from "zod";
-import { isErrorEvent, type SentryEvent } from "../parser/index.js";
-import type { EventContainer } from "../utils/index.js";
+import { type SentryEvent, isErrorEvent } from "../../parser/index.js";
+import type { EventContainer } from "../../utils/index.js";
+import type { ErrorEventSchema } from "../schema.js";
 import { formatEventOutput } from "./event.js";
-import type { ErrorEventSchema } from "./schema.js";
 
 export function formatErrorEnvelope(container: EventContainer) {
   const processedEnvelope = container.getParsedEnvelope();
@@ -77,4 +77,11 @@ export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventS
     contexts: event.contexts,
     platform: event.platform,
   };
+}
+
+/**
+ * Format an error event to human-readable string
+ */
+export function formatError(payload: ErrorEvent): string {
+  return formatEventOutput(processErrorEvent(payload));
 }
