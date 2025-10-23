@@ -8,6 +8,8 @@ export const withTracing =
   (...args: unknown[]) =>
     startSpan({ name: fn.name, ...spanArgs }, () => fn(...args));
 
+export const getSpotlightURL = (port: number, host = "localhost") => `http://${host}:${port}/stream`;
+
 export function logSpotlightUrl(port: number): void {
   logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
 }

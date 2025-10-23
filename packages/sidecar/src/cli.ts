@@ -1,239 +1,40 @@
 #!/usr/bin/env node
-import { spawn } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { captureException } from "@sentry/core";
-import { EventSource } from "eventsource";
-import { SENTRY_CONTENT_TYPE } from "./constants.js";
-import { formatEnvelope } from "./format/index.js";
 import { enableDebugLogging, logger } from "./logger.js";
-import { parseCLIArgs, setupSidecar } from "./main.js";
+import { parseCLIArgs } from "./main.js";
+import type { CLIHandler } from "./types/cli.js";
 
-import type { ParsedEnvelope } from "./parser/processEnvelope.js";
-import * as path from "node:path";
+import showHelp from "./cli/help.js";
+import mcp from "./cli/mcp.js";
+import run from "./cli/run.js";
+import startServer from "./cli/server.js";
+import tail from "./cli/tail.js";
 
-const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
-  traces: ["transaction", "span"],
-  // profiles: ["profile"],
-  logs: ["log"],
-  attachments: ["attachment"],
-  errors: ["event"],
-  // sessions: ["session"],
-  // replays: ["replay_video"],
-  // client_report
-});
-const SUPPORTED_ENVELOPE_TYPES = new Set(Object.values(NAME_TO_TYPE_MAPPING).flat());
-const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
-export const SUPPORTED_TAIL_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
-
-const getSpotlightURL = (port: number, host = "localhost") => `http://${host}:${port}/stream`;
-
-const connectUpstream = async (port: number) =>
-  new Promise<EventSource>((resolve, reject) => {
-    const client = new EventSource(getSpotlightURL(port));
-    client.onerror = reject;
-    client.onopen = () => resolve(client);
-  });
-
-const SEPARATOR = Array(10).fill("─").join("");
-
-function displayEnvelope(envelope: ParsedEnvelope["envelope"]) {
-  console.log(`${envelope[0].event_id} | ${envelope[1][0][0].type} | ${envelope[0].sdk?.name}\n\n`);
-  const lines = formatEnvelope(envelope);
-  if (lines.length > 0) {
-    console.log(lines.join("\n"));
-  } else {
-    console.log("No parser for the given event type");
-  }
-  console.log("\n");
-  console.log(SEPARATOR);
-}
-
-const printHelp = () => {
-  console.log(`
-Spotlight Sidecar - Development proxy server for Spotlight
-
-Usage: spotlight-sidecar [command] [options]
-
-Commands:
-  tail [types...]      Tail Sentry events (default: everything)
-                       Available types: ${[...Object.keys(NAME_TO_TYPE_MAPPING)].join(", ")}
-                       Magic words: ${[...EVERYTHING_MAGIC_WORDS].join(", ")}
-  mcp                  Start in MCP (Model Context Protocol) mode
-  help                 Show this help message
-
-Options:
-  -p, --port <port>    Port to listen on (default: 8969, or 0 for random)
-  -d, --debug          Enable debug logging
-  -h, --help           Show this help message
-
-Examples:
-  spotlight-sidecar                    # Start on default port 8969
-  spotlight-sidecar tail               # Tail all event types
-  spotlight-sidecar tail errors        # Tail only errors
-  spotlight-sidecar tail errors logs   # Tail errors and logs
-  spotlight-sidecar mcp                # Start in MCP mode
-  spotlight-sidecar --port 3000        # Start on port 3000
-  spotlight-sidecar -p 3000 -d         # Start on port 3000 with debug logging
-`);
-  process.exit(0);
-};
+export const CLI_CMD_MAP = new Map<string | undefined, CLIHandler>([
+  ["help", showHelp],
+  ["mcp", mcp],
+  ["tail", tail],
+  ["run", run],
+  ["server", startServer],
+  [undefined, startServer],
+]);
 
 export async function main({
   basePath,
   filesToServe,
 }: { basePath?: string; filesToServe?: Record<string, Buffer> } = {}) {
-  let runServer = true;
   let { cmd, cmdArgs, help, port, debug } = parseCLIArgs();
   if (debug || process.env.SPOTLIGHT_DEBUG) {
     enableDebugLogging(true);
   }
   const spotlightVersion = process.env.npm_package_version || "{unknown}";
   logger.info(`Spotlight by Sentry - v${spotlightVersion}`);
-  let stdioMCP = false;
 
   if (help) {
-    runServer = false;
-    printHelp();
+    cmd = "help";
+    cmdArgs = [];
   }
 
-  let onEnvelope: ((envelope: ParsedEnvelope["envelope"]) => void) | undefined = undefined;
+  const handler = CLI_CMD_MAP.get(cmd) || showHelp;
 
-  switch (cmd) {
-    case "help":
-      printHelp();
-      runServer = false;
-      break;
-    case "mcp":
-      stdioMCP = true;
-      break;
-    // @ts-expect-error ts7029 -- fallthrough is intentional
-    case "run": {
-      let shell = false;
-      const env = {
-        ...process.env,
-        SENTRY_SPOTLIGHT: getSpotlightURL(port),
-        // This is not supported in all SDKs but worth adding
-        // for the ones that support it
-        SENTRY_TRACES_SAMPLE_RATE: "1",
-        //  Consider setting SENTRY_DSN to our hack server too?
-      } as { PATH: string; SENTRY_SPOTLIGHT: string; SENTRY_TRACES_SAMPLE_RATE: string; [key: string]: string };
-      if (cmdArgs.length === 0) {
-        // try package.json to find default dev command
-        try {
-          const scripts = JSON.parse(readFileSync("./package.json", "utf-8")).scripts;
-          cmdArgs = [scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start];
-          shell = true;
-          env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
-        } catch {
-          // pass
-        }
-      }
-      if (cmdArgs.length === 0) {
-        // try to see if this is a docker-compose project
-        try {
-          // TODO: Check docker-compose.yml existence
-          // TODO: Check docker-compose.yaml existence
-          // TODO: Check `docker compose --version` existence
-          // TODO: Check `docker-compose --version` existence
-        } catch {
-          // pass
-        }
-      }
-      if (cmdArgs.length === 0) {
-        logger.error("Error: No command specified to run and could not infer the command automatically.");
-        process.exit(1);
-      }
-      const cmdStr = cmdArgs.join(" ");
-      logger.info(`Starting command: ${cmdStr}`);
-      // TODO: Run this _after_ the server is started
-      const runCmd = spawn(cmdArgs[0], cmdArgs.slice(1), {
-        cwd: process.cwd(),
-        env,
-        shell,
-        windowsVerbatimArguments: true,
-        windowsHide: true,
-        // TODO: Consider using pipe and forwarding output as logs to Spotlight
-        stdio: "ignore",
-      });
-      runCmd.on("error", err => {
-        logger.error(`Failed to run ${cmdStr}:`);
-        logger.error(err);
-        process.exit(1);
-      });
-      runCmd.on("close", code => {
-        if (!code) {
-          logger.error(`${cmdStr} exited, terminating.`);
-        } else {
-          logger.error(`${cmdStr} exited with code ${code}.`);
-        }
-        process.exit(code);
-      });
-      const killRunCmd = () => {
-        runCmd.removeAllListeners();
-        runCmd.kill();
-      };
-      runCmd.on("spawn", () => {
-        runCmd.removeAllListeners("error");
-        process.on("SIGINT", killRunCmd);
-        process.on("SIGTERM", killRunCmd);
-        process.on("beforeExit", killRunCmd);
-      });
-
-      cmd = "tail";
-      cmdArgs = [];
-      // biome-ignore lint/suspicious/noFallthroughSwitchClause:
-      // Intentional fallthrough to start the event streaming after running the command
-    }
-    case "tail": {
-      const eventTypes = cmdArgs.length > 0 ? cmdArgs.map(arg => arg.toLowerCase()) : ["everything"];
-      for (const eventType of eventTypes) {
-        if (!SUPPORTED_TAIL_ARGS.has(eventType)) {
-          logger.error(`Error: Unsupported argument "${eventType}".`);
-          logger.error(`Supported arguments are: ${[...SUPPORTED_TAIL_ARGS].join(", ")}`);
-          process.exit(1);
-        }
-      }
-
-      const types = eventTypes.some(type => EVERYTHING_MAGIC_WORDS.has(type))
-        ? SUPPORTED_ENVELOPE_TYPES
-        : new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
-      onEnvelope = envelope => {
-        if (envelope[1].some(([header]) => header.type && types.has(header.type))) {
-          displayEnvelope(envelope);
-        }
-      };
-
-      // try to connect to an already existing server first
-      try {
-        const client = await connectUpstream(port);
-        runServer = false;
-        client.addEventListener(SENTRY_CONTENT_TYPE, event => onEnvelope!(JSON.parse(event.data)));
-      } catch (err) {
-        // if we fail, fine then we'll start our own
-        if (err instanceof Error && !err.message?.includes(port.toString())) {
-          captureException(err);
-          logger.error("Error when trying to connect to upstream sidecar:");
-          logger.error(err);
-          process.exit(1);
-        }
-      }
-      break;
-    }
-    case undefined:
-    case "":
-      break;
-    default:
-      break;
-  }
-
-  if (runServer) {
-    await setupSidecar({
-      port,
-      stdioMCP,
-      basePath,
-      filesToServe,
-      onEnvelope,
-      isStandalone: true,
-    });
-  }
+  return await handler({ cmd, cmdArgs, port, help, debug, basePath, filesToServe });
 }
