@@ -5,14 +5,20 @@ import { logger } from "../logger.js";
 import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
 import tail from "./tail.js";
+import type { AddressInfo } from "node:net";
 
 export default async function run({ port, cmdArgs, basePath, filesToServe }: CLIHandlerOptions) {
-  await tail({ port, cmdArgs: [], basePath, filesToServe });
+  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe });
+  if (!serverInstance) {
+    logger.error("Failed to start Spotlight sidecar server.");
+    process.exit(1);
+  }
 
+  const actualServerPort = (serverInstance.address() as AddressInfo).port;
   let shell = false;
   const env = {
     ...process.env,
-    SENTRY_SPOTLIGHT: getSpotlightURL(port),
+    SENTRY_SPOTLIGHT: getSpotlightURL(actualServerPort),
     // This is not supported in all SDKs but worth adding
     // for the ones that support it
     SENTRY_TRACES_SAMPLE_RATE: "1",

@@ -50,9 +50,6 @@ export type SideCarOptions = {
   stdioMCP?: boolean;
 };
 
-export type StartServerOptions = Pick<
-  SideCarOptions,
-  "basePath" | "filesToServe" | "incomingPayload" | "onEnvelope" | "stdioMCP"
-> & {
+export type StartServerOptions = Pick<SideCarOptions, "basePath" | "filesToServe" | "incomingPayload" | "onEnvelope"> & {
   port: number;
 };
