@@ -9,3 +9,46 @@ export function formatTimestamp(timestamp: number | undefined): string {
   }
   return new Date(0).toISOString();
 }
+
+/**
+ * Map simple fields from source to data object.
+ * Only sets fields if the source value is truthy.
+ */
+export function mapFields(source: any, data: Record<string, any>, fieldMappings: Record<string, string>): void {
+  for (const [outputKey, sourcePath] of Object.entries(fieldMappings)) {
+    const value = getNestedValue(source, sourcePath);
+    if (value !== undefined && value !== null) {
+      data[outputKey] = value;
+    }
+  }
+}
+
+/**
+ * Map SDK name and version fields
+ */
+export function mapSdkFields(source: any, data: Record<string, any>): void {
+  if (source.sdk?.name) {
+    data.sdk = source.sdk.name;
+    if (source.sdk.version) {
+      data.sdk_version = source.sdk.version;
+    }
+  }
+}
+
+/**
+ * Map tags directly to data object
+ */
+export function mapTags(source: any, data: Record<string, any>): void {
+  if (source.tags) {
+    for (const [key, value] of Object.entries(source.tags)) {
+      data[key] = value;
+    }
+  }
+}
+
+/**
+ * Get nested value from object using dot notation path
+ */
+function getNestedValue(obj: any, path: string): any {
+  return path.split(".").reduce((current, key) => current?.[key], obj);
+}

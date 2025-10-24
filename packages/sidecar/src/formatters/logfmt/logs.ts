@@ -1,6 +1,6 @@
 import type { SerializedLog } from "@sentry/core";
 import logfmt from "logfmt";
-import { formatTimestamp } from "../utils.js";
+import { formatTimestamp, mapFields } from "../utils.js";
 
 export function formatLog(log: SerializedLog): string {
   const data: Record<string, any> = {
@@ -9,17 +9,11 @@ export function formatLog(log: SerializedLog): string {
     type: "log",
   };
 
-  if (log.body) {
-    data.message = log.body;
-  }
-
-  if (log.trace_id) {
-    data.trace_id = log.trace_id;
-  }
-
-  if (log.severity_number) {
-    data.severity_number = log.severity_number;
-  }
+  mapFields(log, data, {
+    message: "body",
+    trace_id: "trace_id",
+    severity_number: "severity_number",
+  });
 
   if (log.attributes) {
     for (const [key, attr] of Object.entries(log.attributes)) {

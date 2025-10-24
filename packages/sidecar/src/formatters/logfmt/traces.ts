@@ -1,6 +1,6 @@
 import logfmt from "logfmt";
 import type { SentryTransactionEvent } from "../../parser/index.js";
-import { formatTimestamp } from "../utils.js";
+import { formatTimestamp, mapFields, mapSdkFields, mapTags } from "../utils.js";
 
 export function formatTrace(event: SentryTransactionEvent): string {
   const data: Record<string, any> = {
@@ -22,38 +22,31 @@ export function formatTrace(event: SentryTransactionEvent): string {
     if (trace.description) data.description = trace.description;
   }
 
-  if (event.transaction) data.transaction = event.transaction;
-
   if (Number.isFinite(event.timestamp) && Number.isFinite(event.start_timestamp)) {
     data.duration_ms = Math.round((event.timestamp - event.start_timestamp) * 1000);
   }
 
   if (event.spans?.length) data.span_count = event.spans.length;
 
-  if (event.environment) data.environment = event.environment;
-  if (event.release) data.release = event.release;
+  mapFields(event, data, {
+    transaction: "transaction",
+    environment: "environment",
+    release: "release",
+    platform: "platform",
+    server_name: "server_name",
+  });
 
-  if (event.platform) data.platform = event.platform;
-  if (event.sdk?.name) {
-    data.sdk = event.sdk.name;
-    if (event.sdk.version) data.sdk_version = event.sdk.version;
-  }
-
-  if (event.server_name) data.server_name = event.server_name;
+  mapSdkFields(event, data);
 
   if (event.measurements) {
     for (const [key, measurement] of Object.entries(event.measurements)) {
       if (measurement?.value !== undefined) {
-        data[`measurement_${key}`] = measurement.value;
+        data[`measurement.${key}`] = measurement.value;
       }
     }
   }
 
-  if (event.tags) {
-    for (const [key, value] of Object.entries(event.tags)) {
-      data[`tag_${key}`] = value;
-    }
-  }
+  mapTags(event, data);
 
   return logfmt.stringify(data);
 }
