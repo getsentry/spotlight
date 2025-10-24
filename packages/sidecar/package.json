@@ -38,8 +38,16 @@
       "types": "./dist/parser/index.d.ts"
     },
     "./format": {
-      "import": "./dist/format/index.js",
-      "types": "./dist/format/index.d.ts"
+      "import": "./dist/formatters/index.js",
+      "types": "./dist/formatters/index.d.ts"
+    },
+    "./formatters/human/errors": {
+      "import": "./dist/formatters/human/errors.js",
+      "types": "./dist/formatters/human/errors.d.ts"
+    },
+    "./formatters/human/event": {
+      "import": "./dist/formatters/human/event.js",
+      "types": "./dist/formatters/human/event.d.ts"
     }
   },
   "dependencies": {
