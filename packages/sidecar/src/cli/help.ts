@@ -1,5 +1,5 @@
 import { EVERYTHING_MAGIC_WORDS, NAME_TO_TYPE_MAPPING } from "../cli/tail.js";
-import { VALID_FORMATTERS } from "../formatters/types.js";
+import { AVAILABLE_FORMATTERS } from "../formatters/types.js";
 
 export default function showHelp() {
   console.log(`
@@ -18,7 +18,7 @@ Options:
   -p, --port <port>      Port to listen on (default: 8969, or 0 for random)
   -d, --debug            Enable debug logging
   -f, --format <format>  Output format for tail command (default: logfmt)
-                         Available formats: ${[...VALID_FORMATTERS].join(", ")}
+                         Available formats: ${[...AVAILABLE_FORMATTERS].join(", ")}
   -h, --help             Show this help message
 
 Examples:

@@ -6,7 +6,7 @@ import run from "./cli/run.js";
 import server from "./cli/server.js";
 import tail from "./cli/tail.js";
 import { DEFAULT_PORT } from "./constants.js";
-import { VALID_FORMATTERS } from "./formatters/types.js";
+import { AVAILABLE_FORMATTERS } from "./formatters/types.js";
 import type { FormatterType } from "./formatters/types.js";
 import { enableDebugLogging, logger } from "./logger.js";
 import type { CLIHandler, CLIHandlerOptions } from "./types/cli.js";
@@ -96,9 +96,9 @@ export function parseCLIArgs(): CLIArgs {
   }
 
   const format = values.format as string;
-  if (!VALID_FORMATTERS.includes(format as FormatterType)) {
+  if (!AVAILABLE_FORMATTERS.includes(format as FormatterType)) {
     console.error(`Error: Invalid format '${format}'`);
-    console.error(`Valid formats are: ${VALID_FORMATTERS.join(", ")}`);
+    console.error(`Valid formats are: ${AVAILABLE_FORMATTERS.join(", ")}`);
     process.exit(1);
   }
 

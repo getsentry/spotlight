@@ -32,4 +32,4 @@ export type FormatterType = "md" | "logfmt" | "json";
  * Runtime array of valid formatter types for validation.
  * Keep in sync with FormatterType.
  */
-export const VALID_FORMATTERS: readonly FormatterType[] = ["md", "logfmt", "json"] as const;
+export const AVAILABLE_FORMATTERS: readonly FormatterType[] = ["md", "logfmt", "json"] as const;
