@@ -195,7 +195,7 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
 
   sidecarServer.addListener("error", handleServerError);
 
-  let retries = 1;
+  let retries = 0;
   function handleServerError(err: { code?: string }): void {
     if ("code" in err && err.code === "EADDRINUSE") {
       logger.info(`Port ${options.port} in use, retrying...`);
