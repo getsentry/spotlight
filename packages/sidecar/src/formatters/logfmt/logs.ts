@@ -17,9 +17,7 @@ export function formatLog(log: SerializedLog): string {
 
   if (log.attributes) {
     for (const [key, attr] of Object.entries(log.attributes)) {
-      if (!key.startsWith("sentry.")) {
-        data[key] = attr.value;
-      }
+      data[key] = attr.value;
     }
   }
 
