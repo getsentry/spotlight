@@ -80,7 +80,7 @@ export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventS
 }
 
 /**
- * Format an error event to human-readable string
+ * Format an error event to markdown string
  */
 export function formatError(payload: ErrorEvent): string {
   return formatEventOutput(processErrorEvent(payload));

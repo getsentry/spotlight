@@ -366,7 +366,7 @@ export function formatTransactionEvent(payload: any): string[] {
 }
 
 /**
- * Format a trace/transaction event to human-readable string
+ * Format a trace/transaction event to markdown string
  */
 export function formatTrace(payload: any): string {
   return formatTransactionEvent(payload).join("\n");

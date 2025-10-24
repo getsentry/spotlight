@@ -24,7 +24,7 @@ export function formatLogEnvelope(container: EventContainer) {
 }
 
 /**
- * Format a log event to human-readable string
+ * Format a log event to markdown string
  */
 export function formatLog(event: SerializedLog): string {
   let attr = "";

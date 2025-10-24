@@ -41,13 +41,13 @@
       "import": "./dist/formatters/index.js",
       "types": "./dist/formatters/index.d.ts"
     },
-    "./formatters/human/errors": {
-      "import": "./dist/formatters/human/errors.js",
-      "types": "./dist/formatters/human/errors.d.ts"
+    "./formatters/md/errors": {
+      "import": "./dist/formatters/md/errors.js",
+      "types": "./dist/formatters/md/errors.d.ts"
     },
-    "./formatters/human/event": {
-      "import": "./dist/formatters/human/event.js",
-      "types": "./dist/formatters/human/event.d.ts"
+    "./formatters/md/event": {
+      "import": "./dist/formatters/md/event.js",
+      "types": "./dist/formatters/md/event.d.ts"
     }
   },
   "dependencies": {

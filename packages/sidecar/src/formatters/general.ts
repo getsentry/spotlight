@@ -8,12 +8,12 @@ import {
   isLogEvent,
   isTraceEvent,
 } from "../parser/index.js";
-import human from "./human/index.js";
 import logfmt from "./logfmt/index.js";
+import md from "./md/index.js";
 import type { Formatter, FormatterType } from "./types.js";
 
 const FORMATTERS: Record<FormatterType, Formatter> = {
-  human,
+  md,
   logfmt,
   // TODO: add json formatter
   json: logfmt, // fallback until we have a json formatter

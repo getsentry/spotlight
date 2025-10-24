@@ -1,6 +1,6 @@
 import { captureException } from "@sentry/core";
-import { processErrorEvent } from "@spotlightjs/sidecar/formatters/human/errors";
-import { formatEventOutput } from "@spotlightjs/sidecar/formatters/human/event";
+import { processErrorEvent } from "@spotlightjs/sidecar/formatters/md/errors";
+import { formatEventOutput } from "@spotlightjs/sidecar/formatters/md/event";
 import { type MouseEvent, useCallback, useEffect, useState } from "react";
 import { ReactComponent as CheckIcon } from "~/assets/check.svg";
 import { ReactComponent as CopyIcon } from "~/assets/copy.svg";
