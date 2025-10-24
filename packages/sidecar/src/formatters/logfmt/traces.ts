@@ -14,12 +14,14 @@ export function formatTrace(event: SentryTransactionEvent): string {
 
   const trace = event.contexts?.trace;
   if (trace?.trace_id) {
-    data.trace_id = trace.trace_id;
-    if (trace.span_id) data.span_id = trace.span_id;
-    if (trace.parent_span_id) data.parent_span_id = trace.parent_span_id;
-    if (trace.op) data.op = trace.op;
-    if (trace.status) data.status = trace.status;
-    if (trace.description) data.description = trace.description;
+    mapFields(trace, data, {
+      trace_id: "trace_id",
+      span_id: "span_id",
+      parent_span_id: "parent_span_id",
+      op: "op",
+      status: "status",
+      description: "description",
+    });
   }
 
   if (Number.isFinite(event.timestamp) && Number.isFinite(event.start_timestamp)) {
