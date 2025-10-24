@@ -35,16 +35,6 @@ describe("messageBuffer", () => {
       expect(messageBuffer.read()).toEqual([11, 10, 9]);
     });
 
-    it("should maintain correct order after wraparound", () => {
-      const messageBuffer = new MessageBuffer<number>(4);
-
-      for (let i = 0; i < 10; i++) {
-        messageBuffer.put(i);
-      }
-
-      expect(messageBuffer.read()).toEqual([9, 8, 7, 6]);
-    });
-
     it("should handle empty buffer", () => {
       const messageBuffer = new MessageBuffer<number>(5);
 
@@ -116,6 +106,8 @@ describe("messageBuffer", () => {
       messageBuffer.reset();
 
       expect(messageBuffer.read()).toEqual([]);
+      // @ts-expect-error - head is private
+      expect(messageBuffer.head).toBe(10);
     });
 
     it("should allow new items after reset", () => {
@@ -299,20 +291,35 @@ describe("messageBuffer", () => {
       expect(result).toEqual([99, 98, 97, 96, 95, 94, 93, 92, 91, 90]);
     });
 
-    it("should handle interleaved put and read operations", () => {
+    it("should handle interleaved put and read operations", async () => {
       const messageBuffer = new MessageBuffer<number>(5);
+
+      const callback = vi.fn();
+      messageBuffer.subscribe(callback);
 
       messageBuffer.put(0);
       messageBuffer.put(1);
+
+      await vi.runAllTimersAsync();
+
       expect(messageBuffer.read()).toEqual([1, 0]);
+      expect(callback).toHaveBeenCalledTimes(2);
 
       messageBuffer.put(2);
       messageBuffer.put(3);
+
+      await vi.runAllTimersAsync();
+
       expect(messageBuffer.read()).toEqual([3, 2, 1, 0]);
+      expect(callback).toHaveBeenCalledTimes(4);
 
       messageBuffer.put(4);
       messageBuffer.put(5);
+
+      await vi.runAllTimersAsync();
+
       expect(messageBuffer.read()).toEqual([5, 4, 3, 2, 1]);
+      expect(callback).toHaveBeenCalledTimes(6);
     });
   });
 
@@ -354,18 +361,6 @@ describe("messageBuffer", () => {
 
       const result = messageBuffer.read();
       expect(result).toEqual([0, undefined, null]);
-    });
-
-    it("should maintain FIFO order when reading in reverse", () => {
-      const messageBuffer = new MessageBuffer<string>(5);
-
-      messageBuffer.put("first");
-      messageBuffer.put("second");
-      messageBuffer.put("third");
-
-      const result = messageBuffer.read();
-      expect(result[result.length - 1]).toBe("first");
-      expect(result[0]).toBe("third");
     });
   });
 });
