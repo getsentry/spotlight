@@ -1,11 +1,12 @@
 import type { ErrorEvent } from "@sentry/core";
 import logfmt from "logfmt";
+import { formatTimestamp } from "../utils.js";
 
 export function formatError(event: ErrorEvent): string {
   const data: Record<string, any> = {
     type: "error",
     event_id: event.event_id,
-    timestamp: event.timestamp ? new Date(event.timestamp * 1000).toISOString() : new Date().toISOString(),
+    timestamp: formatTimestamp(event.timestamp),
     level: event.level || "error",
   };
 

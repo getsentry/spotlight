@@ -1,9 +1,10 @@
 import type { SerializedLog } from "@sentry/core";
 import logfmt from "logfmt";
+import { formatTimestamp } from "../utils.js";
 
 export function formatLog(log: SerializedLog): string {
   const data: Record<string, any> = {
-    timestamp: new Date(log.timestamp * 1000).toISOString(),
+    timestamp: formatTimestamp(log.timestamp),
     level: log.level,
     type: "log",
   };

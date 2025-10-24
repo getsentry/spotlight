@@ -1,5 +1,6 @@
 import logfmt from "logfmt";
 import type { SentryTransactionEvent } from "../../parser/index.js";
+import { formatTimestamp } from "../utils.js";
 
 export function formatTrace(event: SentryTransactionEvent): string {
   const data: Record<string, any> = {
@@ -8,7 +9,7 @@ export function formatTrace(event: SentryTransactionEvent): string {
   };
 
   if (Number.isFinite(event.timestamp)) {
-    data.timestamp = new Date(event.timestamp * 1000).toISOString();
+    data.timestamp = formatTimestamp(event.timestamp);
   }
 
   const trace = event.contexts?.trace;

@@ -1,6 +1,7 @@
 import type { SerializedLog } from "@sentry/core";
 import { type SentryEvent, type SentryLogEvent, isLogEvent } from "../../parser/index.js";
 import type { EventContainer } from "../../utils/index.js";
+import { formatTimestamp } from "../utils.js";
 
 export function formatLogEnvelope(container: EventContainer) {
   const parsedEnvelope = container.getParsedEnvelope();
@@ -36,7 +37,7 @@ export function formatLog(event: SerializedLog): string {
     attr += `${key}: ${property.value} (${property.type})\n`;
   }
 
-  return `${new Date(event.timestamp * 1000).toISOString()} ${event.level} ${event.body}
+  return `${formatTimestamp(event.timestamp)} ${event.level} ${event.body}
 Attributes:
 ${attr}`;
 }

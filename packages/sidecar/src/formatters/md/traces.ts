@@ -1,5 +1,6 @@
 import { processEnvelope } from "../../parser/index.js";
 import type { EventContainer } from "../../utils/index.js";
+import { formatTimestamp } from "../utils.js";
 
 export interface TraceContext {
   trace_id: string;
@@ -420,7 +421,7 @@ export function processTraceEvent(event: TraceEvent): string[] {
 export function formatTraceSummary(trace: TraceSummary): string {
   const duration = trace.duration ? `${Math.round(trace.duration)}ms` : "unknown";
   const transaction = trace.root_transaction || "unnamed";
-  const timestamp = trace.start_timestamp ? new Date(trace.start_timestamp * 1000).toISOString() : "unknown";
+  const timestamp = formatTimestamp(trace.start_timestamp);
 
   return `**${trace.trace_id.substring(0, 8)}** | ${transaction} | ${duration} | ${trace.span_count} spans | ${trace.error_count} errors | ${timestamp}`;
 }
