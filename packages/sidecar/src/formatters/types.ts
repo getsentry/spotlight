@@ -1,5 +1,5 @@
 import type { ErrorEvent, SerializedLog } from "@sentry/core";
-import type { SentryTransactionEvent } from "../parser/index.js";
+import type { ParsedEnvelope, SentryTransactionEvent } from "../parser/index.js";
 
 /**
  * Interface that all formatters must implement.
@@ -20,6 +20,12 @@ export interface Formatter {
    * Format a trace/transaction event
    */
   formatTrace(payload: SentryTransactionEvent): string;
+
+  /**
+   * Format an entire envelope containing multiple events.
+   * Returns a single string ready to be displayed/printed.
+   */
+  formatEnvelope(envelope: ParsedEnvelope["envelope"]): string;
 }
 
 /**
