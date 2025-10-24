@@ -19,7 +19,7 @@ const FORMATTERS: Record<FormatterType, Formatter> = {
   json: logfmt, // fallback until we have a json formatter
 };
 
-export function formatEnvelope(envelope: ParsedEnvelope["envelope"], format: FormatterType = "logfmt"): string[] {
+export function formatEnvelope(envelope: ParsedEnvelope["envelope"], format: FormatterType): string[] {
   const [, items] = envelope;
   const formatter = FORMATTERS[format];
 
