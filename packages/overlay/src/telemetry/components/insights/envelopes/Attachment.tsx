@@ -44,7 +44,8 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
       URL.createObjectURL(
         new Blob(
           [
-            IMAGE_CONTENT_TYPES.has(header.content_type as string)
+            IMAGE_CONTENT_TYPES.has(header.content_type as string) ||
+            VIDEO_CONTENT_TYPES.has(header.content_type as string)
               ? (base64Decode(attachment).buffer as BlobPart)
               : extension === "bin"
                 ? atob(attachment)
