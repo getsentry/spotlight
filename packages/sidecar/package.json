@@ -58,6 +58,7 @@
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
     "eventsource": "^4.0.0",
+    "fast-fuzzy": "^1.12.0",
     "hono": "^4.10.3",
     "launch-editor": "^2.9.1",
     "logfmt": "^1.4.0",

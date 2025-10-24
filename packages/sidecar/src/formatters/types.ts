@@ -1,7 +1,9 @@
+import type { EnvelopeItem } from "@sentry/core";
+
 /**
  * A formatter function that takes a payload and returns an array of formatted strings
  */
-export type FormatterFunction = (payload: any) => string[];
+export type FormatterFunction = (event: EnvelopeItem[1]) => string[];
 
 /**
  * Interface that all formatters must implement.

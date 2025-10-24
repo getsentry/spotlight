@@ -9,6 +9,8 @@ import type { ParsedEnvelope } from "../parser/index.js";
 import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
 
+
+export type OnItemCallback = (type: string, item: ParsedEnvelope["envelope"][1][number]) => boolean;
 export const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
   traces: ["transaction", "span"],
   // profiles: ["profile"],
@@ -38,13 +40,10 @@ const connectUpstream = async (port: number) =>
     client.onopen = () => resolve(client);
   });
 
-export default async function tail({
-  port,
-  cmdArgs,
-  basePath,
-  filesToServe,
-  format = "logfmt",
-}: CLIHandlerOptions): Promise<ServerType | undefined> {
+export default async function tail(
+  { port, cmdArgs, basePath, filesToServe, format = "logfmt" }: CLIHandlerOptions,
+  onItem?: OnItemCallback,
+): Promise<ServerType | undefined> {
   const eventTypes = cmdArgs.length > 0 ? cmdArgs.map(arg => arg.toLowerCase()) : ["everything"];
   for (const eventType of eventTypes) {
     if (!SUPPORTED_TAIL_ARGS.has(eventType)) {
@@ -73,6 +72,10 @@ export default async function tail({
       // Get the formatter for this type
       const formatterFn = formatter.get(type);
       if (!formatterFn) {
+        continue;
+      }
+
+      if (onItem && !onItem(type, item)) {
         continue;
       }
 
