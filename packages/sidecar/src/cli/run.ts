@@ -7,8 +7,8 @@ import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
 import tail from "./tail.js";
 
-export default async function run({ port, cmdArgs, basePath, filesToServe }: CLIHandlerOptions) {
-  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe });
+export default async function run({ port, cmdArgs, basePath, filesToServe, format }: CLIHandlerOptions) {
+  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe, format });
   if (!serverInstance) {
     logger.error("Failed to start Spotlight sidecar server.");
     process.exit(1);
