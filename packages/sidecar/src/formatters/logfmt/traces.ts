@@ -6,11 +6,8 @@ export function formatTrace(event: SentryTransactionEvent): string {
   const data: Record<string, any> = {
     type: "trace",
     event_id: event.event_id,
+    timestamp: formatTimestamp(event.timestamp),
   };
-
-  if (Number.isFinite(event.timestamp)) {
-    data.timestamp = formatTimestamp(event.timestamp);
-  }
 
   const trace = event.contexts?.trace;
   if (trace?.trace_id) {
@@ -24,7 +21,17 @@ export function formatTrace(event: SentryTransactionEvent): string {
     });
   }
 
-  if (Number.isFinite(event.timestamp) && Number.isFinite(event.start_timestamp)) {
+  const { timestamp, start_timestamp } = event;
+  if (typeof timestamp === "number" && typeof start_timestamp === "number") {
+    data.duration_ms = Math.round((timestamp - start_timestamp) * 1000);
+  }
+
+  if (
+    event.timestamp !== undefined &&
+    event.start_timestamp !== undefined &&
+    Number.isFinite(event.timestamp) &&
+    Number.isFinite(event.start_timestamp)
+  ) {
     data.duration_ms = Math.round((event.timestamp - event.start_timestamp) * 1000);
   }
 
