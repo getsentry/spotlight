@@ -279,6 +279,14 @@ describe("messageBuffer", () => {
   });
 
   describe("concurrent operations", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
     it("should handle rapid puts", () => {
       const messageBuffer = new MessageBuffer<number>(10);
 
