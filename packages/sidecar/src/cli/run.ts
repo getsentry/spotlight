@@ -1,14 +1,14 @@
 import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
+import type { AddressInfo } from "node:net";
 import * as path from "node:path";
 import { logger } from "../logger.js";
 import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
 import tail from "./tail.js";
-import type { AddressInfo } from "node:net";
 
-export default async function run({ port, cmdArgs, basePath, filesToServe }: CLIHandlerOptions) {
-  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe });
+export default async function run({ port, cmdArgs, basePath, filesToServe, format }: CLIHandlerOptions) {
+  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe, format });
   if (!serverInstance) {
     logger.error("Failed to start Spotlight sidecar server.");
     process.exit(1);

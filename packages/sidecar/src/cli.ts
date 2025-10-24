@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
-import { DEFAULT_PORT } from "./constants.js";
-import { enableDebugLogging, logger } from "./logger.js";
-import type { CLIHandler, CLIHandlerOptions } from "./types/cli.js";
-
 import showHelp from "./cli/help.js";
 import mcp from "./cli/mcp.js";
 import run from "./cli/run.js";
 import server from "./cli/server.js";
 import tail from "./cli/tail.js";
+import { DEFAULT_PORT } from "./constants.js";
+import { VALID_FORMATTERS } from "./formatters/types.js";
+import type { FormatterType } from "./formatters/types.js";
+import { enableDebugLogging, logger } from "./logger.js";
+import type { CLIHandler, CLIHandlerOptions } from "./types/cli.js";
 
 // When port is set to `0` for a server to listen on,
 // it tells the OS to find a random available port.
@@ -25,6 +26,11 @@ const PARSE_ARGS_CONFIG = {
       type: "boolean",
       short: "d",
       default: false,
+    },
+    format: {
+      type: "string",
+      short: "f",
+      default: "logfmt",
     },
     // Deprecated -- use the positional `mcp` argument instead
     "stdio-mcp": {
@@ -45,6 +51,7 @@ export type CLIArgs = {
   port: number;
   debug: boolean;
   help: boolean;
+  format: FormatterType;
   cmd: string | undefined;
   cmdArgs: string[];
 };
@@ -88,9 +95,17 @@ export function parseCLIArgs(): CLIArgs {
     console.warn("Warning: --stdio-mcp is deprecated. Please use the positional argument 'mcp' instead.");
   }
 
+  const format = values.format as string;
+  if (!VALID_FORMATTERS.includes(format as FormatterType)) {
+    console.error(`Error: Invalid format '${format}'`);
+    console.error(`Valid formats are: ${VALID_FORMATTERS.join(", ")}`);
+    process.exit(1);
+  }
+
   const result: CLIArgs = {
     debug: values.debug as boolean,
     help: values.help as boolean,
+    format: format as FormatterType,
     port,
     cmd: positionals[0],
     cmdArgs: cmdArgs ?? positionals.slice(1),
@@ -111,7 +126,7 @@ export async function main({
   basePath,
   filesToServe,
 }: { basePath?: CLIHandlerOptions["basePath"]; filesToServe?: CLIHandlerOptions["filesToServe"] } = {}) {
-  let { cmd, cmdArgs, help, port, debug } = parseCLIArgs();
+  let { cmd, cmdArgs, help, port, debug, format } = parseCLIArgs();
   if (debug || process.env.SPOTLIGHT_DEBUG) {
     enableDebugLogging(true);
   }
@@ -125,5 +140,5 @@ export async function main({
 
   const handler = CLI_CMD_MAP.get(cmd) || showHelp;
 
-  return await handler({ cmd, cmdArgs, port, help, debug, basePath, filesToServe });
+  return await handler({ cmd, cmdArgs, port, help, debug, format, basePath, filesToServe });
 }

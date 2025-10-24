@@ -1,13 +1,14 @@
+import type { ServerType } from "@hono/node-server";
 import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
 import { SENTRY_CONTENT_TYPE } from "../constants.js";
-import { formatEnvelope } from "../format/index.js";
+import { formatEnvelope } from "../formatters/general.js";
+import type { FormatterType } from "../formatters/types.js";
 import { logger } from "../logger.js";
 import { setupSidecar } from "../main.js";
 import type { ParsedEnvelope } from "../parser/processEnvelope.js";
 import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
-import type { ServerType } from "@hono/node-server";
 
 export const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
   traces: ["transaction", "span"],
@@ -24,18 +25,11 @@ const SUPPORTED_ENVELOPE_TYPES = new Set(Object.values(NAME_TO_TYPE_MAPPING).fla
 export const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
 export const SUPPORTED_TAIL_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
 
-const SEPARATOR = Array(10).fill("─").join("");
-
-function displayEnvelope(envelope: ParsedEnvelope["envelope"]) {
-  console.log(`${envelope[0].event_id} | ${envelope[1][0][0].type} | ${envelope[0].sdk?.name}\n\n`);
-  const lines = formatEnvelope(envelope);
+function displayEnvelope(envelope: ParsedEnvelope["envelope"], format: FormatterType) {
+  const lines = formatEnvelope(envelope, format);
   if (lines.length > 0) {
     console.log(lines.join("\n"));
-  } else {
-    console.log("No parser for the given event type");
   }
-  console.log("\n");
-  console.log(SEPARATOR);
 }
 
 const connectUpstream = async (port: number) =>
@@ -50,6 +44,7 @@ export default async function tail({
   cmdArgs,
   basePath,
   filesToServe,
+  format = "logfmt",
 }: CLIHandlerOptions): Promise<ServerType | undefined> {
   const eventTypes = cmdArgs.length > 0 ? cmdArgs.map(arg => arg.toLowerCase()) : ["everything"];
   for (const eventType of eventTypes) {
@@ -65,7 +60,7 @@ export default async function tail({
     : new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
   const onEnvelope: (envelope: ParsedEnvelope["envelope"]) => void = envelope => {
     if (envelope[1].some(([header]) => header.type && types.has(header.type))) {
-      displayEnvelope(envelope);
+      displayEnvelope(envelope, format);
     }
   };
 
