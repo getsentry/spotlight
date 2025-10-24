@@ -74,7 +74,6 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
     content = (
       <video className="size-full object-contain" controls>
         <source src={downloadUrl} type={header.content_type as string} />
-        <track kind="captions" />
       </video>
     );
   }
