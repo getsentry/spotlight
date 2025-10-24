@@ -7,6 +7,7 @@ import { setupSidecar } from "../main.js";
 import type { ParsedEnvelope } from "../parser/processEnvelope.js";
 import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
+import type { ServerType } from "@hono/node-server";
 
 export const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
   traces: ["transaction", "span"],
@@ -44,7 +45,12 @@ const connectUpstream = async (port: number) =>
     client.onopen = () => resolve(client);
   });
 
-export default async function tail({ port, cmdArgs, basePath, filesToServe }: CLIHandlerOptions) {
+export default async function tail({
+  port,
+  cmdArgs,
+  basePath,
+  filesToServe,
+}: CLIHandlerOptions): Promise<ServerType | undefined> {
   const eventTypes = cmdArgs.length > 0 ? cmdArgs.map(arg => arg.toLowerCase()) : ["everything"];
   for (const eventType of eventTypes) {
     if (!SUPPORTED_TAIL_ARGS.has(eventType)) {
@@ -76,6 +82,6 @@ export default async function tail({ port, cmdArgs, basePath, filesToServe }: CL
       process.exit(1);
     }
 
-    await setupSidecar({ port, filesToServe, basePath, onEnvelope, isStandalone: true });
+    return await setupSidecar({ port, filesToServe, basePath, onEnvelope, isStandalone: true });
   }
 }
