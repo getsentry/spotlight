@@ -532,7 +532,10 @@ function showOrCreateWindow() {
 }
 
 function createTray() {
-  const iconPath = path.join(__dirname, "../../resources/tray/tray.png");
+  const iconPath = path.join(
+    __dirname,
+    `../../resources/tray/logoTemplate.${isMac !== undefined && !isMac ? "ico" : "png"}`,
+  );
   const trayIcon = nativeImage.createFromPath(iconPath);
   tray = new Tray(trayIcon);
 

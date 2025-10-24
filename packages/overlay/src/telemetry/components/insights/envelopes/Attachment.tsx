@@ -8,6 +8,7 @@ import { CodeViewer } from "./CodeViewer";
 const JSON_CONTENT_TYPES = new Set(["application/json", "text/json", "text/x-json", "application/ld+json"]);
 const CODE_CONTENT_TYPES = new Set(["text/css", "text/html", "text/javascript"]);
 const IMAGE_CONTENT_TYPES = new Set(["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif"]);
+const VIDEO_CONTENT_TYPES = new Set(["video/mp4", "video/webm"]);
 
 const CONTENT_TYPES_TO_EXTENSION = {
   "text/plain": "txt",
@@ -27,6 +28,9 @@ const CONTENT_TYPES_TO_EXTENSION = {
   "image/gif": "gif",
   "image/webp": "webp",
   "image/avif": "avif",
+  // Video
+  "video/mp4": "mp4",
+  "video/webm": "webm",
 };
 
 export default function Attachment({ header, attachment }: { header: EnvelopeItem[0]; attachment: string }) {
@@ -40,7 +44,8 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
       URL.createObjectURL(
         new Blob(
           [
-            IMAGE_CONTENT_TYPES.has(header.content_type as string)
+            IMAGE_CONTENT_TYPES.has(header.content_type as string) ||
+            VIDEO_CONTENT_TYPES.has(header.content_type as string)
               ? (base64Decode(attachment).buffer as BlobPart)
               : extension === "bin"
                 ? atob(attachment)
@@ -65,6 +70,12 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
     content = <CodeViewer code={attachment} lang={extension} />;
   } else if (IMAGE_CONTENT_TYPES.has(header.content_type as string)) {
     content = <img className="size-full object-contain" src={downloadUrl} alt="Attachment" />;
+  } else if (VIDEO_CONTENT_TYPES.has(header.content_type as string)) {
+    content = (
+      <video className="size-full object-contain" controls>
+        <source src={downloadUrl} type={header.content_type as string} />
+      </video>
+    );
   }
 
   return (

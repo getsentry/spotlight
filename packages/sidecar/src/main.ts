@@ -1,127 +1,21 @@
 import { readFileSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import { join } from "node:path";
-import { parseArgs } from "node:util";
 import { type ServerType, serve } from "@hono/node-server";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
-import { type FormatterType, VALID_FORMATTERS } from "./formatters/types.js";
 import { serveFilesHandler } from "./handlers/index.js";
 import { activateLogger, logger } from "./logger.js";
-import { createMCPInstance } from "./mcp/mcp.js";
 import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
 
-const PARSE_ARGS_CONFIG = {
-  options: {
-    port: {
-      type: "string",
-      short: "p",
-      default: DEFAULT_PORT.toString(),
-    },
-    debug: {
-      type: "boolean",
-      short: "d",
-      default: false,
-    },
-    format: {
-      type: "string",
-      short: "f",
-      default: "logfmt",
-    },
-    // Deprecated -- use the positional `mcp` argument instead
-    "stdio-mcp": {
-      type: "boolean",
-      default: false,
-    },
-    help: {
-      type: "boolean",
-      short: "h",
-      default: false,
-    },
-  },
-  allowPositionals: true,
-  strict: true,
-} as const;
-
-export type CLIArgs = {
-  port: number;
-  debug: boolean;
-  help: boolean;
-  format: FormatterType;
-  cmd: string | undefined;
-  cmdArgs: string[];
-};
-
-let serverInstance: ServerType;
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
-export function parseCLIArgs(): CLIArgs {
-  const args = Array.from(process.argv).slice(2);
-  const preParse = parseArgs({
-    ...PARSE_ARGS_CONFIG,
-    strict: false,
-    tokens: true,
-  });
-  let cmdArgs: string[] | undefined = undefined;
-  const runToken = preParse.tokens.find(token => token.kind === "positional" && token.value === "run");
-  if (runToken) {
-    const cutOff = preParse.tokens.find(token => token.index > runToken.index && token.kind === "positional");
-    cmdArgs = cutOff ? args.splice(cutOff.index) : [];
-  }
-  const { values, positionals } = parseArgs({
-    args,
-    ...PARSE_ARGS_CONFIG,
-  });
-
-  // Handle legacy positional argument for port (backwards compatibility)
-  const portInput = positionals.length === 1 && /^\d{1,5}$/.test(positionals[0]) ? positionals.shift() : values.port;
-  const port = Number(portInput);
-
-  if (Number.isNaN(port)) {
-    // Validate port number
-    console.error(`Error: Invalid port number '${portInput}'`);
-    console.error("Port must be a valid number between 1 and 65535");
-    process.exit(1);
-  }
-
-  if (port < 0 || port > 65535) {
-    console.error(`Error: Port ${port} is out of valid range (1-65535 or 0 for automatic assignment)`);
-    process.exit(1);
-  }
-
-  if (values["stdio-mcp"]) {
-    positionals.unshift("mcp");
-    console.warn("Warning: --stdio-mcp is deprecated. Please use the positional argument 'mcp' instead.");
-  }
-
-  // Validate format
-  const format = values.format as string;
-  if (!VALID_FORMATTERS.includes(format as FormatterType)) {
-    console.error(`Error: Invalid format '${format}'`);
-    console.error(`Valid formats are: ${VALID_FORMATTERS.join(", ")}`);
-    process.exit(1);
-  }
-
-  const result: CLIArgs = {
-    debug: values.debug as boolean,
-    help: values.help as boolean,
-    format: format as FormatterType,
-    port,
-    cmd: positionals[0],
-    cmdArgs: cmdArgs ?? positionals.slice(1),
-  };
-
-  return result;
-}
-
-async function startServer(options: StartServerOptions): Promise<ServerType> {
+const MAX_RETRIES = 3;
+export async function startServer(options: StartServerOptions): Promise<ServerType> {
   const { port, basePath } = options;
   let filesToServe = options.filesToServe;
   if (!filesToServe && basePath) {
@@ -210,10 +104,18 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
 
   sidecarServer.addListener("error", handleServerError);
 
+  let retries = 0;
   function handleServerError(err: { code?: string }): void {
     if ("code" in err && err.code === "EADDRINUSE") {
       logger.info(`Port ${options.port} in use, retrying...`);
       sidecarServer.close();
+
+      retries++;
+      if (retries > MAX_RETRIES) {
+        reject(err as Error);
+        return;
+      }
+
       portInUseRetryTimeout = setTimeout(() => {
         sidecarServer.listen(options.port);
       }, 5000);
@@ -223,32 +125,14 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
     }
   }
 
-  if (options.stdioMCP) {
-    logger.info("Starting MCP over stdio too...");
-    try {
-      await createMCPInstance().connect(new StdioServerTransport());
-    } catch (err) {
-      logger.error(`Failed to connect MCP over stdio: ${(err as Error).message}`);
-      captureException(err);
-      reject(err as Error);
-    }
-  }
-
   return promise;
 }
 
 export async function setupSidecar(
-  {
-    port,
-    logger: customLogger,
-    basePath,
-    filesToServe,
-    onEnvelope,
-    incomingPayload,
-    isStandalone,
-    stdioMCP,
-  }: SideCarOptions = { port: DEFAULT_PORT },
-): Promise<void> {
+  { port, logger: customLogger, basePath, filesToServe, onEnvelope, incomingPayload, isStandalone }: SideCarOptions = {
+    port: DEFAULT_PORT,
+  },
+): Promise<ServerType | undefined> {
   if (!isStandalone) {
     addEventProcessor(event => (event.spans?.some(span => span.op?.startsWith("sidecar.")) ? null : event));
   }
@@ -258,8 +142,7 @@ export async function setupSidecar(
   }
 
   if (port && !isValidPort(port)) {
-    logger.info("Please provide a valid port.");
-    process.exit(1);
+    throw new Error(`Invalid port number: ${port}. Must be between 1 and 65535, or 0 for automatic assignment.`);
   }
 
   if (port > 0 && (await isSidecarRunning(port))) {
@@ -268,96 +151,40 @@ export async function setupSidecar(
     if (hasSpotlightUI) {
       logSpotlightUrl(port);
     }
-    if (stdioMCP) {
-      async function startMCPStdioHTTPProxy() {
-        const server = await startStdioServer({
-          // We need to hook into `initStreamClient` as the returned object from startStdioServer
-          // is not a meta proxy object giving access to both the server and the client. It just
-          // returns the StdioServerTransport instance without a way to access the client or its errors.
-          // TODO: We should probably upstream a fix for this to close the server or bubble the errors
-          initStreamClient: () => {
-            const client = new Client({
-              name: "Spotlight Sidecar (stdio proxy)",
-              version: "1.0.0",
-            });
-            client.onerror = (err: Error) => {
-              if (
-                err.message.startsWith("Maximum reconnection attempts") ||
-                /disconnected|fetch failed|connection closed/i.test(err.message)
-              ) {
-                client.close();
-                server.close();
-
-                // We need to manually resume stdin as `StdioServerTransport` pauses it on
-                // close but does not `resume` it when a new instance is created. Probably
-                // a bug in https://github.com/modelcontextprotocol/typescript-sdk/blob/main/src/server/stdio.ts
-                process.stdin.resume();
-              } else if (!/conflict/i.test(err.message)) {
-                captureException(err);
-                logger.error(`MCP stdio proxy error: ${err.name}: ${err.message}`);
-              }
-            };
-            return Promise.resolve(client);
-          },
-          serverType: ProxyServerType.HTTPStream,
-          url: `http://localhost:${port}/mcp`,
-        });
-        server.onclose = async () => {
-          logger.info("MCP stdio proxy server closed.");
-          try {
-            await startMCPStdioHTTPProxy();
-          } catch (_err) {
-            try {
-              serverInstance = await startServer({
-                port,
-                basePath,
-                filesToServe,
-                incomingPayload,
-                stdioMCP,
-              });
-            } catch (_err2) {
-              logger.error("Failed to restart sidecar server after MCP stdio proxy closed.");
-              captureException(_err2);
-              await startMCPStdioHTTPProxy();
-            }
-          }
-        };
-      }
-      logger.info("Connecting to existing MCP instance with stdio proxy...");
-      await startMCPStdioHTTPProxy();
-    }
-  } else if (!serverInstance) {
-    serverInstance = await startServer({
-      port,
-      basePath,
-      filesToServe,
-      incomingPayload,
-      onEnvelope,
-      stdioMCP,
-    });
+    return;
   }
+  const serverInstance = await startServer({
+    port,
+    basePath,
+    filesToServe,
+    incomingPayload,
+    onEnvelope,
+  });
+  setShutdownHandlers(serverInstance);
+  return serverInstance;
 }
 
 export function clearBuffer(): void {
   getBuffer().reset();
 }
 
-let forceShutdown = false;
-export const shutdown = () => {
-  if (portInUseRetryTimeout) {
-    clearTimeout(portInUseRetryTimeout);
-  }
-  if (forceShutdown || !serverInstance) {
-    logger.info("Bye.");
-    process.exit(0);
-  }
-  if (serverInstance) {
+export function setShutdownHandlers(server: ServerType): void {
+  let forceShutdown = false;
+  const shutdown = () => {
+    if (portInUseRetryTimeout) {
+      clearTimeout(portInUseRetryTimeout);
+    }
+    if (forceShutdown) {
+      logger.info("Bye.");
+      process.exit(0);
+    }
+
     forceShutdown = true;
     logger.info("Shutting down server gracefully...");
-    serverInstance.close();
-    serverInstance.unref();
-  }
-};
+    server.close();
+    server.unref();
+  };
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
+}

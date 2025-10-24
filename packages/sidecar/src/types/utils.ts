@@ -52,7 +52,7 @@ export type SideCarOptions = {
 
 export type StartServerOptions = Pick<
   SideCarOptions,
-  "basePath" | "filesToServe" | "incomingPayload" | "onEnvelope" | "stdioMCP"
+  "basePath" | "filesToServe" | "incomingPayload" | "onEnvelope"
 > & {
   port: number;
 };

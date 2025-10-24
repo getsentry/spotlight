@@ -1,3 +1,4 @@
+import type { ServerType } from "@hono/node-server";
 import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
 import { SENTRY_CONTENT_TYPE } from "../constants.js";
@@ -38,7 +39,13 @@ const connectUpstream = async (port: number) =>
     client.onopen = () => resolve(client);
   });
 
-export default async function tail({ port, cmdArgs, basePath, filesToServe, format = "logfmt" }: CLIHandlerOptions) {
+export default async function tail({
+  port,
+  cmdArgs,
+  basePath,
+  filesToServe,
+  format = "logfmt",
+}: CLIHandlerOptions): Promise<ServerType | undefined> {
   const eventTypes = cmdArgs.length > 0 ? cmdArgs.map(arg => arg.toLowerCase()) : ["everything"];
   for (const eventType of eventTypes) {
     if (!SUPPORTED_TAIL_ARGS.has(eventType)) {
@@ -70,6 +77,6 @@ export default async function tail({ port, cmdArgs, basePath, filesToServe, form
       process.exit(1);
     }
 
-    await setupSidecar({ port, filesToServe, basePath, onEnvelope, isStandalone: true });
+    return await setupSidecar({ port, filesToServe, basePath, onEnvelope, isStandalone: true });
   }
 }
