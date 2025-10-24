@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import type { AddressInfo } from "node:net";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { type ServerType, serve } from "@hono/node-server";
@@ -15,7 +16,6 @@ import { createMCPInstance } from "./mcp/mcp.js";
 import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
-import type { AddressInfo } from "node:net";
 
 const PARSE_ARGS_CONFIG = {
   options: {
@@ -105,6 +105,7 @@ export function parseCLIArgs(): CLIArgs {
   return result;
 }
 
+const MAX_RETRIES = 3;
 async function startServer(options: StartServerOptions): Promise<ServerType> {
   const { port, basePath } = options;
   let filesToServe = options.filesToServe;
@@ -194,10 +195,18 @@ async function startServer(options: StartServerOptions): Promise<ServerType> {
 
   sidecarServer.addListener("error", handleServerError);
 
+  let retries = 1;
   function handleServerError(err: { code?: string }): void {
     if ("code" in err && err.code === "EADDRINUSE") {
       logger.info(`Port ${options.port} in use, retrying...`);
       sidecarServer.close();
+
+      retries++;
+      if (retries > MAX_RETRIES) {
+        reject(err as Error);
+        return;
+      }
+
       portInUseRetryTimeout = setTimeout(() => {
         sidecarServer.listen(options.port);
       }, 5000);
