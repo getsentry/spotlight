@@ -40,7 +40,8 @@
       "recommended": true,
       "a11y": {
         "useKeyWithClickEvents": "off",
-        "useSemanticElements": "off"
+        "useSemanticElements": "off",
+        "useMediaCaption": "off"
       },
       "complexity": {
         "noExcessiveCognitiveComplexity": "off"
