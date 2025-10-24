@@ -14,6 +14,9 @@ export default async function run({ port, cmdArgs, basePath, filesToServe }: CLI
     process.exit(1);
   }
 
+  // We *MUST* have an instance address and a port here
+  // as not having that indicates either the server did not start
+  // or started in a weird manner (like over a unix socket)
   const actualServerPort = (serverInstance.address() as AddressInfo).port;
   let shell = false;
   const env = {

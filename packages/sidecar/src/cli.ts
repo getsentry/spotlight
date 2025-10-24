@@ -10,6 +10,10 @@ import run from "./cli/run.js";
 import server from "./cli/server.js";
 import tail from "./cli/tail.js";
 
+// When port is set to `0` for a server to listen on,
+// it tells the OS to find a random available port.
+// This can then be retrieved after the server starts.
+const MAGIC_PORT_FOR_DYNAMIC_ASSIGNMENT = 0;
 const PARSE_ARGS_CONFIG = {
   options: {
     port: {
@@ -66,7 +70,7 @@ export function parseCLIArgs(): CLIArgs {
   // Handle legacy positional argument for port (backwards compatibility)
   const portInput = positionals.length === 1 && /^\d{1,5}$/.test(positionals[0]) ? positionals.shift() : values.port;
 
-  const port = portInput != null ? Number(portInput) : runToken ? 0 : DEFAULT_PORT;
+  const port = portInput != null ? Number(portInput) : runToken ? MAGIC_PORT_FOR_DYNAMIC_ASSIGNMENT : DEFAULT_PORT;
   if (Number.isNaN(port)) {
     // Validate port number
     console.error(`Error: Invalid port number '${portInput}'`);
