@@ -2,9 +2,7 @@ import type { ServerType } from "@hono/node-server";
 import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
 import { SENTRY_CONTENT_TYPE } from "../constants.js";
-import logfmt from "../formatters/logfmt/index.js";
-import md from "../formatters/md/index.js";
-import type { Formatter, FormatterType } from "../formatters/types.js";
+import { type Formatter, type FormatterType, logfmtFormatter, mdFormatter } from "../formatters/index.js";
 import { logger } from "../logger.js";
 import { setupSidecar } from "../main.js";
 import type { ParsedEnvelope } from "../parser/processEnvelope.js";
@@ -27,10 +25,10 @@ export const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
 export const SUPPORTED_TAIL_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
 
 const FORMATTERS: Record<FormatterType, Formatter> = {
-  md,
-  logfmt,
+  md: mdFormatter,
+  logfmt: logfmtFormatter,
   // TODO: add json formatter
-  json: logfmt, // fallback until we have a json formatter
+  json: logfmtFormatter, // fallback until we have a json formatter
 };
 
 const connectUpstream = async (port: number) =>
