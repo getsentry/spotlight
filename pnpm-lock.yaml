@@ -281,10 +281,10 @@ importers:
     dependencies:
       '@hono/mcp':
         specifier: ^0.1.1
-        version: 0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.10.2)
+        version: 0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.10.3)
       '@hono/node-server':
         specifier: ^1.19.3
-        version: 1.19.3(hono@4.10.2)
+        version: 1.19.3(hono@4.10.3)
       '@jridgewell/trace-mapping':
         specifier: ^0.3.25
         version: 0.3.25
@@ -301,8 +301,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       hono:
-        specifier: ^4.10.2
-        version: 4.10.2
+        specifier: ^4.10.3
+        version: 4.10.3
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
@@ -5359,8 +5359,8 @@ packages:
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
 
-  hono@4.10.2:
-    resolution: {integrity: sha512-p6fyzl+mQo6uhESLxbF5WlBOAJMDh36PljwlKtP5V1v09NxlqGru3ShK+4wKhSuhuYf8qxMmrivHOa/M7q0sMg==}
+  hono@4.10.3:
+    resolution: {integrity: sha512-2LOYWUbnhdxdL8MNbNg9XZig6k+cZXm5IjHn2Aviv7honhBMOHb+jxrKIeJRZJRmn+htUCKhaicxwXuUDlchRA==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@4.1.0:
@@ -5921,6 +5921,9 @@ packages:
 
   magic-string@0.30.19:
     resolution: {integrity: sha512-2N21sPY9Ws53PZvsEpVtNuSW+ScYbQdp4b9qUaL+9QkHUrGFKo56Lg9Emg5s9V/qrtNBmiR01sYhUOwu3H+VOw==}
+
+  magic-string@0.30.21:
+    resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
   magic-string@0.30.8:
     resolution: {integrity: sha512-ISQTe55T2ao7XtlAStud6qwYPZjE4GK1S/BeVPus4jrq6JuOnQ00YKQC581RWhR122W7msZV263KzVeLoqidyQ==}
@@ -9414,14 +9417,14 @@ snapshots:
 
   '@fontsource/raleway@5.2.5': {}
 
-  '@hono/mcp@0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.10.2)':
+  '@hono/mcp@0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.10.3)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.16.0
-      hono: 4.10.2
+      hono: 4.10.3
 
-  '@hono/node-server@1.19.3(hono@4.10.2)':
+  '@hono/node-server@1.19.3(hono@4.10.3)':
     dependencies:
-      hono: 4.10.2
+      hono: 4.10.3
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -11213,7 +11216,7 @@ snapshots:
       esm-env: 1.2.2
       import-meta-resolve: 4.2.0
       kleur: 4.1.5
-      magic-string: 0.30.19
+      magic-string: 0.30.21
       mrmime: 2.0.1
       sade: 1.8.1
       set-cookie-parser: 2.7.1
@@ -11238,7 +11241,7 @@ snapshots:
       debug: 4.4.3
       deepmerge: 4.3.1
       kleur: 4.1.5
-      magic-string: 0.30.19
+      magic-string: 0.30.21
       svelte: 4.2.19
       vite: 6.3.6(@types/node@24.7.2)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.1)
       vitefu: 1.1.1(vite@6.3.6(@types/node@24.7.2)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.1))
@@ -14018,7 +14021,7 @@ snapshots:
     dependencies:
       react-is: 16.13.1
 
-  hono@4.10.2: {}
+  hono@4.10.3: {}
 
   hosted-git-info@4.1.0:
     dependencies:
@@ -14519,6 +14522,11 @@ snapshots:
   magic-string@0.30.19:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  magic-string@0.30.21:
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.5.5
+    optional: true
 
   magic-string@0.30.8:
     dependencies:
@@ -16501,7 +16509,7 @@ snapshots:
       estree-walker: 3.0.3
       is-reference: 3.0.3
       locate-character: 3.0.0
-      magic-string: 0.30.19
+      magic-string: 0.30.21
       periscopic: 3.1.0
     optional: true
 
