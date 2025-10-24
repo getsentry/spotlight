@@ -60,7 +60,7 @@ export default async function tail({
     : new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
   const onEnvelope: (envelope: ParsedEnvelope["envelope"]) => void = envelope => {
     if (envelope[1].some(([header]) => header.type && types.has(header.type))) {
-      displayEnvelope(envelope, format as FormatterType);
+      displayEnvelope(envelope, format);
     }
   };
 
