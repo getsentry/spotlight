@@ -1,6 +1,6 @@
 import { processEnvelope } from "../../parser/index.js";
 import type { EventContainer } from "../../utils/index.js";
-import { formatTimestamp } from "../utils.js";
+import { formatTimestamp, getDuration } from "../utils.js";
 
 export interface TraceContext {
   trace_id: string;
@@ -197,7 +197,7 @@ function calculateTraceDuration(trace: TraceSummary): void {
     }
   }
 
-  trace.duration = (latestTimestamp - trace.start_timestamp) * 1000; // Convert to milliseconds
+  trace.duration = getDuration(latestTimestamp, trace.start_timestamp);
 }
 
 /**
@@ -233,8 +233,7 @@ export function buildSpanTree(trace: TraceSummary): SpanNode[] {
         children: [],
         level: 0,
         event_id: event.event_id,
-        duration:
-          event.timestamp && event.start_timestamp ? (event.timestamp - event.start_timestamp) * 1000 : undefined,
+        duration: getDuration(event.timestamp, event.start_timestamp),
       };
 
       allSpans.push(eventSpan);
@@ -252,12 +251,7 @@ export function buildSpanTree(trace: TraceSummary): SpanNode[] {
           parent_span_id: span.parent_span_id || event.trace_context?.span_id, // Default to event's span as parent
           op: span.op,
           description: span.description || "unnamed",
-          duration:
-            span.duration !== undefined
-              ? span.duration
-              : span.timestamp && span.start_timestamp
-                ? (span.timestamp - span.start_timestamp) * 1000
-                : undefined,
+          duration: span.duration !== undefined ? span.duration : getDuration(span.timestamp, span.start_timestamp),
           status: span.status,
           children: [],
           level: 0,

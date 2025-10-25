@@ -1,6 +1,6 @@
 import logfmt from "logfmt";
 import type { SentryTransactionEvent } from "../../parser/index.js";
-import { formatTimestamp, mapFields, mapSdkFields, mapTags } from "../utils.js";
+import { formatTimestamp, getDuration, mapFields, mapSdkFields, mapTags } from "../utils.js";
 
 export function formatTrace(event: SentryTransactionEvent): string {
   const data: Record<string, any> = {
@@ -21,18 +21,9 @@ export function formatTrace(event: SentryTransactionEvent): string {
     });
   }
 
-  const { timestamp, start_timestamp } = event;
-  if (typeof timestamp === "number" && typeof start_timestamp === "number") {
-    data.duration_ms = Math.round((timestamp - start_timestamp) * 1000);
-  }
-
-  if (
-    event.timestamp !== undefined &&
-    event.start_timestamp !== undefined &&
-    Number.isFinite(event.timestamp) &&
-    Number.isFinite(event.start_timestamp)
-  ) {
-    data.duration_ms = Math.round((event.timestamp - event.start_timestamp) * 1000);
+  const duration = getDuration(event.timestamp, event.start_timestamp);
+  if (duration !== undefined) {
+    data.duration_ms = duration;
   }
 
   if (event.spans?.length) data.span_count = event.spans.length;

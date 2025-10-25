@@ -9,6 +9,23 @@ export function formatTimestamp(timestamp?: number): string {
 }
 
 /**
+ * Get the duration in milliseconds between two Sentry timestamps.
+ * Accepts timestamps in seconds (as numbers or strings).
+ * Returns undefined if either timestamp is missing or invalid.
+ */
+
+export function getDuration(endTimestamp?: number | string, startTimestamp?: number | string): number | undefined {
+  const end = typeof endTimestamp === "string" ? Number.parseFloat(endTimestamp) : endTimestamp;
+  const start = typeof startTimestamp === "string" ? Number.parseFloat(startTimestamp) : startTimestamp;
+
+  if (typeof end === "number" && typeof start === "number" && !Number.isNaN(end) && !Number.isNaN(start)) {
+    return Math.round((end - start) * 1000);
+  }
+
+  return undefined;
+}
+
+/**
  * Map simple fields from source to data object.
  * Only sets fields if the source value is truthy.
  */
