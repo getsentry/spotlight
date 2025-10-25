@@ -2,8 +2,7 @@ import type { ServerType } from "@hono/node-server";
 import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
 import { SENTRY_CONTENT_TYPE } from "../constants.js";
-import { formatEnvelope } from "../formatters/general.js";
-import type { FormatterType } from "../formatters/types.js";
+import { type Formatter, type FormatterType, logfmtFormatter, mdFormatter } from "../formatters/index.js";
 import { logger } from "../logger.js";
 import { setupSidecar } from "../main.js";
 import type { ParsedEnvelope } from "../parser/processEnvelope.js";
@@ -25,12 +24,12 @@ const SUPPORTED_ENVELOPE_TYPES = new Set(Object.values(NAME_TO_TYPE_MAPPING).fla
 export const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
 export const SUPPORTED_TAIL_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
 
-function displayEnvelope(envelope: ParsedEnvelope["envelope"], format: FormatterType) {
-  const lines = formatEnvelope(envelope, format);
-  if (lines.length > 0) {
-    console.log(lines.join("\n"));
-  }
-}
+const FORMATTERS: Record<FormatterType, Formatter> = {
+  md: mdFormatter,
+  logfmt: logfmtFormatter,
+  // TODO: add json formatter
+  json: logfmtFormatter, // fallback until we have a json formatter
+};
 
 const connectUpstream = async (port: number) =>
   new Promise<EventSource>((resolve, reject) => {
@@ -55,12 +54,16 @@ export default async function tail({
     }
   }
 
+  const formatter = FORMATTERS[format];
   const types = eventTypes.some(type => EVERYTHING_MAGIC_WORDS.has(type))
     ? SUPPORTED_ENVELOPE_TYPES
     : new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
   const onEnvelope: (envelope: ParsedEnvelope["envelope"]) => void = envelope => {
     if (envelope[1].some(([header]) => header.type && types.has(header.type))) {
-      displayEnvelope(envelope, format);
+      const output = formatter.formatEnvelope(envelope);
+      if (output) {
+        console.log(output);
+      }
     }
   };
 

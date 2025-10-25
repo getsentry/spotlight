@@ -442,7 +442,7 @@ function renderContextLines(frame: z.infer<typeof FrameInterface>, contextSize =
  *
  * @param value - The variable value to format (can be any type)
  * @param maxLength - Maximum length for stringified objects/arrays (default: 80)
- * @returns Human-readable string representation of the value
+ * @returns markdown string representation of the value
  */
 function formatVariableValue(value: unknown, maxLength = 80): string {
   try {

@@ -3,6 +3,7 @@ import type { z } from "zod";
 import { type SentryEvent, isErrorEvent } from "../../parser/index.js";
 import type { EventContainer } from "../../utils/index.js";
 import type { ErrorEventSchema } from "../schema.js";
+import { formatTimestamp } from "../utils.js";
 import { formatEventOutput } from "./event.js";
 
 export function formatErrorEnvelope(container: EventContainer) {
@@ -70,7 +71,7 @@ export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventS
       key,
       value: String(value),
     })),
-    dateCreated: event.timestamp ? new Date(event.timestamp).toISOString() : new Date().toISOString(),
+    dateCreated: formatTimestamp(event.timestamp),
     title: event.message ?? "",
     entries,
     // @ts-expect-error
@@ -80,7 +81,7 @@ export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventS
 }
 
 /**
- * Format an error event to human-readable string
+ * Format an error event to markdown string
  */
 export function formatError(payload: ErrorEvent): string {
   return formatEventOutput(processErrorEvent(payload));
