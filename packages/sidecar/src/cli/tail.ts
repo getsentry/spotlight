@@ -5,7 +5,14 @@ import { SENTRY_CONTENT_TYPE } from "../constants.js";
 import { type Formatter, type FormatterType, logfmtFormatter, mdFormatter } from "../formatters/index.js";
 import { logger } from "../logger.js";
 import { setupSidecar } from "../main.js";
-import type { ParsedEnvelope } from "../parser/processEnvelope.js";
+import {
+  type ParsedEnvelope,
+  type SentryEvent,
+  type SentryLogEvent,
+  isErrorEvent,
+  isLogEvent,
+  isTraceEvent,
+} from "../parser/index.js";
 import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
 
@@ -59,11 +66,39 @@ export default async function tail({
     ? SUPPORTED_ENVELOPE_TYPES
     : new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
   const onEnvelope: (envelope: ParsedEnvelope["envelope"]) => void = envelope => {
-    if (envelope[1].some(([header]) => header.type && types.has(header.type))) {
-      const output = formatter.formatEnvelope(envelope);
-      if (output) {
-        console.log(output);
+    const [, items] = envelope;
+    const formatted: string[] = [];
+
+    for (const item of items) {
+      const [{ type }, payload] = item;
+
+      // Skip if not a type we're interested in
+      if (!type || !types.has(type)) {
+        continue;
       }
+
+      // Get the formatter for this type
+      const formatterFn = formatter.formatters.get(type);
+      if (!formatterFn) {
+        continue;
+      }
+
+      // Format based on item type with type guards
+      if (type === "event" && isErrorEvent(payload as SentryEvent)) {
+        formatted.push(...formatterFn(payload));
+      } else if (type === "log" && isLogEvent(payload as SentryEvent)) {
+        // Special handling for logs: payload.items is an array
+        const logPayload = payload as SentryLogEvent;
+        for (const log of logPayload.items) {
+          formatted.push(...formatterFn(log));
+        }
+      } else if (type === "transaction" && isTraceEvent(payload as SentryEvent)) {
+        formatted.push(...formatterFn(payload));
+      }
+    }
+
+    if (formatted.length > 0) {
+      console.log(formatted.join("\n"));
     }
   };
 

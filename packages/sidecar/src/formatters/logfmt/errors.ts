@@ -2,7 +2,7 @@ import type { ErrorEvent } from "@sentry/core";
 import logfmt from "logfmt";
 import { formatTimestamp, mapFields, mapSdkFields, mapTags } from "../utils.js";
 
-export function formatError(event: ErrorEvent): string {
+export function formatError(event: ErrorEvent): string[] {
   const data: Record<string, any> = {
     type: "error",
     event_id: event.event_id,
@@ -63,5 +63,5 @@ export function formatError(event: ErrorEvent): string {
   if (event.spans?.length) data.span_length = event.spans.length;
   mapTags(event, data);
 
-  return logfmt.stringify(data);
+  return [logfmt.stringify(data)];
 }

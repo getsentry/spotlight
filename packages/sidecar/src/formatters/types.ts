@@ -1,5 +1,10 @@
 import type { ErrorEvent, SerializedLog } from "@sentry/core";
-import type { ParsedEnvelope, SentryTransactionEvent } from "../parser/index.js";
+import type { SentryTransactionEvent } from "../parser/index.js";
+
+/**
+ * A formatter function that takes a payload and returns an array of formatted strings
+ */
+export type FormatterFunction = (payload: any) => string[];
 
 /**
  * Interface that all formatters must implement.
@@ -9,23 +14,23 @@ export interface Formatter {
   /**
    * Format an error event
    */
-  formatError(payload: ErrorEvent): string;
+  formatError(payload: ErrorEvent): string[];
 
   /**
    * Format a log event
    */
-  formatLog(log: SerializedLog): string;
+  formatLog(log: SerializedLog): string[];
 
   /**
    * Format a trace/transaction event
    */
-  formatTrace(payload: SentryTransactionEvent): string;
+  formatTrace(payload: SentryTransactionEvent): string[];
 
   /**
-   * Format an entire envelope containing multiple events.
-   * Returns a single string ready to be displayed/printed.
+   * Map of event types to formatter functions.
+   * Keys are event types from envelope items (e.g., "event", "transaction", "log")
    */
-  formatEnvelope(envelope: ParsedEnvelope["envelope"]): string;
+  formatters: Map<string, FormatterFunction>;
 }
 
 /**
