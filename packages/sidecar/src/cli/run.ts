@@ -139,7 +139,11 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     shell,
     windowsVerbatimArguments: true,
     windowsHide: true,
-    stdio: ["ignore", "pipe", "pipe"],
+    // We `inherit` the stdin so we relay any user input to the downstream process
+    // This also helps sending the SIGINT signal directly. Alternative would be to
+    // use "pipe" and call `runCmd.stdin.end()` to signal the end of the input stream.
+    // Never ever use `ignore` as it keeps stdin open forever, preventing a graceful shutdown
+    stdio: ["inherit", "pipe", "pipe"],
   });
 
   const processLogLine = (line: string, level: "info" | "error") => {
@@ -161,7 +165,8 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   let stdoutBuffer = "";
   let stderrBuffer = "";
 
-  runCmd.stdout?.on("data", (data: Buffer) => {
+  // Stream stdout as info-level logs
+  runCmd.stdout.on("data", (data: Buffer) => {
     stdoutBuffer += data.toString();
     const lines = stdoutBuffer.split("\n");
     // Keep the last partial line in the buffer
@@ -172,7 +177,8 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     }
   });
 
-  runCmd.stderr?.on("data", (data: Buffer) => {
+  // Stream stderr as error-level logs
+  runCmd.stderr.on("data", (data: Buffer) => {
     stderrBuffer += data.toString();
     const lines = stderrBuffer.split("\n");
     // Keep the last partial line in the buffer
@@ -206,10 +212,13 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     process.exit(code);
   });
   const killRunCmd = () => {
-    runCmd.removeAllListeners();
+    if (runCmd.killed) return;
+    runCmd.stdout.destroy();
+    runCmd.stderr.destroy();
     runCmd.kill();
   };
   runCmd.on("spawn", () => {
+    runCmd.removeAllListeners("spawn");
     runCmd.removeAllListeners("error");
     process.on("SIGINT", killRunCmd);
     process.on("SIGTERM", killRunCmd);

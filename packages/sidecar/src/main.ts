@@ -115,6 +115,9 @@ export async function startServer(options: StartServerOptions): Promise<ServerTy
         return;
       }
 
+      if (portInUseRetryTimeout) {
+        clearTimeout(portInUseRetryTimeout);
+      }
       portInUseRetryTimeout = setTimeout(() => {
         sidecarServer.listen(options.port);
       }, 5000);
@@ -179,6 +182,8 @@ export function setShutdownHandlers(server: ServerType): void {
 
     forceShutdown = true;
     logger.info("Shutting down server gracefully...");
+
+    server.setTimeout(250);
     server.close();
     server.unref();
   };

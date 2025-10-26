@@ -13,7 +13,9 @@
     "test": "vitest run",
     "test:dev": "vitest"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "bin": {
     "spotlight-sidecar": "dist/run.js"
   },
