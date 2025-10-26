@@ -2,7 +2,7 @@ import logfmt from "logfmt";
 import type { SentryTransactionEvent } from "../../parser/index.js";
 import { formatTimestamp, getDuration, mapFields, mapSdkFields, mapTags } from "../utils.js";
 
-export function formatTrace(event: SentryTransactionEvent): string {
+export function formatTrace(event: SentryTransactionEvent): string[] {
   const data: Record<string, any> = {
     type: "trace",
     event_id: event.event_id,
@@ -48,5 +48,5 @@ export function formatTrace(event: SentryTransactionEvent): string {
 
   mapTags(event, data);
 
-  return logfmt.stringify(data);
+  return [logfmt.stringify(data)];
 }

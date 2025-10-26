@@ -1,14 +1,10 @@
-import type { Formatter } from "../types.js";
-import { formatEnvelope } from "./envelope.js";
+import type { FormatterFunction } from "../types.js";
 import { formatError } from "./errors.js";
 import { formatLog } from "./logs.js";
 import { formatTrace } from "./traces.js";
 
-const formatter = {
-  formatError,
-  formatLog,
-  formatTrace,
-  formatEnvelope,
-} satisfies Formatter;
-
-export default formatter;
+export const formatters = new Map<string, FormatterFunction>([
+  ["event", formatError as FormatterFunction],
+  ["transaction", formatTrace as FormatterFunction],
+  ["log", formatLog as FormatterFunction],
+]);

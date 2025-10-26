@@ -18,7 +18,7 @@ export function formatErrorEnvelope(container: EventContainer) {
     const [{ type }, payload] = item;
 
     if (type === "event" && isErrorEvent(payload as SentryEvent)) {
-      formatted.push(formatEventOutput(processErrorEvent(payload as ErrorEvent)));
+      formatted.push(...formatError(payload as ErrorEvent));
     }
   }
 
@@ -83,6 +83,6 @@ export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventS
 /**
  * Format an error event to markdown string
  */
-export function formatError(payload: ErrorEvent): string {
-  return formatEventOutput(processErrorEvent(payload));
+export function formatError(payload: ErrorEvent): string[] {
+  return [formatEventOutput(processErrorEvent(payload))];
 }

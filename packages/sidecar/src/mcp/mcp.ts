@@ -2,14 +2,14 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import { wrapMcpServerWithSentry } from "@sentry/node";
 import { z } from "zod";
+import { formatErrorEnvelope } from "../formatters/md/errors.js";
+import { formatLogEnvelope } from "../formatters/md/logs.js";
 import {
   buildSpanTree,
   extractTracesFromEnvelopes,
-  formatErrorEnvelope,
-  formatLogEnvelope,
   formatTraceSummary,
   renderSpanTree,
-} from "../formatters/index.js";
+} from "../formatters/md/traces.js";
 import { getBuffer } from "../utils/index.js";
 import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
 
