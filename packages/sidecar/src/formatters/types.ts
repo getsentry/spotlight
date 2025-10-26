@@ -1,6 +1,3 @@
-import type { ErrorEvent } from "@sentry/core";
-import type { SentryLogEvent, SentryTransactionEvent } from "../parser/index.js";
-
 /**
  * A formatter function that takes a payload and returns an array of formatted strings
  */
@@ -8,24 +5,9 @@ export type FormatterFunction = (payload: any) => string[];
 
 /**
  * Interface that all formatters must implement.
- * Each formatter provides methods to format different types of Sentry events.
+ * Formatters expose a map of event types to formatter functions.
  */
 export interface Formatter {
-  /**
-   * Format an error event
-   */
-  formatError(payload: ErrorEvent): string[];
-
-  /**
-   * Format a log event
-   */
-  formatLog(payload: SentryLogEvent): string[];
-
-  /**
-   * Format a trace/transaction event
-   */
-  formatTrace(payload: SentryTransactionEvent): string[];
-
   /**
    * Map of event types to formatter functions.
    * Keys are event types from envelope items (e.g., "event", "transaction", "log")
