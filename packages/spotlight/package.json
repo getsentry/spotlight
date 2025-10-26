@@ -13,7 +13,10 @@
     "yalc:publish": "yalc publish --push --sig --private",
     "clean": "rimraf dist"
   },
-  "files": ["dist", "bin"],
+  "files": [
+    "dist",
+    "bin"
+  ],
   "bin": {
     "spotlight": "./bin/run.js"
   },

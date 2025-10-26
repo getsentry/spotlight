@@ -91,10 +91,9 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   let relayStdioAsLogs = true;
   
   // Initialize fuzzy searcher for stdout/stderr log lines
-  const stdioLogLines: string[] = [];
-  const fuzzySearcher = new Searcher(stdioLogLines, {
+  const fuzzySearcher = new Searcher([] as string[], {
     threshold: 0.8,
-    ignoreCase: true,
+    ignoreCase: false,
   });
   
   const logChecker: OnItemCallback = (type, item) => {
@@ -120,7 +119,6 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
         if (trimmedBody) {
           // Search for fuzzy matches in stdout/stderr lines
           const matches = fuzzySearcher.search(trimmedBody);
-
           // If we find a match with >80% similarity, we detected Sentry logging
           if (matches.length > 0) {
             logger.debug("Detected Sentry logging in the process, disabling stdio relay");
@@ -193,24 +191,18 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
 
   // Helper function to process and send log lines
   const processLogLine = (line: string, level: "info" | "error") => {
+    if (!relayStdioAsLogs) return;
     const trimmedLine = line.trim();
     if (!trimmedLine) return;
 
-    // Add to fuzzy searcher (keep last 100 lines)
-    stdioLogLines.push(trimmedLine);
-    if (stdioLogLines.length > 100) {
-      stdioLogLines.shift();
-    }
+    fuzzySearcher.add(trimmedLine);
 
-    // Send as log envelope if relaying is enabled
-    if (relayStdioAsLogs) {
-      const timestamp = Date.now() / 1000; // Sentry uses seconds
-      const envelopeBuffer = createLogEnvelope(level, trimmedLine, timestamp);
-      // Send to sidecar via HTTP (don't await to avoid blocking)
-      sendEnvelopeToSidecar(envelopeBuffer, actualServerPort).catch(err => {
-        logger.debug(`Failed to send stdio log: ${err}`);
-      });
-    }
+    const timestamp = Date.now() / 1000; // Sentry uses seconds
+    const envelopeBuffer = createLogEnvelope(level, trimmedLine, timestamp);
+    // Send to sidecar via HTTP (don't await to avoid blocking)
+    sendEnvelopeToSidecar(envelopeBuffer, actualServerPort).catch(err => {
+      logger.debug(`Failed to send stdio log: ${err}`);
+    });
   };
 
   // Buffer for partial lines
