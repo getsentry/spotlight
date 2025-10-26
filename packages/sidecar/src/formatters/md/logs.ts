@@ -15,9 +15,7 @@ export function formatLogEnvelope(container: EventContainer) {
     const [{ type }, payload] = item;
 
     if (type === "log" && isLogEvent(payload as SentryEvent)) {
-      for (const log of (payload as SentryLogEvent).items) {
-        formatted.push(...formatLog(log));
-      }
+      formatted.push(...formatLog(payload as SentryLogEvent));
     }
   }
 
@@ -25,9 +23,9 @@ export function formatLogEnvelope(container: EventContainer) {
 }
 
 /**
- * Format a log event to markdown string
+ * Format a single log entry to markdown string
  */
-export function formatLog(event: SerializedLog): string[] {
+function formatSingleLog(event: SerializedLog): string {
   let attr = "";
   for (const [key, property] of Object.entries(event.attributes ?? {})) {
     if (key.startsWith("sentry.")) {
@@ -37,9 +35,14 @@ export function formatLog(event: SerializedLog): string[] {
     attr += `${key}: ${property.value} (${property.type})\n`;
   }
 
-  return [
-    `${formatTimestamp(event.timestamp)} ${event.level} ${event.body}
+  return `${formatTimestamp(event.timestamp)} ${event.level} ${event.body}
 Attributes:
-${attr}`,
-  ];
+${attr}`;
+}
+
+/**
+ * Format a log event to markdown string
+ */
+export function formatLog(payload: SentryLogEvent): string[] {
+  return payload.items.map(formatSingleLog);
 }

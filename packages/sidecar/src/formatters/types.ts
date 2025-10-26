@@ -1,5 +1,5 @@
-import type { ErrorEvent, SerializedLog } from "@sentry/core";
-import type { SentryTransactionEvent } from "../parser/index.js";
+import type { ErrorEvent } from "@sentry/core";
+import type { SentryLogEvent, SentryTransactionEvent } from "../parser/index.js";
 
 /**
  * A formatter function that takes a payload and returns an array of formatted strings
@@ -19,7 +19,7 @@ export interface Formatter {
   /**
    * Format a log event
    */
-  formatLog(log: SerializedLog): string[];
+  formatLog(payload: SentryLogEvent): string[];
 
   /**
    * Format a trace/transaction event
