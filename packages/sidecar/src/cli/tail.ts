@@ -2,7 +2,7 @@ import type { ServerType } from "@hono/node-server";
 import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
 import { SENTRY_CONTENT_TYPE } from "../constants.js";
-import { type Formatter, type FormatterType, logfmtFormatter, mdFormatter } from "../formatters/index.js";
+import { type FormatterFunction, type FormatterType, logfmtFormatters, mdFormatters } from "../formatters/index.js";
 import { logger } from "../logger.js";
 import { setupSidecar } from "../main.js";
 import type { ParsedEnvelope } from "../parser/index.js";
@@ -24,11 +24,11 @@ const SUPPORTED_ENVELOPE_TYPES = new Set(Object.values(NAME_TO_TYPE_MAPPING).fla
 export const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
 export const SUPPORTED_TAIL_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
 
-const FORMATTERS: Record<FormatterType, Formatter> = {
-  md: mdFormatter,
-  logfmt: logfmtFormatter,
+const FORMATTERS: Record<FormatterType, Map<string, FormatterFunction>> = {
+  md: mdFormatters,
+  logfmt: logfmtFormatters,
   // TODO: add json formatter
-  json: logfmtFormatter, // fallback until we have a json formatter
+  json: logfmtFormatters, // fallback until we have a json formatter
 };
 
 const connectUpstream = async (port: number) =>
@@ -71,7 +71,7 @@ export default async function tail({
       }
 
       // Get the formatter for this type
-      const formatterFn = formatter.formatters.get(type);
+      const formatterFn = formatter.get(type);
       if (!formatterFn) {
         continue;
       }
