@@ -16,7 +16,11 @@ import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
 import { getBuffer } from "../utils/index.js";
 
-export type OnItemCallback = (type: string, item: ParsedEnvelope["envelope"][1][number]) => boolean;
+export type OnItemCallback = (
+  type: string,
+  item: ParsedEnvelope["envelope"][1][number],
+  envelopeHeader: ParsedEnvelope["envelope"][0],
+) => boolean;
 export const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
   traces: ["transaction", "span"],
   // profiles: ["profile"],
@@ -63,7 +67,7 @@ export default async function tail(
     ? SUPPORTED_ENVELOPE_TYPES
     : new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
   const onEnvelope: (envelope: ParsedEnvelope["envelope"]) => void = envelope => {
-    const [, items] = envelope;
+    const [envelopeHeader, items] = envelope;
     const formatted: string[] = [];
 
     for (const item of items) {
@@ -80,7 +84,7 @@ export default async function tail(
         continue;
       }
 
-      if (onItem && !onItem(type, item)) {
+      if (onItem && !onItem(type, item, envelopeHeader)) {
         continue;
       }
 
@@ -109,7 +113,7 @@ export default async function tail(
   }
 
   const serverInstance = await setupSidecar({ port, filesToServe, basePath, isStandalone: true });
-  
+
   // Subscribe the onEnvelope callback to the message buffer
   // This ensures it gets called whenever any envelope is added to the buffer
   getBuffer().subscribe(container => {

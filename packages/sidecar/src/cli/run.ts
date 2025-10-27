@@ -13,21 +13,21 @@ import { getSpotlightURL } from "../utils/extras.js";
 import { EventContainer, getBuffer } from "../utils/index.js";
 import tail, { type OnItemCallback } from "./tail.js";
 
-const STDIO_LOG_MARKER = "__spotlight_stdio_log";
+const SPOTLIGHT_VERSION = process.env.npm_package_version || "unknown";
 
 function createLogEnvelope(level: "info" | "error", body: string, timestamp: number): Buffer {
-  const envelopeHeader = {};
+  const envelopeHeader = {
+    sdk: {
+      name: "sentry.spotlight.stdio",
+      version: SPOTLIGHT_VERSION,
+    },
+  };
 
   const logItem: SerializedLog = {
     timestamp,
     level,
     body,
-    attributes: {
-      [STDIO_LOG_MARKER]: {
-        value: true,
-        type: "boolean",
-      },
-    },
+    attributes: {},
   };
 
   const logPayload: SentryLogEvent = {
@@ -67,7 +67,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     ignoreCase: false,
   });
 
-  const logChecker: OnItemCallback = (type, item) => {
+  const logChecker: OnItemCallback = (type, item, envelopeHeader) => {
     if (type !== "log") return true;
 
     const [, payload] = item;
@@ -75,7 +75,8 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
 
     if (logEvent.items && logEvent.items.length > 0) {
       for (const logItem of logEvent.items) {
-        if (logItem.attributes?.[STDIO_LOG_MARKER]) {
+        // Check if this is a stdio log from Spotlight itself
+        if (envelopeHeader.sdk?.name === "sentry.spotlight.stdio") {
           continue;
         }
 
