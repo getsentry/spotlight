@@ -3,15 +3,15 @@ import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
 import { SENTRY_CONTENT_TYPE } from "../constants.js";
 import {
-  type Formatter,
+  type FormatterFunction,
   type FormatterType,
-  jsonFormatter,
-  logfmtFormatter,
-  mdFormatter,
+  jsonFormatters,
+  logfmtFormatters,
+  mdFormatters,
 } from "../formatters/index.js";
 import { logger } from "../logger.js";
 import { setupSidecar } from "../main.js";
-import type { ParsedEnvelope } from "../parser/processEnvelope.js";
+import type { ParsedEnvelope } from "../parser/index.js";
 import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
 
@@ -30,10 +30,11 @@ const SUPPORTED_ENVELOPE_TYPES = new Set(Object.values(NAME_TO_TYPE_MAPPING).fla
 export const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
 export const SUPPORTED_TAIL_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
 
-const FORMATTERS: Record<FormatterType, Formatter> = {
-  md: mdFormatter,
-  logfmt: logfmtFormatter,
-  json: jsonFormatter,
+const FORMATTERS: Record<FormatterType, Map<string, FormatterFunction>> = {
+  md: mdFormatters,
+  logfmt: logfmtFormatters,
+  // TODO: add json formatter
+  json: jsonFormatters, // fallback until we have a json formatter
 };
 
 const connectUpstream = async (port: number) =>
@@ -64,11 +65,28 @@ export default async function tail({
     ? SUPPORTED_ENVELOPE_TYPES
     : new Set([...eventTypes.flatMap(type => NAME_TO_TYPE_MAPPING[type] || [])]);
   const onEnvelope: (envelope: ParsedEnvelope["envelope"]) => void = envelope => {
-    if (envelope[1].some(([header]) => header.type && types.has(header.type))) {
-      const output = formatter.formatEnvelope(envelope);
-      if (output) {
-        console.log(output);
+    const [, items] = envelope;
+    const formatted: string[] = [];
+
+    for (const item of items) {
+      const [{ type }, payload] = item;
+
+      if (!type || !types.has(type)) {
+        // Skip if not a type we're interested in
+        continue;
       }
+
+      // Get the formatter for this type
+      const formatterFn = formatter.get(type);
+      if (!formatterFn) {
+        continue;
+      }
+
+      formatted.push(...formatterFn(payload));
+    }
+
+    if (formatted.length > 0) {
+      console.log(formatted.join("\n"));
     }
   };
 

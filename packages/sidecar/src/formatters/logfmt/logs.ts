@@ -1,7 +1,30 @@
 import type { SerializedLog } from "@sentry/core";
 import logfmt from "logfmt";
-import { buildLogData } from "../shared/data-builders.js";
+import type { SentryLogEvent } from "../../parser/index.js";
+import { formatTimestamp, mapFields } from "../utils.js";
 
-export function formatLog(log: SerializedLog): string {
-  return logfmt.stringify(buildLogData(log));
+function formatSingleLog(log: SerializedLog): string {
+  const data: Record<string, any> = {
+    timestamp: formatTimestamp(log.timestamp),
+    level: log.level,
+    type: "log",
+  };
+
+  mapFields(log, data, {
+    message: "body",
+    trace_id: "trace_id",
+    severity_number: "severity_number",
+  });
+
+  if (log.attributes) {
+    for (const [key, attr] of Object.entries(log.attributes)) {
+      data[key] = attr.value;
+    }
+  }
+
+  return logfmt.stringify(data);
+}
+
+export function formatLog(payload: SentryLogEvent): string[] {
+  return payload.items.map(formatSingleLog);
 }
