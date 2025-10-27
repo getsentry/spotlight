@@ -37,7 +37,6 @@ export async function startServer(options: StartServerOptions): Promise<ServerTy
 
       ctx.set("basePath", options.basePath);
       ctx.set("incomingPayload", options.incomingPayload);
-      ctx.set("onEnvelope", options.onEnvelope);
 
       const host = ctx.req.header("Host") || "localhost";
       const path = ctx.req.path;
@@ -129,7 +128,7 @@ export async function startServer(options: StartServerOptions): Promise<ServerTy
 }
 
 export async function setupSidecar(
-  { port, logger: customLogger, basePath, filesToServe, onEnvelope, incomingPayload, isStandalone }: SideCarOptions = {
+  { port, logger: customLogger, basePath, filesToServe, incomingPayload, isStandalone }: SideCarOptions = {
     port: DEFAULT_PORT,
   },
 ): Promise<ServerType | undefined> {
@@ -158,7 +157,6 @@ export async function setupSidecar(
     basePath,
     filesToServe,
     incomingPayload,
-    onEnvelope,
   });
   setShutdownHandlers(serverInstance);
   return serverInstance;
