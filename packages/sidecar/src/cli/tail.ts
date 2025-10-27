@@ -91,6 +91,7 @@ export default async function tail(
   try {
     const client = await connectUpstream(port);
     client.addEventListener(SENTRY_CONTENT_TYPE, event => onEnvelope!(JSON.parse(event.data)));
+    // Early return - don't start our own server if we can connect to an upstream one
     return undefined;
   } catch (err) {
     // if we fail, fine then we'll start our own
@@ -100,21 +101,21 @@ export default async function tail(
       logger.error(err);
       process.exit(1);
     }
-
-    const serverInstance = await setupSidecar({ port, filesToServe, basePath, isStandalone: true });
-    if (!serverInstance) {
-      return undefined;
-    }
-
-    // Subscribe the onEnvelope callback to the message buffer
-    // This ensures it gets called whenever any envelope is added to the buffer
-    getBuffer().subscribe(container => {
-      const parsedEnvelope = container.getParsedEnvelope();
-      if (parsedEnvelope) {
-        onEnvelope(parsedEnvelope.envelope);
-      }
-    });
-
-    return serverInstance;
   }
+
+  const serverInstance = await setupSidecar({ port, filesToServe, basePath, isStandalone: true });
+  if (!serverInstance) {
+    return undefined;
+  }
+
+  // Subscribe the onEnvelope callback to the message buffer
+  // This ensures it gets called whenever any envelope is added to the buffer
+  getBuffer().subscribe(container => {
+    const parsedEnvelope = container.getParsedEnvelope();
+    if (parsedEnvelope) {
+      onEnvelope(parsedEnvelope.envelope);
+    }
+  });
+
+  return serverInstance;
 }
