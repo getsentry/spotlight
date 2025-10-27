@@ -6,45 +6,18 @@ settings:
 
 catalogs:
   default:
-    '@fontsource/raleway':
-      specifier: ^5.1.0
-      version: 5.2.5
-    '@sentry/astro':
-      specifier: ^8.49.0
-      version: 8.55.0
     '@sentry/core':
       specifier: ^10
       version: 10.5.0
     '@sentry/node':
       specifier: ^10.22.0
       version: 10.22.0
-    '@tailwindcss/vite':
-      specifier: ^4.1.11
-      version: 4.1.11
     '@types/node':
       specifier: ^22.15.21
       version: 22.15.28
-    '@types/react':
-      specifier: ^18.3.11
-      version: 18.3.20
-    '@types/react-dom':
-      specifier: ^18.3.0
-      version: 18.3.7
-    react:
-      specifier: ^18.3.1
-      version: 18.3.1
-    react-dom:
-      specifier: ^18.3.1
-      version: 18.3.1
-    tailwindcss:
-      specifier: ^4.1.10
-      version: 4.1.11
     typescript:
       specifier: ^5.6.2
       version: 5.9.2
-    vite:
-      specifier: ^5.4.19
-      version: 5.4.19
     vitest:
       specifier: ^0.34.6
       version: 0.34.6
