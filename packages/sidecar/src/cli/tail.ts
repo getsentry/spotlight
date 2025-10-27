@@ -9,7 +9,6 @@ import type { ParsedEnvelope } from "../parser/index.js";
 import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
 
-
 export type OnItemCallback = (type: string, item: ParsedEnvelope["envelope"][1][number]) => boolean;
 export const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
   traces: ["transaction", "span"],
@@ -43,7 +42,7 @@ const connectUpstream = async (port: number) =>
 export default async function tail(
   { port, cmdArgs, basePath, filesToServe, format = "logfmt" }: CLIHandlerOptions,
   onItem?: OnItemCallback,
-): Promise<ServerType | undefined> {
+): Promise<{ serverInstance: ServerType; onEnvelope: (envelope: ParsedEnvelope["envelope"]) => void } | undefined> {
   const eventTypes = cmdArgs.length > 0 ? cmdArgs.map(arg => arg.toLowerCase()) : ["everything"];
   for (const eventType of eventTypes) {
     if (!SUPPORTED_TAIL_ARGS.has(eventType)) {
@@ -91,6 +90,7 @@ export default async function tail(
   try {
     const client = await connectUpstream(port);
     client.addEventListener(SENTRY_CONTENT_TYPE, event => onEnvelope!(JSON.parse(event.data)));
+    return undefined;
   } catch (err) {
     // if we fail, fine then we'll start our own
     if (err instanceof Error && !err.message?.includes(port.toString())) {
@@ -100,6 +100,10 @@ export default async function tail(
       process.exit(1);
     }
 
-    return await setupSidecar({ port, filesToServe, basePath, onEnvelope, isStandalone: true });
+    const serverInstance = await setupSidecar({ port, filesToServe, basePath, onEnvelope, isStandalone: true });
+    if (!serverInstance) {
+      return undefined;
+    }
+    return { serverInstance, onEnvelope };
   }
 }
