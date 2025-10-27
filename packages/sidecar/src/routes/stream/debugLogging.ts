@@ -1,6 +1,6 @@
-import { isDebugEnabled, logger } from "../../logger.js";
-import { type ParsedEnvelope, type SentryErrorEvent, type SentryEvent, isErrorEvent } from "../../parser/index.js";
-import type { EventContainer } from "../../utils/index.js";
+import { isDebugEnabled, logger } from "~/logger.js";
+import { type ParsedEnvelope, type SentryErrorEvent, type SentryEvent, isErrorEvent } from "~/parser/index.js";
+import type { EventContainer } from "~/utils/index.js";
 
 /**
  * Logs incoming event details when debug mode is enabled

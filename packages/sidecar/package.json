@@ -7,7 +7,7 @@
   "scripts": {
     "start": "tsx --watch ./src/run.ts",
     "dev": "tsx --watch ./src/run.ts",
-    "build": "NODE_ENV=production tsc",
+    "build": "NODE_ENV=production tsc && tsc-alias",
     "clean": "rimraf dist",
     "sample": "node _fixtures/send_to_sidecar.cjs",
     "test": "vitest run",
@@ -70,6 +70,7 @@
     "@types/logfmt": "^1.2.6",
     "@types/node": "catalog:",
     "fetch-event-stream": "^0.1.5",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.20.3",
     "typescript": "catalog:",
     "vitest": "catalog:"

@@ -1,5 +1,5 @@
-import { processEnvelope } from "../../parser/index.js";
-import type { EventContainer } from "../../utils/index.js";
+import { processEnvelope } from "~/parser/index.js";
+import type { EventContainer } from "~/utils/index.js";
 import { formatTimestamp, getDuration } from "../utils.js";
 
 export interface TraceContext {
