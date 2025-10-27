@@ -1,5 +1,11 @@
 # @spotlightjs/core
 
+## 4.3.1
+
+### Patch Changes
+
+- Refactor formatters by reusing helpers ([#1041](https://github.com/getsentry/spotlight/pull/1041))
+
 ## 4.3.0
 
 ### Minor Changes

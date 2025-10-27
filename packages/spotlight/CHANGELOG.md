@@ -1,5 +1,27 @@
 # @spotlightjs/spotlight
 
+## 4.3.0
+
+### Minor Changes
+
+- Add automatic port selection via `-p/--port 0` ([#1032](https://github.com/getsentry/spotlight/pull/1032))
+
+- Add `spotlight run` to run your apps with Spotlight ([#1020](https://github.com/getsentry/spotlight/pull/1020))
+
+- Remove the CLI ASCII art ([#1030](https://github.com/getsentry/spotlight/pull/1030))
+
+- Emit Spotlight version in CLI runs ([#1031](https://github.com/getsentry/spotlight/pull/1031))
+
+- Use a dynamic port with `spotlight run` so each run is isolated ([#1036](https://github.com/getsentry/spotlight/pull/1036))
+
+### Patch Changes
+
+- Fix shutdown issues where graceful shutdown never worked ([#1050](https://github.com/getsentry/spotlight/pull/1050))
+
+- Updated dependencies [[`6996476`](https://github.com/getsentry/spotlight/commit/69964763e8b66774536ac132646c884f531d5b9c), [`2f063b9`](https://github.com/getsentry/spotlight/commit/2f063b9e5d759f446086449f514a80c3a382cf60), [`fc83eda`](https://github.com/getsentry/spotlight/commit/fc83edaae67bbcbbba6ea5a7cf322c5aef7c6166), [`a291efb`](https://github.com/getsentry/spotlight/commit/a291efba0f4a32088d466d5c5e9c02268d6619f2), [`27686f9`](https://github.com/getsentry/spotlight/commit/27686f9c9623db2ae8674827f5d361933ba7b664), [`13e3d82`](https://github.com/getsentry/spotlight/commit/13e3d82c6ee3b8ecb6c726f2fcc7f03fc683d6e2), [`6c74e9c`](https://github.com/getsentry/spotlight/commit/6c74e9c34dc5f5255e7dff41d6536181fb25c5ce), [`2d34417`](https://github.com/getsentry/spotlight/commit/2d34417128c8ae46bf3b3a6eaafe1dc9adbc9ff5), [`e9f6ae2`](https://github.com/getsentry/spotlight/commit/e9f6ae20753a974974210f0a813e5091f0bbe5cb), [`385a150`](https://github.com/getsentry/spotlight/commit/385a15010822afb47702bbdcdf22f22a92c32043)]:
+  - @spotlightjs/sidecar@2.3.0
+  - @spotlightjs/overlay@4.3.1
+
 ## 4.2.0
 
 ### Minor Changes
