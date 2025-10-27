@@ -1,5 +1,31 @@
 # @spotlightjs/sidecar
 
+## 2.3.0
+
+### Minor Changes
+
+- Add automatic port selection via `-p/--port 0` ([#1032](https://github.com/getsentry/spotlight/pull/1032))
+
+- Add human readable formatter ([#1053](https://github.com/getsentry/spotlight/pull/1053))
+
+- Add `spotlight run` to run your apps with Spotlight ([#1020](https://github.com/getsentry/spotlight/pull/1020))
+
+- Add Logfmt formmater ([#1039](https://github.com/getsentry/spotlight/pull/1039))
+
+- Emit Spotlight version in CLI runs ([#1031](https://github.com/getsentry/spotlight/pull/1031))
+
+- Use a dynamic port with `spotlight run` so each run is isolated ([#1036](https://github.com/getsentry/spotlight/pull/1036))
+
+- Add json formatter to the CLI ([#1045](https://github.com/getsentry/spotlight/pull/1045))
+
+### Patch Changes
+
+- Fix shutdown issues where graceful shutdown never worked ([#1050](https://github.com/getsentry/spotlight/pull/1050))
+
+- Refactor formatters by reusing helpers ([#1041](https://github.com/getsentry/spotlight/pull/1041))
+
+- Added retry logic when starting the server ([#1040](https://github.com/getsentry/spotlight/pull/1040))
+
 ## 2.2.0
 
 ### Minor Changes
