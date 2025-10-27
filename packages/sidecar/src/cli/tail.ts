@@ -5,6 +5,7 @@ import { SENTRY_CONTENT_TYPE } from "../constants.js";
 import {
   type FormatterFunction,
   type FormatterType,
+  humanFormatters,
   jsonFormatters,
   logfmtFormatters,
   mdFormatters,
@@ -36,6 +37,7 @@ const FORMATTERS: Record<FormatterType, Map<string, FormatterFunction>> = {
   md: mdFormatters,
   logfmt: logfmtFormatters,
   json: jsonFormatters,
+  human: humanFormatters,
 };
 
 const connectUpstream = async (port: number) =>
@@ -84,7 +86,7 @@ export default async function tail(
         continue;
       }
 
-      formatted.push(...formatterFn(payload));
+      formatted.push(...formatterFn(payload, envelope));
     }
 
     if (formatted.length > 0) {
@@ -109,7 +111,7 @@ export default async function tail(
   }
 
   const serverInstance = await setupSidecar({ port, filesToServe, basePath, isStandalone: true });
-  
+
   // Subscribe the onEnvelope callback to the message buffer
   // This ensures it gets called whenever any envelope is added to the buffer
   getBuffer().subscribe(container => {

@@ -1,9 +1,9 @@
-import type { EnvelopeItem } from "@sentry/core";
+import type { Envelope, EnvelopeItem } from "@sentry/core";
 
 /**
  * A formatter function that takes a payload and returns an array of formatted strings
  */
-export type FormatterFunction = (event: EnvelopeItem[1]) => string[];
+export type FormatterFunction = (event: EnvelopeItem[1], envelope?: Envelope) => string[];
 
 /**
  * Interface that all formatters must implement.
@@ -21,10 +21,10 @@ export interface Formatter {
  * Available formatter types.
  * Add new formatters here as they are implemented.
  */
-export type FormatterType = "md" | "logfmt" | "json";
+export type FormatterType = "md" | "logfmt" | "json" | "human";
 
 /**
  * Runtime array of valid formatter types for validation.
  * Keep in sync with FormatterType.
  */
-export const AVAILABLE_FORMATTERS: readonly FormatterType[] = ["md", "logfmt", "json"] as const;
+export const AVAILABLE_FORMATTERS: readonly FormatterType[] = ["md", "logfmt", "json", "human"] as const;

@@ -13,9 +13,7 @@
     "test": "vitest run",
     "test:dev": "vitest"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "bin": {
     "spotlight-sidecar": "dist/run.js"
   },
@@ -59,6 +57,7 @@
     "@modelcontextprotocol/sdk": "^1.16.0",
     "@sentry/core": "catalog:",
     "@sentry/node": "catalog:",
+    "chalk": "^5.6.2",
     "eventsource": "^4.0.0",
     "fast-fuzzy": "^1.12.0",
     "hono": "^4.10.3",
