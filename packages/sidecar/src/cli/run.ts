@@ -38,7 +38,7 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
       {
         ...logItem,
         id: uuidv7(),
-        severity_number: level === "error" ? 17 : 9,
+        severity_number: level === "error" ? 17 : 9, // ERROR=17, INFO=9 per OpenTelemetry spec
         sdk: undefined,
       },
     ],
@@ -49,7 +49,7 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
 
   const itemHeader = {
     type: "log",
-    length: payloadBuffer.length,
+    length: payloadBuffer.length, // Use byte length, not string length
     item_count: 1,
     content_type: "application/json",
   };
@@ -105,11 +105,16 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   }
 
   const { serverInstance, onEnvelope } = result;
+  // We *MUST* have an instance address and a port here
+  // as not having that indicates either the server did not start
+  // or started in a weird manner (like over a unix socket)
   const actualServerPort = (serverInstance.address() as AddressInfo).port;
   let shell = false;
   const env = {
     ...process.env,
     SENTRY_SPOTLIGHT: getSpotlightURL(actualServerPort),
+    // This is not supported in all SDKs but worth adding
+    // for the ones that support it
     SENTRY_TRACES_SAMPLE_RATE: "1",
   } as { PATH: string; SENTRY_SPOTLIGHT: string; SENTRY_TRACES_SAMPLE_RATE: string; [key: string]: string };
   if (cmdArgs.length === 0) {
@@ -166,6 +171,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   runCmd.stdout?.on("data", (data: Buffer) => {
     stdoutBuffer += data.toString();
     const lines = stdoutBuffer.split("\n");
+    // Keep the last partial line in the buffer
     stdoutBuffer = lines.pop() || "";
 
     for (const line of lines) {
@@ -176,6 +182,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   runCmd.stderr?.on("data", (data: Buffer) => {
     stderrBuffer += data.toString();
     const lines = stderrBuffer.split("\n");
+    // Keep the last partial line in the buffer
     stderrBuffer = lines.pop() || "";
 
     for (const line of lines) {
@@ -190,6 +197,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   });
 
   runCmd.on("close", code => {
+    // Handle any remaining buffered lines
     if (stdoutBuffer.trim()) {
       processLogLine(stdoutBuffer, "info");
     }
