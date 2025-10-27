@@ -8,7 +8,7 @@ import { setupSidecar } from "../main.js";
 import type { ParsedEnvelope } from "../parser/index.js";
 import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
-
+import { getBuffer } from "../utils/index.js";
 
 export type OnItemCallback = (type: string, item: ParsedEnvelope["envelope"][1][number]) => boolean;
 export const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
@@ -91,6 +91,7 @@ export default async function tail(
   try {
     const client = await connectUpstream(port);
     client.addEventListener(SENTRY_CONTENT_TYPE, event => onEnvelope!(JSON.parse(event.data)));
+    return undefined;
   } catch (err) {
     // if we fail, fine then we'll start our own
     if (err instanceof Error && !err.message?.includes(port.toString())) {
@@ -100,6 +101,20 @@ export default async function tail(
       process.exit(1);
     }
 
-    return await setupSidecar({ port, filesToServe, basePath, onEnvelope, isStandalone: true });
+    const serverInstance = await setupSidecar({ port, filesToServe, basePath, isStandalone: true });
+    if (!serverInstance) {
+      return undefined;
+    }
+
+    // Subscribe the onEnvelope callback to the message buffer
+    // This ensures it gets called whenever any envelope is added to the buffer
+    getBuffer().subscribe(container => {
+      const parsedEnvelope = container.getParsedEnvelope();
+      if (parsedEnvelope) {
+        onEnvelope(parsedEnvelope.envelope);
+      }
+    });
+
+    return serverInstance;
   }
 }

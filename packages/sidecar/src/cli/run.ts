@@ -10,18 +10,14 @@ import { logger } from "../logger.js";
 import type { SentryLogEvent } from "../parser/types.js";
 import type { CLIHandlerOptions } from "../types/cli.js";
 import { getSpotlightURL } from "../utils/extras.js";
+import { EventContainer, getBuffer } from "../utils/index.js";
 import tail, { type OnItemCallback } from "./tail.js";
 
 const STDIO_LOG_MARKER = "__spotlight_stdio_log";
 
-/**
- * Creates a Sentry log envelope from a log message
- * Marks the log with STDIO_LOG_MARKER to exclude from duplicate detection
- */
 function createLogEnvelope(level: "info" | "error", body: string, timestamp: number): Buffer {
   const envelopeHeader = {};
 
-  // Create log item with special marker attribute
   const logItem: SerializedLog = {
     timestamp,
     level,
@@ -34,7 +30,6 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
     },
   };
 
-  // Create log event payload
   const logPayload: SentryLogEvent = {
     type: "log",
     event_id: uuidv7(),
@@ -52,7 +47,6 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
   const payloadJson = JSON.stringify(logPayload);
   const payloadBuffer = Buffer.from(payloadJson, "utf-8");
 
-  // Create item header
   const itemHeader = {
     type: "log",
     length: payloadBuffer.length, // Use byte length, not string length
@@ -60,70 +54,41 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
     content_type: "application/json",
   };
 
-  // Build envelope (newline-delimited JSON)
   const parts = [JSON.stringify(envelopeHeader), JSON.stringify(itemHeader), payloadJson];
 
   return Buffer.from(`${parts.join("\n")}\n`, "utf-8");
 }
 
-/**
- * Sends an envelope to the sidecar server via HTTP POST
- */
-async function sendEnvelopeToSidecar(envelopeBuffer: Buffer, sidecarPort: number): Promise<void> {
-  try {
-    const response = await fetch(`http://localhost:${sidecarPort}/stream`, {
-      method: "POST",
-      headers: {
-        "Content-Type": SENTRY_CONTENT_TYPE,
-      },
-      body: envelopeBuffer,
-    });
-
-    if (!response.ok) {
-      logger.debug(`Failed to send stdio log to sidecar: ${response.status} ${response.statusText}`);
-    }
-  } catch (error) {
-    logger.debug(`Error sending stdio log to sidecar: ${error}`);
-  }
-}
-
 export default async function run({ port, cmdArgs, basePath, filesToServe, format }: CLIHandlerOptions) {
   let relayStdioAsLogs = true;
-  
-  // Initialize fuzzy searcher for stdout/stderr log lines
+
   const fuzzySearcher = new Searcher([] as string[], {
     threshold: 0.8,
     ignoreCase: false,
   });
-  
+
   const logChecker: OnItemCallback = (type, item) => {
     if (type !== "log") return true;
 
-    // Extract log body from the item
     const [, payload] = item;
     const logEvent = payload as SentryLogEvent;
 
     if (logEvent.items && logEvent.items.length > 0) {
       for (const logItem of logEvent.items) {
-        // Skip logs that we created from stdio (they have the marker)
         if (logItem.attributes?.[STDIO_LOG_MARKER]) {
           continue;
         }
 
-        // Only check for duplicates if we're still relaying stdio
         if (!relayStdioAsLogs) continue;
 
         const logBody = typeof logItem.body === "string" ? logItem.body : String(logItem.body);
         const trimmedBody = logBody.trim();
 
         if (trimmedBody) {
-          // Search for fuzzy matches in stdout/stderr lines
           const matches = fuzzySearcher.search(trimmedBody);
-          // If we find a match with >80% similarity, we detected Sentry logging
           if (matches.length > 0) {
             logger.debug("Detected Sentry logging in the process, disabling stdio relay");
             relayStdioAsLogs = false;
-            // Return false to skip this log (prevent duplicate)
             return false;
           }
         }
@@ -150,7 +115,6 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     // This is not supported in all SDKs but worth adding
     // for the ones that support it
     SENTRY_TRACES_SAMPLE_RATE: "1",
-    //  Consider setting SENTRY_DSN to our hack server too?
   } as { PATH: string; SENTRY_SPOTLIGHT: string; SENTRY_TRACES_SAMPLE_RATE: string; [key: string]: string };
   if (cmdArgs.length === 0) {
     // try package.json to find default dev command
@@ -159,17 +123,6 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
       cmdArgs = [scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start];
       shell = true;
       env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
-    } catch {
-      // pass
-    }
-  }
-  if (cmdArgs.length === 0) {
-    // try to see if this is a docker-compose project
-    try {
-      // TODO: Check docker-compose.yml existence
-      // TODO: Check docker-compose.yaml existence
-      // TODO: Check `docker compose --version` existence
-      // TODO: Check `docker-compose --version` existence
     } catch {
       // pass
     }
@@ -189,7 +142,6 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     stdio: ["ignore", "pipe", "pipe"],
   });
 
-  // Helper function to process and send log lines
   const processLogLine = (line: string, level: "info" | "error") => {
     if (!relayStdioAsLogs) return;
     const trimmedLine = line.trim();
@@ -197,19 +149,18 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
 
     fuzzySearcher.add(trimmedLine);
 
-    const timestamp = Date.now() / 1000; // Sentry uses seconds
+    const timestamp = Date.now() / 1000;
     const envelopeBuffer = createLogEnvelope(level, trimmedLine, timestamp);
-    // Send to sidecar via HTTP (don't await to avoid blocking)
-    sendEnvelopeToSidecar(envelopeBuffer, actualServerPort).catch(err => {
-      logger.debug(`Failed to send stdio log: ${err}`);
-    });
+
+    const container = new EventContainer(SENTRY_CONTENT_TYPE, envelopeBuffer);
+    // Add to buffer - this will automatically trigger all subscribers
+    // including the onEnvelope callback registered in tail()
+    getBuffer().put(container);
   };
 
-  // Buffer for partial lines
   let stdoutBuffer = "";
   let stderrBuffer = "";
 
-  // Stream stdout as info-level logs
   runCmd.stdout?.on("data", (data: Buffer) => {
     stdoutBuffer += data.toString();
     const lines = stdoutBuffer.split("\n");
@@ -221,7 +172,6 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     }
   });
 
-  // Stream stderr as error-level logs
   runCmd.stderr?.on("data", (data: Buffer) => {
     stderrBuffer += data.toString();
     const lines = stderrBuffer.split("\n");
@@ -232,13 +182,13 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
       processLogLine(line, "error");
     }
   });
-  
+
   runCmd.on("error", err => {
     logger.error(`Failed to run ${cmdStr}:`);
     logger.error(err);
     process.exit(1);
   });
-  
+
   runCmd.on("close", code => {
     // Handle any remaining buffered lines
     if (stdoutBuffer.trim()) {
