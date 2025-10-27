@@ -9,6 +9,9 @@
     "target": "esnext",
     "module": "nodenext",
     /* paths */
+    "paths": {
+      "~/*": ["src/*"]
+    },
     "outDir": "dist",
     "rootDir": "src"
   },
