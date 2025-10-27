@@ -33,8 +33,7 @@ export const SUPPORTED_TAIL_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING)
 const FORMATTERS: Record<FormatterType, Map<string, FormatterFunction>> = {
   md: mdFormatters,
   logfmt: logfmtFormatters,
-  // TODO: add json formatter
-  json: jsonFormatters, // fallback until we have a json formatter
+  json: jsonFormatters,
 };
 
 const connectUpstream = async (port: number) =>
