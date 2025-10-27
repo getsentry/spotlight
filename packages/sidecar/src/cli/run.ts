@@ -152,14 +152,10 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     const timestamp = Date.now() / 1000;
     const envelopeBuffer = createLogEnvelope(level, trimmedLine, timestamp);
 
-    try {
-      const container = new EventContainer(SENTRY_CONTENT_TYPE, envelopeBuffer);
-      // Add to buffer - this will automatically trigger all subscribers
-      // including the onEnvelope callback registered in tail()
-      getBuffer().put(container);
-    } catch (err) {
-      logger.debug(`Failed to process stdio log: ${err}`);
-    }
+    const container = new EventContainer(SENTRY_CONTENT_TYPE, envelopeBuffer);
+    // Add to buffer - this will automatically trigger all subscribers
+    // including the onEnvelope callback registered in tail()
+    getBuffer().put(container);
   };
 
   let stdoutBuffer = "";
