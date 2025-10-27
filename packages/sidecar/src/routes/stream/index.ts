@@ -95,12 +95,9 @@ const router = new Hono<HonoEnv>()
       // Log incoming event details when debug is enabled
       logIncomingEvent(container);
 
+      // Add to buffer - this will automatically trigger all subscribers
+      // including the onEnvelope callback if one is registered
       getBuffer().put(container);
-
-      const onEnvelope = ctx.get("onEnvelope");
-      if (onEnvelope) {
-        onEnvelope(container.getParsedEnvelope().envelope);
-      }
     }
 
     const incomingPayload = ctx.get("incomingPayload");

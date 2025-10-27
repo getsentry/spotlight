@@ -98,13 +98,12 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     return true;
   };
 
-  const result = await tail({ port, cmdArgs: [], basePath, filesToServe, format }, logChecker);
-  if (!result) {
+  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe, format }, logChecker);
+  if (!serverInstance) {
     logger.error("Failed to start Spotlight sidecar server.");
     process.exit(1);
   }
 
-  const { serverInstance, onEnvelope } = result;
   // We *MUST* have an instance address and a port here
   // as not having that indicates either the server did not start
   // or started in a weird manner (like over a unix socket)
@@ -155,11 +154,9 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
 
     try {
       const container = new EventContainer(SENTRY_CONTENT_TYPE, envelopeBuffer);
+      // Add to buffer - this will automatically trigger all subscribers
+      // including the onEnvelope callback registered in tail()
       getBuffer().put(container);
-
-      if (onEnvelope) {
-        onEnvelope(container.getParsedEnvelope().envelope);
-      }
     } catch (err) {
       logger.debug(`Failed to process stdio log: ${err}`);
     }
