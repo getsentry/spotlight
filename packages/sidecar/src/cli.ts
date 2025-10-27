@@ -30,7 +30,7 @@ const PARSE_ARGS_CONFIG = {
     format: {
       type: "string",
       short: "f",
-      default: "logfmt",
+      default: "human",
     },
     // Deprecated -- use the positional `mcp` argument instead
     "stdio-mcp": {
