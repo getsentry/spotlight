@@ -66,7 +66,7 @@ export async function startServer(options: StartServerOptions): Promise<ServerTy
             [
               `sentryTrace;desc="${traceData["sentry-trace"]}"`,
               `baggage;desc="${traceData.baggage}"`,
-              `sentrySpotlightPort;desc=${options.port}`,
+              `sentrySpotlightPort;desc=${ctx.env.incoming.socket.localPort}`,
             ].join(", "),
           );
 
