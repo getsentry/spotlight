@@ -11,7 +11,7 @@ export const withTracing =
 export const getSpotlightURL = (port: number, host = "localhost") => `http://${host}:${port}/stream`;
 
 export function logSpotlightUrl(port: number): void {
-  logger.info(`You can open: http://localhost:${port} to see the Spotlight overlay directly`);
+  logger.info(`Open http://localhost:${port} to see the Spotlight UI`);
 }
 
 export const isValidPort = withTracing(

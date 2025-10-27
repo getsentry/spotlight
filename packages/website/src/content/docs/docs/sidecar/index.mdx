@@ -7,13 +7,13 @@ sidebar:
 
 import { LinkCard } from '@astrojs/starlight/components';
 
-The Sidecar uses SSE (Server-Sent Events) to forward events to the Spotlight overlay. It is a standalone server that can be deployed on the same machine as the Spotlight overlay or on a different machine.
+The Sidecar uses SSE (Server-Sent Events) to forward events to the Spotlight UI. It is a standalone server that can be deployed on the same machine as the Spotlight UI or on a different machine.
 
-It receives `POST` requests on `/stream` from the Sentry SDKs or any other source and forwards them to the Spotlight overlay via SSE.
+It receives `POST` requests on `/stream` from the Sentry SDKs or any other source and forwards them to the Spotlight UI via SSE.
 
-By default the Sidecar listens on port `8969` and the Spotlight overlay connects to it on `http://localhost:8969/stream`.
+By default the Sidecar listens on port `8969` and the Spotlight UI connects to it on `http://localhost:8969/stream`.
 
-The url can be configured via the `sidecar` config variable in the Spotlight overlay see [Configuration](/docs/reference/configuration/#sidecar).
+The url can be configured via the `sidecar` config variable in the Spotlight UI see [Configuration](/docs/reference/configuration/#sidecar).
 
 Also in the Sentry SDKs the URL can be configured via the `spotlight` option, for example in the Python SDK:
 
