@@ -104,10 +104,7 @@ export default async function tail(
   }
 
   const serverInstance = await setupSidecar({ port, filesToServe, basePath, isStandalone: true });
-  if (!serverInstance) {
-    return undefined;
-  }
-
+  
   // Subscribe the onEnvelope callback to the message buffer
   // This ensures it gets called whenever any envelope is added to the buffer
   getBuffer().subscribe(container => {
