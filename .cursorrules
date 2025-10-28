@@ -4,8 +4,7 @@
 
 This project uses **volta.sh** for Node version management.
 
-- Node version: **22.11.0**
-- pnpm version: **9.15.9**
+**The `volta` section in the root `package.json` defines the exact Node and pnpm versions for this project.**
 
 ### Rules:
 1. **NEVER** use `nvm`, `fnm`, or other Node version managers
@@ -13,6 +12,7 @@ This project uses **volta.sh** for Node version management.
 3. Volta automatically manages the correct Node and pnpm versions based on the `package.json` configuration
 4. If Node/pnpm commands fail, check that volta is installed: `volta --version`
 5. Trust volta to use the pinned versions defined in `package.json`
+6. Check `package.json` for the current volta configuration (Node and pnpm versions)
 
 ## Package Management
 
