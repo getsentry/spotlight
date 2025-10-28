@@ -196,7 +196,7 @@ spotlight.logs.search({ filters: { limit: 20, offset: 0 } })
 - **INFO**: General application flow and significant events
 - **WARN**: Potential issues that don't break functionality  
 - **DEBUG**: Detailed execution information for troubleshooting
-- **ERROR**: Actual failures (also available via get_local_errors)
+- **ERROR**: Actual failures (also available via spotlight.errors.search)
 
 **Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.
 
