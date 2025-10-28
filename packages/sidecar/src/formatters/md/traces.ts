@@ -367,12 +367,12 @@ export function formatTransactionEvent(payload: EnvelopeItem[1]): string[] {
 export function formatTrace(payload: EnvelopeItem[1]): string[] {
   // Type guard: transaction events are identified by the 'transaction' type
   if (!payload || typeof payload !== "object") {
-    return [];
+    throw new Error(`MD trace formatter received invalid payload: expected object, got ${typeof payload}`);
   }
 
   const event = payload as SentryEvent;
   if (!isTraceEvent(event)) {
-    return [];
+    throw new Error(`MD trace formatter received non-transaction event: type=${(event as any).type}`);
   }
 
   return formatTransactionEvent(payload);

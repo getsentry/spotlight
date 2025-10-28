@@ -46,12 +46,12 @@ ${attr}`;
 export function formatLog(payload: EnvelopeItem[1]): string[] {
   // Type guard: log events are identified by the 'log' type
   if (!payload || typeof payload !== "object") {
-    return [];
+    throw new Error(`MD log formatter received invalid payload: expected object, got ${typeof payload}`);
   }
 
   const event = payload as SentryEvent;
   if (!isLogEvent(event)) {
-    return [];
+    throw new Error(`MD log formatter received non-log event: type=${(event as any).type}`);
   }
 
   return event.items.map(formatSingleLog);

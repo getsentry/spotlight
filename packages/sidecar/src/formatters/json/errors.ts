@@ -4,12 +4,12 @@ import { buildErrorData } from "../shared/data-builders.js";
 
 export function formatError(payload: EnvelopeItem[1]): string[] {
   if (!payload || typeof payload !== "object") {
-    return [];
+    throw new Error(`JSON error formatter received invalid payload: expected object, got ${typeof payload}`);
   }
 
   const event = payload as SentryEvent;
   if (!isErrorEvent(event)) {
-    return [];
+    throw new Error(`JSON error formatter received non-error event: type=${(event as any).type}, has exception=${!!(event as any).exception}`);
   }
 
   return [JSON.stringify(buildErrorData(event))];

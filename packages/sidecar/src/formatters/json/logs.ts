@@ -8,12 +8,12 @@ function formatSingleLog(log: SerializedLog): string {
 
 export function formatLog(payload: EnvelopeItem[1]): string[] {
   if (!payload || typeof payload !== "object") {
-    return [];
+    throw new Error(`JSON log formatter received invalid payload: expected object, got ${typeof payload}`);
   }
 
   const event = payload as SentryEvent;
   if (!isLogEvent(event)) {
-    return [];
+    throw new Error(`JSON log formatter received non-log event: type=${(event as any).type}`);
   }
 
   return event.items.map(formatSingleLog);

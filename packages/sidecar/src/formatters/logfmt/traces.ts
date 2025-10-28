@@ -5,12 +5,12 @@ import { buildTraceData } from "../shared/data-builders.js";
 
 export function formatTrace(payload: EnvelopeItem[1]): string[] {
   if (!payload || typeof payload !== "object") {
-    return [];
+    throw new Error(`Logfmt trace formatter received invalid payload: expected object, got ${typeof payload}`);
   }
 
   const event = payload as SentryEvent;
   if (!isTraceEvent(event)) {
-    return [];
+    throw new Error(`Logfmt trace formatter received non-transaction event: type=${(event as any).type}`);
   }
 
   return [logfmt.stringify(buildTraceData(event))];

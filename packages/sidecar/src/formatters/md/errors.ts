@@ -89,12 +89,12 @@ export function formatError(payload: EnvelopeItem[1]): string[] {
   // Type guard: error events are identified by the 'event' type in the envelope
   // and must have an exception property
   if (!payload || typeof payload !== "object") {
-    return [];
+    throw new Error(`MD error formatter received invalid payload: expected object, got ${typeof payload}`);
   }
 
   const event = payload as SentryEvent;
   if (!isErrorEvent(event)) {
-    return [];
+    throw new Error(`MD error formatter received non-error event: type=${(event as any).type}, has exception=${!!(event as any).exception}`);
   }
 
   return [formatEventOutput(processErrorEvent(event))];
