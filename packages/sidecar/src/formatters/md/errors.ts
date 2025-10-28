@@ -1,4 +1,4 @@
-import type { EnvelopeItem } from "@sentry/core";
+import type { Envelope, EnvelopeItem } from "@sentry/core";
 import type { z } from "zod";
 import { type SentryEvent, isErrorEvent } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
@@ -85,7 +85,7 @@ export function processErrorEvent(event: any): z.infer<typeof ErrorEventSchema> 
 /**
  * Format an error event to markdown string
  */
-export function formatError(payload: EnvelopeItem[1], _envelopeHeader: EnvelopeItem[0]): string[] {
+export function formatError(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
   // Type guard: error events are identified by the 'event' type in the envelope
   // and must have an exception property
   if (!payload || typeof payload !== "object") {

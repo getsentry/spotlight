@@ -1,4 +1,4 @@
-import type { EnvelopeItem } from "@sentry/core";
+import type { Envelope, EnvelopeItem } from "@sentry/core";
 import { type SentryEvent, isTraceEvent, processEnvelope } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
 import { formatTimestamp, getDuration } from "../utils.js";
@@ -364,7 +364,7 @@ export function formatTransactionEvent(payload: EnvelopeItem[1]): string[] {
 /**
  * Format a trace/transaction event to markdown string
  */
-export function formatTrace(payload: EnvelopeItem[1], _envelopeHeader: EnvelopeItem[0]): string[] {
+export function formatTrace(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
   // Type guard: transaction events are identified by the 'transaction' type
   if (!payload || typeof payload !== "object") {
     throw new Error(`MD trace formatter received invalid payload: expected object, got ${typeof payload}`);

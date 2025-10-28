@@ -1,4 +1,4 @@
-import type { EnvelopeItem, SerializedLog } from "@sentry/core";
+import type { Envelope, EnvelopeItem, SerializedLog } from "@sentry/core";
 import logfmt from "logfmt";
 import { type SentryEvent, isLogEvent } from "~/parser/index.js";
 import { formatTimestamp, mapFields } from "../utils.js";
@@ -25,7 +25,7 @@ function formatSingleLog(log: SerializedLog): string {
   return logfmt.stringify(data);
 }
 
-export function formatLog(payload: EnvelopeItem[1], _envelopeHeader: EnvelopeItem[0]): string[] {
+export function formatLog(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
   if (!payload || typeof payload !== "object") {
     throw new Error(`Logfmt log formatter received invalid payload: expected object, got ${typeof payload}`);
   }

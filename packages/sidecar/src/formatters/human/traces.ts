@@ -1,4 +1,4 @@
-import type { EnvelopeItem } from "@sentry/core";
+import type { Envelope, EnvelopeItem } from "@sentry/core";
 import { type SentryEvent, isTraceEvent } from "~/parser/index.js";
 import { getDuration } from "../utils.js";
 import { categorizeSDK, formatLogLine } from "./utils.js";
@@ -6,7 +6,7 @@ import { categorizeSDK, formatLogLine } from "./utils.js";
 /**
  * Format a trace/transaction event with envelope headers for SDK categorization
  */
-export function formatTrace(payload: EnvelopeItem[1], envelopeHeader: EnvelopeItem[0]): string[] {
+export function formatTrace(payload: EnvelopeItem[1], envelopeHeader: Envelope[0]): string[] {
   if (!payload || typeof payload !== "object") {
     throw new Error(`Human trace formatter received invalid payload: expected object, got ${typeof payload}`);
   }

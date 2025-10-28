@@ -90,7 +90,7 @@ export default async function tail(
         continue;
       }
 
-      formatted.push(...formatterFn(payload, itemHeader));
+      formatted.push(...formatterFn(payload, envelopeHeader));
     }
 
     if (formatted.length > 0) {
