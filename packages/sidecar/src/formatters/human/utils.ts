@@ -3,39 +3,58 @@ import chalk from "chalk";
 
 /**
  * Categorize SDK as browser, mobile, or server based on sdk.name
+ * Rules based on https://release-registry.services.sentry.io/sdks
  */
 export function categorizeSDK(envelope: Envelope): "browser" | "mobile" | "server" {
   const sdkName = envelope[0]?.sdk?.name || "";
 
-  // Browser patterns
+  // Mobile: Native mobile platforms and frameworks
   if (
-    sdkName.includes("javascript.browser") ||
-    sdkName.includes("javascript.react") ||
-    sdkName.includes("javascript.nextjs") ||
-    sdkName.includes("javascript.angular") ||
-    sdkName.includes("javascript.vue") ||
-    sdkName.includes("javascript.svelte") ||
-    sdkName.includes("javascript.ember") ||
-    sdkName.includes("javascript.gatsby") ||
-    sdkName.includes("javascript.remix")
-  ) {
-    return "browser";
-  }
-
-  // Mobile patterns
-  if (
-    sdkName.includes("cocoa") || // iOS
-    sdkName.includes("android") || // Android
-    sdkName.includes("react-native") || // React Native
-    sdkName.includes("flutter") || // Flutter
-    sdkName.includes("xamarin") || // Xamarin
-    sdkName.includes("dart") || // Dart/Flutter
-    sdkName.includes("unity") // Unity mobile
+    sdkName.includes("cocoa") ||
+    sdkName.includes("android") ||
+    sdkName.includes("react-native") ||
+    sdkName.includes("flutter") ||
+    sdkName.includes("capacitor") ||
+    sdkName.includes("cordova") ||
+    sdkName.includes("xamarin") ||
+    sdkName.includes("maui") ||
+    sdkName.includes("unity") ||
+    sdkName.includes("kotlin.kmp")
   ) {
     return "mobile";
   }
 
-  // Everything else is server (node, python, go, ruby, php, java, etc.)
+  // Browser: JavaScript frameworks/libraries (excluding server/native runtimes and meta-frameworks)
+  if (
+    sdkName.startsWith("sentry.javascript.") &&
+    !sdkName.includes("node") &&
+    !sdkName.includes("bun") &&
+    !sdkName.includes("deno") &&
+    !sdkName.includes("electron") &&
+    !sdkName.includes("serverless") &&
+    !sdkName.includes("cloudflare") &&
+    !sdkName.includes("vercel-edge") &&
+    !sdkName.includes("wasm") &&
+    !sdkName.includes("opentelemetry") &&
+    !sdkName.includes("nextjs") &&
+    !sdkName.includes("remix") &&
+    !sdkName.includes("gatsby") &&
+    !sdkName.includes("astro") &&
+    !sdkName.includes("nuxt") &&
+    !sdkName.includes("sveltekit") &&
+    !sdkName.includes("solidstart") &&
+    !sdkName.includes("nestjs") &&
+    !sdkName.includes("tanstackstart")
+  ) {
+    return "browser";
+  }
+
+  // Special case: Blazor WebAssembly runs in browser
+  if (sdkName.includes("blazor.webassembly")) {
+    return "browser";
+  }
+
+  // Server: Everything else (node, python, ruby, go, php, java, dotnet, etc.)
   return "server";
 }
 
