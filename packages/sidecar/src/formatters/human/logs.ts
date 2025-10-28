@@ -1,4 +1,4 @@
-import type { Envelope, EnvelopeItem, SerializedLog } from "@sentry/core";
+import type { EnvelopeItem, SerializedLog } from "@sentry/core";
 import { type SentryEvent, isLogEvent } from "~/parser/index.js";
 import { categorizeSDK, formatLogLine } from "./utils.js";
 
@@ -26,20 +26,16 @@ function formatSingleLog(log: SerializedLog, source: "browser" | "mobile" | "ser
 /**
  * Format a log event with envelope headers for SDK categorization
  */
-export function formatLog(payload: EnvelopeItem[1], envelope?: Envelope): string[] {
-  if (!envelope) {
-    throw new Error("Human formatter requires envelope parameter");
-  }
-
+export function formatLog(payload: EnvelopeItem[1], envelopeHeader: EnvelopeItem[0]): string[] {
   if (!payload || typeof payload !== "object") {
-    return [];
+    throw new Error(`Human log formatter received invalid payload: expected object, got ${typeof payload}`);
   }
 
   const event = payload as SentryEvent;
   if (!isLogEvent(event)) {
-    return [];
+    throw new Error(`Human log formatter received non-log event: type=${(event as any).type}`);
   }
 
-  const source = categorizeSDK(envelope);
+  const source = categorizeSDK(envelopeHeader);
   return event.items.map(log => formatSingleLog(log, source));
 }

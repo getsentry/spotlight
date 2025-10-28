@@ -6,7 +6,7 @@ function formatSingleLog(log: SerializedLog): string {
   return JSON.stringify(buildLogData(log));
 }
 
-export function formatLog(payload: EnvelopeItem[1]): string[] {
+export function formatLog(payload: EnvelopeItem[1], _envelopeHeader: EnvelopeItem[0]): string[] {
   if (!payload || typeof payload !== "object") {
     throw new Error(`JSON log formatter received invalid payload: expected object, got ${typeof payload}`);
   }

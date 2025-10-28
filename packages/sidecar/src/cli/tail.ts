@@ -73,24 +73,24 @@ export default async function tail(
     const formatted: string[] = [];
 
     for (const item of items) {
-      const [{ type }, payload] = item;
+      const [itemHeader, payload] = item;
 
-      if (!type || !types.has(type)) {
+      if (!itemHeader.type || !types.has(itemHeader.type)) {
         // Skip if not a type we're interested in
         continue;
       }
 
       // Get the formatter for this type
-      const formatterFn = formatter.get(type);
+      const formatterFn = formatter.get(itemHeader.type);
       if (!formatterFn) {
         continue;
       }
 
-      if (onItem && !onItem(type, item, envelopeHeader)) {
+      if (onItem && !onItem(itemHeader.type, item, envelopeHeader)) {
         continue;
       }
 
-      formatted.push(...formatterFn(payload, envelope));
+      formatted.push(...formatterFn(payload, itemHeader));
     }
 
     if (formatted.length > 0) {

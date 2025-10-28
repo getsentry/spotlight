@@ -10,15 +10,15 @@ export function formatErrorEnvelope(container: EventContainer) {
   const processedEnvelope = container.getParsedEnvelope();
 
   const {
-    envelope: [, items],
+    envelope: [_envelopeHeader, items],
   } = processedEnvelope;
 
   const formatted: string[] = [];
   for (const item of items) {
-    const [{ type }, payload] = item;
+    const [itemHeader, payload] = item;
 
-    if (type === "event" && isErrorEvent(payload as SentryEvent)) {
-      formatted.push(...formatError(payload));
+    if (itemHeader.type === "event" && isErrorEvent(payload as SentryEvent)) {
+      formatted.push(...formatError(payload, itemHeader));
     }
   }
 
@@ -85,7 +85,7 @@ export function processErrorEvent(event: any): z.infer<typeof ErrorEventSchema> 
 /**
  * Format an error event to markdown string
  */
-export function formatError(payload: EnvelopeItem[1]): string[] {
+export function formatError(payload: EnvelopeItem[1], _envelopeHeader: EnvelopeItem[0]): string[] {
   // Type guard: error events are identified by the 'event' type in the envelope
   // and must have an exception property
   if (!payload || typeof payload !== "object") {
@@ -94,7 +94,9 @@ export function formatError(payload: EnvelopeItem[1]): string[] {
 
   const event = payload as SentryEvent;
   if (!isErrorEvent(event)) {
-    throw new Error(`MD error formatter received non-error event: type=${(event as any).type}, has exception=${!!(event as any).exception}`);
+    throw new Error(
+      `MD error formatter received non-error event: type=${(event as any).type}, has exception=${!!(event as any).exception}`,
+    );
   }
 
   return [formatEventOutput(processErrorEvent(event))];

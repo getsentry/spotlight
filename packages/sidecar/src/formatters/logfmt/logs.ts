@@ -25,7 +25,7 @@ function formatSingleLog(log: SerializedLog): string {
   return logfmt.stringify(data);
 }
 
-export function formatLog(payload: EnvelopeItem[1]): string[] {
+export function formatLog(payload: EnvelopeItem[1], _envelopeHeader: EnvelopeItem[0]): string[] {
   if (!payload || typeof payload !== "object") {
     throw new Error(`Logfmt log formatter received invalid payload: expected object, got ${typeof payload}`);
   }

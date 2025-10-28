@@ -1,12 +1,12 @@
-import type { Envelope, EnvelopeItem } from "@sentry/core";
+import type { EnvelopeItem } from "@sentry/core";
 
 /**
- * A formatter function that takes an envelope item payload and returns an array of formatted strings.
+ * A formatter function that takes an envelope item payload and envelope header, returning an array of formatted strings.
  * The payload is typed as EnvelopeItem[1] which represents the actual payload data from an envelope item.
+ * The envelopeHeader is typed as EnvelopeItem[0] which contains metadata like SDK info.
  * Formatters should use type guards (e.g., isErrorEvent, isLogEvent) to narrow the payload type.
- * The envelope parameter is optional since some formatters need it (e.g., human) and others don't.
  */
-export type FormatterFunction = (payload: EnvelopeItem[1], envelope?: Envelope) => string[];
+export type FormatterFunction = (payload: EnvelopeItem[1], envelopeHeader: EnvelopeItem[0]) => string[];
 
 /**
  * Interface that all formatters must implement.

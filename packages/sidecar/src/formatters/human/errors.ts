@@ -1,25 +1,23 @@
-import type { Envelope, EnvelopeItem } from "@sentry/core";
+import type { EnvelopeItem } from "@sentry/core";
 import { type SentryEvent, isErrorEvent } from "~/parser/index.js";
 import { categorizeSDK, formatLogLine } from "./utils.js";
 
 /**
  * Format an error event with envelope headers for SDK categorization
  */
-export function formatError(payload: EnvelopeItem[1], envelope?: Envelope): string[] {
-  if (!envelope) {
-    throw new Error("Human formatter requires envelope parameter");
-  }
-
+export function formatError(payload: EnvelopeItem[1], envelopeHeader: EnvelopeItem[0]): string[] {
   if (!payload || typeof payload !== "object") {
-    return [];
+    throw new Error(`Human error formatter received invalid payload: expected object, got ${typeof payload}`);
   }
 
   const event = payload as SentryEvent;
   if (!isErrorEvent(event)) {
-    return [];
+    throw new Error(
+      `Human error formatter received non-error event: type=${(event as any).type}, has exception=${!!(event as any).exception}`,
+    );
   }
 
-  const source = categorizeSDK(envelope);
+  const source = categorizeSDK(envelopeHeader);
 
   const exception = event.exception?.values?.[0];
   const errorType = exception?.type || "Error";
