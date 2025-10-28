@@ -6,11 +6,15 @@ import { categorizeSDK, formatLogLine } from "./utils.js";
 /**
  * Format a trace/transaction event with envelope headers for SDK categorization
  */
-export function formatTrace(payload: SentryTransactionEvent, envelope: Envelope): string[] {
+export function formatTrace(payload: unknown, envelope?: Envelope): string[] {
+  if (!envelope) {
+    throw new Error("Human formatter requires envelope parameter");
+  }
+  const event = payload as SentryTransactionEvent;
   const source = categorizeSDK(envelope);
 
-  const transaction = payload.transaction;
-  const trace = payload.contexts?.trace;
+  const transaction = event.transaction;
+  const trace = event.contexts?.trace;
 
   let message = transaction || trace?.description || "Transaction";
 
@@ -19,7 +23,7 @@ export function formatTrace(payload: SentryTransactionEvent, envelope: Envelope)
     message = `[${op}] ${message}`;
   }
 
-  const duration = getDuration(payload.timestamp, payload.start_timestamp);
+  const duration = getDuration(event.timestamp, event.start_timestamp);
   if (duration !== undefined) {
     message += ` ${Math.round(duration)}ms`;
   }
@@ -29,10 +33,10 @@ export function formatTrace(payload: SentryTransactionEvent, envelope: Envelope)
     message += ` (${status})`;
   }
 
-  const spanCount = payload.spans?.length;
+  const spanCount = event.spans?.length;
   if (spanCount && spanCount > 0) {
     message += ` [${spanCount} span${spanCount === 1 ? "" : "s"}]`;
   }
 
-  return [formatLogLine(payload.timestamp, source, "trace", message)];
+  return [formatLogLine(event.timestamp, source, "trace", message)];
 }

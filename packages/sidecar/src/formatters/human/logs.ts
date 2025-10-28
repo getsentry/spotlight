@@ -26,7 +26,11 @@ function formatSingleLog(log: SerializedLog, source: "browser" | "mobile" | "ser
 /**
  * Format a log event with envelope headers for SDK categorization
  */
-export function formatLog(payload: SentryLogEvent, envelope: Envelope): string[] {
+export function formatLog(payload: unknown, envelope?: Envelope): string[] {
+  if (!envelope) {
+    throw new Error("Human formatter requires envelope parameter");
+  }
+  const event = payload as SentryLogEvent;
   const source = categorizeSDK(envelope);
-  return payload.items.map(log => formatSingleLog(log, source));
+  return event.items.map(log => formatSingleLog(log, source));
 }

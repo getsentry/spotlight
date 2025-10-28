@@ -355,7 +355,7 @@ export function buildSpanTree(trace: TraceSummary): SpanNode[] {
 /**
  * Format a transaction payload for CLI output
  */
-export function formatTransactionEvent(payload: any): string[] {
+export function formatTransactionEvent(payload: unknown): string[] {
   const traceEvent = convertPayloadToTraceEvent(payload);
   return processTraceEvent(traceEvent);
 }
@@ -363,7 +363,7 @@ export function formatTransactionEvent(payload: any): string[] {
 /**
  * Format a trace/transaction event to markdown string
  */
-export function formatTrace(payload: any): string[] {
+export function formatTrace(payload: unknown): string[] {
   return formatTransactionEvent(payload);
 }
 

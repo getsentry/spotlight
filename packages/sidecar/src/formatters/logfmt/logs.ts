@@ -25,6 +25,6 @@ function formatSingleLog(log: SerializedLog): string {
   return logfmt.stringify(data);
 }
 
-export function formatLog(payload: SentryLogEvent): string[] {
-  return payload.items.map(formatSingleLog);
+export function formatLog(payload: unknown): string[] {
+  return (payload as SentryLogEvent).items.map(formatSingleLog);
 }

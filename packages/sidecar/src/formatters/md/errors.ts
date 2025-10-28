@@ -83,6 +83,6 @@ export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventS
 /**
  * Format an error event to markdown string
  */
-export function formatError(payload: ErrorEvent): string[] {
-  return [formatEventOutput(processErrorEvent(payload))];
+export function formatError(payload: unknown): string[] {
+  return [formatEventOutput(processErrorEvent(payload as ErrorEvent))];
 }
