@@ -24,7 +24,7 @@ export function categorizeSDK(envelope: Envelope): "browser" | "mobile" | "serve
     return "mobile";
   }
 
-  // Browser: JavaScript frameworks/libraries (excluding server/native runtimes)
+  // Browser: JavaScript frameworks/libraries (excluding server/native runtimes and meta-frameworks)
   if (
     sdkName.startsWith("sentry.javascript.") &&
     !sdkName.includes("node") &&
@@ -35,7 +35,16 @@ export function categorizeSDK(envelope: Envelope): "browser" | "mobile" | "serve
     !sdkName.includes("cloudflare") &&
     !sdkName.includes("vercel-edge") &&
     !sdkName.includes("wasm") &&
-    !sdkName.includes("opentelemetry")
+    !sdkName.includes("opentelemetry") &&
+    !sdkName.includes("nextjs") &&
+    !sdkName.includes("remix") &&
+    !sdkName.includes("gatsby") &&
+    !sdkName.includes("astro") &&
+    !sdkName.includes("nuxt") &&
+    !sdkName.includes("sveltekit") &&
+    !sdkName.includes("solidstart") &&
+    !sdkName.includes("nestjs") &&
+    !sdkName.includes("tanstackstart")
   ) {
     return "browser";
   }
