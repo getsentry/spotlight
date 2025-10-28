@@ -19,14 +19,14 @@ const inputSchema = {
       timeWindow: z
         .number()
         .describe(
-          "Look back this many seconds for errors. Use 300+ for broader investigation and something around 60 for everything else",
+          "Number of seconds to look back from now. Examples: 60 = last minute, 300 = last 5 minutes, 3600 = last hour. Default: 60",
         ),
     }),
     z.object({
       filename: z
         .string()
         .describe(
-          "Filename to search for in the stack trace. Useful when you want to find errors related to a specific file.",
+          "Exact filename to search in stack traces or logs. Examples: 'Button.tsx', 'auth.js', 'api/routes.ts'. Case-sensitive.",
         ),
     }),
     /**
@@ -38,14 +38,16 @@ const inputSchema = {
      */
     z
       .object({
-        limit: z.number().describe("The number of events to get"),
+        limit: z.number().describe("Maximum number of results to return. Examples: 10, 20, 50. Default: no limit"),
         offset: z
           .number()
           .default(0)
-          .describe("The position to start from. This is useful when you want to leave out the first n events"),
+          .describe(
+            "Number of results to skip from the beginning. Examples: 0 = start from first, 10 = skip first 10. Default: 0",
+          ),
       })
       .optional()
-      .describe("Get the latest n events, useful when you are unable to get data from the timeWindow filter"),
+      .describe("Pagination: Use when timeWindow doesn't work or for browsing through many results"),
   ]),
 };
 
@@ -68,65 +70,45 @@ export function createMCPInstance() {
   );
 
   mcp.registerTool(
-    "get_local_errors",
+    "spotlight.errors.search",
     {
-      title: "Get Local App Errors",
-      description: `Retrieve recent application errors from Spotlight debugger to diagnose failures, crashes, and exceptions across your entire stack - frontend, backend, and edge functions.
+      title: "Search Application Errors",
+      description: `**Purpose:** Search for runtime errors, exceptions, and crashes captured by Spotlight across your entire application stack.
 
 **CRITICAL: Call this tool IMMEDIATELY when:**
 - User says "error", "broken", "not working", "failing", "crash", "bug", "issue"
 - You encounter errors during testing or code execution
 - Before and after making code changes to verify no regressions
 - Investigating any unexpected behavior or performance problems
+- Error messages and exception details
+- Request/response context for API failures
+- Browser/device info when available
 
-**What you get:**
+**Returns:**
 • Full stack traces with exact file:line locations
-• Request/response data for API failures
-• React component errors with hierarchy
-• Database query failures with SQL
-• Network timeouts and connection issues
-• Browser/device context for debugging
 
-## Examples - Auto-call in these scenarios:
+**When to use:**
+- User reports "error", "broken", "not working", "crash", "bug"
+- After code changes to verify no regressions
+- Investigating unexpected behavior or failures
+- Debugging specific file errors
 
-**Example 1: User Issue Report**
-\`\`\`
-User: "The login page is broken"
-✅ FIRST: Call get_local_errors
-❌ NEVER: Start dev server to check logs
-→ Get actual runtime failures, then investigate code
-\`\`\`
+**Example calls:**
+\`\`\`json
+// Example 1: Check last minute for any errors
+spotlight.errors.search({ filters: { timeWindow: 60 } })
 
-**Example 2: Code Change Testing**
-\`\`\`
-User: "I modified the API and now it's not working"
-✅ FIRST: Call get_local_errors  
-❌ NEVER: Analyze code without checking real errors
-→ See exact failure point from runtime execution
+// Example 2: Find errors in specific file
+spotlight.errors.search({ filters: { filename: "auth.tsx" } })
+
+// Example 3: Get last 10 errors with pagination
+spotlight.errors.search({ filters: { limit: 10, offset: 0 } })
 \`\`\`
 
-**Example 3: Deployment Issues**
-\`\`\`
-User: "App crashes after deployment"
-✅ FIRST: Call get_local_errors
-❌ NEVER: Start local servers for comparison
-→ Get production error context immediately
-\`\`\`
-
-## Workflow Pattern:
-1. User reports problem → **Call get_local_errors FIRST**
-2. No errors found → **Ask user to reproduce the issue** → Call tool again
-3. Still no errors → Ask user to trigger specific features/pages
-4. Only after getting errors → Analyze relevant code files
-5. **NEVER start dev servers just to check logs** - use this tool first
-
-**Key trigger phrases:**
-- "Something went wrong" → Get the exact error
-- "Page won't load" → Check for render failures  
-- "API not responding" → See network/backend errors
-- "Button doesn't work" → Find click handler exceptions
-
-**Remember:** Always prefer real runtime errors over speculation. If no errors appear, guide user to reproduce the issue rather than starting development servers or making assumptions.`,
+**Parameter hints:**
+• filters.timeWindow: Seconds to look back (60 = 1 min, 300 = 5 min, 3600 = 1 hour)
+• filters.filename: Exact filename in stack trace (e.g., "Button.tsx", "api.js")
+• filters.limit/offset: For pagination through many errors`,
       inputSchema,
     },
     async args => {
@@ -165,59 +147,43 @@ User: "App crashes after deployment"
   );
 
   mcp.registerTool(
-    "get_local_logs",
+    "spotlight.logs.search",
     {
-      title: "Get Local App Logs",
-      description: `Retrieve recent application logs from Spotlight debugger to monitor behavior, debug issues, and understand application flow across your entire stack - frontend, backend, and edge functions.
+      title: "Search Application Logs",
+      description: `**Purpose:** Search for application logs to understand behavior, debug issues, and trace execution flow across your stack.
 
-**CRITICAL: Call this tool when:**
-- Investigating application behavior or flow
-- User mentions "logs", "debugging", "trace", "monitoring"
-- Understanding what the application is doing under the hood
-- Checking for warnings, info messages, or debug output
-- After making changes to verify expected behavior
-- Troubleshooting performance or unexpected behavior
+**NOT for:** Error diagnostics (use spotlight.errors.search for exceptions/crashes). This tool is for info, warn, debug, and trace messages.
 
-**What you get:**
-• Timestamped log entries with severity levels (info, warn, debug, error)
-• Request/response tracking across your stack
-• Application state changes and user interactions  
-• Database queries and API calls with timing
-• Custom debug messages from your code
-• Context from client-side, server-side, and edge functions
-• Structured attributes for filtering and analysis
+**Returns:**
+• Timestamped log entries with severity levels (info, warn, debug)
+• Custom application messages and debug output
+• API request/response logs with timing
+• Database query logs and performance metrics
 
-## Examples - Auto-call in these scenarios:
+**When to use:**
+- Understanding application flow and behavior
+- User mentions "logs", "debugging", "trace"
+- Checking what the app is doing internally
+- Performance investigation and timing analysis
 
-**Example 1: Understanding Application Flow**
-\`\`\`
-User: "Can you help me understand how authentication works?"
-✅ FIRST: Call get_local_logs (after user performs login)
-❌ NEVER: Just read auth code without seeing runtime flow
-→ See actual auth requests, token handling, redirects
-\`\`\`
+**Example calls:**
+\`\`\`json
+// Example 1: Check last 5 minutes of logs
+spotlight.logs.search({ filters: { timeWindow: 300 } })
 
-**Example 2: Performance Investigation**
-\`\`\`
-User: "The page loads slowly"
-✅ FIRST: Call get_local_logs 
-❌ NEVER: Start analyzing code without runtime data
-→ See database queries, API response times, render timing
-\`\`\`
+// Example 2: Find logs from specific file
+spotlight.logs.search({ filters: { filename: "auth.ts" } })
 
-**Example 3: Feature Testing**
-\`\`\`
-User: "I added logging to track user actions"
-✅ FIRST: Call get_local_logs (after triggering actions)
-→ Verify your logging is working as expected
+// Example 3: Get recent 20 log entries
+spotlight.logs.search({ filters: { limit: 20, offset: 0 } })
 \`\`\`
 
 ## Workflow Pattern:
-1. User reports behavior question → **Call get_local_logs** 
+1. User reports behavior question → **Call spotlight.logs.search** 
 2. User tests new feature → **Check logs for expected output**
 3. Performance concerns → **Look for timing patterns in logs**
 4. Debugging complex flows → **Trace execution through log timeline**
-5. **Use with get_local_errors** for complete debugging picture
+5. **Use with spotlight.errors.search** for complete debugging picture
 
 **Key trigger phrases:**
 - "How does X work?" → See runtime execution flow
@@ -232,7 +198,12 @@ User: "I added logging to track user actions"
 - **DEBUG**: Detailed execution information for troubleshooting
 - **ERROR**: Actual failures (also available via get_local_errors)
 
-**Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.`,
+**Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.
+
+**Parameter hints:**
+• filters.timeWindow: Seconds to look back (60 = 1 min, 300 = 5 min, 3600 = 1 hour) 
+• filters.filename: Exact filename generating logs (e.g., "api.ts", "database.js")
+• filters.limit/offset: For pagination through many log entries`,
       inputSchema,
     },
     async args => {
@@ -271,10 +242,10 @@ User: "I added logging to track user actions"
   );
 
   mcp.registerTool(
-    "get_local_traces",
+    "spotlight.traces.search",
     {
-      title: "Get Local Traces",
-      description: `Retrieve recent trace summaries from Spotlight debugger to identify performance patterns and trace flows across your application.
+      title: "Search Performance Traces",
+      description: `**Purpose:** Search for performance traces to identify slow requests, bottlenecks, and transaction patterns across your application.
 
 **USE THIS TOOL WHEN:**
 - Investigating application performance and request flows
@@ -282,20 +253,41 @@ User: "I added logging to track user actions"
 - Looking for distributed tracing data or transaction flows
 - Need to see high-level trace patterns before diving into details
 
-**What you get:**
-• List of recent traces with trace IDs, durations, and span counts
-• Root transaction names and timing information
-• Error counts per trace for quick issue identification
-• Trace timestamps for debugging specific time periods
+**Returns:**
+• List of traces with IDs, durations, and span counts
+• Root transaction names and total execution time
+• Error counts per trace for quick identification
+• Trace start timestamps for timeline analysis
 
-**Next Steps:**
-After identifying a trace of interest, use \`get_events_for_trace\` with the trace ID to see the full span tree and detailed timing breakdown.
+**When to use:**
+- Investigating performance issues or slow requests
+- User mentions "traces", "performance", "slow"
+- Finding specific transactions or requests
+- Overview of recent application activity
 
+**Example calls:**
+\`\`\`json
+// Example 1: Get traces from last 5 minutes
+spotlight.traces.search({ filters: { timeWindow: 300 } })
+
+// Example 2: Get 10 most recent traces
+spotlight.traces.search({ filters: { limit: 10, offset: 0 } })
+
+// Example 3: Find traces involving specific file
+spotlight.traces.search({ filters: { filename: "api.ts" } })
+\`\`\`
+
+**Parameter hints:**
+• filters.timeWindow: Seconds to look back (60 = 1 min, 300 = 5 min)
+• filters.limit: Number of traces to return (e.g., 10, 20)
+• filters.offset: Skip first N traces for pagination
 **Key trigger phrases:**
 - "Show me recent traces" → Get trace overview
 - "Performance issues" → Look for slow traces
 - "Request flows" → See transaction patterns
-- "Distributed tracing" → View trace summaries`,
+- "Distributed tracing" → View trace summaries
+
+**Next step:** Use spotlight.traces.get with a trace ID to see detailed span breakdown`,
       inputSchema,
     },
     async args => {
@@ -349,7 +341,7 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
 
       content.push({
         type: "text",
-        text: "\n**Next Steps:**\nUse `get_events_for_trace` with a trace ID (e.g., first 8 characters shown above) to see the full span tree and detailed timing breakdown for any specific trace.",
+        text: "\n**Next Steps:**\nUse `spotlight.traces.get` with a trace ID (e.g., first 8 characters shown above) to see the full span tree and detailed timing breakdown for any specific trace.",
       });
 
       return { content };
@@ -357,36 +349,48 @@ After identifying a trace of interest, use \`get_events_for_trace\` with the tra
   );
 
   mcp.registerTool(
-    "get_events_for_trace",
+    "spotlight.traces.get",
     {
-      title: "Get Events for Trace",
-      description: `Get detailed information about a specific trace including full span tree, timing breakdown, and errors.
+      title: "Get Trace Details",
+      description: `**Purpose:** Get the complete span tree and timing breakdown for a specific trace ID to analyze performance bottlenecks.
 
 **USE THIS TOOL WHEN:**
-- User provides a specific trace ID from \`get_local_traces\`
+- User provides a specific trace ID from \`spotlight.traces.search\`
 - Want to see detailed span hierarchy and timing for a trace
 - Investigating performance bottlenecks within a specific request flow
 - Need to understand the complete execution path of a transaction
 
-**What you get:**
-• Complete hierarchical span tree with parent-child relationships
-• Individual span durations and operation details
-• Error context within the trace timeline
-• Chronological flow of operations and timing breakdowns
+**Returns:**
+• Hierarchical span tree with parent-child relationships
+• Individual span durations and operation names
+• Database queries, API calls, and render timings
+• Error details if spans failed
 
-**Input:**
-Provide the trace ID (full 32-character hex string or first 8 characters) obtained from \`get_local_traces\`.
+**When to use:**
+- After finding a trace ID with spotlight.traces.search
+- Investigating specific slow request or transaction
+- Understanding detailed execution flow
+- Finding performance bottlenecks in a trace
 
-**Example Usage:**
+**Example calls:**
+\`\`\`json
+// Example 1: Get trace using short ID (first 8 chars)
+spotlight.traces.get({ traceId: "71a8c5e4" })
+
+// Example 2: Get trace using full 32-char ID
+spotlight.traces.get({ traceId: "71a8c5e41ae1044dee67f50a07538fe7" })
 \`\`\`
-get_events_for_trace(traceId: "71a8c5e4")  // Using short ID
-get_events_for_trace(traceId: "71a8c5e41ae1044dee67f50a07538fe7")  // Using full ID
-\`\`\``,
+
+**Parameter hints:**
+• traceId: Trace identifier from spotlight.traces.search
+  - Can use first 8 characters (e.g., "71a8c5e4")
+  - Or full 32-character hex string
+  - Case-insensitive`,
       inputSchema: {
         traceId: z
           .string()
           .describe(
-            "The trace ID to get details for. Can be the full 32-character hex string or just the first 8 characters.",
+            "Trace ID to retrieve. Format: 8 or 32 hex characters. Examples: '71a8c5e4' or '71a8c5e41ae1044dee67f50a07538fe7'",
           ),
       },
     },
@@ -413,7 +417,7 @@ get_events_for_trace(traceId: "71a8c5e41ae1044dee67f50a07538fe7")  // Using full
           content: [
             {
               type: "text",
-              text: `Trace \`${args.traceId}\` not found. Use \`get_local_traces\` to see available traces, or try expanding the time window if the trace is older.`,
+              text: `Trace \`${args.traceId}\` not found. Use \`spotlight.traces.search\` to see available traces, or try expanding the time window if the trace is older.`,
             },
           ],
         };
