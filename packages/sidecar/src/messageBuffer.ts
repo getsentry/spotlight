@@ -83,6 +83,7 @@ export class MessageBuffer<T> {
       }
 
       readerInfo.tid = setImmediate(() => this.stream(readerId));
+      readerInfo.tid.unref();
     }
   }
 
@@ -93,6 +94,7 @@ export class MessageBuffer<T> {
       pos: this.head,
       tid: setImmediate(() => this.stream(readerId)),
     };
+    readerInfo.tid.unref();
     this.readers.set(readerId, readerInfo);
 
     return readerId;

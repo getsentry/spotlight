@@ -55,6 +55,7 @@ export const isSidecarRunning = withTracing(
       }
       process.on("SIGINT", destroyHealthReq);
       timeoutId = setTimeout(destroyHealthReq, 2000);
+      timeoutId.unref();
       healthReq.on("error", () => {
         resolve(false);
       });

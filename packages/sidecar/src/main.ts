@@ -100,7 +100,7 @@ export async function startServer(options: StartServerOptions): Promise<ServerTy
       resolve(sidecarServer);
     },
   );
-
+  sidecarServer.setTimeout(1000);
   sidecarServer.addListener("error", handleServerError);
 
   let retries = 0;
@@ -121,6 +121,7 @@ export async function startServer(options: StartServerOptions): Promise<ServerTy
       portInUseRetryTimeout = setTimeout(() => {
         sidecarServer.listen(options.port);
       }, 5000);
+      portInUseRetryTimeout.unref();
     } else {
       captureException(err);
       reject(err as Error);
@@ -172,9 +173,6 @@ export function clearBuffer(): void {
 export function setShutdownHandlers(server: ServerType): void {
   let forceShutdown = false;
   const shutdown = () => {
-    if (portInUseRetryTimeout) {
-      clearTimeout(portInUseRetryTimeout);
-    }
     if (forceShutdown) {
       logger.info("Bye.");
       process.exit(0);
@@ -182,8 +180,6 @@ export function setShutdownHandlers(server: ServerType): void {
 
     forceShutdown = true;
     logger.info("Shutting down server gracefully...");
-
-    server.setTimeout(250);
     server.close();
     server.unref();
   };
