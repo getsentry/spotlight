@@ -1,4 +1,4 @@
-import type { ErrorEvent } from "@sentry/core";
+import type { EnvelopeItem } from "@sentry/core";
 import type { z } from "zod";
 import { type SentryEvent, isErrorEvent } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
@@ -18,14 +18,14 @@ export function formatErrorEnvelope(container: EventContainer) {
     const [{ type }, payload] = item;
 
     if (type === "event" && isErrorEvent(payload as SentryEvent)) {
-      formatted.push(...formatError(payload as ErrorEvent));
+      formatted.push(...formatError(payload));
     }
   }
 
   return formatted;
 }
 
-export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventSchema> {
+export function processErrorEvent(event: any): z.infer<typeof ErrorEventSchema> {
   const entries: z.infer<typeof ErrorEventSchema>["entries"] = [];
 
   if (event.exception) {
@@ -63,19 +63,21 @@ export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventS
     });
   }
 
+  const message = typeof event.message === "string" ? event.message : (event.message?.formatted ?? "");
+
   return {
-    message: event.message ?? "",
+    message,
     id: event.event_id ?? "",
-    type: "error",
+    type: "error" as const,
+    culprit: event.culprit ?? null,
     tags: Object.entries(event.tags ?? {}).map(([key, value]) => ({
       key,
       value: String(value),
     })),
     dateCreated: formatTimestamp(event.timestamp),
-    title: event.message ?? "",
+    title: message,
     entries,
-    // @ts-expect-error
-    contexts: event.contexts,
+    contexts: event.contexts as any,
     platform: event.platform,
   };
 }
@@ -83,6 +85,17 @@ export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventS
 /**
  * Format an error event to markdown string
  */
-export function formatError(payload: unknown): string[] {
-  return [formatEventOutput(processErrorEvent(payload as ErrorEvent))];
+export function formatError(payload: EnvelopeItem[1]): string[] {
+  // Type guard: error events are identified by the 'event' type in the envelope
+  // and must have an exception property
+  if (!payload || typeof payload !== "object") {
+    return [];
+  }
+
+  const event = payload as SentryEvent;
+  if (!isErrorEvent(event)) {
+    return [];
+  }
+
+  return [formatEventOutput(processErrorEvent(event))];
 }
