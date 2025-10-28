@@ -1,0 +1,82 @@
+# Cursor AI Rules for Spotlight.js
+
+## Node Version Management
+
+This project uses **volta.sh** for Node version management.
+
+**The `volta` section in the root `package.json` defines the exact Node and pnpm versions for this project.**
+
+### Rules:
+1. **NEVER** use `nvm`, `fnm`, or other Node version managers
+2. **NEVER** manually install or switch Node versions
+3. Volta automatically manages the correct Node and pnpm versions based on the `package.json` configuration
+4. If Node/pnpm commands fail, check that volta is installed: `volta --version`
+5. Trust volta to use the pinned versions defined in `package.json`
+6. Check `package.json` for the current volta configuration (Node and pnpm versions)
+
+## Package Management
+
+This project uses **pnpm** exclusively for package management.
+
+### Rules:
+1. **NEVER** use `npm` or `yarn` commands
+2. **ALWAYS** use `pnpm` for all package operations:
+   - Install dependencies: `pnpm install` (NOT `npm install`)
+   - Add packages: `pnpm add <package>` (NOT `npm install <package>`)
+   - Remove packages: `pnpm remove <package>` (NOT `npm uninstall <package>`)
+   - Run scripts: `pnpm run <script>` or `pnpm <script>`
+   - Execute commands: `pnpm exec <command>` or `pnpm dlx <command>`
+3. The project has a preinstall hook that enforces pnpm usage - any attempt to use npm will fail
+4. pnpm uses workspaces defined in `pnpm-workspace.yaml`
+
+## Common Commands
+
+```bash
+# Install all dependencies
+pnpm install
+
+# Run development servers
+pnpm dev                    # overlay + sidecar
+pnpm dev:overlay           # overlay only
+pnpm dev:sidecar           # sidecar only
+pnpm dev:website           # website only
+pnpm dev:electron          # electron app
+
+# Build all packages
+pnpm build
+
+# Run tests
+pnpm test                  # all package tests
+pnpm test:e2e             # e2e tests
+
+# Linting and formatting
+pnpm lint                  # check code
+pnpm lint:fix             # fix issues
+pnpm format               # format code
+
+# Clean up
+pnpm clean                # clean build artifacts
+pnpm clean:deps           # remove all node_modules
+pnpm clean:all            # clean everything and reinstall
+```
+
+## Workspace Structure
+
+This is a monorepo using pnpm workspaces with the following packages:
+- `@spotlightjs/electron` - Electron application
+- `@spotlightjs/overlay` - Overlay UI components
+- `@spotlightjs/sidecar` - Core sidecar functionality
+- `@spotlightjs/spotlight` - Main spotlight package
+- `@spotlightjs/tsconfig` - Shared TypeScript configuration
+- `@spotlightjs/website` - Documentation website
+
+### Working with workspaces:
+- Filter commands to specific packages: `pnpm --filter=<package-name> <command>`
+- Run commands in all packages: `turbo <command>` (uses Turborepo)
+
+## Important Notes
+
+- Do NOT modify the `volta` section in `package.json` without explicit approval
+- Do NOT modify the `packageManager` field in `package.json`
+- Do NOT remove or modify the `preinstall` script that enforces pnpm usage
+- Always respect the monorepo structure and use workspace protocols when adding dependencies between packages
