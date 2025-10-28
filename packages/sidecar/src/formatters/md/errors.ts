@@ -86,12 +86,6 @@ export function processErrorEvent(event: any): z.infer<typeof ErrorEventSchema> 
  * Format an error event to markdown string
  */
 export function formatError(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
-  // Type guard: error events are identified by the 'event' type in the envelope
-  // and must have an exception property
-  if (!payload || typeof payload !== "object") {
-    throw new Error(`MD error formatter received invalid payload: expected object, got ${typeof payload}`);
-  }
-
   const event = payload as SentryEvent;
   if (!isErrorEvent(event)) {
     throw new Error(

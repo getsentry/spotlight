@@ -6,10 +6,6 @@ import { categorizeSDK, formatLogLine } from "./utils.js";
  * Format an error event with envelope headers for SDK categorization
  */
 export function formatError(payload: EnvelopeItem[1], envelopeHeader: Envelope[0]): string[] {
-  if (!payload || typeof payload !== "object") {
-    throw new Error(`Human error formatter received invalid payload: expected object, got ${typeof payload}`);
-  }
-
   const event = payload as SentryEvent;
   if (!isErrorEvent(event)) {
     throw new Error(

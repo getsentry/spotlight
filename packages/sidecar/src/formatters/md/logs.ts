@@ -44,11 +44,6 @@ ${attr}`;
  * Format a log event to markdown string
  */
 export function formatLog(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
-  // Type guard: log events are identified by the 'log' type
-  if (!payload || typeof payload !== "object") {
-    throw new Error(`MD log formatter received invalid payload: expected object, got ${typeof payload}`);
-  }
-
   const event = payload as SentryEvent;
   if (!isLogEvent(event)) {
     throw new Error(`MD log formatter received non-log event: type=${(event as any).type}`);

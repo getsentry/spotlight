@@ -7,10 +7,6 @@ function formatSingleLog(log: SerializedLog): string {
 }
 
 export function formatLog(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
-  if (!payload || typeof payload !== "object") {
-    throw new Error(`JSON log formatter received invalid payload: expected object, got ${typeof payload}`);
-  }
-
   const event = payload as SentryEvent;
   if (!isLogEvent(event)) {
     throw new Error(`JSON log formatter received non-log event: type=${(event as any).type}`);

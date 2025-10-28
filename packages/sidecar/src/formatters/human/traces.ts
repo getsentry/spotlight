@@ -7,10 +7,6 @@ import { categorizeSDK, formatLogLine } from "./utils.js";
  * Format a trace/transaction event with envelope headers for SDK categorization
  */
 export function formatTrace(payload: EnvelopeItem[1], envelopeHeader: Envelope[0]): string[] {
-  if (!payload || typeof payload !== "object") {
-    throw new Error(`Human trace formatter received invalid payload: expected object, got ${typeof payload}`);
-  }
-
   const event = payload as SentryEvent;
   if (!isTraceEvent(event)) {
     throw new Error(`Human trace formatter received non-transaction event: type=${(event as any).type}`);

@@ -27,10 +27,6 @@ function formatSingleLog(log: SerializedLog, source: "browser" | "mobile" | "ser
  * Format a log event with envelope headers for SDK categorization
  */
 export function formatLog(payload: EnvelopeItem[1], envelopeHeader: Envelope[0]): string[] {
-  if (!payload || typeof payload !== "object") {
-    throw new Error(`Human log formatter received invalid payload: expected object, got ${typeof payload}`);
-  }
-
   const event = payload as SentryEvent;
   if (!isLogEvent(event)) {
     throw new Error(`Human log formatter received non-log event: type=${(event as any).type}`);

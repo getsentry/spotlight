@@ -365,11 +365,6 @@ export function formatTransactionEvent(payload: EnvelopeItem[1]): string[] {
  * Format a trace/transaction event to markdown string
  */
 export function formatTrace(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
-  // Type guard: transaction events are identified by the 'transaction' type
-  if (!payload || typeof payload !== "object") {
-    throw new Error(`MD trace formatter received invalid payload: expected object, got ${typeof payload}`);
-  }
-
   const event = payload as SentryEvent;
   if (!isTraceEvent(event)) {
     throw new Error(`MD trace formatter received non-transaction event: type=${(event as any).type}`);
