@@ -1,5 +1,6 @@
 import { consoleLoggingIntegration, getClient, init } from "@sentry/node";
 import { parseCLIArgs } from "@spotlightjs/sidecar/cli";
+import { DEFAULT_PORT } from "@spotlightjs/sidecar/constants";
 
 // Parse CLI arguments to determine the port this Spotlight instance will use
 const { port: instancePort } = parseCLIArgs();
@@ -13,27 +14,41 @@ let disableSpotlight = false;
 // The server will be assigned a port by the OS after it starts, and if SENTRY_SPOTLIGHT
 // happens to point to that same port, a feedback loop may occur.
 if (spotlightEnv && instancePort !== 0) {
-  try {
-    // Parse the SENTRY_SPOTLIGHT URL to extract the port
-    const spotlightUrl = new URL(spotlightEnv.startsWith("http") ? spotlightEnv : `http://${spotlightEnv}`);
-    const spotlightPort = spotlightUrl.port ? Number(spotlightUrl.port) : spotlightUrl.protocol === "https:" ? 443 : 80;
-    const spotlightHost = spotlightUrl.hostname;
+  let targetPort;
+  let targetHost;
 
-    // Check if it points to localhost/127.0.0.1 with our instance port
-    const isLocalhost = spotlightHost === "localhost" || spotlightHost === "127.0.0.1" || spotlightHost === "::1";
+  // SENTRY_SPOTLIGHT can be:
+  // 1. A full URL like "http://localhost:8969"
+  // 2. A host:port like "localhost:8969"
+  // 3. A truthy value (true, 1, etc.) which means use the default URL
+  const isTruthy = spotlightEnv === "true" || spotlightEnv === "1";
 
-    if (isLocalhost && spotlightPort === instancePort) {
+  if (isTruthy) {
+    // Use default Spotlight URL
+    targetHost = "localhost";
+    targetPort = DEFAULT_PORT;
+  } else {
+    // Try to parse as URL
+    try {
+      const spotlightUrl = new URL(spotlightEnv.startsWith("http") ? spotlightEnv : `http://${spotlightEnv}`);
+      targetHost = spotlightUrl.hostname;
+      targetPort = spotlightUrl.port ? Number(spotlightUrl.port) : spotlightUrl.protocol === "https:" ? 443 : 80;
+    } catch (_err) {
+      // If we can't parse it, we can't determine if it's a feedback loop, so do nothing
+      targetPort = null;
+    }
+  }
+
+  // Only disable if we successfully determined the target and it matches our instance
+  if (targetPort !== null && targetPort !== undefined) {
+    const isLocalhost = targetHost === "localhost" || targetHost === "127.0.0.1" || targetHost === "::1";
+
+    if (isLocalhost && targetPort === instancePort) {
       disableSpotlight = true;
       console.warn(
         `⚠️  [Spotlight] SENTRY_SPOTLIGHT is set to ${spotlightEnv} which points to this Spotlight instance (port ${instancePort}). Disabling Spotlight integration to prevent feedback loop.`,
       );
     }
-  } catch (_err) {
-    // If URL parsing fails, disable spotlight to be safe
-    console.warn(
-      `⚠️  [Spotlight] Failed to parse SENTRY_SPOTLIGHT URL: ${spotlightEnv}. Disabling Spotlight integration to prevent potential feedback loop.`,
-    );
-    disableSpotlight = true;
   }
 }
 
