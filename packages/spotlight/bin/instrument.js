@@ -1,4 +1,4 @@
-import { consoleLoggingIntegration, init } from "@sentry/node";
+import { init } from "@sentry/node";
 
 const sentry = init({
   dsn: "https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713",
@@ -7,13 +7,6 @@ const sentry = init({
   debug: Boolean(process.env.SENTRY_DEBUG),
 
   tracesSampleRate: 1,
-  enableLogs: true,
-
-  integrations: [
-    consoleLoggingIntegration({
-      levels: ["log", "info", "warn", "error", "debug"],
-    }),
-  ],
 
   beforeSendTransaction: event => {
     event.server_name = undefined; // Server name might contain PII
