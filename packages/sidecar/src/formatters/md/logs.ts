@@ -12,9 +12,9 @@ export function formatLogEnvelope(container: EventContainer) {
 
   const formatted: string[] = [];
   for (const item of items) {
-    const [itemHeader, payload] = item;
+    const [{ type }, payload] = item;
 
-    if (itemHeader.type === "log" && isLogEvent(payload as SentryEvent)) {
+    if (type === "log" && isLogEvent(payload as SentryEvent)) {
       formatted.push(...formatLog(payload, envelopeHeader));
     }
   }
