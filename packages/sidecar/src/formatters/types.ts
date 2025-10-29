@@ -39,7 +39,8 @@ export function applyFormatter<K extends keyof FormatterRegistry>(
   if (!entry.typeGuard(event)) {
     throw new Error(`Formatter received invalid event type: ${(event as any).type}`);
   }
-  return entry.format(event, envelopeHeader);
+  // Type assertion needed because TypeScript can't narrow the union type properly
+  return entry.format(event as any, envelopeHeader);
 }
 
 /**
