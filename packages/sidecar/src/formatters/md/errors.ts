@@ -1,6 +1,6 @@
-import type { ErrorEvent } from "@sentry/core";
+import type { Envelope, EnvelopeItem } from "@sentry/core";
 import type { z } from "zod";
-import { type SentryEvent, isErrorEvent } from "~/parser/index.js";
+import { type SentryErrorEvent, type SentryEvent, isErrorEvent } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
 import type { ErrorEventSchema } from "../schema.js";
 import { formatTimestamp } from "../utils.js";
@@ -10,7 +10,7 @@ export function formatErrorEnvelope(container: EventContainer) {
   const processedEnvelope = container.getParsedEnvelope();
 
   const {
-    envelope: [, items],
+    envelope: [envelopeHeader, items],
   } = processedEnvelope;
 
   const formatted: string[] = [];
@@ -18,14 +18,14 @@ export function formatErrorEnvelope(container: EventContainer) {
     const [{ type }, payload] = item;
 
     if (type === "event" && isErrorEvent(payload as SentryEvent)) {
-      formatted.push(...formatError(payload as ErrorEvent));
+      formatted.push(...formatError(payload, envelopeHeader));
     }
   }
 
   return formatted;
 }
 
-export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventSchema> {
+export function processErrorEvent(event: any): z.infer<typeof ErrorEventSchema> {
   const entries: z.infer<typeof ErrorEventSchema>["entries"] = [];
 
   if (event.exception) {
@@ -63,19 +63,21 @@ export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventS
     });
   }
 
+  const message = typeof event.message === "string" ? event.message : (event.message?.formatted ?? "");
+
   return {
-    message: event.message ?? "",
+    message,
     id: event.event_id ?? "",
-    type: "error",
+    type: "error" as const,
+    culprit: event.culprit ?? null,
     tags: Object.entries(event.tags ?? {}).map(([key, value]) => ({
       key,
       value: String(value),
     })),
     dateCreated: formatTimestamp(event.timestamp),
-    title: event.message ?? "",
+    title: message,
     entries,
-    // @ts-expect-error
-    contexts: event.contexts,
+    contexts: event.contexts as any,
     platform: event.platform,
   };
 }
@@ -83,6 +85,7 @@ export function processErrorEvent(event: ErrorEvent): z.infer<typeof ErrorEventS
 /**
  * Format an error event to markdown string
  */
-export function formatError(payload: ErrorEvent): string[] {
-  return [formatEventOutput(processErrorEvent(payload))];
+export function formatError(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
+  const event = payload as SentryErrorEvent;
+  return [formatEventOutput(processErrorEvent(event))];
 }

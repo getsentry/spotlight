@@ -1,15 +1,16 @@
-import type { Envelope, ErrorEvent } from "@sentry/core";
+import type { Envelope } from "@sentry/core";
+import type { SentryErrorEvent } from "~/parser/index.js";
 import { categorizeSDK, formatLogLine } from "./utils.js";
 
 /**
  * Format an error event with envelope headers for SDK categorization
  */
-export function formatError(payload: ErrorEvent, envelope: Envelope): string[] {
-  const source = categorizeSDK(envelope);
+export function formatError(event: SentryErrorEvent, envelopeHeader: Envelope[0]): string[] {
+  const source = categorizeSDK(envelopeHeader);
 
-  const exception = payload.exception?.values?.[0];
+  const exception = event.exception?.values?.[0];
   const errorType = exception?.type || "Error";
-  const errorValue = exception?.value || payload.message || payload.logentry?.message || "Unknown error";
+  const errorValue = exception?.value || event.message || "Unknown error";
 
   let message = `${errorType}: ${errorValue}`;
 
@@ -32,5 +33,5 @@ export function formatError(payload: ErrorEvent, envelope: Envelope): string[] {
     }
   }
 
-  return [formatLogLine(payload.timestamp, source, "error", message)];
+  return [formatLogLine(event.timestamp, source, "error", message)];
 }

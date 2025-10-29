@@ -1,4 +1,4 @@
-import type { SerializedLog } from "@sentry/core";
+import type { Envelope, EnvelopeItem, SerializedLog } from "@sentry/core";
 import { type SentryEvent, type SentryLogEvent, isLogEvent } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
 import { formatTimestamp } from "../utils.js";
@@ -7,7 +7,7 @@ export function formatLogEnvelope(container: EventContainer) {
   const parsedEnvelope = container.getParsedEnvelope();
 
   const {
-    envelope: [, items],
+    envelope: [envelopeHeader, items],
   } = parsedEnvelope;
 
   const formatted: string[] = [];
@@ -15,7 +15,7 @@ export function formatLogEnvelope(container: EventContainer) {
     const [{ type }, payload] = item;
 
     if (type === "log" && isLogEvent(payload as SentryEvent)) {
-      formatted.push(...formatLog(payload as SentryLogEvent));
+      formatted.push(...formatLog(payload, envelopeHeader));
     }
   }
 
@@ -43,6 +43,7 @@ ${attr}`;
 /**
  * Format a log event to markdown string
  */
-export function formatLog(payload: SentryLogEvent): string[] {
-  return payload.items.map(formatSingleLog);
+export function formatLog(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
+  const event = payload as SentryLogEvent;
+  return event.items.map(formatSingleLog);
 }

@@ -5,8 +5,8 @@ import chalk from "chalk";
  * Categorize SDK as browser, mobile, or server based on sdk.name
  * Rules based on https://release-registry.services.sentry.io/sdks
  */
-export function categorizeSDK(envelope: Envelope): "browser" | "mobile" | "server" {
-  const sdkName = envelope[0]?.sdk?.name || "";
+export function categorizeSDK(envelopeHeader: Envelope[0]): "browser" | "mobile" | "server" {
+  const sdkName = envelopeHeader?.sdk?.name || "";
 
   // Mobile: Native mobile platforms and frameworks
   if (

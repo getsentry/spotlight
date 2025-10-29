@@ -1,4 +1,5 @@
-import { processEnvelope } from "~/parser/index.js";
+import type { Envelope, EnvelopeItem } from "@sentry/core";
+import { type SentryTransactionEvent, processEnvelope } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
 import { formatTimestamp, getDuration } from "../utils.js";
 
@@ -355,16 +356,17 @@ export function buildSpanTree(trace: TraceSummary): SpanNode[] {
 /**
  * Format a transaction payload for CLI output
  */
-export function formatTransactionEvent(payload: any): string[] {
-  const traceEvent = convertPayloadToTraceEvent(payload);
+export function formatTransactionEvent(event: SentryTransactionEvent): string[] {
+  const traceEvent = convertPayloadToTraceEvent(event);
   return processTraceEvent(traceEvent);
 }
 
 /**
  * Format a trace/transaction event to markdown string
  */
-export function formatTrace(payload: any): string[] {
-  return formatTransactionEvent(payload);
+export function formatTrace(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
+  const event = payload as SentryTransactionEvent;
+  return formatTransactionEvent(event);
 }
 
 /**

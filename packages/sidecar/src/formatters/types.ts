@@ -1,20 +1,46 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
+import type { SentryErrorEvent, SentryEvent, SentryLogEvent, SentryTransactionEvent } from "~/parser/types.js";
 
 /**
- * A formatter function that takes a payload and returns an array of formatted strings
+ * Strongly-typed formatter functions (no type guards needed in implementation)
  */
-export type FormatterFunction = (event: EnvelopeItem[1], envelope?: Envelope) => string[];
+export type ErrorFormatterFn = (event: SentryErrorEvent, envelopeHeader: Envelope[0]) => string[];
+export type LogFormatterFn = (event: SentryLogEvent, envelopeHeader: Envelope[0]) => string[];
+export type TraceFormatterFn = (event: SentryTransactionEvent, envelopeHeader: Envelope[0]) => string[];
 
 /**
- * Interface that all formatters must implement.
- * Formatters expose a map of event types to formatter functions.
+ * Registry entry that bundles the formatter with its type guard
  */
-export interface Formatter {
-  /**
-   * Map of event types to formatter functions.
-   * Keys are event types from envelope items (e.g., "event", "transaction", "log")
-   */
-  formatters: Map<string, FormatterFunction>;
+export type FormatterEntry<T extends SentryEvent> = {
+  typeGuard: (event: SentryEvent) => event is T;
+  format: (event: T, envelopeHeader: Envelope[0]) => string[];
+};
+
+/**
+ * The formatter registry structure - this IS the formatters object
+ */
+export type FormatterRegistry = {
+  event: FormatterEntry<SentryErrorEvent>;
+  log: FormatterEntry<SentryLogEvent>;
+  transaction: FormatterEntry<SentryTransactionEvent>;
+};
+
+/**
+ * Generic function to get a formatter from registry and apply it
+ */
+export function applyFormatter<K extends keyof FormatterRegistry>(
+  registry: FormatterRegistry,
+  eventType: K,
+  payload: EnvelopeItem[1],
+  envelopeHeader: Envelope[0],
+): string[] {
+  const entry = registry[eventType];
+  const event = payload as SentryEvent;
+  if (!entry.typeGuard(event)) {
+    throw new Error(`Formatter received invalid event type: ${(event as any).type}`);
+  }
+  // Type assertion needed because TypeScript can't narrow the union type properly
+  return entry.format(event as any, envelopeHeader);
 }
 
 /**

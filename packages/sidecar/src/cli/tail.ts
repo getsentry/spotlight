@@ -3,8 +3,9 @@ import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
 import { SENTRY_CONTENT_TYPE } from "../constants.js";
 import {
-  type FormatterFunction,
+  type FormatterRegistry,
   type FormatterType,
+  applyFormatter,
   humanFormatters,
   jsonFormatters,
   logfmtFormatters,
@@ -37,7 +38,7 @@ const SUPPORTED_ENVELOPE_TYPES = new Set(Object.values(NAME_TO_TYPE_MAPPING).fla
 export const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
 export const SUPPORTED_TAIL_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
 
-const FORMATTERS: Record<FormatterType, Map<string, FormatterFunction>> = {
+const FORMATTERS: Record<FormatterType, FormatterRegistry> = {
   md: mdFormatters,
   logfmt: logfmtFormatters,
   json: jsonFormatters,
@@ -80,9 +81,8 @@ export default async function tail(
         continue;
       }
 
-      // Get the formatter for this type
-      const formatterFn = formatter.get(type);
-      if (!formatterFn) {
+      // Check if this event type is supported by the formatter
+      if (!(type in formatter)) {
         continue;
       }
 
@@ -90,7 +90,7 @@ export default async function tail(
         continue;
       }
 
-      formatted.push(...formatterFn(payload, envelope));
+      formatted.push(...applyFormatter(formatter, type as keyof FormatterRegistry, payload, envelopeHeader));
     }
 
     if (formatted.length > 0) {

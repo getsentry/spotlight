@@ -1,10 +1,11 @@
-import type { FormatterFunction } from "../types.js";
+import { isErrorEvent, isLogEvent, isTraceEvent } from "~/parser/helpers.js";
+import type { FormatterRegistry } from "../types.js";
 import { formatError } from "./errors.js";
 import { formatLog } from "./logs.js";
 import { formatTrace } from "./traces.js";
 
-export const formatters = new Map<string, FormatterFunction>([
-  ["event", formatError as FormatterFunction],
-  ["transaction", formatTrace as FormatterFunction],
-  ["log", formatLog as FormatterFunction],
-]);
+export const formatters: FormatterRegistry = {
+  event: { typeGuard: isErrorEvent, format: formatError },
+  log: { typeGuard: isLogEvent, format: formatLog },
+  transaction: { typeGuard: isTraceEvent, format: formatTrace },
+};
