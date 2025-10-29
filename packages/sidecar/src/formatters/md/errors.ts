@@ -1,6 +1,6 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
-import type z from "zod";
-import { type SentryEvent, isErrorEvent } from "~/parser/index.js";
+import type { z } from "zod";
+import { type SentryErrorEvent, type SentryEvent, isErrorEvent } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
 import type { ErrorEventSchema } from "../schema.js";
 import { formatTimestamp } from "../utils.js";
@@ -8,9 +8,6 @@ import { formatEventOutput } from "./event.js";
 
 export function formatErrorEnvelope(container: EventContainer) {
   const processedEnvelope = container.getParsedEnvelope();
-  if (!processedEnvelope) {
-    return [];
-  }
 
   const {
     envelope: [envelopeHeader, items],
@@ -20,11 +17,8 @@ export function formatErrorEnvelope(container: EventContainer) {
   for (const item of items) {
     const [itemHeader, payload] = item;
 
-    if (itemHeader.type === "event") {
-      const event = payload as SentryEvent;
-      if (isErrorEvent(event)) {
-        formatted.push(...formatError(event, envelopeHeader));
-      }
+    if (itemHeader.type === "event" && isErrorEvent(payload as SentryEvent)) {
+      formatted.push(...formatError(payload, envelopeHeader));
     }
   }
 
@@ -92,12 +86,6 @@ export function processErrorEvent(event: any): z.infer<typeof ErrorEventSchema> 
  * Format an error event to markdown string
  */
 export function formatError(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
-  const event = payload as SentryEvent;
-  if (!isErrorEvent(event)) {
-    throw new Error(
-      `MD error formatter received non-error event: type=${(event as any).type}, has exception=${!!(event as any).exception}`,
-    );
-  }
-
+  const event = payload as SentryErrorEvent;
   return [formatEventOutput(processErrorEvent(event))];
 }
