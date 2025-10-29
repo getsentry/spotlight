@@ -19,8 +19,7 @@ if (spotlightEnv && instancePort !== 0) {
 
   // SENTRY_SPOTLIGHT can be:
   // 1. A full URL like "http://localhost:8969"
-  // 2. A host:port like "localhost:8969"
-  // 3. A truthy value (true, 1, etc.) which means use the default URL
+  // 2. A truthy value (true, 1, etc.) which means use the default URL
   const isTruthy = spotlightEnv === "true" || spotlightEnv === "1";
 
   if (isTruthy) {
@@ -30,7 +29,7 @@ if (spotlightEnv && instancePort !== 0) {
   } else {
     // Try to parse as URL
     try {
-      const spotlightUrl = new URL(spotlightEnv.startsWith("http") ? spotlightEnv : `http://${spotlightEnv}`);
+      const spotlightUrl = new URL(spotlightEnv);
       targetHost = spotlightUrl.hostname;
       targetPort = spotlightUrl.port ? Number(spotlightUrl.port) : spotlightUrl.protocol === "https:" ? 443 : 80;
     } catch (_err) {
