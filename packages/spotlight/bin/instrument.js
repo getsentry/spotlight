@@ -1,16 +1,4 @@
-import { consoleLoggingIntegration, init, spotlightIntegration } from "@sentry/node";
-
-// Check if SENTRY_SPOTLIGHT is set, which would cause a feedback loop
-// where Spotlight sends its own telemetry to itself
-const spotlightUrl = process.env.SENTRY_SPOTLIGHT;
-const isSpotlightSelfReferencing = Boolean(spotlightUrl);
-
-if (isSpotlightSelfReferencing) {
-  console.warn(
-    "⚠️  [Spotlight] SENTRY_SPOTLIGHT environment variable is set. " +
-      "Disabling Spotlight integration to prevent feedback loop where Spotlight sends telemetry to itself.",
-  );
-}
+import { init } from "@sentry/node";
 
 const sentry = init({
   dsn: "https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713",
@@ -19,22 +7,6 @@ const sentry = init({
   debug: Boolean(process.env.SENTRY_DEBUG),
 
   tracesSampleRate: 1,
-  enableLogs: true,
-
-  integrations: defaults => {
-    const integrations = [
-      consoleLoggingIntegration({
-        levels: ["log", "info", "warn", "error", "debug"],
-      }),
-    ];
-
-    // Remove spotlightIntegration if SENTRY_SPOTLIGHT is set to prevent feedback loop
-    if (isSpotlightSelfReferencing) {
-      return integrations.concat(defaults.filter(integration => integration.name !== "Spotlight"));
-    }
-
-    return integrations.concat(defaults);
-  },
 
   beforeSendTransaction: event => {
     event.server_name = undefined; // Server name might contain PII

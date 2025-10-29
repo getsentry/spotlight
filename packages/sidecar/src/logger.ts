@@ -3,10 +3,10 @@ import type { SidecarLogger } from "./types/index.js";
 const SPOTLIGHT_PREFIX = "🔎 [Spotlight]";
 
 const defaultLogger: SidecarLogger = {
-  info: message => console.error(SPOTLIGHT_PREFIX, message),
-  warn: message => console.error(SPOTLIGHT_PREFIX, message),
-  error: message => console.error(SPOTLIGHT_PREFIX, message),
-  debug: message => debugEnabled && console.error(SPOTLIGHT_PREFIX, message),
+  info: message => process.stderr.write(`${SPOTLIGHT_PREFIX} ${message}\n`),
+  warn: message => process.stderr.write(`${SPOTLIGHT_PREFIX} ${message}\n`),
+  error: message => process.stderr.write(`${SPOTLIGHT_PREFIX} ${message}\n`),
+  debug: message => debugEnabled && process.stderr.write(`${SPOTLIGHT_PREFIX} ${message}\n`),
 };
 
 let injectedLogger: SidecarLogger | undefined = undefined;
