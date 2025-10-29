@@ -152,8 +152,20 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       if (roots.length === 1) {
         trace.rootTransaction = roots[0];
         trace.rootTransactionName = roots[0].transaction || "(unknown transaction)";
-      } else if (roots.length > 1) trace.rootTransactionName = "(multiple root transactions)";
-      else trace.rootTransactionName = "(missing root transaction)";
+      } else if (roots.length > 1) {
+        trace.rootTransactionName = "(multiple root transactions)";
+      } else if (trace.transactions.length > 0) {
+        // Orphan trace: no root transaction, but has child transactions
+        // This happens when the backend receives a trace continuation from the frontend,
+        // but the frontend is not sending traces to Spotlight
+        console.debug(
+          `[Spotlight] Orphan trace detected (trace_id: ${trace.trace_id}). ` +
+            `Using first transaction "${trace.transactions[0].transaction}" as fallback.`,
+        );
+        trace.rootTransactionName = trace.transactions[0].transaction || "(orphan transaction)";
+      } else {
+        trace.rootTransactionName = "(missing root transaction)";
+      }
 
       if (!existingTrace) {
         const newTracesById = new Map(tracesById);
