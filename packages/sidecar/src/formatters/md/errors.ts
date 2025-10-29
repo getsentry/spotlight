@@ -17,11 +17,8 @@ export function formatErrorEnvelope(container: EventContainer) {
   for (const item of items) {
     const [itemHeader, payload] = item;
 
-    if (itemHeader.type === "event") {
-      const event = payload as SentryEvent;
-      if (isErrorEvent(event)) {
-        formatted.push(...formatError(payload, envelopeHeader));
-      }
+    if (itemHeader.type === "event" && isErrorEvent(payload as SentryEvent)) {
+      formatted.push(...formatError(payload, envelopeHeader));
     }
   }
 

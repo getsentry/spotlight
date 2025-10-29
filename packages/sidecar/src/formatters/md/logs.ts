@@ -14,11 +14,8 @@ export function formatLogEnvelope(container: EventContainer) {
   for (const item of items) {
     const [itemHeader, payload] = item;
 
-    if (itemHeader.type === "log") {
-      const event = payload as SentryEvent;
-      if (isLogEvent(event)) {
-        formatted.push(...formatLog(payload, envelopeHeader));
-      }
+    if (itemHeader.type === "log" && isLogEvent(payload as SentryEvent)) {
+      formatted.push(...formatLog(payload, envelopeHeader));
     }
   }
 
