@@ -44,22 +44,6 @@ export function applyFormatter<K extends keyof FormatterRegistry>(
 }
 
 /**
- * Keep old FormatterFunction type for backward compatibility
- */
-export type FormatterFunction = (payload: EnvelopeItem[1], envelopeHeader: Envelope[0]) => string[];
-
-/**
- * Legacy interface - can be deprecated later
- */
-export interface Formatter {
-  /**
-   * Map of event types to formatter functions.
-   * Keys are event types from envelope items (e.g., "event", "transaction", "log")
-   */
-  formatters: Map<string, FormatterFunction>;
-}
-
-/**
  * Available formatter types.
  * Add new formatters here as they are implemented.
  */
