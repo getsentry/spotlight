@@ -10,6 +10,7 @@ import useSort from "../../hooks/useSort";
 import type { Span } from "../../types";
 import { formatBytes } from "../../utils/bytes";
 import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
+import { getResourceImageUrl } from "../../utils/resource-url";
 
 type ResourceInfo = {
   avgDuration: number;
@@ -137,18 +138,24 @@ const Resources = () => {
                   <TooltipTrigger asChild>
                     <span className="cursor-default truncate block">{resource.description}</span>
                   </TooltipTrigger>
-                  {resource.similarResources[0].op === "resource.img" && resource.description?.startsWith("/") && (
-                    <TooltipContent side="right" className="border-none bg-transparent p-0 shadow-none">
-                      <div className="bg-primary-800 cursor-pointer rounded-lg p-4 shadow-md">
-                        <h2 className="mb-2 font-bold text-white">Preview</h2>
-                        <img
-                          src={resource.description}
-                          className="inline-block max-h-[150px] max-w-[150px] rounded-sm p-1"
-                          alt="preview"
-                        />
-                      </div>
-                    </TooltipContent>
-                  )}
+                  {(() => {
+                    const imageUrl =
+                      resource.similarResources[0].op === "resource.img"
+                        ? getResourceImageUrl(resource.similarResources[0])
+                        : null;
+                    return imageUrl ? (
+                      <TooltipContent side="right" className="border-none bg-transparent p-0 shadow-none">
+                        <div className="bg-primary-800 cursor-pointer rounded-lg p-4 shadow-md">
+                          <h2 className="mb-2 font-bold text-white">Preview</h2>
+                          <img
+                            src={imageUrl}
+                            className="inline-block max-h-[150px] max-w-[150px] rounded-sm p-1"
+                            alt="preview"
+                          />
+                        </div>
+                      </TooltipContent>
+                    ) : null;
+                  })()}
                 </Tooltip>
               </TooltipProvider>
             </td>
