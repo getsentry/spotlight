@@ -1,29 +1,17 @@
-import { consoleLoggingIntegration, init } from "@sentry/node";
+import { consoleLoggingIntegration, getClient, init } from "@sentry/node";
+import { parseCLIArgs } from "@spotlightjs/sidecar/cli";
 
 // Parse CLI arguments to determine the port this Spotlight instance will use
-const DEFAULT_PORT = 8969;
-const args = process.argv.slice(2);
-let instancePort = DEFAULT_PORT;
-
-// Check for -p or --port flag
-const portFlagIndex = args.findIndex(arg => arg === "-p" || arg === "--port");
-if (portFlagIndex !== -1 && args[portFlagIndex + 1]) {
-  const portValue = args[portFlagIndex + 1];
-  const parsed = Number(portValue);
-  if (!Number.isNaN(parsed)) {
-    instancePort = parsed;
-  }
-}
-// Check for legacy positional port argument
-else if (args.length > 0 && /^\d{1,5}$/.test(args[0])) {
-  instancePort = Number(args[0]);
-}
+const { port: instancePort } = parseCLIArgs();
 
 // Check if SENTRY_SPOTLIGHT points to this instance
 const spotlightEnv = process.env.SENTRY_SPOTLIGHT;
 let disableSpotlight = false;
 
-if (spotlightEnv) {
+// Note: If port is set to 0 (dynamic port assignment), we cannot detect the actual port
+// before starting the server, so we cannot prevent the feedback loop in that case.
+// The server will be assigned a port by the OS after it starts.
+if (spotlightEnv && instancePort !== 0) {
   try {
     // Parse the SENTRY_SPOTLIGHT URL to extract the port
     const spotlightUrl = new URL(spotlightEnv.startsWith("http") ? spotlightEnv : `http://${spotlightEnv}`);
@@ -46,6 +34,12 @@ if (spotlightEnv) {
     );
     disableSpotlight = true;
   }
+} else if (spotlightEnv && instancePort === 0) {
+  console.warn(
+    "⚠️  [Spotlight] SENTRY_SPOTLIGHT is set and dynamic port assignment is being used (port 0). " +
+      "Cannot detect feedback loop as the actual port is unknown until server starts. " +
+      "If the ports match, a feedback loop may occur.",
+  );
 }
 
 const sentry = init({
