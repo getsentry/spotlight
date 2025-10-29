@@ -56,7 +56,7 @@ const sentry = init({
 
   tracesSampleRate: 1,
   enableLogs: true,
-  spotlight: !disableSpotlight,
+  ...(disableSpotlight && { spotlight: false }),
 
   integrations: [
     consoleLoggingIntegration({
