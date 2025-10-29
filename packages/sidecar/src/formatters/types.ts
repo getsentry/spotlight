@@ -1,16 +1,54 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
+import type { SentryErrorEvent, SentryEvent, SentryLogEvent, SentryTransactionEvent } from "~/parser/types.js";
 
 /**
- * A formatter function that takes an envelope item payload and envelope header, returning an array of formatted strings.
- * The payload is typed as EnvelopeItem[1] which represents the actual payload data from an envelope item.
- * The envelopeHeader is typed as Envelope[0] which contains metadata like SDK info about the entire envelope.
- * Formatters should use type guards (e.g., isErrorEvent, isLogEvent) to narrow the payload type.
+ * Strongly-typed formatter functions (no type guards needed in implementation)
+ */
+export type ErrorFormatterFn = (event: SentryErrorEvent, envelopeHeader: Envelope[0]) => string[];
+export type LogFormatterFn = (event: SentryLogEvent, envelopeHeader: Envelope[0]) => string[];
+export type TraceFormatterFn = (event: SentryTransactionEvent, envelopeHeader: Envelope[0]) => string[];
+
+/**
+ * Registry entry that bundles the formatter with its type guard
+ */
+export type FormatterEntry<T extends SentryEvent> = {
+  typeGuard: (event: SentryEvent) => event is T;
+  format: (event: T, envelopeHeader: Envelope[0]) => string[];
+};
+
+/**
+ * The formatter registry structure - this IS the formatters object
+ */
+export type FormatterRegistry = {
+  event: FormatterEntry<SentryErrorEvent>;
+  log: FormatterEntry<SentryLogEvent>;
+  transaction: FormatterEntry<SentryTransactionEvent>;
+};
+
+/**
+ * Generic function to get a formatter from registry and apply it
+ */
+export function applyFormatter<K extends keyof FormatterRegistry>(
+  registry: FormatterRegistry,
+  eventType: K,
+  payload: EnvelopeItem[1],
+  envelopeHeader: Envelope[0],
+): string[] {
+  const entry = registry[eventType];
+  const event = payload as SentryEvent;
+  if (!entry.typeGuard(event)) {
+    throw new Error(`Formatter received invalid event type: ${(event as any).type}`);
+  }
+  return entry.format(event, envelopeHeader);
+}
+
+/**
+ * Keep old FormatterFunction type for backward compatibility
  */
 export type FormatterFunction = (payload: EnvelopeItem[1], envelopeHeader: Envelope[0]) => string[];
 
 /**
- * Interface that all formatters must implement.
- * Formatters expose a map of event types to formatter functions.
+ * Legacy interface - can be deprecated later
  */
 export interface Formatter {
   /**

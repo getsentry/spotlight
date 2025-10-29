@@ -1,5 +1,5 @@
-import type { Envelope, EnvelopeItem } from "@sentry/core";
-import { type SentryEvent, isTraceEvent, processEnvelope } from "~/parser/index.js";
+import type { Envelope } from "@sentry/core";
+import { type SentryEvent, type SentryTransactionEvent, isTraceEvent, processEnvelope } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
 import { formatTimestamp, getDuration } from "../utils.js";
 
@@ -364,13 +364,8 @@ export function formatTransactionEvent(payload: EnvelopeItem[1]): string[] {
 /**
  * Format a trace/transaction event to markdown string
  */
-export function formatTrace(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
-  const event = payload as SentryEvent;
-  if (!isTraceEvent(event)) {
-    throw new Error(`MD trace formatter received non-transaction event: type=${(event as any).type}`);
-  }
-
-  return formatTransactionEvent(payload);
+export function formatTrace(event: SentryTransactionEvent, _envelopeHeader: Envelope[0]): string[] {
+  return formatTransactionEvent(event);
 }
 
 /**

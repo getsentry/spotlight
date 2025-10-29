@@ -1,17 +1,12 @@
-import type { Envelope, EnvelopeItem } from "@sentry/core";
-import { type SentryEvent, isTraceEvent } from "~/parser/index.js";
+import type { Envelope } from "@sentry/core";
+import type { SentryTransactionEvent } from "~/parser/index.js";
 import { getDuration } from "../utils.js";
 import { categorizeSDK, formatLogLine } from "./utils.js";
 
 /**
  * Format a trace/transaction event with envelope headers for SDK categorization
  */
-export function formatTrace(payload: EnvelopeItem[1], envelopeHeader: Envelope[0]): string[] {
-  const event = payload as SentryEvent;
-  if (!isTraceEvent(event)) {
-    throw new Error(`Human trace formatter received non-transaction event: type=${(event as any).type}`);
-  }
-
+export function formatTrace(event: SentryTransactionEvent, envelopeHeader: Envelope[0]): string[] {
   const source = categorizeSDK(envelopeHeader);
 
   const transaction = event.transaction;

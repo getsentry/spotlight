@@ -1,6 +1,6 @@
-import type { Envelope, EnvelopeItem, SerializedLog } from "@sentry/core";
+import type { Envelope, SerializedLog } from "@sentry/core";
 import logfmt from "logfmt";
-import { type SentryEvent, isLogEvent } from "~/parser/index.js";
+import type { SentryLogEvent } from "~/parser/index.js";
 import { formatTimestamp, mapFields } from "../utils.js";
 
 function formatSingleLog(log: SerializedLog): string {
@@ -25,11 +25,6 @@ function formatSingleLog(log: SerializedLog): string {
   return logfmt.stringify(data);
 }
 
-export function formatLog(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
-  const event = payload as SentryEvent;
-  if (!isLogEvent(event)) {
-    throw new Error(`Logfmt log formatter received non-log event: type=${(event as any).type}`);
-  }
-
+export function formatLog(event: SentryLogEvent, _envelopeHeader: Envelope[0]): string[] {
   return event.items.map(formatSingleLog);
 }

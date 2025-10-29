@@ -1,15 +1,8 @@
-import type { Envelope, EnvelopeItem } from "@sentry/core";
+import type { Envelope } from "@sentry/core";
 import logfmt from "logfmt";
-import { type SentryEvent, isErrorEvent } from "~/parser/index.js";
+import type { SentryErrorEvent } from "~/parser/index.js";
 import { buildErrorData } from "../shared/data-builders.js";
 
-export function formatError(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
-  const event = payload as SentryEvent;
-  if (!isErrorEvent(event)) {
-    throw new Error(
-      `Logfmt error formatter received non-error event: type=${(event as any).type}, has exception=${!!(event as any).exception}`,
-    );
-  }
-
+export function formatError(event: SentryErrorEvent, _envelopeHeader: Envelope[0]): string[] {
   return [logfmt.stringify(buildErrorData(event))];
 }

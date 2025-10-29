@@ -1,5 +1,5 @@
-import type { Envelope, EnvelopeItem, SerializedLog } from "@sentry/core";
-import { type SentryEvent, isLogEvent } from "~/parser/index.js";
+import type { Envelope, SerializedLog } from "@sentry/core";
+import { type SentryEvent, type SentryLogEvent, isLogEvent } from "~/parser/index.js";
 import type { EventContainer } from "~/utils/index.js";
 import { formatTimestamp } from "../utils.js";
 
@@ -43,11 +43,6 @@ ${attr}`;
 /**
  * Format a log event to markdown string
  */
-export function formatLog(payload: EnvelopeItem[1], _envelopeHeader: Envelope[0]): string[] {
-  const event = payload as SentryEvent;
-  if (!isLogEvent(event)) {
-    throw new Error(`MD log formatter received non-log event: type=${(event as any).type}`);
-  }
-
+export function formatLog(event: SentryLogEvent, _envelopeHeader: Envelope[0]): string[] {
   return event.items.map(formatSingleLog);
 }
