@@ -19,8 +19,9 @@ if (spotlightEnv && instancePort !== 0) {
 
   // SENTRY_SPOTLIGHT can be:
   // 1. A full URL like "http://localhost:8969"
-  // 2. A truthy value (true, 1, etc.) which means use the default URL
-  const isTruthy = spotlightEnv === "true" || spotlightEnv === "1";
+  // 2. A truthy value (true, t, y, yes, on, 1) which means use the default URL
+  const TRUTHY_ENV_VALUES = new Set(["true", "t", "y", "yes", "on", "1"]);
+  const isTruthy = TRUTHY_ENV_VALUES.has(spotlightEnv.toLowerCase());
 
   if (isTruthy) {
     // Use default Spotlight URL
