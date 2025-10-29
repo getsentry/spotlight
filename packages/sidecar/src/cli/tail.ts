@@ -74,23 +74,23 @@ export default async function tail(
     const formatted: string[] = [];
 
     for (const item of items) {
-      const [itemHeader, payload] = item;
+      const [{ type }, payload] = item;
 
-      if (!itemHeader.type || !types.has(itemHeader.type)) {
+      if (!type || !types.has(type)) {
         // Skip if not a type we're interested in
         continue;
       }
 
       // Check if this event type is supported by the formatter
-      if (!(itemHeader.type in formatter)) {
+      if (!(type in formatter)) {
         continue;
       }
 
-      if (onItem && !onItem(itemHeader.type, item, envelopeHeader)) {
+      if (onItem && !onItem(type, item, envelopeHeader)) {
         continue;
       }
 
-      formatted.push(...applyFormatter(formatter, itemHeader.type as keyof FormatterRegistry, payload, envelopeHeader));
+      formatted.push(...applyFormatter(formatter, type as keyof FormatterRegistry, payload, envelopeHeader));
     }
 
     if (formatted.length > 0) {

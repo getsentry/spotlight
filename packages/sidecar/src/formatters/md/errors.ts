@@ -10,15 +10,15 @@ export function formatErrorEnvelope(container: EventContainer) {
   const processedEnvelope = container.getParsedEnvelope();
 
   const {
-    envelope: [_envelopeHeader, items],
+    envelope: [envelopeHeader, items],
   } = processedEnvelope;
 
   const formatted: string[] = [];
   for (const item of items) {
-    const [itemHeader, payload] = item;
+    const [{ type }, payload] = item;
 
-    if (itemHeader.type === "event" && isErrorEvent(payload as SentryEvent)) {
-      formatted.push(...formatError(payload, itemHeader));
+    if (type === "event" && isErrorEvent(payload as SentryEvent)) {
+      formatted.push(...formatError(payload, envelopeHeader));
     }
   }
 
