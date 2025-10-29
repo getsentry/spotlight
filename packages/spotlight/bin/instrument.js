@@ -10,7 +10,8 @@ let disableSpotlight = false;
 
 // Note: If port is set to 0 (dynamic port assignment), we cannot detect the actual port
 // before starting the server, so we cannot prevent the feedback loop in that case.
-// The server will be assigned a port by the OS after it starts.
+// The server will be assigned a port by the OS after it starts, and if SENTRY_SPOTLIGHT
+// happens to point to that same port, a feedback loop may occur.
 if (spotlightEnv && instancePort !== 0) {
   try {
     // Parse the SENTRY_SPOTLIGHT URL to extract the port
@@ -34,12 +35,6 @@ if (spotlightEnv && instancePort !== 0) {
     );
     disableSpotlight = true;
   }
-} else if (spotlightEnv && instancePort === 0) {
-  console.warn(
-    "⚠️  [Spotlight] SENTRY_SPOTLIGHT is set and dynamic port assignment is being used (port 0). " +
-      "Cannot detect feedback loop as the actual port is unknown until server starts. " +
-      "If the ports match, a feedback loop may occur.",
-  );
 }
 
 const sentry = init({
