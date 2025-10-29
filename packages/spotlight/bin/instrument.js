@@ -1,4 +1,4 @@
-import { init, flush, consoleLoggingIntegration } from "@sentry/node";
+import { consoleLoggingIntegration, init } from "@sentry/node";
 
 const sentry = init({
   dsn: "https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713",
@@ -15,12 +15,12 @@ const sentry = init({
     }),
   ],
 
-  beforeSendTransaction: (event) => {
+  beforeSendTransaction: event => {
     event.server_name = undefined; // Server name might contain PII
     return event;
   },
 
-  beforeSend: (event) => {
+  beforeSend: event => {
     const exceptions = event.exception?.values;
     if (!exceptions) {
       return event;
