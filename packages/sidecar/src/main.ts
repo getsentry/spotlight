@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import { join } from "node:path";
-import { type ServerType, serve } from "@hono/node-server";
+import { serve } from "@hono/node-server";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -11,11 +11,12 @@ import { activateLogger, logger } from "./logger.js";
 import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
+import type { Server } from "node:http";
 
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
 const MAX_RETRIES = 3;
-export async function startServer(options: StartServerOptions): Promise<ServerType> {
+export async function startServer(options: StartServerOptions): Promise<Server> {
   const { port, basePath } = options;
   let filesToServe = options.filesToServe;
   if (!filesToServe && basePath) {
@@ -80,9 +81,9 @@ export async function startServer(options: StartServerOptions): Promise<ServerTy
     app.get("/*", serveFilesHandler(filesToServe));
   }
 
-  let resolve: (value: ServerType) => void;
+  let resolve: (value: Server) => void;
   let reject!: (err: Error) => void;
-  const promise = new Promise<ServerType>((res, rej) => {
+  const promise = new Promise<Server>((res, rej) => {
     resolve = res;
     reject = rej;
   });
@@ -97,10 +98,9 @@ export async function startServer(options: StartServerOptions): Promise<ServerTy
       if (basePath) {
         logSpotlightUrl(realPort);
       }
-      resolve(sidecarServer);
+      resolve(sidecarServer as Server);
     },
   );
-  sidecarServer.setTimeout(1000);
   sidecarServer.addListener("error", handleServerError);
 
   let retries = 0;
@@ -135,7 +135,7 @@ export async function setupSidecar(
   { port, logger: customLogger, basePath, filesToServe, incomingPayload, isStandalone }: SideCarOptions = {
     port: DEFAULT_PORT,
   },
-): Promise<ServerType | undefined> {
+): Promise<Server | undefined> {
   if (!isStandalone) {
     addEventProcessor(event => (event.spans?.some(span => span.op?.startsWith("sidecar.")) ? null : event));
   }
@@ -170,7 +170,7 @@ export function clearBuffer(): void {
   getBuffer().reset();
 }
 
-export function setShutdownHandlers(server: ServerType): void {
+export function setShutdownHandlers(server: Server): void {
   let forceShutdown = false;
   const shutdown = () => {
     if (forceShutdown) {
@@ -181,6 +181,7 @@ export function setShutdownHandlers(server: ServerType): void {
     forceShutdown = true;
     logger.info("Shutting down server gracefully...");
     server.close();
+    server.closeAllConnections();
     server.unref();
   };
 
