@@ -49,7 +49,7 @@ async function checkForUpdates() {
     await autoUpdater.checkForUpdates();
   } catch (error) {
     console.error(error);
-    Sentry.captureException(error);
+    // Sentry.captureException(error);
   }
 
   isCheckingForUpdates = false;
@@ -150,6 +150,51 @@ const createWindow = () => {
 
   win.on("closed", () => {
     win = null;
+  });
+
+  // Handle envelope download links
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    // If it's an envelope download link, trigger a download
+    if (url.includes("/envelope/")) {
+      win.webContents.downloadURL(url);
+      return { action: "deny" };
+    }
+    // For other external links, open in default browser
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      shell.openExternal(url);
+      return { action: "deny" };
+    }
+    return { action: "allow" };
+  });
+
+  // Intercept navigation to envelope download URLs
+  win.webContents.on("will-navigate", (event, url) => {
+    // Prevent navigation to envelope download links and trigger download instead
+    if (url.includes("/envelope/")) {
+      event.preventDefault();
+      win.webContents.downloadURL(url);
+    }
+  });
+
+  // Handle downloads
+  win.webContents.session.on("will-download", (_event, item, _webContents) => {
+    // Get the filename from the download item
+    const filename = item.getFilename();
+
+    // Show save dialog for envelope downloads
+    const savePath = dialog.showSaveDialogSync(win, {
+      defaultPath: filename,
+      filters: [
+        { name: "Binary Files", extensions: ["bin"] },
+        { name: "All Files", extensions: ["*"] },
+      ],
+    });
+
+    if (savePath) {
+      item.setSavePath(savePath);
+    } else {
+      item.cancel();
+    }
   });
 
   win.webContents.on("did-start-loading", () => {
