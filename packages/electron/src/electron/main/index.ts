@@ -49,7 +49,7 @@ async function checkForUpdates() {
     await autoUpdater.checkForUpdates();
   } catch (error) {
     console.error(error);
-    // Sentry.captureException(error);
+    Sentry.captureException(error);
   }
 
   isCheckingForUpdates = false;
