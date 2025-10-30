@@ -280,8 +280,8 @@ importers:
   packages/sidecar:
     dependencies:
       '@hono/mcp':
-        specifier: ^0.1.1
-        version: 0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.10.3)
+        specifier: ^0.1.5
+        version: 0.1.5(@modelcontextprotocol/sdk@1.16.0)(hono@4.10.3)
       '@hono/node-server':
         specifier: ^1.19.3
         version: 1.19.3(hono@4.10.3)
@@ -1540,8 +1540,8 @@ packages:
   '@fontsource/raleway@5.2.5':
     resolution: {integrity: sha512-gVFV8Yi8Y5h8sQw0U/F6TQID53DVIWPuRxqBLOBxwLbQma42JAwqTZ+pi3eDjpm20/rjS2XoVJH5hnMx1KFB+g==}
 
-  '@hono/mcp@0.1.1':
-    resolution: {integrity: sha512-2iQ4xBKfQdBBJP3V1/XCVyxQZeWWnxJG+5ytu9/Xuwwje3D70fm9ws0VV536rZ3CKWrnZZ/X+xeJ7FwR3ErVbw==}
+  '@hono/mcp@0.1.5':
+    resolution: {integrity: sha512-q6Yurx9VUwVEpqnwVXtzIYaq4kgQgWWq9lYLM7NFS2W0sg1RzL+RdKh6jO4/dGyvBLKrahPd2v+NC6rr0XWBvQ==}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.12.0
       hono: '>=4.0.0'
@@ -9463,7 +9463,7 @@ snapshots:
 
   '@fontsource/raleway@5.2.5': {}
 
-  '@hono/mcp@0.1.1(@modelcontextprotocol/sdk@1.16.0)(hono@4.10.3)':
+  '@hono/mcp@0.1.5(@modelcontextprotocol/sdk@1.16.0)(hono@4.10.3)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.16.0
       hono: 4.10.3

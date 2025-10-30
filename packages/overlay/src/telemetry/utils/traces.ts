@@ -66,18 +66,22 @@ export function compareSpans(a: { start_timestamp: number }, b: { start_timestam
 }
 
 export function getRootTransactionMethod(trace: Trace) {
-  const method = String(
-    trace.rootTransaction?.contexts?.trace.data?.method || trace.rootTransaction?.request?.method || "",
-  );
+  // Fallback to first transaction if no root transaction (e.g., orphan traces)
+  const transaction = trace.rootTransaction || trace.transactions[0];
+  const method = String(transaction?.contexts?.trace.data?.method || transaction?.request?.method || "");
   return method;
 }
 
 export function getRootTransactionName(trace: Trace) {
   const method = getRootTransactionMethod(trace);
-  const name =
-    method && trace.rootTransactionName.startsWith(method)
-      ? trace.rootTransactionName.slice(method.length + 1)
-      : trace.rootTransactionName;
+  // For orphan traces without a root, use the first transaction's name
+  let name = trace.rootTransactionName;
+  if (!trace.rootTransaction && trace.transactions.length > 0) {
+    name = trace.transactions[0].transaction || trace.rootTransactionName;
+  }
 
-  return name;
+  // Strip method prefix if present
+  const finalName = method && name.startsWith(method) ? name.slice(method.length + 1) : name;
+
+  return finalName;
 }
