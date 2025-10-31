@@ -172,10 +172,10 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                     }
                     if (header.id === "trace_id" && isColumnVisible("trace_id")) {
                       return (
-                        <td key="trace_id" className={cn("text-sm align-middle", idx === 0 && "ps-6")}>
+                        <td key="trace_id" className={cn("text-sm", idx === 0 && "ps-6")}>
                           <Link
                             to={`/telemetry/traces/${log.trace_id}`}
-                            className="text-blue-400 hover:text-blue-300 underline max-w-[150px] truncate inline-block"
+                            className="text-blue-400 hover:text-blue-300 underline max-w-[150px] truncate block"
                             onClick={e => e.stopPropagation()}
                           >
                             {log.trace_id || "N/A"}
