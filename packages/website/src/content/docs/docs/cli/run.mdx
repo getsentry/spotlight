@@ -76,9 +76,9 @@ spotlight run rails server
 
 When you run `spotlight run`, it:
 
-1. **Starts the Spotlight Sidecar** on the specified port (default: 8969)
+1. **Starts the Spotlight Sidecar** on the specified port (default: dynamically assigned)
 2. **Sets Environment Variables**:
-   - `SENTRY_SPOTLIGHT=http://localhost:8969/stream`
+   - `SENTRY_SPOTLIGHT=http://localhost:<port>/stream`
    - `SENTRY_TRACES_SAMPLE_RATE=1` (enables 100% trace sampling)
 3. **Runs Your Command** with these environment variables
 4. **Captures stdout/stderr** as log events automatically
