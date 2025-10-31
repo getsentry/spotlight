@@ -12,7 +12,7 @@ The `run` command wraps your application with Spotlight, automatically setting u
 ## Basic Usage
 
 ```bash
-spotlight-sidecar run [options] [command]
+spotlight run [options] [command]
 ```
 
 **Key points:**
@@ -22,7 +22,7 @@ spotlight-sidecar run [options] [command]
 
 ## Auto-Detection from package.json
 
-When you run `spotlight-sidecar run` without a command, it looks for these scripts in your `package.json` (in order):
+When you run `spotlight run` without a command, it looks for these scripts in your `package.json` (in order):
 
 1. `dev`
 2. `develop`
@@ -31,7 +31,7 @@ When you run `spotlight-sidecar run` without a command, it looks for these scrip
 
 ```bash
 # In a directory with package.json
-spotlight-sidecar run
+spotlight run
 # ✓ Automatically runs: npm run dev (or first available script)
 ```
 
@@ -41,7 +41,7 @@ This makes it incredibly easy to get started - just add Spotlight to your existi
 {
   "scripts": {
     "dev": "node server.js",
-    "dev:spotlight": "spotlight-sidecar run"
+    "dev:spotlight": "spotlight run"
   }
 }
 ```
@@ -50,84 +50,31 @@ This makes it incredibly easy to get started - just add Spotlight to your existi
 
 You can run any command with Spotlight:
 
-### Node.js Applications
+```bash
+spotlight run [your-command]
+```
 
-<Tabs>
-  <TabItem label="Express">
-    ```bash
-    spotlight-sidecar run node server.js
-    ```
-  </TabItem>
-  <TabItem label="Next.js">
-    ```bash
-    spotlight-sidecar run npm run dev
-    # or
-    spotlight-sidecar run next dev
-    ```
-  </TabItem>
-  <TabItem label="Remix">
-    ```bash
-    spotlight-sidecar run npm run dev
-    ```
-  </TabItem>
-  <TabItem label="NestJS">
-    ```bash
-    spotlight-sidecar run npm run start:dev
-    ```
-  </TabItem>
-</Tabs>
+**Examples:**
 
-### Python Applications
+```bash
+# Node.js
+spotlight run node server.js
 
-<Tabs>
-  <TabItem label="Django">
-    ```bash
-    spotlight-sidecar run python manage.py runserver
-    ```
-  </TabItem>
-  <TabItem label="Flask">
-    ```bash
-    spotlight-sidecar run flask run
-    # or
-    spotlight-sidecar run python app.py
-    ```
-  </TabItem>
-  <TabItem label="FastAPI">
-    ```bash
-    spotlight-sidecar run uvicorn main:app --reload
-    ```
-  </TabItem>
-</Tabs>
+# Python
+spotlight run python manage.py runserver
 
-### Other Languages
+# Go
+spotlight run go run main.go
 
-<Tabs>
-  <TabItem label="Go">
-    ```bash
-    spotlight-sidecar run go run main.go
-    # or
-    spotlight-sidecar run ./myapp
-    ```
-  </TabItem>
-  <TabItem label="Ruby">
-    ```bash
-    spotlight-sidecar run ruby app.rb
-    # or for Rails
-    spotlight-sidecar run rails server
-    ```
-  </TabItem>
-  <TabItem label="PHP">
-    ```bash
-    spotlight-sidecar run php artisan serve
-    # or
-    spotlight-sidecar run php -S localhost:8000
-    ```
-  </TabItem>
-</Tabs>
+# Any other command
+spotlight run npm start
+spotlight run flask run
+spotlight run rails server
+```
 
 ## What Happens Under the Hood
 
-When you run `spotlight-sidecar run`, it:
+When you run `spotlight run`, it:
 
 1. **Starts the Spotlight Sidecar** on the specified port (default: 8969)
 2. **Sets Environment Variables**:
@@ -156,13 +103,13 @@ Spotlight automatically detects if your app is already using Sentry's logging an
 
 ```bash
 # Use default port (8969)
-spotlight-sidecar run node server.js
+spotlight run node server.js
 
 # Use custom port
-spotlight-sidecar run -p 3000 node server.js
+spotlight run -p 3000 node server.js
 
 # Use random available port
-spotlight-sidecar run -p 0 node server.js
+spotlight run -p 0 node server.js
 ```
 
 ### Debug Mode
@@ -170,9 +117,9 @@ spotlight-sidecar run -p 0 node server.js
 Enable debug logging to see what Spotlight is doing:
 
 ```bash
-spotlight-sidecar run -d node server.js
+spotlight run -d node server.js
 # or
-spotlight-sidecar run --debug python app.py
+spotlight run --debug python app.py
 ```
 
 ## Complete Examples
@@ -181,7 +128,7 @@ spotlight-sidecar run --debug python app.py
 
 ```bash
 # Terminal 1: Run your app with Spotlight
-spotlight-sidecar run npm run dev
+spotlight run npm run dev
 
 # Terminal 2: Open the Spotlight UI
 open http://localhost:8969
@@ -193,7 +140,7 @@ open http://localhost:8969
 
 ```bash
 # If port 8969 is already in use
-spotlight-sidecar run -p 9000 node server.js
+spotlight run -p 9000 node server.js
 
 # Update your Sentry SDK configuration if needed:
 # spotlight: "http://localhost:9000/stream"
@@ -203,10 +150,10 @@ spotlight-sidecar run -p 9000 node server.js
 
 ```bash
 # Run tests with Spotlight for debugging failures
-spotlight-sidecar run npm test
+spotlight run npm test
 
 # Capture traces during integration tests
-spotlight-sidecar run -p 0 pytest tests/
+spotlight run -p 0 pytest tests/
 ```
 
 ## SDK Configuration
@@ -268,7 +215,7 @@ Sentry.init({
 
 ### Command Not Found
 
-If `spotlight-sidecar` is not found, make sure you've installed it:
+If `spotlight` is not found, make sure you've installed it:
 
 ```bash
 npm install -g @spotlightjs/sidecar
@@ -284,7 +231,7 @@ npx @spotlightjs/sidecar run node server.js
 4. **Enable Debug Mode**: Run with `-d` flag to see what's happening
 
 ```bash
-spotlight-sidecar run -d node server.js
+spotlight run -d node server.js
 ```
 
 ### Port Already in Use
@@ -293,10 +240,10 @@ If port 8969 is already taken:
 
 ```bash
 # Use a different port
-spotlight-sidecar run -p 9000 node server.js
+spotlight run -p 9000 node server.js
 
 # Or let the OS choose an available port
-spotlight-sidecar run -p 0 node server.js
+spotlight run -p 0 node server.js
 ```
 
 ## Next Steps
