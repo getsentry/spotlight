@@ -1,0 +1,368 @@
+---
+title: MCP Server
+description: Connect Spotlight to AI coding assistants via Model Context Protocol
+sidebar:
+  order: 0
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+The Spotlight MCP (Model Context Protocol) server enables AI coding assistants like Cursor, Claude, and others to access your application's runtime data for debugging and development assistance.
+
+## What is MCP?
+
+[Model Context Protocol](https://modelcontextprotocol.io) is an open standard that allows AI assistants to securely access external data sources and tools. Spotlight's MCP server provides tools that let your AI assistant:
+
+- Search through application errors with full stack traces
+- Query logs to understand application behavior
+- Inspect performance traces and identify bottlenecks
+- Get detailed timing information for distributed traces
+
+## Why Use Spotlight with MCP?
+
+When debugging with an AI coding assistant, it can now access actual runtime data from your application instead of just analyzing static code. This means:
+
+- **Context-aware debugging**: Your AI assistant sees the actual errors, not just the code
+- **Real-time insights**: Access to live traces and logs during development
+- **Faster issue resolution**: AI can analyze stack traces and suggest fixes based on real data
+- **Better performance analysis**: AI can identify slow operations from trace data
+
+## Quick Start
+
+### 1. Start Spotlight MCP Server
+
+```bash
+spotlight-sidecar mcp
+```
+
+This starts the Spotlight sidecar server with MCP protocol enabled on the default port (8969).
+
+### 2. Configure Your MCP Client
+
+Add Spotlight to your MCP client configuration. Here are examples for popular clients:
+
+<Tabs>
+  <TabItem label="Cursor">
+    Add to your Cursor MCP settings (`.cursor/mcp.json` or Cursor settings UI):
+
+    ```json
+    {
+      "mcpServers": {
+        "spotlight": {
+          "command": "npx",
+          "args": ["@spotlightjs/sidecar", "mcp"]
+        }
+      }
+    }
+    ```
+
+    Or if you have it installed globally:
+
+    ```json
+    {
+      "mcpServers": {
+        "spotlight": {
+          "command": "spotlight-sidecar",
+          "args": ["mcp"]
+        }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Claude Desktop">
+    Add to Claude Desktop's configuration (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+    ```json
+    {
+      "mcpServers": {
+        "spotlight": {
+          "command": "npx",
+          "args": ["@spotlightjs/sidecar", "mcp"]
+        }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Cline">
+    Add to Cline's MCP settings:
+
+    ```json
+    {
+      "mcpServers": {
+        "spotlight": {
+          "command": "npx",
+          "args": ["@spotlightjs/sidecar", "mcp"]
+        }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Other MCP Clients">
+    For other MCP-compatible clients, add the Spotlight server using these details:
+
+    - **Command:** `npx` (or `spotlight-sidecar` if installed globally)
+    - **Args:** `["@spotlightjs/sidecar", "mcp"]` (or `["mcp"]` if using global install)
+    - **Protocol:** stdio
+
+    Refer to your MCP client's documentation for exact configuration format.
+  </TabItem>
+</Tabs>
+
+### 3. Run Your Application
+
+Make sure your application is running and sending telemetry to Spotlight.
+
+**Option 1 - Use Spotlight CLI:**
+```bash
+spotlight-sidecar run npm run dev
+```
+
+**Option 2 - Set environment variable:**
+```bash
+export SENTRY_SPOTLIGHT=1
+npm run dev
+```
+
+### 4. Use in Your AI Assistant
+
+Now your AI assistant has access to Spotlight tools! Try asking:
+
+- "Are there any errors in my application?"
+- "Show me recent errors in the auth.js file"
+- "What traces do we have from the last 5 minutes?"
+- "Analyze the performance of trace ID abc123"
+- "Show me logs related to database operations"
+
+## Available Tools
+
+The MCP server provides four powerful tools:
+
+### `spotlight.errors.search`
+
+Search for application errors with stack traces and context.
+
+**Perfect for:**
+- Finding runtime errors and exceptions
+- Investigating crashes and failures
+- Analyzing error patterns
+
+[See detailed documentation →](/docs/mcp/tools/#spotlight-errors-search)
+
+### `spotlight.logs.search`
+
+Query application logs to understand behavior and flow.
+
+**Perfect for:**
+- Understanding application execution flow
+- Finding debug information
+- Analyzing timing and performance from logs
+
+[See detailed documentation →](/docs/mcp/tools/#spotlight-logs-search)
+
+### `spotlight.traces.search`
+
+List recent performance traces with summary information.
+
+**Perfect for:**
+- Getting an overview of recent requests
+- Identifying slow operations
+- Finding traces with errors
+
+[See detailed documentation →](/docs/mcp/tools/#spotlight-traces-search)
+
+### `spotlight.traces.get`
+
+Get detailed span tree and timing for a specific trace.
+
+**Perfect for:**
+- Deep-diving into performance issues
+- Analyzing distributed traces
+- Understanding request flow and timing
+
+[See detailed documentation →](/docs/mcp/tools/#spotlight-traces-get)
+
+[View complete tools reference →](/docs/mcp/tools/)
+
+## Configuration
+
+### Custom Port
+
+If you need to run Spotlight on a different port:
+
+```bash
+spotlight-sidecar mcp -p 3000
+```
+
+Update your MCP client configuration to match:
+
+```json
+{
+  "mcpServers": {
+    "spotlight": {
+      "command": "spotlight-sidecar",
+      "args": ["mcp", "-p", "3000"]
+    }
+  }
+}
+```
+
+### Debug Mode
+
+Enable debug logging to troubleshoot MCP connection issues:
+
+```bash
+spotlight-sidecar mcp -d
+```
+
+## How It Works
+
+The MCP integration connects your AI assistant to live application data:
+
+1. **Your Application** sends telemetry (errors, logs, traces) to the Spotlight sidecar via Sentry SDK
+2. **Spotlight Sidecar** stores events in memory and provides them via MCP tools
+3. **MCP Client** (Cursor, Claude, etc.) connects to Spotlight via stdio
+4. **AI Assistant** uses MCP tools to query events and help with debugging
+
+```
+Your App → Sentry SDK → Spotlight Sidecar ← MCP Client ← AI Assistant
+                              ↓
+                        [Errors, Logs, Traces]
+```
+
+## Requirements
+
+### Sentry SDK
+
+Your application must have a Sentry SDK configured to send events to Spotlight:
+
+<Tabs>
+  <TabItem label="Node.js">
+    ```javascript
+    import * as Sentry from '@sentry/node';
+
+    Sentry.init({
+      dsn: 'your-dsn', // Optional for local dev
+      // Spotlight is auto-enabled if SENTRY_SPOTLIGHT env var is set
+    });
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn="your-dsn",  # Optional for local dev
+        # Spotlight is auto-enabled if SENTRY_SPOTLIGHT env var is set
+    )
+    ```
+  </TabItem>
+  <TabItem label="Browser">
+    ```javascript
+    import * as Sentry from '@sentry/browser';
+
+    Sentry.init({
+      dsn: 'your-dsn',
+      integrations: [Sentry.spotlightBrowserIntegration()],
+    });
+    ```
+  </TabItem>
+</Tabs>
+
+### MCP Client
+
+You need an MCP-compatible client such as:
+- [Cursor](https://cursor.sh)
+- [Claude Desktop](https://claude.ai/download)
+- [Cline](https://github.com/cline/cline)
+- Any other MCP-compatible tool
+
+## Example Workflow
+
+Here's a typical debugging session with Spotlight MCP:
+
+1. **Start Spotlight MCP Server**
+   ```bash
+   spotlight-sidecar mcp
+   ```
+
+2. **Run Your Application**
+   ```bash
+   spotlight-sidecar run npm run dev
+   ```
+
+3. **Trigger an Error** in your application (e.g., click a button, make a request)
+
+4. **Ask Your AI Assistant**
+   ```
+   You: "Are there any errors in my app?"
+   
+   AI: I'll check Spotlight for errors...
+   [Calls spotlight.errors.search]
+   
+   AI: "Yes, there's a TypeError in auth.js at line 42:
+        Cannot read property 'id' of undefined
+        
+        The error occurs in the getUserData function.
+        Would you like me to analyze the code?"
+   ```
+
+5. **Deep Dive with Follow-ups**
+   ```
+   You: "Show me the full trace for this request"
+   
+   AI: [Calls spotlight.traces.search and spotlight.traces.get]
+   
+   AI: "Here's the trace:
+        - Total duration: 245ms
+        - Database query: 45ms
+        - External API call: 180ms (this is slow!)
+        - Error occurred during user data processing
+        
+        The external API call is taking most of the time.
+        The error happens because the API returned null."
+   ```
+
+## Troubleshooting
+
+### MCP Server Not Starting
+
+Check that the port isn't already in use:
+
+```bash
+# Use a different port
+spotlight-sidecar mcp -p 3000
+
+# Enable debug logging
+spotlight-sidecar mcp -d
+```
+
+### AI Assistant Not Seeing Tools
+
+1. Verify MCP server is running
+2. Check your MCP client configuration is correct
+3. Restart your MCP client after configuration changes
+4. Check client logs for connection errors
+
+### No Events Available
+
+1. Ensure your application is running
+2. Verify Sentry SDK is configured
+3. Trigger some activity (errors, requests) in your app
+4. Check that `SENTRY_SPOTLIGHT` environment variable is set or SDK has spotlight enabled
+
+### Connection Issues
+
+Enable debug mode to see detailed logs:
+
+```bash
+spotlight-sidecar mcp -d
+```
+
+Check that your MCP client is using the correct command and arguments.
+
+## Next Steps
+
+- [Learn about available MCP tools](/docs/mcp/tools/)
+- [See common debugging workflows](/docs/mcp/workflows/)
+- [Explore CLI commands](/docs/cli/)
+

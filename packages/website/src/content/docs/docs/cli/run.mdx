@@ -1,0 +1,307 @@
+---
+title: Spotlight Run
+description: Run your applications with automatic Spotlight instrumentation
+sidebar:
+  order: 1
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+The `run` command wraps your application with Spotlight, automatically setting up the necessary environment variables and capturing telemetry data.
+
+## Basic Usage
+
+```bash
+spotlight-sidecar run [options] [command]
+```
+
+**Key points:**
+- If you don't provide a command, Spotlight automatically detects and runs your development script from `package.json`
+- Works with any language or framework
+- Automatically configures environment variables for Spotlight integration
+
+## Auto-Detection from package.json
+
+When you run `spotlight-sidecar run` without a command, it looks for these scripts in your `package.json` (in order):
+
+1. `dev`
+2. `develop`
+3. `serve`
+4. `start`
+
+```bash
+# In a directory with package.json
+spotlight-sidecar run
+# ✓ Automatically runs: npm run dev (or first available script)
+```
+
+This makes it incredibly easy to get started - just add Spotlight to your existing workflow:
+
+```json
+{
+  "scripts": {
+    "dev": "node server.js",
+    "dev:spotlight": "spotlight-sidecar run"
+  }
+}
+```
+
+## Running Specific Commands
+
+You can run any command with Spotlight:
+
+### Node.js Applications
+
+<Tabs>
+  <TabItem label="Express">
+    ```bash
+    spotlight-sidecar run node server.js
+    ```
+  </TabItem>
+  <TabItem label="Next.js">
+    ```bash
+    spotlight-sidecar run npm run dev
+    # or
+    spotlight-sidecar run next dev
+    ```
+  </TabItem>
+  <TabItem label="Remix">
+    ```bash
+    spotlight-sidecar run npm run dev
+    ```
+  </TabItem>
+  <TabItem label="NestJS">
+    ```bash
+    spotlight-sidecar run npm run start:dev
+    ```
+  </TabItem>
+</Tabs>
+
+### Python Applications
+
+<Tabs>
+  <TabItem label="Django">
+    ```bash
+    spotlight-sidecar run python manage.py runserver
+    ```
+  </TabItem>
+  <TabItem label="Flask">
+    ```bash
+    spotlight-sidecar run flask run
+    # or
+    spotlight-sidecar run python app.py
+    ```
+  </TabItem>
+  <TabItem label="FastAPI">
+    ```bash
+    spotlight-sidecar run uvicorn main:app --reload
+    ```
+  </TabItem>
+</Tabs>
+
+### Other Languages
+
+<Tabs>
+  <TabItem label="Go">
+    ```bash
+    spotlight-sidecar run go run main.go
+    # or
+    spotlight-sidecar run ./myapp
+    ```
+  </TabItem>
+  <TabItem label="Ruby">
+    ```bash
+    spotlight-sidecar run ruby app.rb
+    # or for Rails
+    spotlight-sidecar run rails server
+    ```
+  </TabItem>
+  <TabItem label="PHP">
+    ```bash
+    spotlight-sidecar run php artisan serve
+    # or
+    spotlight-sidecar run php -S localhost:8000
+    ```
+  </TabItem>
+</Tabs>
+
+## What Happens Under the Hood
+
+When you run `spotlight-sidecar run`, it:
+
+1. **Starts the Spotlight Sidecar** on the specified port (default: 8969)
+2. **Sets Environment Variables**:
+   - `SENTRY_SPOTLIGHT=http://localhost:8969/stream`
+   - `SENTRY_TRACES_SAMPLE_RATE=1` (enables 100% trace sampling)
+3. **Runs Your Command** with these environment variables
+4. **Captures stdout/stderr** as log events automatically
+5. **Streams Everything** to Spotlight in real-time
+
+### Automatic Log Capture
+
+Your application's console output is automatically captured and sent to Spotlight as log events:
+
+- **stdout** → Info-level logs
+- **stderr** → Error-level logs
+
+This means you don't need to add any special logging configuration - your existing `console.log()`, `print()`, or standard output statements will appear in Spotlight!
+
+:::note[Smart Detection]
+Spotlight automatically detects if your app is already using Sentry's logging and disables automatic stdout/stderr capture to avoid duplicates.
+:::
+
+## Options
+
+### Port Configuration
+
+```bash
+# Use default port (8969)
+spotlight-sidecar run node server.js
+
+# Use custom port
+spotlight-sidecar run -p 3000 node server.js
+
+# Use random available port
+spotlight-sidecar run -p 0 node server.js
+```
+
+### Debug Mode
+
+Enable debug logging to see what Spotlight is doing:
+
+```bash
+spotlight-sidecar run -d node server.js
+# or
+spotlight-sidecar run --debug python app.py
+```
+
+## Complete Examples
+
+### Full Development Workflow
+
+```bash
+# Terminal 1: Run your app with Spotlight
+spotlight-sidecar run npm run dev
+
+# Terminal 2: Open the Spotlight UI
+open http://localhost:8969
+
+# Now interact with your app and see errors, traces, and logs in real-time!
+```
+
+### With Custom Port
+
+```bash
+# If port 8969 is already in use
+spotlight-sidecar run -p 9000 node server.js
+
+# Update your Sentry SDK configuration if needed:
+# spotlight: "http://localhost:9000/stream"
+```
+
+### CI/CD Integration
+
+```bash
+# Run tests with Spotlight for debugging failures
+spotlight-sidecar run npm test
+
+# Capture traces during integration tests
+spotlight-sidecar run -p 0 pytest tests/
+```
+
+## SDK Configuration
+
+For the `run` command to work, your application needs:
+
+- Sentry SDK installed and initialized
+- SDK configured to respect the `SENTRY_SPOTLIGHT` environment variable (most modern SDKs do this automatically)
+
+### Automatic Configuration (Recommended)
+
+Most modern Sentry SDKs automatically detect the `SENTRY_SPOTLIGHT` environment variable:
+
+<Tabs>
+  <TabItem label="Node.js">
+    ```javascript
+    // Sentry will automatically use the SENTRY_SPOTLIGHT env var
+    Sentry.init({
+      dsn: "your-dsn", // Optional - can be omitted for local dev
+      // spotlight: true, // Not needed - handled by env var
+    });
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    import sentry_sdk
+    
+    # Sentry will automatically use the SENTRY_SPOTLIGHT env var
+    sentry_sdk.init(
+        dsn="your-dsn",  # Optional - can be omitted for local dev
+        # spotlight="...",  # Not needed - handled by env var
+    )
+    ```
+  </TabItem>
+  <TabItem label="Go">
+    ```go
+    // Sentry will automatically use the SENTRY_SPOTLIGHT env var
+    sentry.Init(sentry.ClientOptions{
+        Dsn: "your-dsn", // Optional
+    })
+    ```
+  </TabItem>
+</Tabs>
+
+### Manual Configuration
+
+If you prefer explicit configuration:
+
+```javascript
+Sentry.init({
+  dsn: "your-dsn",
+  spotlight: process.env.NODE_ENV === "development",
+  // or explicitly:
+  // spotlight: "http://localhost:8969/stream",
+});
+```
+
+## Troubleshooting
+
+### Command Not Found
+
+If `spotlight-sidecar` is not found, make sure you've installed it:
+
+```bash
+npm install -g @spotlightjs/sidecar
+# or use npx
+npx @spotlightjs/sidecar run node server.js
+```
+
+### No Events Showing Up
+
+1. **Check SDK Configuration**: Ensure your Sentry SDK is properly initialized
+2. **Verify Environment Variable**: The SDK should respect `SENTRY_SPOTLIGHT`
+3. **Check Port**: Make sure the port isn't already in use
+4. **Enable Debug Mode**: Run with `-d` flag to see what's happening
+
+```bash
+spotlight-sidecar run -d node server.js
+```
+
+### Port Already in Use
+
+If port 8969 is already taken:
+
+```bash
+# Use a different port
+spotlight-sidecar run -p 9000 node server.js
+
+# Or let the OS choose an available port
+spotlight-sidecar run -p 0 node server.js
+```
+
+## Next Steps
+
+- [View events in your terminal with Tail mode](/docs/cli/tail/)
+- [See all CLI options](/docs/cli/reference/)
+- [Configure the Spotlight UI](/docs/reference/configuration/)
+
