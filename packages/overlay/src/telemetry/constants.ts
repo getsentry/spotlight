@@ -331,6 +331,7 @@ export const LOGS_SORT_KEYS = {
   timestamp: "TIMESTAMP",
   level: "LEVEL",
   sdk: "SDK",
+  trace_id: "TRACE_ID",
 };
 
 export const LOGS_HEADERS = [
@@ -344,6 +345,12 @@ export const LOGS_HEADERS = [
     id: "message",
     title: "Message",
     primary: true,
+  },
+  {
+    id: "trace_id",
+    title: "Trace ID",
+    sortKey: LOGS_SORT_KEYS.trace_id,
+    align: "left",
   },
   {
     id: "timestamp",
