@@ -153,45 +153,59 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                   role="link"
                   className="hover:bg-primary-900 cursor-pointer"
                 >
-                  {isColumnVisible("level") && (
-                    <td className={cn(visibleHeaders[0]?.id === "level" && "ps-6")}>
-                      <span className={LOG_LEVEL_COLORS[log.level] || "text-primary-500"}>
-                        {log.level.toUpperCase()}
-                      </span>
-                    </td>
-                  )}
-                  {isColumnVisible("message") && (
-                    <td className={cn("text-sm truncate", visibleHeaders[0]?.id === "message" && "ps-6")}>
-                      <span>{log.body}</span>
-                    </td>
-                  )}
-                  {isColumnVisible("trace_id") && (
-                    <td className={cn("text-sm", visibleHeaders[0]?.id === "trace_id" && "ps-6")}>
-                      <Link
-                        to={`/telemetry/traces/${log.trace_id}`}
-                        className="text-blue-400 hover:text-blue-300 underline max-w-[150px] truncate inline-block"
-                        onClick={e => e.stopPropagation()}
-                      >
-                        {log.trace_id || "N/A"}
-                      </Link>
-                    </td>
-                  )}
-                  {isColumnVisible("timestamp") && (
-                    <td className={cn("text-right", visibleHeaders[0]?.id === "timestamp" && "ps-6")}>
-                      <span>{formatTimestamp(log.timestamp)}</span>
-                    </td>
-                  )}
-                  {isColumnVisible("sdk") && (
-                    <td
-                      className={cn(
-                        "text-right",
-                        visibleHeaders[0]?.id === "sdk" && "ps-6",
-                        visibleHeaders[visibleHeaders.length - 1]?.id === "sdk" && "pe-6",
-                      )}
-                    >
-                      <span>{log.sdk}</span>
-                    </td>
-                  )}
+                  {visibleHeaders.map((header, idx) => {
+                    if (header.id === "level" && isColumnVisible("level")) {
+                      return (
+                        <td key="level" className={cn("align-middle", idx === 0 && "ps-6")}>
+                          <span className={LOG_LEVEL_COLORS[log.level] || "text-primary-500"}>
+                            {log.level.toUpperCase()}
+                          </span>
+                        </td>
+                      );
+                    }
+                    if (header.id === "message" && isColumnVisible("message")) {
+                      return (
+                        <td key="message" className={cn("text-sm truncate align-middle", idx === 0 && "ps-6")}>
+                          <span>{log.body}</span>
+                        </td>
+                      );
+                    }
+                    if (header.id === "trace_id" && isColumnVisible("trace_id")) {
+                      return (
+                        <td key="trace_id" className={cn("text-sm align-middle", idx === 0 && "ps-6")}>
+                          <Link
+                            to={`/telemetry/traces/${log.trace_id}`}
+                            className="text-blue-400 hover:text-blue-300 underline max-w-[150px] truncate inline-block"
+                            onClick={e => e.stopPropagation()}
+                          >
+                            {log.trace_id || "N/A"}
+                          </Link>
+                        </td>
+                      );
+                    }
+                    if (header.id === "timestamp" && isColumnVisible("timestamp")) {
+                      return (
+                        <td key="timestamp" className={cn("text-right align-middle", idx === 0 && "ps-6")}>
+                          <span>{formatTimestamp(log.timestamp)}</span>
+                        </td>
+                      );
+                    }
+                    if (header.id === "sdk" && isColumnVisible("sdk")) {
+                      return (
+                        <td
+                          key="sdk"
+                          className={cn(
+                            "text-right align-middle",
+                            idx === 0 && "ps-6",
+                            idx === visibleHeaders.length - 1 && "pe-6",
+                          )}
+                        >
+                          <span>{log.sdk}</span>
+                        </td>
+                      );
+                    }
+                    return null;
+                  })}
                 </tr>
               ))}
             </Table.Body>

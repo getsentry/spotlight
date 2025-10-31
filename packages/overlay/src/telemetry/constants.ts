@@ -339,7 +339,7 @@ export const LOGS_HEADERS = [
     id: "level",
     title: "Level",
     sortKey: LOGS_SORT_KEYS.level,
-    stretch: true,
+    align: "left",
   },
   {
     id: "message",
