@@ -212,6 +212,28 @@ Sentry.init({
 });
 ```
 
+### Unsupported SDKs (DSN Workaround)
+
+If your SDK doesn't support the `spotlight` option or the `SENTRY_SPOTLIGHT` environment variable, you can use the DSN workaround:
+
+```javascript
+Sentry.init({
+  dsn: "http://spotlight@localhost:8969/0",
+});
+```
+
+:::caution[Local Development Only]
+This DSN is only for local development with Spotlight. Make sure to use your real Sentry DSN in production:
+
+```javascript
+Sentry.init({
+  dsn: process.env.NODE_ENV === "production" 
+    ? "your-real-sentry-dsn"
+    : "http://spotlight@localhost:8969/0",
+});
+```
+:::
+
 ## Troubleshooting
 
 ### Command Not Found
