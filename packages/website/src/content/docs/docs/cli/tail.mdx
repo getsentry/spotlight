@@ -12,7 +12,7 @@ The `tail` command streams events from Spotlight to your terminal in real-time. 
 ## Basic Usage
 
 ```bash
-spotlight-sidecar tail [event-types...] [options]
+spotlight tail [event-types...] [options]
 ```
 
 **Key features:**
@@ -36,27 +36,27 @@ You can filter which events to display:
 Use magic words to show all event types:
 
 ```bash
-spotlight-sidecar tail
+spotlight tail
 # or explicitly:
-spotlight-sidecar tail all
-spotlight-sidecar tail everything
-spotlight-sidecar tail '*'
+spotlight tail all
+spotlight tail everything
+spotlight tail '*'
 ```
 
 ### Filter Specific Types
 
 ```bash
 # Only errors
-spotlight-sidecar tail errors
+spotlight tail errors
 
 # Only logs
-spotlight-sidecar tail logs
+spotlight tail logs
 
 # Errors and logs
-spotlight-sidecar tail errors logs
+spotlight tail errors logs
 
 # Errors, logs, and traces
-spotlight-sidecar tail errors logs traces
+spotlight tail errors logs traces
 ```
 
 ## Output Formats
@@ -68,9 +68,9 @@ Control how events are displayed with the `-f` or `--format` option.
 Nicely formatted, colored output optimized for reading:
 
 ```bash
-spotlight-sidecar tail --format human
+spotlight tail --format human
 # or just:
-spotlight-sidecar tail
+spotlight tail
 ```
 
 **Example output:**
@@ -91,7 +91,7 @@ TypeError: Cannot read property 'id' of undefined
 Machine-readable key-value format:
 
 ```bash
-spotlight-sidecar tail --format logfmt
+spotlight tail --format logfmt
 ```
 
 **Example output:**
@@ -110,7 +110,7 @@ level=info time=2025-10-31T14:23:46Z message="Request processed" user_id=12345 d
 Structured JSON output for programmatic processing:
 
 ```bash
-spotlight-sidecar tail --format json
+spotlight tail --format json
 ```
 
 **Example output:**
@@ -129,7 +129,7 @@ spotlight-sidecar tail --format json
 Formatted for documentation or reports:
 
 ```bash
-spotlight-sidecar tail --format md
+spotlight tail --format md
 ```
 
 **Example output:**
@@ -161,7 +161,7 @@ If a Spotlight sidecar is already running, `tail` will connect to it:
 npm run dev
 
 # Terminal 2: Tail events
-spotlight-sidecar tail errors logs
+spotlight tail errors logs
 ```
 
 ### Start New Sidecar
@@ -169,7 +169,7 @@ spotlight-sidecar tail errors logs
 If no sidecar is running, `tail` will start one automatically:
 
 ```bash
-spotlight-sidecar tail
+spotlight tail
 # ✓ Started new sidecar on port 8969
 ```
 
@@ -179,29 +179,29 @@ spotlight-sidecar tail
 
 ```bash
 # Connect to sidecar on default port (8969)
-spotlight-sidecar tail
+spotlight tail
 
 # Connect to custom port
-spotlight-sidecar tail -p 3000
+spotlight tail -p 3000
 
 # Start sidecar on random available port
-spotlight-sidecar tail -p 0
+spotlight tail -p 0
 ```
 
 ### Format Selection
 
 ```bash
 # Human-readable (default)
-spotlight-sidecar tail -f human
+spotlight tail -f human
 
 # Logfmt for parsing
-spotlight-sidecar tail -f logfmt
+spotlight tail -f logfmt
 
 # JSON for automation
-spotlight-sidecar tail -f json
+spotlight tail -f json
 
 # Markdown for documentation
-spotlight-sidecar tail -f md
+spotlight tail -f md
 ```
 
 ### Debug Mode
@@ -209,9 +209,9 @@ spotlight-sidecar tail -f md
 Enable verbose logging to troubleshoot issues:
 
 ```bash
-spotlight-sidecar tail -d
+spotlight tail -d
 # or
-spotlight-sidecar tail --debug
+spotlight tail --debug
 ```
 
 ## Common Use Cases
@@ -225,7 +225,7 @@ Monitor errors and logs while developing:
 npm run dev
 
 # Terminal 2: Watch for errors and logs
-spotlight-sidecar tail errors logs --format human
+spotlight tail errors logs --format human
 ```
 
 ### CI/CD Integration
@@ -234,7 +234,7 @@ Capture events during automated tests:
 
 ```bash
 # Start sidecar and run tests, output as JSON
-spotlight-sidecar tail -f json > spotlight-events.json &
+spotlight tail -f json > spotlight-events.json &
 SIDECAR_PID=$!
 
 # Run your tests
@@ -249,7 +249,7 @@ kill $SIDECAR_PID
 Focus only on errors with clean output:
 
 ```bash
-spotlight-sidecar tail errors --format logfmt | grep "level=error"
+spotlight tail errors --format logfmt | grep "level=error"
 ```
 
 ### Performance Analysis
@@ -257,7 +257,7 @@ spotlight-sidecar tail errors --format logfmt | grep "level=error"
 Stream trace data for performance investigation:
 
 ```bash
-spotlight-sidecar tail traces --format json | jq '.duration'
+spotlight tail traces --format json | jq '.duration'
 ```
 
 ### Log Aggregation
@@ -265,7 +265,7 @@ spotlight-sidecar tail traces --format json | jq '.duration'
 Send formatted logs to a file:
 
 ```bash
-spotlight-sidecar tail logs --format logfmt >> app-logs.txt
+spotlight tail logs --format logfmt >> app-logs.txt
 ```
 
 ## Advanced Examples
@@ -274,34 +274,34 @@ spotlight-sidecar tail logs --format logfmt >> app-logs.txt
 
 ```bash
 # Get all error messages from the last run
-spotlight-sidecar tail errors -f json | jq -r '.message'
+spotlight tail errors -f json | jq -r '.message'
 
 # Find slow traces (duration > 1000ms)
-spotlight-sidecar tail traces -f json | jq 'select(.duration > 1000)'
+spotlight tail traces -f json | jq 'select(.duration > 1000)'
 ```
 
 ### Combine with grep
 
 ```bash
 # Only show errors from specific file
-spotlight-sidecar tail errors -f logfmt | grep "file=api/users.js"
+spotlight tail errors -f logfmt | grep "file=api/users.js"
 
 # Watch for specific error messages
-spotlight-sidecar tail errors | grep "database connection"
+spotlight tail errors | grep "database connection"
 ```
 
 ### Multiple Filters
 
 ```bash
 # Stream errors and logs, format as logfmt, filter by level
-spotlight-sidecar tail errors logs -f logfmt | grep "level=error"
+spotlight tail errors logs -f logfmt | grep "level=error"
 ```
 
 ### Background Monitoring
 
 ```bash
 # Start tailing in the background
-spotlight-sidecar tail -f logfmt > spotlight.log 2>&1 &
+spotlight tail -f logfmt > spotlight.log 2>&1 &
 echo $! > spotlight.pid
 
 # Stop it later
@@ -370,7 +370,7 @@ time=2025-10-31T14:23:47Z level=info message="Database query" query="SELECT * FR
 
 ```bash
 # Show all events to see what's coming through
-spotlight-sidecar tail everything
+spotlight tail everything
 ```
 
 ### Connection Refused
@@ -379,10 +379,10 @@ If you see a connection error:
 
 ```bash
 # Check if sidecar is running on the expected port
-spotlight-sidecar tail -p 8969
+spotlight tail -p 8969
 
 # Or try starting a new sidecar
-spotlight-sidecar tail -p 0  # Use random port
+spotlight tail -p 0  # Use random port
 ```
 
 ### Events Too Verbose
@@ -391,10 +391,10 @@ Filter to only what you need:
 
 ```bash
 # Only critical errors
-spotlight-sidecar tail errors -f logfmt | grep "level=error"
+spotlight tail errors -f logfmt | grep "level=error"
 
 # Specific file or component
-spotlight-sidecar tail -f logfmt | grep "file=api/critical.js"
+spotlight tail -f logfmt | grep "file=api/critical.js"
 ```
 
 ## Next Steps
