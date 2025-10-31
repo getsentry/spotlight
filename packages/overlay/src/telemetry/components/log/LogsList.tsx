@@ -154,9 +154,11 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                   className="hover:bg-primary-900 cursor-pointer"
                 >
                   {visibleHeaders.map((header, idx) => {
+                    const paddings = cn(idx === 0 && "ps-6", idx === visibleHeaders.length - 1 && "pe-6");
+
                     if (header.id === "level" && isColumnVisible("level")) {
                       return (
-                        <td key="level" className={cn("align-middle", idx === 0 && "ps-6")}>
+                        <td key="level" className={cn("align-middle", paddings)}>
                           <span className={LOG_LEVEL_COLORS[log.level] || "text-primary-500"}>
                             {log.level.toUpperCase()}
                           </span>
@@ -165,14 +167,14 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                     }
                     if (header.id === "message" && isColumnVisible("message")) {
                       return (
-                        <td key="message" className={cn("text-sm truncate align-middle", idx === 0 && "ps-6")}>
+                        <td key="message" className={cn("text-sm truncate align-middle", paddings)}>
                           <span>{log.body}</span>
                         </td>
                       );
                     }
                     if (header.id === "trace_id" && isColumnVisible("trace_id")) {
                       return (
-                        <td key="trace_id" className={cn("text-sm", idx === 0 && "ps-6")}>
+                        <td key="trace_id" className={cn("text-sm", paddings)}>
                           <Link
                             to={`/telemetry/traces/${log.trace_id}`}
                             className="text-blue-400 hover:text-blue-300 underline max-w-[150px] truncate block"
@@ -185,7 +187,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                     }
                     if (header.id === "timestamp" && isColumnVisible("timestamp")) {
                       return (
-                        <td key="timestamp" className={cn("text-right align-middle", idx === 0 && "ps-6")}>
+                        <td key="timestamp" className={cn("text-right align-middle", paddings)}>
                           <span>{formatTimestamp(log.timestamp)}</span>
                         </td>
                       );
@@ -196,8 +198,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                           key="sdk"
                           className={cn(
                             "text-right align-middle",
-                            idx === 0 && "ps-6",
-                            idx === visibleHeaders.length - 1 && "pe-6",
+                            paddings,
                           )}
                         >
                           <span>{log.sdk}</span>
