@@ -26,7 +26,24 @@ type TraceDetailsProps = {
 
 export function TraceContext({ trace }: { trace: Trace }) {
   const rootTransaction = trace.rootTransaction || trace.transactions[0];
-  
+  const events = useSentryEvents(trace.trace_id);
+
+  const traceEvent = useMemo(() => {
+    const allAttachments = events
+      .filter(e => e.attachments && e.attachments.length > 0)
+      .flatMap(e => e.attachments || []);
+
+    const baseEvent = rootTransaction || events.find(e => e.contexts) || events[0];
+
+    if (!baseEvent) return null;
+
+    // we want to show all attachments from the trace
+    return {
+      ...baseEvent,
+      attachments: allAttachments.length > 0 ? allAttachments : baseEvent.attachments,
+    };
+  }, [events, rootTransaction]);
+
   return (
     <>
       <div className="space-y-6 p-6">
@@ -56,7 +73,7 @@ export function TraceContext({ trace }: { trace: Trace }) {
         <h2 className="mb-2 font-bold uppercase">ID</h2>
         {trace.trace_id}
       </div>
-      <EventContexts event={rootTransaction} />
+      <EventContexts event={traceEvent} />
     </>
   );
 }
