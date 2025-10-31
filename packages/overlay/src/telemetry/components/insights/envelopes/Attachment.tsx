@@ -85,6 +85,8 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
     };
   }, [attachment, header.content_type, extension]);
 
+  const isProcessingThePayload = isLoading || !downloadUrl;
+
   // For lightweight content types (text, JSON, code), no async loading needed
   if (header.content_type === "text/plain" || header.content_type === "text/csv") {
     content = (
@@ -97,44 +99,26 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
   } else if (CODE_CONTENT_TYPES.has(header.content_type as string)) {
     content = <CodeViewer code={attachment} lang={extension} />;
   } else if (IMAGE_CONTENT_TYPES.has(header.content_type as string)) {
-    // Show loading state for images while blob URL is being created
-    if (isLoading || !downloadUrl) {
-      content = (
-        <div className="flex items-center justify-center p-8 text-primary-400">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-8 h-8 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm">Loading image...</span>
-          </div>
-        </div>
-      );
-    } else {
-      content = <img className="size-full object-contain" src={downloadUrl} alt="Attachment" />;
-    }
+    content = (
+      <LoadingSkeleton isLoading={isProcessingThePayload} loadingText="Loading image...">
+        <img className="size-full object-contain" src={downloadUrl ?? ""} alt="Attachment" />
+      </LoadingSkeleton>
+    );
   } else if (VIDEO_CONTENT_TYPES.has(header.content_type as string)) {
-    // Show loading state for videos while blob URL is being created
-    if (isLoading || !downloadUrl) {
-      content = (
-        <div className="flex items-center justify-center p-8 text-primary-400">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-8 h-8 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm">Loading video...</span>
-          </div>
-        </div>
-      );
-    } else {
-      content = (
+    content = (
+      <LoadingSkeleton isLoading={isProcessingThePayload} loadingText="Loading video...">
         <video className="size-full object-contain" controls>
-          <source src={downloadUrl} type={header.content_type as string} />
+          <source src={downloadUrl ?? ""} type={header.content_type as string} />
         </video>
-      );
-    }
+      </LoadingSkeleton>
+    );
   }
 
   return (
     <>
       <h3>
         📎{" "}
-        {isLoading || !downloadUrl ? (
+        {isProcessingThePayload ? (
           <span className="opacity-60">{name} (preparing download...)</span>
         ) : (
           <a href={downloadUrl} download={name}>
@@ -145,4 +129,27 @@ export default function Attachment({ header, attachment }: { header: EnvelopeIte
       {content}
     </>
   );
+}
+
+type LoadingSkeletonProps = {
+  isLoading: boolean;
+  loadingText: string;
+  children: ReactNode;
+};
+
+function LoadingSkeleton(props: LoadingSkeletonProps) {
+  const { isLoading, loadingText, children } = props;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8 text-primary-400">
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-8 h-8 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+          <span className="text-sm">{loadingText}</span>
+        </div>
+      </div>
+    );
+  }
+
+  return children;
 }
