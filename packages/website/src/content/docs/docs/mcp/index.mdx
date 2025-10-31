@@ -29,17 +29,27 @@ When debugging with an AI coding assistant, it can now access actual runtime dat
 
 ## Quick Start
 
-### 1. Start Spotlight MCP Server
+### 1. Install Spotlight MCP Server
+
+We recommend using `npx` to always get the latest version:
+
+**For Claude Desktop:**
 
 ```bash
-spotlight mcp
+claude mcp add sentry-spotlight -- npx -y --prefer-online @spotlightjs/spotlight@latest mcp
 ```
 
-This starts the Spotlight sidecar server with MCP protocol enabled on the default port (8969).
+**For Cursor:**
 
-### 2. Configure Your MCP Client
+Click the button below or add manually:
 
-Add Spotlight to your MCP client configuration. Here are examples for popular clients:
+<a href="cursor://anysphere.cursor-deeplink/mcp/install?name=spotlight&config=eyJjb21tYW5kIjoibnB4IC15IC0tcHJlZmVyLW9ubGluZSBAc3BvdGxpZ2h0anMvc3BvdGxpZ2h0QGxhdGVzdCBtY3AgIn0%3D">
+  <img src="https://cursor.com/deeplink/mcp-install-light.svg" alt="Add spotlight MCP server to Cursor" height="32" />
+</a>
+
+### 2. Manual Configuration (Alternative)
+
+If you prefer to configure manually, add Spotlight to your MCP client configuration:
 
 <Tabs>
   <TabItem label="Cursor">
@@ -50,20 +60,7 @@ Add Spotlight to your MCP client configuration. Here are examples for popular cl
       "mcpServers": {
         "spotlight": {
           "command": "npx",
-          "args": ["@spotlightjs/sidecar", "mcp"]
-        }
-      }
-    }
-    ```
-
-    Or if you have it installed globally:
-
-    ```json
-    {
-      "mcpServers": {
-        "spotlight": {
-          "command": "spotlight",
-          "args": ["mcp"]
+          "args": ["-y", "--prefer-online", "@spotlightjs/spotlight@latest", "mcp"]
         }
       }
     }
@@ -77,7 +74,7 @@ Add Spotlight to your MCP client configuration. Here are examples for popular cl
       "mcpServers": {
         "spotlight": {
           "command": "npx",
-          "args": ["@spotlightjs/sidecar", "mcp"]
+          "args": ["-y", "--prefer-online", "@spotlightjs/spotlight@latest", "mcp"]
         }
       }
     }
@@ -91,17 +88,17 @@ Add Spotlight to your MCP client configuration. Here are examples for popular cl
       "mcpServers": {
         "spotlight": {
           "command": "npx",
-          "args": ["@spotlightjs/sidecar", "mcp"]
+          "args": ["-y", "--prefer-online", "@spotlightjs/spotlight@latest", "mcp"]
         }
       }
     }
     ```
   </TabItem>
   <TabItem label="Other MCP Clients">
-    For other MCP-compatible clients, add the Spotlight server using these details:
+    For other MCP-compatible clients, use this configuration:
 
-    - **Command:** `npx` (or `spotlight-sidecar` if installed globally)
-    - **Args:** `["@spotlightjs/sidecar", "mcp"]` (or `["mcp"]` if using global install)
+    - **Command:** `npx`
+    - **Args:** `["-y", "--prefer-online", "@spotlightjs/spotlight@latest", "mcp"]`
     - **Protocol:** stdio
 
     Refer to your MCP client's documentation for exact configuration format.
@@ -114,7 +111,7 @@ Make sure your application is running and sending telemetry to Spotlight.
 
 **Option 1 - Use Spotlight CLI:**
 ```bash
-spotlight-sidecar run npm run dev
+spotlight run npm run dev
 ```
 
 **Option 2 - Set environment variable:**
