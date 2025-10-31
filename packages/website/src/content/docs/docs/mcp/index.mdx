@@ -32,7 +32,7 @@ When debugging with an AI coding assistant, it can now access actual runtime dat
 ### 1. Start Spotlight MCP Server
 
 ```bash
-spotlight-sidecar mcp
+spotlight mcp
 ```
 
 This starts the Spotlight sidecar server with MCP protocol enabled on the default port (8969).
@@ -62,7 +62,7 @@ Add Spotlight to your MCP client configuration. Here are examples for popular cl
     {
       "mcpServers": {
         "spotlight": {
-          "command": "spotlight-sidecar",
+          "command": "spotlight",
           "args": ["mcp"]
         }
       }
@@ -199,7 +199,7 @@ Update your MCP client configuration to match:
 {
   "mcpServers": {
     "spotlight": {
-      "command": "spotlight-sidecar",
+      "command": "spotlight",
       "args": ["mcp", "-p", "3000"]
     }
   }
