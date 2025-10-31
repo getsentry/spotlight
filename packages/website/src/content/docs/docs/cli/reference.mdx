@@ -315,8 +315,8 @@ open http://localhost:8969
 ### CI/CD Integration
 
 ```bash
-# Capture events during tests
-spotlight tail -f json > events.json &
+# Capture events during tests as newline-delimited JSON (NDJSON)
+spotlight tail -f json > events.ndjson &
 SPOTLIGHT_PID=$!
 
 # Run tests
