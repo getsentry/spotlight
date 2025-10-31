@@ -1,0 +1,404 @@
+---
+title: Spotlight Tail
+description: Stream and filter Spotlight events in real-time from your terminal
+sidebar:
+  order: 2
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+The `tail` command streams events from Spotlight to your terminal in real-time. You can filter by event type and choose different output formats.
+
+## Basic Usage
+
+```bash
+spotlight tail [event-types...] [options]
+```
+
+**Key features:**
+- Filter events by type (errors, logs, traces, attachments)
+- Choose output format (human, logfmt, json, markdown)
+- Connect to existing sidecar or start a new one automatically
+
+## Event Types
+
+You can filter which events to display:
+
+### Available Event Types
+
+- `errors` - Runtime errors and exceptions with stack traces
+- `logs` - Application logs (info, warn, debug messages)
+- `traces` - Performance traces and spans
+
+### Show Everything
+
+Use magic words to show all event types:
+
+```bash
+spotlight tail
+# or explicitly:
+spotlight tail all
+spotlight tail everything
+spotlight tail '*'
+```
+
+### Filter Specific Types
+
+```bash
+# Only errors
+spotlight tail errors
+
+# Only logs
+spotlight tail logs
+
+# Errors and logs
+spotlight tail errors logs
+
+# Errors, logs, and traces
+spotlight tail errors logs traces
+```
+
+## Output Formats
+
+Control how events are displayed with the `-f` or `--format` option.
+
+### Human-Readable Format (Default)
+
+Nicely formatted, colored output optimized for reading:
+
+```bash
+spotlight tail --format human
+# or just:
+spotlight tail
+```
+
+**Example output:**
+```
+🔴 ERROR | 2025-10-31 14:23:45
+TypeError: Cannot read property 'id' of undefined
+  at getUserData (api/users.js:42)
+  at processRequest (api/middleware.js:18)
+
+📝 LOG | 2025-10-31 14:23:46
+[INFO] Request processed successfully
+  user_id: 12345
+  duration: 234ms
+```
+
+### Logfmt Format
+
+Machine-readable key-value format:
+
+```bash
+spotlight tail --format logfmt
+```
+
+**Example output:**
+```
+level=error time=2025-10-31T14:23:45Z message="TypeError: Cannot read property" file=api/users.js line=42
+level=info time=2025-10-31T14:23:46Z message="Request processed" user_id=12345 duration=234ms
+```
+
+**Perfect for:**
+- Log aggregation tools
+- Piping to other CLI tools
+- Parsing with standard tools like `grep`, `awk`
+
+### JSON Format
+
+Structured JSON output for programmatic processing:
+
+```bash
+spotlight tail --format json
+```
+
+**Example output:**
+```json
+{"level":"error","timestamp":"2025-10-31T14:23:45Z","message":"TypeError: Cannot read property 'id' of undefined","stack":[...]}
+{"level":"info","timestamp":"2025-10-31T14:23:46Z","message":"Request processed","user_id":12345,"duration":"234ms"}
+```
+
+**Perfect for:**
+- CI/CD pipelines
+- Automated testing
+- Integration with other tools via `jq`
+
+### Markdown Format
+
+Formatted for documentation or reports:
+
+```bash
+spotlight tail --format md
+```
+
+**Example output:**
+```markdown
+## Error - TypeError
+**Time:** 2025-10-31 14:23:45
+**File:** api/users.js:42
+
+Cannot read property 'id' of undefined
+
+### Stack Trace
+- at getUserData (api/users.js:42)
+- at processRequest (api/middleware.js:18)
+```
+
+**Perfect for:**
+- Creating incident reports
+- Sharing errors in documentation
+- GitHub issues or PRs
+
+## Connection Modes
+
+### Connect to Existing Sidecar
+
+If a Spotlight sidecar is already running, `tail` will connect to it:
+
+```bash
+# Terminal 1: Your app is running with Spotlight
+npm run dev
+
+# Terminal 2: Tail events
+spotlight tail errors logs
+```
+
+### Start New Sidecar
+
+If no sidecar is running, `tail` will start one automatically:
+
+```bash
+spotlight tail
+# ✓ Started new sidecar on port 8969
+```
+
+## Options
+
+### Port Configuration
+
+```bash
+# Connect to sidecar on default port (8969)
+spotlight tail
+
+# Connect to custom port
+spotlight tail -p 3000
+
+# Start sidecar on random available port
+spotlight tail -p 0
+```
+
+### Format Selection
+
+```bash
+# Human-readable (default)
+spotlight tail -f human
+
+# Logfmt for parsing
+spotlight tail -f logfmt
+
+# JSON for automation
+spotlight tail -f json
+
+# Markdown for documentation
+spotlight tail -f md
+```
+
+### Debug Mode
+
+Enable verbose logging to troubleshoot issues:
+
+```bash
+spotlight tail -d
+# or
+spotlight tail --debug
+```
+
+## Common Use Cases
+
+### Development Monitoring
+
+Monitor errors and logs while developing:
+
+```bash
+# Terminal 1: Run your app
+npm run dev
+
+# Terminal 2: Watch for errors and logs
+spotlight tail errors logs --format human
+```
+
+### CI/CD Integration
+
+Capture events during automated tests:
+
+```bash
+# Start sidecar and run tests, output as JSON
+spotlight tail -f json > spotlight-events.json &
+SIDECAR_PID=$!
+
+# Run your tests
+npm test
+
+# Cleanup
+kill $SIDECAR_PID
+```
+
+### Error Monitoring
+
+Focus only on errors with clean output:
+
+```bash
+spotlight tail errors --format logfmt | grep "level=error"
+```
+
+### Performance Analysis
+
+Stream trace data for performance investigation:
+
+```bash
+spotlight tail traces --format json | jq '.duration'
+```
+
+### Log Aggregation
+
+Send formatted logs to a file:
+
+```bash
+spotlight tail logs --format logfmt >> app-logs.txt
+```
+
+## Advanced Examples
+
+### Filter and Process with jq
+
+```bash
+# Get all error messages from the last run
+spotlight tail errors -f json | jq -r '.message'
+
+# Find slow traces (duration > 1000ms)
+spotlight tail traces -f json | jq 'select(.duration > 1000)'
+```
+
+### Combine with grep
+
+```bash
+# Only show errors from specific file
+spotlight tail errors -f logfmt | grep "file=api/users.js"
+
+# Watch for specific error messages
+spotlight tail errors | grep "database connection"
+```
+
+### Multiple Filters
+
+```bash
+# Stream errors and logs, format as logfmt, filter by level
+spotlight tail errors logs -f logfmt | grep "level=error"
+```
+
+### Background Monitoring
+
+```bash
+# Start tailing in the background
+spotlight tail -f logfmt > spotlight.log 2>&1 &
+echo $! > spotlight.pid
+
+# Stop it later
+kill $(cat spotlight.pid)
+```
+
+## Output Examples
+
+### Error Output (Human Format)
+
+```
+🔴 ERROR | 2025-10-31 14:23:45.123
+TypeError: Cannot read property 'id' of undefined
+
+Location: api/users.js:42:10
+
+Stack Trace:
+  at getUserData (api/users.js:42:10)
+  at processRequest (api/middleware.js:18:5)
+  at Layer.handle (express/lib/router/layer.js:95:5)
+
+Context:
+  request_id: req_abc123
+  user_id: 12345
+  method: GET
+  path: /api/users/12345
+```
+
+### Log Output (Logfmt Format)
+
+```
+time=2025-10-31T14:23:45Z level=info message="User login successful" user_id=12345 ip=192.168.1.1
+time=2025-10-31T14:23:46Z level=warn message="Rate limit approaching" user_id=12345 requests=95 limit=100
+time=2025-10-31T14:23:47Z level=info message="Database query" query="SELECT * FROM users" duration=15ms
+```
+
+### Trace Output (JSON Format)
+
+```json
+{
+  "trace_id": "71a8c5e41ae1044dee67f50a07538fe7",
+  "span_id": "b1234567890abcde",
+  "transaction": "GET /api/users/:id",
+  "duration": 245.5,
+  "status": "ok",
+  "spans": [
+    {
+      "description": "database query",
+      "duration": 45.2
+    },
+    {
+      "description": "http request",
+      "duration": 120.3
+    }
+  ]
+}
+```
+
+## Troubleshooting
+
+### No Events Appearing
+
+1. **Check SDK Configuration**: Ensure your app is sending events to Spotlight
+2. **Verify Connection**: Make sure the sidecar is running on the correct port
+3. **Check Event Types**: You might be filtering out the events you want to see
+
+```bash
+# Show all events to see what's coming through
+spotlight tail everything
+```
+
+### Connection Refused
+
+If you see a connection error:
+
+```bash
+# Check if sidecar is running on the expected port
+spotlight tail -p 8969
+
+# Or try starting a new sidecar
+spotlight tail -p 0  # Use random port
+```
+
+### Events Too Verbose
+
+Filter to only what you need:
+
+```bash
+# Only critical errors
+spotlight tail errors -f logfmt | grep "level=error"
+
+# Specific file or component
+spotlight tail -f logfmt | grep "file=api/critical.js"
+```
+
+## Next Steps
+
+- [Run your app with Spotlight](/docs/cli/run/)
+- [See complete CLI reference](/docs/cli/reference/)
+- [Learn about MCP integration](/docs/mcp/)
+

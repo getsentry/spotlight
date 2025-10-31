@@ -1,32 +1,271 @@
 ---
 title: What is the Sidecar?
-description: A server forwarding events to Spotlight UI.
+description: The local proxy server that powers Spotlight's debugging capabilities
 sidebar:
     order: 0
 ---
 
-import { LinkCard } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-The Sidecar uses SSE (Server-Sent Events) to forward events to the Spotlight UI. It is a standalone server that can be deployed on the same machine as the Spotlight UI or on a different machine.
+The Spotlight Sidecar is a lightweight local proxy server that sits between your application and the Spotlight UI. It's the backbone of Spotlight's real-time debugging capabilities.
 
-It receives `POST` requests on `/stream` from the Sentry SDKs or any other source and forwards them to the Spotlight UI via SSE.
+## How It Works
 
-By default the Sidecar listens on port `8969` and the Spotlight UI connects to it on `http://localhost:8969/stream`.
+```
+Your Application → Sentry SDK → Sidecar Server → Spotlight UI
+                                      ↓
+                              [Stores & Streams]
+                              Errors, Traces, Logs
+```
 
-The url can be configured via the `sidecar` config variable in the Spotlight UI see [Configuration](/docs/reference/configuration/#sidecar).
+The sidecar:
 
-Also in the Sentry SDKs the URL can be configured via the `spotlight` option, for example in the Python SDK:
+1. **Receives** telemetry data from your application via Sentry SDKs
+2. **Stores** events in memory for quick access
+3. **Streams** events to connected UIs via Server-Sent Events (SSE)
+4. **Provides** APIs for querying historical data (used by MCP tools)
 
-```python {4}
+## Key Features
+
+### Real-Time Event Streaming
+
+Uses Server-Sent Events (SSE) to push events to the UI as they happen. No polling, no delays - see errors and traces the moment they occur.
+
+### In-Memory Storage
+
+Events are buffered in memory, allowing you to:
+- Browse historical events during your session
+- Query past errors and traces
+- Analyze patterns over time
+
+### Multiple Connection Modes
+
+The sidecar supports different ways to run:
+- **Standalone**: Run independently and connect any UI
+- **Embedded**: Automatically started by framework integrations
+- **CLI-wrapped**: Started by `spotlight` commands
+- **Desktop app**: Bundled with the Spotlight desktop application
+
+### Built-in UI
+
+The sidecar includes a web-based UI accessible at `http://localhost:8969` (default port):
+
+- No additional setup required
+- View events directly in your browser
+- Works alongside desktop app and MCP clients
+
+## Configuration
+
+### Default Settings
+
+The sidecar comes pre-configured with sensible defaults:
+
+- **Port**: 8969
+- **Event endpoint**: `http://localhost:8969/stream`
+- **UI endpoint**: `http://localhost:8969`
+
+### Custom Port
+
+You can configure the port in several ways:
+
+**Via CLI:**
+```bash
+spotlight -p 3000
+```
+
+**Via SDK:**
+```python
 import sentry_sdk
 
 sentry_sdk.init(
-    spotlight="http://localhost:8969/stream",
+    spotlight="http://localhost:3000/stream",
 )
 ```
 
-Spotlight provides a number of convenience utilities to run the Sidecar, and in some cases it will run automatically with an integration (suchy as in Astro).
+**Via UI Config:**
+See [Configuration reference](/docs/reference/configuration/#sidecar) for UI-side configuration.
 
-<LinkCard title="NPX" href="./npx/" description="Run the Sidecar with Node." />
-<LinkCard title="Webpack" href="./webpack/" description="Run the Sidecar as a Webpack plugin." />
-<LinkCard title="Docker" href="./docker/" description="Run the Sidecar via a Docker image." />
+## Running the Sidecar
+
+Choose the method that fits your workflow:
+
+<CardGrid>
+  <LinkCard title="CLI Commands" href="/docs/cli/" description="Run with spotlight-sidecar command" />
+  <LinkCard title="NPX" href="./npx/" description="Quick start with npx" />
+  <LinkCard title="Webpack Plugin" href="./webpack/" description="Auto-start with webpack" />
+  <LinkCard title="Docker" href="./docker/" description="Run in a container" />
+  <LinkCard title="Desktop App" href="/docs/desktop-app/" description="Built-in with desktop app" />
+</CardGrid>
+
+### Quick Start Options
+
+**Standalone Server:**
+```bash
+# Using CLI
+spotlight-sidecar server
+
+# Using npx
+npx @spotlightjs/sidecar
+```
+
+**With Your Application:**
+```bash
+# Run your app with Spotlight
+spotlight-sidecar run npm run dev
+```
+
+**For MCP Integration:**
+```bash
+# Start with MCP support
+spotlight-sidecar mcp
+```
+
+## Architecture
+
+### Communication Flow
+
+1. **Your Application** sends telemetry to the sidecar via HTTP POST
+2. **Sidecar** validates, stores, and broadcasts events
+3. **UI Clients** receive events via SSE connections
+4. **MCP Clients** query events via stdio protocol
+
+### Multiple Clients
+
+A single sidecar instance can serve multiple clients simultaneously:
+
+- **Browser-based UI** - View in any web browser
+- **Desktop app** - Dedicated application window
+- **MCP clients** - AI assistants (Cursor, Claude, etc.)
+- **Multiple apps** - Different services sending to the same sidecar
+
+All clients receive the same events in real-time.
+
+### Data Persistence
+
+Events are stored **in memory only** by design:
+
+**Benefits:**
+- ✅ Fast access and streaming
+- ✅ No disk I/O overhead
+- ✅ Automatic cleanup on restart
+
+**Trade-off:**
+- ⚠️ Events are lost when sidecar stops
+
+This is intentional - Spotlight is for **active development**, not long-term storage.
+
+## SDK Integration
+
+Your application sends events to the sidecar via Sentry SDKs. 
+
+### Quick Setup
+
+Most SDKs support automatic detection via environment variable:
+
+```bash
+export SENTRY_SPOTLIGHT=1
+# or specify custom URL
+export SENTRY_SPOTLIGHT=http://localhost:8969/stream
+```
+
+**Or configure explicitly:**
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Tabs>
+  <TabItem label="Node.js">
+    ```javascript
+    import * as Sentry from '@sentry/node';
+
+    Sentry.init({
+      spotlight: process.env.NODE_ENV === 'development',
+      // or explicitly:
+      // spotlight: "http://localhost:8969/stream"
+    });
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    import sentry_sdk
+
+    sentry_sdk.init(
+        spotlight=True,  # Uses SENTRY_SPOTLIGHT env var
+        # or explicitly:
+        # spotlight="http://localhost:8969/stream"
+    )
+    ```
+  </TabItem>
+  <TabItem label="Browser">
+    ```javascript
+    import * as Sentry from '@sentry/browser';
+
+    Sentry.init({
+      integrations: [Sentry.spotlightBrowserIntegration()],
+    });
+    ```
+  </TabItem>
+</Tabs>
+
+## Use Cases
+
+### Local Development
+
+Run the sidecar alongside your development server to see errors and traces as you code.
+
+### Integration Testing
+
+Start the sidecar during tests to capture and analyze test failures with full context.
+
+### Mobile Development
+
+Point your mobile app to your machine's sidecar to debug on real devices:
+```
+spotlight: "http://192.168.1.100:8969/stream"
+```
+
+### Microservices
+
+Run one sidecar and point all your services to it for unified debugging across your stack.
+
+## When to Use Each Method
+
+### Use CLI When:
+- You want simple command-line control
+- You need to wrap your application
+- You want to stream events to terminal
+
+[Learn more about CLI →](/docs/cli/)
+
+### Use NPX When:
+- You want the quickest setup
+- You don't need the CLI features
+- You just want the sidecar running
+
+[Learn more about NPX →](/docs/sidecar/npx/)
+
+### Use Webpack Plugin When:
+- You're using webpack
+- You want automatic sidecar lifecycle management
+- You want sidecar to start/stop with your build
+
+[Learn more about Webpack →](/docs/sidecar/webpack/)
+
+### Use Docker When:
+- You're containerizing your dev environment
+- You need isolation from your host system
+- You're deploying to a remote dev server
+
+[Learn more about Docker →](/docs/sidecar/docker/)
+
+### Use Desktop App When:
+- You want a GUI experience
+- You prefer desktop applications
+- You're developing mobile or headless apps
+
+[Learn more about Desktop App →](/docs/desktop-app/)
+
+## Next Steps
+
+- [Learn about CLI commands](/docs/cli/) - Control sidecar via terminal
+- [MCP Integration](/docs/mcp/) - Connect to AI assistants
+- [Configuration reference](/docs/reference/configuration/) - Advanced settings

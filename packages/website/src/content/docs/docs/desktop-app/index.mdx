@@ -1,0 +1,336 @@
+---
+title: Desktop App
+description: Standalone Spotlight application with built-in UI for local debugging
+sidebar:
+  order: 0
+---
+
+import DownloadButton from '../../../../components/DownloadButton.astro';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+The Spotlight Desktop App is a standalone application that combines the sidecar server and debugging UI in a single package. Perfect for when you want a dedicated debugging environment.
+
+## Why Use the Desktop App?
+
+The desktop app offers several advantages:
+
+- **All-in-one solution**: Sidecar server and UI bundled together
+- **No browser required**: Dedicated window for debugging
+- **Persistent workspace**: Stays open across browser refreshes
+- **Auto-updates**: Always get the latest features
+- **Clean separation**: Keep debugging separate from your development browser
+- **Built-in HTTP MCP server:** Model Context Protocol (MCP) Server directly from the desktop app.
+**Perfect for:**
+- Headless or mobile development
+- When you want debugging in a separate window
+- Team members who prefer desktop apps
+- Quick setup without browser configuration
+
+## Download and Installation
+
+Get started by downloading the latest version for your platform:
+
+<DownloadButton>Download for Mac</DownloadButton>
+
+:::note[Other Platforms]
+Currently, the desktop app is available for macOS. Windows and Linux support is coming soon.
+
+In the meantime, you can use the [CLI](/docs/cli/) or [browser-based UI](/docs/sidecar/npx/).
+:::
+
+### Installation Steps
+
+1. **Download** the app using the button above
+2. **Open** the downloaded `.dmg` file
+3. **Drag** Spotlight to your Applications folder
+4. **Launch** Spotlight from Applications
+
+## What's Included
+
+The desktop app provides everything you need for local debugging:
+
+### Built-in Sidecar Server
+
+The app automatically starts a Spotlight sidecar server:
+
+- Default port: 8969 (configurable in settings)
+- No need to run separate commands
+- Just launch the app and you're ready
+
+### Debugging UI
+
+Access all Spotlight features through the dedicated interface:
+
+- **Errors Tab**: View runtime errors with full stack traces
+- **Traces Tab**: Inspect performance traces and spans
+- **Logs Tab**: Browse application logs with filtering
+- **Profiles Tab**: Analyze performance profiles
+- **Settings**: Configure sidecar and UI preferences
+
+### Auto-Updates
+
+The app keeps itself up to date:
+
+- Automatically checks for updates
+- Downloads and installs in the background
+- Ensures you always have the latest features and bug fixes
+
+## Setup Your Application
+
+Once the desktop app is running, configure your application to send telemetry to Spotlight:
+
+### Backend Applications (Node.js, Python, etc.)
+
+Set the `SENTRY_SPOTLIGHT` environment variable:
+
+<Tabs>
+  <TabItem label="Node.js">
+    ```javascript
+    // Sentry will automatically use SENTRY_SPOTLIGHT env var
+    import * as Sentry from '@sentry/node';
+
+    Sentry.init({
+      dsn: 'your-dsn', // Optional for local dev
+      // No spotlight config needed - handled by env var
+    });
+    ```
+
+    Run your app:
+    ```bash
+    SENTRY_SPOTLIGHT=1 node server.js
+    # or
+    export SENTRY_SPOTLIGHT=1
+    npm run dev
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    # Sentry will automatically use SENTRY_SPOTLIGHT env var
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn="your-dsn",  # Optional for local dev
+        # No spotlight config needed - handled by env var
+    )
+    ```
+
+    Run your app:
+    ```bash
+    SENTRY_SPOTLIGHT=1 python app.py
+    # or
+    export SENTRY_SPOTLIGHT=1
+    flask run
+    ```
+  </TabItem>
+  <TabItem label="Other Languages">
+    Most Sentry SDKs support the `SENTRY_SPOTLIGHT` environment variable:
+
+    ```bash
+    SENTRY_SPOTLIGHT=1 ./your-app
+    # or
+    export SENTRY_SPOTLIGHT=1
+    ./your-app
+    ```
+
+    Check your SDK's documentation for Spotlight support.
+  </TabItem>
+</Tabs>
+
+### Frontend Applications
+
+For browser-based applications, add the Spotlight browser integration:
+
+```javascript
+import * as Sentry from '@sentry/browser';
+
+Sentry.init({
+  dsn: 'your-dsn', // Optional for local dev
+  integrations: [
+    Sentry.spotlightBrowserIntegration()
+  ],
+  // Only enable in development
+  enabled: process.env.NODE_ENV === 'development'
+});
+```
+
+## Using the Desktop App
+
+### Starting the App
+
+1. Launch Spotlight from your Applications folder
+2. The sidecar server starts automatically on port 8969
+3. The debugging UI opens in the app window
+
+### Viewing Events
+
+As your application sends telemetry to Spotlight:
+
+1. **Errors appear in real-time** in the Errors tab
+2. **Traces are displayed** with timing information
+3. **Logs stream** to the Logs tab
+4. **Profiles** show up when captured
+
+### Filtering and Searching
+
+Use the built-in filters to find what you need:
+
+- **Search by text**: Find errors or logs containing specific text
+- **Filter by type**: Show only errors, traces, or logs
+- **Time range**: Focus on specific time periods
+- **Source filter**: Show events from specific files or components
+
+### Inspecting Details
+
+Click any event to see full details:
+
+- **Errors**: Complete stack traces, context, and breadcrumbs
+- **Traces**: Full span tree with timing breakdown
+- **Logs**: Structured log data with attributes
+- **Profiles**: Flamegraphs and performance metrics
+
+### Clearing Events
+
+Use the clear button in the toolbar to remove all events and start fresh.
+
+## Configuration
+
+### Changing the Port
+
+If port 8969 is already in use:
+
+1. Open Spotlight **Settings** (via menu or gear icon)
+2. Change the **Sidecar Port** setting
+3. Restart the app
+4. Update your app's SDK configuration to match
+
+### UI Preferences
+
+Customize the interface:
+
+- **Theme**: Choose light or dark mode
+- **Font size**: Adjust for readability
+- **Panel layout**: Configure which panels are visible
+
+## When to Use Desktop App vs CLI vs Browser
+
+Choose the right tool for your workflow:
+
+### Use Desktop App When:
+- ✅ You want a dedicated debugging window
+- ✅ You prefer desktop applications
+- ✅ You're developing headless or mobile apps
+- ✅ You want automatic updates
+
+### Use CLI When:
+- ✅ You prefer terminal-based workflows
+- ✅ You need to stream events to files
+- ✅ You're automating with scripts
+- ✅ You want machine-readable output
+
+### Use Browser UI When:
+- ✅ You want overlay on your application
+- ✅ You're debugging frontend web apps
+- ✅ You want integrated developer experience
+
+[Learn more about CLI →](/docs/cli/)
+
+## Use Cases
+
+### Mobile Development
+
+When developing mobile apps, the desktop app provides a great debugging companion:
+
+1. Run the desktop app on your machine
+2. Configure your mobile app's SDK to point to your machine's IP:
+   ```
+   spotlight: "http://192.168.1.100:8969/stream"
+   ```
+3. Run your mobile app on device/simulator
+4. View events in the desktop app
+
+### Backend Development
+
+For backend services without a browser:
+
+1. Start the desktop app
+2. Run your backend with `SENTRY_SPOTLIGHT=1`
+3. Make API requests to your service
+4. See traces and errors in the desktop app
+
+### Microservices
+
+Debug multiple services simultaneously:
+
+1. Start the desktop app (single sidecar on port 8969)
+2. Point all services to the same sidecar
+3. See events from all services in one place
+4. Filter by service or component
+
+## Troubleshooting
+
+### App Won't Start
+
+**macOS Security Warning:**
+
+If you see "Spotlight can't be opened because it is from an unidentified developer":
+
+1. Right-click the app and select "Open"
+2. Click "Open" in the security dialog
+3. macOS will remember this choice
+
+**Port Already in Use:**
+
+If you see a port conflict:
+1. Change the port in Settings
+2. Or close other applications using port 8969
+
+### No Events Showing
+
+**Check SDK Configuration:**
+1. Verify Sentry SDK is initialized in your app
+2. Ensure `spotlight` integration is enabled
+3. Check environment variable is set: `SENTRY_SPOTLIGHT=1`
+
+**Check Network:**
+1. Verify your app can reach `localhost:8969`
+2. Check firewall settings if needed
+
+**Enable Debug:**
+1. In your app, enable Sentry debug mode
+2. Check console for Spotlight connection messages
+
+### Events Not Updating
+
+**Refresh the View:**
+- Click the refresh button or use Cmd+R
+
+**Clear and Restart:**
+1. Clear events
+2. Restart your application
+3. Trigger new events
+
+## Privacy and Security
+
+### Local-Only
+
+The desktop app and sidecar run entirely on your local machine:
+
+- **No data sent to external servers** - Everything stays local
+- **No telemetry collected** - The app doesn't track your usage
+- **Memory-only storage** - Events are cleared when the app closes
+
+### Development Only
+
+Spotlight is designed exclusively for development:
+
+- **Never enable in production** - Use environment checks to restrict to development only
+- **Guard sensitive data** - Keep production secrets out of test scenarios
+- **Review before sharing** - Be mindful when sharing screenshots or logs
+
+## Next Steps
+
+- [Configure your SDK](/docs/setup/) - Setup guide for different frameworks
+- [Use the CLI](/docs/cli/) - Terminal-based workflows
+- [MCP Integration](/docs/mcp/) - Connect to AI assistants
+- [Explore integrations](/docs/reference/integration/) - Custom integrations
+

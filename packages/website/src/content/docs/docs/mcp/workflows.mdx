@@ -1,0 +1,524 @@
+---
+title: MCP Workflows
+description: Common debugging workflows using Spotlight MCP tools with AI assistants
+sidebar:
+  order: 2
+---
+
+Learn how to effectively use Spotlight MCP tools with your AI coding assistant for common debugging scenarios.
+
+## Quick Start Workflow
+
+The simplest way to start debugging with Spotlight MCP:
+
+**Your prompt:**
+```
+"Check if there are any errors in my application"
+```
+
+**What the AI does:**
+1. Calls `spotlight.errors.search` with recent timeWindow
+2. Analyzes any errors found
+3. Suggests fixes or asks for more context
+
+This works because the AI assistant knows to check Spotlight first when you mention errors or issues.
+
+## Common Workflows
+
+### 1. Error Investigation
+
+**Scenario:** User reports an error or unexpected behavior.
+
+#### Step 1: Find the Error
+
+**Your prompt:**
+```
+"My login page is broken. What's the error?"
+```
+
+**AI action:**
+```json
+spotlight.errors.search({
+  filters: { timeWindow: 300 }
+})
+```
+
+#### Step 2: Analyze the Error
+
+The AI receives:
+```
+TypeError: Cannot read property 'token' of null
+  at handleLogin (auth.js:42)
+  at onClick (LoginButton.tsx:18)
+```
+
+**AI response:**
+```
+I found a TypeError in auth.js at line 42. The error indicates
+that you're trying to access the 'token' property on a null object.
+```
+
+#### Step 3: Deep Dive with Code
+
+**Your follow-up:**
+```
+"Show me the code around that error"
+```
+
+**AI action:**
+- Reads `auth.js` lines 35-50
+- Analyzes the code context
+- Suggests fix
+
+#### Step 4: Check Related Traces
+
+**Your follow-up:**
+```
+"Is there a trace for this request?"
+```
+
+**AI action:**
+```json
+spotlight.traces.search({
+  filters: { timeWindow: 60 }
+})
+```
+
+Then gets trace details with `spotlight.traces.get` if trace ID found.
+
+---
+
+### 2. Performance Investigation
+
+**Scenario:** Application feels slow, need to identify bottlenecks.
+
+#### Step 1: List Recent Traces
+
+**Your prompt:**
+```
+"Why is my API so slow?"
+```
+
+**AI action:**
+```json
+spotlight.traces.search({
+  filters: { timeWindow: 300 }
+})
+```
+
+#### Step 2: Identify Slow Traces
+
+**AI response:**
+```
+I found several traces. Here are the slowest:
+- GET /api/users/profile: 2,450ms
+- POST /api/data/upload: 1,820ms
+- GET /api/products/search: 980ms
+
+The profile endpoint is notably slow. Let me analyze it.
+```
+
+#### Step 3: Analyze Slow Trace
+
+**AI action:**
+```json
+spotlight.traces.get({
+  traceId: "abc12345"
+})
+```
+
+**AI response:**
+```
+The slow profile request breaks down as:
+- Database query: 2,100ms (bottleneck!)
+- JSON processing: 200ms
+- Response formatting: 150ms
+
+The database query is taking most of the time.
+Would you like me to look at the query?
+```
+
+#### Step 4: Fix and Verify
+
+After making changes:
+
+**Your prompt:**
+```
+"Check if the profile endpoint is faster now"
+```
+
+**AI checks recent traces again and compares durations**
+
+---
+
+### 3. Understanding Application Behavior
+
+**Scenario:** Need to understand how a feature works.
+
+#### Step 1: Trigger the Feature
+
+1. Interact with your application
+2. Trigger the feature you want to understand
+
+#### Step 2: Check Logs
+
+**Your prompt:**
+```
+"What happened when I clicked the submit button?"
+```
+
+**AI action:**
+```json
+spotlight.logs.search({
+  filters: { timeWindow: 60 }
+})
+```
+
+#### Step 3: Analyze Flow
+
+**AI response:**
+```
+I can see the following flow:
+1. Form validation started
+2. API request to /api/submit
+3. Database insert operation (25ms)
+4. Email notification triggered
+5. Success response returned
+
+Everything looks normal. The operation took 180ms total.
+```
+
+---
+
+### 4. Debugging Specific Files
+
+**Scenario:** You made changes to a file and want to check for issues.
+
+#### Step 1: Check for Errors
+
+**Your prompt:**
+```
+"Are there any errors in auth.tsx?"
+```
+
+**AI action:**
+```json
+spotlight.errors.search({
+  filters: { filename: "auth.tsx" }
+})
+```
+
+#### Step 2: Check Logs
+
+**Your prompt:**
+```
+"Show me logs from auth.tsx"
+```
+
+**AI action:**
+```json
+spotlight.logs.search({
+  filters: { filename: "auth.tsx" }
+})
+```
+
+#### Step 3: Analyze Together
+
+The AI can now correlate errors and logs from the same file to give you a complete picture.
+
+---
+
+### 5. Regression Testing
+
+**Scenario:** After deployment or changes, verify nothing broke.
+
+#### Step 1: Baseline Check
+
+**Your prompt:**
+```
+"Check for any errors or issues after my deployment"
+```
+
+**AI action:**
+```json
+spotlight.errors.search({
+  filters: { timeWindow: 300 }
+})
+```
+
+#### Step 2: Performance Comparison
+
+**Your prompt:**
+```
+"Compare performance before and after"
+```
+
+**AI can:**
+- Get recent traces
+- Calculate average durations
+- Identify regressions
+
+---
+
+### 6. Distributed Tracing Analysis
+
+**Scenario:** Debugging a request that spans multiple services.
+
+#### Step 1: Find the Request Trace
+
+**Your prompt:**
+```
+"I made a request to /api/orders/create. Show me the full trace."
+```
+
+**AI action:**
+```json
+spotlight.traces.search({
+  filters: { timeWindow: 60 }
+})
+```
+
+Filters for transactions matching the path.
+
+#### Step 2: Analyze the Span Tree
+
+**AI action:**
+```json
+spotlight.traces.get({
+  traceId: "found-trace-id"
+})
+```
+
+**AI response:**
+```
+Transaction: POST /api/orders/create (450ms)
+├─ Database: Check inventory (45ms)
+├─ HTTP: Call payment service (280ms)
+│  ├─ Payment validation (50ms)
+│  └─ Charge card (220ms)
+├─ Database: Create order (80ms)
+└─ HTTP: Send notification (45ms)
+
+The payment service is the bottleneck at 280ms.
+```
+
+---
+
+## Advanced Patterns
+
+### Correlating Errors with Traces
+
+When an error includes a trace ID:
+
+**Your prompt:**
+```
+"This error mentions trace xyz123. What was happening?"
+```
+
+**AI action:**
+1. Get trace details: `spotlight.traces.get({ traceId: "xyz123" })`
+2. Analyze span tree
+3. Identify where error occurred in the flow
+
+### Time-Based Analysis
+
+Investigate issues during a specific time:
+
+**Your prompt:**
+```
+"What happened around 2:30 PM when the app crashed?"
+```
+
+**AI action:**
+- Searches errors around that timeWindow
+- Gets related traces
+- Analyzes logs from that period
+- Correlates all events to build timeline
+
+### Pattern Detection
+
+Find recurring issues:
+
+**Your prompt:**
+```
+"Are there any recurring errors?"
+```
+
+**AI action:**
+1. Gets all recent errors
+2. Groups by error message/type
+3. Identifies patterns
+4. Reports frequency and commonalities
+
+---
+
+## Effective Prompts
+
+### Good Prompts
+
+These prompts work well with Spotlight MCP:
+
+- ✅ "Are there any errors?"
+- ✅ "Show me errors from auth.js"
+- ✅ "Why is the API slow?"
+- ✅ "What happened in the last 5 minutes?"
+- ✅ "Analyze trace abc123"
+- ✅ "Show me database query logs"
+
+### Prompts That Need Context
+
+These might need clarification:
+
+- ⚠️ "Fix the bug" → Be specific about what's broken
+- ⚠️ "It's slow" → Specify what action or endpoint
+- ⚠️ "Something's wrong" → Describe the symptom
+
+### Following Up
+
+Always effective:
+
+- "Show me the code"
+- "What's causing this?"
+- "How can I fix it?"
+- "Are there related errors?"
+- "Check the trace for this request"
+
+---
+
+## Best Practices
+
+### 1. Start Broad, Then Narrow
+
+```
+You: "Are there any errors?"
+AI: [Finds multiple errors]
+
+You: "Focus on errors in the auth module"
+AI: [Filters to auth-related files]
+
+You: "Show me the code for that error"
+AI: [Reads specific file and analyzes]
+```
+
+### 2. Use Timeframes Effectively
+
+- **Last 60s** - Immediate issues you just triggered
+- **Last 5min** - Recent session activity
+- **Last hour** - Broader investigation
+
+### 3. Combine Tools
+
+The AI can use multiple tools together:
+
+```
+You: "Debug the slow checkout process"
+
+AI workflow:
+1. spotlight.traces.search → Find checkout traces
+2. spotlight.traces.get → Analyze slow trace
+3. spotlight.logs.search → Check related logs
+4. spotlight.errors.search → Look for errors
+```
+
+### 4. Reproduce First
+
+For best results:
+
+1. Trigger the issue in your app
+2. Then ask the AI to investigate
+3. Fresh data gives better insights
+
+### 5. Iterate
+
+Don't expect one prompt to solve everything:
+
+```
+You: "Why did this fail?"
+AI: [Finds error]
+
+You: "What was the request data?"
+AI: [Shows context from error]
+
+You: "Is this validation working correctly?"
+AI: [Reads validation code]
+
+You: "How should I fix it?"
+AI: [Suggests solution]
+```
+
+---
+
+## Troubleshooting Workflows
+
+### "No Errors Found"
+
+**What to do:**
+1. Reproduce the issue in your app
+2. Ask AI to check again immediately
+3. Make sure your app is running with Spotlight enabled
+
+### "No Traces Available"
+
+**What to do:**
+1. Verify Sentry SDK has tracing enabled
+2. Trigger some requests in your app
+3. Check SDK configuration with AI
+
+### "Can't Find Specific Event"
+
+**What to do:**
+1. Widen the time window
+2. Remove file filters
+3. Ask AI to show everything
+
+---
+
+## Example Debugging Session
+
+Here's a complete example:
+
+```
+You: "My app crashed when I clicked submit. What happened?"
+
+AI: Let me check for errors...
+[Calls spotlight.errors.search]
+
+AI: I found a TypeError in forms/SubmitButton.tsx at line 34:
+     "Cannot read property 'validate' of undefined"
+     
+     Would you like me to analyze the code?
+
+You: "Yes, and show me what happened before the crash"
+
+AI: [Reads SubmitButton.tsx code]
+[Calls spotlight.logs.search for recent activity]
+
+AI: Here's what I found:
+     
+     Code issue: Line 34 tries to call this.validator.validate(),
+     but this.validator is undefined.
+     
+     Logs show:
+     1. Form render started
+     2. Submit button clicked
+     3. Crash occurred - no validator was initialized
+     
+     The validator is supposed to be set in the constructor,
+     but it looks like it's only set when props.validationSchema
+     exists. In your case, that prop might be missing.
+     
+     Would you like me to suggest a fix?
+
+You: "Yes please"
+
+AI: [Suggests adding null check or default validator]
+```
+
+---
+
+## Next Steps
+
+- [Learn about MCP tools](/docs/mcp/tools/) - Detailed tool reference
+- [MCP setup guide](/docs/mcp/) - Getting started
+- [CLI workflows](/docs/cli/) - Using Spotlight from terminal
+

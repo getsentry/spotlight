@@ -1,0 +1,519 @@
+---
+title: MCP Tools Reference
+description: Complete reference for Spotlight MCP tools available to AI assistants
+sidebar:
+  order: 1
+---
+
+Spotlight provides four MCP tools that allow AI coding assistants to query your application's runtime data.
+
+## Tool Overview
+
+| Tool | Purpose | Returns |
+|------|---------|---------|
+| `spotlight.errors.search` | Find runtime errors | Errors with stack traces |
+| `spotlight.logs.search` | Query application logs | Log entries with context |
+| `spotlight.traces.search` | List performance traces | Trace summaries |
+| `spotlight.traces.get` | Get trace details | Full span tree and timing |
+
+## Common Filter Parameters
+
+All search tools support these filter options:
+
+### `timeWindow`
+
+Look back a specified number of seconds from now.
+
+- **Type:** Number (seconds)
+- **Examples:**
+  - `60` - Last minute
+  - `300` - Last 5 minutes
+  - `3600` - Last hour
+
+**Example:**
+```json
+{
+  "filters": {
+    "timeWindow": 300
+  }
+}
+```
+
+### `filename`
+
+Search for events related to a specific file (exact match, case-sensitive).
+
+- **Type:** String
+- **Examples:**
+  - `"auth.js"`
+  - `"Button.tsx"`
+  - `"api/users.ts"`
+
+**Example:**
+```json
+{
+  "filters": {
+    "filename": "auth.js"
+  }
+}
+```
+
+### `limit` and `offset`
+
+Paginate through results.
+
+- **Type:** Number
+- **Examples:**
+  - `limit: 10` - Return first 10 results
+  - `limit: 20, offset: 10` - Skip first 10, return next 20
+
+**Example:**
+```json
+{
+  "filters": {
+    "limit": 10,
+    "offset": 0
+  }
+}
+```
+
+---
+
+## spotlight.errors.search
+
+Search for runtime errors, exceptions, and crashes captured by Spotlight.
+
+### Purpose
+
+Find and analyze application errors with full context:
+
+- **Complete stack traces** with file and line numbers
+- **Error messages and types** (TypeError, ReferenceError, etc.)
+- **Request/response context** for API failures
+- **Browser/device information** when available
+
+### When to Use
+
+Use this tool when:
+
+- User reports "error", "broken", "not working", "crash", or "bug"
+- Investigating unexpected application behavior
+- Verifying no regressions after code changes
+- Debugging errors in specific files
+
+### Parameters
+
+```typescript
+{
+  filters: {
+    timeWindow?: number,      // Seconds to look back
+    filename?: string,        // Exact filename in stack trace
+    limit?: number,           // Max results
+    offset?: number          // Skip first N results
+  }
+}
+```
+
+### Usage Examples
+
+#### Get Recent Errors
+
+```json
+{
+  "filters": {
+    "timeWindow": 60
+  }
+}
+```
+
+Returns errors from the last minute.
+
+#### Find Errors in Specific File
+
+```json
+{
+  "filters": {
+    "filename": "auth.tsx"
+  }
+}
+```
+
+Returns all errors with `auth.tsx` in the stack trace.
+
+#### Paginated Error Search
+
+```json
+{
+  "filters": {
+    "limit": 10,
+    "offset": 0
+  }
+}
+```
+
+Returns first 10 errors.
+
+### Response Format
+
+Each error includes:
+
+- **Error Message**: The exception message
+- **Error Type**: Exception class (e.g., TypeError, ReferenceError)
+- **Stack Trace**: Full stack with file:line:column
+- **Timestamp**: When the error occurred
+- **Context**: Additional information (request data, user info, etc.)
+
+### Example AI Prompts
+
+- "Are there any errors in my app?"
+- "Show me errors from the last 5 minutes"
+- "Find errors in the authentication module"
+- "What's causing the TypeError in user.js?"
+
+---
+
+## spotlight.logs.search
+
+Search application logs to understand behavior, debug issues, and trace execution flow.
+
+### Purpose
+
+Query logs to see:
+
+- **Application execution flow** and behavior
+- **Debug messages** and timing information
+- **API request/response logs** with context
+- **Database query logs** with performance metrics
+
+### When to Use
+
+Best for:
+
+- Understanding how the application works
+- User mentions "logs", "debugging", or "trace"
+- Investigating what the app is doing internally
+- Performance investigation and timing analysis
+
+:::note
+For error diagnostics with stack traces, use `spotlight.errors.search` instead.
+:::
+
+### Parameters
+
+```typescript
+{
+  filters: {
+    timeWindow?: number,      // Seconds to look back
+    filename?: string,        // Exact filename generating logs
+    limit?: number,           // Max results
+    offset?: number          // Skip first N results
+  }
+}
+```
+
+### Log Levels
+
+- **INFO**: General application flow and significant events
+- **WARN**: Potential issues that don't break functionality
+- **DEBUG**: Detailed execution information for troubleshooting
+
+:::note
+ERROR level logs are available, but `spotlight.errors.search` provides more detailed error context including stack traces.
+:::
+
+### Usage Examples
+
+#### Check Recent Activity
+
+```json
+{
+  "filters": {
+    "timeWindow": 300
+  }
+}
+```
+
+Returns logs from the last 5 minutes.
+
+#### Find Logs from Specific File
+
+```json
+{
+  "filters": {
+    "filename": "database.ts"
+  }
+}
+```
+
+Returns logs generated by `database.ts`.
+
+#### Get Latest Log Entries
+
+```json
+{
+  "filters": {
+    "limit": 20,
+    "offset": 0
+  }
+}
+```
+
+Returns 20 most recent log entries.
+
+### Response Format
+
+Each log entry includes:
+
+- **Level**: Log severity (info, warn, debug)
+- **Message**: The log message
+- **Timestamp**: When it was logged
+- **Attributes**: Custom structured data (user_id, request_id, duration, etc.)
+- **Source**: File and line number (when available)
+
+### Example AI Prompts
+
+- "Show me recent logs"
+- "What's happening in the authentication flow?"
+- "Show me database query logs"
+- "How long are API requests taking?"
+
+---
+
+## spotlight.traces.search
+
+List recent performance traces with summary information.
+
+### Purpose
+
+Get an overview of recent application activity:
+
+- **Trace IDs** and root transaction names
+- **Total duration** and span counts
+- **Error counts** per trace
+- **Timestamps** for timeline analysis
+
+### When to Use
+
+Perfect for:
+
+- Investigating performance issues or slow requests
+- User mentions "traces", "performance", or "slow"
+- Finding specific transactions or requests
+- Getting an overview of recent activity
+
+### Parameters
+
+```typescript
+{
+  filters: {
+    timeWindow?: number,      // Seconds to look back
+    filename?: string,        // Exact filename in trace spans
+    limit?: number,           // Max results
+    offset?: number          // Skip first N results
+  }
+}
+```
+
+### Usage Examples
+
+#### Get Recent Traces
+
+```json
+{
+  "filters": {
+    "timeWindow": 300
+  }
+}
+```
+
+Returns traces from the last 5 minutes.
+
+#### Find Most Recent Traces
+
+```json
+{
+  "filters": {
+    "limit": 10,
+    "offset": 0
+  }
+}
+```
+
+Returns 10 most recent traces.
+
+#### Find Traces Involving Specific File
+
+```json
+{
+  "filters": {
+    "filename": "api.ts"
+  }
+}
+```
+
+Returns traces with spans from `api.ts`.
+
+### Response Format
+
+Each trace summary includes:
+
+- **Trace ID**: Unique identifier (first 8 chars shown)
+- **Transaction Name**: Root operation (e.g., "GET /api/users/:id")
+- **Duration**: Total time in milliseconds
+- **Span Count**: Number of operations in the trace
+- **Error Count**: Number of errors in this trace
+- **Timestamp**: When the trace started
+
+### Next Step
+
+After finding a trace of interest, use `spotlight.traces.get` with the trace ID to see detailed timing breakdown.
+
+### Example AI Prompts
+
+- "Show me recent traces"
+- "What requests happened in the last minute?"
+- "Find slow transactions"
+- "Show me traces with errors"
+
+---
+
+## spotlight.traces.get
+
+Get complete span tree and timing breakdown for a specific trace.
+
+### Purpose
+
+Deep-dive into a specific trace to see:
+
+- **Hierarchical span tree** with parent-child relationships
+- **Individual operation durations** for each span
+- **Database queries, API calls**, and render timings
+- **Error details** within the trace timeline
+
+### When to Use
+
+Use this after:
+
+- Finding a trace ID from `spotlight.traces.search`
+- Investigating a specific slow request or transaction
+- Understanding detailed execution flow
+- Finding performance bottlenecks in a trace
+
+### Parameters
+
+```typescript
+{
+  traceId: string  // Full 32-char hex or first 8 chars
+}
+```
+
+The trace ID can be:
+- First 8 characters: `"71a8c5e4"`
+- Full 32 characters: `"71a8c5e41ae1044dee67f50a07538fe7"`
+
+### Usage Examples
+
+#### Using Short Trace ID
+
+```json
+{
+  "traceId": "71a8c5e4"
+}
+```
+
+#### Using Full Trace ID
+
+```json
+{
+  "traceId": "71a8c5e41ae1044dee67f50a07538fe7"
+}
+```
+
+### Response Format
+
+Returns a hierarchical span tree showing:
+
+- **Span ID**: Unique identifier for each operation
+- **Operation**: Description of what the span does
+- **Duration**: Time in milliseconds
+- **Start Time**: When the operation started (relative to trace start)
+- **Parent/Child Relationships**: How operations nest
+- **Status**: ok, error, etc.
+- **Tags/Data**: Additional context (SQL queries, HTTP methods, etc.)
+
+Example structure:
+```
+Transaction: GET /api/users/123 (245ms)
+├─ Database Query: SELECT * FROM users (45ms)
+├─ HTTP Request: GET external-api.com (180ms)
+│  └─ DNS Lookup (5ms)
+└─ Process Response (20ms)
+   └─ Error: Cannot read property 'id'
+```
+
+### Example AI Prompts
+
+- "Show me details for trace 71a8c5e4"
+- "Analyze trace abc12345 for performance issues"
+- "Why is trace xyz taking so long?"
+- "Show me the span tree for this slow request"
+
+---
+
+## Workflow Patterns
+
+### Error Investigation
+
+1. **Search for errors**: `spotlight.errors.search`
+2. **If error mentions a trace**: Get trace details with `spotlight.traces.get`
+3. **Check related logs**: `spotlight.logs.search` with filename from error
+
+### Performance Analysis
+
+1. **List recent traces**: `spotlight.traces.search`
+2. **Identify slow traces**: Look at duration in summary
+3. **Deep dive**: `spotlight.traces.get` with trace ID
+4. **Check logs**: `spotlight.logs.search` for timing details
+
+### Understanding Application Behavior
+
+1. **Check logs**: `spotlight.logs.search` for recent activity
+2. **Look for errors**: `spotlight.errors.search` for issues
+3. **Examine traces**: `spotlight.traces.search` for request flow
+
+## Best Practices
+
+### Time Windows
+
+- Use **60s** (1 minute) for recent activity
+- Use **300s** (5 minutes) for broader investigation
+- Use **3600s** (1 hour) for historical analysis
+
+### Pagination
+
+- Start with `limit: 10` to avoid overwhelming output
+- Use `offset` to load more if needed
+- For specific issues, filter by `filename` instead of paginating
+
+### Combining Filters
+
+You can only use one filter type at a time:
+- Either `timeWindow`
+- Or `filename`
+- Or `limit`/`offset`
+
+Choose the most specific filter for your use case.
+
+### Following Trace IDs
+
+Traces often reference related data:
+1. Errors include trace IDs → use `spotlight.traces.get`
+2. Logs include trace IDs → use `spotlight.traces.get`
+3. Trace spans reference files → use `spotlight.logs.search` or `spotlight.errors.search` with filename
+
+## Next Steps
+
+- [See MCP workflows](/docs/mcp/workflows/) - Common debugging patterns
+- [MCP server setup](/docs/mcp/) - Getting started guide
+- [CLI reference](/docs/cli/reference/) - Command-line tools
+

@@ -1,0 +1,371 @@
+---
+title: CLI Reference
+description: Complete reference for all Spotlight CLI commands and options
+sidebar:
+  order: 3
+---
+
+Complete reference for the Spotlight CLI (`spotlight`).
+
+## Global Syntax
+
+```bash
+spotlight [command] [options] [arguments]
+```
+
+## Commands
+
+### `run` - Run Application with Spotlight
+
+Wraps your application and automatically configures Spotlight.
+
+```bash
+spotlight run [options] [command...]
+```
+
+**Examples:**
+
+```bash
+# Auto-detect from package.json
+spotlight run
+
+# Run specific command
+spotlight run node server.js
+spotlight run python manage.py runserver
+spotlight run go run main.go
+
+# With custom port
+spotlight run -p 3000 npm start
+
+# With debug logging
+spotlight run -d node server.js
+```
+
+**Behavior:**
+- Starts Spotlight sidecar server
+- Sets `SENTRY_SPOTLIGHT` environment variable
+- Sets `SENTRY_TRACES_SAMPLE_RATE=1`
+- Captures stdout/stderr as logs
+- Runs the specified command
+
+**Auto-detection:**
+If no command is provided, looks for these scripts in `package.json`:
+1. `dev`
+2. `develop`
+3. `serve`
+4. `start`
+
+[Learn more about run →](/docs/cli/run/)
+
+---
+
+### `tail` - Stream Events
+
+Streams events from Spotlight to your terminal in real-time.
+
+```bash
+spotlight tail [event-types...] [options]
+```
+
+**Event Types:**
+- `errors` - Errors and exceptions
+- `logs` - Application logs
+- `traces` - Performance traces
+- `all`, `everything`, `*` - All event types
+
+**Examples:**
+
+```bash
+# Stream all events
+spotlight tail
+
+# Stream only errors
+spotlight tail errors
+
+# Stream errors and logs
+spotlight tail errors logs
+
+# Stream with JSON format
+spotlight tail -f json
+
+# Stream traces with logfmt format
+spotlight tail traces -f logfmt
+
+# Stream on custom port
+spotlight tail -p 3000
+```
+
+**Behavior:**
+- Connects to existing sidecar or starts new one
+- Streams filtered events to stdout
+- Formats output based on `-f` option
+
+[Learn more about tail →](/docs/cli/tail/)
+
+---
+
+### `mcp` - Start MCP Server
+
+Starts Spotlight in MCP (Model Context Protocol) stdio server mode for integration with AI coding assistants.
+
+```bash
+spotlight mcp [options]
+```
+
+**Examples:**
+
+```bash
+# Start MCP server on default port
+spotlight mcp
+
+# Start on custom port
+spotlight mcp -p 3000
+
+# Start with debug logging
+spotlight mcp -d
+```
+
+**Behavior:**
+- Starts Spotlight sidecar server
+- Enables MCP protocol over stdio
+- Provides tools for AI assistants to query errors, logs, and traces
+
+**Available MCP Tools:**
+- `spotlight.errors.search` - Search for errors
+- `spotlight.logs.search` - Search for logs
+- `spotlight.traces.search` - List traces
+- `spotlight.traces.get` - Get trace details
+
+[Learn more about MCP →](/docs/mcp/)
+
+---
+
+### `server` - Start Standalone Server
+
+Starts the Spotlight sidecar server without any additional modes.
+
+```bash
+spotlight server [options]
+spotlight [options]  # server is the default command
+```
+
+**Examples:**
+
+```bash
+# Start on default port (8969)
+spotlight server
+
+# Start on custom port
+spotlight server -p 3000
+
+# Start with debug logging
+spotlight server -d
+
+# Shorthand (server is default)
+spotlight
+spotlight -p 3000
+```
+
+**Behavior:**
+- Starts the sidecar HTTP server
+- Listens for events from Sentry SDKs
+- Serves the Spotlight UI at `http://localhost:PORT`
+- Streams events via Server-Sent Events (SSE)
+
+---
+
+### `help` - Show Help
+
+Displays help information.
+
+```bash
+spotlight help
+spotlight --help
+spotlight -h
+```
+
+## Global Options
+
+These options work with all commands:
+
+### `-p, --port <port>`
+
+Specify the port for the sidecar server.
+
+- **Type:** Number (1-65535 or 0)
+- **Default:** `8969` (for most commands), `0` (for `run` command)
+- **Special:** `0` = auto-assign random available port
+
+**Examples:**
+
+```bash
+spotlight -p 3000
+spotlight --port 9000 tail errors
+spotlight run -p 0 npm start  # Random port
+```
+
+### `-d, --debug`
+
+Enable debug logging for troubleshooting.
+
+- **Type:** Boolean
+- **Default:** `false`
+
+**Examples:**
+
+```bash
+spotlight -d
+spotlight --debug tail logs
+spotlight run -d node server.js
+```
+
+**Output includes:**
+- Detailed server startup information
+- Connection status
+- Event processing details
+- SDK communication logs
+
+### `-h, --help`
+
+Show help message and exit.
+
+**Examples:**
+
+```bash
+spotlight -h
+spotlight --help
+```
+
+#### `-f, --format <format>`
+
+Specify output format for events.
+
+- **Type:** String
+- **Options:** `human`, `logfmt`, `json`, `md`
+- **Default:** `human`
+
+**Examples:**
+
+```bash
+spotlight tail -f json
+spotlight tail --format logfmt errors
+spotlight tail errors logs -f md
+```
+
+**Formats:**
+- `human` - Colored, human-readable (default). Based on the [hl](https://github.com/pamburus/hl) library.
+- `logfmt` - Machine-readable key-value pairs following the [logfmt](https://brandur.org/logfmt) format.
+- `json` - Structured JSON (one per line)
+- `md` - Markdown format
+
+## Environment Variables
+
+### `SPOTLIGHT_DEBUG`
+
+Enable debug logging (alternative to `-d` flag).
+
+```bash
+export SPOTLIGHT_DEBUG=1
+spotlight tail
+```
+
+### `SENTRY_SPOTLIGHT`
+
+Set by `run` command to tell SDKs where to send events.
+
+```bash
+# Automatically set by spotlight run
+SENTRY_SPOTLIGHT=http://localhost:8969/stream
+```
+
+### `SENTRY_TRACES_SAMPLE_RATE`
+
+Set by `run` command to enable 100% trace sampling.
+
+```bash
+# Automatically set by spotlight run
+SENTRY_TRACES_SAMPLE_RATE=1
+```
+
+## Exit Codes
+
+- `0` - Success
+- `1` - General error (invalid arguments, connection failed, etc.)
+- `130` - Interrupted by user (SIGINT/Ctrl+C)
+
+## Configuration Files
+
+Spotlight CLI does not use configuration files. All configuration is done via command-line arguments and environment variables.
+
+## Common Patterns
+
+### Development Workflow
+
+```bash
+# Terminal 1: Run your app with Spotlight
+spotlight run
+
+# Terminal 2: Monitor specific events
+spotlight tail errors logs
+
+# Browser: View in UI
+open http://localhost:8969
+```
+
+### CI/CD Integration
+
+```bash
+# Capture events during tests as newline-delimited JSON (NDJSON)
+spotlight tail -f json > events.ndjson &
+SPOTLIGHT_PID=$!
+
+# Run tests
+spotlight run npm test
+
+# Cleanup
+kill $SPOTLIGHT_PID
+```
+
+### Multi-Service Setup
+
+```bash
+# Service 1 (backend)
+spotlight run -p 8969 npm run dev:backend
+
+# Service 2 (frontend - connects to same sidecar)
+spotlight run -p 8969 npm run dev:frontend
+```
+
+### Log Aggregation
+
+```bash
+# Stream to file with logfmt
+spotlight tail -f logfmt >> spotlight.log
+
+# Stream to file with JSON
+spotlight tail -f json | jq . >> spotlight.json
+```
+
+## Version
+
+To check the installed version:
+
+```bash
+spotlight --version
+# or check package version
+npm list -g @spotlightjs/spotlight
+```
+
+## Package Information
+
+- **Package:** `@spotlightjs/sidecar`
+- **Binary:** `spotlight`
+- **Minimum Node Version:** 20.0.0
+
+## Related Documentation
+
+- [Run Command Guide](/docs/cli/run/) - Detailed guide for running applications
+- [Tail Command Guide](/docs/cli/tail/) - Detailed guide for streaming events
+- [MCP Integration](/docs/mcp/) - Using Spotlight with AI coding assistants
+- [Sidecar Documentation](/docs/sidecar/) - Understanding the sidecar server
+

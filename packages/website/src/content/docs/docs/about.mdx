@@ -1,12 +1,12 @@
 ---
 title: About Spotlight
-description: "Spotlight is Sentry for Development. Inspired by an old project, Django Debug Toolbar, Spotlight brings a rich debug
-overlay into development environments, and it does it by leveraging the existing power of Sentry's SDKs."
+description: "Spotlight is Sentry for Development. A powerful local debugging companion that brings real-time error tracking, traces, and logs to your development environment."
 sidebar:
   label: What is Spotlight?
   order: 0
 ---
 import DownloadButton from '../../../components/DownloadButton.astro';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
 Spotlight started out as a [Hackweek project](https://syntax.fm/show/666/hackweek-projects-realtime-markdown-editor-and-a-hardware-recording-button) at Sentry:
 
@@ -15,12 +15,70 @@ overlay into development environments, and it does it by leveraging the existing
 
 You get the power of Sentry's telemetry (through its SDKs) without needing Sentry's production monitoring. If you already use Sentry, that's great. All you need is enabling Spotlight in your SDK and run Spotlight locally. If you are not using Sentry, you need to install the free and open source Sentry SDKs to get started. If you want to use Sentry later on, this saves you the initial setup. Just add your Sentry DSNs into your projects and off you go!
 
-Spotlight can show you errors, traces (including distributed traces), profiling data, configurations settings, installed dependencies, you name it. Spotlight is developed with customizablity in mind, so you can add your own integrations to it.
-The main differences between Spotlight and Sentry are:
+## Three Ways to Use Spotlight
 
-1. Spotlight runs locally on your system (including the sidecar)
-2. Spotlight shows you everything and in realtime whereas Sentry is all about aggregation
-3. Spotlight is completely free and open source, whereas Sentry is a commercial product (with a free tier and self-hosting options)
+Spotlight provides three powerful tools for debugging and development:
+
+### 1. Local Development Tool
+
+A real-time debugging overlay that displays errors, traces, logs, and profiles directly in your browser or dedicated desktop app. See everything happening in your application as it happens.
+
+**Perfect for:**
+- Visual debugging during development
+- Inspecting distributed traces
+- Monitoring application performance
+- Viewing real-time logs and errors
+
+### 2. MCP Server
+
+Model Context Protocol integration that connects Spotlight to AI coding assistants like Cursor, Claude, and other MCP clients. Your AI assistant can access your application's runtime data to help debug issues.
+
+**Perfect for:**
+- AI-assisted debugging
+- Letting your coding assistant analyze errors
+- Getting context-aware code suggestions based on runtime data
+- Automated error investigation
+
+### 3. CLI (Command Line Interface)
+
+Run your applications with Spotlight's CLI to automatically capture telemetry data, or tail events in real-time from your terminal.
+
+**Perfect for:**
+- Running backend services with automatic instrumentation
+- Streaming logs and traces to your terminal
+- CI/CD integration
+- Headless environments
+
+## Why Spotlight?
+
+Spotlight provides comprehensive debugging visibility:
+
+- **Errors** with full stack traces
+- **Traces** including distributed transactions
+- **Logs** with structured data
+- **Profiling data** for performance analysis
+- **Configuration** and dependency information
+- **Customizable** with your own integrations
+
+### Spotlight vs Sentry
+
+|  | Spotlight | Sentry |
+|---|---|---|
+| **Where it runs** | Local on your machine | Cloud or self-hosted |
+| **Data display** | Real-time, shows everything | Aggregated, sampled |
+| **Cost** | Free and open source | Commercial (with free tier) |
+| **Use case** | Active development | Production monitoring |
+
+## Get Started
+
+Choose the approach that fits your workflow:
+
+<CardGrid>
+  <LinkCard title="Desktop App" href="/docs/desktop-app/" description="Download the standalone app with built-in UI" />
+  <LinkCard title="CLI Tools" href="/docs/cli/" description="Run your apps with Spotlight or tail events" />
+  <LinkCard title="MCP Server" href="/docs/mcp/" description="Connect to AI coding assistants" />
+  <LinkCard title="Sidecar Integration" href="/docs/sidecar/" description="Integrate into your build process" />
+</CardGrid>
 
 ## Quick Start
 

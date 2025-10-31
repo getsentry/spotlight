@@ -88,9 +88,21 @@ export default defineConfig({
           ],
         },
         {
-          label: "Setup",
+          label: "CLI",
           autogenerate: {
-            directory: "docs/setup",
+            directory: "docs/cli",
+          },
+        },
+        {
+          label: "MCP Server",
+          autogenerate: {
+            directory: "docs/mcp",
+          },
+        },
+        {
+          label: "Desktop App",
+          autogenerate: {
+            directory: "docs/desktop-app",
           },
         },
         {
