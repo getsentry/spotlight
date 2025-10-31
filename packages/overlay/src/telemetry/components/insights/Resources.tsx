@@ -3,14 +3,12 @@ import { ReactComponent as Sort } from "~/assets/sort.svg";
 import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
 import { cn } from "~/lib/cn";
 import Table from "~/ui/table";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/ui/tooltip";
 import { RESOURCES_SORT_KEYS, RESOURCE_HEADERS } from "../../constants";
 import { useSentrySpans } from "../../data/useSentrySpans";
 import useSort from "../../hooks/useSort";
 import type { Span } from "../../types";
 import { formatBytes } from "../../utils/bytes";
 import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
-import { getResourceImageUrl } from "../../utils/resource-url";
 
 type ResourceInfo = {
   avgDuration: number;
@@ -133,31 +131,7 @@ const Resources = () => {
               title={resource.description}
               className="text-primary-200 relative w-2/5 whitespace-nowrap px-6 py-4 text-left text-sm font-medium overflow-x-hidden"
             >
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="cursor-default truncate block">{resource.description}</span>
-                  </TooltipTrigger>
-                  {(() => {
-                    const imageUrl =
-                      resource.similarResources[0].op === "resource.img"
-                        ? getResourceImageUrl(resource.similarResources[0])
-                        : null;
-                    return imageUrl ? (
-                      <TooltipContent side="right" className="border-none bg-transparent p-0 shadow-none">
-                        <div className="bg-primary-800 cursor-pointer rounded-lg p-4 shadow-md">
-                          <h2 className="mb-2 font-bold text-white">Preview</h2>
-                          <img
-                            src={imageUrl}
-                            className="inline-block max-h-[150px] max-w-[150px] rounded-sm p-1"
-                            alt="preview"
-                          />
-                        </div>
-                      </TooltipContent>
-                    ) : null;
-                  })()}
-                </Tooltip>
-              </TooltipProvider>
+              <span className="cursor-default truncate block">{resource.description}</span>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
               <span className={getSpanDurationClassName(resource.avgDuration)}>
