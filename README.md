@@ -4,6 +4,10 @@
   </a>
 </p>
 
+<p align="center">
+  <strong>For more information, <a href="https://spotlightjs.com/docs/setup/">see our documentation.</a></strong>
+</p>
+
 # What's Spotlight? [![npm version](https://img.shields.io/npm/v/@spotlightjs/spotlight.svg)](https://www.npmjs.com/package/@spotlightjs/spotlight)
 
 Spotlight is Sentry for Development. Debuggability elevated. Spotlight brings rich observability into development environments by leveraging the power of Sentry's SDKs, giving you real-time insights into errors, performance, and logs—essential for modern development and AI-assisted coding workflows.
