@@ -1,7 +1,7 @@
 ---
 "@spotlightjs/overlay": minor
 "@spotlightjs/spotlight": minor
-"@spotlightjs/electron": patch
+"@spotlightjs/electron": minor
 ---
 
 Display attachments in Event and Trace Context tabs
