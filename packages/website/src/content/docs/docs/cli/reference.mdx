@@ -5,12 +5,12 @@ sidebar:
   order: 3
 ---
 
-Complete reference for the Spotlight CLI (`spotlight-sidecar`).
+Complete reference for the Spotlight CLI (`spotlight`).
 
 ## Global Syntax
 
 ```bash
-spotlight-sidecar [command] [options] [arguments]
+spotlight [command] [options] [arguments]
 ```
 
 ## Commands
@@ -20,25 +20,25 @@ spotlight-sidecar [command] [options] [arguments]
 Wraps your application and automatically configures Spotlight.
 
 ```bash
-spotlight-sidecar run [options] [command...]
+spotlight run [options] [command...]
 ```
 
 **Examples:**
 
 ```bash
 # Auto-detect from package.json
-spotlight-sidecar run
+spotlight run
 
 # Run specific command
-spotlight-sidecar run node server.js
-spotlight-sidecar run python manage.py runserver
-spotlight-sidecar run go run main.go
+spotlight run node server.js
+spotlight run python manage.py runserver
+spotlight run go run main.go
 
 # With custom port
-spotlight-sidecar run -p 3000 npm start
+spotlight run -p 3000 npm start
 
 # With debug logging
-spotlight-sidecar run -d node server.js
+spotlight run -d node server.js
 ```
 
 **Behavior:**
@@ -64,7 +64,7 @@ If no command is provided, looks for these scripts in `package.json`:
 Streams events from Spotlight to your terminal in real-time.
 
 ```bash
-spotlight-sidecar tail [event-types...] [options]
+spotlight tail [event-types...] [options]
 ```
 
 **Event Types:**
@@ -78,22 +78,22 @@ spotlight-sidecar tail [event-types...] [options]
 
 ```bash
 # Stream all events
-spotlight-sidecar tail
+spotlight tail
 
 # Stream only errors
-spotlight-sidecar tail errors
+spotlight tail errors
 
 # Stream errors and logs
-spotlight-sidecar tail errors logs
+spotlight tail errors logs
 
 # Stream with JSON format
-spotlight-sidecar tail -f json
+spotlight tail -f json
 
 # Stream traces with logfmt format
-spotlight-sidecar tail traces -f logfmt
+spotlight tail traces -f logfmt
 
 # Stream on custom port
-spotlight-sidecar tail -p 3000
+spotlight tail -p 3000
 ```
 
 **Behavior:**
@@ -110,20 +110,20 @@ spotlight-sidecar tail -p 3000
 Starts Spotlight in MCP (Model Context Protocol) mode for integration with AI coding assistants.
 
 ```bash
-spotlight-sidecar mcp [options]
+spotlight mcp [options]
 ```
 
 **Examples:**
 
 ```bash
 # Start MCP server on default port
-spotlight-sidecar mcp
+spotlight mcp
 
 # Start on custom port
-spotlight-sidecar mcp -p 3000
+spotlight mcp -p 3000
 
 # Start with debug logging
-spotlight-sidecar mcp -d
+spotlight mcp -d
 ```
 
 **Behavior:**
@@ -146,25 +146,25 @@ spotlight-sidecar mcp -d
 Starts the Spotlight sidecar server without any additional modes.
 
 ```bash
-spotlight-sidecar server [options]
-spotlight-sidecar [options]  # server is the default command
+spotlight server [options]
+spotlight [options]  # server is the default command
 ```
 
 **Examples:**
 
 ```bash
 # Start on default port (8969)
-spotlight-sidecar server
+spotlight server
 
 # Start on custom port
-spotlight-sidecar server -p 3000
+spotlight server -p 3000
 
 # Start with debug logging
-spotlight-sidecar server -d
+spotlight server -d
 
 # Shorthand (server is default)
-spotlight-sidecar
-spotlight-sidecar -p 3000
+spotlight
+spotlight -p 3000
 ```
 
 **Behavior:**
@@ -180,9 +180,9 @@ spotlight-sidecar -p 3000
 Displays help information.
 
 ```bash
-spotlight-sidecar help
-spotlight-sidecar --help
-spotlight-sidecar -h
+spotlight help
+spotlight --help
+spotlight -h
 ```
 
 ## Global Options
@@ -200,9 +200,9 @@ Specify the port for the sidecar server.
 **Examples:**
 
 ```bash
-spotlight-sidecar -p 3000
-spotlight-sidecar --port 9000 tail errors
-spotlight-sidecar run -p 0 npm start  # Random port
+spotlight -p 3000
+spotlight --port 9000 tail errors
+spotlight run -p 0 npm start  # Random port
 ```
 
 ### `-d, --debug`
@@ -215,9 +215,9 @@ Enable debug logging for troubleshooting.
 **Examples:**
 
 ```bash
-spotlight-sidecar -d
-spotlight-sidecar --debug tail logs
-spotlight-sidecar run -d node server.js
+spotlight -d
+spotlight --debug tail logs
+spotlight run -d node server.js
 ```
 
 **Output includes:**
@@ -233,8 +233,8 @@ Show help message and exit.
 **Examples:**
 
 ```bash
-spotlight-sidecar -h
-spotlight-sidecar --help
+spotlight -h
+spotlight --help
 ```
 
 ## Command-Specific Options
@@ -252,9 +252,9 @@ Specify output format for events.
 **Examples:**
 
 ```bash
-spotlight-sidecar tail -f json
-spotlight-sidecar tail --format logfmt errors
-spotlight-sidecar tail errors logs -f md
+spotlight tail -f json
+spotlight tail --format logfmt errors
+spotlight tail errors logs -f md
 ```
 
 **Formats:**
@@ -271,7 +271,7 @@ Enable debug logging (alternative to `-d` flag).
 
 ```bash
 export SPOTLIGHT_DEBUG=1
-spotlight-sidecar tail
+spotlight tail
 ```
 
 ### `SENTRY_SPOTLIGHT`
@@ -279,7 +279,7 @@ spotlight-sidecar tail
 Set by `run` command to tell SDKs where to send events.
 
 ```bash
-# Automatically set by spotlight-sidecar run
+# Automatically set by spotlight run
 SENTRY_SPOTLIGHT=http://localhost:8969/stream
 ```
 
@@ -288,7 +288,7 @@ SENTRY_SPOTLIGHT=http://localhost:8969/stream
 Set by `run` command to enable 100% trace sampling.
 
 ```bash
-# Automatically set by spotlight-sidecar run
+# Automatically set by spotlight run
 SENTRY_TRACES_SAMPLE_RATE=1
 ```
 
@@ -308,10 +308,10 @@ Spotlight CLI does not use configuration files. All configuration is done via co
 
 ```bash
 # Terminal 1: Run your app with Spotlight
-spotlight-sidecar run
+spotlight run
 
 # Terminal 2: Monitor specific events
-spotlight-sidecar tail errors logs
+spotlight tail errors logs
 
 # Browser: View in UI
 open http://localhost:8969
@@ -321,11 +321,11 @@ open http://localhost:8969
 
 ```bash
 # Capture events during tests
-spotlight-sidecar tail -f json > events.json &
+spotlight tail -f json > events.json &
 SPOTLIGHT_PID=$!
 
 # Run tests
-spotlight-sidecar run npm test
+spotlight run npm test
 
 # Cleanup
 kill $SPOTLIGHT_PID
@@ -335,20 +335,20 @@ kill $SPOTLIGHT_PID
 
 ```bash
 # Service 1 (backend)
-spotlight-sidecar run -p 8969 npm run dev:backend
+spotlight run -p 8969 npm run dev:backend
 
 # Service 2 (frontend - connects to same sidecar)
-spotlight-sidecar run -p 8969 npm run dev:frontend
+spotlight run -p 8969 npm run dev:frontend
 ```
 
 ### Log Aggregation
 
 ```bash
 # Stream to file with logfmt
-spotlight-sidecar tail -f logfmt >> spotlight.log
+spotlight tail -f logfmt >> spotlight.log
 
 # Stream to file with JSON
-spotlight-sidecar tail -f json | jq . >> spotlight.json
+spotlight tail -f json | jq . >> spotlight.json
 ```
 
 ## Version
@@ -356,7 +356,7 @@ spotlight-sidecar tail -f json | jq . >> spotlight.json
 To check the installed version:
 
 ```bash
-spotlight-sidecar --version
+spotlight --version
 # or check package version
 npm list -g @spotlightjs/sidecar
 ```
@@ -364,7 +364,7 @@ npm list -g @spotlightjs/sidecar
 ## Package Information
 
 - **Package:** `@spotlightjs/sidecar`
-- **Binary:** `spotlight-sidecar`
+- **Binary:** `spotlight`
 - **Minimum Node Version:** 20.0.0
 
 ## Related Documentation
