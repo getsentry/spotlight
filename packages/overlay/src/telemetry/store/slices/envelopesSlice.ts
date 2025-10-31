@@ -40,6 +40,15 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
 
     const traceContext = header.trace;
 
+    // Collect all attachments from this envelope
+    const attachments = items
+      .filter(([itemHeader]) => RAW_TYPES.has(itemHeader.type))
+      .map(([itemHeader, itemData]) => ({
+        header: itemHeader,
+        // @ts-expect-error -- attachment data structure has data property
+        data: itemData.data as string,
+      }));
+
     for (const [itemHeader, itemData] of items) {
       if (SUPPORTED_EVENT_TYPES.has(itemHeader.type)) {
         const item = itemData as SentryEvent;
@@ -51,6 +60,10 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
             item.contexts = {};
           }
           item.contexts.trace ??= traceContext;
+        }
+        // Associate attachments with this event
+        if (attachments.length > 0) {
+          item.attachments = attachments;
         }
         // The below is an async function but we really don't need to wait for that
         get().pushEvent(itemData as SentryEvent);

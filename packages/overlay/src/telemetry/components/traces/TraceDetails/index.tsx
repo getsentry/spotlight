@@ -25,6 +25,8 @@ type TraceDetailsProps = {
 };
 
 export function TraceContext({ trace }: { trace: Trace }) {
+  const rootTransaction = trace.rootTransaction || trace.transactions[0];
+  
   return (
     <>
       <div className="space-y-6 p-6">
@@ -54,7 +56,7 @@ export function TraceContext({ trace }: { trace: Trace }) {
         <h2 className="mb-2 font-bold uppercase">ID</h2>
         {trace.trace_id}
       </div>
-      <EventContexts event={trace.rootTransaction || trace.transactions[0]} />
+      <EventContexts event={rootTransaction} />
     </>
   );
 }

@@ -1,8 +1,13 @@
-import type { EventEnvelopeHeaders, Measurements, SerializedLog } from "@sentry/core";
+import type { EnvelopeItem, EventEnvelopeHeaders, Measurements, SerializedLog } from "@sentry/core";
 import type { ColorValue } from "nanovis";
 
 export type TraceId = string;
 export type SpanId = string;
+
+export type EventAttachment = {
+  header: EnvelopeItem[0];
+  data: string;
+};
 
 export type FrameVars = {
   [key: string]: string;
@@ -72,6 +77,7 @@ type CommonEventAttrs = {
   modules?: Record<string, string>;
   sdk?: Sdk;
   measurements?: Measurements;
+  attachments?: EventAttachment[];
 };
 
 // Note: For some reason the `sentry/core` module doesn't have these additional properties
