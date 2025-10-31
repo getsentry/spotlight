@@ -10,5 +10,3 @@ Add Trace ID column and column selector to logs view
 - Column visibility preferences are persisted to localStorage
 - Trace ID column is sortable like other columns
 - Enhanced UX with truncated trace IDs and "N/A" fallback for missing values
-
-Closes #993
