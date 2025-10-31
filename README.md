@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/getsentry-spotlight-badge.png)](https://mseep.ai/app/getsentry-spotlight)
+
 <p align="center">
   <a href="https://blog.sentry.io/sentry-for-development/" target="_blank">
     <img src="https://raw.githubusercontent.com/getsentry/spotlight/main/.github/spotlight-hero-v2.jpg?utm_source=github&utm_medium=logo" alt="Spotlight">
