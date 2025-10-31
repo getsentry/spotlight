@@ -205,7 +205,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                             paddings,
                           )}
                         >
-                          <span title={log.sdk || undefined} className="max-w-[150px] truncate block text-right">
+                          <span title={log.sdk || undefined} className="block max-w-[150px] truncate text-right ms-auto">
                             {log.sdk || "N/A"}
                           </span>
                         </td>
