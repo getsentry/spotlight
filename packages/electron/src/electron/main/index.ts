@@ -184,27 +184,6 @@ const createWindow = () => {
     }
   });
 
-  // Handle downloads
-  win.webContents.session.on("will-download", (_event, item, _webContents) => {
-    // Get the filename from the download item
-    const filename = item.getFilename();
-
-    // Show save dialog for envelope downloads
-    const savePath = dialog.showSaveDialogSync(win, {
-      defaultPath: filename,
-      filters: [
-        { name: "Binary Files", extensions: ["bin"] },
-        { name: "All Files", extensions: ["*"] },
-      ],
-    });
-
-    if (savePath) {
-      item.setSavePath(savePath);
-    } else {
-      item.cancel();
-    }
-  });
-
   win.webContents.on("did-start-loading", () => {
     clearBuffer();
     app.setBadgeCount(0);
@@ -647,11 +626,38 @@ function createTray() {
   });
 }
 
+// Setup download handler once for the app's default session
+function setupDownloadHandler() {
+  app.getDefaultSession().on("will-download", (_event, item, webContents) => {
+    // Get the filename from the download item
+    const filename = item.getFilename();
+
+    // Get the window from the webContents that initiated the download
+    const downloadWindow = BrowserWindow.fromWebContents(webContents);
+
+    // Show save dialog for envelope downloads
+    const savePath = dialog.showSaveDialogSync(downloadWindow, {
+      defaultPath: filename,
+      filters: [
+        { name: "Binary Files", extensions: ["bin"] },
+        { name: "All Files", extensions: ["*"] },
+      ],
+    });
+
+    if (savePath) {
+      item.setSavePath(savePath);
+    } else {
+      item.cancel();
+    }
+  });
+}
+
 app.whenReady().then(() => {
   if (!isLinux) {
     createTray();
   }
 
+  setupDownloadHandler();
   createWindow();
   app.on("activate", () => {
     showOrCreateWindow();
