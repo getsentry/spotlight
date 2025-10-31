@@ -111,7 +111,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                     scope="col"
                     className={cn(
                       "text-primary-100 py-3.5 text-sm font-semibold",
-                      !header.stretch && "w-[20%]",
+                      !header.primary && "w-[20%]",
                       header.primary && "w-[50%]",
                       idx === 0 && "ps-6",
                       idx === visibleHeaders.length - 1 && "pe-6",
