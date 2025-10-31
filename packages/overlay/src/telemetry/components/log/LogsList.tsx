@@ -175,13 +175,17 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                     if (header.id === "trace_id" && isColumnVisible("trace_id")) {
                       return (
                         <td key="trace_id" className={cn("text-sm", paddings)}>
-                          <Link
-                            to={`/telemetry/traces/${log.trace_id}`}
-                            className="text-blue-400 hover:text-blue-300 underline max-w-[150px] truncate block"
-                            onClick={e => e.stopPropagation()}
-                          >
-                            {log.trace_id || "N/A"}
-                          </Link>
+                          {log.trace_id ? (
+                            <Link
+                              to={`/telemetry/traces/${log.trace_id}`}
+                              className="text-blue-400 hover:text-blue-300 underline max-w-[150px] truncate block"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              {log.trace_id}
+                            </Link>
+                          ) : (
+                            <span className="text-primary-300 max-w-[150px] truncate block">N/A</span>
+                          )}
                         </td>
                       );
                     }
