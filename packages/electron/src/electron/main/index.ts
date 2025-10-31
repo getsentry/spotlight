@@ -2,7 +2,7 @@ import path from "node:path";
 import * as Sentry from "@sentry/electron/main";
 import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
 import { DEFAULT_PORT } from "@spotlightjs/sidecar/constants";
-import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, shell } from "electron";
+import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, session, shell } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
 
@@ -628,7 +628,7 @@ function createTray() {
 
 // Setup download handler once for the app's default session
 function setupDownloadHandler() {
-  app.getDefaultSession().on("will-download", (_event, item, webContents) => {
+  session.defaultSession.on("will-download", (_event, item, webContents) => {
     // Get the filename from the download item
     const filename = item.getFilename();
 
