@@ -1,7 +1,7 @@
 import type { Envelope } from "@sentry/core";
 import type { StateCreator } from "zustand";
-import { SUPPORTED_EVENT_TYPES } from "../../constants/sentry";
-import type { Sdk, SentryEvent } from "../../types";
+import { ATTACHMENT_EVENT_TYPES, SUPPORTED_EVENT_TYPES } from "../../constants/sentry";
+import type { EventAttachment, Sdk, SentryEvent } from "../../types";
 import { sdkToPlatform } from "../../utils/sdkToPlatform";
 import type { EnvelopesSliceActions, EnvelopesSliceState, SentryStore } from "../types";
 import { RAW_TYPES } from "@spotlightjs/sidecar/constants";
@@ -40,14 +40,39 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
 
     const traceContext = header.trace;
 
-    // Collect all attachments from this envelope
-    const attachments = items
-      .filter(([itemHeader]) => RAW_TYPES.has(itemHeader.type))
-      .map(([itemHeader, itemData]) => ({
+    const attachmentsByEventId = new Map<string, EventAttachment[]>();
+    const envelopeScopedAttachments: EventAttachment[] = [];
+    let eventCount = 0;
+
+    for (const [itemHeader, itemData] of items) {
+      if (SUPPORTED_EVENT_TYPES.has(itemHeader.type)) {
+        eventCount += 1;
+      }
+
+      if (!ATTACHMENT_EVENT_TYPES.has(itemHeader.type)) {
+        continue;
+      }
+
+      const rawData = (itemData as { data?: unknown })?.data;
+      if (typeof rawData !== "string") {
+        continue;
+      }
+
+      const attachment: EventAttachment = {
         header: itemHeader,
-        // @ts-expect-error -- attachment data structure has data property
-        data: itemData.data as string,
-      }));
+        data: rawData,
+      };
+
+      const eventId = "event_id" in itemHeader ? (itemHeader.event_id as string | undefined) : undefined;
+
+      if (eventId) {
+        const existing = attachmentsByEventId.get(eventId) ?? [];
+        existing.push(attachment);
+        attachmentsByEventId.set(eventId, existing);
+      } else {
+        envelopeScopedAttachments.push(attachment);
+      }
+    }
 
     for (const [itemHeader, itemData] of items) {
       if (SUPPORTED_EVENT_TYPES.has(itemHeader.type)) {
@@ -61,9 +86,15 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
           }
           item.contexts.trace ??= traceContext;
         }
-        // Associate attachments with this event
-        if (attachments.length > 0) {
-          item.attachments = attachments;
+        const eventId = item.event_id ?? ("event_id" in itemHeader ? (itemHeader.event_id as string | undefined) : undefined);
+        let attachmentsForEvent = eventId ? attachmentsByEventId.get(eventId) : undefined;
+
+        if (!attachmentsForEvent?.length && eventCount === 1 && envelopeScopedAttachments.length > 0) {
+          attachmentsForEvent = envelopeScopedAttachments;
+        }
+
+        if (attachmentsForEvent?.length) {
+          item.attachments = attachmentsForEvent;
         }
         // The below is an async function but we really don't need to wait for that
         get().pushEvent(itemData as SentryEvent);
