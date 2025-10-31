@@ -2,7 +2,7 @@ import path from "node:path";
 import * as Sentry from "@sentry/electron/main";
 import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
 import { DEFAULT_PORT } from "@spotlightjs/sidecar/constants";
-import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, shell } from "electron";
+import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, session, shell } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
 
@@ -181,27 +181,6 @@ const createWindow = () => {
     if (url.includes("/envelope/")) {
       event.preventDefault();
       win.webContents.downloadURL(url);
-    }
-  });
-
-  // Handle downloads
-  win.webContents.session.on("will-download", (_event, item, _webContents) => {
-    // Get the filename from the download item
-    const filename = item.getFilename();
-
-    // Show save dialog for envelope downloads
-    const savePath = dialog.showSaveDialogSync(win, {
-      defaultPath: filename,
-      filters: [
-        { name: "Binary Files", extensions: ["bin"] },
-        { name: "All Files", extensions: ["*"] },
-      ],
-    });
-
-    if (savePath) {
-      item.setSavePath(savePath);
-    } else {
-      item.cancel();
     }
   });
 
@@ -647,11 +626,38 @@ function createTray() {
   });
 }
 
+// Setup download handler once for the app's default session
+function setupDownloadHandler() {
+  session.defaultSession.on("will-download", (_event, item, webContents) => {
+    // Get the filename from the download item
+    const filename = item.getFilename();
+
+    // Get the window from the webContents that initiated the download
+    const downloadWindow = BrowserWindow.fromWebContents(webContents);
+
+    // Show save dialog for envelope downloads
+    const savePath = dialog.showSaveDialogSync(downloadWindow, {
+      defaultPath: filename,
+      filters: [
+        { name: "Binary Files", extensions: ["bin"] },
+        { name: "All Files", extensions: ["*"] },
+      ],
+    });
+
+    if (savePath) {
+      item.setSavePath(savePath);
+    } else {
+      item.cancel();
+    }
+  });
+}
+
 app.whenReady().then(() => {
   if (!isLinux) {
     createTray();
   }
 
+  setupDownloadHandler();
   createWindow();
   app.on("activate", () => {
     showOrCreateWindow();
