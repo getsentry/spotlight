@@ -46,10 +46,14 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
     <>
       <ContextView context={contextEntries} tags={event.tags} />
       {event.attachments && event.attachments.length > 0 && (
-        <div className="space-y-4 px-6 py-4">
-          <h2 className="mb-2 font-bold uppercase">Attachments</h2>
+        <div className="flex flex-col gap-2 px-6 py-4">
+          <h2 className="mb-2 text-xl font-semibold">Attachments</h2>
           {event.attachments.map((attachment, index) => (
-            <Attachment key={`${index}-${attachment.header.type}`} header={attachment.header} attachment={attachment.data} />
+            <Attachment
+              key={`${index}-${attachment.header.type}`}
+              header={attachment.header}
+              attachment={attachment.data}
+            />
           ))}
         </div>
       )}
