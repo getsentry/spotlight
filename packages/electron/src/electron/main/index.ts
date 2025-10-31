@@ -49,7 +49,10 @@ async function checkForUpdates() {
     await autoUpdater.checkForUpdates();
   } catch (error) {
     console.error(error);
-    Sentry.captureException(error);
+    Sentry.withScope(scope => {
+      scope.setTag("error_source", "updater");
+      Sentry.captureException(error);
+    });
   }
 
   isCheckingForUpdates = false;
@@ -82,7 +85,12 @@ app.on("ready", () => {
     }
   });
 
-  autoUpdater.on("error", error => Sentry.captureException(error));
+  autoUpdater.on("error", error => {
+    Sentry.withScope(scope => {
+      scope.setTag("error_source", "updater");
+      Sentry.captureException(error);
+    });
+  });
 });
 
 Sentry.init({
@@ -489,6 +497,16 @@ const showErrorMessage = () => {
 };
 
 async function askForPermissionToSendToSentry(event: Sentry.Event, hint: Sentry.EventHint) {
+  // Handle updater errors silently - no dialogs or error screens
+  if (event.tags?.error_source === "updater") {
+    // Only send if user has explicitly enabled error reporting
+    if (store.get("sentry-enabled") === false) {
+      return null;
+    }
+    // For updater errors, send silently if enabled or not yet configured
+    return event;
+  }
+
   showErrorMessage();
   if (store.get("sentry-enabled") === false) {
     return null;
