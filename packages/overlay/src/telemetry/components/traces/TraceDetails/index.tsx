@@ -73,7 +73,7 @@ export function TraceContext({ trace }: { trace: Trace }) {
         <h2 className="mb-2 font-bold uppercase">ID</h2>
         {trace.trace_id}
       </div>
-      <EventContexts event={traceEvent} />
+      {traceEvent && <EventContexts event={traceEvent} />}
     </>
   );
 }
