@@ -1,5 +1,5 @@
 import type { EnvelopeItem } from "@sentry/core";
-import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { ReactComponent as Download } from "~/assets/download.svg";
 import { base64Decode } from "~/lib/base64";
 import JsonViewer from "../../shared/JsonViewer";
