@@ -19,6 +19,7 @@ export default function JsonViewer({
   quotesOnKeys = false,
   name = null,
   collapseStringsAfterLength = 80,
+  collapsedDepth = false,
 }: {
   data: object;
   onUpdateData?: (value: unknown) => void;
@@ -28,6 +29,7 @@ export default function JsonViewer({
   quotesOnKeys?: boolean;
   name?: string | null | false;
   collapseStringsAfterLength?: number;
+  collapsedDepth?: number | boolean;
 }) {
   return (
     <ReactJson
@@ -39,6 +41,7 @@ export default function JsonViewer({
       name={name}
       src={data}
       enableClipboard={clipboardEnabled}
+      collapsed={collapsedDepth}
       onEdit={
         editingEnabled &&
         (e => {
