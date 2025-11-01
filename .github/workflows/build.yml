@@ -106,7 +106,7 @@ jobs:
           if-no-files-found: error
           path: |
             packages/spotlight/dist/spotlight.cjs
-            packages/spotlight/dist/overlay/
+            packages/spotlight/dist/ui/
 
       - name: Store standalone spotlight binaries
         uses: actions/upload-artifact@v4
@@ -126,7 +126,7 @@ jobs:
       # which depends on the build job, hence why we do this here
       - name: Playwright Version
         id: playwright-version
-        working-directory: packages/electron
+        working-directory: packages/spotlight
         run: |
           # Playwright outputs something like `Version 1.54.2` so we cut the "crap" at the beginning
           echo "version=$(pnpm exec playwright --version | cut -c 9-)" >> $GITHUB_OUTPUT

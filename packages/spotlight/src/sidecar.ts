@@ -1,1 +1,1 @@
-export { setupSidecar } from "@spotlightjs/sidecar";
+export { setupSidecar } from "./sidecar/main";

@@ -1,0 +1,144 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@config "../../tailwind.config.ts";
+
+@theme {
+  --color-primary-50: #f5faff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-800: #3730a3;
+  --color-primary-900: #312e81;
+  --color-primary-950: #1e1b4b;
+
+  --color-frame-application: #d0d1f5;
+  --color-frame-system: #ffe0e4;
+  --color-frame-unknown: #f3f4f6;
+}
+
+ul.tree {
+  position: relative;
+}
+ul.tree ul.tree {
+  position: static;
+}
+
+ul.tree,
+ul.tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ul.tree.deep > li > ul {
+  margin-left: 8px;
+}
+ul.tree.deep > li {
+  @apply border-primary-400 border-l;
+  padding-left: 1rem;
+  margin-left: 1rem;
+}
+
+ul.tree li:last-child {
+  @apply border-0;
+}
+
+ul.tree > li:first-child:before {
+  display: none;
+}
+
+ul.tree.deep > li:before,
+ul.tree ul.tree > li:before {
+  @apply border-primary-400 border-b;
+  position: absolute;
+  height: 15px;
+  width: 12px;
+  content: "";
+  display: inline-block;
+  margin-left: -16px;
+}
+
+ul.tree li:last-child:before {
+  @apply border-primary-400 border-l;
+}
+
+.tree .node {
+  @apply flex items-center gap-x-1 overflow-hidden py-1 pl-1;
+}
+
+.tree .waterfall {
+  @apply border-l-primary-800 bg-primary-950 absolute right-0 h-7 border-l-2 py-1 pl-1;
+}
+
+.table-values {
+  @apply bg-primary-900 border-collapse text-sm;
+}
+
+.table-values tbody th {
+  @apply border-primary-950 text-primary-300 w-1/12 border-y px-2 py-1 text-right font-mono font-normal;
+}
+
+.table-values tbody td {
+  @apply border-primary-950 border-y px-2 py-1;
+}
+
+.hydration-error-wrapper pre {
+  @apply text-primary-300!;
+}
+
+.hydration-error-wrapper td[class^="react-diff"][class$="title-block"] {
+  @apply bg-primary-900!;
+}
+
+.react-json-view {
+  @apply rounded-xs bg-primary-900/50! p-2;
+}
+
+.react-json-view .string-value {
+  word-break: break-word;
+}
+input:checked {
+  @apply bg-primary-900;
+}
+input:checked ~ .dot {
+  @apply bg-primary-800 translate-x-full;
+}
+
+.resizer.is-resizing {
+  @apply bg-primary-500;
+}
+
+/* custom scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary-700) var(--color-primary-900);
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--color-primary-900);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-primary-700);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-600);
+  }
+  &::-webkit-scrollbar-corner {
+    background: var(--color-primary-900);
+  }
+}
+
+.shiki {
+  @apply p-2 rounded-xs;
+
+  .highlighted {
+    @apply bg-primary-600 py-1 px-2 rounded-xs;
+  }
+}
