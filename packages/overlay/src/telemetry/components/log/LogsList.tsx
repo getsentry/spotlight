@@ -30,9 +30,9 @@ const COMPARATORS: Record<LogsSortTypes, LogsComparator> = {
     return a.timestamp - b.timestamp;
   },
   [LOGS_SORT_KEYS.sdk]: (a, b) => {
-    if (a < b) return -1;
-    if (a > b) return 1;
-    return 0;
+    const aSdk = a.sdk || "";
+    const bSdk = b.sdk || "";
+    return aSdk.localeCompare(bSdk);
   },
   [LOGS_SORT_KEYS.level]: (a, b) => {
     return a.severity_number - b.severity_number;
@@ -198,14 +198,11 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                     }
                     if (header.id === "sdk" && isColumnVisible("sdk")) {
                       return (
-                        <td
-                          key="sdk"
-                          className={cn(
-                            "text-right align-middle",
-                            paddings,
-                          )}
-                        >
-                          <span title={log.sdk || undefined} className="block max-w-[150px] truncate text-right ms-auto">
+                        <td key="sdk" className={cn("text-right align-middle", paddings)}>
+                          <span
+                            title={log.sdk || undefined}
+                            className="block max-w-[150px] truncate text-right ms-auto"
+                          >
                             {log.sdk || "N/A"}
                           </span>
                         </td>
