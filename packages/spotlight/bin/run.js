@@ -4,7 +4,7 @@ import Module from "node:module";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { setContext, startSpan } from "@sentry/node";
-import { main } from "@spotlightjs/sidecar/cli";
+import { main } from "../dist/sidecar/cli.js";
 import "./instrument.js";
 const require = Module.createRequire(import.meta.url);
 let sea = null;
@@ -32,7 +32,7 @@ const readAsset = withTracing(
   sea.isSea()
     ? name => Buffer.from(sea.getRawAsset(name))
     : (() => {
-        const ASSET_DIR = join(fileURLToPath(import.meta.url), "../../dist/overlay/");
+        const ASSET_DIR = join(fileURLToPath(import.meta.url), "../../dist/ui/");
 
         return name => readFileSync(join(ASSET_DIR, name));
       })(),

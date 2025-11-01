@@ -19,12 +19,6 @@
       "persistent": true,
       "cache": false
     },
-    "@spotlightjs/overlay#dev": {
-      "with": ["@spotlightjs/sidecar#dev"],
-      "dependsOn": ["^build"],
-      "persistent": true,
-      "cache": false
-    },
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**", "**/junit.xml"],

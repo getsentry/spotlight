@@ -2,11 +2,23 @@
   "extends": "@spotlightjs/tsconfig/tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "skipLibCheck": true,
-    /* paths */
+    "paths": {
+      "~/*": ["src/ui/*"],
+      "~/main.js": ["src/sidecar/main.ts"],
+      "~/logger.js": ["src/sidecar/logger.ts"],
+      "~/constants.js": ["src/sidecar/constants.ts"],
+      "~/parser/index.js": ["src/sidecar/parser/index.ts"],
+      "~/parser/helpers.js": ["src/sidecar/parser/helpers.ts"],
+      "~/parser/types.js": ["src/sidecar/parser/types.ts"],
+      "~/formatters/md/__tests__/test_envelopes.js": ["src/sidecar/formatters/md/__tests__/test_envelopes.ts"],
+      "~/mcp/mcp.js": ["src/sidecar/mcp/mcp.ts"],
+      "~/types/env.js": ["src/sidecar/types/env.ts"],
+      "~/utils/index.js": ["src/sidecar/utils/index.ts"]
+    },
     "outDir": "dist",
     "rootDir": "src"
   },
   "include": ["src"],
+  "exclude": ["src/electron/**/*", "src/electron-renderer.ts", "**/__tests__/**/*", "**/*.test.ts", "**/*.spec.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
