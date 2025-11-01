@@ -4,6 +4,7 @@ import { ReactComponent as Download } from "~/assets/download.svg";
 import { base64Decode } from "~/lib/base64";
 import JsonViewer from "../../shared/JsonViewer";
 import { CodeViewer } from "./CodeViewer";
+import { inferExtension } from "./contentType";
 
 const JSON_CONTENT_TYPES = new Set(["application/json", "text/json", "text/x-json", "application/ld+json"]);
 const CODE_CONTENT_TYPES = new Set(["text/css", "text/html", "text/javascript"]);
@@ -20,11 +21,7 @@ export default function Attachment({
   expanded?: boolean;
 }) {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const extension = JSON_CONTENT_TYPES.has(header.content_type as string)
-    ? "json"
-    : CODE_CONTENT_TYPES.has(header.content_type as string)
-      ? "txt"
-      : "bin";
+  const extension = inferExtension(header.content_type as string | null, header.type as string | null);
   const name = (header.filename as string) || `untitled.${extension}`;
 
   const createDownloadUrl = useCallback(() => {

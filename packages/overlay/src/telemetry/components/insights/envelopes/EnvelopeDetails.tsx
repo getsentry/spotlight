@@ -6,6 +6,7 @@ import { useSpotlightContext } from "~/lib/useSpotlightContext";
 import JsonViewer from "~/telemetry/components/shared/JsonViewer";
 import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
 import Attachment from "./Attachment";
+import { inferExtension } from "./contentType";
 
 export default function EnvelopeDetails({ envelope }: { envelope: Envelope }) {
   const [showRawJSON, setShowRawJSON] = useState<boolean>(false);
@@ -84,17 +85,43 @@ function EnvelopeItemPanel({ item, index }: { item: EnvelopeItem; index: number 
 
   const summary = useMemo(() => {
     const parts: string[] = [];
-    if (itemHeader.type) {
-      parts.push(itemHeader.type);
+    
+    // For RAW_TYPES (attachment, replay_video, statsd), show filename
+    if (RAW_TYPES.has(itemHeader.type)) {
+      const filename = itemHeader.filename 
+        ? String(itemHeader.filename)
+        : `untitled.${inferExtension(itemHeader.content_type as string | null, itemHeader.type as string | null)}`;
+      parts.push(filename);
+    } else {
+      // For other event types, extract useful identifiers from payload
+      const payload = item[1];
+      if (payload && typeof payload === "object") {
+        // Try to find useful identifiers
+        if ("event_id" in payload && payload.event_id) {
+          parts.push(`ID: ${String(payload.event_id).substring(0, 8)}`);
+        } else if ("sid" in payload && payload.sid) {
+          parts.push(`Session: ${String(payload.sid).substring(0, 8)}`);
+        }
+        
+        // Add transaction name if available
+        if ("transaction" in payload && payload.transaction) {
+          parts.push(`${String(payload.transaction)}`);
+        }
+      }
     }
+    
+    // Add content type if present
     if (itemHeader.content_type) {
       parts.push(String(itemHeader.content_type));
     }
+    
+    // Add length
     if (typeof itemHeader.length === "number") {
       parts.push(`${itemHeader.length} bytes`);
     }
+    
     return parts.join(" • ");
-  }, [itemHeader]);
+  }, [itemHeader, item]);
 
   const payloadForViewer = useMemo(() => {
     const rawPayload = item[1];
