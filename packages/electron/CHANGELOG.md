@@ -1,5 +1,23 @@
 # @spotlightjs/electron
 
+## 1.10.2
+
+### Patch Changes
+
+- Make Sentry error reporting silent for auto-updater failures. Updater check errors are now reported to Sentry in the background without showing disruptive dialogs or error screens to users. ([#1072](https://github.com/getsentry/spotlight/pull/1072))
+
+- Fix envelope download 404 error in Electron app ([#1071](https://github.com/getsentry/spotlight/pull/1071))
+
+  - Added proper download handlers to intercept /envelope/ URLs and trigger downloads
+  - Updated CSP to allow localhost connections while maintaining security
+  - Fixed issue where clicking envelope download links would result in 404 errors
+
+- Fix image preview for resource.img spans in Electron app by constructing absolute URLs from relative paths ([#1070](https://github.com/getsentry/spotlight/pull/1070))
+
+- Updated dependencies [[`ae5b8c9`](https://github.com/getsentry/spotlight/commit/ae5b8c96eee71b4d416262b6a3ebb5155ba9b4a3), [`b6e73a0`](https://github.com/getsentry/spotlight/commit/b6e73a0daa88cab91171bf550aeff4f2cc346b96), [`4cdf0cc`](https://github.com/getsentry/spotlight/commit/4cdf0cce36c33451b5fcf2cc532705308e14b267), [`00dc41a`](https://github.com/getsentry/spotlight/commit/00dc41a0367e4f8aaae9192eb2d3b8449e120f4d), [`1c35fd1`](https://github.com/getsentry/spotlight/commit/1c35fd1b972c9e24d5e84c910df045c7f328a55c), [`16150f1`](https://github.com/getsentry/spotlight/commit/16150f118a7a49f496b85b058671cd538d398276), [`223c7e5`](https://github.com/getsentry/spotlight/commit/223c7e57706a5bc6ada0739c724cde0c81fdc5f1)]:
+  - @spotlightjs/overlay@4.4.0
+  - @spotlightjs/sidecar@2.4.0
+
 ## 1.10.1
 
 ### Patch Changes

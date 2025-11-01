@@ -1,5 +1,34 @@
 # @spotlightjs/core
 
+## 4.4.0
+
+### Minor Changes
+
+- Add Trace ID column and column selector to logs view ([#1076](https://github.com/getsentry/spotlight/pull/1076))
+
+  - Added new Trace ID column to logs table with clickable links to trace details
+  - Implemented column selector dropdown to toggle visibility of log columns
+  - Column visibility preferences are persisted to localStorage
+  - Trace ID column is sortable like other columns
+  - Enhanced UX with truncated trace IDs and "N/A" fallback for missing values
+
+### Patch Changes
+
+- Remove image preview from resources ([#1079](https://github.com/getsentry/spotlight/pull/1079))
+
+- Fix image preview for resource.img spans in Electron app by constructing absolute URLs from relative paths ([#1070](https://github.com/getsentry/spotlight/pull/1070))
+
+- Fix orphan traces not displaying in the UI when parent transactions are missing ([#1065](https://github.com/getsentry/spotlight/pull/1065))
+
+  This fixes an issue where backend transactions from distributed tracing scenarios would not be displayed in Spotlight when the frontend wasn't instrumented with spotlightBrowserIntegration. The transactions were being received and stored, but the UI wasn't able to properly extract and display the transaction name and method for traces without a root transaction.
+
+  Changes:
+
+  - Updated `getRootTransactionMethod` to fallback to the first transaction when `rootTransaction` is null
+  - Updated `getRootTransactionName` to use the first transaction's name for orphan traces
+  - Updated trace creation logic to set a more descriptive name for orphan traces
+  - Added debug logging to help identify when orphan traces are detected
+
 ## 4.3.1
 
 ### Patch Changes

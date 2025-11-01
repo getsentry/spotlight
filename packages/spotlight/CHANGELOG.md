@@ -1,5 +1,40 @@
 # @spotlightjs/spotlight
 
+## 4.4.0
+
+### Minor Changes
+
+- Add Trace ID column and column selector to logs view ([#1076](https://github.com/getsentry/spotlight/pull/1076))
+
+  - Added new Trace ID column to logs table with clickable links to trace details
+  - Implemented column selector dropdown to toggle visibility of log columns
+  - Column visibility preferences are persisted to localStorage
+  - Trace ID column is sortable like other columns
+  - Enhanced UX with truncated trace IDs and "N/A" fallback for missing values
+
+### Patch Changes
+
+- Fix image preview for resource.img spans in Electron app by constructing absolute URLs from relative paths ([#1070](https://github.com/getsentry/spotlight/pull/1070))
+
+- Fix orphan traces not displaying in the UI when parent transactions are missing ([#1065](https://github.com/getsentry/spotlight/pull/1065))
+
+  This fixes an issue where backend transactions from distributed tracing scenarios would not be displayed in Spotlight when the frontend wasn't instrumented with spotlightBrowserIntegration. The transactions were being received and stored, but the UI wasn't able to properly extract and display the transaction name and method for traces without a root transaction.
+
+  Changes:
+
+  - Updated `getRootTransactionMethod` to fallback to the first transaction when `rootTransaction` is null
+  - Updated `getRootTransactionName` to use the first transaction's name for orphan traces
+  - Updated trace creation logic to set a more descriptive name for orphan traces
+  - Added debug logging to help identify when orphan traces are detected
+
+- Prevent feedback loop when SENTRY_SPOTLIGHT points to self. When users set the SENTRY_SPOTLIGHT environment variable to point to the same Spotlight instance they're running, it now detects this and disables the Spotlight integration to prevent infinite feedback loops that cause memory exhaustion. ([#1064](https://github.com/getsentry/spotlight/pull/1064))
+
+- Fix hang during shutdown during mcp mode ([#1059](https://github.com/getsentry/spotlight/pull/1059))
+
+- Updated dependencies [[`ae5b8c9`](https://github.com/getsentry/spotlight/commit/ae5b8c96eee71b4d416262b6a3ebb5155ba9b4a3), [`b6e73a0`](https://github.com/getsentry/spotlight/commit/b6e73a0daa88cab91171bf550aeff4f2cc346b96), [`4cdf0cc`](https://github.com/getsentry/spotlight/commit/4cdf0cce36c33451b5fcf2cc532705308e14b267), [`00dc41a`](https://github.com/getsentry/spotlight/commit/00dc41a0367e4f8aaae9192eb2d3b8449e120f4d), [`1c35fd1`](https://github.com/getsentry/spotlight/commit/1c35fd1b972c9e24d5e84c910df045c7f328a55c), [`16150f1`](https://github.com/getsentry/spotlight/commit/16150f118a7a49f496b85b058671cd538d398276), [`223c7e5`](https://github.com/getsentry/spotlight/commit/223c7e57706a5bc6ada0739c724cde0c81fdc5f1)]:
+  - @spotlightjs/overlay@4.4.0
+  - @spotlightjs/sidecar@2.4.0
+
 ## 4.3.0
 
 ### Minor Changes
