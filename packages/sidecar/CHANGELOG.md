@@ -1,5 +1,17 @@
 # @spotlightjs/sidecar
 
+## 2.4.0
+
+### Minor Changes
+
+- Improved tool descriptions and better tool namespacing ([#1061](https://github.com/getsentry/spotlight/pull/1061))
+
+### Patch Changes
+
+- Prevent feedback loop when SENTRY_SPOTLIGHT points to self. When users set the SENTRY_SPOTLIGHT environment variable to point to the same Spotlight instance they're running, it now detects this and disables the Spotlight integration to prevent infinite feedback loops that cause memory exhaustion. ([#1064](https://github.com/getsentry/spotlight/pull/1064))
+
+- Fix hang during shutdown during mcp mode ([#1059](https://github.com/getsentry/spotlight/pull/1059))
+
 ## 2.3.0
 
 ### Minor Changes
