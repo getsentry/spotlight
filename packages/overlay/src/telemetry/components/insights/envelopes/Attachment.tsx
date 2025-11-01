@@ -63,13 +63,6 @@ export default function Attachment({
     [downloadUrl],
   );
 
-  const ensureDownloadReady = useCallback(() => {
-    if (!downloadUrl) {
-      return createDownloadUrl();
-    }
-    return downloadUrl;
-  }, [createDownloadUrl, downloadUrl]);
-
   let content: ReactNode = null;
 
   if (expanded) {
@@ -92,13 +85,11 @@ export default function Attachment({
     } else if (CODE_CONTENT_TYPES.has(header.content_type as string)) {
       content = <CodeViewer code={attachment} lang={extension} />;
     } else if (IMAGE_CONTENT_TYPES.has(header.content_type as string)) {
-      const preparedUrl = downloadUrl ?? ensureDownloadReady();
-      content = preparedUrl ? <img className="size-full object-contain" src={preparedUrl} alt="Attachment" /> : null;
+      content = downloadUrl ? <img className="size-full object-contain" src={downloadUrl} alt="Attachment" /> : null;
     } else if (VIDEO_CONTENT_TYPES.has(header.content_type as string)) {
-      const preparedUrl = downloadUrl ?? ensureDownloadReady();
-      content = preparedUrl ? (
+      content = downloadUrl ? (
         <video className="size-full object-contain" controls>
-          <source src={preparedUrl} type={header.content_type as string} />
+          <source src={downloadUrl} type={header.content_type as string} />
         </video>
       ) : null;
     }
@@ -110,9 +101,6 @@ export default function Attachment({
         📎{" "}
         <a
           href={downloadUrl ?? undefined}
-          onMouseEnter={ensureDownloadReady}
-          onFocus={ensureDownloadReady}
-          onClick={ensureDownloadReady}
           download={name}
           className="group inline-flex items-center gap-1"
         >
