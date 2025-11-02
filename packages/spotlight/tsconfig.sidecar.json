@@ -1,0 +1,20 @@
+{
+  "extends": "@spotlightjs/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "baseUrl": ".",
+    "moduleResolution": "nodenext",
+    "esModuleInterop": false,
+    "emitDeclarationOnly": false,
+    "declaration": true,
+    "target": "esnext",
+    "module": "nodenext",
+    "paths": {
+      "~/*": ["src/sidecar/*"]
+    },
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src/sidecar/**/*", "src/shared/**/*"],
+  "exclude": ["**/__tests__/**/*", "**/*.test.ts", "**/*.spec.ts"]
+}
