@@ -42,7 +42,7 @@ const readAsset = withTracing(
 startSpan({ name: "Spotlight CLI", op: "cli" }, async () => {
   await startSpan({ name: "Setup Sidecar", op: "cli.setup.sidecar" }, async () => {
     const MANIFEST_NAME = "manifest.json";
-    const ENTRY_POINT_NAME = "src/index.html";
+    const ENTRY_POINT_NAME = "index.html";
     const filesToServe = Object.create(null);
 
     startSpan({ name: "Setup Server Assets", op: "cli.setup.sidecar.assets" }, () => {
