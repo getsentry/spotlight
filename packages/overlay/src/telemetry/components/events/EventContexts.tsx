@@ -1,5 +1,6 @@
 import type { Nullable } from "vitest";
 import type { SentryEvent } from "../../types";
+import Attachment from "../insights/envelopes/Attachment";
 import { CodeViewer } from "../insights/envelopes/CodeViewer";
 import { ContextView } from "../shared/ContextView";
 
@@ -37,9 +38,25 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
   }
 
   const contextEntries = Object.entries(contexts).filter(entry => entry[1]) as [string, Record<string, unknown>][];
-  if (contextEntries.length === 0 && !event.tags) {
+  if (contextEntries.length === 0 && !event.tags && !event.attachments?.length) {
     return exampleContext;
   }
 
-  return <ContextView context={contextEntries} tags={event.tags} />;
+  return (
+    <>
+      <ContextView context={contextEntries} tags={event.tags} />
+      {event.attachments && event.attachments.length > 0 && (
+        <div className="flex flex-col gap-2 px-6 py-4">
+          <h2 className="mb-2 text-xl font-semibold">Attachments</h2>
+          {event.attachments.map((attachment, index) => (
+            <Attachment
+              key={`${index}-${attachment.header.type}`}
+              header={attachment.header}
+              attachment={attachment.data}
+            />
+          ))}
+        </div>
+      )}
+    </>
+  );
 }
