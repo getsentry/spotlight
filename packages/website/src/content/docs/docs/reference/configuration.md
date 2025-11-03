@@ -89,62 +89,35 @@ Experiment names are:
 
 - `sentry:focus-local-events` - if set to true, errors and traces will hide events from other sessions when possible.
 
-#### `injectImmediately`
+:::note[Deprecated Options]
+The following options were part of the deprecated embedded overlay model. Spotlight now runs as a standalone UI accessed at `http://localhost:8969` instead of being embedded in your application.
+
+If you need these features, consider using the desktop app or accessing the standalone UI in a separate browser window/tab.
+:::
+
+#### `injectImmediately` (Deprecated)
 
 **type:** `boolean` **default:** `false`
 
-By default, Spotlight waits until the host page is loaded before injecting the Spotlight Overlay. Depending on how and
-when the `init` call is made, the `load` event might have already happened.
+Previously controlled when the embedded overlay was injected into the page. No longer applicable with the standalone UI model.
 
-By setting `injectImmediately` to `true`, the UI will be injected synchronously with the `init` call.
-
-Use this option, if you called `init()` but the Spotlight Overlay UI is not visible.
-
-```ts
-init({
-  injectImmediately: true,
-});
-```
-
-#### `openOnInit`
+#### `openOnInit` (Deprecated)
 
 **type:** `boolean` **default:** `false`
 
-If set to `true`, the Spotlight overlay Window will be opened immediately after calling the init function. By default,
-only the button is visible.
+Previously opened the embedded overlay window immediately. No longer applicable with the standalone UI model.
 
-```ts
-init({
-  openOnInit: true,
-});
-```
-
-#### `fullPage`
+#### `fullPage` (Deprecated)
 
 **type:** `boolean` **default:** `false`
 
-If set to `true`, the Spotlight overlay will be rendered directly in the HTML as a relative `<div/>`. It's helpful and
-goes well with `injectImmediately`. It's used for rendering a blocking page like an error page or dedicated HTML. Also
-the ability for closing the overlay is disabled when this is avitce.
+Previously rendered the overlay as a full-page element. No longer applicable with the standalone UI model.
 
-```ts
-init({
-  fullPage: true,
-});
-```
-
-#### `showClearEventsButton`
+#### `showClearEventsButton` (Deprecated)
 
 **type:** `boolean` **default:** `true`
 
-If set to `true`, the Spotlight overlay will have a clear events button on top. On clicking the button, all events
-processed from sidecar will be removed.
-
-```ts
-init({
-  showClearEventsButton: true,
-});
-```
+The standalone UI includes a clear events button by default. This option is no longer configurable.
 
 ## `trigger`
 
