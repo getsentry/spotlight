@@ -8,7 +8,7 @@
     "start": "node --disable-warning=ExperimentalWarning --experimental-transform-types --watch ./src/run.ts",
     "dev": "node --disable-warning=ExperimentalWarning --experimental-transform-types --watch ./src/run.ts",
     "build:sea": "fossilize -m dist/overlay/manifest.json",
-    "build": "vite build && chmod +x dist/run.js && vite build --config vite.overlay.config.ts && pnpm build:sea && tsc"
+    "build": "vite build && vite build --config vite.overlay.config.ts && pnpm build:sea && tsc"
   },
   "files": ["dist"],
   "bin": {
