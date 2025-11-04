@@ -56,7 +56,6 @@ const router = new Hono<HonoEnv>()
     const buffer = getBuffer();
 
     const envelopeId = ctx.req.param("id");
-    console.log(buffer.read().map(c => c.getParsedEnvelope().envelope[0]));
     const container = buffer.read({ envelopeId });
 
     if (container.length === 0) {
