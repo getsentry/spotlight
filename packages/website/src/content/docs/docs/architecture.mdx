@@ -11,31 +11,41 @@ import Architecture from "../../../../public/images/simple-event-flow.png";
 
 At a high level, Spotlight consists of two components:
 
-1. An overlay (`@spotlightjs/overlay`) that renders inside of your application. The overlay is a simple React application, and can
-   seamlessly run in any web application (or even independently!).
+1. A standalone UI (`@spotlightjs/overlay`) that runs independently in your browser or as a desktop application. The UI is a React application that displays your application's telemetry data in real-time.
 
-2. A proxy server (`@spotlightjs/sidecar`) which enables push-based communication to the overlay. This is achieved via a simple HTTP relay,
-   allowing SDKs to push events to it, and allowing the overlay to receive events using [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events).
+2. A proxy server (`@spotlightjs/sidecar`) which receives telemetry from your application and streams it to the UI. This is achieved via a simple HTTP relay, allowing SDKs to push events to it, and allowing the UI to receive events using [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events).
 
-For convenience, these packages are combined in a single package (`@spotlightjs/spotlight`), which is the recommended way to use Spotlight.
-This means that adoption in most projects is as simple as adding a single dependency:
+For convenience, these packages are combined in a single package (`@spotlightjs/spotlight`), which is the recommended way to run Spotlight.
+This means that adoption in most projects is as simple as:
 
 ```shell
-npm add @spotlightjs/spotlight
+# Run the Spotlight sidecar with UI
+npx @spotlightjs/spotlight
+
+# Or install globally
+npm install -g @spotlightjs/spotlight
+spotlight
 ```
 
-Registering Spotlight in your frontend application:
+Enabling Spotlight in your application's SDK:
 
 ```typescript
-import * as Spotlight from '@spotlightjs/spotlight';
+import * as Sentry from '@sentry/node';
 
-// only load Spotlight in dev
-if (process.env.NODE_ENV === "development") {
-  Spotlight.init();
-}
+// Enable Spotlight for development
+Sentry.init({
+  dsn: 'your-dsn',
+  spotlight: process.env.NODE_ENV === 'development',
+});
 ```
 
-You can send any kind of events to the Sidecar, it forwards it to Spotlight and the integrations within Spotlight need to understand what to do with it.
+Or simply set the environment variable:
+
+```shell
+export SENTRY_SPOTLIGHT=1
+```
+
+You can send any kind of events to the Sidecar, it forwards them to the Spotlight UI where integrations process and display the data.
 
 <LinkCard title="Sidecar" description="Understand what the sidecar does" href="/docs/sidecar/" />
 
