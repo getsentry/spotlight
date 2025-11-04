@@ -1,8 +1,7 @@
 import type { Envelope } from "@sentry/core";
 import { SENTRY_CONTENT_TYPE } from "@spotlightjs/sidecar/constants";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { removeURLSuffix } from "~/lib/removeURLSuffix";
-import { getSpotlightEventTarget } from "../lib/eventTarget";
 import { log } from "../lib/logger";
 import { connectToSidecar } from "../sidecar";
 import TelemetryView from "./components/TelemetryView";
@@ -32,8 +31,6 @@ type TelemetryRouteProps = {
   sidecarUrl: string;
 };
 
-type EventData = { contentType: string; data: string };
-
 export function Telemetry({ sidecarUrl }: TelemetryRouteProps) {
   const [sentryEvents, setSentryEvents] = useState<Envelope[]>([]);
   const [isOnline, setOnline] = useState(false);
@@ -60,53 +57,6 @@ export function Telemetry({ sidecarUrl }: TelemetryRouteProps) {
     return result;
   }, []);
 
-  const spotlightEventTarget = useMemo(() => getSpotlightEventTarget(), []);
-
-  const dispatchToContentTypeListener = useCallback(
-    ({ contentType, data }: EventData) => {
-      const contentTypeBits = contentType.split(";");
-      const contentTypeWithoutEncoding = contentTypeBits[0];
-
-      if (contentTypeWithoutEncoding !== SENTRY_CONTENT_TYPE) {
-        log("Got event for unknown content type:", contentTypeWithoutEncoding);
-        return;
-      }
-
-      const listener = contentTypeListeners[contentTypeWithoutEncoding];
-      if (!listener) {
-        return;
-      }
-      listener(data);
-    },
-    [contentTypeListeners],
-  );
-
-  const contextId = sidecarUrl;
-
-  const clearEvents = useCallback(async () => {
-    try {
-      const clearEventsUrl: string = new URL("/clear", sidecarUrl).href;
-
-      await fetch(clearEventsUrl, {
-        method: "DELETE",
-        mode: "cors",
-      });
-    } catch (err) {
-      console.error(`Spotlight can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`, err);
-      return;
-    }
-
-    setSentryEvents([]);
-    useSentryStore.getState().resetData();
-  }, [sidecarUrl]);
-
-  const onEvent = useCallback(
-    ({ detail }: CustomEvent<EventData>) => {
-      dispatchToContentTypeListener(detail);
-    },
-    [dispatchToContentTypeListener],
-  );
-
   useEffect(() => {
     setSidecarUrlInStore(sidecarUrl);
   }, [sidecarUrl]);
@@ -116,17 +66,5 @@ export function Telemetry({ sidecarUrl }: TelemetryRouteProps) {
     [sidecarUrl, contentTypeListeners],
   );
 
-  useEffect(() => {
-    log("useEffect: Adding event listeners");
-    spotlightEventTarget.addEventListener("clearEvents", clearEvents as EventListener);
-    spotlightEventTarget.addEventListener("event", onEvent as EventListener);
-
-    return (): undefined => {
-      log("useEffect[destructor]: Removing event listeners");
-      spotlightEventTarget.removeEventListener("clearEvents", clearEvents as EventListener);
-      spotlightEventTarget.removeEventListener("event", onEvent as EventListener);
-    };
-  }, [spotlightEventTarget, clearEvents, onEvent]);
-
-  return <TelemetryView isOnline={isOnline} contextId={contextId} />;
+  return <TelemetryView isOnline={isOnline} contextId={sidecarUrl} />;
 }

@@ -4,32 +4,14 @@ import App from "./App";
 import { DEFAULT_SIDECAR_STREAM_URL } from "./constants";
 import globalStyles from "./index.css?inline";
 import { Router } from "./lib/Router";
-import { on, trigger } from "./lib/eventTarget";
 import initSentry from "./lib/instrumentation";
 import { activateLogger, log } from "./lib/logger";
 import { removeURLSuffix } from "./lib/removeURLSuffix";
 import { getDataFromServerTiming } from "./lib/serverTimingMeta";
 import { SpotlightContextProvider } from "./lib/useSpotlightContext";
 import { React, ReactDOM } from "./react-instance";
-import type { WindowWithSpotlight } from "./types";
 
-export type { WindowWithSpotlight } from "./types";
-export { CONTEXT_LINES_ENDPOINT, DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL, React, ReactDOM, trigger };
-
-/**
- * Send an event to spotlight without the sidecar
- */
-export async function sendEvent(contentType: string, data: string | Uint8Array) {
-  trigger("event", { contentType, data });
-}
-
-/**
- * Register a callback that is invoked when a severe sentry event is processed.
- * A count of the number of collected severe events is passed to the callback.
- */
-export async function onSevereEvent(cb: (count: number) => void) {
-  on("severeEventCount", e => cb((e as CustomEvent).detail?.count ?? 1));
-}
+export { CONTEXT_LINES_ENDPOINT, DEFAULT_SIDECAR_STREAM_URL as DEFAULT_SIDECAR_URL, React, ReactDOM };
 
 export type SpotlightInitOptions = {
   sidecarUrl?: string;
