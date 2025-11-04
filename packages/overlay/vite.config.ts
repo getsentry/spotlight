@@ -35,18 +35,10 @@ export default defineConfig({
       name: "Spotlight",
       // the proper extensions will be added
       fileName: "sentry-spotlight",
-      formats: ["es", "iife", "umd"],
+      formats: ["es", "umd"],
     },
     rollupOptions: {
       treeshake: "smallest",
-      output: {
-        footer(chunk: RenderedChunk) {
-          if (chunk.fileName.endsWith(".iife.js")) {
-            return "(function(S){S && S.init()}(window.Spotlight))";
-          }
-          return "";
-        },
-      },
     },
     sourcemap: true,
   },

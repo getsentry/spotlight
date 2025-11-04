@@ -47,12 +47,6 @@ export type TabPanel<T> = {
   panels?: (context: { processedEvents: T[] }) => TabPanel<T>[];
 };
 
-export type WindowWithSpotlight = Window & {
-  __spotlight?: {
-    eventTarget?: EventTarget;
-  };
-};
-
 export type SpotlightContext = {
   sidecarUrl: string;
 };

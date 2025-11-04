@@ -51,8 +51,7 @@ export async function _init(initOptions: SpotlightInitOptions = {}) {
   // @see https://github.com/vitejs/vite/discussions/17644#discussioncomment-10026390
   if (typeof document === "undefined") return;
 
-  const windowWithSpotlight = window as WindowWithSpotlight;
-  if (windowWithSpotlight.__spotlight && document.getElementById("spotlight-root")) {
+  if (document.getElementById("spotlight-root")) {
     log("Spotlight already initialized, skipping");
     return;
   }
