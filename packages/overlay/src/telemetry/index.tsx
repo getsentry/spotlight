@@ -1,4 +1,3 @@
-import type { Envelope } from "@sentry/core";
 import { SENTRY_CONTENT_TYPE } from "@spotlightjs/sidecar/constants";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { removeURLSuffix } from "~/lib/removeURLSuffix";
