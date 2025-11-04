@@ -1,6 +1,6 @@
 import path from "node:path";
 import * as Sentry from "@sentry/electron/main";
-import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
+import { setupSidecar } from "@spotlightjs/sidecar";
 import { DEFAULT_PORT } from "@spotlightjs/sidecar/constants";
 import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, session, shell } from "electron";
 import Store from "electron-store";
@@ -160,36 +160,8 @@ const createWindow = () => {
     win = null;
   });
 
-  // Handle envelope download links
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    // If it's an envelope download link, trigger a download
-    if (url.includes("/envelope/")) {
-      win.webContents.downloadURL(url);
-      return { action: "deny" };
-    }
-    // For other external links, open in default browser
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-      shell.openExternal(url);
-      return { action: "deny" };
-    }
-    return { action: "allow" };
-  });
-
-  // Intercept navigation to envelope download URLs
-  win.webContents.on("will-navigate", (event, url) => {
-    // Prevent navigation to envelope download links and trigger download instead
-    if (url.includes("/envelope/")) {
-      event.preventDefault();
-      win.webContents.downloadURL(url);
-    }
-  });
-
-  win.webContents.on("did-start-loading", () => {
-    clearBuffer();
-    app.setBadgeCount(0);
-  });
-
   win.webContents.on("did-finish-load", () => {
+    app.setBadgeCount(0);
     /**
      * Need to create these elements here as Spotlight.init() function
      * replaces the body content with the app root. This runs after the app
@@ -314,17 +286,6 @@ const template: Electron.MenuItemConstructorOptions[] = [
         accelerator: "CmdOrCtrl+R",
         click: () => {
           try {
-            win.webContents.executeJavaScript(`
-            try{
-              window?.__spotlight?.eventTarget.dispatchEvent(
-                new CustomEvent("clearEvents", {
-                  detail: {},
-                }),
-              );
-            } catch(err){
-              console.error(err)
-            }
-            `);
             win.webContents.reload();
           } catch (error) {
             console.error(error);
@@ -336,17 +297,6 @@ const template: Electron.MenuItemConstructorOptions[] = [
         accelerator: "CmdOrCtrl+Shift+R",
         click: () => {
           try {
-            win.webContents.executeJavaScript(`
-            try{
-              window?.__spotlight?.eventTarget.dispatchEvent(
-                new CustomEvent("clearEvents", {
-                  detail: {},
-                }),
-              );
-            } catch(err){
-              console.error(err)
-            }
-            `);
             win.webContents.reloadIgnoringCache();
           } catch (error) {
             console.error(error);
@@ -626,38 +576,11 @@ function createTray() {
   });
 }
 
-// Setup download handler once for the app's default session
-function setupDownloadHandler() {
-  session.defaultSession.on("will-download", (_event, item, webContents) => {
-    // Get the filename from the download item
-    const filename = item.getFilename();
-
-    // Get the window from the webContents that initiated the download
-    const downloadWindow = BrowserWindow.fromWebContents(webContents);
-
-    // Show save dialog for envelope downloads
-    const savePath = dialog.showSaveDialogSync(downloadWindow, {
-      defaultPath: filename,
-      filters: [
-        { name: "Binary Files", extensions: ["bin"] },
-        { name: "All Files", extensions: ["*"] },
-      ],
-    });
-
-    if (savePath) {
-      item.setSavePath(savePath);
-    } else {
-      item.cancel();
-    }
-  });
-}
-
 app.whenReady().then(() => {
   if (!isLinux) {
     createTray();
   }
 
-  setupDownloadHandler();
   createWindow();
   app.on("activate", () => {
     showOrCreateWindow();
