@@ -10,11 +10,18 @@ const dependencies = Object.keys({
 });
 
 export default defineConfig({
+  define: {
+    "process.env.NODE_ENV": '"production"',
+    "process.env.npm_package_version": JSON.stringify(
+      process.env.npm_package_version
+    ),
+  },
   build: {
+    ssr: true,
     lib: {
       entry: {
-        overlay: resolve(__dirname, "src/overlay.ts"),
         sidecar: resolve(__dirname, "src/sidecar.ts"),
+        run: resolve(__dirname, "bin/run.ts"),
       },
     },
     rollupOptions: {

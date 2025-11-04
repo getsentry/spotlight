@@ -16,20 +16,15 @@
     "postinstall": "simple-git-hooks",
     "test": "turbo test --filter=./packages/*",
     "test:e2e": "turbo test:e2e",
-    "yalc:publish": "yalc publish --push --sig --private",
     "changeset:add": "pnpm changeset",
     "changeset:consume": "pnpm changeset version",
-    "changeset:publish": "pnpm changeset publish",
-    "clean": "turbo clean",
-    "clean:deps": "rimraf ./packages/*/node_modules node_modules",
-    "clean:all": "pnpm run clean && pnpm run clean:deps && pnpm install"
+    "changeset:publish": "pnpm changeset publish"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@changesets/cli": "^2.27.9",
     "@svitejs/changesets-changelog-github-compact": "^1.1.0",
     "lint-staged": "^15.2.10",
-    "rimraf": "^5.0.10",
     "simple-git-hooks": "^2.11.1",
     "turbo": "^2.4.0",
     "typescript": "catalog:"

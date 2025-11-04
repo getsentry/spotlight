@@ -35,17 +35,10 @@
       "outputs": ["coverage/**", "**/junit.xml", "**/test-results/**"],
       "cache": false
     },
-    "clean": {
-      "cache": false
-    },
     "preview": {
       "dependsOn": ["build"],
       "cache": false,
       "persistent": true
-    },
-    "yalc:publish": {
-      "dependsOn": ["build"],
-      "cache": false
     }
   },
   "globalDependencies": ["biome.json", "tsconfig.json", "package.json"]

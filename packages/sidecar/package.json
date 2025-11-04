@@ -8,7 +8,6 @@
     "start": "tsx --watch ./src/run.ts",
     "dev": "tsx --watch ./src/run.ts",
     "build": "NODE_ENV=production tsc && tsc-alias",
-    "clean": "rimraf dist",
     "sample": "node _fixtures/send_to_sidecar.cjs",
     "test": "vitest run",
     "test:dev": "vitest"
