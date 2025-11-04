@@ -1,4 +1,4 @@
-import { consoleLoggingIntegration, getClient, init } from "@sentry/node";
+import { consoleLoggingIntegration, init } from "@sentry/node";
 import { parseCLIArgs } from "@spotlightjs/sidecar/cli";
 import { DEFAULT_PORT } from "@spotlightjs/sidecar/constants";
 
@@ -100,10 +100,11 @@ const sentry = init({
   },
 });
 
-function shutdown() {
-  sentry.close();
-}
+if (sentry) {
+  function shutdown() {
+    sentry!.close();
+  }
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
-// process.on("beforeExit", shutdown);
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
+}

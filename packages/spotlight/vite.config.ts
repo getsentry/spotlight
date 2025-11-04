@@ -26,6 +26,14 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [...dependencies, ...builtinModules.map((x) => `node:${x}`)],
+      output: {
+        banner: (chunk) => {
+          if (chunk.name === 'run') {
+            return '#!/usr/bin/env node';
+          }
+          return '';
+        }
+      }
     },
   },
 });

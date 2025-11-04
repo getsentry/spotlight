@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { readFileSync } from "node:fs";
 import Module from "node:module";
 import { join } from "node:path";
