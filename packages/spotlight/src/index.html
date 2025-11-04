@@ -20,28 +20,20 @@
   <body>
     <script type="module">
       import * as Spotlight from "@spotlightjs/overlay";
-      if (!window.__spotlight) {
-        window.__spotlight = {};
-      }
-      if (!window.__spotlight.initOptions) {
-        window.__spotlight.initOptions = {};
-      }
-      // This check is so that we don't override potentially SDK-injected config
-      if (!window.__spotlight.initOptions.sidecarUrl) {
-        const navTiming = performance.getEntriesByType("navigation");
-        if (navTiming.length > 0) {
-          const serverTiming = navTiming[0].serverTiming;
-          if (serverTiming && serverTiming.length > 0) {
-            for (const { name, description } of serverTiming) {
-              if (name === "sentrySpotlightPort") {
-                window.__spotlight.initOptions.sidecarUrl = `http://localhost:${description}`;
-                break;
-              }
+      let sidecarUrl = undefined;
+      const navTiming = performance.getEntriesByType("navigation");
+      if (navTiming.length > 0) {
+        const serverTiming = navTiming[0].serverTiming;
+        if (serverTiming && serverTiming.length > 0) {
+          for (const { name, description } of serverTiming) {
+            if (name === "sentrySpotlightPort") {
+              sidecarUrl = `http://localhost:${description}`;
+              break;
             }
           }
         }
       }
-      Spotlight._init();
+      Spotlight._init({ sidecarUrl });
     </script>
   </body>
 </html>

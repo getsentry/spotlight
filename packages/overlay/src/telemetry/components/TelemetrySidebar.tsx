@@ -1,10 +1,12 @@
+import { useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ReactComponent as DeleteIcon } from "~/assets/deleteIcon.svg";
 import { ReactComponent as Logo } from "~/assets/glyph.svg";
 import { cn } from "~/lib/cn";
-import { trigger } from "~/lib/eventTarget";
 import type { NotificationCount } from "~/types";
 import { Badge } from "~/ui/badge";
+import useSentryStore from "../store";
+import { useSpotlightContext } from "~/lib/useSpotlightContext";
 
 interface TelemetrySidebarProps {
   errorCount: number;
@@ -44,14 +46,23 @@ function NavigationLink({
 export default function TelemetrySidebar({ errorCount, traceCount, logCount, isOnline }: TelemetrySidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
+  const { getSidecarUrl } = useSpotlightContext();
+  const clearEventsUrl = getSidecarUrl("/clear");
 
-  const clearEvents = async () => {
+  const clearEvents = useCallback(async () => {
+    
     try {
-      await trigger("clearEvents");
+      await fetch(clearEventsUrl, {
+        method: "DELETE",
+        mode: "cors",
+      });
     } catch (err) {
-      console.error("Failed to clear events", err);
+      console.error(`Spotlight can't connect to Sidecar is it running?`, err);
+      return;
     }
-  };
+
+    useSentryStore.getState().resetData();
+  }, [clearEventsUrl]);
 
   const isActive = (path: string) => {
     // case for primary path
@@ -176,3 +187,4 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
     </nav>
   );
 }
+
