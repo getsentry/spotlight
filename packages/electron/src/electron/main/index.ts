@@ -2,7 +2,7 @@ import path from "node:path";
 import * as Sentry from "@sentry/electron/main";
 import { clearBuffer, setupSidecar } from "@spotlightjs/sidecar";
 import { DEFAULT_PORT } from "@spotlightjs/sidecar/constants";
-import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, session, shell } from "electron";
+import { BrowserWindow, Menu, Notification, Tray, app, dialog, ipcMain, nativeImage, session, shell } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
 
@@ -629,8 +629,9 @@ function createTray() {
 // Setup download handler once for the app's default session
 function setupDownloadHandler() {
   session.defaultSession.on("will-download", (_event, item, webContents) => {
-    // Get the filename from the download item
+    const url = item.getURL();
     const filename = item.getFilename();
+    console.log(`[Download] Starting download: ${url}`);
 
     // Get the window from the webContents that initiated the download
     const downloadWindow = BrowserWindow.fromWebContents(webContents);
@@ -646,7 +647,26 @@ function setupDownloadHandler() {
 
     if (savePath) {
       item.setSavePath(savePath);
+      console.log(`[Download] Save path set to: ${savePath}`);
+
+      item.once("done", (_event, state) => {
+        if (state === "completed") {
+          console.log(`[Download] Successfully saved to: ${savePath}`);
+          new Notification({
+            title: "Download Complete",
+            body: `Envelope saved to ${path.basename(savePath)}`,
+          }).show();
+        } else if (state === "interrupted") {
+          console.error(`[Download] Failed - state: ${state}, URL: ${url}`);
+          new Notification({
+            title: "Download Failed",
+            body: `Failed to download ${filename}. The sidecar may not be responding or the envelope was not found.`,
+          }).show();
+        }
+        // state === 'cancelled' - no action needed
+      });
     } else {
+      console.log(`[Download] User cancelled save dialog`);
       item.cancel();
     }
   });
