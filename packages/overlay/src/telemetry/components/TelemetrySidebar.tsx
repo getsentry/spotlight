@@ -46,22 +46,23 @@ function NavigationLink({
 export default function TelemetrySidebar({ errorCount, traceCount, logCount, isOnline }: TelemetrySidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
+  const { getSidecarUrl } = useSpotlightContext();
+  const clearEventsUrl = getSidecarUrl("/clear");
 
   const clearEvents = useCallback(async () => {
-    const { getSidecarUrl } = useSpotlightContext();
-    const clearEventsUrl = getSidecarUrl("/clear");
+    
     try {
       await fetch(clearEventsUrl, {
         method: "DELETE",
         mode: "cors",
       });
     } catch (err) {
-      console.error(`Spotlight can't connect to Sidecar is it running? See: https://spotlightjs.com/sidecar/npx/`, err);
+      console.error(`Spotlight can't connect to Sidecar is it running?`, err);
       return;
     }
 
     useSentryStore.getState().resetData();
-  }, []);
+  }, [clearEventsUrl]);
 
   const isActive = (path: string) => {
     // case for primary path
