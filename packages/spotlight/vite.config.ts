@@ -21,7 +21,7 @@ export default defineConfig({
     lib: {
       entry: {
         sidecar: resolve(__dirname, "src/sidecar.ts"),
-        run: resolve(__dirname, "bin/run.ts"),
+        run: resolve(__dirname, "src/run.ts"),
       },
     },
     rollupOptions: {
