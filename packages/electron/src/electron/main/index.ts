@@ -161,6 +161,7 @@ const createWindow = () => {
   });
 
   win.webContents.on("did-finish-load", () => {
+    app.setBadgeCount(0);
     /**
      * Need to create these elements here as Spotlight.init() function
      * replaces the body content with the app root. This runs after the app
@@ -285,17 +286,6 @@ const template: Electron.MenuItemConstructorOptions[] = [
         accelerator: "CmdOrCtrl+R",
         click: () => {
           try {
-            win.webContents.executeJavaScript(`
-            try{
-              window?.__spotlight?.eventTarget.dispatchEvent(
-                new CustomEvent("clearEvents", {
-                  detail: {},
-                }),
-              );
-            } catch(err){
-              console.error(err)
-            }
-            `);
             win.webContents.reload();
           } catch (error) {
             console.error(error);
