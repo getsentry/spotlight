@@ -10,15 +10,30 @@ const dependencies = Object.keys({
 });
 
 export default defineConfig({
+  define: {
+    "process.env.NODE_ENV": '"production"',
+    "process.env.npm_package_version": JSON.stringify(
+      process.env.npm_package_version
+    ),
+  },
   build: {
+    ssr: true,
     lib: {
       entry: {
-        overlay: resolve(__dirname, "src/overlay.ts"),
         sidecar: resolve(__dirname, "src/sidecar.ts"),
+        run: resolve(__dirname, "src/run.ts"),
       },
     },
     rollupOptions: {
       external: [...dependencies, ...builtinModules.map((x) => `node:${x}`)],
+      output: {
+        banner: (chunk) => {
+          if (chunk.name === 'run') {
+            return '#!/usr/bin/env node';
+          }
+          return '';
+        }
+      }
     },
   },
 });

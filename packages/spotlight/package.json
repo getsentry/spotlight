@@ -5,26 +5,23 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "start": "./bin/run.js",
-    "dev": "vite build --watch",
+    "start": "node --disable-warning=ExperimentalWarning --experimental-transform-types --watch ./src/run.ts",
+    "dev": "node --disable-warning=ExperimentalWarning --experimental-transform-types --watch ./src/run.ts",
     "build:sea": "fossilize -m dist/overlay/manifest.json",
-    "build": "vite build && vite build --config vite.overlay.config.ts && npm run build:sea && tsc",
-    "build:watch": "vite build --watch",
-    "yalc:publish": "yalc publish --push --sig --private",
-    "clean": "rimraf dist"
+    "build": "vite build && vite build --config vite.overlay.config.ts && pnpm build:sea && tsc"
   },
-  "files": ["dist", "bin"],
+  "files": ["dist"],
   "bin": {
-    "spotlight": "./bin/run.js"
+    "spotlight": "./dist/run.js"
   },
-  "main": "./dist/overlay.cjs",
-  "module": "./dist/overlay.js",
-  "types": "./dist/overlay.d.ts",
+  "main": "./dist/sidecar.cjs",
+  "module": "./dist/sidecar.js",
+  "types": "./dist/sidecar.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/overlay.d.ts",
-      "import": "./dist/overlay.js",
-      "require": "./dist/overlay.cjs"
+      "types": "./dist/sidecar.d.ts",
+      "import": "./dist/sidecar.js",
+      "require": "./dist/sidecar.cjs"
     },
     "./sidecar": {
       "types": "./dist/sidecar.d.ts",

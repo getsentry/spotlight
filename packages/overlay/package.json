@@ -10,9 +10,7 @@
     "build:watch": "vite build --watch",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:dev": "vitest",
-    "yalc:publish": "yalc publish --push --sig --private",
-    "clean": "rimraf dist"
+    "test:dev": "vitest"
   },
   "files": ["dist"],
   "main": "./dist/sentry-spotlight.js",

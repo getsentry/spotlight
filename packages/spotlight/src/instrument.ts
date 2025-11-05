@@ -1,4 +1,4 @@
-import { consoleLoggingIntegration, getClient, init } from "@sentry/node";
+import { consoleLoggingIntegration, init } from "@sentry/node";
 import { parseCLIArgs } from "@spotlightjs/sidecar/cli";
 import { DEFAULT_PORT } from "@spotlightjs/sidecar/constants";
 
@@ -14,8 +14,8 @@ let disableSpotlight = false;
 // The server will be assigned a port by the OS after it starts, and if SENTRY_SPOTLIGHT
 // happens to point to that same port, a feedback loop may occur.
 if (spotlightEnv && instancePort !== 0) {
-  let targetPort;
-  let targetHost;
+  let targetPort: number | undefined;
+  let targetHost: string | undefined;
 
   // SENTRY_SPOTLIGHT can be:
   // 1. A full URL like "http://localhost:8969"
@@ -35,7 +35,7 @@ if (spotlightEnv && instancePort !== 0) {
       targetPort = spotlightUrl.port ? Number(spotlightUrl.port) : spotlightUrl.protocol === "https:" ? 443 : 80;
     } catch (_err) {
       // If we can't parse it, we can't determine if it's a feedback loop, so do nothing
-      targetPort = null;
+      targetPort = undefined;
     }
   }
 
@@ -79,7 +79,7 @@ const sentry = init({
       return event;
     }
     for (const exception of exceptions) {
-      if (!exception.stacktrace) {
+      if (!exception.stacktrace || !exception.stacktrace.frames) {
         continue;
       }
 
@@ -89,7 +89,9 @@ const sentry = init({
         }
 
         const homeDir = process.env.HOME || process.env.USERPROFILE;
-        frame.filename = frame.filename?.replace(homeDir, "~");
+        if (homeDir) {
+          frame.filename = frame.filename?.replace(homeDir, "~");
+        }
       }
     }
 
@@ -98,10 +100,11 @@ const sentry = init({
   },
 });
 
-function shutdown() {
-  sentry.close();
-}
+if (sentry) {
+  function shutdown() {
+    sentry!.close();
+  }
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
-// process.on("beforeExit", shutdown);
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
+}
