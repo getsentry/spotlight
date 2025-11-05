@@ -102,7 +102,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe, format }, logChecker);
   if (!serverInstance) {
     logger.error("Failed to start Spotlight sidecar server.");
-    logger.error(`The port ${port} might already be in use by another process.`);
+logger.error(`The port ${port} might already be in use — most likely by another Spotlight instance.`);
     process.exit(1);
   }
 
