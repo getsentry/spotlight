@@ -1,7 +1,9 @@
 import { resolve } from "node:path";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
+import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "electron-vite";
 import sourcemaps from "rollup-plugin-sourcemaps2";
+import svgr from "vite-plugin-svgr";
 
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
@@ -14,6 +16,11 @@ export default defineConfig(({ mode }) => {
   }
   return {
     main: {
+      resolve: {
+        alias: {
+          "~": resolve(__dirname, "src/sidecar"),
+        },
+      },
       plugins: [
         sentryVitePlugin({
           org: env.MAIN_VITE_SENTRY_ORG,
@@ -35,6 +42,11 @@ export default defineConfig(({ mode }) => {
       },
     },
     preload: {
+      resolve: {
+        alias: {
+          "~": resolve(__dirname, "src/sidecar"),
+        },
+      },
       plugins: [
         sentryVitePlugin({
           org: env.MAIN_VITE_SENTRY_ORG,
@@ -56,11 +68,22 @@ export default defineConfig(({ mode }) => {
       },
     },
     renderer: {
+      resolve: {
+        alias: {
+          "~": resolve(__dirname, "src/ui"),
+        },
+      },
       define: {
         "process.env.NODE_ENV": '"production"',
         "process.env.npm_package_version": JSON.stringify(process.env.npm_package_version),
       },
       plugins: [
+        react(),
+        svgr({
+          svgrOptions: {
+            titleProp: true,
+          },
+        }),
         sentryVitePlugin({
           org: env.MAIN_VITE_SENTRY_ORG,
           project: env.MAIN_VITE_SENTRY_PROJECT,
