@@ -87,11 +87,36 @@ export class MessageBuffer<T> {
     }
   }
 
-  subscribe(callback: (item: T) => void): string {
+  subscribe(callback: (item: T) => void, lastEventId?: string): string {
     const readerId = uuidv7();
+
+    // Determine starting position based on lastEventId
+    let startPos = this.head;
+    if (lastEventId) {
+      // Find the position of the last event ID
+      const start = this.head;
+      const end = this.writePos;
+
+      for (let i = start; i < end; i++) {
+        const item = this.items[i % this.size];
+        if (item == null) continue;
+
+        if (item[1] instanceof EventContainer) {
+          const envelope = item[1].getParsedEnvelope();
+          if (envelope?.envelope && envelope.envelope[0].__spotlight_envelope_id === lastEventId) {
+            // Start from the position after the found event
+            startPos = i + 1;
+            break;
+          }
+        }
+      }
+
+      // If lastEventId not found, startPos remains at this.head (normal behavior)
+    }
+
     const readerInfo = {
       callback,
-      pos: this.head,
+      pos: startPos,
       tid: setImmediate(() => this.stream(readerId)),
     };
     readerInfo.tid.unref();
