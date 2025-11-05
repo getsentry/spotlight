@@ -1,4 +1,3 @@
-import type { Envelope } from "@sentry/core";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { removeURLSuffix } from "~/lib/removeURLSuffix";
 import { connectToSidecar } from "~/sidecar";

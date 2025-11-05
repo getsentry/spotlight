@@ -20,7 +20,3 @@ Sentry.init({
 });
 
 Spotlight._init();
-
-Spotlight.onSevereEvent(count => {
-  window.electronAPI.setBadgeCount(count);
-});
