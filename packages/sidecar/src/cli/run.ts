@@ -109,14 +109,24 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   // as not having that indicates either the server did not start
   // or started in a weird manner (like over a unix socket)
   const actualServerPort = (serverInstance.address() as AddressInfo).port;
+  const spotlightUrl = getSpotlightURL(actualServerPort);
   let shell = false;
   const env = {
     ...process.env,
-    SENTRY_SPOTLIGHT: getSpotlightURL(actualServerPort),
+    SENTRY_SPOTLIGHT: spotlightUrl,
+    // We need the one below for Next.js projects -- they only allow NEXT_PUBLIC_ prefixed env vars
+    // on frontend code
+    NEXT_PUBLIC_SENTRY_SPOTLIGHT: spotlightUrl,
     // This is not supported in all SDKs but worth adding
     // for the ones that support it
     SENTRY_TRACES_SAMPLE_RATE: "1",
-  } as { PATH: string; SENTRY_SPOTLIGHT: string; SENTRY_TRACES_SAMPLE_RATE: string; [key: string]: string };
+  } as {
+    PATH: string;
+    SENTRY_SPOTLIGHT: string;
+    NEXT_PUBLIC_SENTRY_SPOTLIGHT: string;
+    SENTRY_TRACES_SAMPLE_RATE: string;
+    [key: string]: string;
+  };
   if (cmdArgs.length === 0) {
     // try package.json to find default dev command
     try {
