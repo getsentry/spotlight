@@ -1,5 +1,32 @@
 # @spotlightjs/core
 
+## 4.5.0
+
+### Minor Changes
+
+- Display attachments in Event and Trace Context tabs ([#1075](https://github.com/getsentry/spotlight/pull/1075))
+
+  This implements attachment display in the Context tabs of Error and Trace detail pages. Attachments from envelopes are now associated with their events/traces during envelope parsing and displayed alongside other context information.
+
+  Changes:
+
+  - Added `EventAttachment` type definition to store attachment headers and data
+  - Added optional `attachments` field to event types
+  - Updated envelope parsing to collect and associate attachments with events
+  - Added attachment rendering in EventContexts component
+  - Attachments are displayed for both individual events and traces (via root transaction)
+  - Supports all content types: images, videos, JSON, code, and text files
+
+  Fixes #274
+
+- Reduce UI stalls when opening large envelopes by collapsing viewers by default and lazily rendering item payloads and attachments. ([#1084](https://github.com/getsentry/spotlight/pull/1084))
+
+### Patch Changes
+
+- Fix SDK column sorting by comparing SDK string properties instead of full log objects. ([#1086](https://github.com/getsentry/spotlight/pull/1086))
+
+- fix electron click on first error ([#1101](https://github.com/getsentry/spotlight/pull/1101))
+
 ## 4.4.0
 
 ### Minor Changes
