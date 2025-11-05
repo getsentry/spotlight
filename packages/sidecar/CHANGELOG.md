@@ -1,5 +1,11 @@
 # @spotlightjs/sidecar
 
+## 2.4.1
+
+### Patch Changes
+
+- Updated the error message in the run command ([#1102](https://github.com/getsentry/spotlight/pull/1102))
+
 ## 2.4.0
 
 ### Minor Changes
