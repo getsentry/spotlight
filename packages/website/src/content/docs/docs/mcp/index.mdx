@@ -187,7 +187,7 @@ Get detailed span tree and timing for a specific trace.
 If you need to run Spotlight on a different port:
 
 ```bash
-spotlight-sidecar mcp -p 3000
+spotlight mcp -p 3000
 ```
 
 Update your MCP client configuration to match:
@@ -208,7 +208,7 @@ Update your MCP client configuration to match:
 Enable debug logging to troubleshoot MCP connection issues:
 
 ```bash
-spotlight-sidecar mcp -d
+spotlight mcp -d
 ```
 
 ## How It Works
@@ -279,12 +279,12 @@ Here's a typical debugging session with Spotlight MCP:
 
 1. **Start Spotlight MCP Server**
    ```bash
-   spotlight-sidecar mcp
+   spotlight mcp
    ```
 
 2. **Run Your Application**
    ```bash
-   spotlight-sidecar run npm run dev
+   spotlight run npm run dev
    ```
 
 3. **Trigger an Error** in your application (e.g., click a button, make a request)
@@ -327,10 +327,10 @@ Check that the port isn't already in use:
 
 ```bash
 # Use a different port
-spotlight-sidecar mcp -p 3000
+spotlight mcp -p 3000
 
 # Enable debug logging
-spotlight-sidecar mcp -d
+spotlight mcp -d
 ```
 
 ### AI Assistant Not Seeing Tools
@@ -346,16 +346,6 @@ spotlight-sidecar mcp -d
 2. Verify Sentry SDK is configured
 3. Trigger some activity (errors, requests) in your app
 4. Check that `SENTRY_SPOTLIGHT` environment variable is set or SDK has spotlight enabled
-
-### Connection Issues
-
-Enable debug mode to see detailed logs:
-
-```bash
-spotlight-sidecar mcp -d
-```
-
-Check that your MCP client is using the correct command and arguments.
 
 ## Next Steps
 

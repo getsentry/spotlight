@@ -36,8 +36,6 @@ test-results
 *.sw?
 
 .astro
-.yalc
-yalc.lock
 .vite-inspect
 .vercel
 .env
