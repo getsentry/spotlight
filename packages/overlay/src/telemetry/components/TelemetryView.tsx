@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
+import { cn } from "~/lib/cn";
 import { log } from "~/lib/logger";
 import { getRouteStorageKey } from "~/lib/routePersistence";
 import useSentryStore from "../store";
@@ -38,10 +39,12 @@ export default function TelemetryView({
 
   const logCount = store.getLogs().length;
 
+  const isElectron = globalThis.IN_DESKTOP_ENV;
+
   return (
     <div className="from-primary-900 to-primary-950 flex h-full overflow-hidden bg-gradient-to-br from-0% to-20% font-sans text-white">
       <TelemetrySidebar errorCount={errorCount} traceCount={traceCount} logCount={logCount} isOnline={isOnline} />
-      <div className="flex-1 overflow-auto">
+      <div className={cn("flex-1 overflow-auto", isElectron && "pt-8")}>
         <Routes>
           <Route path="not-found" element={<p>Not Found - How'd you manage to get here?</p>} key="not-found" />
           <Route path="traces/*" element={<TracesTab />} key="traces" />
