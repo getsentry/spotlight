@@ -1,5 +1,5 @@
 import { SENTRY_CONTENT_TYPE } from "@spotlightjs/sidecar/constants";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { removeURLSuffix } from "~/lib/removeURLSuffix";
 import { log } from "../lib/logger";
 import { connectToSidecar } from "../sidecar";
@@ -28,22 +28,21 @@ export function Telemetry({ sidecarUrl }: TelemetryRouteProps) {
     useSentryStore.getState().pushEnvelope(envelope);
   }, []);
 
-  const contentTypeListeners = useMemo(() => {
-    log("Adding listener for", SENTRY_CONTENT_TYPE);
-
-    const result: Record<string, (event: string) => void> = Object.create(null);
-    result[SENTRY_CONTENT_TYPE] = listener;
-    result[`${SENTRY_CONTENT_TYPE};base64`] = event => listener(event);
-    return result;
-  }, [listener]);
-
   useEffect(() => {
     setSidecarUrlInStore(sidecarUrl);
   }, [sidecarUrl]);
 
   useEffect(
-    () => connectToSidecar(sidecarUrl, contentTypeListeners, setOnline) as () => undefined,
-    [sidecarUrl, contentTypeListeners],
+    () =>
+      connectToSidecar(
+        sidecarUrl,
+        {
+          [SENTRY_CONTENT_TYPE]: listener,
+          [`${SENTRY_CONTENT_TYPE};base64`]: listener,
+        },
+        setOnline,
+      ) as () => undefined,
+    [sidecarUrl, listener],
   );
 
   return <TelemetryView isOnline={isOnline} contextId={sidecarUrl} />;
