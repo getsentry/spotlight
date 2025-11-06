@@ -6,7 +6,7 @@ import { categorizeSDK, formatLogLine } from "./utils.js";
  * Format an error event with envelope headers for SDK categorization
  */
 export function formatError(event: SentryErrorEvent, envelopeHeader: Envelope[0]): string[] {
-  const source = categorizeSDK(envelopeHeader);
+  const source = categorizeSDK(envelopeHeader, event);
 
   const exception = event.exception?.values?.[0];
   const errorType = exception?.type || "Error";

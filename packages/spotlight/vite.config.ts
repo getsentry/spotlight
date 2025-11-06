@@ -12,9 +12,7 @@ const dependencies = Object.keys({
 export default defineConfig({
   define: {
     "process.env.NODE_ENV": '"production"',
-    "process.env.npm_package_version": JSON.stringify(
-      process.env.npm_package_version
-    ),
+    "process.env.npm_package_version": JSON.stringify(process.env.npm_package_version),
   },
   build: {
     ssr: true,
@@ -25,15 +23,15 @@ export default defineConfig({
       },
     },
     rollupOptions: {
-      external: [...dependencies, ...builtinModules.map((x) => `node:${x}`)],
+      external: [...dependencies, ...builtinModules.map(x => `node:${x}`)],
       output: {
-        banner: (chunk) => {
-          if (chunk.name === 'run') {
-            return '#!/usr/bin/env node';
+        banner: chunk => {
+          if (chunk.name === "run") {
+            return "#!/usr/bin/env node";
           }
-          return '';
-        }
-      }
+          return "";
+        },
+      },
     },
   },
 });

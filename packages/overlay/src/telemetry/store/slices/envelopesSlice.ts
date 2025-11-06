@@ -1,10 +1,10 @@
 import type { Envelope } from "@sentry/core";
+import { RAW_TYPES } from "@spotlightjs/sidecar/constants";
 import type { StateCreator } from "zustand";
 import { ATTACHMENT_EVENT_TYPES, SUPPORTED_EVENT_TYPES } from "../../constants/sentry";
 import type { EventAttachment, Sdk, SentryEvent } from "../../types";
 import { sdkToPlatform } from "../../utils/sdkToPlatform";
 import type { EnvelopesSliceActions, EnvelopesSliceState, SentryStore } from "../types";
-import { RAW_TYPES } from "@spotlightjs/sidecar/constants";
 
 const initialEnvelopesState: EnvelopesSliceState = {
   envelopes: new Map(),
@@ -86,7 +86,8 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
           }
           item.contexts.trace ??= traceContext;
         }
-        const eventId = item.event_id ?? ("event_id" in itemHeader ? (itemHeader.event_id as string | undefined) : undefined);
+        const eventId =
+          item.event_id ?? ("event_id" in itemHeader ? (itemHeader.event_id as string | undefined) : undefined);
         let attachmentsForEvent = eventId ? attachmentsByEventId.get(eventId) : undefined;
 
         if (!attachmentsForEvent?.length && eventCount === 1 && envelopeScopedAttachments.length > 0) {

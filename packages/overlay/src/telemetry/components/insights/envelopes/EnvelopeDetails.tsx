@@ -81,10 +81,10 @@ type EnvelopeItem = Envelope[1][number];
 
 function getEnvelopeItemSummary(itemHeader: EnvelopeItem[0], payload: EnvelopeItem[1]): string {
   const parts: string[] = [];
-  
+
   // For RAW_TYPES (attachment, replay_video, statsd), show filename
   if (RAW_TYPES.has(itemHeader.type)) {
-    const filename = itemHeader.filename 
+    const filename = itemHeader.filename
       ? String(itemHeader.filename)
       : `untitled.${inferExtension(itemHeader.content_type as string | null, itemHeader.type as string | null)}`;
     parts.push(filename);
@@ -97,24 +97,24 @@ function getEnvelopeItemSummary(itemHeader: EnvelopeItem[0], payload: EnvelopeIt
       } else if ("sid" in payload && payload.sid) {
         parts.push(`Session: ${String(payload.sid).substring(0, 8)}`);
       }
-      
+
       // Add transaction name if available
       if ("transaction" in payload && payload.transaction) {
         parts.push(`${String(payload.transaction)}`);
       }
     }
   }
-  
+
   // Add content type if present
   if (itemHeader.content_type) {
     parts.push(String(itemHeader.content_type));
   }
-  
+
   // Add length
   if (typeof itemHeader.length === "number") {
     parts.push(`${itemHeader.length} bytes`);
   }
-  
+
   return parts.join(" • ");
 }
 

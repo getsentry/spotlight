@@ -26,9 +26,10 @@ const TEXT_CONTENT_TYPES = new Set([
  * Implements parser for
  * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
  * @param rawEvent Envelope data
+ * @param senderUserAgent Optional User-Agent header from the HTTP request sending the envelope
  * @returns parsed envelope
  */
-export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope | null {
+export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: string): ParsedEnvelope | null {
   let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
 
   function readLine(length?: number) {
@@ -45,6 +46,11 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope | nul
   }
 
   envelopeHeader.__spotlight_envelope_id = uuidv7();
+
+  // Store sender User-Agent for improved SDK categorization
+  if (senderUserAgent) {
+    envelopeHeader.__spotlight_sender_user_agent = senderUserAgent;
+  }
 
   const items: EnvelopeItem[] = [];
   while (buffer.length) {

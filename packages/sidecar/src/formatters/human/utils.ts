@@ -1,13 +1,31 @@
 import type { Envelope } from "@sentry/core";
 import chalk from "chalk";
+import { parseBrowserFromUserAgent } from "~/routes/stream/userAgent.js";
 
 /**
- * Categorize SDK as browser, mobile, or server based on sdk.name
+ * Helper to detect if a User-Agent string is from a browser
+ */
+function isBrowserUserAgent(userAgent: string): boolean {
+  const parsed = parseBrowserFromUserAgent(userAgent);
+  return (
+    parsed !== "unknown" &&
+    (parsed.includes("Chrome") || parsed.includes("Firefox") || parsed.includes("Safari") || parsed.includes("Edge"))
+  );
+}
+
+/**
+ * Categorize SDK as browser, mobile, or server using multiple signals
+ * Priority order:
+ * 1. Sender User-Agent (from HTTP request header)
+ * 2. Platform & Runtime tags (from event payload)
+ * 3. SDK name (fallback)
+ *
  * Rules based on https://release-registry.services.sentry.io/sdks
  */
-export function categorizeSDK(envelopeHeader: Envelope[0]): "browser" | "mobile" | "server" {
+export function categorizeSDK(envelopeHeader: Envelope[0], event?: any): "browser" | "mobile" | "server" {
   const sdkName = envelopeHeader?.sdk?.name || "";
 
+  // 1. Mobile check (unchanged - already reliable from SDK name)
   // Mobile: Native mobile platforms and frameworks
   if (
     sdkName.includes("cocoa") ||
@@ -24,6 +42,50 @@ export function categorizeSDK(envelopeHeader: Envelope[0]): "browser" | "mobile"
     return "mobile";
   }
 
+  // 2. Sender User-Agent check
+  const senderUserAgent = (envelopeHeader as any).__spotlight_sender_user_agent;
+  if (senderUserAgent && typeof senderUserAgent === "string") {
+    if (isBrowserUserAgent(senderUserAgent)) {
+      return "browser";
+    }
+    // Server SDKs send server UAs like "Node.js/*", "Python-urllib/*", etc.
+    // If we have a non-browser UA, we continue to further checks
+  }
+
+  // 3. Runtime tags check
+  if (event?.tags?.runtime === "browser") {
+    return "browser";
+  }
+
+  // 4. Platform & server-specific signals
+  if (event?.contexts?.runtime?.name) {
+    // Runtime context (node, CPython, etc.) indicates server
+    return "server";
+  }
+
+  if (event?.server_name) {
+    // server_name is a server-specific field
+    return "server";
+  }
+
+  const platform = event?.platform;
+  if (
+    platform === "node" ||
+    platform === "python" ||
+    platform === "ruby" ||
+    platform === "php" ||
+    platform === "java" ||
+    platform === "go" ||
+    platform === "rust" ||
+    platform === "perl" ||
+    platform === "elixir" ||
+    platform === "csharp" ||
+    platform === "dotnet"
+  ) {
+    return "server";
+  }
+
+  // 5. SDK name check (existing logic as fallback)
   // Browser: JavaScript frameworks/libraries (excluding server/native runtimes and meta-frameworks)
   if (
     sdkName.startsWith("sentry.javascript.") &&

@@ -7,7 +7,7 @@ import { categorizeSDK, formatLogLine } from "./utils.js";
  * Format a trace/transaction event with envelope headers for SDK categorization
  */
 export function formatTrace(event: SentryTransactionEvent, envelopeHeader: Envelope[0]): string[] {
-  const source = categorizeSDK(envelopeHeader);
+  const source = categorizeSDK(envelopeHeader, event);
 
   const transaction = event.transaction;
   const trace = event.contexts?.trace;
