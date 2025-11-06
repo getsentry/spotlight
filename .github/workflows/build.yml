@@ -23,6 +23,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'push' && (github.ref_name == 'main' || startsWith(github.ref_name, 'release/')) && 'Production' || 'Preview' }}
     outputs:
       playwright-version: ${{ steps.playwright-version.outputs.version }}
     steps:
@@ -82,7 +83,7 @@ jobs:
       - name: Build packages
         env:
           APPLE_CERT_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.TEAMID }}
+          APPLE_TEAM_ID: ${{ vars.TEAMID }}
           FOSSILIZE_PLATFORMS: linux-x64,linux-arm64,win-x64,darwin-x64,darwin-arm64
           FOSSILIZE_SIGN: ${{ github.event_name == 'push' && (github.ref_name == 'main' || startsWith(github.ref_name, 'release/')) && 'y' || 'n' }}
         run: pnpm build
