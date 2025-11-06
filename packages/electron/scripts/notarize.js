@@ -12,8 +12,8 @@ exports.default = async function notarizing(context) {
   return await notarize({
     appBundleId: "io.sentry.spotlight",
     appPath: `${appOutDir}/${appName}.app`,
-    appleId: process.env.APPLEID,
-    appleIdPassword: process.env.APPLEIDPASS,
+    appleApiKey: process.env.APPLE_API_KEY_P8_PATH,
+    appleApiIssuer: process.env.APPLE_API_KEY_ISSUER_ID,
     teamId: process.env.TEAMID,
   });
 };
