@@ -9,6 +9,7 @@ import { SENTRY_CONTENT_TYPE } from "../constants.js";
 import { logger } from "../logger.js";
 import type { SentryLogEvent } from "../parser/types.js";
 import type { CLIHandlerOptions } from "../types/cli.js";
+import { buildDockerComposeCommand, detectDockerCompose } from "../utils/docker-compose.js";
 import { getSpotlightURL } from "../utils/extras.js";
 import { EventContainer, getBuffer } from "../utils/index.js";
 import tail, { type OnItemCallback } from "./tail.js";
@@ -110,6 +111,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   // or started in a weird manner (like over a unix socket)
   const actualServerPort = (serverInstance.address() as AddressInfo).port;
   let shell = false;
+  let dockerComposeOverride: string | undefined = undefined;
   const env = {
     ...process.env,
     SENTRY_SPOTLIGHT: getSpotlightURL(actualServerPort),
@@ -118,14 +120,26 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     SENTRY_TRACES_SAMPLE_RATE: "1",
   } as { PATH: string; SENTRY_SPOTLIGHT: string; SENTRY_TRACES_SAMPLE_RATE: string; [key: string]: string };
   if (cmdArgs.length === 0) {
-    // try package.json to find default dev command
-    try {
-      const scripts = JSON.parse(readFileSync("./package.json", "utf-8")).scripts;
-      cmdArgs = [scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start];
-      shell = true;
-      env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
-    } catch {
-      // pass
+    const dockerCompose = detectDockerCompose();
+    // We check for docker-compose first: even if there is a package.json (for a JS project),
+    // if there's Docker configuration present, that's almost certainly the intended way to run the project
+
+    if (dockerCompose) {
+      logger.info(
+        `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
+      );
+      const command = buildDockerComposeCommand(dockerCompose, actualServerPort);
+      cmdArgs = command.cmdArgs;
+      dockerComposeOverride = command.dockerComposeOverride;
+    } else {
+      try {
+        const scripts = JSON.parse(readFileSync("./package.json", "utf-8")).scripts;
+        cmdArgs = [scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start];
+        shell = true;
+        env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
+      } catch {
+        // pass
+      }
     }
   }
   if (cmdArgs.length === 0) {
@@ -134,18 +148,29 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   }
   const cmdStr = cmdArgs.join(" ");
   logger.info(`Starting command: ${cmdStr}`);
+  // When we have Docker Compose override YAML (for -f -), we need to pipe stdin
+  // Otherwise, inherit stdin to relay user input to the downstream process
+  const stdinMode: "pipe" | "inherit" = dockerComposeOverride ? "pipe" : "inherit";
   const runCmd = spawn(cmdArgs[0], cmdArgs.slice(1), {
     cwd: process.cwd(),
     env,
     shell,
     windowsVerbatimArguments: true,
     windowsHide: true,
-    // We `inherit` the stdin so we relay any user input to the downstream process
-    // This also helps sending the SIGINT signal directly. Alternative would be to
-    // use "pipe" and call `runCmd.stdin.end()` to signal the end of the input stream.
-    // Never ever use `ignore` as it keeps stdin open forever, preventing a graceful shutdown
-    stdio: ["inherit", "pipe", "pipe"],
+    stdio: [stdinMode, "pipe", "pipe"],
   });
+
+  const { stdout, stderr } = runCmd;
+  if (!stdout || !stderr) {
+    logger.error("Failed to create process streams");
+    process.exit(1);
+  }
+
+  // If we have Docker Compose override YAML, write it and close stdin
+  if (dockerComposeOverride && runCmd.stdin) {
+    runCmd.stdin.write(dockerComposeOverride);
+    runCmd.stdin.end();
+  }
 
   const processLogLine = (line: string, level: "info" | "error") => {
     if (!relayStdioAsLogs) return;
@@ -167,7 +192,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   let stderrBuffer = "";
 
   // Stream stdout as info-level logs
-  runCmd.stdout.on("data", (data: Buffer) => {
+  stdout.on("data", (data: Buffer) => {
     stdoutBuffer += data.toString();
     const lines = stdoutBuffer.split("\n");
     // Keep the last partial line in the buffer
@@ -179,7 +204,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   });
 
   // Stream stderr as error-level logs
-  runCmd.stderr.on("data", (data: Buffer) => {
+  stderr.on("data", (data: Buffer) => {
     stderrBuffer += data.toString();
     const lines = stderrBuffer.split("\n");
     // Keep the last partial line in the buffer
@@ -214,8 +239,8 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   });
   const killRunCmd = () => {
     if (runCmd.killed) return;
-    runCmd.stdout.destroy();
-    runCmd.stderr.destroy();
+    stdout.destroy();
+    stderr.destroy();
     runCmd.kill();
   };
   runCmd.on("spawn", () => {
