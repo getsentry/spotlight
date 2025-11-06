@@ -14,7 +14,7 @@ function isBrowserUserAgent(userAgent: string): boolean {
 }
 
 /**
- * Categorize SDK as browser, mobile, or server using multiple signals
+ * Infer the source of an envelope as browser, mobile, or server using multiple signals
  * Priority order:
  * 1. Sender User-Agent (from HTTP request header)
  * 2. Platform & Runtime tags (from event payload)
@@ -22,7 +22,7 @@ function isBrowserUserAgent(userAgent: string): boolean {
  *
  * Rules based on https://release-registry.services.sentry.io/sdks
  */
-export function categorizeSDK(envelopeHeader: Envelope[0], event?: any): "browser" | "mobile" | "server" {
+export function inferEnvelopeSource(envelopeHeader: Envelope[0], event?: any): "browser" | "mobile" | "server" {
   const sdkName = envelopeHeader?.sdk?.name || "";
 
   // 1. Mobile check (unchanged - already reliable from SDK name)
@@ -150,7 +150,7 @@ export function colorizeTime(time: string): string {
 }
 
 /**
- * Colorize source based on SDK category
+ * Colorize source based on envelope source
  */
 export function colorizeSource(source: string): string {
   switch (source) {
