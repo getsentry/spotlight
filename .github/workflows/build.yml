@@ -78,7 +78,12 @@ jobs:
           echo "$APPLE_CERT_DATA" | base64 --decode > /tmp/certs.p12
           echo 'APPLE_CERT_PATH=/tmp/certs.p12' >> $GITHUB_ENV
           echo "$APPLE_API_KEY" | base64 -d > /tmp/apple_key.json
+          cat /tmp/apple_key.json | jq .private_key -r > /tmp/apple_key.pem
+          echo "APPLE_API_KEY_ISSUER_ID=$(cat /tmp/apple_key.json | jq .key_id -r)" >> $GITHUB_ENV
+          echo "APPLE_API_KEY_ID=$(cat /tmp/apple_key.json | jq .issuer_id -r)" >> $GITHUB_ENV
+          echo "APPLE_API_KEY_P8_PATH=/tmp/apple_key.pem" >> $GITHUB_ENV
           echo 'APPLE_API_KEY_PATH=/tmp/apple_key.json' >> $GITHUB_ENV
+          
 
       - name: Build packages
         env:
