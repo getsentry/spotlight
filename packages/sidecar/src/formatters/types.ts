@@ -1,4 +1,4 @@
-import type { Envelope, EnvelopeItem } from "@sentry/core";
+import type { Envelope } from "@sentry/core";
 import type { SentryErrorEvent, SentryEvent, SentryLogEvent, SentryTransactionEvent } from "~/parser/types.js";
 
 /**
@@ -24,24 +24,6 @@ export type FormatterRegistry = {
   log: FormatterEntry<SentryLogEvent>;
   transaction: FormatterEntry<SentryTransactionEvent>;
 };
-
-/**
- * Generic function to get a formatter from registry and apply it
- */
-export function applyFormatter<K extends keyof FormatterRegistry>(
-  registry: FormatterRegistry,
-  eventType: K,
-  payload: EnvelopeItem[1],
-  envelopeHeader: Envelope[0],
-): string[] {
-  const entry = registry[eventType];
-  const event = payload as SentryEvent;
-  if (!entry.typeGuard(event)) {
-    throw new Error(`Formatter received invalid event type: ${(event as any).type}`);
-  }
-  // Type assertion needed because TypeScript can't narrow the union type properly
-  return entry.format(event as any, envelopeHeader);
-}
 
 /**
  * Available formatter types.
