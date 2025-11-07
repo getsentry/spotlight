@@ -18,6 +18,7 @@ env:
   CACHED_BUILD_PATHS: |
     ${{ github.workspace }}/packages/*/dist
     ${{ github.workspace }}/packages/*/dist-bin
+    ${{ github.workspace }}/packages/*/out
 
 jobs:
   build:
@@ -220,6 +221,14 @@ jobs:
 
       - name: Setup dependencies
         run: pnpm install
+
+      - name: Restore build cache
+        uses: actions/cache/restore@v4
+        with:
+          enableCrossOsArchive: true
+          fail-on-cache-miss: true
+          path: ${{ env.CACHED_BUILD_PATHS }}
+          key: ${{ env.BUILD_CACHE_KEY }}
 
       - name: Cache turbo build setup
         uses: actions/cache@v4
