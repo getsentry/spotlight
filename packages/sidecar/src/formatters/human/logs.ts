@@ -13,12 +13,12 @@ function formatSingleLog(log: SerializedLog, source: "browser" | "mobile" | "ser
   if (log.attributes) {
     for (const [key, attr] of Object.entries(log.attributes)) {
       if (!key.startsWith("sentry.") && attr.value !== undefined && attr.value !== null) {
-        attrs.push(`${key}=${attr.value}`);
+        attrs.push(`[${key}=${attr.value}]`);
       }
     }
   }
 
-  const fullMessage = attrs.length > 0 ? `${message} (${attrs.join(", ")})` : message;
+  const fullMessage = attrs.length > 0 ? `${message} ${attrs.join(" ")}` : message;
 
   return formatLogLine(log.timestamp, source, level, fullMessage);
 }
