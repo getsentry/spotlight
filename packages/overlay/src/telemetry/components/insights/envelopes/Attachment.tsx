@@ -99,11 +99,7 @@ export default function Attachment({
     <>
       <h3>
         📎{" "}
-        <a
-          href={downloadUrl ?? undefined}
-          download={name}
-          className="group inline-flex items-center gap-1"
-        >
+        <a href={downloadUrl ?? undefined} download={name} className="group inline-flex items-center gap-1">
           {name}
           <Download className="inline h-4 w-4 opacity-60 transition-opacity group-hover:opacity-100" />
         </a>

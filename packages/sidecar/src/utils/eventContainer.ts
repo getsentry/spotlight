@@ -7,12 +7,14 @@ import { type ParsedEnvelope, processEnvelope } from "../parser/index.js";
 export class EventContainer {
   private contentType: string;
   private data: Buffer;
+  private senderUserAgent?: string;
   private parsedEnvelope: ParsedEnvelope | null = null;
   private isParsed = false;
 
-  constructor(contentType: string, data: Buffer) {
+  constructor(contentType: string, data: Buffer, senderUserAgent?: string) {
     this.contentType = contentType;
     this.data = data;
+    this.senderUserAgent = senderUserAgent;
   }
 
   /**
@@ -35,10 +37,13 @@ export class EventContainer {
   getParsedEnvelope(): ParsedEnvelope {
     // Parse once and cache the result
     if (!this.isParsed) {
-      this.parsedEnvelope = processEnvelope({
-        contentType: this.contentType,
-        data: this.data,
-      });
+      this.parsedEnvelope = processEnvelope(
+        {
+          contentType: this.contentType,
+          data: this.data,
+        },
+        this.senderUserAgent,
+      );
       this.isParsed = true;
     }
 

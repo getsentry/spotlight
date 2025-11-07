@@ -90,7 +90,8 @@ const router = new Hono<HonoEnv>()
       logger.warn("No content type, skipping payload...");
     } else {
       // Create event container and add to buffer
-      const container = new EventContainer(contentType, body);
+      const senderUserAgent = ctx.req.header("User-Agent");
+      const container = new EventContainer(contentType, body, senderUserAgent);
 
       // Log incoming event details when debug is enabled
       logIncomingEvent(container);

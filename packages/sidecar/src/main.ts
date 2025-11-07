@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { join } from "node:path";
 import { serve } from "@hono/node-server";
@@ -11,7 +12,6 @@ import { activateLogger, logger } from "./logger.js";
 import routes from "./routes/index.js";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
 import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
-import type { Server } from "node:http";
 
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 

@@ -22,17 +22,13 @@ setContext("CLI", {
   argv: homeDir ? process.argv.map(arg => arg.replace(homeDir, "~")) : process.argv,
 });
 
-const withTracing =
-  <T extends (...args: any[]) => any>(
-    fn: T,
-    spanArgs = {}
-  ): ((...args: Parameters<T>) => ReturnType<T>) => {
-    return (...args: Parameters<T>): ReturnType<T> =>
-      startSpan(
-        { name: fn.name, attributes: { args }, ...spanArgs },
-        () => fn(...args)
-      );
-  }
+const withTracing = <T extends (...args: any[]) => any>(
+  fn: T,
+  spanArgs = {},
+): ((...args: Parameters<T>) => ReturnType<T>) => {
+  return (...args: Parameters<T>): ReturnType<T> =>
+    startSpan({ name: fn.name, attributes: { args }, ...spanArgs }, () => fn(...args));
+};
 
 const readAsset = withTracing(
   sea.isSea()

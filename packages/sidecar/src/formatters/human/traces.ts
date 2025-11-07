@@ -1,13 +1,13 @@
 import type { Envelope } from "@sentry/core";
 import type { SentryTransactionEvent } from "~/parser/index.js";
 import { getDuration } from "../utils.js";
-import { categorizeSDK, formatLogLine } from "./utils.js";
+import { formatLogLine, inferEnvelopeSource } from "./utils.js";
 
 /**
- * Format a trace/transaction event with envelope headers for SDK categorization
+ * Format a trace/transaction event with envelope headers for source inference
  */
 export function formatTrace(event: SentryTransactionEvent, envelopeHeader: Envelope[0]): string[] {
-  const source = categorizeSDK(envelopeHeader);
+  const source = inferEnvelopeSource(envelopeHeader, event);
 
   const transaction = event.transaction;
   const trace = event.contexts?.trace;

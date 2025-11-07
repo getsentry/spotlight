@@ -7,6 +7,6 @@ export const useSentryEvents = (traceId?: string) => {
   const events = traceId
     ? useSentryStore(state => state.getEventsByTrace)(traceId)
     : useSentryStore(state => state.getEvents)();
-  
+
   return events.sort((a, b) => b.timestamp - a.timestamp);
 };

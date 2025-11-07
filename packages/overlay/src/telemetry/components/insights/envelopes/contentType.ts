@@ -43,4 +43,3 @@ export function inferExtension(contentType?: string | null, itemType?: string | 
 
   return "bin";
 }
-

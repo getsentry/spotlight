@@ -3,10 +3,10 @@ import { Link, useLocation } from "react-router-dom";
 import { ReactComponent as DeleteIcon } from "~/assets/deleteIcon.svg";
 import { ReactComponent as Logo } from "~/assets/glyph.svg";
 import { cn } from "~/lib/cn";
+import { useSpotlightContext } from "~/lib/useSpotlightContext";
 import type { NotificationCount } from "~/types";
 import { Badge } from "~/ui/badge";
 import useSentryStore from "../store";
-import { useSpotlightContext } from "~/lib/useSpotlightContext";
 
 interface TelemetrySidebarProps {
   errorCount: number;
@@ -50,7 +50,6 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
   const clearEventsUrl = getSidecarUrl("/clear");
 
   const clearEvents = useCallback(async () => {
-    
     try {
       await fetch(clearEventsUrl, {
         method: "DELETE",
@@ -187,4 +186,3 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
     </nav>
   );
 }
-
