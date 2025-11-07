@@ -1,12 +1,12 @@
 import type { Envelope } from "@sentry/core";
 import type { SentryErrorEvent } from "~/parser/index.js";
-import { categorizeSDK, formatLogLine } from "./utils.js";
+import { formatLogLine, inferEnvelopeSource } from "./utils.js";
 
 /**
- * Format an error event with envelope headers for SDK categorization
+ * Format an error event with envelope headers for source inference
  */
 export function formatError(event: SentryErrorEvent, envelopeHeader: Envelope[0]): string[] {
-  const source = categorizeSDK(envelopeHeader);
+  const source = inferEnvelopeSource(envelopeHeader, event);
 
   const exception = event.exception?.values?.[0];
   const errorType = exception?.type || "Error";

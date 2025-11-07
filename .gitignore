@@ -47,3 +47,4 @@ junit.xml
 # Build artifacts
 *.tgz
 tsconfig.tsbuildinfo
+packages/spotlight/core

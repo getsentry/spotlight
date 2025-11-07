@@ -38,6 +38,7 @@ jobs:
   npm:
     name: NPM Package
     runs-on: ubuntu-latest
+    environment: Production
     if: >-
       (github.event.workflow_run.conclusion == 'success'
       &&
@@ -126,6 +127,7 @@ jobs:
   electron:
     name: Electron Build
     runs-on: macos-latest
+    environment: Production
     if: >-
       (github.event.workflow_run.conclusion == 'success'
       &&
@@ -164,12 +166,9 @@ jobs:
 
       - name: Build Electron
         env:
-          APPLEID: ${{ secrets.APPLEID }}
-          APPLEIDPASS: ${{ secrets.APPLEIDPASS }}
-          TEAMID: ${{ secrets.TEAMID }}
-          CERT_PASS: ${{ secrets.CERT_PASS }}
-          MAIN_VITE_SENTRY_ORG: ${{ secrets.MAIN_VITE_SENTRY_ORG }}
-          MAIN_VITE_SENTRY_PROJECT: ${{ secrets.MAIN_VITE_SENTRY_PROJECT }}
+          TEAMID: ${{ vars.TEAMID }}
+          MAIN_VITE_SENTRY_ORG: ${{ vars.MAIN_VITE_SENTRY_ORG }}
+          MAIN_VITE_SENTRY_PROJECT: ${{ vars.MAIN_VITE_SENTRY_PROJECT }}
           MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
