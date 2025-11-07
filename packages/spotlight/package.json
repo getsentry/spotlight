@@ -12,11 +12,11 @@
     "directory": "packages/spotlight"
   },
   "scripts": {
-    "start": "./bin/run.js",
+    "start": "./dist/run.js",
     "dev": "vite serve --config=vite.dev.config.ts",
     "dev:electron": "electron-vite dev",
-    "build": "NODE_ENV=production tsc --skipLibCheck && tsc --project tsconfig.sidecar.json && tsc-alias -p tsconfig.sidecar.json && vite build && vite build --config vite.ui.config.ts && npm run build:sea && npm run build:electron",
-    "build:sea": "fossilize -m dist/ui/manifest.json -o spotlight bin/run.js",
+    "build": "NODE_ENV=production tsc --skipLibCheck && tsc --project tsconfig.sidecar.json && tsc-alias -p tsconfig.sidecar.json && vite build && vite build --config vite.ui.config.ts && vite build --config vite.sidecar.config.ts && npm run build:sea && npm run build:electron",
+    "build:sea": "fossilize -m dist/ui/manifest.json -o spotlight dist/run.js",
     "build:watch": "vite build --watch",
     "build:electron": "electron-vite build",
     "build:mac": "./electron-builder.js",
@@ -27,9 +27,9 @@
     "yalc:publish": "yalc publish --push --sig --private",
     "clean": "rimraf dist out"
   },
-  "files": ["dist", "bin", "out"],
+  "files": ["dist", "out"],
   "bin": {
-    "spotlight": "./bin/run.js",
+    "spotlight": "./dist/run.js",
     "spotlight-sidecar": "dist/sidecar/run.js"
   },
   "main": "./dist/sidecar/main.js",
