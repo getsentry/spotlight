@@ -139,8 +139,8 @@ export function padLabel(label: string, width: number): string {
 }
 
 // Constants for consistent padding
-export const SOURCE_WIDTH = 7; // "browser" is the longest
-export const TYPE_WIDTH = 7; // "warning" is the longest
+export const SOURCE_WIDTH = 9; // "[BROWSER]" is the longest
+export const TYPE_WIDTH = 9; // "[WARNING]" is the longest
 
 /**
  * Colorize time with dim gray
@@ -153,15 +153,18 @@ export function colorizeTime(time: string): string {
  * Colorize source based on envelope source
  */
 export function colorizeSource(source: string): string {
+  const uppercaseSource = source.toUpperCase();
+  const bracketed = `[${uppercaseSource}]`;
+
   switch (source) {
     case "browser":
-      return chalk.yellow(padLabel(source, SOURCE_WIDTH));
+      return chalk.yellow(padLabel(bracketed, SOURCE_WIDTH));
     case "mobile":
-      return chalk.blue(padLabel(source, SOURCE_WIDTH));
+      return chalk.blue(padLabel(bracketed, SOURCE_WIDTH));
     case "server":
-      return chalk.magenta(padLabel(source, SOURCE_WIDTH));
+      return chalk.magenta(padLabel(bracketed, SOURCE_WIDTH));
     default:
-      return chalk.white(padLabel(source, SOURCE_WIDTH));
+      return chalk.white(padLabel(bracketed, SOURCE_WIDTH));
   }
 }
 
@@ -169,7 +172,9 @@ export function colorizeSource(source: string): string {
  * Colorize event type
  */
 export function colorizeType(type: string): string {
-  const paddedType = padLabel(type.toLowerCase(), TYPE_WIDTH);
+  const uppercaseType = type.toUpperCase();
+  const bracketed = `[${uppercaseType}]`;
+  const paddedType = padLabel(bracketed, TYPE_WIDTH);
 
   switch (type.toLowerCase()) {
     case "error":
