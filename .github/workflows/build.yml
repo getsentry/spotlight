@@ -122,6 +122,13 @@ jobs:
           if-no-files-found: error
           path: packages/spotlight/dist-bin/spotlight-*
 
+      - name: Store Electron build
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-build
+          if-no-files-found: error
+          path: packages/spotlight/out/
+
       - name: Update build cache
         uses: actions/cache/save@v4
         with:
@@ -222,13 +229,11 @@ jobs:
       - name: Setup dependencies
         run: pnpm install
 
-      - name: Restore build cache
-        uses: actions/cache/restore@v4
+      - name: Download Electron build
+        uses: actions/download-artifact@v4
         with:
-          enableCrossOsArchive: true
-          fail-on-cache-miss: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
+          name: electron-build
+          path: packages/spotlight/out/
 
       - name: Cache turbo build setup
         uses: actions/cache@v4
