@@ -7,7 +7,7 @@ export const DOCKER_MIN_VERSION = "20.10.0";
 export const DOCKER_HOST_INTERNAL = "host.docker.internal";
 export const DOCKER_HOST_GATEWAY = "host-gateway";
 
-export interface DockerComposeConfig {
+interface DockerComposeConfig {
   composeFile: string;
   overrideFile?: string;
   command: string[];
@@ -96,7 +96,7 @@ function detectComposeCommand(): { command: string[]; version: string } | null {
 /**
  * Generate the override YAML for injecting Spotlight environment variables
  */
-export function generateSpotlightOverrideYaml(serviceNames: string[], port: number): string {
+function generateSpotlightOverrideYaml(serviceNames: string[], port: number): string {
   const services: Record<string, unknown> = {};
 
   // We use host.docker.internal to ensure the container can access the host machine
