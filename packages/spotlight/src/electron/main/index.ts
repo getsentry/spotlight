@@ -1,10 +1,14 @@
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import * as Sentry from "@sentry/electron/main";
 import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, session, shell } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
 import { DEFAULT_PORT } from "../../sidecar/constants";
 import { clearBuffer, setupSidecar } from "../../sidecar/main";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const store = new Store();
 
@@ -140,7 +144,7 @@ const createWindow = () => {
   if (!app.isPackaged && process.env.ELECTRON_RENDERER_URL) {
     win.loadURL(process.env.ELECTRON_RENDERER_URL);
   } else {
-    win.loadFile(path.join(__dirname, "../renderer/index.html"));
+    win.loadFile(path.join(__dirname, "../renderer/electron.html"));
   }
 
   win.once("ready-to-show", () => {

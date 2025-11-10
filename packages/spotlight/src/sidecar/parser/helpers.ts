@@ -18,7 +18,10 @@ export const SUPPORTED_EVENT_TYPES = new Set([
 ]);
 
 export function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
-  return (!event.type || ERROR_EVENT_TYPES.has(event.type)) && Boolean((event as SentryErrorEvent).exception);
+  const hasValidType = !event.type || ERROR_EVENT_TYPES.has(event.type);
+  const hasException = Boolean((event as SentryErrorEvent).exception);
+  const hasMessage = Boolean((event as SentryErrorEvent).message);
+  return hasValidType && (hasException || hasMessage);
 }
 
 export function isProfileEvent(event: SentryEvent): event is SentryProfileV1Event {
