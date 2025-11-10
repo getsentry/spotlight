@@ -1,4 +1,4 @@
-import { uuidv7 } from "uuidv7";
+import { UUID, uuidv7 } from "uuidv7";
 import type { InputSchema } from "./mcp/mcp.js";
 import { EventContainer } from "./utils/eventContainer.js";
 
@@ -15,6 +15,95 @@ export class MessageBuffer<T> {
     this.items = new Array(size);
   }
 
+  /**
+   * Binary search for an event by its envelope ID (UUIDv7).
+   * Returns the position of the event, or -1 if not found.
+   * Takes advantage of UUIDv7's time-ordered property.
+   */
+  private binarySearchEventId(targetId: string): number {
+    let left = this.head;
+    let right = this.writePos - 1;
+    const targetUuid = UUID.parse(targetId);
+
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      const item = this.items[mid % this.size];
+
+      // Skip null items or non-EventContainer items
+      if (item == null || !(item[1] instanceof EventContainer)) {
+        // Linear scan nearby to handle gaps
+        // Check left side
+        for (let i = mid - 1; i >= left; i--) {
+          const leftItem = this.items[i % this.size];
+          if (leftItem && leftItem[1] instanceof EventContainer) {
+            const envelope = leftItem[1].getParsedEnvelope();
+            if (envelope?.envelope) {
+              const envelopeId = envelope.envelope[0].__spotlight_envelope_id;
+              const isEqual = envelopeId.compareTo(targetUuid);
+              if (isEqual === 0) {
+                return i;
+              }
+              // Adjust search bounds based on comparison
+              if (isEqual < 0) {
+                left = mid + 1;
+              } else {
+                right = mid - 1;
+              }
+              break;
+            }
+          }
+        }
+        // Check right side if left didn't help
+        for (let i = mid + 1; i <= right; i++) {
+          const rightItem = this.items[i % this.size];
+          if (rightItem && rightItem[1] instanceof EventContainer) {
+            const envelope = rightItem[1].getParsedEnvelope();
+            if (envelope?.envelope) {
+              const envelopeId = envelope.envelope[0].__spotlight_envelope_id;
+              const isEqual = envelopeId.compareTo(targetUuid);
+              if (isEqual === 0) {
+                return i;
+              }
+              // Adjust search bounds
+              if (isEqual < 0) {
+                left = mid + 1;
+              } else {
+                right = mid - 1;
+              }
+              break;
+            }
+          }
+        }
+        continue;
+      }
+
+      const envelope = item[1].getParsedEnvelope();
+      if (!envelope?.envelope) {
+        // Skip invalid envelopes, move to next
+        left = mid + 1;
+        continue;
+      }
+
+      const envelopeId = envelope.envelope[0].__spotlight_envelope_id;
+
+      const isEqual = envelopeId.compareTo(targetUuid);
+      if (isEqual === 0) {
+        // Found exact match
+        return mid;
+      }
+
+      if (isEqual < 0) {
+        // Target is in the right half (later in time)
+        left = mid + 1;
+      } else {
+        // Target is in the left half (earlier in time)
+        right = mid - 1;
+      }
+    }
+
+    return -1;
+  }
+
   put(item: T): void {
     const curTime = new Date().getTime();
 
@@ -23,10 +112,10 @@ export class MessageBuffer<T> {
     if (oldValue && oldValue[1] instanceof EventContainer) {
       const envelope = oldValue[1].getParsedEnvelope();
       if (envelope?.envelope) {
-        const deletedEnvelopeId = envelope.envelope[0].__spotlight_envelope_id;
+        const deletedEnvelopeId = envelope.envelope[0].__spotlight_envelope_id.toString();
         const goneFiles = new Set<string>();
         for (const [filename, envelopeIds] of this.filenameCache.entries()) {
-          envelopeIds.delete(String(deletedEnvelopeId));
+          envelopeIds.delete(deletedEnvelopeId);
           if (envelopeIds.size === 0) {
             goneFiles.add(filename);
           }
@@ -48,7 +137,7 @@ export class MessageBuffer<T> {
     if (item instanceof EventContainer) {
       const envelope = item.getParsedEnvelope();
       if (envelope?.envelope) {
-        const spotlightEnvelopeId = envelope.envelope[0].__spotlight_envelope_id;
+        const spotlightEnvelopeId = envelope.envelope[0].__spotlight_envelope_id.toString();
         const events = envelope.envelope[1] ?? [];
 
         for (const event of events) {
@@ -93,24 +182,13 @@ export class MessageBuffer<T> {
     // Determine starting position based on lastEventId
     let startPos = this.head;
     if (lastEventId) {
-      // Find the position of the last event ID
-      const start = this.head;
-      const end = this.writePos;
-
-      for (let i = start; i < end; i++) {
-        const item = this.items[i % this.size];
-        if (item == null) continue;
-
-        if (item[1] instanceof EventContainer) {
-          const envelope = item[1].getParsedEnvelope();
-          if (envelope?.envelope && envelope.envelope[0].__spotlight_envelope_id === lastEventId) {
-            // Start from the position after the found event
-            startPos = i + 1;
-            break;
-          }
-        }
+      // Binary search for lastEventId (UUIDv7 is time-ordered)
+      // Since buffer is chronologically ordered, we can use binary search
+      const foundPos = this.binarySearchEventId(lastEventId);
+      if (foundPos !== -1) {
+        // Start from the position after the found event
+        startPos = foundPos + 1;
       }
-
       // If lastEventId not found, startPos remains at this.head (normal behavior)
     }
 
@@ -232,7 +310,7 @@ export class MessageBuffer<T> {
 
       const data = (item[1] as EventContainer).getParsedEnvelope();
 
-      return data.envelope[0].__spotlight_envelope_id === value.envelopeId;
+      return data.envelope[0].__spotlight_envelope_id.equals(UUID.parse(value.envelopeId));
     },
     filename: (item, value, ctx) => {
       if (!("filename" in value)) {
@@ -240,11 +318,11 @@ export class MessageBuffer<T> {
       }
 
       const contents = (item[1] as EventContainer).getParsedEnvelope();
-      const spotlightEnvelopeId = contents.envelope[0].__spotlight_envelope_id;
+      const spotlightEnvelopeId = contents.envelope[0].__spotlight_envelope_id.toString();
 
       for (const [filename, envelopeIds] of ctx.filenameCache.entries()) {
         if (filename.endsWith(value.filename)) {
-          if (envelopeIds.has(String(spotlightEnvelopeId))) {
+          if (envelopeIds.has(spotlightEnvelopeId)) {
             return true;
           }
         }

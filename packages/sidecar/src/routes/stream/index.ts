@@ -45,7 +45,7 @@ const router = new Hono<HonoEnv>()
         const parsedEnvelope = container.getParsedEnvelope();
         if (parsedEnvelope) {
           stream.writeSSE({
-            id: parsedEnvelope.envelope[0].__spotlight_envelope_id,
+            id: parsedEnvelope.envelope[0].__spotlight_envelope_id.toString(),
             event: `${container.getContentType()}${base64Indicator}`,
             data: JSON.stringify(parsedEnvelope.envelope),
           });
