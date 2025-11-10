@@ -169,7 +169,7 @@ After making changes:
 
 **AI action:**
 ```json
-spotlight.logs.search({
+logs_search({
   filters: { timeWindow: 60 }
 })
 ```
@@ -217,7 +217,7 @@ errors_search({
 
 **AI action:**
 ```json
-spotlight.logs.search({
+logs_search({
   filters: { filename: "auth.tsx" }
 })
 ```
@@ -416,7 +416,7 @@ You: "Debug the slow checkout process"
 AI workflow:
 1. spotlight.traces.search → Find checkout traces
 2. spotlight.traces.get → Analyze slow trace
-3. spotlight.logs.search → Check related logs
+3. logs_search → Check related logs
 4. errors_search → Look for errors
 ```
 
@@ -491,7 +491,7 @@ AI: I found a TypeError in forms/SubmitButton.tsx at line 34:
 You: "Yes, and show me what happened before the crash"
 
 AI: [Reads SubmitButton.tsx code]
-[Calls spotlight.logs.search for recent activity]
+[Calls logs_search for recent activity]
 
 AI: Here's what I found:
      

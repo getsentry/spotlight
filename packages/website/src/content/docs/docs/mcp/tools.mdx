@@ -12,7 +12,7 @@ Spotlight provides four MCP tools that allow AI coding assistants to query your 
 | Tool | Purpose | Returns |
 |------|---------|---------|
 | `errors_search` | Find runtime errors | Errors with stack traces |
-| `spotlight.logs.search` | Query application logs | Log entries with context |
+| `logs_search` | Query application logs | Log entries with context |
 | `spotlight.traces.search` | List performance traces | Trace summaries |
 | `spotlight.traces.get` | Get trace details | Full span tree and timing |
 
@@ -172,7 +172,7 @@ Each error includes:
 
 ---
 
-## spotlight.logs.search
+## logs_search
 
 Search application logs to understand behavior, debug issues, and trace execution flow.
 
@@ -466,18 +466,18 @@ Transaction: GET /api/users/123 (245ms)
 
 1. **Search for errors**: `errors_search`
 2. **If error mentions a trace**: Get trace details with `spotlight.traces.get`
-3. **Check related logs**: `spotlight.logs.search` with filename from error
+3. **Check related logs**: `logs_search` with filename from error
 
 ### Performance Analysis
 
 1. **List recent traces**: `spotlight.traces.search`
 2. **Identify slow traces**: Look at duration in summary
 3. **Deep dive**: `spotlight.traces.get` with trace ID
-4. **Check logs**: `spotlight.logs.search` for timing details
+4. **Check logs**: `logs_search` for timing details
 
 ### Understanding Application Behavior
 
-1. **Check logs**: `spotlight.logs.search` for recent activity
+1. **Check logs**: `logs_search` for recent activity
 2. **Look for errors**: `errors_search` for issues
 3. **Examine traces**: `spotlight.traces.search` for request flow
 
@@ -509,7 +509,7 @@ Choose the most specific filter for your use case.
 Traces often reference related data:
 1. Errors include trace IDs → use `spotlight.traces.get`
 2. Logs include trace IDs → use `spotlight.traces.get`
-3. Trace spans reference files → use `spotlight.logs.search` or `errors_search` with filename
+3. Trace spans reference files → use `logs_search` or `errors_search` with filename
 
 ## Next Steps
 

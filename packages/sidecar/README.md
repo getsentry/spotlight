@@ -56,7 +56,7 @@ Spotlight Sidecar includes MCP tools for accessing local debugging data through 
 
 #### Error Debugging
 - `errors_search` - Retrieve recent application errors with stack traces
-- `spotlight.logs.search` - Access application logs for behavior analysis
+- `logs_search` - Access application logs for behavior analysis
 
 #### Performance & Tracing
 - `spotlight.traces.search` - List recent traces with performance summaries

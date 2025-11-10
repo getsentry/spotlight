@@ -147,7 +147,7 @@ errors_search({ filters: { limit: 10, offset: 0 } })
   );
 
   mcp.registerTool(
-    "spotlight.logs.search",
+    "logs_search",
     {
       title: "Search Application Logs",
       description: `**Purpose:** Search for application logs to understand behavior, debug issues, and trace execution flow across your stack.
@@ -169,17 +169,17 @@ errors_search({ filters: { limit: 10, offset: 0 } })
 **Example calls:**
 \`\`\`json
 // Example 1: Check last 5 minutes of logs
-spotlight.logs.search({ filters: { timeWindow: 300 } })
+logs_search({ filters: { timeWindow: 300 } })
 
 // Example 2: Find logs from specific file
-spotlight.logs.search({ filters: { filename: "auth.ts" } })
+logs_search({ filters: { filename: "auth.ts" } })
 
 // Example 3: Get recent 20 log entries
-spotlight.logs.search({ filters: { limit: 20, offset: 0 } })
+logs_search({ filters: { limit: 20, offset: 0 } })
 \`\`\`
 
 ## Workflow Pattern:
-1. User reports behavior question → **Call spotlight.logs.search** 
+1. User reports behavior question → **Call logs_search** 
 2. User tests new feature → **Check logs for expected output**
 3. Performance concerns → **Look for timing patterns in logs**
 4. Debugging complex flows → **Trace execution through log timeline**
