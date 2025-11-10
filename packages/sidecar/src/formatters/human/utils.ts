@@ -8,6 +8,21 @@ export type SourceType = (typeof SOURCE_TYPES)[number];
 export const LOG_LEVELS = ["error", "warning", "log", "info", "trace", "debug"] as const;
 export type LogLevel = (typeof LOG_LEVELS)[number];
 
+export const SOURCE_COLORS: Record<SourceType, (text: string) => string> = {
+  browser: chalk.yellow,
+  mobile: chalk.blue,
+  server: chalk.magenta,
+};
+
+export const LOG_LEVEL_COLORS: Record<LogLevel, (text: string) => string> = {
+  error: chalk.red.bold,
+  warning: chalk.hex("#FFA500"), // Orange
+  log: chalk.white,
+  info: chalk.cyan,
+  trace: chalk.green,
+  debug: chalk.dim,
+};
+
 /**
  * Helper to detect if a User-Agent string is from a browser
  */
@@ -160,43 +175,19 @@ export function colorizeTime(time: string): string {
  */
 export function colorizeSource(source: string): string {
   const bracketed = `[${source}]`;
-
-  switch (source) {
-    case "browser":
-      return chalk.yellow(padLabel(bracketed, SOURCE_WIDTH));
-    case "mobile":
-      return chalk.blue(padLabel(bracketed, SOURCE_WIDTH));
-    case "server":
-      return chalk.magenta(padLabel(bracketed, SOURCE_WIDTH));
-    default:
-      return chalk.white(padLabel(bracketed, SOURCE_WIDTH));
-  }
+  const padded = padLabel(bracketed, SOURCE_WIDTH);
+  const colorFn = SOURCE_COLORS[source as SourceType] || chalk.white;
+  return colorFn(padded);
 }
 
 /**
  * Colorize event type
  */
 export function colorizeType(type: string): string {
-  const uppercaseType = type.toUpperCase();
-  const bracketed = `[${uppercaseType}]`;
-  const paddedType = padLabel(bracketed, TYPE_WIDTH);
-
-  switch (type.toLowerCase()) {
-    case "error":
-      return chalk.red.bold(paddedType);
-    case "warning":
-      return chalk.hex("#FFA500")(paddedType); // Orange
-    case "log":
-      return chalk.white(paddedType);
-    case "info":
-      return chalk.cyan(paddedType);
-    case "trace":
-      return chalk.green(paddedType);
-    case "debug":
-      return chalk.dim(paddedType);
-    default:
-      return chalk.white(paddedType);
-  }
+  const bracketed = `[${type.toUpperCase()}]`;
+  const padded = padLabel(bracketed, TYPE_WIDTH);
+  const colorFn = LOG_LEVEL_COLORS[type.toLowerCase() as LogLevel] || chalk.white;
+  return colorFn(padded);
 }
 
 /**
@@ -212,5 +203,5 @@ export function formatLogLine(
   const coloredSource = colorizeSource(source);
   const coloredType = colorizeType(type);
 
-  return `${time} ${coloredSource} ${coloredType} ${message}`;
+  return `${time} ${coloredType} ${coloredSource} ${message}`;
 }
