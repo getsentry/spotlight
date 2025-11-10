@@ -126,7 +126,7 @@ export type SentryFormattedMessage =
 
 export type SentryErrorEvent = CommonEventAttrs & {
   type?: "error" | "event" | "message" | "default";
-  exception: EventException;
+  exception?: EventException;
 };
 
 export type Span = {
