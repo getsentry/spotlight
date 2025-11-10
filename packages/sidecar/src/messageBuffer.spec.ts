@@ -1,5 +1,7 @@
+import { UUID } from "uuidv7";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MessageBuffer } from "./messageBuffer.js";
+import { EventContainer } from "./utils/eventContainer.js";
 
 describe("messageBuffer", () => {
   describe("ring buffer behavior", () => {
@@ -369,6 +371,184 @@ describe("messageBuffer", () => {
 
       const result = messageBuffer.read();
       expect(result).toEqual([0, undefined, null]);
+    });
+  });
+
+  describe("subscribe with lastEventId", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    // Helper function to create an EventContainer with a specific UUID
+    function createEventContainerWithId(uuid: UUID, eventData = { type: "event" }): EventContainer {
+      // Create a minimal valid Sentry envelope
+      const header = JSON.stringify({ event_id: "test", sent_at: new Date().toISOString() });
+      const itemHeader = JSON.stringify({ type: "event" });
+      const itemPayload = JSON.stringify(eventData);
+      const envelope = `${header}\n${itemHeader}\n${itemPayload}\n`;
+      const buffer = Buffer.from(envelope, "utf-8");
+
+      const container = new EventContainer("application/x-sentry-envelope", buffer);
+
+      // Force parsing to set the UUID
+      const parsed = container.getParsedEnvelope();
+      if (parsed?.envelope) {
+        // Override the auto-generated UUID with our test UUID
+        (parsed.envelope[0] as any).__spotlight_envelope_id = uuid;
+      }
+
+      return container;
+    }
+
+    it("should subscribe with lastEventId that exists in buffer", async () => {
+      const messageBuffer = new MessageBuffer<EventContainer>(5);
+      const callback = vi.fn();
+
+      // Create events with known UUIDs
+      const uuid1 = UUID.parse("01800000-0000-7000-8000-000000000001");
+      const uuid2 = UUID.parse("01800000-0000-7000-8000-000000000002");
+      const uuid3 = UUID.parse("01800000-0000-7000-8000-000000000003");
+      const uuid4 = UUID.parse("01800000-0000-7000-8000-000000000004");
+
+      const event1 = createEventContainerWithId(uuid1, { type: "event1" });
+      const event2 = createEventContainerWithId(uuid2, { type: "event2" });
+      const event3 = createEventContainerWithId(uuid3, { type: "event3" });
+      const event4 = createEventContainerWithId(uuid4, { type: "event4" });
+
+      messageBuffer.put(event1);
+      messageBuffer.put(event2);
+      messageBuffer.put(event3);
+      messageBuffer.put(event4);
+
+      // Subscribe starting from event2
+      messageBuffer.subscribe(callback, uuid2.toString());
+      await vi.runAllTimersAsync();
+
+      // Should receive event3 and event4 (after event2)
+      expect(callback).toHaveBeenCalledTimes(2);
+      expect(callback).toHaveBeenCalledWith(event3);
+      expect(callback).toHaveBeenCalledWith(event4);
+    });
+
+    it("should subscribe with lastEventId at buffer end", async () => {
+      const messageBuffer = new MessageBuffer<EventContainer>(5);
+      const callback = vi.fn();
+
+      const uuid1 = UUID.parse("01800000-0000-7000-8000-000000000001");
+      const uuid2 = UUID.parse("01800000-0000-7000-8000-000000000002");
+      const uuid3 = UUID.parse("01800000-0000-7000-8000-000000000003");
+
+      const event1 = createEventContainerWithId(uuid1);
+      const event2 = createEventContainerWithId(uuid2);
+      const event3 = createEventContainerWithId(uuid3);
+
+      messageBuffer.put(event1);
+      messageBuffer.put(event2);
+      messageBuffer.put(event3);
+
+      // Subscribe starting from the last event
+      messageBuffer.subscribe(callback, uuid3.toString());
+      await vi.runAllTimersAsync();
+
+      // Should receive nothing (already at the end)
+      expect(callback).not.toHaveBeenCalled();
+    });
+
+    it("should subscribe with lastEventId that was evicted from buffer", async () => {
+      const messageBuffer = new MessageBuffer<EventContainer>(3);
+      const callback = vi.fn();
+
+      const uuid1 = UUID.parse("01800000-0000-7000-8000-000000000001");
+      const uuid2 = UUID.parse("01800000-0000-7000-8000-000000000002");
+      const uuid3 = UUID.parse("01800000-0000-7000-8000-000000000003");
+      const uuid4 = UUID.parse("01800000-0000-7000-8000-000000000004");
+      const uuid5 = UUID.parse("01800000-0000-7000-8000-000000000005");
+
+      const event1 = createEventContainerWithId(uuid1);
+      const event2 = createEventContainerWithId(uuid2);
+      const event3 = createEventContainerWithId(uuid3);
+      const event4 = createEventContainerWithId(uuid4);
+      const event5 = createEventContainerWithId(uuid5);
+
+      messageBuffer.put(event1);
+      messageBuffer.put(event2);
+      messageBuffer.put(event3);
+
+      // Buffer now contains [event1, event2, event3]
+      // Add more events to evict event1 and event2
+      messageBuffer.put(event4);
+      messageBuffer.put(event5);
+
+      // Buffer now contains [event3, event4, event5]
+      // Try to subscribe from event1 (which was evicted)
+      messageBuffer.subscribe(callback, uuid1.toString());
+      await vi.runAllTimersAsync();
+
+      // Should fallback to head and receive all current events
+      expect(callback).toHaveBeenCalledTimes(3);
+      expect(callback).toHaveBeenCalledWith(event3);
+      expect(callback).toHaveBeenCalledWith(event4);
+      expect(callback).toHaveBeenCalledWith(event5);
+    });
+
+    it("should subscribe with invalid lastEventId", async () => {
+      const messageBuffer = new MessageBuffer<EventContainer>(5);
+      const callback = vi.fn();
+
+      const uuid1 = UUID.parse("01800000-0000-7000-8000-000000000001");
+      const uuid2 = UUID.parse("01800000-0000-7000-8000-000000000002");
+
+      const event1 = createEventContainerWithId(uuid1);
+      const event2 = createEventContainerWithId(uuid2);
+
+      messageBuffer.put(event1);
+      messageBuffer.put(event2);
+
+      // Subscribe with invalid UUID format
+      messageBuffer.subscribe(callback, "not-a-valid-uuid");
+      await vi.runAllTimersAsync();
+
+      // Should fallback to head and receive all events
+      expect(callback).toHaveBeenCalledTimes(2);
+      expect(callback).toHaveBeenCalledWith(event1);
+      expect(callback).toHaveBeenCalledWith(event2);
+    });
+
+    it("should handle multiple subscribers with different lastEventIds", async () => {
+      const messageBuffer = new MessageBuffer<EventContainer>(5);
+      const callback1 = vi.fn();
+      const callback2 = vi.fn();
+      const callback3 = vi.fn();
+
+      const uuid1 = UUID.parse("01800000-0000-7000-8000-000000000001");
+      const uuid2 = UUID.parse("01800000-0000-7000-8000-000000000002");
+      const uuid3 = UUID.parse("01800000-0000-7000-8000-000000000003");
+      const uuid4 = UUID.parse("01800000-0000-7000-8000-000000000004");
+
+      const event1 = createEventContainerWithId(uuid1);
+      const event2 = createEventContainerWithId(uuid2);
+      const event3 = createEventContainerWithId(uuid3);
+      const event4 = createEventContainerWithId(uuid4);
+
+      messageBuffer.put(event1);
+      messageBuffer.put(event2);
+      messageBuffer.put(event3);
+      messageBuffer.put(event4);
+
+      // Subscribe from different positions
+      messageBuffer.subscribe(callback1, uuid1.toString()); // Should get 2, 3, 4
+      messageBuffer.subscribe(callback2, uuid2.toString()); // Should get 3, 4
+      messageBuffer.subscribe(callback3, uuid3.toString()); // Should get 4
+
+      await vi.runAllTimersAsync();
+
+      expect(callback1).toHaveBeenCalledTimes(3);
+      expect(callback2).toHaveBeenCalledTimes(2);
+      expect(callback3).toHaveBeenCalledTimes(1);
     });
   });
 });
