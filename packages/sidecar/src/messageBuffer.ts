@@ -23,7 +23,15 @@ export class MessageBuffer<T> {
   private binarySearchEventId(targetId: string): number {
     let left = this.head;
     let right = this.writePos - 1;
-    const targetUuid = UUID.parse(targetId);
+
+    // Parse and validate the target UUID
+    let targetUuid: UUID;
+    try {
+      targetUuid = UUID.parse(targetId);
+    } catch {
+      // Invalid UUID format, cannot find
+      return -1;
+    }
 
     while (left <= right) {
       const mid = Math.floor((left + right) / 2);
