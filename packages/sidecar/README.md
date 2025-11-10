@@ -60,7 +60,7 @@ Spotlight Sidecar includes MCP tools for accessing local debugging data through 
 
 #### Performance & Tracing
 - `traces_search` - List recent traces with performance summaries
-- `spotlight.traces.get` - Get detailed span tree and timing for specific traces
+- `traces_get` - Get detailed span tree and timing for specific traces
 
 ### Trace Viewing Workflow
 
@@ -76,7 +76,7 @@ Spotlight Sidecar includes MCP tools for accessing local debugging data through 
 
 2. **Examine Specific Trace**
    ```
-   Use spotlight.traces.get with a trace ID:
+   Use traces_get with a trace ID:
    - Complete hierarchical span tree
    - Individual span durations and operations
    - Error context within trace timeline
@@ -101,5 +101,5 @@ spotlight-sidecar --debug
 traces_search({ filters: { timeWindow: 300 } })
 
 # 2. Get details for a specific trace
-spotlight.traces.get({ traceId: "71a8c5e4" })
+traces_get({ traceId: "71a8c5e4" })
 ```

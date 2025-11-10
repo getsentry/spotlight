@@ -14,7 +14,7 @@ Spotlight provides four MCP tools that allow AI coding assistants to query your 
 | `errors_search` | Find runtime errors | Errors with stack traces |
 | `logs_search` | Query application logs | Log entries with context |
 | `traces_search` | List performance traces | Trace summaries |
-| `spotlight.traces.get` | Get trace details | Full span tree and timing |
+| `traces_get` | Get trace details | Full span tree and timing |
 
 ## Common Filter Parameters
 
@@ -366,7 +366,7 @@ Each trace summary includes:
 
 ### Next Step
 
-After finding a trace of interest, use `spotlight.traces.get` with the trace ID to see detailed timing breakdown.
+After finding a trace of interest, use `traces_get` with the trace ID to see detailed timing breakdown.
 
 ### Example AI Prompts
 
@@ -377,7 +377,7 @@ After finding a trace of interest, use `spotlight.traces.get` with the trace ID 
 
 ---
 
-## spotlight.traces.get
+## traces_get
 
 Get complete span tree and timing breakdown for a specific trace.
 
@@ -465,14 +465,14 @@ Transaction: GET /api/users/123 (245ms)
 ### Error Investigation
 
 1. **Search for errors**: `errors_search`
-2. **If error mentions a trace**: Get trace details with `spotlight.traces.get`
+2. **If error mentions a trace**: Get trace details with `traces_get`
 3. **Check related logs**: `logs_search` with filename from error
 
 ### Performance Analysis
 
 1. **List recent traces**: `traces_search`
 2. **Identify slow traces**: Look at duration in summary
-3. **Deep dive**: `spotlight.traces.get` with trace ID
+3. **Deep dive**: `traces_get` with trace ID
 4. **Check logs**: `logs_search` for timing details
 
 ### Understanding Application Behavior
@@ -507,8 +507,8 @@ Choose the most specific filter for your use case.
 ### Following Trace IDs
 
 Traces often reference related data:
-1. Errors include trace IDs → use `spotlight.traces.get`
-2. Logs include trace IDs → use `spotlight.traces.get`
+1. Errors include trace IDs → use `traces_get`
+2. Logs include trace IDs → use `traces_get`
 3. Trace spans reference files → use `logs_search` or `errors_search` with filename
 
 ## Next Steps

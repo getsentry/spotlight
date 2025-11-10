@@ -287,7 +287,7 @@ traces_search({ filters: { filename: "api.ts" } })
 - "Request flows" → See transaction patterns
 - "Distributed tracing" → View trace summaries
 
-**Next step:** Use spotlight.traces.get with a trace ID to see detailed span breakdown`,
+**Next step:** Use traces_get with a trace ID to see detailed span breakdown`,
       inputSchema,
     },
     async args => {
@@ -341,7 +341,7 @@ traces_search({ filters: { filename: "api.ts" } })
 
       content.push({
         type: "text",
-        text: "\n**Next Steps:**\nUse `spotlight.traces.get` with a trace ID (e.g., first 8 characters shown above) to see the full span tree and detailed timing breakdown for any specific trace.",
+        text: "\n**Next Steps:**\nUse `traces_get` with a trace ID (e.g., first 8 characters shown above) to see the full span tree and detailed timing breakdown for any specific trace.",
       });
 
       return { content };
@@ -349,7 +349,7 @@ traces_search({ filters: { filename: "api.ts" } })
   );
 
   mcp.registerTool(
-    "spotlight.traces.get",
+    "traces_get",
     {
       title: "Get Trace Details",
       description: `**Purpose:** Get the complete span tree and timing breakdown for a specific trace ID to analyze performance bottlenecks.
@@ -375,10 +375,10 @@ traces_search({ filters: { filename: "api.ts" } })
 **Example calls:**
 \`\`\`json
 // Example 1: Get trace using short ID (first 8 chars)
-spotlight.traces.get({ traceId: "71a8c5e4" })
+traces_get({ traceId: "71a8c5e4" })
 
 // Example 2: Get trace using full 32-char ID
-spotlight.traces.get({ traceId: "71a8c5e41ae1044dee67f50a07538fe7" })
+traces_get({ traceId: "71a8c5e41ae1044dee67f50a07538fe7" })
 \`\`\`
 
 **Parameter hints:**
