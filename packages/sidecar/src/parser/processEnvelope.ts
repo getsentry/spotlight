@@ -5,7 +5,7 @@ import { logger } from "../logger.js";
 import type { RawEventContext } from "./types.js";
 
 export type ParsedEnvelope = {
-  envelope: Envelope;
+  envelope: [Envelope[0] & { __spotlight_envelope_id: string }, Envelope[1]];
   rawEnvelope: RawEventContext;
 };
 
@@ -86,7 +86,7 @@ export function processEnvelope(rawEvent: RawEventContext): ParsedEnvelope | nul
   }
 
   return {
-    envelope: [envelopeHeader, items] as Envelope,
+    envelope: [envelopeHeader, items] as ParsedEnvelope["envelope"],
     rawEnvelope: rawEvent,
   };
 }

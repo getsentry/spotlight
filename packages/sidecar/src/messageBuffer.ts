@@ -48,7 +48,7 @@ export class MessageBuffer<T> {
     if (item instanceof EventContainer) {
       const envelope = item.getParsedEnvelope();
       if (envelope?.envelope) {
-        const spotlightEnvelopeId = String(envelope.envelope[0].__spotlight_envelope_id);
+        const spotlightEnvelopeId = envelope.envelope[0].__spotlight_envelope_id;
         const events = envelope.envelope[1] ?? [];
 
         for (const event of events) {
@@ -63,9 +63,9 @@ export class MessageBuffer<T> {
                   if (filename) {
                     const envelopeIds = this.filenameCache.get(filename);
                     if (envelopeIds) {
-                      envelopeIds.add(String(spotlightEnvelopeId));
+                      envelopeIds.add(spotlightEnvelopeId);
                     } else {
-                      this.filenameCache.set(filename, new Set([String(spotlightEnvelopeId)]));
+                      this.filenameCache.set(filename, new Set([spotlightEnvelopeId]));
                     }
                   }
                 }
