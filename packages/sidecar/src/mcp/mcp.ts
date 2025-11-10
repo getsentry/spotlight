@@ -70,7 +70,7 @@ export function createMCPInstance() {
   );
 
   mcp.registerTool(
-    "errors_search",
+    "search_errors",
     {
       title: "Search Application Errors",
       description: `**Purpose:** Search for runtime errors, exceptions, and crashes captured by Spotlight across your entire application stack.
@@ -96,13 +96,13 @@ export function createMCPInstance() {
 **Example calls:**
 \`\`\`json
 // Example 1: Check last minute for any errors
-errors_search({ filters: { timeWindow: 60 } })
+search_errors({ filters: { timeWindow: 60 } })
 
 // Example 2: Find errors in specific file
-errors_search({ filters: { filename: "auth.tsx" } })
+search_errors({ filters: { filename: "auth.tsx" } })
 
 // Example 3: Get last 10 errors with pagination
-errors_search({ filters: { limit: 10, offset: 0 } })
+search_errors({ filters: { limit: 10, offset: 0 } })
 \`\`\`
 
 **Parameter hints:**
@@ -147,12 +147,12 @@ errors_search({ filters: { limit: 10, offset: 0 } })
   );
 
   mcp.registerTool(
-    "logs_search",
+    "search_logs",
     {
       title: "Search Application Logs",
       description: `**Purpose:** Search for application logs to understand behavior, debug issues, and trace execution flow across your stack.
 
-**NOT for:** Error diagnostics (use errors_search for exceptions/crashes). This tool is for info, warn, debug, and trace messages.
+**NOT for:** Error diagnostics (use search_errors for exceptions/crashes). This tool is for info, warn, debug, and trace messages.
 
 **Returns:**
 • Timestamped log entries with severity levels (info, warn, debug)
@@ -169,21 +169,21 @@ errors_search({ filters: { limit: 10, offset: 0 } })
 **Example calls:**
 \`\`\`json
 // Example 1: Check last 5 minutes of logs
-logs_search({ filters: { timeWindow: 300 } })
+search_logs({ filters: { timeWindow: 300 } })
 
 // Example 2: Find logs from specific file
-logs_search({ filters: { filename: "auth.ts" } })
+search_logs({ filters: { filename: "auth.ts" } })
 
 // Example 3: Get recent 20 log entries
-logs_search({ filters: { limit: 20, offset: 0 } })
+search_logs({ filters: { limit: 20, offset: 0 } })
 \`\`\`
 
 ## Workflow Pattern:
-1. User reports behavior question → **Call logs_search** 
+1. User reports behavior question → **Call search_logs** 
 2. User tests new feature → **Check logs for expected output**
 3. Performance concerns → **Look for timing patterns in logs**
 4. Debugging complex flows → **Trace execution through log timeline**
-5. **Use with errors_search** for complete debugging picture
+5. **Use with search_errors** for complete debugging picture
 
 **Key trigger phrases:**
 - "How does X work?" → See runtime execution flow
@@ -196,7 +196,7 @@ logs_search({ filters: { limit: 20, offset: 0 } })
 - **INFO**: General application flow and significant events
 - **WARN**: Potential issues that don't break functionality  
 - **DEBUG**: Detailed execution information for troubleshooting
-- **ERROR**: Actual failures (also available via errors_search)
+- **ERROR**: Actual failures (also available via search_errors)
 
 **Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.
 
@@ -242,7 +242,7 @@ logs_search({ filters: { limit: 20, offset: 0 } })
   );
 
   mcp.registerTool(
-    "traces_search",
+    "search_traces",
     {
       title: "Search Performance Traces",
       description: `**Purpose:** Search for performance traces to identify slow requests, bottlenecks, and transaction patterns across your application.
@@ -268,13 +268,13 @@ logs_search({ filters: { limit: 20, offset: 0 } })
 **Example calls:**
 \`\`\`json
 // Example 1: Get traces from last 5 minutes
-traces_search({ filters: { timeWindow: 300 } })
+search_traces({ filters: { timeWindow: 300 } })
 
 // Example 2: Get 10 most recent traces
-traces_search({ filters: { limit: 10, offset: 0 } })
+search_traces({ filters: { limit: 10, offset: 0 } })
 
 // Example 3: Find traces involving specific file
-traces_search({ filters: { filename: "api.ts" } })
+search_traces({ filters: { filename: "api.ts" } })
 \`\`\`
 
 **Parameter hints:**
@@ -287,7 +287,7 @@ traces_search({ filters: { filename: "api.ts" } })
 - "Request flows" → See transaction patterns
 - "Distributed tracing" → View trace summaries
 
-**Next step:** Use traces_get with a trace ID to see detailed span breakdown`,
+**Next step:** Use get_traces with a trace ID to see detailed span breakdown`,
       inputSchema,
     },
     async args => {
@@ -341,7 +341,7 @@ traces_search({ filters: { filename: "api.ts" } })
 
       content.push({
         type: "text",
-        text: "\n**Next Steps:**\nUse `traces_get` with a trace ID (e.g., first 8 characters shown above) to see the full span tree and detailed timing breakdown for any specific trace.",
+        text: "\n**Next Steps:**\nUse `get_traces` with a trace ID (e.g., first 8 characters shown above) to see the full span tree and detailed timing breakdown for any specific trace.",
       });
 
       return { content };
@@ -349,13 +349,13 @@ traces_search({ filters: { filename: "api.ts" } })
   );
 
   mcp.registerTool(
-    "traces_get",
+    "get_traces",
     {
       title: "Get Trace Details",
       description: `**Purpose:** Get the complete span tree and timing breakdown for a specific trace ID to analyze performance bottlenecks.
 
 **USE THIS TOOL WHEN:**
-- User provides a specific trace ID from \`traces_search\`
+- User provides a specific trace ID from \`search_traces\`
 - Want to see detailed span hierarchy and timing for a trace
 - Investigating performance bottlenecks within a specific request flow
 - Need to understand the complete execution path of a transaction
@@ -367,7 +367,7 @@ traces_search({ filters: { filename: "api.ts" } })
 • Error details if spans failed
 
 **When to use:**
-- After finding a trace ID with traces_search
+- After finding a trace ID with search_traces
 - Investigating specific slow request or transaction
 - Understanding detailed execution flow
 - Finding performance bottlenecks in a trace
@@ -375,14 +375,14 @@ traces_search({ filters: { filename: "api.ts" } })
 **Example calls:**
 \`\`\`json
 // Example 1: Get trace using short ID (first 8 chars)
-traces_get({ traceId: "71a8c5e4" })
+get_traces({ traceId: "71a8c5e4" })
 
 // Example 2: Get trace using full 32-char ID
-traces_get({ traceId: "71a8c5e41ae1044dee67f50a07538fe7" })
+get_traces({ traceId: "71a8c5e41ae1044dee67f50a07538fe7" })
 \`\`\`
 
 **Parameter hints:**
-• traceId: Trace identifier from traces_search
+• traceId: Trace identifier from search_traces
   - Can use first 8 characters (e.g., "71a8c5e4")
   - Or full 32-character hex string
   - Case-insensitive`,
@@ -417,7 +417,7 @@ traces_get({ traceId: "71a8c5e41ae1044dee67f50a07538fe7" })
           content: [
             {
               type: "text",
-              text: `Trace \`${args.traceId}\` not found. Use \`traces_search\` to see available traces, or try expanding the time window if the trace is older.`,
+              text: `Trace \`${args.traceId}\` not found. Use \`search_traces\` to see available traces, or try expanding the time window if the trace is older.`,
             },
           ],
         };

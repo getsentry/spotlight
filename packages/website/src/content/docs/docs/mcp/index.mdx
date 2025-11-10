@@ -134,7 +134,7 @@ Now your AI assistant has access to Spotlight tools! Try asking:
 
 The MCP server provides four powerful tools:
 
-### `errors_search`
+### `search_errors`
 
 Search for application errors with stack traces and context.
 
@@ -145,7 +145,7 @@ Search for application errors with stack traces and context.
 
 [See detailed documentation →](/docs/mcp/tools/#spotlight-errors-search)
 
-### `logs_search`
+### `search_logs`
 
 Query application logs to understand behavior and flow.
 
@@ -156,7 +156,7 @@ Query application logs to understand behavior and flow.
 
 [See detailed documentation →](/docs/mcp/tools/#spotlight-logs-search)
 
-### `traces_search`
+### `search_traces`
 
 List recent performance traces with summary information.
 
@@ -167,7 +167,7 @@ List recent performance traces with summary information.
 
 [See detailed documentation →](/docs/mcp/tools/#spotlight-traces-search)
 
-### `traces_get`
+### `get_traces`
 
 Get detailed span tree and timing for a specific trace.
 
@@ -294,7 +294,7 @@ Here's a typical debugging session with Spotlight MCP:
    You: "Are there any errors in my app?"
    
    AI: I'll check Spotlight for errors...
-   [Calls errors_search]
+   [Calls search_errors]
    
    AI: "Yes, there's a TypeError in auth.js at line 42:
         Cannot read property 'id' of undefined
@@ -307,7 +307,7 @@ Here's a typical debugging session with Spotlight MCP:
    ```
    You: "Show me the full trace for this request"
    
-   AI: [Calls traces_search and traces_get]
+   AI: [Calls search_traces and get_traces]
    
    AI: "Here's the trace:
         - Total duration: 245ms

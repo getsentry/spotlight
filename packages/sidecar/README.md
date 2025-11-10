@@ -55,18 +55,18 @@ Spotlight Sidecar includes MCP tools for accessing local debugging data through 
 ### Available Tools
 
 #### Error Debugging
-- `errors_search` - Retrieve recent application errors with stack traces
-- `logs_search` - Access application logs for behavior analysis
+- `search_errors` - Retrieve recent application errors with stack traces
+- `search_logs` - Access application logs for behavior analysis
 
 #### Performance & Tracing
-- `traces_search` - List recent traces with performance summaries
-- `traces_get` - Get detailed span tree and timing for specific traces
+- `search_traces` - List recent traces with performance summaries
+- `get_traces` - Get detailed span tree and timing for specific traces
 
 ### Trace Viewing Workflow
 
 1. **List Recent Traces**
    ```
-   Use traces_search to see trace summaries:
+   Use search_traces to see trace summaries:
    - Trace IDs (first 8 characters shown)
    - Root transaction names  
    - Duration and span counts
@@ -76,7 +76,7 @@ Spotlight Sidecar includes MCP tools for accessing local debugging data through 
 
 2. **Examine Specific Trace**
    ```
-   Use traces_get with a trace ID:
+   Use get_traces with a trace ID:
    - Complete hierarchical span tree
    - Individual span durations and operations
    - Error context within trace timeline
@@ -98,8 +98,8 @@ spotlight-sidecar --debug
 
 # In Claude Code or MCP client:
 # 1. List recent traces
-traces_search({ filters: { timeWindow: 300 } })
+search_traces({ filters: { timeWindow: 300 } })
 
 # 2. Get details for a specific trace
-traces_get({ traceId: "71a8c5e4" })
+get_traces({ traceId: "71a8c5e4" })
 ```
