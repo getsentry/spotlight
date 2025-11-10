@@ -144,8 +144,24 @@ export function inferEnvelopeSource(envelopeHeader: Envelope[0], event?: any): S
 /**
  * Format timestamp as local time HH:MM:SS
  */
-export function formatLocalTime(timestamp?: number): string {
-  const date = timestamp ? new Date(timestamp * 1000) : new Date();
+export function formatLocalTime(timestamp?: number | string): string {
+  let date: Date;
+
+  if (!timestamp) {
+    date = new Date();
+  } else if (typeof timestamp === "string") {
+    // Handle ISO string format (e.g., "2023-11-22T16:23:50.406684Z")
+    date = new Date(timestamp);
+  } else {
+    // Handle Unix timestamp
+    date = new Date(timestamp * 1000);
+  }
+
+  if (Number.isNaN(date.getTime())) {
+    // placeholder with same width as valid timestamp for alignment in the logs
+    return "??:??:??";
+  }
+
   const hours = date.getHours().toString().padStart(2, "0");
   const minutes = date.getMinutes().toString().padStart(2, "0");
   const seconds = date.getSeconds().toString().padStart(2, "0");
