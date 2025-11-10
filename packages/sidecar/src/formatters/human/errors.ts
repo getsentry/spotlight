@@ -22,13 +22,13 @@ export function formatError(event: SentryErrorEvent, envelopeHeader: Envelope[0]
         const location = frame.colno
           ? `${frame.filename}:${frame.lineno}:${frame.colno}`
           : `${frame.filename}:${frame.lineno}`;
-        message += ` at ${location}`;
+        message += ` [${location}]`;
       } else if (frame.filename) {
-        message += ` in ${frame.filename}`;
+        message += ` [${frame.filename}]`;
       }
 
       if (frame.function && !message.includes(frame.function)) {
-        message += ` (${frame.function})`;
+        message += ` [${frame.function}]`;
       }
     }
   }

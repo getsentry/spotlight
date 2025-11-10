@@ -21,12 +21,12 @@ export function formatTrace(event: SentryTransactionEvent, envelopeHeader: Envel
 
   const duration = getDuration(event.timestamp, event.start_timestamp);
   if (duration !== undefined) {
-    message += ` ${Math.round(duration)}ms`;
+    message += ` [${Math.round(duration)}ms]`;
   }
 
   const status = trace?.status;
   if (status && status !== "ok") {
-    message += ` (${status})`;
+    message += ` [${status}]`;
   }
 
   const spanCount = event.spans?.length;

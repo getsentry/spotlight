@@ -2,6 +2,27 @@ import type { Envelope } from "@sentry/core";
 import chalk from "chalk";
 import { parseBrowserFromUserAgent } from "~/routes/stream/userAgent.js";
 
+export const SOURCE_TYPES = ["browser", "mobile", "server"] as const;
+export type SourceType = (typeof SOURCE_TYPES)[number];
+
+export const LOG_LEVELS = ["error", "warning", "log", "info", "trace", "debug"] as const;
+export type LogLevel = (typeof LOG_LEVELS)[number];
+
+export const SOURCE_COLORS: Record<SourceType, (text: string) => string> = {
+  browser: chalk.yellow,
+  mobile: chalk.blue,
+  server: chalk.magenta,
+};
+
+export const LOG_LEVEL_COLORS: Record<LogLevel, (text: string) => string> = {
+  error: chalk.red.bold,
+  warning: chalk.hex("#FFA500"), // Orange
+  log: chalk.white,
+  info: chalk.cyan,
+  trace: chalk.green,
+  debug: chalk.dim,
+};
+
 /**
  * Helper to detect if a User-Agent string is from a browser
  */
@@ -22,7 +43,7 @@ function isBrowserUserAgent(userAgent: string): boolean {
  *
  * Rules based on https://release-registry.services.sentry.io/sdks
  */
-export function inferEnvelopeSource(envelopeHeader: Envelope[0], event?: any): "browser" | "mobile" | "server" {
+export function inferEnvelopeSource(envelopeHeader: Envelope[0], event?: any): SourceType {
   const sdkName = envelopeHeader?.sdk?.name || "";
 
   // 1. Mobile check (unchanged - already reliable from SDK name)
@@ -154,9 +175,9 @@ export function padLabel(label: string, width: number): string {
   return label.padEnd(width);
 }
 
-// Constants for consistent padding
-export const SOURCE_WIDTH = 7; // "browser" is the longest
-export const TYPE_WIDTH = 7; // "warning" is the longest
+// Constants for consistent padding (adding brackets)
+export const SOURCE_WIDTH = Math.max(...SOURCE_TYPES.map(s => `[${s.toUpperCase()}]`.length));
+export const TYPE_WIDTH = Math.max(...LOG_LEVELS.map(l => `[${l.toUpperCase()}]`.length));
 
 /**
  * Colorize time with dim gray
@@ -169,48 +190,28 @@ export function colorizeTime(time: string): string {
  * Colorize source based on envelope source
  */
 export function colorizeSource(source: string): string {
-  switch (source) {
-    case "browser":
-      return chalk.yellow(padLabel(source, SOURCE_WIDTH));
-    case "mobile":
-      return chalk.blue(padLabel(source, SOURCE_WIDTH));
-    case "server":
-      return chalk.magenta(padLabel(source, SOURCE_WIDTH));
-    default:
-      return chalk.white(padLabel(source, SOURCE_WIDTH));
-  }
+  const bracketed = `[${source}]`;
+  const padded = padLabel(bracketed, SOURCE_WIDTH);
+  const colorFn = SOURCE_COLORS[source as SourceType] || chalk.white;
+  return colorFn(padded);
 }
 
 /**
  * Colorize event type
  */
 export function colorizeType(type: string): string {
-  const paddedType = padLabel(type.toLowerCase(), TYPE_WIDTH);
-
-  switch (type.toLowerCase()) {
-    case "error":
-      return chalk.red.bold(paddedType);
-    case "warning":
-      return chalk.hex("#FFA500")(paddedType); // Orange
-    case "log":
-      return chalk.white(paddedType);
-    case "info":
-      return chalk.cyan(paddedType);
-    case "trace":
-      return chalk.green(paddedType);
-    case "debug":
-      return chalk.dim(paddedType);
-    default:
-      return chalk.white(paddedType);
-  }
+  const bracketed = `[${type.toUpperCase()}]`;
+  const padded = padLabel(bracketed, TYPE_WIDTH);
+  const colorFn = LOG_LEVEL_COLORS[type.toLowerCase() as LogLevel] || chalk.white;
+  return colorFn(padded);
 }
 
 /**
  * Format a complete log line with proper alignment and colors
  */
 export function formatLogLine(
-  timestamp: number | string | undefined,
-  source: "browser" | "mobile" | "server",
+  timestamp: number | undefined,
+  source: SourceType,
   type: string,
   message: string,
 ): string {
@@ -218,5 +219,5 @@ export function formatLogLine(
   const coloredSource = colorizeSource(source);
   const coloredType = colorizeType(type);
 
-  return `${time} ${coloredSource} ${coloredType} ${message}`;
+  return `${time} ${coloredType} ${coloredSource} ${message}`;
 }
