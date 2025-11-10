@@ -59,14 +59,14 @@ Spotlight Sidecar includes MCP tools for accessing local debugging data through 
 - `logs_search` - Access application logs for behavior analysis
 
 #### Performance & Tracing
-- `spotlight.traces.search` - List recent traces with performance summaries
+- `traces_search` - List recent traces with performance summaries
 - `spotlight.traces.get` - Get detailed span tree and timing for specific traces
 
 ### Trace Viewing Workflow
 
 1. **List Recent Traces**
    ```
-   Use spotlight.traces.search to see trace summaries:
+   Use traces_search to see trace summaries:
    - Trace IDs (first 8 characters shown)
    - Root transaction names  
    - Duration and span counts
@@ -98,7 +98,7 @@ spotlight-sidecar --debug
 
 # In Claude Code or MCP client:
 # 1. List recent traces
-spotlight.traces.search({ filters: { timeWindow: 300 } })
+traces_search({ filters: { timeWindow: 300 } })
 
 # 2. Get details for a specific trace
 spotlight.traces.get({ traceId: "71a8c5e4" })

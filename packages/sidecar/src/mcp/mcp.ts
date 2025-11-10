@@ -242,7 +242,7 @@ logs_search({ filters: { limit: 20, offset: 0 } })
   );
 
   mcp.registerTool(
-    "spotlight.traces.search",
+    "traces_search",
     {
       title: "Search Performance Traces",
       description: `**Purpose:** Search for performance traces to identify slow requests, bottlenecks, and transaction patterns across your application.
@@ -268,13 +268,13 @@ logs_search({ filters: { limit: 20, offset: 0 } })
 **Example calls:**
 \`\`\`json
 // Example 1: Get traces from last 5 minutes
-spotlight.traces.search({ filters: { timeWindow: 300 } })
+traces_search({ filters: { timeWindow: 300 } })
 
 // Example 2: Get 10 most recent traces
-spotlight.traces.search({ filters: { limit: 10, offset: 0 } })
+traces_search({ filters: { limit: 10, offset: 0 } })
 
 // Example 3: Find traces involving specific file
-spotlight.traces.search({ filters: { filename: "api.ts" } })
+traces_search({ filters: { filename: "api.ts" } })
 \`\`\`
 
 **Parameter hints:**
@@ -355,7 +355,7 @@ spotlight.traces.search({ filters: { filename: "api.ts" } })
       description: `**Purpose:** Get the complete span tree and timing breakdown for a specific trace ID to analyze performance bottlenecks.
 
 **USE THIS TOOL WHEN:**
-- User provides a specific trace ID from \`spotlight.traces.search\`
+- User provides a specific trace ID from \`traces_search\`
 - Want to see detailed span hierarchy and timing for a trace
 - Investigating performance bottlenecks within a specific request flow
 - Need to understand the complete execution path of a transaction
@@ -367,7 +367,7 @@ spotlight.traces.search({ filters: { filename: "api.ts" } })
 • Error details if spans failed
 
 **When to use:**
-- After finding a trace ID with spotlight.traces.search
+- After finding a trace ID with traces_search
 - Investigating specific slow request or transaction
 - Understanding detailed execution flow
 - Finding performance bottlenecks in a trace
@@ -382,7 +382,7 @@ spotlight.traces.get({ traceId: "71a8c5e41ae1044dee67f50a07538fe7" })
 \`\`\`
 
 **Parameter hints:**
-• traceId: Trace identifier from spotlight.traces.search
+• traceId: Trace identifier from traces_search
   - Can use first 8 characters (e.g., "71a8c5e4")
   - Or full 32-character hex string
   - Case-insensitive`,
@@ -417,7 +417,7 @@ spotlight.traces.get({ traceId: "71a8c5e41ae1044dee67f50a07538fe7" })
           content: [
             {
               type: "text",
-              text: `Trace \`${args.traceId}\` not found. Use \`spotlight.traces.search\` to see available traces, or try expanding the time window if the trace is older.`,
+              text: `Trace \`${args.traceId}\` not found. Use \`traces_search\` to see available traces, or try expanding the time window if the trace is older.`,
             },
           ],
         };

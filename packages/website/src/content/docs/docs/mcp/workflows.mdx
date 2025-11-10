@@ -79,7 +79,7 @@ that you're trying to access the 'token' property on a null object.
 
 **AI action:**
 ```json
-spotlight.traces.search({
+traces_search({
   filters: { timeWindow: 60 }
 })
 ```
@@ -101,7 +101,7 @@ Then gets trace details with `spotlight.traces.get` if trace ID found.
 
 **AI action:**
 ```json
-spotlight.traces.search({
+traces_search({
   filters: { timeWindow: 300 }
 })
 ```
@@ -273,7 +273,7 @@ errors_search({
 
 **AI action:**
 ```json
-spotlight.traces.search({
+traces_search({
   filters: { timeWindow: 60 }
 })
 ```
@@ -414,7 +414,7 @@ The AI can use multiple tools together:
 You: "Debug the slow checkout process"
 
 AI workflow:
-1. spotlight.traces.search → Find checkout traces
+1. traces_search → Find checkout traces
 2. spotlight.traces.get → Analyze slow trace
 3. logs_search → Check related logs
 4. errors_search → Look for errors

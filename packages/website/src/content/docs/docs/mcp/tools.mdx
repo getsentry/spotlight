@@ -13,7 +13,7 @@ Spotlight provides four MCP tools that allow AI coding assistants to query your 
 |------|---------|---------|
 | `errors_search` | Find runtime errors | Errors with stack traces |
 | `logs_search` | Query application logs | Log entries with context |
-| `spotlight.traces.search` | List performance traces | Trace summaries |
+| `traces_search` | List performance traces | Trace summaries |
 | `spotlight.traces.get` | Get trace details | Full span tree and timing |
 
 ## Common Filter Parameters
@@ -279,7 +279,7 @@ Each log entry includes:
 
 ---
 
-## spotlight.traces.search
+## traces_search
 
 List recent performance traces with summary information.
 
@@ -394,7 +394,7 @@ Deep-dive into a specific trace to see:
 
 Use this after:
 
-- Finding a trace ID from `spotlight.traces.search`
+- Finding a trace ID from `traces_search`
 - Investigating a specific slow request or transaction
 - Understanding detailed execution flow
 - Finding performance bottlenecks in a trace
@@ -470,7 +470,7 @@ Transaction: GET /api/users/123 (245ms)
 
 ### Performance Analysis
 
-1. **List recent traces**: `spotlight.traces.search`
+1. **List recent traces**: `traces_search`
 2. **Identify slow traces**: Look at duration in summary
 3. **Deep dive**: `spotlight.traces.get` with trace ID
 4. **Check logs**: `logs_search` for timing details
@@ -479,7 +479,7 @@ Transaction: GET /api/users/123 (245ms)
 
 1. **Check logs**: `logs_search` for recent activity
 2. **Look for errors**: `errors_search` for issues
-3. **Examine traces**: `spotlight.traces.search` for request flow
+3. **Examine traces**: `traces_search` for request flow
 
 ## Best Practices
 
