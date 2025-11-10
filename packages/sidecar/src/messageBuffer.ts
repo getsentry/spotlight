@@ -32,6 +32,8 @@ export class MessageBuffer<T> {
       // Skip null items or non-EventContainer items
       if (item == null || !(item[1] instanceof EventContainer)) {
         // Linear scan nearby to handle gaps
+        let boundsAdjusted = false;
+
         // Check left side
         for (let i = mid - 1; i >= left; i--) {
           const leftItem = this.items[i % this.size];
@@ -49,31 +51,43 @@ export class MessageBuffer<T> {
               } else {
                 right = mid - 1;
               }
+              boundsAdjusted = true;
               break;
             }
           }
         }
+
         // Check right side if left didn't help
-        for (let i = mid + 1; i <= right; i++) {
-          const rightItem = this.items[i % this.size];
-          if (rightItem && rightItem[1] instanceof EventContainer) {
-            const envelope = rightItem[1].getParsedEnvelope();
-            if (envelope?.envelope) {
-              const envelopeId = envelope.envelope[0].__spotlight_envelope_id;
-              const isEqual = envelopeId.compareTo(targetUuid);
-              if (isEqual === 0) {
-                return i;
+        if (!boundsAdjusted) {
+          for (let i = mid + 1; i <= right; i++) {
+            const rightItem = this.items[i % this.size];
+            if (rightItem && rightItem[1] instanceof EventContainer) {
+              const envelope = rightItem[1].getParsedEnvelope();
+              if (envelope?.envelope) {
+                const envelopeId = envelope.envelope[0].__spotlight_envelope_id;
+                const isEqual = envelopeId.compareTo(targetUuid);
+                if (isEqual === 0) {
+                  return i;
+                }
+                // Adjust search bounds
+                if (isEqual < 0) {
+                  left = mid + 1;
+                } else {
+                  right = mid - 1;
+                }
+                boundsAdjusted = true;
+                break;
               }
-              // Adjust search bounds
-              if (isEqual < 0) {
-                left = mid + 1;
-              } else {
-                right = mid - 1;
-              }
-              break;
             }
           }
         }
+
+        // If both scans failed to find a valid item, skip past this gap
+        // to avoid infinite loop
+        if (!boundsAdjusted) {
+          left = mid + 1;
+        }
+
         continue;
       }
 
