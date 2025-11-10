@@ -1,5 +1,23 @@
 # @spotlightjs/sidecar
 
+## 2.5.0
+
+### Minor Changes
+
+- Docker compose support for Spotlight run command ([#1108](https://github.com/getsentry/spotlight/pull/1108))
+
+- Added support for Last-Event-Id in SSE stream ([#1104](https://github.com/getsentry/spotlight/pull/1104))
+
+- Change tool names: change `.` for `_` and remove `spotlight` preffix ([#1114](https://github.com/getsentry/spotlight/pull/1114))
+
+- Improved human formatter readability ([#1112](https://github.com/getsentry/spotlight/pull/1112))
+
+### Patch Changes
+
+- Fix breaking error when event type is not supported ([#1111](https://github.com/getsentry/spotlight/pull/1111))
+
+- Fix SDK categorization for Next.js by using User-Agent headers to distinguish browser from server events ([#1110](https://github.com/getsentry/spotlight/pull/1110))
+
 ## 2.4.1
 
 ### Patch Changes
