@@ -11,7 +11,7 @@ Spotlight provides four MCP tools that allow AI coding assistants to query your 
 
 | Tool | Purpose | Returns |
 |------|---------|---------|
-| `spotlight.errors.search` | Find runtime errors | Errors with stack traces |
+| `errors_search` | Find runtime errors | Errors with stack traces |
 | `spotlight.logs.search` | Query application logs | Log entries with context |
 | `spotlight.traces.search` | List performance traces | Trace summaries |
 | `spotlight.traces.get` | Get trace details | Full span tree and timing |
@@ -79,7 +79,7 @@ Paginate through results.
 
 ---
 
-## spotlight.errors.search
+## errors_search
 
 Search for runtime errors, exceptions, and crashes captured by Spotlight.
 
@@ -195,7 +195,7 @@ Best for:
 - Performance investigation and timing analysis
 
 :::note
-For error diagnostics with stack traces, use `spotlight.errors.search` instead.
+For error diagnostics with stack traces, use `errors_search` instead.
 :::
 
 ### Parameters
@@ -218,7 +218,7 @@ For error diagnostics with stack traces, use `spotlight.errors.search` instead.
 - **DEBUG**: Detailed execution information for troubleshooting
 
 :::note
-ERROR level logs are available, but `spotlight.errors.search` provides more detailed error context including stack traces.
+ERROR level logs are available, but `errors_search` provides more detailed error context including stack traces.
 :::
 
 ### Usage Examples
@@ -464,7 +464,7 @@ Transaction: GET /api/users/123 (245ms)
 
 ### Error Investigation
 
-1. **Search for errors**: `spotlight.errors.search`
+1. **Search for errors**: `errors_search`
 2. **If error mentions a trace**: Get trace details with `spotlight.traces.get`
 3. **Check related logs**: `spotlight.logs.search` with filename from error
 
@@ -478,7 +478,7 @@ Transaction: GET /api/users/123 (245ms)
 ### Understanding Application Behavior
 
 1. **Check logs**: `spotlight.logs.search` for recent activity
-2. **Look for errors**: `spotlight.errors.search` for issues
+2. **Look for errors**: `errors_search` for issues
 3. **Examine traces**: `spotlight.traces.search` for request flow
 
 ## Best Practices
@@ -509,7 +509,7 @@ Choose the most specific filter for your use case.
 Traces often reference related data:
 1. Errors include trace IDs → use `spotlight.traces.get`
 2. Logs include trace IDs → use `spotlight.traces.get`
-3. Trace spans reference files → use `spotlight.logs.search` or `spotlight.errors.search` with filename
+3. Trace spans reference files → use `spotlight.logs.search` or `errors_search` with filename
 
 ## Next Steps
 

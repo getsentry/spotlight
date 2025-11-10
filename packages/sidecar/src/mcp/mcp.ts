@@ -70,7 +70,7 @@ export function createMCPInstance() {
   );
 
   mcp.registerTool(
-    "spotlight.errors.search",
+    "errors_search",
     {
       title: "Search Application Errors",
       description: `**Purpose:** Search for runtime errors, exceptions, and crashes captured by Spotlight across your entire application stack.
@@ -96,13 +96,13 @@ export function createMCPInstance() {
 **Example calls:**
 \`\`\`json
 // Example 1: Check last minute for any errors
-spotlight.errors.search({ filters: { timeWindow: 60 } })
+errors_search({ filters: { timeWindow: 60 } })
 
 // Example 2: Find errors in specific file
-spotlight.errors.search({ filters: { filename: "auth.tsx" } })
+errors_search({ filters: { filename: "auth.tsx" } })
 
 // Example 3: Get last 10 errors with pagination
-spotlight.errors.search({ filters: { limit: 10, offset: 0 } })
+errors_search({ filters: { limit: 10, offset: 0 } })
 \`\`\`
 
 **Parameter hints:**
@@ -152,7 +152,7 @@ spotlight.errors.search({ filters: { limit: 10, offset: 0 } })
       title: "Search Application Logs",
       description: `**Purpose:** Search for application logs to understand behavior, debug issues, and trace execution flow across your stack.
 
-**NOT for:** Error diagnostics (use spotlight.errors.search for exceptions/crashes). This tool is for info, warn, debug, and trace messages.
+**NOT for:** Error diagnostics (use errors_search for exceptions/crashes). This tool is for info, warn, debug, and trace messages.
 
 **Returns:**
 • Timestamped log entries with severity levels (info, warn, debug)
@@ -183,7 +183,7 @@ spotlight.logs.search({ filters: { limit: 20, offset: 0 } })
 2. User tests new feature → **Check logs for expected output**
 3. Performance concerns → **Look for timing patterns in logs**
 4. Debugging complex flows → **Trace execution through log timeline**
-5. **Use with spotlight.errors.search** for complete debugging picture
+5. **Use with errors_search** for complete debugging picture
 
 **Key trigger phrases:**
 - "How does X work?" → See runtime execution flow
@@ -196,7 +196,7 @@ spotlight.logs.search({ filters: { limit: 20, offset: 0 } })
 - **INFO**: General application flow and significant events
 - **WARN**: Potential issues that don't break functionality  
 - **DEBUG**: Detailed execution information for troubleshooting
-- **ERROR**: Actual failures (also available via spotlight.errors.search)
+- **ERROR**: Actual failures (also available via errors_search)
 
 **Remember:** Logs show you what your application is actually doing, not just what the code says it should do. Use this for understanding real runtime behavior, performance patterns, and verifying that features work as intended.
 

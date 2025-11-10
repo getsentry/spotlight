@@ -17,7 +17,7 @@ The simplest way to start debugging with Spotlight MCP:
 ```
 
 **What the AI does:**
-1. Calls `spotlight.errors.search` with recent timeWindow
+1. Calls `errors_search` with recent timeWindow
 2. Analyzes any errors found
 3. Suggests fixes or asks for more context
 
@@ -38,7 +38,7 @@ This works because the AI assistant knows to check Spotlight first when you ment
 
 **AI action:**
 ```json
-spotlight.errors.search({
+errors_search({
   filters: { timeWindow: 300 }
 })
 ```
@@ -203,7 +203,7 @@ Everything looks normal. The operation took 180ms total.
 
 **AI action:**
 ```json
-spotlight.errors.search({
+errors_search({
   filters: { filename: "auth.tsx" }
 })
 ```
@@ -241,7 +241,7 @@ The AI can now correlate errors and logs from the same file to give you a comple
 
 **AI action:**
 ```json
-spotlight.errors.search({
+errors_search({
   filters: { timeWindow: 300 }
 })
 ```
@@ -417,7 +417,7 @@ AI workflow:
 1. spotlight.traces.search → Find checkout traces
 2. spotlight.traces.get → Analyze slow trace
 3. spotlight.logs.search → Check related logs
-4. spotlight.errors.search → Look for errors
+4. errors_search → Look for errors
 ```
 
 ### 4. Reproduce First
@@ -481,7 +481,7 @@ Here's a complete example:
 You: "My app crashed when I clicked submit. What happened?"
 
 AI: Let me check for errors...
-[Calls spotlight.errors.search]
+[Calls errors_search]
 
 AI: I found a TypeError in forms/SubmitButton.tsx at line 34:
      "Cannot read property 'validate' of undefined"

@@ -103,7 +103,7 @@ describe("mcp", () => {
         jsonrpc: "2.0",
         method: "tools/call",
         params: {
-          name: "spotlight.errors.search",
+          name: "errors_search",
           arguments: {
             filters: {
               timeWindow: 60,
@@ -155,7 +155,7 @@ describe("mcp", () => {
         jsonrpc: "2.0",
         method: "tools/call",
         params: {
-          name: "spotlight.errors.search",
+          name: "errors_search",
           arguments: {
             filters: {
               timeWindow: 60,
