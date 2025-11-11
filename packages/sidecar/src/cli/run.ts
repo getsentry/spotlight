@@ -23,11 +23,8 @@ const SPOTLIGHT_VERSION = process.env.npm_package_version || "unknown";
 function detectPackageJson(): { scriptName: string; scriptCommand: string } | null {
   try {
     const scripts = JSON.parse(readFileSync("./package.json", "utf-8")).scripts;
-    const scriptName = scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start;
-    if (scriptName) {
-      const detectedScript = ["dev", "develop", "serve", "start"].find(name => scripts[name]);
-      return { scriptName: detectedScript || "dev", scriptCommand: scriptName };
-    }
+    const scriptName = ["dev", "develop", "serve", "start"].find(name => scripts[name]) || "dev";
+    return { scriptName, scriptCommand: scripts[scriptName] };
   } catch {
     // pass
   }
