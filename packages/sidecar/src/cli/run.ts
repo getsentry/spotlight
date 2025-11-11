@@ -43,7 +43,7 @@ async function promptUserChoice(): Promise<"docker" | "package"> {
   return new Promise(resolve => {
     console.log("\n⚠️  Both Docker Compose and package.json detected!");
     console.log("\nWhich would you like to use?");
-    console.log("  1) Docker compose");
+    console.log("  1) docker compose");
     console.log("  2) package.json");
 
     rl.question("Enter your choice (1 or 2): ", answer => {
@@ -176,6 +176,11 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
 
     // If both Docker Compose and package.json are detected, ask the user which one to use
     if (dockerCompose && packageJson) {
+      if (!process.stdin.isTTY) {
+        logger.error("Both Docker Compose and package.json detected, but cannot prompt in non-interactive mode.");
+        logger.error("Please specify a command explicitly or run in an interactive terminal.");
+        process.exit(1);
+      }
       const choice = await promptUserChoice();
 
       if (choice === "docker") {
