@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
 import { logger } from "../logger.js";
 
@@ -6,14 +6,21 @@ const COMPOSE_FILE_BASE_NAMES = ["docker-compose", "compose"] as const;
 const COMPOSE_FILE_EXTENSIONS = [".yaml", ".yml"] as const;
 
 /**
- * Find a file by checking all combinations of base names and extensions
+ * Find a file by trying to read all combinations of base names and extensions.
+ * This saves an I/O operation by skipping existsSync and directly attempting to read.
  */
 function findFile(buildFileName: (baseName: string, ext: string) => string): string | null {
   for (const baseName of COMPOSE_FILE_BASE_NAMES) {
     for (const ext of COMPOSE_FILE_EXTENSIONS) {
       const fileName = buildFileName(baseName, ext);
-      if (existsSync(fileName)) {
+      try {
+        readFileSync(fileName);
         return fileName;
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+          continue;
+        }
+        logger.error(`Error checking file ${fileName}: ${error}`);
       }
     }
   }
