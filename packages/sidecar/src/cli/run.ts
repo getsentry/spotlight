@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import * as path from "node:path";
+import * as readline from "node:readline";
 import type { SerializedLog } from "@sentry/core";
 import { Searcher } from "fast-fuzzy";
 import { uuidv7 } from "uuidv7";
@@ -15,6 +16,48 @@ import { EventContainer, getBuffer } from "../utils/index.js";
 import tail, { type OnItemCallback } from "./tail.js";
 
 const SPOTLIGHT_VERSION = process.env.npm_package_version || "unknown";
+
+/**
+ * Detect if there's a package.json with runnable scripts
+ */
+function detectPackageJson(): { scriptName: string; scriptCommand: string } | null {
+  try {
+    const scripts = JSON.parse(readFileSync("./package.json", "utf-8")).scripts;
+    const scriptName = scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start;
+    if (scriptName) {
+      const detectedScript = ["dev", "develop", "serve", "start"].find(name => scripts[name]);
+      return { scriptName: detectedScript || "dev", scriptCommand: scriptName };
+    }
+  } catch {
+    // pass
+  }
+  return null;
+}
+
+/**
+ * Prompt the user to choose between Docker Compose and package.json
+ */
+async function promptUserChoice(): Promise<"docker" | "package"> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise(resolve => {
+    console.log("\n⚠️  Both Docker Compose and package.json detected!");
+    console.log("\nWhich would you like to use?");
+    console.log("  1) Docker compose");
+    console.log("  2) package.json");
+
+    rl.question("Enter your choice (1 or 2): ", answer => {
+      rl.close();
+      const choice = answer.trim();
+      const selected = choice === "2" ? "package" : "docker";
+      logger.info(`Selected: ${selected === "docker" ? "Docker compose" : "package.json"}`);
+      resolve(selected);
+    });
+  });
+}
 
 function createLogEnvelope(level: "info" | "error", body: string, timestamp: number): Buffer {
   const envelopeHeader = {
@@ -132,25 +175,37 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   };
   if (cmdArgs.length === 0) {
     const dockerCompose = detectDockerCompose();
-    // We check for docker-compose first: even if there is a package.json (for a JS project),
-    // if there's Docker configuration present, that's almost certainly the intended way to run the project
+    const packageJson = detectPackageJson();
 
-    if (dockerCompose) {
+    // If both Docker Compose and package.json are detected, ask the user which one to use
+    if (dockerCompose && packageJson) {
+      const choice = await promptUserChoice();
+
+      if (choice === "docker") {
+        logger.info(
+          `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
+        );
+        const command = buildDockerComposeCommand(dockerCompose, actualServerPort);
+        cmdArgs = command.cmdArgs;
+        dockerComposeOverride = command.dockerComposeOverride;
+      } else {
+        logger.info(`Using package.json script: ${packageJson.scriptName}`);
+        cmdArgs = [packageJson.scriptCommand];
+        shell = true;
+        env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
+      }
+    } else if (dockerCompose) {
       logger.info(
         `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
       );
       const command = buildDockerComposeCommand(dockerCompose, actualServerPort);
       cmdArgs = command.cmdArgs;
       dockerComposeOverride = command.dockerComposeOverride;
-    } else {
-      try {
-        const scripts = JSON.parse(readFileSync("./package.json", "utf-8")).scripts;
-        cmdArgs = [scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start];
-        shell = true;
-        env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
-      } catch {
-        // pass
-      }
+    } else if (packageJson) {
+      logger.info(`Using package.json script: ${packageJson.scriptName}`);
+      cmdArgs = [packageJson.scriptCommand];
+      shell = true;
+      env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
     }
   }
   if (cmdArgs.length === 0) {
