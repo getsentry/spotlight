@@ -5,7 +5,7 @@ function sleep(ms: number) {
 }
 
 test("launch app", async () => {
-  const app = await electron.launch({ args: ["./out/main/index.js", "--no-sandbox"] });
+  const app = await electron.launch({ args: ["./dist-electron/main/index.js", "--no-sandbox"] });
 
   const isPackaged = await app.evaluate(async ({ app }) => {
     // This runs in Electron's main process, parameter here is always

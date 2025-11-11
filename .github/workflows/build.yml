@@ -18,7 +18,7 @@ env:
   CACHED_BUILD_PATHS: |
     ${{ github.workspace }}/packages/*/dist
     ${{ github.workspace }}/packages/*/dist-bin
-    ${{ github.workspace }}/packages/*/out
+    ${{ github.workspace }}/packages/*/dist-electron
 
 jobs:
   build:
@@ -127,7 +127,7 @@ jobs:
         with:
           name: electron-build
           if-no-files-found: error
-          path: packages/spotlight/out/
+          path: packages/spotlight/dist-electron/
 
       - name: Update build cache
         uses: actions/cache/save@v4
@@ -233,7 +233,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: electron-build
-          path: packages/spotlight/out/
+          path: packages/spotlight/dist-electron/
 
       - name: Cache turbo build setup
         uses: actions/cache@v4

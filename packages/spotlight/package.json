@@ -25,7 +25,7 @@
     "test:dev": "vitest",
     "test:e2e": "playwright test",
     "yalc:publish": "yalc publish --push --sig --private",
-    "clean": "rimraf dist out"
+    "clean": "rimraf dist dist-electron"
   },
   "files": ["dist"],
   "bin": {
