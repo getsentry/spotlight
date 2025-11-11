@@ -35,10 +35,23 @@ export function findComposeFile(): string | null {
 }
 
 /**
- * Find the override file in the current directory
+ * Find the override file for a given compose file
  */
-export function findOverrideFile(): string | null {
-  return findFile((baseName, ext) => `${baseName}.override${ext}`);
+export function findOverrideFile(composeFile: string): string | null {
+  const ext = composeFile.endsWith(".yaml") ? ".yaml" : ".yml";
+  const baseName = composeFile.replace(/\.(yaml|yml)$/, "");
+  const overrideFile = `${baseName}.override${ext}`;
+
+  try {
+    readFileSync(overrideFile);
+    return overrideFile;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return null;
+    }
+    logger.error(`Error checking file ${overrideFile}: ${error}`);
+    return null;
+  }
 }
 
 /**
