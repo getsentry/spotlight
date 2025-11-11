@@ -127,6 +127,14 @@ export function buildDockerComposeCommand(config: DockerComposeConfig): {
  * compose files, and services to build a complete configuration.
  */
 export function detectDockerCompose(): DockerComposeConfig | null {
+  const composeFile = findComposeFile();
+  if (!composeFile) {
+    logger.debug("No compose file found in current directory");
+    return null;
+  }
+
+  logger.debug(`Found compose file: ${composeFile}`);
+
   const docker = detectDocker();
   if (!docker) {
     logger.debug("Docker is not installed or not in PATH");
@@ -147,14 +155,6 @@ export function detectDockerCompose(): DockerComposeConfig | null {
   }
 
   logger.debug(`Detected Docker Compose version ${compose.version} (${compose.command.join(" ")})`);
-
-  const composeFile = findComposeFile();
-  if (!composeFile) {
-    logger.debug("No compose file found in current directory");
-    return null;
-  }
-
-  logger.debug(`Found compose file: ${composeFile}`);
 
   const serviceNames = getDockerComposeServices(composeFile);
   if (serviceNames.length === 0) {
