@@ -83,8 +83,7 @@ function detectComposeCommand(): { command: string[]; version: string } | null {
  * Generate the override YAML for injecting Spotlight environment variables
  */
 function generateSpotlightOverrideYaml(serviceNames: string[]): string {
-  const services: Record<string, unknown> = {};
-
+  const services: Record<string, { environment: string[]; extra_hosts: string[] }> = {};
   // Pass environment variables without values to inherit from parent process (run.ts)
   // so the values set in run.ts are propagated correctly
   for (const serviceName of serviceNames) {
