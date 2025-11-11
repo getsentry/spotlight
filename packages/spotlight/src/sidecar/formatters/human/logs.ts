@@ -1,11 +1,11 @@
 import type { Envelope, SerializedLog } from "@sentry/core";
 import type { SentryLogEvent } from "~/parser/index.js";
-import { formatLogLine, inferEnvelopeSource } from "./utils.js";
+import { type SourceType, formatLogLine, inferEnvelopeSource } from "./utils.js";
 
 /**
  * Format a single log entry with source inference
  */
-function formatSingleLog(log: SerializedLog, source: "browser" | "mobile" | "server"): string {
+function formatSingleLog(log: SerializedLog, source: SourceType): string {
   const level = log.level || "log";
   const message = log.body || "";
 
@@ -13,12 +13,12 @@ function formatSingleLog(log: SerializedLog, source: "browser" | "mobile" | "ser
   if (log.attributes) {
     for (const [key, attr] of Object.entries(log.attributes)) {
       if (!key.startsWith("sentry.") && attr.value !== undefined && attr.value !== null) {
-        attrs.push(`${key}=${attr.value}`);
+        attrs.push(`[${key}=${attr.value}]`);
       }
     }
   }
 
-  const fullMessage = attrs.length > 0 ? `${message} (${attrs.join(", ")})` : message;
+  const fullMessage = attrs.length > 0 ? `${message} ${attrs.join(" ")}` : message;
 
   return formatLogLine(log.timestamp, source, level, fullMessage);
 }

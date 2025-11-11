@@ -1,11 +1,11 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
-import { uuidv7 } from "uuidv7";
+import { type UUID, uuidv7obj } from "uuidv7";
 import { RAW_TYPES } from "../constants.js";
 import { logger } from "../logger.js";
 import type { RawEventContext } from "./types.js";
 
 export type ParsedEnvelope = {
-  envelope: Envelope;
+  envelope: [Envelope[0] & { __spotlight_envelope_id: UUID }, Envelope[1]];
   rawEnvelope: RawEventContext;
 };
 
@@ -45,7 +45,7 @@ export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: str
     return null;
   }
 
-  envelopeHeader.__spotlight_envelope_id = uuidv7();
+  envelopeHeader.__spotlight_envelope_id = uuidv7obj();
 
   // Store sender User-Agent for improved SDK categorization
   if (senderUserAgent) {
@@ -92,7 +92,7 @@ export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: str
   }
 
   return {
-    envelope: [envelopeHeader, items] as Envelope,
+    envelope: [envelopeHeader, items] as ParsedEnvelope["envelope"],
     rawEnvelope: rawEvent,
   };
 }

@@ -11,10 +11,10 @@ Spotlight provides four MCP tools that allow AI coding assistants to query your 
 
 | Tool | Purpose | Returns |
 |------|---------|---------|
-| `spotlight.errors.search` | Find runtime errors | Errors with stack traces |
-| `spotlight.logs.search` | Query application logs | Log entries with context |
-| `spotlight.traces.search` | List performance traces | Trace summaries |
-| `spotlight.traces.get` | Get trace details | Full span tree and timing |
+| `search_errors` | Find runtime errors | Errors with stack traces |
+| `search_logs` | Query application logs | Log entries with context |
+| `search_traces` | List performance traces | Trace summaries |
+| `get_traces` | Get trace details | Full span tree and timing |
 
 ## Common Filter Parameters
 
@@ -79,7 +79,7 @@ Paginate through results.
 
 ---
 
-## spotlight.errors.search
+## search_errors
 
 Search for runtime errors, exceptions, and crashes captured by Spotlight.
 
@@ -172,7 +172,7 @@ Each error includes:
 
 ---
 
-## spotlight.logs.search
+## search_logs
 
 Search application logs to understand behavior, debug issues, and trace execution flow.
 
@@ -195,7 +195,7 @@ Best for:
 - Performance investigation and timing analysis
 
 :::note
-For error diagnostics with stack traces, use `spotlight.errors.search` instead.
+For error diagnostics with stack traces, use `search_errors` instead.
 :::
 
 ### Parameters
@@ -218,7 +218,7 @@ For error diagnostics with stack traces, use `spotlight.errors.search` instead.
 - **DEBUG**: Detailed execution information for troubleshooting
 
 :::note
-ERROR level logs are available, but `spotlight.errors.search` provides more detailed error context including stack traces.
+ERROR level logs are available, but `search_errors` provides more detailed error context including stack traces.
 :::
 
 ### Usage Examples
@@ -279,7 +279,7 @@ Each log entry includes:
 
 ---
 
-## spotlight.traces.search
+## search_traces
 
 List recent performance traces with summary information.
 
@@ -366,7 +366,7 @@ Each trace summary includes:
 
 ### Next Step
 
-After finding a trace of interest, use `spotlight.traces.get` with the trace ID to see detailed timing breakdown.
+After finding a trace of interest, use `get_traces` with the trace ID to see detailed timing breakdown.
 
 ### Example AI Prompts
 
@@ -377,7 +377,7 @@ After finding a trace of interest, use `spotlight.traces.get` with the trace ID 
 
 ---
 
-## spotlight.traces.get
+## get_traces
 
 Get complete span tree and timing breakdown for a specific trace.
 
@@ -394,7 +394,7 @@ Deep-dive into a specific trace to see:
 
 Use this after:
 
-- Finding a trace ID from `spotlight.traces.search`
+- Finding a trace ID from `search_traces`
 - Investigating a specific slow request or transaction
 - Understanding detailed execution flow
 - Finding performance bottlenecks in a trace
@@ -464,22 +464,22 @@ Transaction: GET /api/users/123 (245ms)
 
 ### Error Investigation
 
-1. **Search for errors**: `spotlight.errors.search`
-2. **If error mentions a trace**: Get trace details with `spotlight.traces.get`
-3. **Check related logs**: `spotlight.logs.search` with filename from error
+1. **Search for errors**: `search_errors`
+2. **If error mentions a trace**: Get trace details with `get_traces`
+3. **Check related logs**: `search_logs` with filename from error
 
 ### Performance Analysis
 
-1. **List recent traces**: `spotlight.traces.search`
+1. **List recent traces**: `search_traces`
 2. **Identify slow traces**: Look at duration in summary
-3. **Deep dive**: `spotlight.traces.get` with trace ID
-4. **Check logs**: `spotlight.logs.search` for timing details
+3. **Deep dive**: `get_traces` with trace ID
+4. **Check logs**: `search_logs` for timing details
 
 ### Understanding Application Behavior
 
-1. **Check logs**: `spotlight.logs.search` for recent activity
-2. **Look for errors**: `spotlight.errors.search` for issues
-3. **Examine traces**: `spotlight.traces.search` for request flow
+1. **Check logs**: `search_logs` for recent activity
+2. **Look for errors**: `search_errors` for issues
+3. **Examine traces**: `search_traces` for request flow
 
 ## Best Practices
 
@@ -507,9 +507,9 @@ Choose the most specific filter for your use case.
 ### Following Trace IDs
 
 Traces often reference related data:
-1. Errors include trace IDs → use `spotlight.traces.get`
-2. Logs include trace IDs → use `spotlight.traces.get`
-3. Trace spans reference files → use `spotlight.logs.search` or `spotlight.errors.search` with filename
+1. Errors include trace IDs → use `get_traces`
+2. Logs include trace IDs → use `get_traces`
+3. Trace spans reference files → use `search_logs` or `search_errors` with filename
 
 ## Next Steps
 

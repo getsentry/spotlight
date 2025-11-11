@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/spotlight",
   "description": "Spotlight - Sentry for development. Containing the UI, sidecar, and electron app.",
-  "version": "4.5.0",
+  "version": "4.5.1",
   "productName": "Spotlight",
   "author": "Sentry",
   "license": "Apache-2.0",
@@ -93,6 +93,7 @@
     "logfmt": "^1.4.0",
     "mcp-proxy": "^5.6.0",
     "uuidv7": "^1.0.2",
+    "yaml": "^2.8.1",
     "zod": "^3"
   },
   "devDependencies": {
