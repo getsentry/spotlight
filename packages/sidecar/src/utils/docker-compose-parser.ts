@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
 import { logger } from "../logger.js";
 
@@ -6,21 +6,14 @@ const COMPOSE_FILE_BASE_NAMES = ["docker-compose", "compose"] as const;
 const COMPOSE_FILE_EXTENSIONS = [".yml", ".yaml"] as const;
 
 /**
- * Find a file by trying to read all combinations of base names and extensions.
- * This saves an I/O operation by skipping existsSync and directly attempting to read.
+ * Find a file by trying all combinations of base names and extensions.
  */
 function findFile(buildFileName: (baseName: string, ext: string) => string): string | null {
   for (const baseName of COMPOSE_FILE_BASE_NAMES) {
     for (const ext of COMPOSE_FILE_EXTENSIONS) {
       const fileName = buildFileName(baseName, ext);
-      try {
-        readFileSync(fileName);
+      if (existsSync(fileName)) {
         return fileName;
-      } catch (error) {
-        if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-          continue;
-        }
-        logger.error(`Error checking file ${fileName}: ${error}`);
       }
     }
   }
@@ -42,16 +35,10 @@ export function findOverrideFile(composeFile: string): string | null {
   const baseName = composeFile.replace(/\.(yaml|yml)$/, "");
   const overrideFile = `${baseName}.override${ext}`;
 
-  try {
-    readFileSync(overrideFile);
+  if (existsSync(overrideFile)) {
     return overrideFile;
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      return null;
-    }
-    logger.error(`Error checking file ${overrideFile}: ${error}`);
-    return null;
   }
+  return null;
 }
 
 /**
