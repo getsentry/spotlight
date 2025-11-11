@@ -4,6 +4,8 @@ import { stringify as stringifyYaml } from "yaml";
 import { logger } from "../logger.js";
 import { findComposeFile, findOverrideFile, parseComposeFile } from "./docker-compose-parser.js";
 
+// minimum version of Docker required to use host.docker.internal on linux
+/// https://docs.docker.com/engine/release-notes/20.10/#bug-fixes-and-enhancements-1
 export const DOCKER_MIN_VERSION = "20.10.0";
 export const DOCKER_HOST_INTERNAL = "host.docker.internal";
 export const DOCKER_HOST_GATEWAY = "host-gateway";
