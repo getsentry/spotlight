@@ -27,7 +27,7 @@
     "yalc:publish": "yalc publish --push --sig --private",
     "clean": "rimraf dist out"
   },
-  "files": ["dist", "out"],
+  "files": ["dist"],
   "bin": {
     "spotlight": "./dist/run.js",
     "spotlight-sidecar": "dist/sidecar/run.js"

@@ -1,29 +1,12 @@
 import { resolve } from "node:path";
-import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-import svgr from "vite-plugin-svgr";
+import { aliases, defineProduction, reactPlugins } from "./vite.config.base";
 
 export default defineConfig({
-  plugins: [
-    react(),
-    svgr({
-      svgrOptions: {
-        titleProp: true,
-      },
-    }),
-    tailwindcss(),
-  ],
-  define: {
-    "process.env.NODE_ENV": '"production"',
-    "process.env.npm_package_version": JSON.stringify(process.env.npm_package_version),
-  },
+  plugins: reactPlugins,
+  define: defineProduction,
   resolve: {
-    alias: {
-      "@spotlight/ui": resolve(__dirname, "src/ui"),
-      "@spotlight/sidecar": resolve(__dirname, "src/sidecar"),
-      "@spotlight/shared": resolve(__dirname, "src/shared"),
-    },
+    alias: aliases,
   },
   build: {
     outDir: resolve(__dirname, "dist", "ui"),

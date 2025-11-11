@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 
-import { resolve } from "node:path";
 import { defineConfig } from "vitest/config";
+import { aliases } from "./vite.config.base";
 
 const isCI = Boolean(process.env.CI);
 export default defineConfig({
@@ -19,10 +19,6 @@ export default defineConfig({
     watchExclude: [".*\\/node_modules\\/.*", ".*\\/dist\\/.*"],
   },
   resolve: {
-    alias: {
-      "@spotlight/ui": resolve(__dirname, "src/ui"),
-      "@spotlight/sidecar": resolve(__dirname, "src/sidecar"),
-      "@spotlight/shared": resolve(__dirname, "src/shared"),
-    },
+    alias: aliases,
   },
 });

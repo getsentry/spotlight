@@ -1,6 +1,7 @@
 import { builtinModules } from "node:module";
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
+import { aliases, defineProduction } from "./vite.config.base";
 
 import packageJson from "./package.json";
 
@@ -10,15 +11,9 @@ const dependencies = Object.keys({
 });
 
 export default defineConfig({
-  define: {
-    "process.env.NODE_ENV": '"production"',
-    "process.env.npm_package_version": JSON.stringify(process.env.npm_package_version),
-  },
+  define: defineProduction,
   resolve: {
-    alias: {
-      "@spotlight/sidecar": resolve(__dirname, "src/sidecar"),
-      "@spotlight/shared": resolve(__dirname, "src/shared"),
-    },
+    alias: aliases,
   },
   build: {
     ssr: true,

@@ -1,34 +1,12 @@
-import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
-import dts from "vite-plugin-dts";
-import svgr from "vite-plugin-svgr";
-
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
+import { aliases, defineDevelopment, dtsPlugin, reactPlugins } from "./vite.config.base";
 
 export default defineConfig({
-  plugins: [
-    react(),
-    dts({
-      insertTypesEntry: true,
-    }),
-    svgr({
-      svgrOptions: {
-        titleProp: true,
-      },
-    }),
-    tailwindcss(),
-  ],
-  define: {
-    "process.env.NODE_ENV": '"development"',
-    "process.env.npm_package_version": JSON.stringify(process.env.npm_package_version),
-  },
+  plugins: [...reactPlugins, dtsPlugin],
+  define: defineDevelopment,
   resolve: {
-    alias: {
-      "@spotlight/ui": resolve(__dirname, "src/ui"),
-      "@spotlight/sidecar": resolve(__dirname, "src/sidecar"),
-      "@spotlight/shared": resolve(__dirname, "src/shared"),
-    },
+    alias: aliases,
   },
   server: {
     headers: {
