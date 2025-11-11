@@ -21,6 +21,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "~/shared": resolve(__dirname, "src/shared"),
+      "~/sidecar": resolve(__dirname, "src/sidecar"),
       "~": resolve(__dirname, "src/ui"),
     },
   },
