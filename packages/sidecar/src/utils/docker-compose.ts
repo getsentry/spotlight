@@ -1,4 +1,5 @@
 import { execSync } from "node:child_process";
+import semver from "semver";
 import { stringify as stringifyYaml } from "yaml";
 import { logger } from "../logger.js";
 import { findComposeFile, findOverrideFile, parseComposeFile } from "./docker-compose-parser.js";
@@ -12,23 +13,6 @@ interface DockerComposeConfig {
   overrideFile?: string;
   command: string[];
   serviceNames: string[];
-}
-
-/**
- * Check if the first version is greater than or equal to the second version
- * Returns true if v1 >= v2
- */
-function isVersionGreaterOrEqual(v1: string, v2: string): boolean {
-  const parts1 = v1.replace(/^v/, "").split(".").map(Number);
-  const parts2 = v2.replace(/^v/, "").split(".").map(Number);
-
-  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
-    const p1 = parts1[i] || 0;
-    const p2 = parts2[i] || 0;
-    if (p1 > p2) return true;
-    if (p1 < p2) return false;
-  }
-  return true;
 }
 
 /**
@@ -57,7 +41,7 @@ export function detectDocker(): { version: string; valid: boolean } | null {
   }
 
   const versionNumber = match[1];
-  const valid = isVersionGreaterOrEqual(versionNumber, DOCKER_MIN_VERSION);
+  const valid = semver.gte(versionNumber, DOCKER_MIN_VERSION);
 
   return { version: versionNumber, valid };
 }
@@ -86,7 +70,7 @@ function detectComposeCommand(): { command: string[]; version: string } | null {
   const pluginVer = composePluginVersion!.replace(/^v/, "");
   const standaloneVer = composeStandaloneVersion!.replace(/^v/, "");
 
-  if (isVersionGreaterOrEqual(standaloneVer, pluginVer)) {
+  if (semver.gte(standaloneVer, pluginVer)) {
     return { command: ["docker-compose"], version: composeStandaloneVersion! };
   }
 
