@@ -37,7 +37,7 @@ export function findOverrideFile(): string | null {
 /**
  * Parse compose file and extract service names
  */
-export function parseComposeFile(filePath: string): string[] {
+export function getDockerComposeServices(filePath: string): string[] {
   try {
     const content = readFileSync(filePath, "utf-8");
     const parsed = parseYaml(content);

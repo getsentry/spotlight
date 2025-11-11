@@ -2,7 +2,7 @@ import { execSync } from "node:child_process";
 import semver from "semver";
 import { stringify as stringifyYaml } from "yaml";
 import { logger } from "../logger.js";
-import { findComposeFile, findOverrideFile, parseComposeFile } from "./docker-compose-parser.js";
+import { findComposeFile, findOverrideFile, getDockerComposeServices } from "./docker-compose-parser.js";
 
 // minimum version of Docker required to use host.docker.internal on linux
 /// https://docs.docker.com/engine/release-notes/20.10/#bug-fixes-and-enhancements-1
@@ -156,7 +156,7 @@ export function detectDockerCompose(): DockerComposeConfig | null {
 
   logger.debug(`Found compose file: ${composeFile}`);
 
-  const serviceNames = parseComposeFile(composeFile);
+  const serviceNames = getDockerComposeServices(composeFile);
   if (serviceNames.length === 0) {
     logger.debug("No services found in compose file");
     return null;
