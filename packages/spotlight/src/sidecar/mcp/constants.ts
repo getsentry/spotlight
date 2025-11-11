@@ -69,7 +69,7 @@ export const NO_LOGS_CONTENT: CallToolResult = {
 - **INFO**: General application flow and significant events
 - **WARN**: Potential issues or important notices
 - **DEBUG**: Detailed execution information
-- **ERROR**: Failures (also check spotlight.errors.search tool)
+- **ERROR**: Failures (also check search_errors tool)
 
 **Pro tip:** Absence of logs doesn't mean your application isn't working - it might just be running quietly. Many applications only log during significant events, errors, or when explicitly configured for verbose logging.`,
     },

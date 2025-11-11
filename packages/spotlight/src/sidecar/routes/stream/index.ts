@@ -35,17 +35,22 @@ const router = new Hono<HonoEnv>()
     if (!clientId) clientId = "unknown";
 
     return streamSSE(ctx, async stream => {
+      // Check for Last-Event-ID header to support reconnection
+      const lastEventId = ctx.req.header("Last-Event-ID");
+
+      // Subscribe to events, optionally starting from after the lastEventId
       const sub = buffer.subscribe(container => {
         logOutgoingEvent(container, clientId);
 
         const parsedEnvelope = container.getParsedEnvelope();
         if (parsedEnvelope) {
           stream.writeSSE({
+            id: parsedEnvelope.envelope[0].__spotlight_envelope_id.toString(),
             event: `${container.getContentType()}${base64Indicator}`,
             data: JSON.stringify(parsedEnvelope.envelope),
           });
         }
-      });
+      }, lastEventId);
 
       stream.onAbort(() => {
         buffer.unsubscribe(sub);

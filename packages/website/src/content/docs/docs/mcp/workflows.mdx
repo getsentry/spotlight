@@ -17,7 +17,7 @@ The simplest way to start debugging with Spotlight MCP:
 ```
 
 **What the AI does:**
-1. Calls `spotlight.errors.search` with recent timeWindow
+1. Calls `search_errors` with recent timeWindow
 2. Analyzes any errors found
 3. Suggests fixes or asks for more context
 
@@ -38,7 +38,7 @@ This works because the AI assistant knows to check Spotlight first when you ment
 
 **AI action:**
 ```json
-spotlight.errors.search({
+search_errors({
   filters: { timeWindow: 300 }
 })
 ```
@@ -79,12 +79,12 @@ that you're trying to access the 'token' property on a null object.
 
 **AI action:**
 ```json
-spotlight.traces.search({
+search_traces({
   filters: { timeWindow: 60 }
 })
 ```
 
-Then gets trace details with `spotlight.traces.get` if trace ID found.
+Then gets trace details with `get_traces` if trace ID found.
 
 ---
 
@@ -101,7 +101,7 @@ Then gets trace details with `spotlight.traces.get` if trace ID found.
 
 **AI action:**
 ```json
-spotlight.traces.search({
+search_traces({
   filters: { timeWindow: 300 }
 })
 ```
@@ -122,7 +122,7 @@ The profile endpoint is notably slow. Let me analyze it.
 
 **AI action:**
 ```json
-spotlight.traces.get({
+get_traces({
   traceId: "abc12345"
 })
 ```
@@ -169,7 +169,7 @@ After making changes:
 
 **AI action:**
 ```json
-spotlight.logs.search({
+search_logs({
   filters: { timeWindow: 60 }
 })
 ```
@@ -203,7 +203,7 @@ Everything looks normal. The operation took 180ms total.
 
 **AI action:**
 ```json
-spotlight.errors.search({
+search_errors({
   filters: { filename: "auth.tsx" }
 })
 ```
@@ -217,7 +217,7 @@ spotlight.errors.search({
 
 **AI action:**
 ```json
-spotlight.logs.search({
+search_logs({
   filters: { filename: "auth.tsx" }
 })
 ```
@@ -241,7 +241,7 @@ The AI can now correlate errors and logs from the same file to give you a comple
 
 **AI action:**
 ```json
-spotlight.errors.search({
+search_errors({
   filters: { timeWindow: 300 }
 })
 ```
@@ -273,7 +273,7 @@ spotlight.errors.search({
 
 **AI action:**
 ```json
-spotlight.traces.search({
+search_traces({
   filters: { timeWindow: 60 }
 })
 ```
@@ -284,7 +284,7 @@ Filters for transactions matching the path.
 
 **AI action:**
 ```json
-spotlight.traces.get({
+get_traces({
   traceId: "found-trace-id"
 })
 ```
@@ -316,7 +316,7 @@ When an error includes a trace ID:
 ```
 
 **AI action:**
-1. Get trace details: `spotlight.traces.get({ traceId: "xyz123" })`
+1. Get trace details: `get_traces({ traceId: "xyz123" })`
 2. Analyze span tree
 3. Identify where error occurred in the flow
 
@@ -414,10 +414,10 @@ The AI can use multiple tools together:
 You: "Debug the slow checkout process"
 
 AI workflow:
-1. spotlight.traces.search → Find checkout traces
-2. spotlight.traces.get → Analyze slow trace
-3. spotlight.logs.search → Check related logs
-4. spotlight.errors.search → Look for errors
+1. search_traces → Find checkout traces
+2. get_traces → Analyze slow trace
+3. search_logs → Check related logs
+4. search_errors → Look for errors
 ```
 
 ### 4. Reproduce First
@@ -481,7 +481,7 @@ Here's a complete example:
 You: "My app crashed when I clicked submit. What happened?"
 
 AI: Let me check for errors...
-[Calls spotlight.errors.search]
+[Calls search_errors]
 
 AI: I found a TypeError in forms/SubmitButton.tsx at line 34:
      "Cannot read property 'validate' of undefined"
@@ -491,7 +491,7 @@ AI: I found a TypeError in forms/SubmitButton.tsx at line 34:
 You: "Yes, and show me what happened before the crash"
 
 AI: [Reads SubmitButton.tsx code]
-[Calls spotlight.logs.search for recent activity]
+[Calls search_logs for recent activity]
 
 AI: Here's what I found:
      

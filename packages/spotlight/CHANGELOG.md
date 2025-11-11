@@ -1,5 +1,15 @@
 # @spotlightjs/spotlight
 
+## 4.5.1
+
+### Patch Changes
+
+- Fix SDK categorization for Next.js by using User-Agent headers to distinguish browser from server events ([#1110](https://github.com/getsentry/spotlight/pull/1110))
+
+- Updated dependencies [[`0942c8a`](https://github.com/getsentry/spotlight/commit/0942c8afa15d688d0de2a288df1535bc6f1785a1), [`bce012e`](https://github.com/getsentry/spotlight/commit/bce012e93424fb0652b3bb182e903da589684c34), [`7624030`](https://github.com/getsentry/spotlight/commit/76240306877184d0f2b1b8a2294e1b56b8abd04e), [`15a7f41`](https://github.com/getsentry/spotlight/commit/15a7f418dc54b80ac1c8e8bdb7616cc37d3e33f8), [`13da542`](https://github.com/getsentry/spotlight/commit/13da5428842c1b965ce86006e0bd4e6360137e2d), [`b3a654a`](https://github.com/getsentry/spotlight/commit/b3a654a5893ea22c61ad4d596f76ec16da12659e)]:
+  - @spotlightjs/sidecar@2.5.0
+  - @spotlightjs/overlay@4.5.0
+
 ## 4.5.0
 
 ### Minor Changes
