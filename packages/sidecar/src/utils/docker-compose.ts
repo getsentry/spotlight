@@ -60,23 +60,23 @@ function detectComposeCommand(): { command: string[]; version: string } | null {
     return null;
   }
 
-  if (!composePluginVersion && composeStandaloneVersion) {
-    return { command: ["docker-compose"], version: composeStandaloneVersion };
-  }
-
-  if (composePluginVersion && !composeStandaloneVersion) {
-    return { command: ["docker", "compose"], version: composePluginVersion };
-  }
-
-  // Use standalone if it's newer, otherwise prefer plugin
-  const pluginVer = composePluginVersion!.replace(/^v/, "");
-  const standaloneVer = composeStandaloneVersion!.replace(/^v/, "");
-
-  if (semver.gte(standaloneVer, pluginVer)) {
+  if (!composePluginVersion) {
     return { command: ["docker-compose"], version: composeStandaloneVersion! };
   }
 
-  return { command: ["docker", "compose"], version: composePluginVersion! };
+  if (!composeStandaloneVersion) {
+    return { command: ["docker", "compose"], version: composePluginVersion! };
+  }
+
+  // Use standalone if it's newer, otherwise prefer plugin
+  const pluginVer = composePluginVersion.replace(/^v/, "");
+  const standaloneVer = composeStandaloneVersion.replace(/^v/, "");
+
+  if (semver.gt(standaloneVer, pluginVer)) {
+    return { command: ["docker-compose"], version: composeStandaloneVersion };
+  }
+
+  return { command: ["docker", "compose"], version: composePluginVersion };
 }
 
 /**
