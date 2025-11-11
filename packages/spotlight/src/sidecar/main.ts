@@ -23,7 +23,7 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
     try {
       filesToServe = {
         "index.html": readFileSync(join(basePath, "index.html")),
-        "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
+        "assets/main.js": readFileSync(join(basePath, "assets/main.js")),
       };
     } catch {
       // pass -- no UI
