@@ -3,7 +3,7 @@ import { parse as parseYaml } from "yaml";
 import { logger } from "../logger.js";
 
 const COMPOSE_FILE_BASE_NAMES = ["docker-compose", "compose"] as const;
-const COMPOSE_FILE_EXTENSIONS = [".yaml", ".yml"] as const;
+const COMPOSE_FILE_EXTENSIONS = [".yml", ".yaml"] as const;
 
 /**
  * Find a file by trying to read all combinations of base names and extensions.
