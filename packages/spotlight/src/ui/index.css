@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@config "../../tailwind.config.ts";
+@config "./tailwind.config.ts";
 
 @theme {
   --color-primary-50: #f5faff;

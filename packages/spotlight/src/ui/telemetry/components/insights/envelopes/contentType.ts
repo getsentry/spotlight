@@ -1,4 +1,4 @@
-import { RAW_TYPES } from "../../../../../shared/constants";
+import { RAW_TYPES } from "~/shared/constants.js";
 
 const CONTENT_TYPES_TO_EXTENSION: Record<string, string> = {
   "text/plain": "txt",

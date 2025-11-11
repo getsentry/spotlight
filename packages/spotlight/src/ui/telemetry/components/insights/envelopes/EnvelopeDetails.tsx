@@ -4,7 +4,7 @@ import { ReactComponent as Download } from "~/assets/download.svg";
 import { useSpotlightContext } from "~/lib/useSpotlightContext";
 import JsonViewer from "~/telemetry/components/shared/JsonViewer";
 import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
-import { RAW_TYPES } from "../../../../../shared/constants";
+import { RAW_TYPES } from "~/shared/constants.js";
 import Attachment from "./Attachment";
 import { inferExtension } from "./contentType";
 

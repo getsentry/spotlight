@@ -7,6 +7,7 @@
       "~/main.js": ["src/sidecar/main.ts"],
       "~/logger.js": ["src/sidecar/logger.ts"],
       "~/constants.js": ["src/sidecar/constants.ts"],
+      "~/shared/constants.js": ["src/shared/constants.ts"],
       "~/parser/index.js": ["src/sidecar/parser/index.ts"],
       "~/parser/helpers.js": ["src/sidecar/parser/helpers.ts"],
       "~/parser/types.js": ["src/sidecar/parser/types.ts"],

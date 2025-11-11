@@ -9,12 +9,12 @@ const { port: instancePort } = parseCLIArgs();
 const spotlightEnv = process.env.SENTRY_SPOTLIGHT;
 let disableSpotlight = false;
 
-// Note: If port is set to 0 (dynamic port assignment), we cannot detect the actual port
-// before starting the server, so we cannot prevent the feedback loop in that case.
-// The server will be assigned a port by the OS after it starts, and if SENTRY_SPOTLIGHT
-// happens to point to that same port, a feedback loop may occur.
 if (spotlightEnv && instancePort !== 0) {
-  let targetPort: number | null | undefined;
+  // Note: If port is set to 0 (dynamic port assignment), we cannot detect the actual port
+  // before starting the server, so we cannot prevent the feedback loop in that case.
+  // The server will be assigned a port by the OS after it starts, and if SENTRY_SPOTLIGHT
+  // happens to point to that same port, a feedback loop may occur.
+  let targetPort: number | undefined;
   let targetHost: string | undefined;
 
   // SENTRY_SPOTLIGHT can be:
@@ -35,7 +35,7 @@ if (spotlightEnv && instancePort !== 0) {
       targetPort = spotlightUrl.port ? Number(spotlightUrl.port) : spotlightUrl.protocol === "https:" ? 443 : 80;
     } catch (_err) {
       // If we can't parse it, we can't determine if it's a feedback loop, so do nothing
-      targetPort = null;
+      targetPort = undefined;
     }
   }
 
@@ -46,7 +46,7 @@ if (spotlightEnv && instancePort !== 0) {
     if (isLocalhost && targetPort === instancePort) {
       disableSpotlight = true;
       console.warn(
-        `??  [Spotlight] SENTRY_SPOTLIGHT is set to ${spotlightEnv} which points to this Spotlight instance (port ${instancePort}). Disabling Spotlight integration to prevent feedback loop.`,
+        `⚠️  [Spotlight] SENTRY_SPOTLIGHT is set to ${spotlightEnv} which points to this Spotlight instance (port ${instancePort}). Disabling Spotlight integration to prevent feedback loop.`,
       );
     }
   }
@@ -79,20 +79,18 @@ const sentry = init({
       return event;
     }
     for (const exception of exceptions) {
-      if (!exception.stacktrace) {
+      if (!exception.stacktrace || !exception.stacktrace.frames) {
         continue;
       }
 
-      if (exception.stacktrace?.frames) {
-        for (const frame of exception.stacktrace.frames) {
-          if (!frame.filename) {
-            continue;
-          }
+      for (const frame of exception.stacktrace.frames) {
+        if (!frame.filename) {
+          continue;
+        }
 
-          const homeDir = process.env.HOME || process.env.USERPROFILE;
-          if (homeDir) {
-            frame.filename = frame.filename?.replace(homeDir, "~");
-          }
+        const homeDir = process.env.HOME || process.env.USERPROFILE;
+        if (homeDir) {
+          frame.filename = frame.filename?.replace(homeDir, "~");
         }
       }
     }
@@ -102,10 +100,11 @@ const sentry = init({
   },
 });
 
-function shutdown() {
-  sentry?.close();
-}
+if (sentry) {
+  function shutdown() {
+    sentry!.close();
+  }
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
-// process.on("beforeExit", shutdown);
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
+}

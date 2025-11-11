@@ -22,7 +22,7 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
   if (!filesToServe && basePath) {
     try {
       filesToServe = {
-        "/src/index.html": readFileSync(join(basePath, "src/index.html")),
+        "index.html": readFileSync(join(basePath, "index.html")),
         "/assets/main.js": readFileSync(join(basePath, "assets/main.js")),
       };
     } catch {
@@ -150,7 +150,7 @@ export async function setupSidecar(
 
   if (port > 0 && (await isSidecarRunning(port))) {
     logger.info(`Sidecar is already running on port ${port}`);
-    const hasSpotlightUI = (filesToServe && "/src/index.html" in filesToServe) || (!filesToServe && basePath);
+    const hasSpotlightUI = (filesToServe && "index.html" in filesToServe) || (!filesToServe && basePath);
     if (hasSpotlightUI) {
       logSpotlightUrl(port);
     }

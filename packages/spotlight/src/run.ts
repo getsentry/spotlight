@@ -51,8 +51,7 @@ startSpan({ name: "Spotlight CLI", op: "cli" }, async () => {
     startSpan({ name: "Setup Server Assets", op: "cli.setup.sidecar.assets" }, () => {
       // Following the guide here: https://vite.dev/guide/backend-integration.html
       const manifest = JSON.parse(readAsset(MANIFEST_NAME).toString());
-      // Store as "src/index.html" to match what serveFilesHandler expects
-      filesToServe["src/index.html"] = readAsset(ENTRY_POINT_NAME);
+      filesToServe[ENTRY_POINT_NAME] = readAsset(ENTRY_POINT_NAME);
       const entries = Object.values(manifest);
       for (const entry of entries) {
         if (entry && typeof entry === "object" && "file" in entry && typeof entry.file === "string") {

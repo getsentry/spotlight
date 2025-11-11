@@ -16,7 +16,7 @@ export function serveFilesHandler(filesToServe: Record<string, Buffer>): Handler
     // the page or directly navigates to `/telemetry`. Should probably find
     // a better way to share routes from the UI to the sidecar later on.
     if (filePath === "/" || filePath.startsWith("/telemetry")) {
-      filePath = "/src/index.html";
+      filePath = "/index.html";
     }
 
     filePath = filePath.slice(1);

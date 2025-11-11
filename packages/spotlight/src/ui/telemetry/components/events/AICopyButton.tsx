@@ -1,4 +1,6 @@
 import { captureException } from "@sentry/core";
+import { processErrorEvent } from "@spotlightjs/sidecar/formatters/md/errors";
+import { formatEventOutput } from "@spotlightjs/sidecar/formatters/md/event";
 import { type MouseEvent, useCallback, useEffect, useState } from "react";
 import { ReactComponent as CheckIcon } from "~/assets/check.svg";
 import { ReactComponent as CopyIcon } from "~/assets/copy.svg";
@@ -30,16 +32,7 @@ export default function AICopyButton({ event }: AICopyButtonProps) {
 
       setIsCopied(true);
       try {
-        // Simple JSON representation for AI consumption
-        const formattedEvent = {
-          message: event.message,
-          exception: event.exception,
-          stacktrace: event.exception?.values?.[0]?.stacktrace,
-          tags: event.tags,
-          contexts: event.contexts,
-          breadcrumbs: event.breadcrumbs,
-        };
-        await navigator.clipboard.writeText(JSON.stringify(formattedEvent, null, 2));
+        await navigator.clipboard.writeText(formatEventOutput(processErrorEvent(event as any)));
       } catch (err) {
         console.error(err);
         captureException(err);
