@@ -101,7 +101,7 @@ function generateSpotlightOverrideYaml(serviceNames: string[]): string {
  */
 export function buildDockerComposeCommand(config: DockerComposeConfig): {
   cmdArgs: string[];
-  dockerComposeOverride: string;
+  stdin: string;
 } {
   const cmdArgs = [...config.command];
 
@@ -115,9 +115,9 @@ export function buildDockerComposeCommand(config: DockerComposeConfig): {
 
   cmdArgs.push("up");
 
-  const dockerComposeOverride = generateSpotlightOverrideYaml(config.serviceNames);
+  const stdin = generateSpotlightOverrideYaml(config.serviceNames);
 
-  return { cmdArgs, dockerComposeOverride };
+  return { cmdArgs, stdin };
 }
 
 /**

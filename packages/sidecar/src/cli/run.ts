@@ -146,7 +146,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
 
       const command = buildDockerComposeCommand(dockerCompose);
       cmdArgs = command.cmdArgs;
-      dockerComposeOverride = command.dockerComposeOverride;
+      dockerComposeOverride = command.stdin;
     } else {
       try {
         const scripts = JSON.parse(readFileSync("./package.json", "utf-8")).scripts;
