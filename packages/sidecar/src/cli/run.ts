@@ -139,7 +139,12 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
       logger.info(
         `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
       );
-      const command = buildDockerComposeCommand(dockerCompose, actualServerPort);
+      // Use host.docker.internal for backend services to access the host machine
+      env.SENTRY_SPOTLIGHT = `http://host.docker.internal:${actualServerPort}/stream`;
+      // Keep localhost for browser-side (Next.js public env vars)
+      env.NEXT_PUBLIC_SENTRY_SPOTLIGHT = `http://localhost:${actualServerPort}/stream`;
+
+      const command = buildDockerComposeCommand(dockerCompose);
       cmdArgs = command.cmdArgs;
       dockerComposeOverride = command.dockerComposeOverride;
     } else {

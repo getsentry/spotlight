@@ -82,21 +82,14 @@ function detectComposeCommand(): { command: string[]; version: string } | null {
 /**
  * Generate the override YAML for injecting Spotlight environment variables
  */
-function generateSpotlightOverrideYaml(serviceNames: string[], port: number): string {
+function generateSpotlightOverrideYaml(serviceNames: string[]): string {
   const services: Record<string, unknown> = {};
 
-  // We use host.docker.internal to ensure the container can access the host machine
-  // for backend services that need to access the host machine to send events to the Sidecar.
-  const spotlightUrl = `http://${DOCKER_HOST_INTERNAL}:${port}/stream`;
-  const spotlightUrlForBrowser = `http://localhost:${port}/stream`;
-
+  // Pass environment variables without values to inherit from parent process (run.ts)
+  // so the values set in run.ts are propagated correctly
   for (const serviceName of serviceNames) {
     services[serviceName] = {
-      environment: [
-        `SENTRY_SPOTLIGHT=${spotlightUrl}`,
-        `NEXT_PUBLIC_SENTRY_SPOTLIGHT=${spotlightUrlForBrowser}`, // This is needed for Next.js
-        "SENTRY_TRACES_SAMPLE_RATE=1",
-      ],
+      environment: ["SENTRY_SPOTLIGHT", "NEXT_PUBLIC_SENTRY_SPOTLIGHT", "SENTRY_TRACES_SAMPLE_RATE"],
       extra_hosts: [`${DOCKER_HOST_INTERNAL}:${DOCKER_HOST_GATEWAY}`],
     };
   }
@@ -107,10 +100,10 @@ function generateSpotlightOverrideYaml(serviceNames: string[], port: number): st
 /**
  * Build the Docker Compose command with Spotlight environment injection
  */
-export function buildDockerComposeCommand(
-  config: DockerComposeConfig,
-  port: number,
-): { cmdArgs: string[]; dockerComposeOverride: string } {
+export function buildDockerComposeCommand(config: DockerComposeConfig): {
+  cmdArgs: string[];
+  dockerComposeOverride: string;
+} {
   const cmdArgs = [...config.command];
 
   cmdArgs.push("-f", config.composeFile);
@@ -123,7 +116,7 @@ export function buildDockerComposeCommand(
 
   cmdArgs.push("up");
 
-  const dockerComposeOverride = generateSpotlightOverrideYaml(config.serviceNames, port);
+  const dockerComposeOverride = generateSpotlightOverrideYaml(config.serviceNames);
 
   return { cmdArgs, dockerComposeOverride };
 }
