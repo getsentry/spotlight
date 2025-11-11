@@ -88,13 +88,13 @@ function generateSpotlightOverrideYaml(serviceNames: string[], port: number): st
   // We use host.docker.internal to ensure the container can access the host machine
   // for backend services that need to access the host machine to send events to the Sidecar.
   const spotlightUrl = `http://${DOCKER_HOST_INTERNAL}:${port}/stream`;
-  const publicSpotlightUrl = `http://localhost:${port}/stream`;
+  const spotlightUrlForBrowser = `http://localhost:${port}/stream`;
 
   for (const serviceName of serviceNames) {
     services[serviceName] = {
       environment: [
         `SENTRY_SPOTLIGHT=${spotlightUrl}`,
-        `NEXT_PUBLIC_SENTRY_SPOTLIGHT=${publicSpotlightUrl}`, // This is needed for Next.js
+        `NEXT_PUBLIC_SENTRY_SPOTLIGHT=${spotlightUrlForBrowser}`, // This is needed for Next.js
         "SENTRY_TRACES_SAMPLE_RATE=1",
       ],
       extra_hosts: [`${DOCKER_HOST_INTERNAL}:${DOCKER_HOST_GATEWAY}`],
