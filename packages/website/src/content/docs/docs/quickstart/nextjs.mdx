@@ -106,6 +106,21 @@ Now that your Next.js app is instrumented, you can run Spotlight to capture and 
 
     This starts Spotlight on `http://localhost:8969` where you can access the web UI.
   </TabItem>
+  <TabItem label="CLI">
+    Install the Spotlight CLI globally:
+
+    ```bash
+    npm install -g @spotlightjs/spotlight
+    ```
+
+    Then run:
+
+    ```bash
+    spotlight
+    ```
+
+    This starts Spotlight on `http://localhost:8969` where you can access the web UI.
+  </TabItem>
   <TabItem label="Desktop App">
     Download the Spotlight desktop application:
 
@@ -120,47 +135,20 @@ Now that your Next.js app is instrumented, you can run Spotlight to capture and 
     docker run --rm -p 8969:8969 ghcr.io/getsentry/spotlight:latest
     ```
   </TabItem>
-  <TabItem label="CLI">
-    Install the Spotlight CLI globally:
-
-    ```bash
-    npm install -g @spotlightjs/spotlight
-    ```
-
-    Then run:
-
-    ```bash
-    spotlight
-    ```
-  </TabItem>
 </Tabs>
 
-### Enable Spotlight in Development Only
+### Add environment variable to enable Spotlight
 
-To ensure Spotlight only runs during development, you can conditionally enable the integration:
+:::note[When you don't need this]
+If you are using `spotlight run` to start Spotlight, you don't need to add this environment variable as we take care of it for you.
+:::
 
-```typescript
-// sentry.client.config.ts
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN || "https://spotlight@local/0",
-  integrations: [
-    // Only include Spotlight integration in development
-    ...(process.env.NODE_ENV === 'development' 
-      ? [Sentry.spotlightBrowserIntegration()] 
-      : []),
-  ],
-  tracesSampleRate: process.env.NODE_ENV === 'development' ? 1.0 : 0.1,
-  enableLogs: true,
-});
-```
-
-Alternatively, use the `SENTRY_SPOTLIGHT` environment variable:
+ use the `SENTRY_SPOTLIGHT` environment variable:
 
 ```bash
 # In your .env.local file
-SENTRY_SPOTLIGHT=1
+NEXT_PUBLIC_SENTRY_SPOTLIGHT=1 # for frontend event sending
+SENTRY_SPOTLIGHT=1 # for backend event sending
 ```
 
 Then in your SDK configuration:
