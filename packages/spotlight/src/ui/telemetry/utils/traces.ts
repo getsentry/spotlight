@@ -1,4 +1,4 @@
-import { log } from "~/lib/logger";
+import { log } from "@spotlight/ui/lib/logger";
 import type { Span, Trace } from "../types";
 
 // mutates spans in place and adds children, as well as returns the top level tree

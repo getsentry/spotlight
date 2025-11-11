@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useMemo } from "react";
-import { cn } from "~/lib/cn";
+import { cn } from "@spotlight/ui/lib/cn";
 
 export type RingChartProps = React.HTMLAttributes<SVGSVGElement> & {
   backgroundColors: string[];

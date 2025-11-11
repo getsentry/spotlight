@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import type { Trace } from "~/telemetry/types";
+import type { Trace } from "@spotlight/ui/telemetry/types";
 import { AITraceDetailsEmbedded } from "./AITraceDetails";
 import { extractAllAIRootSpans } from "./sdks/aiLibraries";
 

@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import type { TabPanel } from "~/types";
+import type { TabPanel } from "@spotlight/ui/types";
 
 type TabsProps = {
   tabs: TabPanel<unknown>[];

@@ -1,5 +1,5 @@
-import JsonViewer from "~/telemetry/components/shared/JsonViewer";
-import type { Tags as TagsType } from "~/telemetry/types";
+import JsonViewer from "@spotlight/ui/telemetry/components/shared/JsonViewer";
+import type { Tags as TagsType } from "@spotlight/ui/telemetry/types";
 import Tags from "./Tags";
 
 export function ContextView({

@@ -1,4 +1,4 @@
-import type { TabPanel } from "~/types";
+import type { TabPanel } from "@spotlight/ui/types";
 
 export function createTab<T>(
   id: string,

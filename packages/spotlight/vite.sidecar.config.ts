@@ -16,20 +16,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "~/main.js": resolve(__dirname, "src/sidecar/main.ts"),
-      "~/logger.js": resolve(__dirname, "src/sidecar/logger.ts"),
-      "~/constants.js": resolve(__dirname, "src/sidecar/constants.ts"),
-      "~/parser/index.js": resolve(__dirname, "src/sidecar/parser/index.ts"),
-      "~/parser/helpers.js": resolve(__dirname, "src/sidecar/parser/helpers.ts"),
-      "~/parser/types.js": resolve(__dirname, "src/sidecar/parser/types.ts"),
-      "~/formatters/md/__tests__/test_envelopes.js": resolve(
-        __dirname,
-        "src/sidecar/formatters/md/__tests__/test_envelopes.ts",
-      ),
-      "~/mcp/mcp.js": resolve(__dirname, "src/sidecar/mcp/mcp.ts"),
-      "~/routes/stream/userAgent.js": resolve(__dirname, "src/sidecar/routes/stream/userAgent.ts"),
-      "~/types/env.js": resolve(__dirname, "src/sidecar/types/env.ts"),
-      "~/utils/index.js": resolve(__dirname, "src/sidecar/utils/index.ts"),
+      "@spotlight/sidecar": resolve(__dirname, "src/sidecar"),
+      "@spotlight/shared": resolve(__dirname, "src/shared"),
     },
   },
   build: {

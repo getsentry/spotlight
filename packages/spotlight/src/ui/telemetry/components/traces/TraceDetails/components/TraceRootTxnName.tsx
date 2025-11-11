@@ -1,6 +1,6 @@
-import type { Trace } from "~/telemetry/types";
-import { getRootTransactionMethod, getRootTransactionName } from "~/telemetry/utils/traces";
-import Tag from "~/ui/tag";
+import type { Trace } from "@spotlight/ui/telemetry/types";
+import { getRootTransactionMethod, getRootTransactionName } from "@spotlight/ui/telemetry/utils/traces";
+import Tag from "@spotlight/ui/ui/tag";
 
 export function TraceRootTxnName({ trace, flowing = false }: { trace: Trace; flowing?: boolean }) {
   const method = getRootTransactionMethod(trace);

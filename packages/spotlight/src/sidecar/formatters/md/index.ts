@@ -1,4 +1,4 @@
-import { isErrorEvent, isLogEvent, isTraceEvent } from "~/parser/helpers.js";
+import { isErrorEvent, isLogEvent, isTraceEvent } from "@spotlight/sidecar/parser/helpers.js";
 import type { FormatterRegistry } from "../types.js";
 import { formatError } from "./errors.js";
 import { formatLog } from "./logs.js";

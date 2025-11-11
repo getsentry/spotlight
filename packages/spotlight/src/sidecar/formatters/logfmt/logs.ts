@@ -1,6 +1,6 @@
 import type { Envelope, SerializedLog } from "@sentry/core";
 import logfmt from "logfmt";
-import type { SentryLogEvent } from "~/parser/index.js";
+import type { SentryLogEvent } from "@spotlight/sidecar/parser/index.js";
 import { formatTimestamp, mapFields } from "../utils.js";
 
 function formatSingleLog(log: SerializedLog): string {

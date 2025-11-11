@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import CardList from "~/telemetry/components/shared/CardList";
+import CardList from "@spotlight/ui/telemetry/components/shared/CardList";
 import { TraceSplitViewLayout } from "../../tabs/TracesTab";
 import type { Trace } from "../../types";
 import TraceItem from "./TraceItem";

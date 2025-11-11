@@ -1,7 +1,7 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
 import type { z } from "zod";
-import { type SentryErrorEvent, type SentryEvent, isErrorEvent } from "~/parser/index.js";
-import type { EventContainer } from "~/utils/index.js";
+import { type SentryErrorEvent, type SentryEvent, isErrorEvent } from "@spotlight/sidecar/parser/index.js";
+import type { EventContainer } from "@spotlight/sidecar/utils/index.js";
 import type { ErrorEventSchema } from "../schema.js";
 import { formatTimestamp } from "../utils.js";
 import { formatEventOutput } from "./event.js";

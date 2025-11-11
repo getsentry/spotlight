@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { removeURLSuffix } from "~/lib/removeURLSuffix";
-import { connectToSidecar } from "~/sidecar";
-import { SENTRY_CONTENT_TYPE } from "~/shared/constants.js";
+import { removeURLSuffix } from "@spotlight/ui/lib/removeURLSuffix";
+import { connectToSidecar } from "@spotlight/ui/sidecar";
+import { SENTRY_CONTENT_TYPE } from "@spotlight/shared/constants.js";
 import { log } from "../lib/logger";
 import TelemetryView from "./components/TelemetryView";
 import useSentryStore from "./store";

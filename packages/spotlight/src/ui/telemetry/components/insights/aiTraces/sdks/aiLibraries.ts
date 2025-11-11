@@ -1,4 +1,4 @@
-import type { AILibraryHandler, Span, SpotlightAITrace, Trace } from "~/telemetry/types";
+import type { AILibraryHandler, Span, SpotlightAITrace, Trace } from "@spotlight/ui/telemetry/types";
 import { vercelAISDKHandler } from "./vercelAISDK";
 
 // Registry of supported AI libraries

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { ReactComponent as ChevronIcon } from "~/assets/chevronDown.svg";
-import { cn } from "~/lib/cn";
+import { ReactComponent as ChevronIcon } from "@spotlight/ui/assets/chevronDown.svg";
+import { cn } from "@spotlight/ui/lib/cn";
 
 export type CrumbProps = {
   id: string;

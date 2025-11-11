@@ -1,9 +1,9 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { format as formatSQL } from "sql-formatter";
-import JsonViewer from "~/telemetry/components/shared/JsonViewer";
-import { getFormattedDuration } from "~/telemetry/utils/duration";
-import { isErrorEvent } from "~/telemetry/utils/sentry";
-import { createTab } from "~/telemetry/utils/tabs";
+import JsonViewer from "@spotlight/ui/telemetry/components/shared/JsonViewer";
+import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
+import { isErrorEvent } from "@spotlight/ui/telemetry/utils/sentry";
+import { createTab } from "@spotlight/ui/telemetry/utils/tabs";
 import { DB_SPAN_REGEX } from "../../../constants";
 import useSentryStore from "../../../store";
 import type { Span } from "../../../types";

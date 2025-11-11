@@ -20,9 +20,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "~/shared": resolve(__dirname, "src/shared"),
-      "~/sidecar": resolve(__dirname, "src/sidecar"),
-      "~": resolve(__dirname, "src/ui"),
+      "@spotlight/ui": resolve(__dirname, "src/ui"),
+      "@spotlight/sidecar": resolve(__dirname, "src/sidecar"),
+      "@spotlight/shared": resolve(__dirname, "src/shared"),
     },
   },
   build: {

@@ -1,5 +1,5 @@
 import type { Envelope, SerializedLog } from "@sentry/core";
-import type { SentryLogEvent } from "~/parser/index.js";
+import type { SentryLogEvent } from "@spotlight/sidecar/parser/index.js";
 import { type SourceType, formatLogLine, inferEnvelopeSource } from "./utils.js";
 
 /**

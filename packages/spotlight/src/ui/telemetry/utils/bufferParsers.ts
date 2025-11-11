@@ -1,4 +1,4 @@
-import { log } from "~/lib/logger";
+import { log } from "@spotlight/ui/lib/logger";
 
 export function parseJSONFromBuffer<T = unknown>(data: Uint8Array): T {
   try {

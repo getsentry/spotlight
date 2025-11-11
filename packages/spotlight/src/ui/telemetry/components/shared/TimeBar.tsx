@@ -1,4 +1,4 @@
-import { cn } from "~/lib/cn";
+import { cn } from "@spotlight/ui/lib/cn";
 
 type TimeBarProps = {
   value: number;

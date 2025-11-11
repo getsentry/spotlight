@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "~/lib/cn";
+import { cn } from "@spotlight/ui/lib/cn";
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {

@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { SentryEventsContextProvider } from "~/telemetry/data/sentryEventsContext";
+import { SentryEventsContextProvider } from "@spotlight/ui/telemetry/data/sentryEventsContext";
 import AITraceList from "./AITraceList";
 
 export default function AItracesTab() {

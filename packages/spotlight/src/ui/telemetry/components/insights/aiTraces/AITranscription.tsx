@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ReactComponent as CrossIcon } from "~/assets/cross.svg";
-import { cn } from "~/lib/cn";
-import useSearchInput from "~/telemetry/hooks/useSearchInput";
-import useSentryStore from "~/telemetry/store";
-import type { SpotlightAITrace } from "~/telemetry/types";
-import { getFormattedDuration } from "~/telemetry/utils/duration";
+import { ReactComponent as CrossIcon } from "@spotlight/ui/assets/cross.svg";
+import { cn } from "@spotlight/ui/lib/cn";
+import useSearchInput from "@spotlight/ui/telemetry/hooks/useSearchInput";
+import useSentryStore from "@spotlight/ui/telemetry/store";
+import type { SpotlightAITrace } from "@spotlight/ui/telemetry/types";
+import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
 import DateTime from "../../shared/DateTime";
 import { createAITraceFromSpan, extractAllAIRootSpans } from "./sdks/aiLibraries";
 

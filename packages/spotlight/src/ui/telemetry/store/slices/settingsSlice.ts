@@ -1,6 +1,6 @@
 import type { StateCreator } from "zustand";
-import { DEFAULT_SIDECAR_URL } from "~/constants";
-import { CONTEXT_LINES_ENDPOINT } from "~/shared/constants.js";
+import { DEFAULT_SIDECAR_URL } from "@spotlight/ui/constants";
+import { CONTEXT_LINES_ENDPOINT } from "@spotlight/shared/constants.js";
 import type { SentryStore, SettingsSliceActions, SettingsSliceState } from "../types";
 
 const initialSettingsState: SettingsSliceState = {

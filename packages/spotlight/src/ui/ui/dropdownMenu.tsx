@@ -1,10 +1,10 @@
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-import { ReactComponent as ChevronIcon } from "~/assets/branch.svg";
-import { ReactComponent as Check } from "~/assets/check.svg";
-import { ReactComponent as Circle } from "~/assets/circle.svg";
+import { ReactComponent as ChevronIcon } from "@spotlight/ui/assets/branch.svg";
+import { ReactComponent as Check } from "@spotlight/ui/assets/check.svg";
+import { ReactComponent as Circle } from "@spotlight/ui/assets/circle.svg";
 
 import * as React from "react";
-import { cn } from "~/lib/cn";
+import { cn } from "@spotlight/ui/lib/cn";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

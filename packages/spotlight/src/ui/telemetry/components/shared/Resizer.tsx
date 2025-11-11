@@ -1,5 +1,5 @@
 import { type HTMLAttributes, type MouseEventHandler, type ReactNode, useRef } from "react";
-import { cn } from "~/lib/cn";
+import { cn } from "@spotlight/ui/lib/cn";
 
 export type ResizeDirection = "column" | "row";
 

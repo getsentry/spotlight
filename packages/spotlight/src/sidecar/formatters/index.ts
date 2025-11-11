@@ -1,6 +1,6 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
-import { logger } from "~/logger.js";
-import type { SentryEvent } from "~/parser/types.js";
+import { logger } from "@spotlight/sidecar/logger.js";
+import type { SentryEvent } from "@spotlight/sidecar/parser/types.js";
 import type { FormatterRegistry } from "./types.js";
 
 export * from "./types.js";

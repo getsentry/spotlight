@@ -1,4 +1,4 @@
-import Tag from "~/ui/tag";
+import Tag from "@spotlight/ui/ui/tag";
 
 export default function Tags({ tags }: { tags: { [key: string]: string } }) {
   return (

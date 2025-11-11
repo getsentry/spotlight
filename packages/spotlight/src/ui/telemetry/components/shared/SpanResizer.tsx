@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { cn } from "~/lib/cn";
+import { cn } from "@spotlight/ui/lib/cn";
 import Resizer, { type ResizeDirection } from "./Resizer";
 
 type SpanResizerProps = {

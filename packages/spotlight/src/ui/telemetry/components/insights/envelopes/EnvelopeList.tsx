@@ -1,8 +1,8 @@
 import type { Envelope } from "@sentry/core";
 import { Link, useParams } from "react-router-dom";
-import { cn } from "~/lib/cn";
-import CardList from "~/telemetry/components/shared/CardList";
-import TimeSince from "~/telemetry/components/shared/TimeSince";
+import { cn } from "@spotlight/ui/lib/cn";
+import CardList from "@spotlight/ui/telemetry/components/shared/CardList";
+import TimeSince from "@spotlight/ui/telemetry/components/shared/TimeSince";
 import { useSentryEnvelopes } from "../../../data/useSentryEnvelopes";
 import useSentryStore from "../../../store";
 import { sdkToPlatform } from "../../../utils/sdkToPlatform";

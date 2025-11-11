@@ -1,7 +1,7 @@
 import type { EnvelopeItem } from "@sentry/core";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
-import { ReactComponent as Download } from "~/assets/download.svg";
-import { base64Decode } from "~/lib/base64";
+import { ReactComponent as Download } from "@spotlight/ui/assets/download.svg";
+import { base64Decode } from "@spotlight/ui/lib/base64";
 import JsonViewer from "../../shared/JsonViewer";
 import { CodeViewer } from "./CodeViewer";
 import { inferExtension } from "./contentType";

@@ -1,10 +1,10 @@
-import { ReactComponent as X } from "~/assets/cross.svg";
-import { ReactComponent as Search } from "~/assets/search.svg";
+import { ReactComponent as X } from "@spotlight/ui/assets/cross.svg";
+import { ReactComponent as Search } from "@spotlight/ui/assets/search.svg";
 
 import { useCallback, useMemo } from "react";
-import { Badge } from "~/ui/badge";
-import { Button } from "~/ui/button";
-import { Input } from "~/ui/input";
+import { Badge } from "@spotlight/ui/ui/badge";
+import { Button } from "@spotlight/ui/ui/button";
+import { Input } from "@spotlight/ui/ui/input";
 import type { FilterConfigs } from "../../hooks/useTraceFiltering";
 import { FilterDropdown } from "../shared/FilterDropdown";
 

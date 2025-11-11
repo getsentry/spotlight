@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import CardList from "~/telemetry/components/shared/CardList";
-import TimeSince from "~/telemetry/components/shared/TimeSince";
+import CardList from "@spotlight/ui/telemetry/components/shared/CardList";
+import TimeSince from "@spotlight/ui/telemetry/components/shared/TimeSince";
 import { useSentryEvents } from "../../data/useSentryEvents";
 import { isErrorEvent } from "../../utils/sentry";
 import { truncateId } from "../../utils/text";

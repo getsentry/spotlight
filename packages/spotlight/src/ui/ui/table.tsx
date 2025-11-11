@@ -1,5 +1,5 @@
 import { type ReactNode, createContext, useContext } from "react";
-import { cn } from "~/lib/cn";
+import { cn } from "@spotlight/ui/lib/cn";
 
 type TableVariant = "default" | "detail";
 

@@ -1,5 +1,5 @@
-import { getAllSpansInTree } from "~/telemetry/store/helpers";
-import type { AILibraryHandler, AIToolCall, Span, SpotlightAITrace } from "~/telemetry/types";
+import { getAllSpansInTree } from "@spotlight/ui/telemetry/store/helpers";
+import type { AILibraryHandler, AIToolCall, Span, SpotlightAITrace } from "@spotlight/ui/telemetry/types";
 
 // https://ai-sdk.dev/docs/ai-sdk-core/telemetry
 const AI_SPAN_OP_PREFIX = "gen_ai.";

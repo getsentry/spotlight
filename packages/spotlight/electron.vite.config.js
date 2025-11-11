@@ -18,7 +18,8 @@ export default defineConfig(({ mode }) => {
     main: {
       resolve: {
         alias: {
-          "~": resolve(__dirname, "src/sidecar"),
+          "@spotlight/sidecar": resolve(__dirname, "src/sidecar"),
+          "@spotlight/shared": resolve(__dirname, "src/shared"),
         },
       },
       plugins: [
@@ -44,7 +45,8 @@ export default defineConfig(({ mode }) => {
     preload: {
       resolve: {
         alias: {
-          "~": resolve(__dirname, "src/sidecar"),
+          "@spotlight/sidecar": resolve(__dirname, "src/sidecar"),
+          "@spotlight/shared": resolve(__dirname, "src/shared"),
         },
       },
       plugins: [
@@ -70,7 +72,9 @@ export default defineConfig(({ mode }) => {
     renderer: {
       resolve: {
         alias: {
-          "~": resolve(__dirname, "src/ui"),
+          "@spotlight/ui": resolve(__dirname, "src/ui"),
+          "@spotlight/sidecar": resolve(__dirname, "src/sidecar"),
+          "@spotlight/shared": resolve(__dirname, "src/shared"),
         },
       },
       define: {

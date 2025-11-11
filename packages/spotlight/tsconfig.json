@@ -3,22 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/ui/*"],
-      "~/main.js": ["src/sidecar/main.ts"],
-      "~/logger.js": ["src/sidecar/logger.ts"],
-      "~/constants.js": ["src/sidecar/constants.ts"],
-      "~/shared/constants.js": ["src/shared/constants.ts"],
-      "~/sidecar": ["src/sidecar/main.ts"],
-      "~/sidecar/formatters/md/errors.js": ["src/sidecar/formatters/md/errors.ts"],
-      "~/sidecar/formatters/md/event.js": ["src/sidecar/formatters/md/event.ts"],
-      "~/parser/index.js": ["src/sidecar/parser/index.ts"],
-      "~/parser/helpers.js": ["src/sidecar/parser/helpers.ts"],
-      "~/parser/types.js": ["src/sidecar/parser/types.ts"],
-      "~/formatters/md/__tests__/test_envelopes.js": ["src/sidecar/formatters/md/__tests__/test_envelopes.ts"],
-      "~/mcp/mcp.js": ["src/sidecar/mcp/mcp.ts"],
-      "~/routes/stream/userAgent.js": ["src/sidecar/routes/stream/userAgent.ts"],
-      "~/types/env.js": ["src/sidecar/types/env.ts"],
-      "~/utils/index.js": ["src/sidecar/utils/index.ts"]
+      "@spotlight/ui/*": ["src/ui/*"],
+      "@spotlight/sidecar/*": ["src/sidecar/*"],
+      "@spotlight/shared/*": ["src/shared/*"]
     },
     "outDir": "dist",
     "rootDir": "src"

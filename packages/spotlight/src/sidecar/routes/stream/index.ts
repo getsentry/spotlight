@@ -1,9 +1,9 @@
 import { createWriteStream } from "node:fs";
 import { brotliDecompressSync, gunzipSync, inflateSync } from "node:zlib";
 import { Hono } from "hono";
-import { logger } from "~/logger.js";
-import type { HonoEnv } from "~/types/env.js";
-import { EventContainer, getBuffer } from "~/utils/index.js";
+import { logger } from "@spotlight/sidecar/logger.js";
+import type { HonoEnv } from "@spotlight/sidecar/types/env.js";
+import { EventContainer, getBuffer } from "@spotlight/sidecar/utils/index.js";
 import { logIncomingEvent, logOutgoingEvent } from "./debugLogging.js";
 import { streamSSE } from "./streaming.js";
 import { parseBrowserFromUserAgent } from "./userAgent.js";

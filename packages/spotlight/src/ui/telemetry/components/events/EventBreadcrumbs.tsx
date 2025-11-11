@@ -1,7 +1,7 @@
 import { Fragment } from "react";
-import { cn } from "~/lib/cn";
-import JsonViewer from "~/telemetry/components/shared/JsonViewer";
-import Time from "~/telemetry/components/shared/Time";
+import { cn } from "@spotlight/ui/lib/cn";
+import JsonViewer from "@spotlight/ui/telemetry/components/shared/JsonViewer";
+import Time from "@spotlight/ui/telemetry/components/shared/Time";
 import type { Breadcrumb, SentryEvent } from "../../types";
 import { CodeViewer } from "../insights/envelopes/CodeViewer";
 

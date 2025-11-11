@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { SearchProvider, useSearch } from "~/telemetry/context/SearchContext";
-import useSearchInput from "~/telemetry/hooks/useSearchInput";
-import useSentryStore from "~/telemetry/store";
-import type { Trace } from "~/telemetry/types";
+import { SearchProvider, useSearch } from "@spotlight/ui/telemetry/context/SearchContext";
+import useSearchInput from "@spotlight/ui/telemetry/hooks/useSearchInput";
+import useSentryStore from "@spotlight/ui/telemetry/store";
+import type { Trace } from "@spotlight/ui/telemetry/types";
 import { getFormattedSpanDuration } from "../../../../utils/duration";
 
-import { ReactComponent as X } from "~/assets/cross.svg";
-import { ReactComponent as Search } from "~/assets/search.svg";
-import { Button } from "~/ui/button";
-import { Input } from "~/ui/input";
+import { ReactComponent as X } from "@spotlight/ui/assets/cross.svg";
+import { ReactComponent as Search } from "@spotlight/ui/assets/search.svg";
+import { Button } from "@spotlight/ui/ui/button";
+import { Input } from "@spotlight/ui/ui/input";
 import DateTime from "../../../shared/DateTime";
 import SpanTree from "../../spans/SpanTree";
 

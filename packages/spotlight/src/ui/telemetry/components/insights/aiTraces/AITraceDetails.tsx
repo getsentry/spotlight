@@ -4,12 +4,12 @@ import {
   createAITraceFromSpan,
   detectAILibraryHandler,
   extractAllAIRootSpans,
-} from "~/telemetry/components/insights/aiTraces/sdks/aiLibraries";
-import type { AILibraryHandler, SpotlightAITrace } from "~/telemetry/types";
-import { getFormattedDuration } from "~/telemetry/utils/duration";
-import { Badge } from "~/ui/badge";
-import SidePanel, { SidePanelHeader } from "~/ui/sidePanel";
-import Table from "~/ui/table";
+} from "@spotlight/ui/telemetry/components/insights/aiTraces/sdks/aiLibraries";
+import type { AILibraryHandler, SpotlightAITrace } from "@spotlight/ui/telemetry/types";
+import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
+import { Badge } from "@spotlight/ui/ui/badge";
+import SidePanel, { SidePanelHeader } from "@spotlight/ui/ui/sidePanel";
+import Table from "@spotlight/ui/ui/table";
 import { SearchProvider } from "../../../context/SearchContext";
 import useSentryStore from "../../../store";
 import DateTime from "../../shared/DateTime";

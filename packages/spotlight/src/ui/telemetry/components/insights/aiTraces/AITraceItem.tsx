@@ -1,5 +1,5 @@
-import type { SpotlightAITrace } from "~/telemetry/types";
-import { getFormattedDuration } from "~/telemetry/utils/duration";
+import type { SpotlightAITrace } from "@spotlight/ui/telemetry/types";
+import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
 import DateTime from "../../shared/DateTime";
 interface AITraceItemProps {
   trace: SpotlightAITrace;

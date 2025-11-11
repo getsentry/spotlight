@@ -1,11 +1,11 @@
 import { useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ReactComponent as DeleteIcon } from "~/assets/deleteIcon.svg";
-import { ReactComponent as Logo } from "~/assets/glyph.svg";
-import { cn } from "~/lib/cn";
-import { useSpotlightContext } from "~/lib/useSpotlightContext";
-import type { NotificationCount } from "~/types";
-import { Badge } from "~/ui/badge";
+import { ReactComponent as DeleteIcon } from "@spotlight/ui/assets/deleteIcon.svg";
+import { ReactComponent as Logo } from "@spotlight/ui/assets/glyph.svg";
+import { cn } from "@spotlight/ui/lib/cn";
+import { useSpotlightContext } from "@spotlight/ui/lib/useSpotlightContext";
+import type { NotificationCount } from "@spotlight/ui/types";
+import { Badge } from "@spotlight/ui/ui/badge";
 import useSentryStore from "../store";
 
 interface TelemetrySidebarProps {

@@ -1,6 +1,6 @@
 import { transformerNotationHighlight } from "@shikijs/transformers";
 import { bundledLanguages } from "shiki/bundle-web.mjs";
-import { SHIKI_DEFAULT_THEME, useShiki } from "~/ShikiProvider";
+import { SHIKI_DEFAULT_THEME, useShiki } from "@spotlight/ui/ShikiProvider";
 
 export function CodeViewer({ code, lang }: { code: string; lang: string }) {
   const highlighter = useShiki();

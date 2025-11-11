@@ -1,5 +1,5 @@
 import type { Envelope } from "@sentry/core";
-import type { SentryErrorEvent, SentryEvent, SentryLogEvent, SentryTransactionEvent } from "~/parser/types.js";
+import type { SentryErrorEvent, SentryEvent, SentryLogEvent, SentryTransactionEvent } from "@spotlight/sidecar/parser/types.js";
 
 /**
  * Strongly-typed formatter functions (no type guards needed in implementation)

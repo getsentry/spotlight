@@ -1,5 +1,5 @@
 import type { StateCreator } from "zustand";
-import { generateUuidv4 } from "~/lib/uuid";
+import { generateUuidv4 } from "@spotlight/ui/lib/uuid";
 import { graftProfileSpans } from "../../data/profiles";
 import type {
   ProfileSample,

@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
-import { PERFORMANCE_SCORE_PROFILES } from "~/telemetry/constants";
-import { useSentryEvents } from "~/telemetry/data/useSentryEvents";
-import type { MetricScoreProps, MetricWeightsProps, SentryEventWithPerformanceData } from "~/telemetry/types";
-import { getFormattedDuration } from "~/telemetry/utils/duration";
-import Breadcrumbs from "~/ui/breadcrumbs";
+import { PERFORMANCE_SCORE_PROFILES } from "@spotlight/ui/telemetry/constants";
+import { useSentryEvents } from "@spotlight/ui/telemetry/data/useSentryEvents";
+import type { MetricScoreProps, MetricWeightsProps, SentryEventWithPerformanceData } from "@spotlight/ui/telemetry/types";
+import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
+import Breadcrumbs from "@spotlight/ui/ui/breadcrumbs";
 import { normalizePerformanceScore } from "../../../utils/webVitals";
 import PerformanceChart from "./PerformanceChart";
 

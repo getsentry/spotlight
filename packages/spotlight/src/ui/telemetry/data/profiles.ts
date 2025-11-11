@@ -1,5 +1,5 @@
-import { log } from "~/lib/logger";
-import { generateUuidv4 } from "~/lib/uuid";
+import { log } from "@spotlight/ui/lib/logger";
+import { generateUuidv4 } from "@spotlight/ui/lib/uuid";
 import useSentryStore from "../store";
 import type { SentryProfileWithTraceMeta } from "../store/types";
 import type { EventFrame, Span, Trace } from "../types";

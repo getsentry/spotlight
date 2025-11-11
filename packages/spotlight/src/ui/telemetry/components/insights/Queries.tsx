@@ -1,15 +1,15 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ReactComponent as Sort } from "~/assets/sort.svg";
-import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
-import { cn } from "~/lib/cn";
-import { TimeBar } from "~/telemetry/components/shared/TimeBar";
-import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from "~/telemetry/constants";
-import { useSentrySpans } from "~/telemetry/data/useSentrySpans";
-import useSort from "~/telemetry/hooks/useSort";
-import type { Span } from "~/telemetry/types";
-import { getFormattedDuration, getSpanDurationClassName } from "~/telemetry/utils/duration";
-import Table from "~/ui/table";
+import { ReactComponent as Sort } from "@spotlight/ui/assets/sort.svg";
+import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
+import { cn } from "@spotlight/ui/lib/cn";
+import { TimeBar } from "@spotlight/ui/telemetry/components/shared/TimeBar";
+import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from "@spotlight/ui/telemetry/constants";
+import { useSentrySpans } from "@spotlight/ui/telemetry/data/useSentrySpans";
+import useSort from "@spotlight/ui/telemetry/hooks/useSort";
+import type { Span } from "@spotlight/ui/telemetry/types";
+import { getFormattedDuration, getSpanDurationClassName } from "@spotlight/ui/telemetry/utils/duration";
+import Table from "@spotlight/ui/ui/table";
 
 type QueryInfo = {
   avgDuration: number;

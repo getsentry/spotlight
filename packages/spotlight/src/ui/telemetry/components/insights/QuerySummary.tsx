@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ReactComponent as Sort } from "~/assets/sort.svg";
-import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
-import { cn } from "~/lib/cn";
-import Breadcrumbs from "~/ui/breadcrumbs";
-import Table from "~/ui/table";
+import { ReactComponent as Sort } from "@spotlight/ui/assets/sort.svg";
+import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
+import { cn } from "@spotlight/ui/lib/cn";
+import Breadcrumbs from "@spotlight/ui/ui/breadcrumbs";
+import Table from "@spotlight/ui/ui/table";
 import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from "../../constants";
 import { useSentrySpans } from "../../data/useSentrySpans";
 import useSort from "../../hooks/useSort";

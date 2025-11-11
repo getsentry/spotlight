@@ -1,4 +1,4 @@
-import type { SentryEvent } from "~/telemetry/types";
+import type { SentryEvent } from "@spotlight/ui/telemetry/types";
 import type { WebVitals } from "../constants";
 
 const SQRT_2 = Math.sqrt(2);

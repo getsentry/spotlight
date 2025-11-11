@@ -15,7 +15,7 @@
     "start": "./dist/run.js",
     "dev": "vite serve --config=vite.dev.config.ts",
     "dev:electron": "electron-vite dev",
-    "build": "NODE_ENV=production tsc --skipLibCheck && tsc --project tsconfig.sidecar.json && tsc-alias -p tsconfig.sidecar.json && vite build && vite build --config vite.ui.config.ts && vite build --config vite.sidecar.config.ts && npm run build:sea && npm run build:electron",
+    "build": "NODE_ENV=production tsc --skipLibCheck && tsc --project tsconfig.sidecar.json && vite build && vite build --config vite.ui.config.ts && vite build --config vite.sidecar.config.ts && npm run build:sea && npm run build:electron",
     "build:sea": "fossilize -m dist/ui/manifest.json -o spotlight dist/run.js",
     "build:watch": "vite build --watch",
     "build:electron": "electron-vite build",

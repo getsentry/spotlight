@@ -1,9 +1,9 @@
 import type { TreeNode } from "nanovis";
 import { useEffect, useRef, useState } from "react";
-import { cn } from "~/lib/cn";
-import { FRAME_TYPES } from "~/telemetry/constants/profile";
-import useMouseTracking from "~/telemetry/hooks/useMouseTracking";
-import type { NanovisTreeNode } from "~/telemetry/types";
+import { cn } from "@spotlight/ui/lib/cn";
+import { FRAME_TYPES } from "@spotlight/ui/telemetry/constants/profile";
+import useMouseTracking from "@spotlight/ui/telemetry/hooks/useMouseTracking";
+import type { NanovisTreeNode } from "@spotlight/ui/telemetry/types";
 import type { SentryProfileWithTraceMeta } from "../../../../store/types";
 import { convertSentryProfileToNormalizedTree } from "../../../../utils/profileTree";
 

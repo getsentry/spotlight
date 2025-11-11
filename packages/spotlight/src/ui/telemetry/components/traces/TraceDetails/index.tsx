@@ -1,13 +1,13 @@
 import { useMemo } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { createTab } from "~/telemetry/utils/tabs";
+import { createTab } from "@spotlight/ui/telemetry/utils/tabs";
 import TelemetryTabs from "../../TelemetryTabs";
 
-import { useSentryEvents } from "~/telemetry/data/useSentryEvents";
-import useSentryStore from "~/telemetry/store/store";
-import type { Trace } from "~/telemetry/types";
-import { getFormattedDuration } from "~/telemetry/utils/duration";
-import { isErrorEvent } from "~/telemetry/utils/sentry";
+import { useSentryEvents } from "@spotlight/ui/telemetry/data/useSentryEvents";
+import useSentryStore from "@spotlight/ui/telemetry/store/store";
+import type { Trace } from "@spotlight/ui/telemetry/types";
+import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
+import { isErrorEvent } from "@spotlight/ui/telemetry/utils/sentry";
 import EventContexts from "../../events/EventContexts";
 import EventList from "../../events/EventList";
 import AITraceSplitView from "../../insights/aiTraces/AITraceSplitView";

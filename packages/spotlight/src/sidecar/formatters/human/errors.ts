@@ -1,5 +1,5 @@
 import type { Envelope } from "@sentry/core";
-import type { SentryErrorEvent } from "~/parser/index.js";
+import type { SentryErrorEvent } from "@spotlight/sidecar/parser/index.js";
 import { formatLogLine, inferEnvelopeSource } from "./utils.js";
 
 /**

@@ -1,11 +1,11 @@
 import { captureException } from "@sentry/core";
-import { processErrorEvent } from "~/sidecar/formatters/md/errors.js";
-import { formatEventOutput } from "~/sidecar/formatters/md/event.js";
+import { processErrorEvent } from "@spotlight/sidecar/formatters/md/errors.js";
+import { formatEventOutput } from "@spotlight/sidecar/formatters/md/event.js";
 import { type MouseEvent, useCallback, useEffect, useState } from "react";
-import { ReactComponent as CheckIcon } from "~/assets/check.svg";
-import { ReactComponent as CopyIcon } from "~/assets/copy.svg";
-import { Button } from "~/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/ui/tooltip";
+import { ReactComponent as CheckIcon } from "@spotlight/ui/assets/check.svg";
+import { ReactComponent as CopyIcon } from "@spotlight/ui/assets/copy.svg";
+import { Button } from "@spotlight/ui/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@spotlight/ui/ui/tooltip";
 import type { SentryErrorEvent } from "../../types";
 
 interface AICopyButtonProps {

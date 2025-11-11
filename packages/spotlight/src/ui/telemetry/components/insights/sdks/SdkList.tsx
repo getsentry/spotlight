@@ -1,7 +1,7 @@
-import CardList from "~/telemetry/components/shared/CardList";
-import TimeSince from "~/telemetry/components/shared/TimeSince";
-import { useSentrySdks } from "~/telemetry/data/useSentrySdks";
-import { sdkToPlatform } from "~/telemetry/utils/sdkToPlatform";
+import CardList from "@spotlight/ui/telemetry/components/shared/CardList";
+import TimeSince from "@spotlight/ui/telemetry/components/shared/TimeSince";
+import { useSentrySdks } from "@spotlight/ui/telemetry/data/useSentrySdks";
+import { sdkToPlatform } from "@spotlight/ui/telemetry/utils/sdkToPlatform";
 import PlatformIcon from "../../shared/PlatformIcon";
 
 export default function SdkList() {

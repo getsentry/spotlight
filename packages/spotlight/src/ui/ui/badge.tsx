@@ -1,7 +1,7 @@
 import { type VariantProps, cva } from "class-variance-authority";
 import type * as React from "react";
 
-import { cn } from "~/lib/cn";
+import { cn } from "@spotlight/ui/lib/cn";
 
 const badgeVariants = cva(
   "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-neutral-950 focus:ring-offset-2",

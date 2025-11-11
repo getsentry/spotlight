@@ -1,11 +1,11 @@
 import { type KeyboardEvent, useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ReactComponent as Filter } from "~/assets/filter.svg";
-import { ReactComponent as Sort } from "~/assets/sort.svg";
-import { ReactComponent as SortDown } from "~/assets/sortDown.svg";
-import { cn } from "~/lib/cn";
-import CardList from "~/telemetry/components/shared/CardList";
-import { Button } from "~/ui/button";
+import { ReactComponent as Filter } from "@spotlight/ui/assets/filter.svg";
+import { ReactComponent as Sort } from "@spotlight/ui/assets/sort.svg";
+import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
+import { cn } from "@spotlight/ui/lib/cn";
+import CardList from "@spotlight/ui/telemetry/components/shared/CardList";
+import { Button } from "@spotlight/ui/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -13,8 +13,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "~/ui/dropdownMenu";
-import Table from "~/ui/table";
+} from "@spotlight/ui/ui/dropdownMenu";
+import Table from "@spotlight/ui/ui/table";
 import { LOGS_HEADERS, LOGS_SORT_KEYS, LOG_LEVEL_COLORS } from "../../constants";
 import { useSentryLogs } from "../../data/useSentryLogs";
 import useColumnVisibility from "../../hooks/useColumnVisibility";

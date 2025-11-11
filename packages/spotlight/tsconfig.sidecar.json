@@ -10,7 +10,8 @@
     "target": "esnext",
     "module": "nodenext",
     "paths": {
-      "~/*": ["src/sidecar/*"]
+      "@spotlight/sidecar/*": ["src/sidecar/*"],
+      "@spotlight/shared/*": ["src/shared/*"]
     },
     "outDir": "dist",
     "rootDir": "src"

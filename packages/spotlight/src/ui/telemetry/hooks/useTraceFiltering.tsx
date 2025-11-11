@@ -1,9 +1,9 @@
 import { type ElementType, useCallback, useMemo } from "react";
-import { ReactComponent as AlertCircle } from "~/assets/alertCircle.svg";
-import { ReactComponent as Branch } from "~/assets/branch.svg";
-import { ReactComponent as Clock } from "~/assets/clock.svg";
-import { ReactComponent as Filter } from "~/assets/filter.svg";
-import { ReactComponent as Hash } from "~/assets/hash.svg";
+import { ReactComponent as AlertCircle } from "@spotlight/ui/assets/alertCircle.svg";
+import { ReactComponent as Branch } from "@spotlight/ui/assets/branch.svg";
+import { ReactComponent as Clock } from "@spotlight/ui/assets/clock.svg";
+import { ReactComponent as Filter } from "@spotlight/ui/assets/filter.svg";
+import { ReactComponent as Hash } from "@spotlight/ui/assets/hash.svg";
 import type { Trace } from "../types";
 import { getRootTransactionMethod, getRootTransactionName } from "../utils/traces";
 
