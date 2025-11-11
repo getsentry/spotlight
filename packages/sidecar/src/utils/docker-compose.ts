@@ -134,6 +134,7 @@ export function detectDockerCompose(): DockerComposeConfig | null {
   }
 
   if (!docker.valid) {
+    logger.error(`Docker version ${docker.version} does not meet the minimum required version ${DOCKER_MIN_VERSION}`);
     return null;
   }
 
