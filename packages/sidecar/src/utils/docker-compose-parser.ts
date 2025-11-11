@@ -2,34 +2,36 @@ import { existsSync, readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
 import { logger } from "../logger.js";
 
-const COMPOSE_FILE_NAMES = ["docker-compose.yaml", "docker-compose.yml", "compose.yml", "compose.yaml"] as const;
+const COMPOSE_FILE_BASE_NAMES = ["docker-compose", "compose"] as const;
+const COMPOSE_FILE_EXTENSIONS = [".yaml", ".yml"] as const;
 
 /**
- * Find the compose file in the current directory
+ * Find a file by checking all combinations of base names and extensions
  */
-export function findComposeFile(): string | null {
-  for (const fileName of COMPOSE_FILE_NAMES) {
-    if (existsSync(fileName)) {
-      return fileName;
+function findFile(buildFileName: (baseName: string, ext: string) => string): string | null {
+  for (const baseName of COMPOSE_FILE_BASE_NAMES) {
+    for (const ext of COMPOSE_FILE_EXTENSIONS) {
+      const fileName = buildFileName(baseName, ext);
+      if (existsSync(fileName)) {
+        return fileName;
+      }
     }
   }
   return null;
 }
 
 /**
- * Find the override file for a given compose file
+ * Find the compose file in the current directory
  */
-export function findOverrideFile(composeFile: string): string | null {
-  const ext = composeFile.endsWith(".yaml") ? ".yaml" : ".yml";
-  const baseName = composeFile.replace(/\.(yaml|yml)$/, "");
+export function findComposeFile(): string | null {
+  return findFile((baseName, ext) => `${baseName}${ext}`);
+}
 
-  const overrideFile = `${baseName}.override${ext}`;
-
-  if (existsSync(overrideFile)) {
-    return overrideFile;
-  }
-
-  return null;
+/**
+ * Find the override file in the current directory
+ */
+export function findOverrideFile(): string | null {
+  return findFile((baseName, ext) => `${baseName}.override${ext}`);
 }
 
 /**

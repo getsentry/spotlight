@@ -185,7 +185,7 @@ export function detectDockerCompose(): DockerComposeConfig | null {
 
   logger.debug(`Found ${serviceNames.length} service(s): ${serviceNames.join(", ")}`);
 
-  const overrideFile = findOverrideFile(composeFile);
+  const overrideFile = findOverrideFile();
   if (overrideFile) {
     logger.debug(`Found override file: ${overrideFile}`);
   }
