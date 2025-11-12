@@ -18,6 +18,5 @@
     "rootDir": "src"
   },
   "include": ["src"],
-  "exclude": ["src/electron/**/*", "src/electron-renderer.ts", "**/__tests__/**/*", "**/*.test.ts", "**/*.spec.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": ["src/electron/**/*", "src/electron-renderer.ts", "**/__tests__/**/*", "**/*.test.ts", "**/*.spec.ts"]
 }

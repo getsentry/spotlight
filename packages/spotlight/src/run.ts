@@ -48,17 +48,19 @@ startSpan({ name: "Spotlight CLI", op: "cli" }, async () => {
     const ENTRY_POINT_NAME = "index.html";
     const filesToServe = Object.create(null);
 
-    startSpan({ name: "Setup Server Assets", op: "cli.setup.assets" }, () => {
-      // Following the guide here: https://vite.dev/guide/backend-integration.html
-      const manifest = JSON.parse(readAsset(MANIFEST_NAME).toString());
-      filesToServe[ENTRY_POINT_NAME] = readAsset(ENTRY_POINT_NAME);
-      const entries = Object.values(manifest);
-      for (const entry of entries) {
-        if (entry && typeof entry === "object" && "file" in entry && typeof entry.file === "string") {
-          filesToServe[entry.file] = readAsset(entry.file);
+    if (process.env.NODE_ENV === "production") {
+      startSpan({ name: "Setup Server Assets", op: "cli.setup.assets" }, () => {
+        // Following the guide here: https://vite.dev/guide/backend-integration.html
+        const manifest = JSON.parse(readAsset(MANIFEST_NAME).toString());
+        filesToServe[ENTRY_POINT_NAME] = readAsset(ENTRY_POINT_NAME);
+        const entries = Object.values(manifest);
+        for (const entry of entries) {
+          if (entry && typeof entry === "object" && "file" in entry && typeof entry.file === "string") {
+            filesToServe[entry.file] = readAsset(entry.file);
+          }
         }
-      }
-    });
+      });
+    }
 
     await main({
       basePath: process.cwd(),
