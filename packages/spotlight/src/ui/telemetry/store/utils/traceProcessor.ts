@@ -26,7 +26,8 @@ export function processTransactionEvent(
   const { existingTrace, profilesByTraceId } = context;
 
   // Add guard to ensure trace_id exists
-    throw new Error("Transaction event missing required trace_id");
+  if (!traceCtx.trace_id) {
+    throw new Error('Transaction event missing required trace_id');
   }
 
   // Initialize or get existing trace
