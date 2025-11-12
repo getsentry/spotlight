@@ -1,6 +1,6 @@
 import { consoleLoggingIntegration, init } from "@sentry/node";
-import { parseCLIArgs } from "./sidecar/cli.js";
-import { DEFAULT_PORT } from "./sidecar/constants.js";
+import { parseCLIArgs } from "./server/cli.js";
+import { DEFAULT_PORT } from "./server/constants.js";
 
 // Parse CLI arguments to determine the port this Spotlight instance will use
 const { port: instancePort } = parseCLIArgs();

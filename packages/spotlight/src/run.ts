@@ -3,7 +3,7 @@ import Module from "node:module";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { setContext, startSpan } from "@sentry/node";
-import { main } from "./sidecar/cli.js";
+import { main } from "./server/cli.js";
 import "./instrument.js";
 
 const require = Module.createRequire(import.meta.url);
@@ -43,12 +43,12 @@ const readAsset = withTracing(
 );
 
 startSpan({ name: "Spotlight CLI", op: "cli" }, async () => {
-  await startSpan({ name: "Setup Sidecar", op: "cli.setup.sidecar" }, async () => {
+  await startSpan({ name: "Setup Spotlight", op: "cli.setup" }, async () => {
     const MANIFEST_NAME = "manifest.json";
     const ENTRY_POINT_NAME = "index.html";
     const filesToServe = Object.create(null);
 
-    startSpan({ name: "Setup Server Assets", op: "cli.setup.sidecar.assets" }, () => {
+    startSpan({ name: "Setup Server Assets", op: "cli.setup.assets" }, () => {
       // Following the guide here: https://vite.dev/guide/backend-integration.html
       const manifest = JSON.parse(readAsset(MANIFEST_NAME).toString());
       filesToServe[ENTRY_POINT_NAME] = readAsset(ENTRY_POINT_NAME);

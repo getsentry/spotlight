@@ -1,10 +1,16 @@
 {
   "extends": "@spotlightjs/tsconfig/tsconfig.json",
   "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
+    "moduleResolution": "bundler",
+    "emitDeclarationOnly": false,
+    "declaration": true,
+    "target": "esnext",
+    "module": "esnext",
     "paths": {
       "@spotlight/ui/*": ["src/ui/*"],
-      "@spotlight/sidecar/*": ["src/sidecar/*"],
+      "@spotlight/server/*": ["src/server/*"],
       "@spotlight/shared/*": ["src/shared/*"]
     },
     "outDir": "dist",

@@ -4,8 +4,8 @@ import * as Sentry from "@sentry/electron/main";
 import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, session, shell } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
-import { DEFAULT_PORT } from "../../sidecar/constants";
-import { clearBuffer, setupSidecar } from "../../sidecar/main";
+import { DEFAULT_PORT } from "../../server/constants";
+import { clearBuffer, setupSpotlight } from "../../server/main";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -541,7 +541,7 @@ function createTray() {
       click: () => showOrCreateWindow(),
     },
     {
-      label: "Sidecar Status",
+      label: "Spotlight Status",
       enabled: false,
       sublabel: `Running on port ${DEFAULT_PORT}`,
     },
@@ -568,7 +568,7 @@ function createTray() {
     },
   ]);
 
-  tray.setToolTip("Spotlight - Sidecar is running");
+  tray.setToolTip("Spotlight is running");
   tray.setContextMenu(contextMenu);
 
   tray.on("click", () => {
@@ -597,13 +597,13 @@ const MAX_RETRIES = 3;
 const RECHECK_DELAY = 5000;
 const RETRY_DELAY_INCREMENT = 2000;
 
-async function makeSureSidecarIsRunning() {
+async function makeSureSpotlightIsRunning() {
   let retries = 0;
   let subscriber: NodeJS.Timeout | null = null;
 
   async function handler() {
     try {
-      await setupSidecar({
+      await setupSpotlight({
         port: DEFAULT_PORT,
         incomingPayload: storeIncomingPayload,
         isStandalone: true,
@@ -639,4 +639,4 @@ async function makeSureSidecarIsRunning() {
   handler();
 }
 
-makeSureSidecarIsRunning();
+makeSureSpotlightIsRunning();
