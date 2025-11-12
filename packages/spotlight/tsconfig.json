@@ -1,12 +1,22 @@
 {
   "extends": "@spotlightjs/tsconfig/tsconfig.json",
   "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
-    "skipLibCheck": true,
-    /* paths */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "declaration": true,
+    "target": "esnext",
+    "module": "esnext",
+    "paths": {
+      "@spotlight/ui/*": ["src/ui/*"],
+      "@spotlight/server/*": ["src/server/*"],
+      "@spotlight/shared/*": ["src/shared/*"]
+    },
     "outDir": "dist",
     "rootDir": "src"
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": ["src/electron/**/*", "src/electron-renderer.ts", "**/__tests__/**/*", "**/*.test.ts", "**/*.spec.ts"]
 }

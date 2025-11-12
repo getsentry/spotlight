@@ -36,9 +36,9 @@ This project uses **pnpm** exclusively for package management.
 pnpm install
 
 # Run development servers
-pnpm dev                    # overlay + sidecar
-pnpm dev:overlay           # overlay only
-pnpm dev:sidecar           # sidecar only
+pnpm dev                    # spotlight UI + sidecar
+pnpm dev:ui                # spotlight UI only
+pnpm dev:sidecar           # spotlight sidecar only
 pnpm dev:website           # website only
 pnpm dev:electron          # electron app
 
@@ -47,7 +47,7 @@ pnpm build
 
 # Run tests
 pnpm test                  # all package tests
-pnpm test:e2e             # e2e tests
+pnpm test:e2e             # e2e tests (electron)
 
 # Linting and formatting
 pnpm lint                  # check code
@@ -63,10 +63,11 @@ pnpm clean:all            # clean everything and reinstall
 ## Workspace Structure
 
 This is a monorepo using pnpm workspaces with the following packages:
-- `@spotlightjs/electron` - Electron application
-- `@spotlightjs/overlay` - Overlay UI components
-- `@spotlightjs/sidecar` - Core sidecar functionality
-- `@spotlightjs/spotlight` - Main spotlight package
+- `@spotlightjs/spotlight` - Main spotlight package containing:
+  - `src/ui/` - UI components
+  - `src/sidecar/` - Core sidecar functionality
+  - `src/electron/` - Electron application code
+  - CLI binary and exports for all three components
 - `@spotlightjs/tsconfig` - Shared TypeScript configuration
 - `@spotlightjs/website` - Documentation website
 
