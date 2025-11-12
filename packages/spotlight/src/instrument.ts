@@ -1,6 +1,6 @@
 import { consoleLoggingIntegration, init } from "@sentry/node";
-import { parseCLIArgs } from "@spotlightjs/sidecar/cli";
-import { DEFAULT_PORT } from "@spotlightjs/sidecar/constants";
+import { parseCLIArgs } from "./server/cli.ts";
+import { DEFAULT_PORT } from "./server/constants.ts";
 
 // Parse CLI arguments to determine the port this Spotlight instance will use
 const { port: instancePort } = parseCLIArgs();
@@ -9,11 +9,11 @@ const { port: instancePort } = parseCLIArgs();
 const spotlightEnv = process.env.SENTRY_SPOTLIGHT;
 let disableSpotlight = false;
 
-// Note: If port is set to 0 (dynamic port assignment), we cannot detect the actual port
-// before starting the server, so we cannot prevent the feedback loop in that case.
-// The server will be assigned a port by the OS after it starts, and if SENTRY_SPOTLIGHT
-// happens to point to that same port, a feedback loop may occur.
 if (spotlightEnv && instancePort !== 0) {
+  // Note: If port is set to 0 (dynamic port assignment), we cannot detect the actual port
+  // before starting the server, so we cannot prevent the feedback loop in that case.
+  // The server will be assigned a port by the OS after it starts, and if SENTRY_SPOTLIGHT
+  // happens to point to that same port, a feedback loop may occur.
   let targetPort: number | undefined;
   let targetHost: string | undefined;
 

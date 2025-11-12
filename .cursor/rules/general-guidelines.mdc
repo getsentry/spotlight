@@ -352,7 +352,6 @@ pnpm clean            # Clean all dist folders
 {
   "dev": "vite build --watch",
   "build": "vite build && tsc",
-  "clean": "rimraf dist",
   "test": "vitest"
 }
 ```

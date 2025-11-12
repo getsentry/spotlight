@@ -2,11 +2,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "turbo dev --filter=@spotlightjs/overlay --filter=@spotlightjs/sidecar",
-    "dev:overlay": "turbo dev --filter=@spotlightjs/overlay",
-    "dev:sidecar": "pnpm run --filter=@spotlightjs/sidecar start",
+    "dev": "turbo dev --filter=@spotlightjs/spotlight",
     "dev:website": "turbo dev --filter=@spotlightjs/website",
-    "dev:electron": "turbo dev --filter=@spotlightjs/electron",
+    "dev:electron": "pnpm run --filter=@spotlightjs/spotlight dev:electron",
     "build": "turbo build",
     "preview": "turbo preview",
     "lint": "biome check .",

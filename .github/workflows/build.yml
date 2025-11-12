@@ -18,6 +18,7 @@ env:
   CACHED_BUILD_PATHS: |
     ${{ github.workspace }}/packages/*/dist
     ${{ github.workspace }}/packages/*/dist-bin
+    ${{ github.workspace }}/packages/*/dist-electron
 
 jobs:
   build:
@@ -112,7 +113,7 @@ jobs:
           if-no-files-found: error
           path: |
             packages/spotlight/dist/spotlight.cjs
-            packages/spotlight/dist/overlay/
+            packages/spotlight/dist/ui/
 
       - name: Store standalone spotlight binaries
         uses: actions/upload-artifact@v4
@@ -120,6 +121,13 @@ jobs:
           name: spotlight
           if-no-files-found: error
           path: packages/spotlight/dist-bin/spotlight-*
+
+      - name: Store Electron build
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-build
+          if-no-files-found: error
+          path: packages/spotlight/dist-electron/
 
       - name: Update build cache
         uses: actions/cache/save@v4
@@ -132,7 +140,7 @@ jobs:
       # which depends on the build job, hence why we do this here
       - name: Playwright Version
         id: playwright-version
-        working-directory: packages/electron
+        working-directory: packages/spotlight
         run: |
           # Playwright outputs something like `Version 1.54.2` so we cut the "crap" at the beginning
           echo "version=$(pnpm exec playwright --version | cut -c 9-)" >> $GITHUB_OUTPUT
@@ -220,6 +228,12 @@ jobs:
 
       - name: Setup dependencies
         run: pnpm install
+
+      - name: Download Electron build
+        uses: actions/download-artifact@v4
+        with:
+          name: electron-build
+          path: packages/spotlight/dist-electron/
 
       - name: Cache turbo build setup
         uses: actions/cache@v4
