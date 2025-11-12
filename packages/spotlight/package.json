@@ -26,8 +26,7 @@
     "lint:react-refresh": "eslint 'src/ui/**/*.{ts,tsx}'",
     "test": "vitest run",
     "test:dev": "vitest",
-    "test:e2e": "playwright test",
-    "yalc:publish": "yalc publish --push --sig --private",
+    "test:e2e": "playwright test"
   },
   "files": ["dist"],
   "bin": {

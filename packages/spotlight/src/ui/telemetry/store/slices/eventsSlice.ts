@@ -1,18 +1,13 @@
 import type { StateCreator } from "zustand";
 import { generateUuidv4 } from "@spotlight/ui/lib/uuid";
-import { graftProfileSpans } from "../../data/profiles";
-import type {
-  ProfileSample,
-  SentryEvent,
-  SentryLogEventItem,
-  SentryProfileTransactionInfo,
-  SentryTransactionEvent,
-  Span,
-} from "../../types";
+import type { SentryEvent, SentryLogEventItem } from "../../types";
 import { isErrorEvent, isLogEvent, isProfileEvent, isTraceEvent } from "../../utils/sentry";
-import { compareSpans, groupSpans } from "../../utils/traces";
 import type { EventsSliceActions, EventsSliceState, SentryStore } from "../types";
-import { relativeNsToTimestamp, toTimestamp } from "../utils";
+import { toTimestamp } from "../utils";
+import { processLogItems } from "../utils/logProcessor";
+import { processProfileEvent } from "../utils/profileProcessor";
+import { initializeTrace } from "../utils/traceInitializer";
+import { processTransactionEvent, updateTraceMetadata } from "../utils/traceProcessor";
 
 const initialEventsState: EventsSliceState = {
   eventsById: new Map(),
@@ -44,18 +39,11 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
 
     if (isLogEvent(event) && event.items?.length) {
       const { logsById, logsByTraceId } = get();
-      for (const logItem of event.items) {
-        const logId = logItem.id || generateUuidv4();
-        if (logsById.has(logId)) {
-          continue;
-        }
-        if (logItem.severity_number == null) {
-          logItem.severity_number = 0;
-        }
-        logItem.sdk = logItem.attributes?.["sentry.sdk.name"]?.value as string;
-        logItem.timestamp = toTimestamp(logItem.timestamp);
-        logItem.id = logId;
+      const existingLogIds = new Set(logsById.keys());
+      const { processedLogs } = processLogItems(event, existingLogIds);
 
+      // Update store with processed logs
+      for (const logItem of processedLogs) {
         const newLogsById = new Map(logsById);
         newLogsById.set(logItem.id, logItem);
         set({ logsById: newLogsById });
@@ -84,134 +72,49 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
 
     const traceCtx = event.contexts?.trace;
     if (traceCtx?.trace_id) {
-      const { tracesById } = get();
+      const { tracesById, profilesByTraceId } = get();
       const existingTrace = tracesById.get(traceCtx.trace_id);
-      const trace = existingTrace ?? {
-        ...traceCtx,
-        trace_id: traceCtx.trace_id,
-        spans: new Map(),
-        spanTree: [] as Span[],
-        transactions: [] as SentryTransactionEvent[],
-        errors: 0,
-        start_timestamp: event.start_timestamp ?? event.timestamp,
-        timestamp: event.timestamp,
-        status: traceCtx.status,
-        rootTransactionName: event.transaction || "(unknown transaction)",
-        rootTransaction: null,
-        profileGrafted: false,
-      };
+
+      // Initialize or get existing trace
+      let trace = existingTrace ?? initializeTrace(event);
+
+      // Update timestamps for all events
       trace.start_timestamp = Math.min(event.start_timestamp ?? event.timestamp, trace.start_timestamp);
       trace.timestamp = Math.max(event.timestamp, trace.timestamp);
 
       if (isTraceEvent(event)) {
-        trace.transactions.push(event);
-        trace.transactions.sort(compareSpans);
-
-        // recompute tree as we might have txn out of order
-        // XXX: we're trusting timestamps, which may not be as reliable as we'd like
-        const spanMap: Map<string, Span> = new Map();
-        for (const txn of trace.transactions) {
-          const trace = txn.contexts.trace;
-          if (!trace || !trace.span_id || !trace.trace_id) {
-            continue;
-          }
-
-          spanMap.set(trace.span_id, {
-            ...trace,
-            // TypeScript is not smart enough to compose the assertion above
-            // with the spread syntax above, hence the need for these explicit
-            // `span_id` and `trace_id` assignments
-            span_id: trace.span_id,
-            trace_id: trace.trace_id,
-            tags: txn?.tags,
-            start_timestamp: txn.start_timestamp,
-            timestamp: txn.timestamp,
-            description: traceCtx.description || txn.transaction,
-            transaction: txn,
-          });
-
-          if (txn.spans) {
-            for (const span of txn.spans) {
-              spanMap.set(span.span_id, {
-                ...span,
-                timestamp: toTimestamp(span.timestamp),
-                start_timestamp: toTimestamp(span.start_timestamp),
-              });
-            }
-          }
-        }
-        trace.spans = spanMap;
-        trace.spanTree = groupSpans(trace.spans);
-        graftProfileSpans(trace);
+        // Process transaction event and update trace
+        const result = processTransactionEvent(event, {
+          existingTrace: trace,
+          profilesByTraceId,
+        });
+        trace = result.trace;
       } else if (isErrorEvent(event)) {
+        // For error events, increment error count
         trace.errors += 1;
       }
-      if (traceCtx.status !== "ok") trace.status = traceCtx.status;
 
-      const roots = trace.transactions.filter(e => !e.contexts.trace.parent_span_id);
-      if (roots.length === 1) {
-        trace.rootTransaction = roots[0];
-        trace.rootTransactionName = roots[0].transaction || "(unknown transaction)";
-      } else if (roots.length > 1) {
-        trace.rootTransactionName = "(multiple root transactions)";
-      } else if (trace.transactions.length > 0) {
-        // Orphan trace: no root transaction, but has child transactions
-        // This happens when the backend receives a trace continuation from the frontend,
-        // but the frontend is not sending traces to Spotlight
-        console.debug(
-          `[Spotlight] Orphan trace detected (trace_id: ${trace.trace_id}). ` +
-            `Using first transaction "${trace.transactions[0].transaction}" as fallback.`,
-        );
-        trace.rootTransactionName = trace.transactions[0].transaction || "(orphan transaction)";
-      } else {
-        trace.rootTransactionName = "(missing root transaction)";
+      // Update trace metadata and status for all events with trace context
+      updateTraceMetadata(trace);
+
+      if (traceCtx.status !== "ok") {
+        trace.status = traceCtx.status;
       }
 
-      if (!existingTrace) {
-        const newTracesById = new Map(tracesById);
-        newTracesById.set(trace.trace_id, trace);
-        set({
-          tracesById: newTracesById,
-        });
-      }
+      // Always save trace to store (whether new or updated)
+      const newTracesById = new Map(tracesById);
+      newTracesById.set(trace.trace_id, trace);
+      set({ tracesById: newTracesById });
     }
 
     if (isProfileEvent(event)) {
-      if (!event.transactions) {
-        event.transactions = event.transaction ? [event.transaction] : [];
-      }
       const { profilesByTraceId, tracesById } = get();
+      const { profiles } = processProfileEvent(event, { tracesById });
+
+      // Update store with processed profiles
       const newProfilesByTraceId = new Map(profilesByTraceId);
-
-      for (const txn of event.transactions) {
-        if (typeof txn === "string") continue; // Skip if it's just a string transaction ID
-        const profileTxn = txn as SentryProfileTransactionInfo;
-        const trace = tracesById.get(profileTxn.trace_id);
-        const timestamp =
-          trace && profileTxn.relative_start_ns != null
-            ? relativeNsToTimestamp(trace.start_timestamp, profileTxn.relative_start_ns)
-            : event.timestamp;
-
-        const profile = {
-          platform: event.platform,
-          thread_metadata: event.profile.thread_metadata,
-          samples: event.profile.samples.map((s: ProfileSample) => ({
-            stack_id: s.stack_id,
-            thread_id: s.thread_id,
-            elapsed_since_start_ns: s.elapsed_since_start_ns,
-            start_timestamp: relativeNsToTimestamp(timestamp, s.elapsed_since_start_ns),
-          })),
-          frames: event.profile.frames,
-          stacks: event.profile.stacks.map(s => Array.from(s).reverse()),
-          timestamp,
-          active_thread_id: profileTxn.active_thread_id,
-        };
-        newProfilesByTraceId.set(profileTxn.trace_id, profile);
-        // Avoid grafting partial traces (where we mocked start_timestamp from the event's timestamp)
-        // These should get grafted once we get the full trace data later on
-        if (trace && trace.start_timestamp < trace.timestamp) {
-          graftProfileSpans(trace, profile);
-        }
+      for (const { traceId, profile } of profiles) {
+        newProfilesByTraceId.set(traceId, profile);
       }
       set({ profilesByTraceId: newProfilesByTraceId });
     }

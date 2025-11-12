@@ -1,23 +1,9 @@
 import { log } from "@spotlight/ui/lib/logger";
 import { generateUuidv4 } from "@spotlight/ui/lib/uuid";
-import useSentryStore from "../store";
 import type { SentryProfileWithTraceMeta } from "../store/types";
-import type { EventFrame, Span, Trace } from "../types";
+import type { Span, Trace } from "../types";
 import { compareSpans } from "../utils/traces";
-
-const _FUNCTION_NAME_FROM_FRAME_CACHE = new Map<EventFrame, string>();
-export function getFunctionNameFromFrame(frame: EventFrame): string {
-  let result = _FUNCTION_NAME_FROM_FRAME_CACHE.get(frame);
-  if (!result) {
-    const module = frame.module || frame.filename || frame.abs_path || "<unknown>";
-    const functionName = frame.function || "<anonymous>";
-    const lineNo = frame.lineno ? `:${frame.lineno}` : "";
-    const colNo = frame.lineno && frame.colno ? `:${frame.colno}` : "";
-    result = `${module}@${functionName}${lineNo}${colNo}`;
-    _FUNCTION_NAME_FROM_FRAME_CACHE.set(frame, result);
-  }
-  return result;
-}
+import { getFunctionNameFromFrame } from "../utils/profileUtils";
 
 /**
  * Groups consequent spans with the same description and op into a single span per each level.
@@ -174,7 +160,7 @@ export function getSpansFromProfile(
  */
 export function graftProfileSpans(
   trace: Trace,
-  profile?: SentryProfileWithTraceMeta,
+  profile: SentryProfileWithTraceMeta,
   spanTree: Span[] = trace.spanTree,
   parent: Span | Trace = trace,
 ) {
@@ -182,13 +168,6 @@ export function graftProfileSpans(
   if (trace.profileGrafted) {
     log(`Trace already has profile grafted ${trace.trace_id}`);
     return;
-  }
-  if (!profile) {
-    profile = trace.trace_id ? useSentryStore.getState().getProfileByTraceId(trace.trace_id) : undefined;
-    if (!profile) {
-      log(`Profile not found for trace ${trace.trace_id}`);
-      return;
-    }
   }
 
   let idx = -1;

@@ -1,5 +1,5 @@
 import type { StateCreator } from "zustand";
-import { getFunctionNameFromFrame } from "../../data/profiles";
+import { getFunctionNameFromFrame } from "../../utils/profileUtils";
 import type { AggregateCallData, TraceId } from "../../types";
 import type { ProfilesSliceActions, ProfilesSliceState, SentryStore } from "../types";
 
