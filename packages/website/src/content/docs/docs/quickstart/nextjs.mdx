@@ -311,15 +311,6 @@ export default CustomErrorComponent;
   });
   ```
 
-### CORS Errors
-
-**Issue**: CORS errors when connecting to Spotlight.
-
-**Solutions**:
-- Spotlight sidecar should handle CORS automatically
-- If using a custom port or host, ensure it's properly configured
-- Check that you're accessing both your app and Spotlight via `localhost` (not mixing `localhost` and `127.0.0.1`)
-
 ### Missing Server-Side Events
 
 **Issue**: Only seeing client-side events, no server-side errors or traces.
@@ -332,25 +323,15 @@ export default CustomErrorComponent;
 
 ## Next Steps
 
-Now that Spotlight is running with your Next.js application, explore more features:
+Now that Spotlight is running with your Next.js application, explore its powerful features:
 
-### Desktop App
-Try the [Spotlight Desktop App](/docs/desktop-app/) for an enhanced UI experience with better performance and dedicated window management.
-
-### MCP Integration
-Connect Spotlight to AI coding assistants like Cursor and Claude with the [MCP Server](/docs/mcp/). Your AI assistant can analyze errors, traces, and logs to help you debug faster.
-
-### CLI Commands
-Explore [CLI commands](/docs/cli/) to:
-- Tail events in your terminal
-- Run your application with automatic instrumentation
-- Stream logs and traces to stdout
+- [CLI](/docs/cli/) - Run apps with automatic instrumentation, stream events, and tail logs in real-time
+- [MCP Server](/docs/mcp/) - Connect Spotlight to AI assistants like Cursor and Claude for AI-powered debugging assistance
+- [Desktop App](/docs/desktop-app/) - Enhanced debugging experience with dedicated window, system integration, and better performance
 
 ### Production Monitoring
 While Spotlight is perfect for local development, consider using [Sentry](https://sentry.io) for production monitoring. Since you've already installed the SDK, you just need to:
 1. Create a free Sentry account
 2. Replace the placeholder DSN with your real project DSN
-3. Adjust sample rates for production (e.g., `tracesSampleRate: 0.1`)
 
 Your application will seamlessly send production telemetry to Sentry while keeping development data in Spotlight.
-
