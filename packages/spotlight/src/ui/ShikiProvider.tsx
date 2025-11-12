@@ -1,7 +1,7 @@
 import { type PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 import { type Highlighter, bundledLanguages, createHighlighter } from "shiki/bundle-web.mjs";
+import { SHIKI_DEFAULT_THEME } from "./shiki-constants";
 
-export const SHIKI_DEFAULT_THEME = "github-dark";
 const ShikiContext = createContext<Highlighter | null>(null);
 
 export function ShikiProvider({ children }: PropsWithChildren) {

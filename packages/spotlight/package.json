@@ -23,6 +23,7 @@
     "build:electron": "electron-vite build",
     "build:mac": "./electron-builder.js",
     "preview": "vite preview",
+    "lint:react-refresh": "eslint 'src/ui/**/*.{ts,tsx}'",
     "test": "vitest run",
     "test:dev": "vitest",
     "test:e2e": "playwright test",

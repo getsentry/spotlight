@@ -1,17 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { removeURLSuffix } from "@spotlight/ui/lib/removeURLSuffix";
 import { connectToSidecar } from "@spotlight/ui/sidecar";
 import { SENTRY_CONTENT_TYPE } from "@spotlight/shared/constants.ts";
 import { log } from "../lib/logger";
 import TelemetryView from "./components/TelemetryView";
 import useSentryStore from "./store";
-
-export function setSidecarUrlInStore(url: string) {
-  const store = useSentryStore.getState();
-  const baseSidecarUrl = removeURLSuffix(url, "/stream");
-  store.setSidecarUrl(baseSidecarUrl);
-  log("Set sidecar URL for telemetry:", baseSidecarUrl);
-}
+import { setSidecarUrlInStore } from "./utils";
 
 type TelemetryRouteProps = {
   sidecarUrl: string;
