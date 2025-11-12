@@ -1,0 +1,158 @@
+---
+title: Getting Started with Spotlight
+description: Install and configure Spotlight for local debugging with Sentry SDKs
+sidebar:
+  order: 0
+---
+
+import DownloadButton from '../../../../components/DownloadButton.astro';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+:::note[You don't need a Sentry account to use Spotlight]
+:::
+
+Spotlight brings the power of Sentry into your local development environment. This guide will help you set up everything you need to start debugging with Spotlight.
+
+## Step 1: Install Sentry SDK
+
+Follow your language or framework setup to install Sentry's SDK here: [https://docs.sentry.io/](https://docs.sentry.io/). Follow Sentry docs and enable logs and set tracing sample rate to 1.
+
+**Come back here after you've installed the Sentry SDK.**
+
+## Step 2: Install Spotlight
+
+Choose the method that works best for your workflow:
+
+<Tabs>
+  <TabItem label="Quick Start (npx)">
+    The fastest way to get started:
+
+    ```bash
+    npx @spotlightjs/spotlight
+    ```
+
+    This starts Spotlight on `http://localhost:8969` where you can access the web UI.
+  </TabItem>
+  <TabItem label="Desktop App">
+    Download the Spotlight desktop application for the best experience:
+
+    <DownloadButton>Download for Mac</DownloadButton>
+
+    The desktop app includes:
+    - Dedicated window for debugging
+    - System tray integration
+    - Automatic updates
+    - Better performance
+  </TabItem>
+  <TabItem label="CLI (Global Install)">
+    Install the Spotlight CLI globally:
+
+    ```bash
+    npm install -g @spotlightjs/spotlight
+    ```
+
+    Then run:
+
+    ```bash
+    spotlight
+    ```
+
+    The CLI provides additional commands for streaming events and running applications.
+  </TabItem>
+  <TabItem label="Docker">
+    Run Spotlight in a container:
+
+    ```bash
+    docker run --rm -p 8969:8969 ghcr.io/getsentry/spotlight:latest
+    ```
+  </TabItem>
+</Tabs>
+
+## Step 3: Configure Your SDK
+
+Now configure your Sentry SDK to send data to Spotlight. The exact configuration depends on your framework, but here's the pattern:
+
+### Frontend Applications
+
+For browser-based applications, enable the Spotlight browser integration:
+
+```javascript
+import * as Sentry from "@sentry/browser";
+
+Sentry.init({
+  dsn: "https://spotlight@local/0", // Placeholder DSN
+  
+  // Enable Spotlight integration
+  integrations: [
+    Sentry.spotlightBrowserIntegration(),
+  ],
+  
+  // Capture 100% of transactions locally
+  tracesSampleRate: 1.0,
+  
+  // Enable comprehensive logging
+  integrations: [
+    Sentry.captureConsoleIntegration({
+      levels: ['log', 'info', 'warn', 'error', 'debug'],
+    }),
+  ],
+});
+```
+
+### Backend Applications
+
+For Node.js and other backend applications:
+
+```javascript
+import * as Sentry from "@sentry/node";
+
+Sentry.init({
+  dsn: "https://spotlight@local/0", // Placeholder DSN
+
+  // Capture 100% of transactions locally
+  tracesSampleRate: 1.0,
+});
+```
+
+### Environment Variable
+
+:::note[When you don't need this]
+If you are using `spotlight run` to start Spotlight, you don't need to add this environment variable as we take care of it for you.
+:::
+
+You need to set the `SENTRY_SPOTLIGHT` environment variable to `1` to enable Spotlight if you're using `spotlight tail`, our UI or the MCP server.
+
+```bash
+# In your .env.local or .env file
+SENTRY_SPOTLIGHT=1
+```
+
+## Step 4: Verify Your Setup
+
+1. **Ensure Spotlight is running** (you should see the UI at http://localhost:8969)
+
+2. **Start your application** in development mode
+
+3. **Create a test error** to verify everything works:
+
+   ```javascript
+   // Add this temporary code to trigger a test error
+   setTimeout(() => {
+     throw new Error("Test error for Spotlight!");
+   }, 1000);
+   ```
+
+4. **Check the Spotlight UI** - you should see:
+   - The error in the Errors tab
+   - A trace showing the error context
+   - Console logs in the Logs tab
+
+🎉 **Success!** You're now capturing local telemetry with Spotlight.
+
+## Next Steps
+
+Now that Spotlight is running, explore its powerful features:
+
+- [CLI](/docs/cli/) - Run apps with automatic instrumentation, stream events, and tail logs in real-time
+- [MCP Server](/docs/mcp/) - Connect Spotlight to AI assistants like Cursor and Claude for AI-powered debugging assistance
+- [Desktop App](/docs/desktop-app/) - Enhanced debugging experience with dedicated window, system integration, and better performance
