@@ -75,6 +75,10 @@ export default defineConfig({
       ],
       sidebar: [
         {
+          label: "Getting Started",
+          link: "/docs/getting-started/",
+        },
+        {
           label: "Quick Starts",
           autogenerate: {
             directory: "docs/quickstart",
