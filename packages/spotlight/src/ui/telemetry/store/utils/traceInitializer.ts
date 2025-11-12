@@ -5,12 +5,12 @@ import type { SentryEvent, SentryTransactionEvent, Span, Trace } from "../../typ
  * This is used when we receive an event with a trace_id but don't have a trace yet.
  */
 export function initializeTrace(event: SentryEvent): Trace {
-  const traceCtx = event.contexts!.trace;
-  
-  // Add guard to ensure trace context and trace_id exist
-  if (!traceCtx || !traceCtx.trace_id) {
+  // Add guard to ensure contexts, trace context and trace_id exist
+  if (!event.contexts?.trace || !event.contexts.trace.trace_id) {
     throw new Error('Event missing required trace context or trace_id');
   }
+  
+  const traceCtx = event.contexts.trace;
 
   return {
     ...traceCtx,
