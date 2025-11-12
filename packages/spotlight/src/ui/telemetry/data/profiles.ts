@@ -126,7 +126,7 @@ export function getSpansFromProfile(
       const frame = profile.frames[currentStack[frameIdxIdx]];
       // XXX: We may wanna skip frames that doesn't have `in_app` set to true
       //      that said it's better to have this as a dynamic filter
-      const [op, description] = getFunctionNameFromFrame(frame).split("@");
+      const [description, op] = getFunctionNameFromFrame(frame).split("@");
       const spanFromFrame: Span = {
         span_id: generateUuidv4(),
         parent_span_id: currentSpan.span_id,
