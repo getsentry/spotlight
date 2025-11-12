@@ -1,7 +1,7 @@
 import { graftProfileSpans } from "../../data/profiles";
 import type {
   ProfileSample,
-  SentryProfileEvent,
+  SentryProfileV1Event,
   SentryProfileTransactionInfo,
   Trace,
 } from "../../types";
@@ -24,7 +24,7 @@ export interface ProfileProcessingResult {
  * Handles profile grafting onto existing traces if available.
  */
 export function processProfileEvent(
-  event: SentryProfileEvent,
+  event: SentryProfileV1Event,
   context: ProfileProcessingContext,
 ): ProfileProcessingResult {
   const { tracesById } = context;
@@ -65,7 +65,7 @@ export function processProfileEvent(
         ),
       })),
       frames: event.profile.frames,
-      stacks: event.profile.stacks.map((s) => Array.from(s).reverse()),
+      stacks: event.profile.stacks.map((s: number[]) => Array.from(s).reverse()),
       timestamp,
       active_thread_id: profileTxn.active_thread_id,
     };

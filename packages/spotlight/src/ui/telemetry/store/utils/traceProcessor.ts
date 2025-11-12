@@ -1,5 +1,5 @@
 import { graftProfileSpans } from "../../data/profiles";
-import type { SentryEvent, SentryTransactionEvent, Span, Trace } from "../../types";
+import type { SentryTransactionEvent, Span, Trace } from "../../types";
 import { compareSpans, groupSpans } from "../../utils/traces";
 import type { SentryProfileWithTraceMeta } from "../types";
 import { toTimestamp } from "../utils";
@@ -24,6 +24,10 @@ export function processTransactionEvent(
 ): TraceProcessingResult {
   const traceCtx = event.contexts.trace;
   const { existingTrace, profilesByTraceId } = context;
+
+  // Add guard to ensure trace_id exists
+    throw new Error("Transaction event missing required trace_id");
+  }
 
   // Initialize or get existing trace
   const trace: Trace = existingTrace ?? {
