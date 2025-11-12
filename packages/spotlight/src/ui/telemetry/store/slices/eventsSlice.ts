@@ -43,19 +43,22 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       const { processedLogs } = processLogItems(event, existingLogIds);
 
       // Update store with processed logs
+      // Build up the Maps incrementally to avoid stale state capture
+      const newLogsById = new Map(logsById);
+      const newLogsByTraceId = new Map(logsByTraceId);
+      
       for (const logItem of processedLogs) {
-        const newLogsById = new Map(logsById);
         newLogsById.set(logItem.id, logItem);
-        set({ logsById: newLogsById });
 
         if (logItem.trace_id) {
-          const newLogsByTraceId = new Map(logsByTraceId);
           const logSet = newLogsByTraceId.get(logItem.trace_id) || new Set<SentryLogEventItem>();
           logSet.add(logItem);
           newLogsByTraceId.set(logItem.trace_id, logSet);
-          set({ logsByTraceId: newLogsByTraceId });
         }
       }
+      
+      // Set state once with all accumulated changes
+      set({ logsById: newLogsById, logsByTraceId: newLogsByTraceId });
     }
 
     const { eventsById } = get();
