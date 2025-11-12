@@ -1,7 +1,7 @@
 import type { Envelope, EnvelopeItem, SerializedLog } from "@sentry/core";
-import { type SentryEvent, type SentryLogEvent, isLogEvent } from "@spotlight/server/parser/index.js";
-import type { EventContainer } from "@spotlight/server/utils/index.js";
-import { formatTimestamp } from "../utils.js";
+import { type SentryEvent, type SentryLogEvent, isLogEvent } from "../../parser/index.ts";
+import type { EventContainer } from "../../utils/index.ts";
+import { formatTimestamp } from "../utils.ts";
 
 export function formatLogEnvelope(container: EventContainer) {
   const parsedEnvelope = container.getParsedEnvelope();

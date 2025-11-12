@@ -2,16 +2,16 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import { wrapMcpServerWithSentry } from "@sentry/node";
 import { z } from "zod";
-import { formatErrorEnvelope } from "../formatters/md/errors.js";
-import { formatLogEnvelope } from "../formatters/md/logs.js";
+import { formatErrorEnvelope } from "../formatters/md/errors.ts";
+import { formatLogEnvelope } from "../formatters/md/logs.ts";
 import {
   buildSpanTree,
   extractTracesFromEnvelopes,
   formatTraceSummary,
   renderSpanTree,
-} from "../formatters/md/traces.js";
-import { getBuffer } from "../utils/index.js";
-import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.js";
+} from "../formatters/md/traces.ts";
+import { getBuffer } from "../utils/index.ts";
+import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.ts";
 
 const inputSchema = {
   filters: z.union([

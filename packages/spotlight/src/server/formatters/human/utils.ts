@@ -1,6 +1,6 @@
 import type { Envelope } from "@sentry/core";
 import chalk from "chalk";
-import { parseBrowserFromUserAgent } from "@spotlight/server/routes/stream/userAgent.js";
+import { parseBrowserFromUserAgent } from "../../routes/stream/userAgent.ts";
 
 export const SOURCE_TYPES = ["browser", "mobile", "server"] as const;
 export type SourceType = (typeof SOURCE_TYPES)[number];

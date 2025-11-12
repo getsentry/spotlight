@@ -1,3 +1,3 @@
-export * from "./helpers.js";
-export * from "./processEnvelope.js";
-export * from "./types.js";
+export * from "./helpers.ts";
+export * from "./processEnvelope.ts";
+export * from "./types.ts";

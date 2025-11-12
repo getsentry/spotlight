@@ -1,8 +1,8 @@
 import { brotliCompressSync, deflateSync, gzipSync } from "node:zlib";
 import { events } from "fetch-event-stream";
 import { describe, expect, it } from "vitest";
-import { envelopeReactClientSideError } from "@spotlight/server/formatters/md/__tests__/test_envelopes.js";
-import app from "../index.js";
+import { envelopeReactClientSideError } from "../../formatters/md/__tests__/test_envelopes.ts";
+import app from "../index.ts";
 
 describe("generic endpoints", () => {
   it("should return 200 on health check", async () => {

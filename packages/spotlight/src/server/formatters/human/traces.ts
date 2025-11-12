@@ -1,7 +1,7 @@
 import type { Envelope } from "@sentry/core";
-import type { SentryTransactionEvent } from "@spotlight/server/parser/index.js";
-import { getDuration } from "../utils.js";
-import { formatLogLine, inferEnvelopeSource } from "./utils.js";
+import type { SentryTransactionEvent } from "../../parser/index.ts";
+import { getDuration } from "../utils.ts";
+import { formatLogLine, inferEnvelopeSource } from "./utils.ts";
 
 /**
  * Format a trace/transaction event with envelope headers for source inference

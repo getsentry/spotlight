@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { processEnvelope } from "../index.js";
+import { processEnvelope } from "../index.ts";
 
 import * as fs from "node:fs";
 import type { Event, TransactionEvent } from "@sentry/core";

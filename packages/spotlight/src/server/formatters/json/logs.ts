@@ -1,6 +1,6 @@
 import type { Envelope, SerializedLog } from "@sentry/core";
-import type { SentryLogEvent } from "@spotlight/server/parser/index.js";
-import { buildLogData } from "../shared/data-builders.js";
+import type { SentryLogEvent } from "../../parser/index.ts";
+import { buildLogData } from "../shared/data-builders.ts";
 
 function formatSingleLog(log: SerializedLog): string {
   return JSON.stringify(buildLogData(log));

@@ -1,6 +1,6 @@
-import { isDebugEnabled, logger } from "@spotlight/server/logger.js";
-import { type ParsedEnvelope, type SentryErrorEvent, type SentryEvent, isErrorEvent } from "@spotlight/server/parser/index.js";
-import type { EventContainer } from "@spotlight/server/utils/index.js";
+import { isDebugEnabled, logger } from "../../logger.ts";
+import { type ParsedEnvelope, type SentryErrorEvent, type SentryEvent, isErrorEvent } from "../../parser/index.ts";
+import type { EventContainer } from "../../utils/index.ts";
 
 /**
  * Logs incoming event details when debug mode is enabled

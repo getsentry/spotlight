@@ -1,11 +1,11 @@
 import { Hono } from "hono";
-import { CONTEXT_LINES_ENDPOINT } from "../constants.js";
-import clearRouter from "./clear.js";
-import contextLinesRouter from "./contextlines/index.js";
-import healthRouter from "./health.js";
-import mcpRouter from "./mcp.js";
-import openRouter from "./open.js";
-import streamRouter from "./stream/index.js";
+import { CONTEXT_LINES_ENDPOINT } from "../constants.ts";
+import clearRouter from "./clear.ts";
+import contextLinesRouter from "./contextlines/index.ts";
+import healthRouter from "./health.ts";
+import mcpRouter from "./mcp.ts";
+import openRouter from "./open.ts";
+import streamRouter from "./stream/index.ts";
 
 const router = new Hono();
 router.route("/mcp", mcpRouter);

@@ -1,6 +1,6 @@
 import type { Envelope, SerializedLog } from "@sentry/core";
-import type { SentryLogEvent } from "@spotlight/server/parser/index.js";
-import { type SourceType, formatLogLine, inferEnvelopeSource } from "./utils.js";
+import type { SentryLogEvent } from "../../parser/index.ts";
+import { type SourceType, formatLogLine, inferEnvelopeSource } from "./utils.ts";
 
 /**
  * Format a single log entry with source inference

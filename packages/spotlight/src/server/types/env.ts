@@ -1,5 +1,5 @@
 import type { HttpBindings } from "@hono/node-server";
-import type { IncomingPayloadCallback } from "./utils.js";
+import type { IncomingPayloadCallback } from "./utils.ts";
 
 export type HonoEnv = {
   Bindings: HttpBindings;

@@ -1,8 +1,8 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
 import { type UUID, uuidv7obj } from "uuidv7";
-import { RAW_TYPES } from "../constants.js";
-import { logger } from "../logger.js";
-import type { RawEventContext } from "./types.js";
+import { RAW_TYPES } from "../constants.ts";
+import { logger } from "../logger.ts";
+import type { RawEventContext } from "./types.ts";
 
 export type ParsedEnvelope = {
   envelope: [Envelope[0] & { __spotlight_envelope_id: UUID }, Envelope[1]];

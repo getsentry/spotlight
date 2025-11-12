@@ -1,10 +1,10 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
 import type { z } from "zod";
-import { type SentryErrorEvent, type SentryEvent, isErrorEvent } from "@spotlight/server/parser/index.js";
-import type { EventContainer } from "@spotlight/server/utils/index.js";
-import type { ErrorEventSchema } from "../schema.js";
-import { formatTimestamp } from "../utils.js";
-import { formatEventOutput } from "./event.js";
+import { type SentryErrorEvent, type SentryEvent, isErrorEvent } from "../../parser/index.ts";
+import type { EventContainer } from "../../utils/index.ts";
+import type { ErrorEventSchema } from "../schema.ts";
+import { formatTimestamp } from "../utils.ts";
+import { formatEventOutput } from "./event.ts";
 
 export function formatErrorEnvelope(container: EventContainer) {
   const processedEnvelope = container.getParsedEnvelope();

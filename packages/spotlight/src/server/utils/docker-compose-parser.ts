@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
-import { logger } from "../logger.js";
+import { logger } from "../logger.ts";
 
 const COMPOSE_FILE_NAMES = ["docker-compose.yaml", "docker-compose.yml", "compose.yml", "compose.yaml"] as const;
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { processErrorEvent } from "../errors.js";
-import { formatEventOutput } from "../event.js";
-import { envelopeFetchRequestError, envelopeReactClientSideError } from "./test_envelopes.js";
+import { processErrorEvent } from "../errors.ts";
+import { formatEventOutput } from "../event.ts";
+import { envelopeFetchRequestError, envelopeReactClientSideError } from "./test_envelopes.ts";
 
 describe("tools", () => {
   it("should format error envelope", () => {

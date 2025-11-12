@@ -1,7 +1,7 @@
 import { get } from "node:http";
 import { startSpan } from "@sentry/node";
-import { SERVER_IDENTIFIER } from "../constants.js";
-import { logger } from "../logger.js";
+import { SERVER_IDENTIFIER } from "../constants.ts";
+import { logger } from "../logger.ts";
 
 export const withTracing =
   (fn: CallableFunction, spanArgs = {}) =>

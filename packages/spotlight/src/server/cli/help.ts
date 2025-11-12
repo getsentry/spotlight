@@ -1,5 +1,5 @@
-import { EVERYTHING_MAGIC_WORDS, NAME_TO_TYPE_MAPPING } from "../cli/tail.js";
-import { AVAILABLE_FORMATTERS } from "../formatters/types.js";
+import { EVERYTHING_MAGIC_WORDS, NAME_TO_TYPE_MAPPING } from "../cli/tail.ts";
+import { AVAILABLE_FORMATTERS } from "../formatters/types.ts";
 
 export default function showHelp() {
   console.log(`

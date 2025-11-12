@@ -1,4 +1,4 @@
-import { RAW_TYPES } from "@spotlight/shared/constants.js";
+import { RAW_TYPES } from "@spotlight/shared/constants.ts";
 
 const CONTENT_TYPES_TO_EXTENSION: Record<string, string> = {
   "text/plain": "txt",

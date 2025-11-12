@@ -5,14 +5,14 @@ import * as path from "node:path";
 import type { SerializedLog } from "@sentry/core";
 import { Searcher } from "fast-fuzzy";
 import { uuidv7 } from "uuidv7";
-import { SENTRY_CONTENT_TYPE } from "../constants.js";
-import { logger } from "../logger.js";
-import type { SentryLogEvent } from "../parser/types.js";
-import type { CLIHandlerOptions } from "../types/cli.js";
-import { buildDockerComposeCommand, detectDockerCompose } from "../utils/docker-compose.js";
-import { getSpotlightURL } from "../utils/extras.js";
-import { EventContainer, getBuffer } from "../utils/index.js";
-import tail, { type OnItemCallback } from "./tail.js";
+import { SENTRY_CONTENT_TYPE } from "../constants.ts";
+import { logger } from "../logger.ts";
+import type { SentryLogEvent } from "../parser/types.ts";
+import type { CLIHandlerOptions } from "../types/cli.ts";
+import { buildDockerComposeCommand, detectDockerCompose } from "../utils/docker-compose.ts";
+import { getSpotlightURL } from "../utils/extras.ts";
+import { EventContainer, getBuffer } from "../utils/index.ts";
+import tail, { type OnItemCallback } from "./tail.ts";
 
 const SPOTLIGHT_VERSION = process.env.npm_package_version || "unknown";
 

@@ -1,4 +1,4 @@
-import { formatTimestamp, getDuration, mapFields, mapSdkFields, mapTags } from "../utils.js";
+import { formatTimestamp, getDuration, mapFields, mapSdkFields, mapTags } from "../utils.ts";
 
 /**
  * Build error event data object.

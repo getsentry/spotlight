@@ -2,11 +2,11 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { captureException } from "@sentry/node";
 import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
-import { setShutdownHandlers, startServer } from "@spotlight/server/main.js";
-import { createMCPInstance } from "@spotlight/server/mcp/mcp.js";
-import { logger } from "../logger.js";
-import type { CLIHandlerOptions } from "../types/cli.js";
-import { isSidecarRunning } from "../utils/extras.js";
+import { setShutdownHandlers, startServer } from "../main.ts";
+import { createMCPInstance } from "../mcp/mcp.ts";
+import { logger } from "../logger.ts";
+import type { CLIHandlerOptions } from "../types/cli.ts";
+import { isSidecarRunning } from "../utils/extras.ts";
 
 async function startServerWithStdioMCP(
   port: CLIHandlerOptions["port"],

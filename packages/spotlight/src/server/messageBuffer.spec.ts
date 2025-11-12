@@ -1,7 +1,7 @@
 import { UUID } from "uuidv7";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MessageBuffer } from "./messageBuffer.js";
-import { EventContainer } from "./utils/eventContainer.js";
+import { MessageBuffer } from "./messageBuffer.ts";
+import { EventContainer } from "./utils/eventContainer.ts";
 
 describe("messageBuffer", () => {
   describe("ring buffer behavior", () => {

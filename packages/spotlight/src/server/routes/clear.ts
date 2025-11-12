@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { getBuffer } from "../utils/index.js";
+import { getBuffer } from "../utils/index.ts";
 
 const router = new Hono();
 

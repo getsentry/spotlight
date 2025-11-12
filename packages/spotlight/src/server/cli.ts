@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
-import showHelp from "./cli/help.js";
-import mcp from "./cli/mcp.js";
-import run from "./cli/run.js";
-import server from "./cli/server.js";
-import tail from "./cli/tail.js";
-import { DEFAULT_PORT } from "./constants.js";
-import { AVAILABLE_FORMATTERS } from "./formatters/types.js";
-import type { FormatterType } from "./formatters/types.js";
-import { enableDebugLogging, logger } from "./logger.js";
-import type { CLIHandler, CLIHandlerOptions } from "./types/cli.js";
+import showHelp from "./cli/help.ts";
+import mcp from "./cli/mcp.ts";
+import run from "./cli/run.ts";
+import server from "./cli/server.ts";
+import tail from "./cli/tail.ts";
+import { DEFAULT_PORT } from "./constants.ts";
+import { AVAILABLE_FORMATTERS } from "./formatters/types.ts";
+import type { FormatterType } from "./formatters/types.ts";
+import { enableDebugLogging, logger } from "./logger.ts";
+import type { CLIHandler, CLIHandlerOptions } from "./types/cli.ts";
 
 // When port is set to `0` for a server to listen on,
 // it tells the OS to find a random available port.

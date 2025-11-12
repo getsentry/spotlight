@@ -4,7 +4,7 @@ import type {
   SentryLogEvent,
   SentryProfileV1Event,
   SentryTransactionEvent,
-} from "./types.js";
+} from "./types.ts";
 
 export const ERROR_EVENT_TYPES = new Set(["event", "error"]);
 export const TRACE_EVENT_TYPES = new Set(["transaction"]);

@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
 import { stringify as stringifyYaml } from "yaml";
-import { logger } from "../logger.js";
-import { findComposeFile, findOverrideFile, parseComposeFile } from "./docker-compose-parser.js";
+import { logger } from "../logger.ts";
+import { findComposeFile, findOverrideFile, parseComposeFile } from "./docker-compose-parser.ts";
 
 export const DOCKER_MIN_VERSION = "20.10.0";
 export const DOCKER_HOST_INTERNAL = "host.docker.internal";

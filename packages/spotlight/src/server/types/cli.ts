@@ -1,5 +1,5 @@
-import type { FormatterType } from "../formatters/types.js";
-import type { SideCarOptions } from "./utils.js";
+import type { FormatterType } from "../formatters/types.ts";
+import type { SideCarOptions } from "./utils.ts";
 
 export type CLIHandlerOptions = {
   cmd?: string;

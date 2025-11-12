@@ -1,12 +1,12 @@
 import { createWriteStream } from "node:fs";
 import { brotliDecompressSync, gunzipSync, inflateSync } from "node:zlib";
 import { Hono } from "hono";
-import { logger } from "@spotlight/server/logger.js";
-import type { HonoEnv } from "@spotlight/server/types/env.js";
-import { EventContainer, getBuffer } from "@spotlight/server/utils/index.js";
-import { logIncomingEvent, logOutgoingEvent } from "./debugLogging.js";
-import { streamSSE } from "./streaming.js";
-import { parseBrowserFromUserAgent } from "./userAgent.js";
+import { logger } from "../../logger.ts";
+import type { HonoEnv } from "../../types/env.ts";
+import { EventContainer, getBuffer } from "../../utils/index.ts";
+import { logIncomingEvent, logOutgoingEvent } from "./debugLogging.ts";
+import { streamSSE } from "./streaming.ts";
+import { parseBrowserFromUserAgent } from "./userAgent.ts";
 
 const decompressors: Record<string, ((buf: Buffer) => Buffer) | undefined> = {
   gzip: gunzipSync,

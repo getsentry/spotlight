@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { EventContainer } from "@spotlight/server/utils/index.js";
-import { buildSpanTree, extractTracesFromEnvelopes, formatTraceSummary, renderSpanTree } from "../traces.js";
-import { envelopeSecondTransactionEvent, envelopeTransactionEvent } from "./test_envelopes.js";
+import { EventContainer } from "../../../utils/index.ts";
+import { buildSpanTree, extractTracesFromEnvelopes, formatTraceSummary, renderSpanTree } from "../traces.ts";
+import { envelopeSecondTransactionEvent, envelopeTransactionEvent } from "./test_envelopes.ts";
 
 function createMockEventContainer(event: any): EventContainer {
   // Create a minimal Sentry envelope with the event

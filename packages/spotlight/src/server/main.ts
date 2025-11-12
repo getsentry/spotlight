@@ -6,12 +6,12 @@ import { serve } from "@hono/node-server";
 import { addEventProcessor, captureException, getTraceData, startSpan } from "@sentry/node";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.js";
-import { serveFilesHandler } from "./handlers/index.js";
-import { activateLogger, logger } from "./logger.js";
-import routes from "./routes/index.js";
-import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.js";
-import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.js";
+import { DEFAULT_PORT, SERVER_IDENTIFIER } from "./constants.ts";
+import { serveFilesHandler } from "./handlers/index.ts";
+import { activateLogger, logger } from "./logger.ts";
+import routes from "./routes/index.ts";
+import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.ts";
+import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.ts";
 
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 

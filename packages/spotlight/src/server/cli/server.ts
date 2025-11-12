@@ -1,5 +1,5 @@
-import { setupSpotlight } from "../main.js";
-import type { CLIHandlerOptions } from "../types/cli.js";
+import { setupSpotlight } from "../main.ts";
+import type { CLIHandlerOptions } from "../types/cli.ts";
 
 export default async function server({ port, basePath, filesToServe }: CLIHandlerOptions) {
   return await setupSpotlight({

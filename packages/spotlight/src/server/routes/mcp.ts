@@ -1,6 +1,6 @@
 import { StreamableHTTPTransport } from "@hono/mcp";
 import { Hono } from "hono";
-import { createMCPInstance } from "../mcp/mcp.js";
+import { createMCPInstance } from "../mcp/mcp.ts";
 
 const transport = new StreamableHTTPTransport();
 const mcp = createMCPInstance();

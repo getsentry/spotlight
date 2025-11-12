@@ -1,3 +1,3 @@
-export * from "./getBuffer.js";
-export * from "./eventContainer.js";
-export * from "./extras.js";
+export * from "./getBuffer.ts";
+export * from "./eventContainer.ts";
+export * from "./extras.ts";

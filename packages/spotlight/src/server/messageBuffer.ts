@@ -1,6 +1,6 @@
 import { UUID, uuidv7 } from "uuidv7";
-import type { InputSchema } from "./mcp/mcp.js";
-import { EventContainer } from "./utils/eventContainer.js";
+import type { InputSchema } from "./mcp/mcp.ts";
+import { EventContainer } from "./utils/eventContainer.ts";
 
 export class MessageBuffer<T> {
   private size: number;

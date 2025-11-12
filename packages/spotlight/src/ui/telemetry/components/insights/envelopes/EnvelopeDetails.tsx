@@ -4,7 +4,7 @@ import { ReactComponent as Download } from "@spotlight/ui/assets/download.svg";
 import { useSpotlightContext } from "@spotlight/ui/lib/useSpotlightContext";
 import JsonViewer from "@spotlight/ui/telemetry/components/shared/JsonViewer";
 import SidePanel, { SidePanelHeader } from "@spotlight/ui/ui/sidePanel";
-import { RAW_TYPES } from "@spotlight/shared/constants.js";
+import { RAW_TYPES } from "@spotlight/shared/constants.ts";
 import Attachment from "./Attachment";
 import { inferExtension } from "./contentType";
 

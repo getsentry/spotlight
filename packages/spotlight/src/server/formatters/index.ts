@@ -1,14 +1,14 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
-import { logger } from "@spotlight/server/logger.js";
-import type { SentryEvent } from "@spotlight/server/parser/types.js";
-import type { FormatterRegistry } from "./types.js";
+import { logger } from "../logger.ts";
+import type { SentryEvent } from "../parser/types.ts";
+import type { FormatterRegistry } from "./types.ts";
 
-export * from "./types.js";
+export * from "./types.ts";
 
-export { formatters as mdFormatters } from "./md/index.js";
-export { formatters as logfmtFormatters } from "./logfmt/index.js";
-export { formatters as jsonFormatters } from "./json/index.js";
-export { formatters as humanFormatters } from "./human/index.js";
+export { formatters as mdFormatters } from "./md/index.ts";
+export { formatters as logfmtFormatters } from "./logfmt/index.ts";
+export { formatters as jsonFormatters } from "./json/index.ts";
+export { formatters as humanFormatters } from "./human/index.ts";
 
 /**
  * Generic function to get a formatter from registry and apply it

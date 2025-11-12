@@ -1,7 +1,7 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
-import { type SentryTransactionEvent, processEnvelope } from "@spotlight/server/parser/index.js";
-import type { EventContainer } from "@spotlight/server/utils/index.js";
-import { formatTimestamp, getDuration } from "../utils.js";
+import { type SentryTransactionEvent, processEnvelope } from "../../parser/index.ts";
+import type { EventContainer } from "../../utils/index.ts";
+import { formatTimestamp, getDuration } from "../utils.ts";
 
 export interface TraceContext {
   trace_id: string;

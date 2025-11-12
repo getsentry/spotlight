@@ -1,4 +1,4 @@
-import type { SidecarLogger } from "./types/index.js";
+import type { SidecarLogger } from "./types/index.ts";
 
 const SPOTLIGHT_PREFIX = "🔎 [Spotlight]";
 

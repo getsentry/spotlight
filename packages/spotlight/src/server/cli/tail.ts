@@ -1,7 +1,7 @@
 import type { ServerType } from "@hono/node-server";
 import { captureException } from "@sentry/core";
 import { EventSource } from "eventsource";
-import { SENTRY_CONTENT_TYPE } from "../constants.js";
+import { SENTRY_CONTENT_TYPE } from "../constants.ts";
 import {
   type FormatterRegistry,
   type FormatterType,
@@ -10,13 +10,13 @@ import {
   jsonFormatters,
   logfmtFormatters,
   mdFormatters,
-} from "../formatters/index.js";
-import { logger } from "../logger.js";
-import { setupSpotlight } from "../main.js";
-import type { ParsedEnvelope } from "../parser/index.js";
-import type { CLIHandlerOptions } from "../types/cli.js";
-import { getSpotlightURL } from "../utils/extras.js";
-import { getBuffer } from "../utils/index.js";
+} from "../formatters/index.ts";
+import { logger } from "../logger.ts";
+import { setupSpotlight } from "../main.ts";
+import type { ParsedEnvelope } from "../parser/index.ts";
+import type { CLIHandlerOptions } from "../types/cli.ts";
+import { getSpotlightURL } from "../utils/extras.ts";
+import { getBuffer } from "../utils/index.ts";
 
 export type OnItemCallback = (
   type: string,

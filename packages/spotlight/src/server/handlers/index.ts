@@ -1,1 +1,1 @@
-export * from "./fileToServe.js";
+export * from "./fileToServe.ts";

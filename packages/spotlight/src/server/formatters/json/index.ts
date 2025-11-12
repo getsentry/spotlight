@@ -1,8 +1,8 @@
-import { isErrorEvent, isLogEvent, isTraceEvent } from "@spotlight/server/parser/helpers.js";
-import type { FormatterRegistry } from "../types.js";
-import { formatError } from "./errors.js";
-import { formatLog } from "./logs.js";
-import { formatTrace } from "./traces.js";
+import { isErrorEvent, isLogEvent, isTraceEvent } from "../../parser/helpers.ts";
+import type { FormatterRegistry } from "../types.ts";
+import { formatError } from "./errors.ts";
+import { formatLog } from "./logs.ts";
+import { formatTrace } from "./traces.ts";
 
 export const formatters: FormatterRegistry = {
   event: { typeGuard: isErrorEvent, format: formatError },

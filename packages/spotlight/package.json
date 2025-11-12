@@ -13,9 +13,9 @@
   },
   "scripts": {
     "start": "./dist/run.js",
-    "dev": "concurrently \"node --disable-warning=ExperimentalWarning --experimental-transform-types --watch src/server/cli.ts\" \"vite --config vite.dev.config.ts\"",
+    "dev": "concurrently \"node --disable-warning=ExperimentalWarning --experimental-transform-types --watch src/run.ts\" \"vite --config vite.dev.config.ts\"",
     "dev:ui": "vite --config vite.dev.config.ts",
-    "dev:server": "node --disable-warning=ExperimentalWarning --experimental-transform-types --watch src/server/cli.ts",
+    "dev:server": "node --disable-warning=ExperimentalWarning --experimental-transform-types --watch src/run.ts",
     "dev:electron": "electron-vite dev",
     "build": "NODE_ENV=production tsc && tsc-alias && vite build --config vite.ui.config.ts && npm run build:sea && npm run build:electron",
     "build:sea": "fossilize -m dist/ui/manifest.json -o spotlight dist/run.js",

@@ -1,6 +1,6 @@
 import type { Envelope } from "@sentry/core";
-import type { SentryErrorEvent } from "@spotlight/server/parser/index.js";
-import { formatLogLine, inferEnvelopeSource } from "./utils.js";
+import type { SentryErrorEvent } from "../../parser/index.ts";
+import { formatLogLine, inferEnvelopeSource } from "./utils.ts";
 
 /**
  * Format an error event with envelope headers for source inference

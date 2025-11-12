@@ -6,7 +6,7 @@ import {
   getGeneratedCodeFromServer,
   isValidSentryStackFrame,
   parseStackTrace,
-} from "./utils.js";
+} from "./utils.ts";
 
 const router = new Hono();
 

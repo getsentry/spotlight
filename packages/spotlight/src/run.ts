@@ -3,8 +3,8 @@ import Module from "node:module";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { setContext, startSpan } from "@sentry/node";
-import { main } from "./server/cli.js";
-import "./instrument.js";
+import { main } from "./server/cli.ts";
+import "./instrument.ts";
 
 const require = Module.createRequire(import.meta.url);
 let sea: any = null;
