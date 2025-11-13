@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { delimiter } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { logger } from "../logger.ts";
 
@@ -14,10 +15,9 @@ export function getComposeFilesFromEnv(): string[] | null {
     return null;
   }
 
-  // Split by : on Unix or ; on Windows
-  const separator = process.platform === "win32" ? ";" : ":";
+  // Split by platform-specific path delimiter (: on Unix, ; on Windows)
   const files = composeFileEnv
-    .split(separator)
+    .split(delimiter)
     .map(f => f.trim())
     .filter(f => f.length > 0);
 
