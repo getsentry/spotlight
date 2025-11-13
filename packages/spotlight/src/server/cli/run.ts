@@ -193,6 +193,10 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
         const command = buildDockerComposeCommand(dockerCompose, actualServerPort);
         cmdArgs = command.cmdArgs;
         dockerComposeOverride = command.dockerComposeOverride;
+        // Unset COMPOSE_FILE if it was used
+        if (command.shouldUnsetComposeFile) {
+          env.COMPOSE_FILE = undefined;
+        }
       } else {
         logger.info(`Using package.json script: ${packageJson.scriptName}`);
         cmdArgs = [packageJson.scriptCommand];
@@ -206,6 +210,10 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
       const command = buildDockerComposeCommand(dockerCompose, actualServerPort);
       cmdArgs = command.cmdArgs;
       dockerComposeOverride = command.dockerComposeOverride;
+      // Unset COMPOSE_FILE if it was used
+      if (command.shouldUnsetComposeFile) {
+        env.COMPOSE_FILE = undefined;
+      }
     } else if (packageJson) {
       logger.info(`Using package.json script: ${packageJson.scriptName}`);
       cmdArgs = [packageJson.scriptCommand];

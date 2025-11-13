@@ -5,6 +5,26 @@ import { logger } from "../logger.ts";
 const COMPOSE_FILE_NAMES = ["docker-compose.yaml", "docker-compose.yml", "compose.yml", "compose.yaml"] as const;
 
 /**
+ * Get compose files from COMPOSE_FILE environment variable
+ * Returns an array of file paths if the variable is set, null otherwise
+ */
+export function getComposeFilesFromEnv(): string[] | null {
+  const composeFileEnv = process.env.COMPOSE_FILE;
+  if (!composeFileEnv) {
+    return null;
+  }
+
+  // Split by : on Unix or ; on Windows
+  const separator = process.platform === "win32" ? ";" : ":";
+  const files = composeFileEnv
+    .split(separator)
+    .map(f => f.trim())
+    .filter(f => f.length > 0);
+
+  return files.length > 0 ? files : null;
+}
+
+/**
  * Find the compose file in the current directory
  */
 export function findComposeFile(): string | null {

@@ -1,17 +1,22 @@
 import { execSync } from "node:child_process";
 import { stringify as stringifyYaml } from "yaml";
 import { logger } from "../logger.ts";
-import { findComposeFile, findOverrideFile, parseComposeFile } from "./docker-compose-parser.ts";
+import {
+  findComposeFile,
+  findOverrideFile,
+  getComposeFilesFromEnv,
+  parseComposeFile,
+} from "./docker-compose-parser.ts";
 
 export const DOCKER_MIN_VERSION = "20.10.0";
 export const DOCKER_HOST_INTERNAL = "host.docker.internal";
 export const DOCKER_HOST_GATEWAY = "host-gateway";
 
 interface DockerComposeConfig {
-  composeFile: string;
-  overrideFile?: string;
+  composeFiles: string[]; // Array of compose files
   command: string[];
   serviceNames: string[];
+  usingComposeFileEnv: boolean; // Flag to know if COMPOSE_FILE was used
 }
 
 /**
@@ -124,22 +129,25 @@ function generateSpotlightOverrideYaml(serviceNames: string[], port: number): st
 export function buildDockerComposeCommand(
   config: DockerComposeConfig,
   port: number,
-): { cmdArgs: string[]; dockerComposeOverride: string } {
+): { cmdArgs: string[]; dockerComposeOverride: string; shouldUnsetComposeFile: boolean } {
   const cmdArgs = [...config.command];
 
-  cmdArgs.push("-f", config.composeFile);
-
-  if (config.overrideFile) {
-    cmdArgs.push("-f", config.overrideFile);
+  // Add -f for each compose file
+  for (const file of config.composeFiles) {
+    cmdArgs.push("-f", file);
   }
 
+  // Add our Spotlight override last
   cmdArgs.push("-f", "-");
-
   cmdArgs.push("up");
 
   const dockerComposeOverride = generateSpotlightOverrideYaml(config.serviceNames, port);
 
-  return { cmdArgs, dockerComposeOverride };
+  return {
+    cmdArgs,
+    dockerComposeOverride,
+    shouldUnsetComposeFile: config.usingComposeFileEnv,
+  };
 }
 
 /**
@@ -169,31 +177,57 @@ export function detectDockerCompose(): DockerComposeConfig | null {
 
   logger.debug(`Detected Docker Compose version ${compose.version} (${compose.command.join(" ")})`);
 
-  const composeFile = findComposeFile();
-  if (!composeFile) {
-    logger.debug("No compose file found in current directory");
-    return null;
+  // First check if COMPOSE_FILE env is set
+  const composeFilesFromEnv = getComposeFilesFromEnv();
+  let composeFiles: string[];
+  let usingComposeFileEnv = false;
+
+  if (composeFilesFromEnv) {
+    // Use files from COMPOSE_FILE env variable
+    composeFiles = composeFilesFromEnv;
+    usingComposeFileEnv = true;
+    logger.debug(`Using COMPOSE_FILE environment variable: ${composeFiles.join(", ")}`);
+  } else {
+    // Use existing findComposeFile() + findOverrideFile() logic
+    const composeFile = findComposeFile();
+    if (!composeFile) {
+      logger.debug("No compose file found in current directory");
+      return null;
+    }
+
+    logger.debug(`Found compose file: ${composeFile}`);
+
+    composeFiles = [composeFile];
+
+    // Check for override file (only when COMPOSE_FILE is not set)
+    const overrideFile = findOverrideFile(composeFile);
+    if (overrideFile) {
+      logger.debug(`Found override file: ${overrideFile}`);
+      composeFiles.push(overrideFile);
+    }
   }
 
-  logger.debug(`Found compose file: ${composeFile}`);
+  // Parse services from all compose files
+  const serviceNamesSet = new Set<string>();
+  for (const file of composeFiles) {
+    const services = parseComposeFile(file);
+    for (const service of services) {
+      serviceNamesSet.add(service);
+    }
+  }
 
-  const serviceNames = parseComposeFile(composeFile);
+  const serviceNames = Array.from(serviceNamesSet);
   if (serviceNames.length === 0) {
-    logger.debug("No services found in compose file");
+    logger.debug("No services found in compose file(s)");
     return null;
   }
 
   logger.debug(`Found ${serviceNames.length} service(s): ${serviceNames.join(", ")}`);
 
-  const overrideFile = findOverrideFile(composeFile);
-  if (overrideFile) {
-    logger.debug(`Found override file: ${overrideFile}`);
-  }
-
   return {
-    composeFile,
-    overrideFile: overrideFile ?? undefined,
+    composeFiles,
     command: compose.command,
     serviceNames,
+    usingComposeFileEnv,
   };
 }
