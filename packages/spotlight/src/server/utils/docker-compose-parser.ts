@@ -19,7 +19,7 @@ export function getComposeFilesFromEnv(): string[] | null {
   const files = composeFileEnv
     .split(delimiter)
     .map(f => f.trim())
-    .filter(f => f.length > 0);
+    .filter(Boolean);
 
   return files.length > 0 ? files : null;
 }
