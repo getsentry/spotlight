@@ -16,7 +16,6 @@ interface DockerComposeConfig {
   composeFiles: string[]; // Array of compose files
   command: string[];
   serviceNames: string[];
-  usingComposeFileEnv: boolean; // Flag to know if COMPOSE_FILE was used
 }
 
 /**
@@ -129,7 +128,7 @@ function generateSpotlightOverrideYaml(serviceNames: string[], port: number): st
 export function buildDockerComposeCommand(
   config: DockerComposeConfig,
   port: number,
-): { cmdArgs: string[]; dockerComposeOverride: string; shouldUnsetComposeFile: boolean } {
+): { cmdArgs: string[]; dockerComposeOverride: string } {
   const cmdArgs = [...config.command];
 
   // Add -f for each compose file
@@ -146,7 +145,6 @@ export function buildDockerComposeCommand(
   return {
     cmdArgs,
     dockerComposeOverride,
-    shouldUnsetComposeFile: config.usingComposeFileEnv,
   };
 }
 
@@ -180,12 +178,10 @@ export function detectDockerCompose(): DockerComposeConfig | null {
   // First check if COMPOSE_FILE env is set
   const composeFilesFromEnv = getComposeFilesFromEnv();
   let composeFiles: string[];
-  let usingComposeFileEnv = false;
 
   if (composeFilesFromEnv) {
     // Use files from COMPOSE_FILE env variable
     composeFiles = composeFilesFromEnv;
-    usingComposeFileEnv = true;
     logger.debug(`Using COMPOSE_FILE environment variable: ${composeFiles.join(", ")}`);
   } else {
     // Use existing findComposeFile() + findOverrideFile() logic
@@ -228,6 +224,5 @@ export function detectDockerCompose(): DockerComposeConfig | null {
     composeFiles,
     command: compose.command,
     serviceNames,
-    usingComposeFileEnv,
   };
 }
