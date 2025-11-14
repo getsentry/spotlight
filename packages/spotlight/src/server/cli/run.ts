@@ -160,7 +160,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   const actualServerPort = (serverInstance.address() as AddressInfo).port;
   const spotlightUrl = getSpotlightURL(actualServerPort, LOCALHOST_HOST);
   let shell = false;
-  let dockerComposeOverride: string | undefined = undefined;
+  let stdin: string | undefined = undefined;
   const env = {
     ...process.env,
     SENTRY_SPOTLIGHT: spotlightUrl,
@@ -198,7 +198,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
         env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
         const command = buildDockerComposeCommand(dockerCompose);
         cmdArgs = command.cmdArgs;
-        dockerComposeOverride = command.stdin;
+        stdin = command.stdin;
         // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
         env.COMPOSE_FILE = undefined;
       } else {
@@ -216,7 +216,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
 
       const command = buildDockerComposeCommand(dockerCompose);
       cmdArgs = command.cmdArgs;
-      dockerComposeOverride = command.stdin;
+      stdin = command.stdin;
       // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
       env.COMPOSE_FILE = undefined;
     } else if (packageJson) {
@@ -234,7 +234,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   logger.info(`Starting command: ${cmdStr}`);
   // When we have Docker Compose override YAML (for -f -), we need to pipe stdin
   // Otherwise, inherit stdin to relay user input to the downstream process
-  const stdinMode: "pipe" | "inherit" = dockerComposeOverride ? "pipe" : "inherit";
+  const stdinMode: "pipe" | "inherit" = stdin ? "pipe" : "inherit";
   const runCmd = spawn(cmdArgs[0], cmdArgs.slice(1), {
     cwd: process.cwd(),
     env,
@@ -251,12 +251,12 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   }
 
   // If we have Docker Compose override YAML, write it and close stdin
-  if (dockerComposeOverride) {
+  if (stdin) {
     if (!runCmd.stdin) {
       logger.error("Failed to pipe Docker Compose override: stdin is not available");
       process.exit(1);
     }
-    runCmd.stdin.write(dockerComposeOverride);
+    runCmd.stdin.write(stdin);
     runCmd.stdin.end();
   }
 
