@@ -7,24 +7,6 @@ const COMPOSE_FILE_BASE_NAMES = ["docker-compose", "compose"] as const;
 const COMPOSE_FILE_EXTENSIONS = [".yml", ".yaml"] as const;
 
 /**
- * Find a file by trying all combinations of base names and extensions.
- */
-function findFile(buildFileName: (baseName: string, ext: string) => string): string | null {
-  for (const baseName of COMPOSE_FILE_BASE_NAMES) {
-    for (const ext of COMPOSE_FILE_EXTENSIONS) {
-      const fileName = buildFileName(baseName, ext);
-      try {
-        accessSync(fileName, constants.R_OK);
-        return fileName;
-      } catch {
-        // File doesn't exist or isn't readable, continue searching
-      }
-    }
-  }
-  return null;
-}
-
-/**
  * Get compose files from COMPOSE_FILE environment variable
  * Returns an array of file paths if the variable is set, null otherwise
  */
@@ -44,16 +26,31 @@ export function getComposeFilesFromEnv(): string[] | null {
 }
 
 /**
- * Find the compose file in the current directory
+ * Find the compose file in the current directory by trying all combinations
+ * of base names and extensions.
  */
 export function findComposeFile(): string | null {
-  return findFile((baseName, ext) => `${baseName}${ext}`);
+  for (const baseName of COMPOSE_FILE_BASE_NAMES) {
+    for (const ext of COMPOSE_FILE_EXTENSIONS) {
+      const fileName = `${baseName}${ext}`;
+      try {
+        accessSync(fileName, constants.R_OK);
+        return fileName;
+      } catch {
+        // File doesn't exist or isn't readable, continue searching
+      }
+    }
+  }
+  return null;
 }
 
 /**
- * Find the override file for a given compose file
+ * Find the override file for a given compose file.
+ * Docker Compose looks for an override file with the same base name and extension.
+ * For example: docker-compose.yml -> docker-compose.override.yml
  */
 export function findOverrideFile(composeFile: string): string | null {
+  // Extract extension from the original file to maintain consistency
   const ext = composeFile.endsWith(".yaml") ? ".yaml" : ".yml";
   const baseName = composeFile.replace(/\.(yaml|yml)$/, "");
   const overrideFile = `${baseName}.override${ext}`;
