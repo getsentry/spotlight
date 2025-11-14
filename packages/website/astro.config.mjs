@@ -75,17 +75,14 @@ export default defineConfig({
       ],
       sidebar: [
         {
-          label: "About",
-          items: [
-            {
-              label: "What is Spotlight?",
-              link: "/docs/about/",
-            },
-            {
-              label: "Architecture",
-              link: "/docs/architecture/",
-            },
-          ],
+          label: "Getting Started",
+          link: "/docs/getting-started/",
+        },
+        {
+          label: "Quick Starts",
+          autogenerate: {
+            directory: "docs/quickstart",
+          },
         },
         {
           label: "CLI",
@@ -116,6 +113,19 @@ export default defineConfig({
           autogenerate: {
             directory: "docs/contribute",
           },
+        },
+        {
+          label: "About",
+          items: [
+            {
+              label: "What is Spotlight?",
+              link: "/docs/about/",
+            },
+            {
+              label: "Architecture",
+              link: "/docs/architecture/",
+            },
+          ],
         },
         {
           label: "Reference",
