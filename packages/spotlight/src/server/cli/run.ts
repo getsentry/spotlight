@@ -17,6 +17,10 @@ import tail, { type OnItemCallback } from "./tail.ts";
 
 const SPOTLIGHT_VERSION = process.env.npm_package_version || "unknown";
 
+// Environment variable host configurations
+const LOCALHOST_HOST = "localhost";
+const DOCKER_HOST = "host.docker.internal";
+
 /**
  * Detect if there's a package.json with runnable scripts
  */
@@ -154,7 +158,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   // as not having that indicates either the server did not start
   // or started in a weird manner (like over a unix socket)
   const actualServerPort = (serverInstance.address() as AddressInfo).port;
-  const spotlightUrl = getSpotlightURL(actualServerPort);
+  const spotlightUrl = getSpotlightURL(actualServerPort, LOCALHOST_HOST);
   let shell = false;
   let dockerComposeOverride: string | undefined = undefined;
   const env = {
@@ -190,6 +194,8 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
         logger.info(
           `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
         );
+        // Use host.docker.internal for backend services to access the host machine
+        env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
         const command = buildDockerComposeCommand(dockerCompose);
         cmdArgs = command.cmdArgs;
         dockerComposeOverride = command.stdin;
@@ -206,9 +212,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
         `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
       );
       // Use host.docker.internal for backend services to access the host machine
-      env.SENTRY_SPOTLIGHT = `http://host.docker.internal:${actualServerPort}/stream`;
-      // Keep localhost for browser-side (Next.js public env vars)
-      env.NEXT_PUBLIC_SENTRY_SPOTLIGHT = `http://localhost:${actualServerPort}/stream`;
+      env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
 
       const command = buildDockerComposeCommand(dockerCompose);
       cmdArgs = command.cmdArgs;
