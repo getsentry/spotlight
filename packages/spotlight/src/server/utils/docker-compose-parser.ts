@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { constants, accessSync, readFileSync } from "node:fs";
 import { delimiter } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { logger } from "../logger.ts";
@@ -13,8 +13,11 @@ function findFile(buildFileName: (baseName: string, ext: string) => string): str
   for (const baseName of COMPOSE_FILE_BASE_NAMES) {
     for (const ext of COMPOSE_FILE_EXTENSIONS) {
       const fileName = buildFileName(baseName, ext);
-      if (existsSync(fileName)) {
+      try {
+        accessSync(fileName, constants.R_OK);
         return fileName;
+      } catch {
+        // File doesn't exist or isn't readable, continue searching
       }
     }
   }
@@ -55,10 +58,13 @@ export function findOverrideFile(composeFile: string): string | null {
   const baseName = composeFile.replace(/\.(yaml|yml)$/, "");
   const overrideFile = `${baseName}.override${ext}`;
 
-  if (existsSync(overrideFile)) {
+  try {
+    accessSync(overrideFile, constants.R_OK);
     return overrideFile;
+  } catch {
+    // File doesn't exist or isn't readable
+    return null;
   }
-  return null;
 }
 
 /**

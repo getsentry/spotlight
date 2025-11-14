@@ -250,7 +250,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     process.exit(1);
   }
 
-  // If we have Docker Compose override YAML, write it and close stdin
+  // If our command has a stdin input _and_ we can send to stdin, write and close
   if (stdin) {
     if (!runCmd.stdin) {
       logger.error("Failed to pipe Docker Compose override: stdin is not available");
