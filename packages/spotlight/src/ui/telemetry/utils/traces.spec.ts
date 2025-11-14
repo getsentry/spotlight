@@ -1,5 +1,5 @@
-import { describe, expect, test } from "vitest";
 import { generateUuidv4 } from "@spotlight/ui/lib/uuid";
+import { describe, expect, test } from "vitest";
 import type { Span } from "../types";
 import { groupSpans } from "./traces";
 

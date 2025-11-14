@@ -1,5 +1,3 @@
-import { type KeyboardEvent, useMemo } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
 import { ReactComponent as Filter } from "@spotlight/ui/assets/filter.svg";
 import { ReactComponent as Sort } from "@spotlight/ui/assets/sort.svg";
 import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
@@ -15,6 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@spotlight/ui/ui/dropdownMenu";
 import Table from "@spotlight/ui/ui/table";
+import { type KeyboardEvent, useMemo } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { LOGS_HEADERS, LOGS_SORT_KEYS, LOG_LEVEL_COLORS } from "../../constants";
 import { useSentryLogs } from "../../data/useSentryLogs";
 import useColumnVisibility from "../../hooks/useColumnVisibility";

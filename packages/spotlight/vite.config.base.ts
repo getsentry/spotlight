@@ -33,4 +33,3 @@ export const reactPlugins = [
 export const dtsPlugin = dts({
   insertTypesEntry: true,
 });
-

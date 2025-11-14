@@ -1,7 +1,7 @@
-import { Link, useParams } from "react-router-dom";
 import { cn } from "@spotlight/ui/lib/cn";
 import TimeSince from "@spotlight/ui/telemetry/components/shared/TimeSince";
 import { Badge } from "@spotlight/ui/ui/badge";
+import { Link, useParams } from "react-router-dom";
 import type { Span, Trace } from "../../types";
 import { getFormattedSpanDuration } from "../../utils/duration";
 import { truncateId } from "../../utils/text";

@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
 import {
   createAITraceFromSpan,
   detectAILibraryHandler,
@@ -10,6 +8,8 @@ import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
 import { Badge } from "@spotlight/ui/ui/badge";
 import SidePanel, { SidePanelHeader } from "@spotlight/ui/ui/sidePanel";
 import Table from "@spotlight/ui/ui/table";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { SearchProvider } from "../../../context/SearchContext";
 import useSentryStore from "../../../store";
 import DateTime from "../../shared/DateTime";

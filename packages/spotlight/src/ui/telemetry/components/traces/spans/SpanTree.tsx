@@ -1,6 +1,6 @@
-import { useMemo } from "react";
 import { cn } from "@spotlight/ui/lib/cn";
 import { useSearch } from "@spotlight/ui/telemetry/context/SearchContext";
+import { useMemo } from "react";
 import type { Span, TraceContext } from "../../../types";
 import SpanItem from "./SpanItem";
 

@@ -1,10 +1,10 @@
 import type { Envelope } from "@sentry/core";
-import { useMemo, useState } from "react";
+import { RAW_TYPES } from "@spotlight/shared/constants.ts";
 import { ReactComponent as Download } from "@spotlight/ui/assets/download.svg";
 import { useSpotlightContext } from "@spotlight/ui/lib/useSpotlightContext";
 import JsonViewer from "@spotlight/ui/telemetry/components/shared/JsonViewer";
 import SidePanel, { SidePanelHeader } from "@spotlight/ui/ui/sidePanel";
-import { RAW_TYPES } from "@spotlight/shared/constants.ts";
+import { useMemo, useState } from "react";
 import Attachment from "./Attachment";
 import { inferExtension } from "./contentType";
 

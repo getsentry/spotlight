@@ -8,4 +8,3 @@ export function setSidecarUrlInStore(url: string) {
   store.setSidecarUrl(baseSidecarUrl);
   log("Set sidecar URL for telemetry:", baseSidecarUrl);
 }
-

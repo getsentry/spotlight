@@ -1,6 +1,6 @@
+import { createTab } from "@spotlight/ui/telemetry/utils/tabs";
 import { useMemo } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { createTab } from "@spotlight/ui/telemetry/utils/tabs";
 import TelemetryTabs from "../../TelemetryTabs";
 
 import { useSentryEvents } from "@spotlight/ui/telemetry/data/useSentryEvents";

@@ -1,6 +1,6 @@
+import type { SpotlightContext } from "@spotlight/ui/types";
 import type React from "react";
 import { type ReactNode, createContext, useContext } from "react";
-import type { SpotlightContext } from "@spotlight/ui/types";
 import { DEFAULT_SIDECAR_URL } from "../constants";
 
 const Context = createContext<SpotlightContext>({

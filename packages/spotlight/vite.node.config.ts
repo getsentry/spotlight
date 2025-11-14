@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
-import { aliases, dtsPlugin, defineProduction } from "./vite.config.base";
+import { aliases, defineProduction, dtsPlugin } from "./vite.config.base";
 
 export default defineConfig({
   plugins: [dtsPlugin],

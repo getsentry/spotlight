@@ -2,8 +2,8 @@ import { log } from "@spotlight/ui/lib/logger";
 import { generateUuidv4 } from "@spotlight/ui/lib/uuid";
 import type { SentryProfileWithTraceMeta } from "../store/types";
 import type { Span, Trace } from "../types";
-import { compareSpans } from "../utils/traces";
 import { getFunctionNameFromFrame } from "../utils/profileUtils";
+import { compareSpans } from "../utils/traces";
 
 /**
  * Groups consequent spans with the same description and op into a single span per each level.

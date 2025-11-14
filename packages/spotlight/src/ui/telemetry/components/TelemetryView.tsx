@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
 import { cn } from "@spotlight/ui/lib/cn";
 import { log } from "@spotlight/ui/lib/logger";
 import { getRouteStorageKey } from "@spotlight/ui/lib/routePersistence";
+import { useEffect } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
 import useSentryStore from "../store";
 import ErrorsTab from "../tabs/ErrorsTab";
 import InsightsTab from "../tabs/InsightsTab";

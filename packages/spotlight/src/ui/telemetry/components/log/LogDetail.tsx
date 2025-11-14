@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
 import JsonViewer from "@spotlight/ui/telemetry/components/shared/JsonViewer";
 import { useSentryLog } from "@spotlight/ui/telemetry/data/useSentryLogs";
 import SidePanel, { SidePanelHeader } from "@spotlight/ui/ui/sidePanel";
 import Table from "@spotlight/ui/ui/table";
+import { Link } from "react-router-dom";
 import { LOG_LEVEL_COLORS } from "../../constants";
 import DateTime from "../shared/DateTime";
 

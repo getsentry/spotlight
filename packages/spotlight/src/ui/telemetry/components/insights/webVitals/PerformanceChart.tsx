@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
 import { cn } from "@spotlight/ui/lib/cn";
 import type { MetricScoreProps, MetricWeightsProps } from "@spotlight/ui/telemetry/types";
 import { calculateLabelCoordinates } from "@spotlight/ui/telemetry/utils/webVitals";
 import RingChart from "@spotlight/ui/ui/ringChart";
+import { useRef, useState } from "react";
 import type { WebVitals } from "../../../constants";
 import useMouseTracking from "../../../hooks/useMouseTracking";
 

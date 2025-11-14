@@ -27,7 +27,7 @@ export function processTransactionEvent(
 
   // Add guard to ensure trace_id exists
   if (!traceCtx.trace_id) {
-    throw new Error('Transaction event missing required trace_id');
+    throw new Error("Transaction event missing required trace_id");
   }
 
   // Initialize or get existing trace

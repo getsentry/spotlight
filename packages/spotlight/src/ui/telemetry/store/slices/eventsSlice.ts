@@ -1,5 +1,5 @@
-import type { StateCreator } from "zustand";
 import { generateUuidv4 } from "@spotlight/ui/lib/uuid";
+import type { StateCreator } from "zustand";
 import type { SentryEvent, SentryLogEventItem } from "../../types";
 import { isErrorEvent, isLogEvent, isProfileEvent, isTraceEvent } from "../../utils/sentry";
 import type { EventsSliceActions, EventsSliceState, SentryStore } from "../types";
@@ -46,7 +46,7 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       // Build up the Maps incrementally to avoid stale state capture
       const newLogsById = new Map(logsById);
       const newLogsByTraceId = new Map(logsByTraceId);
-      
+
       for (const logItem of processedLogs) {
         newLogsById.set(logItem.id, logItem);
 
@@ -56,7 +56,7 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
           newLogsByTraceId.set(logItem.trace_id, logSet);
         }
       }
-      
+
       // Set state once with all accumulated changes
       set({ logsById: newLogsById, logsByTraceId: newLogsByTraceId });
     }

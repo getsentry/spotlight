@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { connectToSidecar } from "@spotlight/ui/sidecar";
 import { SENTRY_CONTENT_TYPE } from "@spotlight/shared/constants.ts";
+import { connectToSidecar } from "@spotlight/ui/sidecar";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { log } from "../lib/logger";
 import TelemetryView from "./components/TelemetryView";
 import useSentryStore from "./store";

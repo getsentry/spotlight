@@ -1,4 +1,3 @@
-import type { ElementType } from "react";
 import { ReactComponent as ChevronDown } from "@spotlight/ui/assets/chevronDown.svg";
 import { Button } from "@spotlight/ui/ui/button";
 import {
@@ -9,6 +8,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@spotlight/ui/ui/dropdownMenu";
+import type { ElementType } from "react";
 
 interface FilterOption {
   label: string;

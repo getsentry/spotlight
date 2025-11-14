@@ -1,14 +1,18 @@
-import { type KeyboardEvent, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { ReactComponent as Sort } from "@spotlight/ui/assets/sort.svg";
 import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
 import { cn } from "@spotlight/ui/lib/cn";
-import { PERFORMANCE_SCORE_PROFILES, WEB_VITALS_HEADERS, WEB_VITALS_SORT_KEYS } from "@spotlight/ui/telemetry/constants";
+import {
+  PERFORMANCE_SCORE_PROFILES,
+  WEB_VITALS_HEADERS,
+  WEB_VITALS_SORT_KEYS,
+} from "@spotlight/ui/telemetry/constants";
 import { useSentryEvents } from "@spotlight/ui/telemetry/data/useSentryEvents";
 import useSort from "@spotlight/ui/telemetry/hooks/useSort";
 import type { SentryEventWithPerformanceData } from "@spotlight/ui/telemetry/types";
 import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
 import Table from "@spotlight/ui/ui/table";
+import { type KeyboardEvent, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { normalizePerformanceScore } from "../../../utils/webVitals";
 
 type SentryEventComparator = (a: SentryEventWithPerformanceData, b: SentryEventWithPerformanceData) => number;

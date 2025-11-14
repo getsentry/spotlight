@@ -1,7 +1,7 @@
-import type React from "react";
-import { useCallback, useState } from "react";
 import { ReactComponent as CheckIcon } from "@spotlight/ui/assets/check.svg";
 import { ReactComponent as CopyIcon } from "@spotlight/ui/assets/copy.svg";
+import type React from "react";
+import { useCallback, useState } from "react";
 
 export default function CopyToClipboard({ data }: { data: string }) {
   const [isCopied, setIsCopied] = useState(false);

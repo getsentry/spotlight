@@ -1,13 +1,16 @@
 import { execSync } from "node:child_process";
+import semver from "semver";
 import { stringify as stringifyYaml } from "yaml";
 import { logger } from "../logger.ts";
 import {
   findComposeFile,
   findOverrideFile,
   getComposeFilesFromEnv,
-  parseComposeFile,
+  getDockerComposeServices,
 } from "./docker-compose-parser.ts";
 
+// minimum version of Docker required to use host.docker.internal on linux
+/// https://docs.docker.com/engine/release-notes/20.10/#bug-fixes-and-enhancements-1
 export const DOCKER_MIN_VERSION = "20.10.0";
 export const DOCKER_HOST_INTERNAL = "host.docker.internal";
 export const DOCKER_HOST_GATEWAY = "host-gateway";
@@ -16,23 +19,6 @@ interface DockerComposeConfig {
   composeFiles: string[]; // Array of compose files
   command: string[];
   serviceNames: string[];
-}
-
-/**
- * Check if the first version is greater than or equal to the second version
- * Returns true if v1 >= v2
- */
-function isVersionGreaterOrEqual(v1: string, v2: string): boolean {
-  const parts1 = v1.replace(/^v/, "").split(".").map(Number);
-  const parts2 = v2.replace(/^v/, "").split(".").map(Number);
-
-  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
-    const p1 = parts1[i] || 0;
-    const p2 = parts2[i] || 0;
-    if (p1 > p2) return true;
-    if (p1 < p2) return false;
-  }
-  return true;
 }
 
 /**
@@ -61,7 +47,7 @@ export function detectDocker(): { version: string; valid: boolean } | null {
   }
 
   const versionNumber = match[1];
-  const valid = isVersionGreaterOrEqual(versionNumber, DOCKER_MIN_VERSION);
+  const valid = semver.gte(versionNumber, DOCKER_MIN_VERSION);
 
   return { version: versionNumber, valid };
 }
@@ -78,43 +64,35 @@ function detectComposeCommand(): { command: string[]; version: string } | null {
     return null;
   }
 
-  if (!composePluginVersion && composeStandaloneVersion) {
-    return { command: ["docker-compose"], version: composeStandaloneVersion };
-  }
-
-  if (composePluginVersion && !composeStandaloneVersion) {
-    return { command: ["docker", "compose"], version: composePluginVersion };
-  }
-
-  // Use standalone if it's newer, otherwise prefer plugin
-  const pluginVer = composePluginVersion!.replace(/^v/, "");
-  const standaloneVer = composeStandaloneVersion!.replace(/^v/, "");
-
-  if (isVersionGreaterOrEqual(standaloneVer, pluginVer)) {
+  if (!composePluginVersion) {
     return { command: ["docker-compose"], version: composeStandaloneVersion! };
   }
 
-  return { command: ["docker", "compose"], version: composePluginVersion! };
+  if (!composeStandaloneVersion) {
+    return { command: ["docker", "compose"], version: composePluginVersion! };
+  }
+
+  // Use standalone if it's newer, otherwise prefer plugin
+  const pluginVer = composePluginVersion.replace(/^v/, "");
+  const standaloneVer = composeStandaloneVersion.replace(/^v/, "");
+
+  if (semver.gt(standaloneVer, pluginVer)) {
+    return { command: ["docker-compose"], version: composeStandaloneVersion };
+  }
+
+  return { command: ["docker", "compose"], version: composePluginVersion };
 }
 
 /**
  * Generate the override YAML for injecting Spotlight environment variables
  */
-function generateSpotlightOverrideYaml(serviceNames: string[], port: number): string {
-  const services: Record<string, unknown> = {};
-
-  // We use host.docker.internal to ensure the container can access the host machine
-  // for backend services that need to access the host machine to send events to Spotlight.
-  const spotlightUrl = `http://${DOCKER_HOST_INTERNAL}:${port}/stream`;
-  const publicSpotlightUrl = `http://localhost:${port}/stream`;
-
+function generateSpotlightOverrideYaml(serviceNames: string[]): string {
+  const services: Record<string, { environment: string[]; extra_hosts: string[] }> = {};
+  // Pass environment variables without values to inherit from parent process (run.ts)
+  // so the values set in run.ts are propagated correctly
   for (const serviceName of serviceNames) {
     services[serviceName] = {
-      environment: [
-        `SENTRY_SPOTLIGHT=${spotlightUrl}`,
-        `NEXT_PUBLIC_SENTRY_SPOTLIGHT=${publicSpotlightUrl}`, // This is needed for Next.js
-        "SENTRY_TRACES_SAMPLE_RATE=1",
-      ],
+      environment: ["SENTRY_SPOTLIGHT", "NEXT_PUBLIC_SENTRY_SPOTLIGHT", "SENTRY_TRACES_SAMPLE_RATE"],
       extra_hosts: [`${DOCKER_HOST_INTERNAL}:${DOCKER_HOST_GATEWAY}`],
     };
   }
@@ -125,10 +103,10 @@ function generateSpotlightOverrideYaml(serviceNames: string[], port: number): st
 /**
  * Build the Docker Compose command with Spotlight environment injection
  */
-export function buildDockerComposeCommand(
-  config: DockerComposeConfig,
-  port: number,
-): { cmdArgs: string[]; dockerComposeOverride: string } {
+export function buildDockerComposeCommand(config: DockerComposeConfig): {
+  cmdArgs: string[];
+  stdin: string;
+} {
   const cmdArgs = [...config.command];
 
   // Add -f for each compose file
@@ -140,12 +118,9 @@ export function buildDockerComposeCommand(
   cmdArgs.push("-f", "-");
   cmdArgs.push("up");
 
-  const dockerComposeOverride = generateSpotlightOverrideYaml(config.serviceNames, port);
+  const stdin = generateSpotlightOverrideYaml(config.serviceNames);
 
-  return {
-    cmdArgs,
-    dockerComposeOverride,
-  };
+  return { cmdArgs, stdin };
 }
 
 /**
@@ -162,6 +137,7 @@ export function detectDockerCompose(): DockerComposeConfig | null {
   }
 
   if (!docker.valid) {
+    logger.error(`Docker version ${docker.version} does not meet the minimum required version ${DOCKER_MIN_VERSION}`);
     return null;
   }
 
@@ -203,10 +179,10 @@ export function detectDockerCompose(): DockerComposeConfig | null {
     }
   }
 
-  // Parse services from all compose files
+  // Parse services from all compose files using the refactored function
   const serviceNamesSet = new Set<string>();
   for (const file of composeFiles) {
-    const services = parseComposeFile(file);
+    const services = getDockerComposeServices(file);
     for (const service of services) {
       serviceNamesSet.add(service);
     }

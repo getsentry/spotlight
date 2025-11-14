@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
         }),
       ],
       build: {
-        outDir: 'dist-electron/main',
+        outDir: "dist-electron/main",
         sourcemap: true,
         rollupOptions: {
           plugins: [sourcemaps()],
@@ -56,7 +56,7 @@ export default defineConfig(({ mode }) => {
         }),
       ],
       build: {
-        outDir: 'dist-electron/preload',
+        outDir: "dist-electron/preload",
         sourcemap: true,
         rollupOptions: {
           plugins: [sourcemaps()],
@@ -87,7 +87,7 @@ export default defineConfig(({ mode }) => {
       ],
       root: ".",
       build: {
-        outDir: 'dist-electron/renderer',
+        outDir: "dist-electron/renderer",
         sourcemap: true,
         rollupOptions: {
           plugins: [sourcemaps()],
@@ -99,4 +99,3 @@ export default defineConfig(({ mode }) => {
     },
   };
 });
-

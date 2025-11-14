@@ -1,6 +1,6 @@
 import type { Envelope } from "@sentry/core";
-import type { StateCreator } from "zustand";
 import { RAW_TYPES } from "@spotlight/shared/constants.ts";
+import type { StateCreator } from "zustand";
 import { ATTACHMENT_EVENT_TYPES, SUPPORTED_EVENT_TYPES } from "../../constants/sentry";
 import type { EventAttachment, Sdk, SentryEvent } from "../../types";
 import { sdkToPlatform } from "../../utils/sdkToPlatform";

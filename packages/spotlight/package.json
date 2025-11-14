@@ -49,6 +49,7 @@
     "@sentry/core": "catalog:",
     "@sentry/electron": "^5.6.0",
     "@sentry/node": "catalog:",
+    "@types/semver": "^7.7.1",
     "chalk": "^5.6.2",
     "electron-store": "^10.0.0",
     "electron-updater": "^6.3.9",
@@ -59,6 +60,7 @@
     "launch-editor": "^2.9.1",
     "logfmt": "^1.4.0",
     "mcp-proxy": "^5.6.0",
+    "semver": "^7.7.3",
     "uuidv7": "^1.0.2",
     "yaml": "^2.8.1",
     "zod": "^3"

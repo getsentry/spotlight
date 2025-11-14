@@ -3,8 +3,8 @@ import { ReactComponent as ChevronIcon } from "@spotlight/ui/assets/branch.svg";
 import { ReactComponent as Check } from "@spotlight/ui/assets/check.svg";
 import { ReactComponent as Circle } from "@spotlight/ui/assets/circle.svg";
 
-import * as React from "react";
 import { cn } from "@spotlight/ui/lib/cn";
+import * as React from "react";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

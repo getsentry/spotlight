@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
 import { ReactComponent as ChevronIcon } from "@spotlight/ui/assets/chevronDown.svg";
 import { cn } from "@spotlight/ui/lib/cn";
 import { useSearch } from "@spotlight/ui/telemetry/context/SearchContext";
+import { useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import type { Span, TraceContext } from "../../../types";
 import { getFormattedDuration, getSpanDurationClassName } from "../../../utils/duration";
 import PlatformIcon from "../../shared/PlatformIcon";
