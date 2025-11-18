@@ -10,6 +10,15 @@ import { clearBuffer, setupSpotlight } from "../../server/main";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+process.on("uncaughtException", error => {
+  console.error(error);
+  dialog.showErrorBox("Uncaught Exception", error.stack || error.message);
+});
+
+process.on("unhandledRejection", reason => {
+  console.error(reason);
+});
+
 const store = new Store();
 
 autoUpdater.forceDevUpdateConfig = process.env.NODE_ENV === "development";
@@ -61,6 +70,7 @@ async function checkForUpdates() {
 
   isCheckingForUpdates = false;
   checkingForUpdatesTimeout = setTimeout(checkForUpdates, ONE_HOUR);
+  checkingForUpdatesTimeout.unref();
 }
 
 app.on("ready", () => {
@@ -122,10 +132,7 @@ const createWindow = () => {
     show: false,
     title: "Spotlight",
     // frame: false,
-    // resizable: false,
-    // maximizable: false,
     // transparent: true,
-    // webPreferences: { nodeIntegration: true },
     titleBarStyle: "hidden",
     // titleBarOverlay: {
     //   color: '#2f3241',
@@ -133,18 +140,18 @@ const createWindow = () => {
     //   height: 60,
     // },
     webPreferences: {
-      preload: path.join(__dirname, "../preload/index.js"),
+      preload: path.join(__dirname, "../preload/index.cjs"),
+      nodeIntegration: true,
       sandbox: false,
     },
     backgroundColor: "#1e1b4b",
   });
 
-  // win.webContents.openDevTools();
-
-  if (!app.isPackaged && process.env.ELECTRON_RENDERER_URL) {
-    win.loadURL(process.env.ELECTRON_RENDERER_URL);
+  // vite-plugin-electron sets VITE_DEV_SERVER_URL during development
+  if (process.env.VITE_DEV_SERVER_URL) {
+    win.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
-    win.loadFile(path.join(__dirname, "../renderer/electron.html"));
+    win.loadFile(path.join(__dirname, "../renderer/index.html"));
   }
 
   win.once("ready-to-show", () => {
@@ -502,6 +509,7 @@ async function askToSendEnvelope(event: Sentry.Event, hint?: Sentry.EventHint) {
 
 function storeIncomingPayload(body: string) {
   if (store.get("sentry-send-envelopes") === true || store.get("sentry-send-envelopes") === undefined) {
+    // WARN: This will cause memory leaks if not cleared
     const scope = Sentry.getCurrentScope();
     scope.clearAttachments();
     scope.addAttachment({
@@ -634,6 +642,7 @@ async function makeSureSpotlightIsRunning() {
     }
 
     subscriber = setTimeout(handler, RECHECK_DELAY + retries * RETRY_DELAY_INCREMENT);
+    subscriber.unref();
   }
 
   handler();

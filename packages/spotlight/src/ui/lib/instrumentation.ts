@@ -6,6 +6,7 @@ import { getDataFromServerTiming } from "./serverTimingMeta";
 const TRACE_PARENT_KEYS = ["sentryTrace", "baggage"];
 
 export default function initSentry() {
+  const isElectron = globalThis.IN_DESKTOP_ENV;
   const traceParentData = TRACE_PARENT_KEYS.map(key => [key, getDataFromServerTiming(key)]);
 
   const hasTraceParent = traceParentData.every(([, value]) => Boolean(value));
@@ -20,7 +21,15 @@ export default function initSentry() {
       createRoutesFromChildren,
       matchRoutes,
     }),
-    Sentry.replayIntegration(),
+    Sentry.replayIntegration(
+      isElectron
+        ? {
+            // Electron-specific replay settings
+            maskAllText: true,
+            blockAllMedia: true,
+          }
+        : {},
+    ),
     Sentry.browserProfilingIntegration(),
   ];
   const hash = document.location.hash.slice(1);
@@ -30,6 +39,29 @@ export default function initSentry() {
     integrations.push(Sentry.spotlightBrowserIntegration({ sidecarUrl }));
   }
 
+  // For Electron, use the combined SDK pattern for better observability
+  // This gives us Electron-specific error handling PLUS React features
+  if (isElectron) {
+    // Dynamically import the Electron SDK
+    import("@sentry/electron/renderer").then(ElectronSentry => {
+      ElectronSentry.init(
+        {
+          dsn: "https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976",
+          environment: process.env.NODE_ENV,
+          release: `spotlight@${process.env.npm_package_version}`,
+          integrations,
+          tracesSampleRate: 1.0,
+          profilesSampleRate: 1.0,
+          replaysSessionSampleRate: 1.0,
+          replaysOnErrorSampleRate: 1.0,
+        },
+        Sentry.init,
+      );
+    });
+    return;
+  }
+
+  // Web UI initialization
   const sentryClient = Sentry.init({
     transport: Sentry.makeBrowserOfflineTransport(Sentry.makeFetchTransport),
     dsn: "https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713",
