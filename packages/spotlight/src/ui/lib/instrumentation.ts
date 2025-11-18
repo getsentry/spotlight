@@ -27,7 +27,7 @@ export default function initSentry() {
   if (hash.startsWith("spotlight")) {
     const splitterPos = hash.indexOf("=");
     const sidecarUrl = splitterPos > -1 ? decodeURIComponent(hash.slice(splitterPos + 1)) : undefined;
-    integrations.push(Sentry.spotlightBrowserIntegration({ sidecarUrl }));
+    integrations.push(Sentry.browserTracingIntegration({ sidecarUrl }));
   }
 
   const sentryClient = Sentry.init({

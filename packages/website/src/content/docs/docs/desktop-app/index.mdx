@@ -146,7 +146,7 @@ import * as Sentry from '@sentry/browser';
 Sentry.init({
   dsn: 'your-dsn', // Optional for local dev
   integrations: [
-    Sentry.spotlightBrowserIntegration()
+    Sentry.browserTracingIntegration()
   ],
   // Only enable in development
   enabled: process.env.NODE_ENV === 'development'

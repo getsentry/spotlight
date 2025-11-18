@@ -197,7 +197,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
     import * as Sentry from '@sentry/browser';
 
     Sentry.init({
-      integrations: [Sentry.spotlightBrowserIntegration()],
+      integrations: [Sentry.browserTracingIntegration()],
     });
     ```
   </TabItem>
