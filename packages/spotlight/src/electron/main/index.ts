@@ -10,15 +10,6 @@ import { clearBuffer, setupSpotlight } from "../../server/main";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-process.on("uncaughtException", error => {
-  console.error(error);
-  dialog.showErrorBox("Uncaught Exception", error.stack || error.message);
-});
-
-process.on("unhandledRejection", reason => {
-  console.error(reason);
-});
-
 const store = new Store();
 
 autoUpdater.forceDevUpdateConfig = process.env.NODE_ENV === "development";
