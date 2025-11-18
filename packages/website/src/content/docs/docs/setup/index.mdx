@@ -39,14 +39,14 @@ If Electron apps are not your thing or you are not using a Mac we have some more
 
 In addition to loading the application, make sure you've enabled spotlight in the relevant Sentry SDKs (e.g. via `spotlight: true`):
 
-For front-end applications, you need to enable the `spotlightBrowserIntegration` for it to work. This is to only include this bit of the code for the users of Spotlight:
+For front-end applications, you need to enable the `browserTracingIntegration` for tracing to work. This is to only include this bit of the code for the users of Spotlight:
 
 ```javascript
 import * as Sentry from '@sentry/browser';
 
 Sentry.init({
   dsn: '___DSN___',
-  integrations: [Sentry.spotlightBrowserIntegration()],
+  integrations: [Sentry.browserTracingIntegration()],
   // ...other Sentry options
 });
 ```
