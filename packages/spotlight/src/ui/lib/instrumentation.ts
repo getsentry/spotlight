@@ -5,33 +5,23 @@ import { getDataFromServerTiming } from "./serverTimingMeta";
 
 const TRACE_PARENT_KEYS = ["sentryTrace", "baggage"];
 
-export default function initSentry() {
-  const isElectron = globalThis.IN_DESKTOP_ENV;
-  const traceParentData = TRACE_PARENT_KEYS.map(key => [key, getDataFromServerTiming(key)]);
-
-  const hasTraceParent = traceParentData.every(([, value]) => Boolean(value));
+// Export for reuse in electron-index.tsx
+export function getIntegrations(instrumentPageLoad = true) {
   const integrations = [
     // See docs for support of different versions of variation of react router
     // https://docs.sentry.io/platforms/javascript/guides/react/configuration/integrations/react-router/
     Sentry.reactRouterV6BrowserTracingIntegration({
-      instrumentPageLoad: !hasTraceParent,
+      instrumentPageLoad,
       useEffect,
       useLocation,
       useNavigationType,
       createRoutesFromChildren,
       matchRoutes,
     }),
-    Sentry.replayIntegration(
-      isElectron
-        ? {
-            // Electron-specific replay settings
-            maskAllText: true,
-            blockAllMedia: true,
-          }
-        : {},
-    ),
+    Sentry.replayIntegration(),
     Sentry.browserProfilingIntegration(),
   ];
+
   const hash = document.location.hash.slice(1);
   if (hash.startsWith("spotlight")) {
     const splitterPos = hash.indexOf("=");
@@ -39,27 +29,13 @@ export default function initSentry() {
     integrations.push(Sentry.spotlightBrowserIntegration({ sidecarUrl }));
   }
 
-  // For Electron, use the combined SDK pattern for better observability
-  // This gives us Electron-specific error handling PLUS React features
-  if (isElectron) {
-    // Dynamically import the Electron SDK
-    import("@sentry/electron/renderer").then(ElectronSentry => {
-      ElectronSentry.init(
-        {
-          dsn: "https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976",
-          environment: process.env.NODE_ENV,
-          release: `spotlight@${process.env.npm_package_version}`,
-          integrations,
-          tracesSampleRate: 1.0,
-          profilesSampleRate: 1.0,
-          replaysSessionSampleRate: 1.0,
-          replaysOnErrorSampleRate: 1.0,
-        },
-        Sentry.init,
-      );
-    });
-    return;
-  }
+  return integrations;
+}
+
+export default function initSentry() {
+  const traceParentData = TRACE_PARENT_KEYS.map(key => [key, getDataFromServerTiming(key)]);
+  const hasTraceParent = traceParentData.every(([, value]) => Boolean(value));
+  const integrations = getIntegrations(!hasTraceParent);
 
   // Web UI initialization
   const sentryClient = Sentry.init({

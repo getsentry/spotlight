@@ -131,7 +131,6 @@ const createWindow = () => {
     //   height: 60,
     // },
     webPreferences: {
-      preload: path.join(__dirname, "../preload/index.cjs"),
       nodeIntegration: true,
       sandbox: false,
     },

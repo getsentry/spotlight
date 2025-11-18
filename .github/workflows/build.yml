@@ -13,13 +13,6 @@ defaults:
   run:
     shell: bash
 
-env:
-  BUILD_CACHE_KEY: ${{ github.sha }}
-  CACHED_BUILD_PATHS: |
-    ${{ github.workspace }}/packages/*/dist
-    ${{ github.workspace }}/packages/*/dist-bin
-    ${{ github.workspace }}/packages/*/dist-electron
-
 jobs:
   build:
     name: Build
@@ -106,19 +99,19 @@ jobs:
           curl -sf --retry 3 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
           kill -2 $SPOTLIGHT_PID
 
-      - name: Store Spotlight CJS
+      - name: Store built packages
         uses: actions/upload-artifact@v4
         with:
-          name: spotlight-cjs
+          name: built-packages
           if-no-files-found: error
           path: |
-            packages/spotlight/dist/spotlight.cjs
-            packages/spotlight/dist/ui/
+            packages/spotlight/dist/
+            !packages/spotlight/dist/**/*.map
 
       - name: Store standalone spotlight binaries
         uses: actions/upload-artifact@v4
         with:
-          name: spotlight
+          name: spotlight-binaries
           if-no-files-found: error
           path: packages/spotlight/dist-bin/spotlight-*
 
@@ -128,13 +121,6 @@ jobs:
           name: electron-build
           if-no-files-found: error
           path: packages/spotlight/dist-electron/
-
-      - name: Update build cache
-        uses: actions/cache/save@v4
-        with:
-          enableCrossOsArchive: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
       
       # This will be used for the base image name in e2e tests below
       # which depends on the build job, hence why we do this here
@@ -271,13 +257,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore build cache
-        uses: actions/cache/restore@v4
+      - name: Download spotlight binaries
+        uses: actions/download-artifact@v4
         with:
-          enableCrossOsArchive: true
-          fail-on-cache-miss: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
+          name: spotlight-binaries
+          path: packages/spotlight/dist-bin/
 
       - name: Rename x64 to amd64
         # This is because Node ecosystem uses x64, but Docker uses amd64 :shrug:

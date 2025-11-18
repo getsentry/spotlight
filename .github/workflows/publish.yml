@@ -29,10 +29,6 @@ concurrency: ${{ github.workflow }}-${{ github.event.workflow_run.head_sha || in
 
 env:
   SHA: ${{ github.event.workflow_run.head_sha || inputs.sha }}
-  BUILD_CACHE_KEY: ${{ github.event.workflow_run.head_sha || inputs.sha }}
-  CACHED_BUILD_PATHS: |
-    ${{ github.workspace }}/packages/*/dist
-    ${{ github.workspace }}/packages/*/dist-bin
 
 jobs:
   npm:
@@ -63,13 +59,21 @@ jobs:
       - name: Setup NPM dependencies
         run: pnpm install
 
-      - name: Restore build cache
-        uses: actions/cache/restore@v4
+      - name: Download built packages
+        uses: actions/download-artifact@v4
         with:
-          enableCrossOsArchive: true
-          fail-on-cache-miss: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
+          name: built-packages
+          path: packages/spotlight/dist/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Download spotlight binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: spotlight-binaries
+          path: packages/spotlight/dist-bin/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
 
       - name: Publish to NPM
         uses: changesets/action@v1
@@ -152,21 +156,27 @@ jobs:
       - name: Setup dependencies
         run: pnpm install
 
-      - name: Restore build cache
-        id: cache
-        uses: actions/cache/restore@v4
+      - name: Download Electron build
+        uses: actions/download-artifact@v4
         with:
-          enableCrossOsArchive: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
+          name: electron-build
+          path: packages/spotlight/dist-electron/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
 
-      - name: Build
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm --filter '@spotlightjs/electron...' build
+      - name: Setup Apple API Key for Notarization
+        env:
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+        run: |
+          echo "$APPLE_API_KEY" | base64 -d > /tmp/apple_key.json
+          cat /tmp/apple_key.json | jq .private_key -r > /tmp/apple_key.pem
+          echo "APPLE_API_KEY_ISSUER_ID=$(cat /tmp/apple_key.json | jq .issuer_id -r)" >> $GITHUB_ENV
+          echo "APPLE_API_KEY_ID=$(cat /tmp/apple_key.json | jq .key_id -r)" >> $GITHUB_ENV
+          echo "APPLE_API_KEY_P8_PATH=/tmp/apple_key.pem" >> $GITHUB_ENV
 
       - name: Build Electron
         env:
-          TEAMID: ${{ vars.TEAMID }}
+          APPLE_TEAM_ID: ${{ vars.TEAMID }}
           MAIN_VITE_SENTRY_ORG: ${{ vars.MAIN_VITE_SENTRY_ORG }}
           MAIN_VITE_SENTRY_PROJECT: ${{ vars.MAIN_VITE_SENTRY_PROJECT }}
           MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
@@ -175,7 +185,7 @@ jobs:
           # Needed by electron-builder's Github Provider for publishing,
           # This helps with auto-updater as we are using Github Releases
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: cd packages/electron && pnpm build:mac
+        run: cd packages/spotlight && pnpm build:mac
 
       - name: Gets latest created release info
         id: latest_release_info
@@ -187,7 +197,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: packages/electron/dist/*
+          file: packages/spotlight/dist-electron/*.{dmg,zip,blockmap}
           tag: ${{ steps.latest_release_info.outputs.tag_name }}
           file_glob: true
           make_latest: false
