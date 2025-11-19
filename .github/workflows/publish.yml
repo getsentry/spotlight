@@ -160,9 +160,34 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: electron-build
-          path: packages/spotlight/dist-electron/
+          path: ${{ runner.temp }}/electron-artifact/
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Validate and copy Electron build files
+        run: |
+          # Create/empty the target directory
+          rm -rf packages/spotlight/dist-electron/
+          mkdir -p packages/spotlight/dist-electron/
+          
+          # Copy only expected directories (main and renderer) to prevent artifact poisoning
+          if [ -d "${{ runner.temp }}/electron-artifact/main" ]; then
+            cp -r "${{ runner.temp }}/electron-artifact/main" packages/spotlight/dist-electron/
+            echo "Copied main/ directory"
+          fi
+          
+          if [ -d "${{ runner.temp }}/electron-artifact/renderer" ]; then
+            cp -r "${{ runner.temp }}/electron-artifact/renderer" packages/spotlight/dist-electron/
+            echo "Copied renderer/ directory"
+          fi
+          
+          # Verify expected directories exist
+          if [ ! -d "packages/spotlight/dist-electron/main" ] || [ ! -d "packages/spotlight/dist-electron/renderer" ]; then
+            echo "Error: Expected directories (main/ and renderer/) not found in artifact"
+            exit 1
+          fi
+          
+          echo "Successfully validated and copied electron build files"
 
       - name: Setup Apple API Key for Notarization
         env:
