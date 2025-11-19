@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, beforeAll } from 'vitest';
+import { describe, it, expect, afterEach, beforeAll, vi } from 'vitest';
 import path from 'node:path';
 import {
   spawnSpotlight,
@@ -217,18 +217,33 @@ describe('spotlight tail e2e tests', () => {
     const lines = output.split('\n').filter(l => l.trim());
     expect(lines.length).toBeGreaterThan(0);
     
-    // At least one line should be parseable as JSON
-    let foundJson = false;
+    // Every non-empty line should be valid JSON
+    const jsonLines: any[] = [];
     for (const line of lines) {
-      try {
-        JSON.parse(line);
-        foundJson = true;
-        break;
-      } catch {
-        // Not JSON, continue
+      if (line.trim()) {
+        try {
+          const parsed = JSON.parse(line);
+          jsonLines.push(parsed);
+        } catch (e) {
+          throw new Error(`Invalid JSON line: ${line}`);
+        }
       }
     }
-    expect(foundJson).toBe(true);
+    
+    expect(jsonLines.length).toBeGreaterThan(0);
+    
+    // Snapshot the first JSON object (normalized)
+    if (jsonLines.length > 0) {
+      const firstJson = jsonLines[0];
+      // Normalize timestamps and dynamic IDs for snapshot
+      const normalized = JSON.stringify(firstJson, (key, value) => {
+        if (key === 'timestamp' || key === 'event_id' || key === 'trace_id' || key === 'span_id') {
+          return '[DYNAMIC]';
+        }
+        return value;
+      }, 2);
+      expect(normalized).toMatchSnapshot();
+    }
   }, 15000);
 
   it('should output in logfmt format', async () => {
@@ -255,6 +270,15 @@ describe('spotlight tail e2e tests', () => {
     const output = tail.stdout.join('');
     // Logfmt typically has key=value pairs
     expect(output).toMatch(/\w+=/);
+    
+    // Normalize dynamic values and snapshot
+    const normalized = output
+      .replace(/timestamp=[\d\-T:.Z]+/g, 'timestamp=[TIMESTAMP]')
+      .replace(/event_id=[a-f0-9\-]+/g, 'event_id=[ID]')
+      .replace(/trace_id=[a-f0-9]+/g, 'trace_id=[ID]')
+      .replace(/span_id=[a-f0-9]+/g, 'span_id=[ID]');
+    
+    expect(normalized).toMatchSnapshot();
   }, 15000);
 
   it('should output in human format (default)', async () => {
@@ -280,6 +304,14 @@ describe('spotlight tail e2e tests', () => {
 
     const output = tail.stdout.join('');
     expect(output.length).toBeGreaterThan(0);
+    
+    // Normalize and snapshot
+    const normalized = output
+      .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, '[TIMESTAMP]')
+      .replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/g, '[UUID]')
+      .replace(/[a-f0-9]{32}/g, '[ID]');
+    
+    expect(normalized).toMatchSnapshot();
   }, 15000);
 
   it('should output in markdown format', async () => {
@@ -306,5 +338,13 @@ describe('spotlight tail e2e tests', () => {
     const output = tail.stdout.join('');
     // Markdown typically has # or ``` or other markdown syntax
     expect(output).toMatch(/[#*`]/);
+    
+    // Normalize and snapshot
+    const normalized = output
+      .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, '[TIMESTAMP]')
+      .replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/g, '[UUID]')
+      .replace(/[a-f0-9]{32}/g, '[ID]');
+    
+    expect(normalized).toMatchSnapshot();
   }, 15000);
 });

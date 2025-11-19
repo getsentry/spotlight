@@ -15,8 +15,12 @@ export default defineConfig({
       reporter: ["json"],
     },
     globals: true,
-    include: ["./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    include: [
+      "./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+      "./tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+    ],
     watchExclude: [".*\\/node_modules\\/.*", ".*\\/dist\\/.*"],
+    testTimeout: 30000, // 30 seconds for e2e tests
   },
   resolve: {
     alias: aliases,
