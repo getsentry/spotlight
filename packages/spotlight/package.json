@@ -26,7 +26,9 @@
     "lint:react-refresh": "eslint 'src/ui/**/*.{ts,tsx}'",
     "test": "vitest run",
     "test:dev": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "pnpm run test:e2e:cli && pnpm run test:e2e:ui",
+    "test:e2e:cli": "vitest run tests/e2e/cli",
+    "test:e2e:ui": "playwright test tests/e2e/ui"
   },
   "files": ["dist"],
   "bin": {

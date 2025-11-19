@@ -1,4 +1,4 @@
-import { defineConfig } from "@playwright/test";
+import { defineConfig, devices } from "@playwright/test";
 
 // Reference: https://playwright.dev/docs/test-configuration
 export default defineConfig({
@@ -15,9 +15,30 @@ export default defineConfig({
   // Artifacts folder where screenshots, videos, and traces are stored.
   outputDir: "test-results/",
 
+  // Run tests in files in parallel
+  fullyParallel: !process.env.CI,
+
   use: {
+    // Base URL for UI tests
+    baseURL: process.env.SPOTLIGHT_BASE_URL || "http://localhost:8969",
     // Retry a test if its failing with enabled tracing. This allows you to analyze the DOM, console logs, network traffic etc.
     // More information: https://playwright.dev/docs/trace-viewer
     trace: "retry-with-trace",
+    // Screenshot on failure
+    screenshot: "only-on-failure",
+    // Video on failure
+    video: "retain-on-failure",
   },
+
+  // Configure projects for major browsers
+  projects: [
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+    },
+  ],
 });
