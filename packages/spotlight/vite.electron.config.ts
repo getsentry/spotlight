@@ -49,35 +49,6 @@ export default defineConfig(({ mode }) => {
             },
           },
         },
-        preload: {
-          input: "src/electron/preload/index.ts",
-          vite: {
-            resolve: {
-              alias: aliases,
-            },
-            plugins: [
-              sentryVitePlugin({
-                org: env.MAIN_VITE_SENTRY_ORG,
-                project: env.MAIN_VITE_SENTRY_PROJECT,
-                authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
-                release: {
-                  name: process.env.npm_package_version,
-                },
-              }),
-            ],
-            build: {
-              outDir: "dist-electron/preload",
-              sourcemap: true,
-              rollupOptions: {
-                plugins: [sourcemaps()],
-                output: {
-                  format: "cjs",
-                  entryFileNames: "[name].cjs",
-                },
-              },
-            },
-          },
-        },
       }),
     ],
     resolve: {
