@@ -57,6 +57,7 @@ export default defineConfig(({ mode }) => {
     define: isDev ? defineDevelopment : defineProduction,
     build: {
       outDir: "dist-electron/renderer",
+      sourcemap: true,
       rollupOptions: {
         input: { index: "index.html" },
       },
