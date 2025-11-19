@@ -2,7 +2,11 @@ import { test as base, type Page } from '@playwright/test';
 import type { ChildProcess } from 'node:child_process';
 import fs from 'node:fs/promises';
 import http from 'node:http';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { findFreePort, spawnProcess, killProcess, getFixturePath } from '../shared/utils';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export interface SidecarFixture {
   port: number;
@@ -21,7 +25,7 @@ export interface TestFixtures {
  */
 async function startSidecar(): Promise<SidecarFixture> {
   const port = await findFreePort();
-  const binPath = require('node:path').join(__dirname, '../../../dist/run.js');
+  const binPath = path.join(__dirname, '../../../dist/run.js');
 
   const proc = spawnProcess('node', [binPath, 'server', '-p', port.toString()]);
 

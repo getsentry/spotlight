@@ -12,6 +12,8 @@ pnpm build
 
 This creates `dist/run.js` which is required by all CLI tests.
 
+**Note**: E2E tests are separate from unit tests. The `pnpm test` command runs only unit tests (using `vitest.config.ts`), while `pnpm test:e2e` runs the full E2E test suite (using `vitest.e2e.config.ts` for CLI tests and Playwright for UI tests). This separation ensures that CI can run unit tests without requiring a full build first.
+
 ## Running Tests
 
 ### All E2E Tests
@@ -31,7 +33,7 @@ pnpm test:e2e:ui
 
 ### Watch Mode (CLI tests)
 ```bash
-pnpm exec vitest --config vitest.config.ts tests/e2e/cli
+pnpm exec vitest --config vitest.e2e.config.ts
 ```
 
 ## Test Structure
@@ -72,13 +74,13 @@ Tests for `-f json` output verify:
 ### Running Individual Tests
 ```bash
 # Run specific test file
-pnpm exec vitest run tests/e2e/cli/tail.e2e.test.ts
+pnpm exec vitest run --config vitest.e2e.config.ts tests/e2e/cli/tail.e2e.test.ts
 
 # Run specific test
-pnpm exec vitest run -t "should output in json format"
+pnpm exec vitest run --config vitest.e2e.config.ts -t "should output in json format"
 
 # Update snapshots
-pnpm exec vitest run -u tests/e2e/cli
+pnpm exec vitest run --config vitest.e2e.config.ts -u
 ```
 
 ## UI Tests Features
@@ -108,7 +110,7 @@ pnpm exec playwright test --debug
 
 ### CLI Tests
 1. Check that spotlight binary is built: `ls -la dist/run.js`
-2. Run tests with verbose output: `pnpm exec vitest --reporter=verbose`
+2. Run tests with verbose output: `pnpm exec vitest --config vitest.e2e.config.ts --reporter=verbose`
 3. Check individual test output in console
 
 ### UI Tests
@@ -120,7 +122,8 @@ pnpm exec playwright test --debug
 
 ### "No test files found"
 - Make sure you're in the `packages/spotlight` directory
-- Verify vitest.config.ts includes the test path
+- For CLI e2e tests, use `--config vitest.e2e.config.ts` to run with the correct configuration
+- Unit tests and e2e tests use separate vitest configs
 
 ### "spotlight binary not found"
 - Run `pnpm build` to create the binary
@@ -137,7 +140,7 @@ pnpm exec playwright test --debug
 - Review the diff carefully
 - If the change is intentional, update snapshots:
   ```bash
-  pnpm exec vitest run -u tests/e2e/cli
+  pnpm exec vitest run --config vitest.e2e.config.ts -u
   ```
 
 ## CI/CD
