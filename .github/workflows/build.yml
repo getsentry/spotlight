@@ -234,8 +234,11 @@ jobs:
         with:
           enableCrossOsArchive: true
           fail-on-cache-miss: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
+          path: |
+            ${{ github.workspace }}/packages/*/dist
+            ${{ github.workspace }}/packages/*/dist-bin
+            ${{ github.workspace }}/packages/*/dist-electron
+          key: ${{ github.sha }}
 
       - name: Download Electron build
         uses: actions/download-artifact@v4
