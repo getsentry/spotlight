@@ -1,3 +1,1 @@
-export declare global {
-  var IN_DESKTOP_ENV: boolean;
-}
+// Global type declarations for the UI

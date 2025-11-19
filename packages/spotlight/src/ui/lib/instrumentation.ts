@@ -5,15 +5,13 @@ import { getDataFromServerTiming } from "./serverTimingMeta";
 
 const TRACE_PARENT_KEYS = ["sentryTrace", "baggage"];
 
-export default function initSentry() {
-  const traceParentData = TRACE_PARENT_KEYS.map(key => [key, getDataFromServerTiming(key)]);
-
-  const hasTraceParent = traceParentData.every(([, value]) => Boolean(value));
+// Export for reuse in electron-index.tsx
+export function getIntegrations(instrumentPageLoad = true) {
   const integrations = [
     // See docs for support of different versions of variation of react router
     // https://docs.sentry.io/platforms/javascript/guides/react/configuration/integrations/react-router/
     Sentry.reactRouterV6BrowserTracingIntegration({
-      instrumentPageLoad: !hasTraceParent,
+      instrumentPageLoad,
       useEffect,
       useLocation,
       useNavigationType,
@@ -23,6 +21,7 @@ export default function initSentry() {
     Sentry.replayIntegration(),
     Sentry.browserProfilingIntegration(),
   ];
+
   const hash = document.location.hash.slice(1);
   if (hash.startsWith("spotlight")) {
     const splitterPos = hash.indexOf("=");
@@ -30,6 +29,15 @@ export default function initSentry() {
     integrations.push(Sentry.spotlightBrowserIntegration({ sidecarUrl }));
   }
 
+  return integrations;
+}
+
+export default function initSentry() {
+  const traceParentData = TRACE_PARENT_KEYS.map(key => [key, getDataFromServerTiming(key)]);
+  const hasTraceParent = traceParentData.every(([, value]) => Boolean(value));
+  const integrations = getIntegrations(!hasTraceParent);
+
+  // Web UI initialization
   const sentryClient = Sentry.init({
     transport: Sentry.makeBrowserOfflineTransport(Sentry.makeFetchTransport),
     dsn: "https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713",
