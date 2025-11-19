@@ -1,0 +1,88 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`spotlight tail e2e tests > should output in human format (default) 1`] = `
+"13:45:24 [ERROR]   [browser] SyntaxError: Unexpected end of JSON input [webpack-internal:///../../spotlight/packages/core/dist/sentry-spotlight.js:23135:61] [EventSource.m]
+"
+`;
+
+exports[`spotlight tail e2e tests > should output in json format 1`] = `
+"{
+  \\"timestamp\\": \\"[DYNAMIC]\\",
+  \\"type\\": \\"error\\",
+  \\"level\\": \\"error\\",
+  \\"event_id\\": \\"[DYNAMIC]\\",
+  \\"exception_type\\": \\"SyntaxError\\",
+  \\"exception_value\\": \\"Unexpected end of JSON input\\",
+  \\"filename\\": \\"webpack-internal:///../../spotlight/packages/core/dist/sentry-spotlight.js\\",
+  \\"lineno\\": 23135,
+  \\"colno\\": 61,
+  \\"function\\": \\"EventSource.m\\",
+  \\"trace_id\\": \\"[DYNAMIC]\\",
+  \\"span_id\\": \\"[DYNAMIC]\\",
+  \\"environment\\": \\"development\\",
+  \\"release\\": \\"frontend@23.12.0.dev0+bb23b737689d93946c3df76d00726f12b1aaa4ae\\",
+  \\"platform\\": \\"javascript\\",
+  \\"user_id\\": 1,
+  \\"user_email\\": \\"admin@sentry.io\\",
+  \\"request_url\\": \\"http://127.0.0.1:8000/organizations/sentry/issues/16/?project=3&query=is%3Aunresolved&referrer=issue-stream&stream_index=0\\",
+  \\"sdk\\": \\"sentry.javascript.react\\",
+  \\"sdk_version\\": \\"7.80.2-alpha.1\\",
+  \\"breadcrumb_length\\": 13,
+  \\"transaction\\": \\"/organizations/:orgId/issues/:groupId/\\",
+  \\"organization\\": \\"1\\",
+  \\"organization.slug\\": \\"sentry\\",
+  \\"timeOrigin.mode\\": \\"navigationStart\\"
+}"
+`;
+
+exports[`spotlight tail e2e tests > should output in logfmt format 1`] = `
+"timestamp=[TIMESTAMP] type=error level=error event_id=[ID] exception_type=SyntaxError exception_value=\\"Unexpected end of JSON input\\" filename=webpack-internal:///../../spotlight/packages/core/dist/sentry-spotlight.js lineno=23135 colno=61 function=EventSource.m trace_id=[ID] span_id=[ID] environment=development release=frontend@23.12.0.dev0+bb23b737689d93946c3df76d00726f12b1aaa4ae platform=javascript user_id=1 user_email=admin@sentry.io request_url=\\"http://127.0.0.1:8000/organizations/sentry/issues/16/?project=3&query=is%3Aunresolved&referrer=issue-stream&stream_index=0\\" sdk=sentry.javascript.react sdk_version=7.80.2-alpha.1 breadcrumb_length=13 transaction=/organizations/:orgId/issues/:groupId/ organization=1 organization.slug=sentry timeOrigin.mode=navigationStart
+"
+`;
+
+exports[`spotlight tail e2e tests > should output in markdown format 1`] = `
+"### Error
+
+\`\`\`
+SyntaxError: Unexpected end of JSON input
+\`\`\`
+
+**Stacktrace:**
+\`\`\`
+webpack-internal:///../../spotlight/packages/core/dist/sentry-spotlight.js (EventSource.m)
+<anonymous> (Array.forEach)
+webpack-internal:///../../spotlight/packages/core/dist/sentry-spotlight.js (eval)
+webpack-internal:///../../spotlight/packages/core/dist/sentry-spotlight.js (Object.processEvent)
+<anonymous> (JSON.parse)
+\`\`\`
+
+### Tags
+
+**transaction**: /organizations/:orgId/issues/:groupId/
+**organization**: 1
+**organization.slug**: sentry
+**timeOrigin.mode**: navigationStart
+
+### Additional Context
+
+These are additional context provided by the user when they're instrumenting their application.
+
+**trace**
+op: \\"pageload\\"
+span_id: \\"8de972b918691039\\"
+tags: {
+  \\"routing.instrumentation\\": \\"react-router-v3\\"
+}
+trace_id: \\"[ID]\\"
+origin: \\"auto.pageload.react.reactrouterv3\\"
+
+**organization**
+id: \\"1\\"
+slug: \\"sentry\\"
+
+**SyntaxError**
+
+
+
+"
+`;

@@ -4,19 +4,13 @@ This directory contains end-to-end tests for Spotlight CLI and UI.
 
 ## Prerequisites
 
-Before running e2e tests, you must:
+Before running e2e tests, you must build the Spotlight binary:
 
-1. **Build the Spotlight binary:**
-   ```bash
-   pnpm build
-   ```
-   
-   This creates `dist/run.js` which is required by all CLI tests.
+```bash
+pnpm build
+```
 
-2. **Install dependencies:**
-   ```bash
-   pnpm install
-   ```
+This creates `dist/run.js` which is required by all CLI tests.
 
 ## Running Tests
 

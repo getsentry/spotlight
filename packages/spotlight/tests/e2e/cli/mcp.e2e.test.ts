@@ -94,7 +94,7 @@ describe('spotlight mcp e2e tests', () => {
     expect(toolNames).toContain('search_errors');
     expect(toolNames).toContain('search_logs');
     expect(toolNames).toContain('search_traces');
-    expect(toolNames).toContain('get_trace');
+    expect(toolNames).toContain('get_traces');
   }, 15000);
 
   it('should search errors via MCP', async () => {
