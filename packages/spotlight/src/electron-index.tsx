@@ -4,7 +4,7 @@ import { _init } from "./index";
 import { getIntegrations } from "./ui/lib/instrumentation";
 
 // Static import - this blocks execution until Sentry loads
-// Uses Sentry's recommended "Framework-Specific SDK" pattern
+// Uses Sentry's recommended "Framework-Specific SDK" pattern for Electron v7+
 // https://docs.sentry.io/platforms/javascript/guides/electron/#using-framework-specific-sdks
 ElectronSentryInit(
   {
@@ -21,5 +21,5 @@ ElectronSentryInit(
 );
 
 // Now initialize the app after Sentry is ready
-_init({ debug: true });
+_init();
 
