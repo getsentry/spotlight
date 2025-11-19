@@ -229,6 +229,14 @@ jobs:
       - name: Setup dependencies
         run: pnpm install
 
+      - name: Restore build cache
+        uses: actions/cache/restore@v4
+        with:
+          enableCrossOsArchive: true
+          fail-on-cache-miss: true
+          path: ${{ env.CACHED_BUILD_PATHS }}
+          key: ${{ env.BUILD_CACHE_KEY }}
+
       - name: Download Electron build
         uses: actions/download-artifact@v4
         with:
@@ -242,6 +250,10 @@ jobs:
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-turbo-
+
+      - name: Install Playwright browsers
+        working-directory: packages/spotlight
+        run: pnpm exec playwright install --with-deps
 
       - name: Run Xvfb (virtual display)
         run: |
