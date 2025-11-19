@@ -3,33 +3,35 @@ const fs = require('node:fs').promises;
 const http = require('node:http');
 const path = require('node:path');
 const zlib = require('node:zlib');
-const { promisify } = require('node:util');
+const { promisify, parseArgs } = require('node:util');
 
 const gzipAsync = promisify(zlib.gzip);
 const brotliCompressAsync = promisify(zlib.brotliCompress);
 
-// Parse CLI arguments
-function parseArgs() {
-  const args = {
-    compression: 'gzip', // default
-    keepAlive: false,
+// Parse CLI arguments using Node.js built-in parseArgs
+function parseCLIArgs() {
+  const { values, positionals } = parseArgs({
+    options: {
+      'keep-alive': {
+        type: 'boolean',
+        short: 'k',
+        default: false,
+      },
+      compression: {
+        type: 'string',
+        short: 'c',
+        default: 'gzip',
+      },
+    },
+    allowPositionals: true,
+    strict: false,
+  });
+
+  return {
+    keepAlive: values['keep-alive'],
+    compression: values.compression,
+    target: positionals[0],
   };
-
-  for (let i = 2; i < process.argv.length; i++) {
-    const arg = process.argv[i];
-    
-    if (arg === '--keep-alive' || arg === '-k') {
-      args.keepAlive = true;
-    } else if (arg.startsWith('--compression=')) {
-      args.compression = arg.split('=')[1];
-    } else if (arg === '-c' || arg === '--compression') {
-      args.compression = process.argv[++i];
-    } else if (!arg.startsWith('-')) {
-      args.target = arg;
-    }
-  }
-
-  return args;
 }
 
 // Parse SENTRY_SPOTLIGHT environment variable to extract URL components
@@ -192,7 +194,7 @@ async function readDir(directoryPath, targetUrl, compressionType) {
 }
 
 async function main() {
-  const args = parseArgs();
+  const args = parseCLIArgs();
   const targetUrl = parseSentrySpotlight();
   
   console.log(`Target: ${targetUrl.hostname}:${targetUrl.port}${targetUrl.path}`);
