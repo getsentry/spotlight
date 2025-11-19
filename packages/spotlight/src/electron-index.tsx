@@ -14,7 +14,7 @@ ElectronSentryInit(
     integrations: getIntegrations(true),
     tracesSampleRate: 1.0,
     profilesSampleRate: 1.0,
-    replaysSessionSampleRate: 1.0,
+    replaysSessionSampleRate: 0.01,
     replaysOnErrorSampleRate: 1.0,
   },
   ReactSentryInit,
