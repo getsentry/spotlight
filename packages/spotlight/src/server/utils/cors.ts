@@ -16,32 +16,19 @@ export function isAllowedOrigin(origin: string): boolean {
 
   try {
     const url = new URL(origin);
+    const hostname = url.hostname.toLowerCase();
 
     // Allow localhost with any port and protocol (http or https)
-    if (url.hostname === "localhost" || url.hostname === "127.0.0.1" || url.hostname === "[::1]") {
+    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]") {
       return true;
     }
 
-    // Check for spotlightjs.com domains
-    const hostname = url.hostname.toLowerCase();
-    const isSpotlightDomain = hostname === "spotlightjs.com" || hostname.endsWith(".spotlightjs.com");
-
-    if (isSpotlightDomain) {
-      // Must be HTTPS
-      if (url.protocol !== "https:") {
-        return false;
-      }
-
-      // Must be default port (443) or unspecified
-      if (url.port !== "" && url.port !== "443") {
-        return false;
-      }
-
-      return true;
+    // Check for spotlightjs.com domains - must be HTTPS with default port
+    if (url.protocol !== "https:" || (url.port !== "" && url.port !== "443")) {
+      return false;
     }
 
-    // All other origins are rejected
-    return false;
+    return hostname === "spotlightjs.com" || hostname.endsWith(".spotlightjs.com");
   } catch {
     // Invalid URL
     return false;

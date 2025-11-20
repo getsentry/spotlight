@@ -11,9 +11,7 @@ import routes from "../index.ts";
 const app = new Hono()
   .use(
     cors({
-      origin: origin => {
-        return isAllowedOrigin(origin) ? origin : null;
-      },
+      origin: origin => (isAllowedOrigin(origin) ? origin : null),
     }),
   )
   .route("/", routes);
