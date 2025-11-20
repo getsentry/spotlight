@@ -308,7 +308,8 @@ describe("spotlight tail e2e tests", () => {
     const normalized = output
       .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, "[TIMESTAMP]")
       .replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/g, "[UUID]")
-      .replace(/[a-f0-9]{32}/g, "[ID]");
+      .replace(/[a-f0-9]{32}/g, "[ID]")
+      .trim();
 
     expect(normalized).toMatchSnapshot();
   }, 15000);
@@ -342,7 +343,8 @@ describe("spotlight tail e2e tests", () => {
     const normalized = output
       .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, "[TIMESTAMP]")
       .replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/g, "[UUID]")
-      .replace(/[a-f0-9]{32}/g, "[ID]");
+      .replace(/[a-f0-9]{32}/g, "[ID]")
+      .trim();
 
     expect(normalized).toMatchSnapshot();
   }, 15000);
