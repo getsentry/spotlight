@@ -7,13 +7,10 @@ test.describe("Trace Display UI Tests", () => {
 
     // Send trace envelope
     await sendTestEnvelope("envelope_angular.txt");
-    await waitForSidecarConnection(page);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for trace to appear
     await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
@@ -50,13 +47,10 @@ test.describe("Trace Display UI Tests", () => {
 
     // Send Java transaction envelope
     await sendTestEnvelope("envelope_java.txt");
-    await waitForSidecarConnection(page);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for trace to appear
     await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
@@ -72,13 +66,10 @@ test.describe("Trace Display UI Tests", () => {
 
     // Send Python transaction envelope
     await sendTestEnvelope("envelope_python.txt");
-    await waitForSidecarConnection(page);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for trace to appear
     await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
@@ -94,13 +85,10 @@ test.describe("Trace Display UI Tests", () => {
 
     // Send Astro SSR envelope
     await sendTestEnvelope("envelope_astro_ssr_node.txt");
-    await waitForSidecarConnection(page);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for trace to appear
     await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
@@ -116,17 +104,12 @@ test.describe("Trace Display UI Tests", () => {
 
     // Send multiple different trace envelopes
     await sendTestEnvelope("envelope_java.txt");
-    await waitForSidecarConnection(page);
     await sendTestEnvelope("envelope_python.txt");
-    await waitForSidecarConnection(page);
     await sendTestEnvelope("envelope_angular.txt");
-    await waitForSidecarConnection(page);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for traces to appear
     await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
@@ -142,13 +125,10 @@ test.describe("Trace Display UI Tests", () => {
 
     // Send trace envelope
     await sendTestEnvelope("envelope_angular.txt");
-    await waitForSidecarConnection(page);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for trace to appear
     await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 

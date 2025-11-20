@@ -7,13 +7,10 @@ test.describe('Log Display UI Tests', () => {
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
-    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for logs to appear
     await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
@@ -29,13 +26,10 @@ test.describe('Log Display UI Tests', () => {
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
-    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for logs to appear
     await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
@@ -53,13 +47,10 @@ test.describe('Log Display UI Tests', () => {
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
-    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for logs to appear
     await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
@@ -77,15 +68,11 @@ test.describe('Log Display UI Tests', () => {
 
     // Send log envelope multiple times
     await sendTestEnvelope('log_envelope.txt');
-    await waitForSidecarConnection(page);
     await sendTestEnvelope('log_envelope.txt');
-    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for logs to appear
     await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
@@ -101,13 +88,10 @@ test.describe('Log Display UI Tests', () => {
 
     // Send message in transaction
     await sendTestEnvelope('Capture.Message.in.a.transaction.txt');
-    await waitForSidecarConnection(page);
 
     // Check Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for logs to appear
     await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
@@ -123,7 +107,6 @@ test.describe('Log Display UI Tests', () => {
 
     // Send message
     await sendTestEnvelope('Capture.Message.txt');
-    await waitForSidecarConnection(page);
 
     // Try to find the message content
     const pageContent = page.locator('body');
@@ -137,13 +120,10 @@ test.describe('Log Display UI Tests', () => {
 
     // Send PHP metrics
     await sendTestEnvelope('envelope_php_metrics.txt');
-    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for logs to appear
     await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
@@ -159,13 +139,10 @@ test.describe('Log Display UI Tests', () => {
 
     // Send envelope with ANSI escapes
     await sendTestEnvelope('envelope_with_nextjs_ansi_escapes.txt');
-    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for logs to appear
     await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
@@ -181,13 +158,10 @@ test.describe('Log Display UI Tests', () => {
 
     // Send multiple logs
     await sendTestEnvelope('log_envelope.txt');
-    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for logs to appear
     await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
@@ -209,13 +183,10 @@ test.describe('Log Display UI Tests', () => {
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
-    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    await waitForSidecarConnection(page);
-
     // Wait for logs to appear
     await page.waitForSelector('[data-test-id="log-item"], article, .event-item', { timeout: 10000 });
 

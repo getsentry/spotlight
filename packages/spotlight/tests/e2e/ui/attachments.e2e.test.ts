@@ -7,7 +7,6 @@ test.describe('Attachments Display UI Tests', () => {
 
     // Send envelope with screenshot (binary)
     await sendTestEnvelope('envelope_with_screenshot.bin');
-    await waitForSidecarConnection(page);
 
     // Navigate through tabs to find the attachment
     // Could be in Errors, Traces, or a dedicated Attachments tab
@@ -26,7 +25,6 @@ test.describe('Attachments Display UI Tests', () => {
 
     // Send Flutter replay binary
     await sendTestEnvelope('envelope_flutter_replay.bin');
-    await waitForSidecarConnection(page);
 
     // Verify content is displayed
     const pageContent = page.locator('body');
@@ -40,7 +38,6 @@ test.describe('Attachments Display UI Tests', () => {
 
     // Send browser JS profile binary
     await sendTestEnvelope('enveplope_browser_js_profile.bin');
-    await waitForSidecarConnection(page);
 
     // Verify content is displayed
     const pageContent = page.locator('body');
@@ -54,7 +51,6 @@ test.describe('Attachments Display UI Tests', () => {
 
     // Send generic binary envelope
     await sendTestEnvelope('envelope_binary.bin');
-    await waitForSidecarConnection(page);
 
     // Verify the UI doesn't crash and displays something
     const pageContent = page.locator('body');
@@ -81,7 +77,6 @@ test.describe('Attachments Display UI Tests', () => {
 
     // Send empty payload envelope
     await sendTestEnvelope('envelope_empty_payload.txt');
-    await waitForSidecarConnection(page);
 
     // Should not crash
     const pageContent = page.locator('body');
@@ -95,7 +90,6 @@ test.describe('Attachments Display UI Tests', () => {
 
     // Send empty envelope
     await sendTestEnvelope('envelope_empty.txt');
-    await waitForSidecarConnection(page);
 
     // Should not crash
     const pageContent = page.locator('body');
@@ -109,7 +103,6 @@ test.describe('Attachments Display UI Tests', () => {
 
     // Send envelope with screenshot
     await sendTestEnvelope('envelope_with_screenshot.bin');
-    await waitForSidecarConnection(page);
 
     // Look for image elements
     const hasImage = await page.locator('img, [role="img"]').first().isVisible().catch(() => false);
@@ -126,7 +119,6 @@ test.describe('Attachments Display UI Tests', () => {
 
     // Send envelope with attachment
     await sendTestEnvelope('envelope_with_screenshot.bin');
-    await waitForSidecarConnection(page);
 
     // Look for download buttons or links
     const hasDownloadLink = await Promise.race([
@@ -146,9 +138,7 @@ test.describe('Attachments Display UI Tests', () => {
 
     // Send multiple envelopes with different content
     await sendTestEnvelope('envelope_javascript.txt');
-    await waitForSidecarConnection(page);
     await sendTestEnvelope('envelope_python.txt');
-    await waitForSidecarConnection(page);
 
     // Should handle various types without crashing
     const pageContent = page.locator('body');
@@ -162,7 +152,6 @@ test.describe('Attachments Display UI Tests', () => {
 
     // Send envelope with no length and EOF
     await sendTestEnvelope('envelope_no_len_w_eof.txt');
-    await waitForSidecarConnection(page);
 
     // Should not crash
     const pageContent = page.locator('body');
