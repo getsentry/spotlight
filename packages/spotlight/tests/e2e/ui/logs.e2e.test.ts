@@ -1,18 +1,18 @@
 import { test, expect } from './fixtures';
 
 test.describe('Log Display UI Tests', () => {
-  test('should display log events', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display log events', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
-    
-    // Wait a bit for the event to be processed
-    await page.waitForTimeout(1000);
+    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
+    await waitForSidecarConnection(page);
 
     // Wait for logs to appear
     await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
@@ -23,21 +23,21 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display log levels', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display log levels', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
-    
-    // Wait a bit for the event to be processed
-    await page.waitForTimeout(1000);
+    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
+    await waitForSidecarConnection(page);
 
     // Wait for logs to appear
-    await page.waitForTimeout(1000);
+    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Look for log level indicators (info, error, warning, debug)
     const pageContent = page.locator('body');
@@ -47,21 +47,21 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display timestamps', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display timestamps', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
-    
-    // Wait a bit for the event to be processed
-    await page.waitForTimeout(1000);
+    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
+    await waitForSidecarConnection(page);
 
-    // Wait for logs
-    await page.waitForTimeout(1000);
+    // Wait for logs to appear
+    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Look for timestamp patterns
     const pageContent = page.locator('body');
@@ -71,19 +71,23 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display multiple log entries', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display multiple log entries', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send log envelope multiple times
     await sendTestEnvelope('log_envelope.txt');
+    await waitForSidecarConnection(page);
     await sendTestEnvelope('log_envelope.txt');
+    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
+    await waitForSidecarConnection(page);
 
-    // Wait for logs
-    await page.waitForTimeout(1000);
+    // Wait for logs to appear
+    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Verify multiple entries are displayed
     const pageContent = page.locator('body');
@@ -91,34 +95,35 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle message capture in transaction', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should handle message capture in transaction', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send message in transaction
     await sendTestEnvelope('Capture.Message.in.a.transaction.txt');
-
-    // Wait a moment for processing
-    await page.waitForTimeout(1000);
+    await waitForSidecarConnection(page);
 
     // Check Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
+    await waitForSidecarConnection(page);
 
-    // Wait and verify content
-    await page.waitForTimeout(1000);
+    // Wait for logs to appear
+    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+
+    // Verify content
     const pageContent = page.locator('body');
     const text = await pageContent.textContent();
     expect(text).not.toBe('');
   });
 
-  test('should display message capture', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display message capture', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send message
     await sendTestEnvelope('Capture.Message.txt');
-
-    // Navigate to appropriate tab (might be Logs or Events)
-    await page.waitForTimeout(1000);
+    await waitForSidecarConnection(page);
 
     // Try to find the message content
     const pageContent = page.locator('body');
@@ -126,18 +131,21 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle PHP metrics logs', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should handle PHP metrics logs', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send PHP metrics
     await sendTestEnvelope('envelope_php_metrics.txt');
+    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
+    await waitForSidecarConnection(page);
 
-    // Wait for content
-    await page.waitForTimeout(1000);
+    // Wait for logs to appear
+    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Verify content is displayed
     const pageContent = page.locator('body');
@@ -145,18 +153,21 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display logs with ANSI escapes', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display logs with ANSI escapes', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send envelope with ANSI escapes
     await sendTestEnvelope('envelope_with_nextjs_ansi_escapes.txt');
+    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
+    await waitForSidecarConnection(page);
 
-    // Wait for logs
-    await page.waitForTimeout(1000);
+    // Wait for logs to appear
+    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Verify logs are displayed (ANSI escapes should be handled)
     const pageContent = page.locator('body');
@@ -164,18 +175,21 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle log filtering', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should handle log filtering', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send multiple logs
     await sendTestEnvelope('log_envelope.txt');
+    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
+    await waitForSidecarConnection(page);
 
-    // Wait for logs
-    await page.waitForTimeout(1000);
+    // Wait for logs to appear
+    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Look for filter controls (buttons, dropdowns, inputs)
     const _hasFilterControls = await Promise.race([
@@ -189,21 +203,21 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display log details on click', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display log details on click', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
-    
-    // Wait a bit for the event to be processed
-    await page.waitForTimeout(1000);
+    await waitForSidecarConnection(page);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
+    await waitForSidecarConnection(page);
 
-    // Wait for logs
-    await page.waitForTimeout(1000);
+    // Wait for logs to appear
+    await page.waitForSelector('[data-test-id="log-item"], article, .event-item', { timeout: 10000 });
 
     // Try to click on a log item
     const logItem = page.locator('[data-test-id="log-item"], article, .event-item').first();

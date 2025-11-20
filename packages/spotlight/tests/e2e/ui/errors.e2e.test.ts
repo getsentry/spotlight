@@ -1,19 +1,19 @@
 import { test, expect } from './fixtures';
 
 test.describe('Error Display UI Tests', () => {
-  test('should display JavaScript error', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display JavaScript error', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     // Navigate to Spotlight UI
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send JavaScript error envelope
     await sendTestEnvelope('envelope_javascript.txt');
-    
-    // Wait a bit for the event to be processed
-    await page.waitForTimeout(1000);
+    await waitForSidecarConnection(page);
 
     // Navigate to Errors tab
     const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
     await errorsTab.click();
+    await waitForSidecarConnection(page);
 
     // Wait for error to appear
     await page.waitForSelector('[data-test-id="error-item"], [class*="error"], article, .event-item', { timeout: 10000 });
@@ -23,18 +23,18 @@ test.describe('Error Display UI Tests', () => {
     await expect(errorContent).toContainText(/error|exception/i);
   });
 
-  test('should display error details and stack trace', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display error details and stack trace', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send JavaScript error envelope
     await sendTestEnvelope('envelope_javascript.txt');
-    
-    // Wait a bit for the event to be processed
-    await page.waitForTimeout(1000);
+    await waitForSidecarConnection(page);
 
     // Navigate to Errors tab
     const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
     await errorsTab.click();
+    await waitForSidecarConnection(page);
 
     // Wait for error item and click on it
     const errorItem = page.locator('[data-test-id="error-item"], article, .event-item').first();
@@ -54,15 +54,18 @@ test.describe('Error Display UI Tests', () => {
     expect(hasStackTraceIndicators).toBe(true);
   });
 
-  test('should display Python transaction', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display Python transaction', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send Python transaction envelope
     await sendTestEnvelope('envelope_python.txt');
+    await waitForSidecarConnection(page);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
+    await waitForSidecarConnection(page);
 
     // Wait for trace to appear
     await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
@@ -73,15 +76,18 @@ test.describe('Error Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display PHP error', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display PHP error', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send PHP error envelope
     await sendTestEnvelope('envelope_php_error.txt');
+    await waitForSidecarConnection(page);
 
     // Navigate to Errors tab
     const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
     await errorsTab.click();
+    await waitForSidecarConnection(page);
 
     // Wait for error to appear
     await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 10000 });
@@ -91,16 +97,20 @@ test.describe('Error Display UI Tests', () => {
     await expect(errorContent).toContainText(/error|exception/i);
   });
 
-  test('should display multiple errors', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display multiple errors', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send multiple error envelopes
     await sendTestEnvelope('envelope_javascript.txt');
+    await waitForSidecarConnection(page);
     await sendTestEnvelope('envelope_php_error.txt');
+    await waitForSidecarConnection(page);
 
     // Navigate to Errors tab
     const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
     await errorsTab.click();
+    await waitForSidecarConnection(page);
 
     // Wait for errors to appear
     await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 10000 });
@@ -111,15 +121,18 @@ test.describe('Error Display UI Tests', () => {
     expect(count).toBeGreaterThanOrEqual(2);
   });
 
-  test('should display Java transaction', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display Java transaction', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
     await page.goto(sidecar.baseURL);
+    await waitForSidecarConnection(page);
 
     // Send Java transaction envelope
     await sendTestEnvelope('envelope_java.txt');
+    await waitForSidecarConnection(page);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
+    await waitForSidecarConnection(page);
 
     // Wait for trace to appear
     await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });

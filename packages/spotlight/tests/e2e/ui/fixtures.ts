@@ -18,6 +18,7 @@ export interface TestFixtures {
   sidecar: SidecarFixture;
   sendTestEnvelope: (fixtureFile: string) => Promise<void>;
   waitForEvent: (page: Page, selector: string, timeout?: number) => Promise<void>;
+  waitForSidecarConnection: (page: Page, timeout?: number) => Promise<void>;
 }
 
 /**
@@ -132,6 +133,16 @@ async function waitForEventInUI(
 }
 
 /**
+ * Wait for sidecar connection to be established in the UI
+ */
+async function waitForSidecarConnection(
+  page: Page,
+  timeout: number = 10000,
+): Promise<void> {
+  await page.waitForSelector('text="Connected to Sidecar"', { timeout });
+}
+
+/**
  * Extended test with sidecar fixture
  */
 export const test = base.extend<TestFixtures>({
@@ -153,6 +164,10 @@ export const test = base.extend<TestFixtures>({
 
   waitForEvent: async ({}, use) => {
     await use(waitForEventInUI);
+  },
+
+  waitForSidecarConnection: async ({}, use) => {
+    await use(waitForSidecarConnection);
   },
 });
 
