@@ -12,11 +12,9 @@
     "format": "biome format --write .",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",
-    "test": "turbo test --filter=./packages/*",
-    "test:e2e": "turbo test:e2e",
-    "changeset:add": "pnpm changeset",
-    "changeset:consume": "pnpm changeset version",
-    "changeset:publish": "pnpm changeset publish"
+    "changeset:add": "changeset",
+    "changeset:consume": "changeset version",
+    "changeset:publish": "changeset publish"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

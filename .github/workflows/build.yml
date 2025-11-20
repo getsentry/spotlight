@@ -230,7 +230,7 @@ jobs:
           path: packages/spotlight/dist-electron/
 
       - name: Run tests
-        run: PLAYWRIGHT_BROWSERS_PATH='/ms-playwright' pnpm test:e2e
+        run: pnpm test:e2e
 
       - name: Test results
         if: always()
