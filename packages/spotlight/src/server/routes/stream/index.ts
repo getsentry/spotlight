@@ -81,6 +81,9 @@ const router = new Hono<HonoEnv>()
         userAgent: ctx.req.header("User-Agent"),
         origin: ctx.req.header("Origin"),
       },
+      query: {
+        sentry_client: ctx.req.query("sentry_client"),
+      },
     });
 
     if (container) {

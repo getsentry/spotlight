@@ -21,13 +21,16 @@ type PushToSpotlightBufferOptions = {
     userAgent?: string;
     origin?: string;
   };
+  query: {
+    sentry_client?: string;
+  };
 };
 
 export function pushToSpotlightBuffer(options: PushToSpotlightBufferOptions) {
   const body = decompressBody(options.body, options.headers.contentEncoding);
 
   let contentType = options.headers.contentType?.split(";")[0].toLocaleLowerCase();
-  if (options.headers.userAgent?.startsWith("sentry.javascript.browser") && options.headers.origin) {
+  if (options.query.sentry_client?.startsWith("sentry.javascript.browser") && options.headers.origin) {
     // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
     contentType = "application/x-sentry-envelope";
   }
