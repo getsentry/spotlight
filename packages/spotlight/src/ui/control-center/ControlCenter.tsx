@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { Button } from "@spotlight/ui/ui/button";
-import useSentryStore from "../telemetry/store";
-import { getConnectionManager } from "../lib/connectionManager";
-import { InstanceList } from "./InstanceList";
-import { connectToSidecar } from "../sidecar";
 import { SENTRY_CONTENT_TYPE } from "@spotlight/shared/constants.ts";
+import { Button } from "@spotlight/ui/ui/button";
+import { useEffect } from "react";
+import { getConnectionManager } from "../lib/connectionManager";
+import { connectToSidecar } from "../sidecar";
+import useSentryStore from "../telemetry/store";
+import { InstanceList } from "./InstanceList";
 
 type ControlCenterProps = {
   sidecarUrl: string;
@@ -12,15 +12,8 @@ type ControlCenterProps = {
 };
 
 export function ControlCenter({ onClose }: ControlCenterProps) {
-  const {
-    instances,
-    currentInstanceId,
-    isLoadingInstances,
-    fetchInstances,
-    terminateInstance,
-    addOrUpdateInstance,
-    resetData,
-  } = useSentryStore();
+  const { instances, currentInstanceId, isLoadingInstances, fetchInstances, terminateInstance, resetData } =
+    useSentryStore();
 
   // Fetch instances on mount and set up periodic refresh
   useEffect(() => {
@@ -62,7 +55,7 @@ export function ControlCenter({ onClose }: ControlCenterProps) {
         () => {
           // Reset store
           resetData();
-        }
+        },
       );
 
       // Find and set the current instance ID
@@ -95,12 +88,7 @@ export function ControlCenter({ onClose }: ControlCenterProps) {
       <div className="border-b border-neutral-700 p-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Spotlight Control Center</h1>
         <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => fetchInstances()}
-            disabled={isLoadingInstances}
-          >
+          <Button size="sm" variant="ghost" onClick={() => fetchInstances()} disabled={isLoadingInstances}>
             {isLoadingInstances ? "Refreshing..." : "Refresh"}
           </Button>
           {onClose && (
