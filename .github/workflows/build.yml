@@ -231,8 +231,6 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
       options: --user 1001
-      env:
-        PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     steps:
       - uses: actions/checkout@v4
 
