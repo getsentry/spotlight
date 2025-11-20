@@ -16,6 +16,9 @@ defaults:
 env:
   TURBO_TELEMETRY_MESSAGE_DISABLED: 1
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build
@@ -227,6 +230,8 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
       options: --user 1001
+      env:
+        PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     steps:
       - uses: actions/checkout@v4
 
@@ -264,6 +269,8 @@ jobs:
 
       - name: Run UI E2E tests
         run: pnpm -r test:e2e:ui
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
 
       - name: Test results
         if: always()
