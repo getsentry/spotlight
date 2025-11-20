@@ -112,8 +112,7 @@ jobs:
           name: spotlight-cjs
           if-no-files-found: error
           path: |
-            packages/spotlight/dist/spotlight.cjs
-            packages/spotlight/dist/ui/
+            packages/spotlight/dist/
 
       - name: Store standalone spotlight binaries
         uses: actions/upload-artifact@v4
@@ -229,16 +228,11 @@ jobs:
       - name: Setup dependencies
         run: pnpm install
 
-      - name: Restore build cache
-        uses: actions/cache/restore@v4
+      - name: Download Spotlight build
+        uses: actions/download-artifact@v4
         with:
-          enableCrossOsArchive: true
-          fail-on-cache-miss: true
-          path: |
-            ${{ github.workspace }}/packages/*/dist
-            ${{ github.workspace }}/packages/*/dist-bin
-            ${{ github.workspace }}/packages/*/dist-electron
-          key: ${{ github.sha }}
+          name: spotlight-cjs
+          path: packages/spotlight/dist/
 
       - name: Download Electron build
         uses: actions/download-artifact@v4
