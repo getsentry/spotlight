@@ -1,18 +1,12 @@
 import { createWriteStream } from "node:fs";
-import { brotliDecompressSync, gunzipSync, inflateSync } from "node:zlib";
+import { pushToSpotlightBuffer } from "@spotlight/server/sdk.ts";
 import { Hono } from "hono";
 import { logger } from "../../logger.ts";
 import type { HonoEnv } from "../../types/env.ts";
-import { EventContainer, getBuffer } from "../../utils/index.ts";
+import { getBuffer } from "../../utils/index.ts";
 import { logIncomingEvent, logOutgoingEvent } from "./debugLogging.ts";
 import { streamSSE } from "./streaming.ts";
 import { parseBrowserFromUserAgent } from "./userAgent.ts";
-
-const decompressors: Record<string, ((buf: Buffer) => Buffer) | undefined> = {
-  gzip: gunzipSync,
-  deflate: inflateSync,
-  br: brotliDecompressSync,
-};
 
 const router = new Hono<HonoEnv>()
   .get("/stream", ctx => {
@@ -76,39 +70,30 @@ const router = new Hono<HonoEnv>()
   })
   .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {
     const arrayBuffer = await ctx.req.arrayBuffer();
-    let body: Buffer = Buffer.from(arrayBuffer);
+    const body: Buffer = Buffer.from(arrayBuffer);
 
-    // Check for gzip or deflate encoding and create appropriate stream
-    const encoding = ctx.req.header("Content-Encoding");
-    const decompressor = decompressors[encoding ?? ""];
-    if (decompressor) {
-      body = decompressor(body);
-    }
+    const container = pushToSpotlightBuffer({
+      body,
+      spotlightBuffer: getBuffer(),
+      headers: {
+        contentEncoding: ctx.req.header("Content-Encoding"),
+        contentType: ctx.req.header("content-type"),
+        userAgent: ctx.req.header("User-Agent"),
+        origin: ctx.req.header("Origin"),
+      },
+    });
 
-    let contentType = ctx.req.header("content-type")?.split(";")[0].toLocaleLowerCase();
-    if (ctx.req.query("sentry_client")?.startsWith("sentry.javascript.browser") && ctx.req.header("Origin")) {
-      // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
-      contentType = "application/x-sentry-envelope";
-    }
-
-    if (!contentType) {
-      logger.warn("No content type, skipping payload...");
-    } else {
-      // Create event container and add to buffer
-      const senderUserAgent = ctx.req.header("User-Agent");
-      const container = new EventContainer(contentType, body, senderUserAgent);
-
+    if (container) {
       // Log incoming event details when debug is enabled
       logIncomingEvent(container);
-
-      // Add to buffer - this will automatically trigger all subscribers
-      // including the onEnvelope callback if one is registered
-      getBuffer().put(container);
+    } else {
+      logger.warn("No content type, skipping payload...");
     }
 
     const incomingPayload = ctx.get("incomingPayload");
 
     if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
+      const contentType = typeof container !== "boolean" ? container.getContentType() : undefined;
       const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
       const filename = `${contentType?.replace(/[^a-z0-9]/gi, "_") || "no_content_type"}-${timestamp}.txt`;
 
