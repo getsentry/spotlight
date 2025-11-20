@@ -41,8 +41,9 @@ test.describe("Trace Display UI Tests", () => {
     const pageContent = page.locator("body");
     const text = await pageContent.textContent();
 
-    // Traces typically show duration/timing
-    const _hasTimingInfo = /\d+\s*(ms|s|sec)/i.test(text || "");
+    // Traces typically show duration/timing information
+    const hasTimingInfo = /\d+\s*(ms|s|sec)/i.test(text || "");
+    expect(hasTimingInfo).toBe(true);
 
     // Should have some trace content
     expect(text).not.toBe("");
@@ -201,16 +202,19 @@ test.describe("Trace Display UI Tests", () => {
     await traceItem.click({ timeout: 5000 }).catch(() => {});
 
     // Look for timing visualization elements (SVG, canvas, or timing bars)
-    const _hasSvg = await page
+    const hasSvg = await page
       .locator("svg")
       .first()
       .isVisible()
       .catch(() => false);
-    const _hasCanvas = await page
+    const hasCanvas = await page
       .locator("canvas")
       .first()
       .isVisible()
       .catch(() => false);
+
+    // Should have at least one visualization method (SVG or Canvas)
+    expect(hasSvg || hasCanvas).toBe(true);
 
     // Should have some timing visualization or at least trace content
     const pageContent = page.locator("body");
