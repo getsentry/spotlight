@@ -1,10 +1,8 @@
 import { test, expect } from './fixtures';
 
 test.describe('Log Display UI Tests', () => {
-  test('should display log events', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display log events', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
 
@@ -20,10 +18,8 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display log levels', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display log levels', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
 
@@ -41,10 +37,8 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display timestamps', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display timestamps', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
 
@@ -62,10 +56,8 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display multiple log entries', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display multiple log entries', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send log envelope multiple times
     await sendTestEnvelope('log_envelope.txt');
     await sendTestEnvelope('log_envelope.txt');
@@ -82,10 +74,8 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle message capture in transaction', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should handle message capture in transaction', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send message in transaction
     await sendTestEnvelope('Capture.Message.in.a.transaction.txt');
 
@@ -101,10 +91,8 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display message capture', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display message capture', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send message
     await sendTestEnvelope('Capture.Message.txt');
 
@@ -114,10 +102,8 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle PHP metrics logs', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should handle PHP metrics logs', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send PHP metrics
     await sendTestEnvelope('envelope_php_metrics.txt');
 
@@ -133,10 +119,8 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display logs with ANSI escapes', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display logs with ANSI escapes', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send envelope with ANSI escapes
     await sendTestEnvelope('envelope_with_nextjs_ansi_escapes.txt');
 
@@ -152,10 +136,8 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle log filtering', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should handle log filtering', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send multiple logs
     await sendTestEnvelope('log_envelope.txt');
 
@@ -177,10 +159,8 @@ test.describe('Log Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display log details on click', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display log details on click', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
 

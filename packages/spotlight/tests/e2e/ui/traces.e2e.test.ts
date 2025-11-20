@@ -1,10 +1,8 @@
 import { expect, test } from "./fixtures";
 
 test.describe("Trace Display UI Tests", () => {
-  test("should display trace list with metadata and details", async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test("should display trace list with metadata and details", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send trace envelope
     await sendTestEnvelope("envelope_angular.txt");
 
@@ -41,10 +39,8 @@ test.describe("Trace Display UI Tests", () => {
     expect(detailsText).not.toBe("");
   });
 
-  test("should display Java transaction traces", async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test("should display Java transaction traces", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send Java transaction envelope
     await sendTestEnvelope("envelope_java.txt");
 
@@ -60,10 +56,8 @@ test.describe("Trace Display UI Tests", () => {
     expect(text).not.toBe("");
   });
 
-  test("should display Python transaction traces", async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test("should display Python transaction traces", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send Python transaction envelope
     await sendTestEnvelope("envelope_python.txt");
 
@@ -79,10 +73,8 @@ test.describe("Trace Display UI Tests", () => {
     expect(text).not.toBe("");
   });
 
-  test("should display Astro SSR traces", async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test("should display Astro SSR traces", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send Astro SSR envelope
     await sendTestEnvelope("envelope_astro_ssr_node.txt");
 
@@ -98,10 +90,8 @@ test.describe("Trace Display UI Tests", () => {
     expect(text).not.toBe("");
   });
 
-  test("should handle multiple traces", async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test("should handle multiple traces", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send multiple different trace envelopes
     await sendTestEnvelope("envelope_java.txt");
     await sendTestEnvelope("envelope_python.txt");
@@ -119,10 +109,8 @@ test.describe("Trace Display UI Tests", () => {
     expect(text).not.toBe("");
   });
 
-  test("should display timing visualization", async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test("should display timing visualization", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send trace envelope
     await sendTestEnvelope("envelope_angular.txt");
 

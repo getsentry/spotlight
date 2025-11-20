@@ -1,10 +1,8 @@
 import { test, expect } from './fixtures';
 
 test.describe('Attachments Display UI Tests', () => {
-  test('should display envelope with screenshot', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display envelope with screenshot', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send envelope with screenshot (binary)
     await sendTestEnvelope('envelope_with_screenshot.bin');
 
@@ -19,10 +17,8 @@ test.describe('Attachments Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle Flutter replay binary', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should handle Flutter replay binary', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send Flutter replay binary
     await sendTestEnvelope('envelope_flutter_replay.bin');
 
@@ -32,10 +28,8 @@ test.describe('Attachments Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle browser JS profile', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should handle browser JS profile', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send browser JS profile binary
     await sendTestEnvelope('enveplope_browser_js_profile.bin');
 
@@ -45,10 +39,8 @@ test.describe('Attachments Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle generic binary envelope', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should handle generic binary envelope', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send generic binary envelope
     await sendTestEnvelope('envelope_binary.bin');
 
@@ -58,10 +50,8 @@ test.describe('Attachments Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display attachments from fixture directory', async ({ page, sidecar, waitForSidecarConnection }) => {
+  test('should display attachments from fixture directory', async ({ page, sidecar }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-    
     // The test verifies that the UI can handle attachment data
     // Wait for page to be ready
     const pageContent = page.locator('body');
@@ -71,10 +61,8 @@ test.describe('Attachments Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle empty payload', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should handle empty payload', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send empty payload envelope
     await sendTestEnvelope('envelope_empty_payload.txt');
 
@@ -84,10 +72,8 @@ test.describe('Attachments Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle empty envelope', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should handle empty envelope', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send empty envelope
     await sendTestEnvelope('envelope_empty.txt');
 
@@ -97,10 +83,8 @@ test.describe('Attachments Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display image attachments if present', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display image attachments if present', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send envelope with screenshot
     await sendTestEnvelope('envelope_with_screenshot.bin');
 
@@ -113,10 +97,8 @@ test.describe('Attachments Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should provide download capability for attachments', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should provide download capability for attachments', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send envelope with attachment
     await sendTestEnvelope('envelope_with_screenshot.bin');
 
@@ -132,10 +114,8 @@ test.describe('Attachments Display UI Tests', () => {
     expect(await pageContent.isVisible()).toBe(true);
   });
 
-  test('should handle various attachment content types', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should handle various attachment content types', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send multiple envelopes with different content
     await sendTestEnvelope('envelope_javascript.txt');
     await sendTestEnvelope('envelope_python.txt');
@@ -146,10 +126,8 @@ test.describe('Attachments Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should handle envelope with no length and EOF', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should handle envelope with no length and EOF', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send envelope with no length and EOF
     await sendTestEnvelope('envelope_no_len_w_eof.txt');
 

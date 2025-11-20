@@ -18,7 +18,6 @@ export interface TestFixtures {
   sidecar: SidecarFixture;
   sendTestEnvelope: (fixtureFile: string) => Promise<void>;
   waitForEvent: (page: Page, selector: string, timeout?: number) => Promise<void>;
-  waitForSidecarConnection: (page: Page, timeout?: number) => Promise<void>;
 }
 
 /**
@@ -133,29 +132,6 @@ async function waitForEventInUI(
 }
 
 /**
- * Wait for sidecar connection to be established in the UI
- * This is a non-blocking wait - it waits for the connection status to appear,
- * but doesn't fail if connection takes time. The page is ready once status appears.
- */
-async function waitForSidecarConnection(
-  page: Page,
-  timeout: number = 10000,
-): Promise<void> {
-  // Wait for the connection status element to be present (either connected or not)
-  // This ensures the page has loaded and the sidebar is rendered
-  await page.waitForSelector('text=/Connected to Sidecar|Not connected to Sidecar/', { timeout });
-  
-  // Optionally wait for connection, but don't fail if it takes time
-  // Connection will establish via SSE, which may take a moment
-  try {
-    await page.waitForSelector('text="Connected to Sidecar"', { timeout: 3000 });
-  } catch {
-    // Connection might take longer - that's okay, continue with test
-    // The test will fail later if content doesn't appear due to no connection
-  }
-}
-
-/**
  * Extended test with sidecar fixture
  */
 export const test = base.extend<TestFixtures>({
@@ -177,10 +153,6 @@ export const test = base.extend<TestFixtures>({
 
   waitForEvent: async ({}, use) => {
     await use(waitForEventInUI);
-  },
-
-  waitForSidecarConnection: async ({}, use) => {
-    await use(waitForSidecarConnection);
   },
 });
 

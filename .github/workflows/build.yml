@@ -112,6 +112,9 @@ jobs:
           path: |
             packages/spotlight/dist/
             !packages/spotlight/dist/**/*.map
+            # Explicitly include dist/node_modules and dist/_virtual which are needed at runtime
+            packages/spotlight/dist/node_modules/
+            packages/spotlight/dist/_virtual/
 
       - name: Store standalone spotlight binaries
         uses: actions/upload-artifact@v4
@@ -195,14 +198,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
@@ -215,15 +210,14 @@ jobs:
       - name: Setup dependencies
         run: pnpm install
 
+      - name: Clean dist directory before downloading artifacts
+        run: rm -rf packages/spotlight/dist/
+
       - name: Download Spotlight build
         uses: actions/download-artifact@v4
         with:
           name: built-packages
           path: packages/spotlight/dist/
-
-      - name: Build
-        working-directory: packages/spotlight
-        run: pnpm build
 
       - name: Run CLI E2E tests
         working-directory: packages/spotlight
@@ -239,14 +233,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
@@ -259,6 +245,11 @@ jobs:
       - name: Setup dependencies
         run: pnpm install
 
+      - name: Clean dist directories before downloading artifacts
+        run: |
+          rm -rf packages/spotlight/dist/
+          rm -rf packages/spotlight/dist-electron/
+
       - name: Download Spotlight build
         uses: actions/download-artifact@v4
         with:
@@ -270,10 +261,6 @@ jobs:
         with:
           name: electron-build
           path: packages/spotlight/dist-electron/
-      
-      - name: Build
-        working-directory: packages/spotlight
-        run: pnpm build
 
       - name: Run UI E2E tests
         working-directory: packages/spotlight

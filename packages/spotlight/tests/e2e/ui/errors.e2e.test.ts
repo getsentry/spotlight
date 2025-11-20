@@ -1,11 +1,9 @@
 import { test, expect } from './fixtures';
 
 test.describe('Error Display UI Tests', () => {
-  test('should display JavaScript error', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display JavaScript error', async ({ page, sidecar, sendTestEnvelope }) => {
     // Navigate to Spotlight UI
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send JavaScript error envelope
     await sendTestEnvelope('envelope_javascript.txt');
 
@@ -21,10 +19,8 @@ test.describe('Error Display UI Tests', () => {
     await expect(errorContent).toContainText(/error|exception/i);
   });
 
-  test('should display error details and stack trace', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display error details and stack trace', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send JavaScript error envelope
     await sendTestEnvelope('envelope_javascript.txt');
 
@@ -49,10 +45,8 @@ test.describe('Error Display UI Tests', () => {
     expect(hasStackTraceIndicators).toBe(true);
   });
 
-  test('should display Python transaction', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display Python transaction', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send Python transaction envelope
     await sendTestEnvelope('envelope_python.txt');
 
@@ -69,10 +63,8 @@ test.describe('Error Display UI Tests', () => {
     expect(text).not.toBe('');
   });
 
-  test('should display PHP error', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display PHP error', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send PHP error envelope
     await sendTestEnvelope('envelope_php_error.txt');
 
@@ -88,10 +80,8 @@ test.describe('Error Display UI Tests', () => {
     await expect(errorContent).toContainText(/error|exception/i);
   });
 
-  test('should display multiple errors', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display multiple errors', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send multiple error envelopes
     await sendTestEnvelope('envelope_javascript.txt');
     await sendTestEnvelope('envelope_php_error.txt');
@@ -108,10 +98,8 @@ test.describe('Error Display UI Tests', () => {
     expect(count).toBeGreaterThanOrEqual(2);
   });
 
-  test('should display Java transaction', async ({ page, sidecar, sendTestEnvelope, waitForSidecarConnection }) => {
+  test('should display Java transaction', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
-    await waitForSidecarConnection(page);
-
     // Send Java transaction envelope
     await sendTestEnvelope('envelope_java.txt');
 
