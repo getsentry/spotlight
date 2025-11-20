@@ -182,13 +182,10 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  test-e2e:
-    name: E2E Tests
+  test-e2e-cli:
+    name: E2E CLI Tests
     needs: build
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
-      options: --user 1001
     strategy:
       matrix:
         node_version: [20, 22, 24]
@@ -223,21 +220,62 @@ jobs:
           name: built-packages
           path: packages/spotlight/dist/
 
+      - name: Run CLI E2E tests
+        run: pnpm -r test:e2e:cli
+
+  test-e2e-ui:
+    name: E2E UI Tests
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Setup dependencies
+        run: pnpm install
+
+      - name: Download Spotlight build
+        uses: actions/download-artifact@v4
+        with:
+          name: built-packages
+          path: packages/spotlight/dist/
+
       - name: Download Electron build
         uses: actions/download-artifact@v4
         with:
           name: electron-build
           path: packages/spotlight/dist-electron/
 
-      - name: Run tests
-        run: pnpm -r test:e2e
+      - name: Run UI E2E tests
+        run: pnpm -r test:e2e:ui
 
       - name: Test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: e2e-tests/**/test-results/**
+          name: test-results-ui
+          path: packages/spotlight/test-results/**
 
   docker:
     name: Docker Image
