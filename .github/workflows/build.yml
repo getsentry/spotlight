@@ -237,7 +237,7 @@ jobs:
 
       - name: Install Playwright browsers
         working-directory: packages/spotlight
-        run: pnpm exec playwright install --with-deps
+        run: pnpm exec playwright install
 
       - name: Run Xvfb (virtual display)
         run: |
