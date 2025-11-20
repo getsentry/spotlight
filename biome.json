@@ -58,7 +58,8 @@
       },
       "suspicious": {
         "noExplicitAny": "off",
-        "noArrayIndexKey": "warn"
+        "noArrayIndexKey": "warn",
+        "noControlCharactersInRegex": "off"
       },
       "nursery": {
         "useSortedClasses": "off"

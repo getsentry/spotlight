@@ -4,6 +4,37 @@ import { ensureSpotlightBuilt, findFreePort, getFixturePath } from "../shared/ut
 import type { SpawnResult } from "../shared/utils";
 import { killGracefully, sendEnvelope, spawnSpotlight, waitForOutput, waitForSidecarReady } from "./helpers";
 
+// From https://stackoverflow.com/a/29497680/90297
+// Retrieved 2025-11-20, License - CC BY-SA 4.0
+// eslint-disable-next-line no-control-regex -- ANSI escape pattern requires control characters
+const ANSI_ESCAPE_PATTERN = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
+
+/**
+ * Normalizes output by removing ANSI escape codes and replacing dynamic values
+ * with placeholders for consistent snapshot testing.
+ */
+function normalizeOutput(output: string): string {
+  return output
+    .replace(ANSI_ESCAPE_PATTERN, "")
+    .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, "[TIMESTAMP]")
+    .replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/g, "[UUID]")
+    .replace(/[a-f0-9]{32}/g, "[ID]")
+    .trim();
+}
+
+/**
+ * Normalizes logfmt output by removing ANSI escape codes and replacing dynamic
+ * key-value pairs with placeholders for consistent snapshot testing.
+ */
+function normalizeLogfmtOutput(output: string): string {
+  return output
+    .replace(ANSI_ESCAPE_PATTERN, "")
+    .replace(/timestamp=[\dT:.Z-]+/g, "timestamp=[TIMESTAMP]")
+    .replace(/event_id=[a-f0-9-]+/g, "event_id=[ID]")
+    .replace(/trace_id=[a-f0-9]+/g, "trace_id=[ID]")
+    .replace(/span_id=[a-f0-9]+/g, "span_id=[ID]");
+}
+
 describe("spotlight tail e2e tests", () => {
   const activeProcesses: SpawnResult[] = [];
 
@@ -271,11 +302,7 @@ describe("spotlight tail e2e tests", () => {
     expect(output).toMatch(/\w+=/);
 
     // Normalize dynamic values and snapshot
-    const normalized = output
-      .replace(/timestamp=[\d\-T:.Z]+/g, "timestamp=[TIMESTAMP]")
-      .replace(/event_id=[a-f0-9\-]+/g, "event_id=[ID]")
-      .replace(/trace_id=[a-f0-9]+/g, "trace_id=[ID]")
-      .replace(/span_id=[a-f0-9]+/g, "span_id=[ID]");
+    const normalized = normalizeLogfmtOutput(output);
 
     expect(normalized).toMatchSnapshot();
   }, 15000);
@@ -305,11 +332,7 @@ describe("spotlight tail e2e tests", () => {
     expect(output.length).toBeGreaterThan(0);
 
     // Normalize and snapshot
-    const normalized = output
-      .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, "[TIMESTAMP]")
-      .replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/g, "[UUID]")
-      .replace(/[a-f0-9]{32}/g, "[ID]")
-      .trim();
+    const normalized = normalizeOutput(output);
 
     expect(normalized).toMatchSnapshot();
   }, 15000);
@@ -340,11 +363,7 @@ describe("spotlight tail e2e tests", () => {
     expect(output).toMatch(/[#*`]/);
 
     // Normalize and snapshot
-    const normalized = output
-      .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, "[TIMESTAMP]")
-      .replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/g, "[UUID]")
-      .replace(/[a-f0-9]{32}/g, "[ID]")
-      .trim();
+    const normalized = normalizeOutput(output);
 
     expect(normalized).toMatchSnapshot();
   }, 15000);
