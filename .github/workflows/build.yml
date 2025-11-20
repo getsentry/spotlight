@@ -186,9 +186,6 @@ jobs:
     name: E2E Tests
     needs: build
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
-    env:
-      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     strategy:
       matrix:
         node_version: [20, 22, 24]
@@ -229,18 +226,9 @@ jobs:
           name: electron-build
           path: packages/spotlight/dist-electron/
 
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
-
-      - name: Run Xvfb (virtual display)
-        run: |
-          Xvfb :99 -screen 0 1920x1080x24 &
-          echo "DISPLAY=:99" >> $GITHUB_ENV
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+        working-directory: packages/spotlight
 
       - name: Run tests
         run: pnpm test:e2e
