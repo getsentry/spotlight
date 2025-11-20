@@ -1,5 +1,5 @@
 import { createWriteStream } from "node:fs";
-import { pushToSpotlightBuffer } from "@spotlight/server/sdk.ts";
+import { decompressBody, pushToSpotlightBuffer } from "@spotlight/server/sdk.ts";
 import { Hono } from "hono";
 import { logger } from "../../logger.ts";
 import type { HonoEnv } from "../../types/env.ts";
@@ -70,7 +70,7 @@ const router = new Hono<HonoEnv>()
   })
   .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {
     const arrayBuffer = await ctx.req.arrayBuffer();
-    const body: Buffer = Buffer.from(arrayBuffer);
+    let body: Buffer = Buffer.from(arrayBuffer);
 
     const container = pushToSpotlightBuffer({
       body,
@@ -96,6 +96,8 @@ const router = new Hono<HonoEnv>()
       const contentType = typeof container !== "boolean" ? container.getContentType() : undefined;
       const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
       const filename = `${contentType?.replace(/[^a-z0-9]/gi, "_") || "no_content_type"}-${timestamp}.txt`;
+
+      body = decompressBody(body);
 
       if (incomingPayload) {
         incomingPayload(body.toString("binary"));

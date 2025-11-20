@@ -24,12 +24,7 @@ type PushToSpotlightBufferOptions = {
 };
 
 export function pushToSpotlightBuffer(options: PushToSpotlightBufferOptions) {
-  let body = options.body;
-
-  const decompressor = decompressors[options.headers.contentEncoding ?? ""];
-  if (decompressor) {
-    body = decompressor(body);
-  }
+  const body = decompressBody(options.body, options.headers.contentEncoding);
 
   let contentType = options.headers.contentType?.split(";")[0].toLocaleLowerCase();
   if (options.headers.userAgent?.startsWith("sentry.javascript.browser") && options.headers.origin) {
@@ -50,4 +45,12 @@ export function pushToSpotlightBuffer(options: PushToSpotlightBufferOptions) {
   }
 
   return false;
+}
+
+export function decompressBody(body: Buffer, contentEncoding?: string) {
+  const decompressor = decompressors[contentEncoding ?? ""];
+  if (decompressor) {
+    return decompressor(body);
+  }
+  return body;
 }
