@@ -1,11 +1,49 @@
 import { expect, test } from "./fixtures";
 
 test.describe("Trace Display UI Tests", () => {
-  test("should display trace list", async ({ page, sidecar, sendTestEnvelope }) => {
+  test("should display trace list with metadata and details", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
 
     // Send trace envelope
     await sendTestEnvelope("envelope_angular.txt");
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
+
+    // Navigate to Traces tab
+    const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
+    await tracesTab.click();
+
+    // Wait for trace to appear
+    await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
+
+    // Verify trace is displayed with timing information
+    const pageContent = page.locator("body");
+    const text = await pageContent.textContent();
+    
+    // Traces typically show duration/timing information
+    const hasTimingInfo = /\d+\s*(ms|s|sec)/i.test(text || "");
+    expect(hasTimingInfo).toBe(true);
+    expect(text).not.toBe("");
+
+    // Click on trace to view details
+    const traceItem = page.locator('[data-test-id="trace-item"], article, .event-item').first();
+    await traceItem.click({ timeout: 5000 }).catch(() => {
+      // Item might already be expanded
+    });
+
+    // Wait for details to load
+    await page.waitForTimeout(500);
+
+    // Verify details and span information are shown
+    const detailsText = await pageContent.textContent();
+    expect(detailsText).not.toBe("");
+  });
+
+  test("should display Java transaction traces", async ({ page, sidecar, sendTestEnvelope }) => {
+    await page.goto(sidecar.baseURL);
+
+    // Send Java transaction envelope
+    await sendTestEnvelope("envelope_java.txt");
     // Wait a bit for the event to be processed
     await page.waitForTimeout(1000);
 
@@ -17,16 +55,16 @@ test.describe("Trace Display UI Tests", () => {
     await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
     // Verify trace is displayed
-    const traceContent = page.locator("body");
-    const hasContent = await traceContent.textContent();
-    expect(hasContent).not.toBe("");
+    const pageContent = page.locator("body");
+    const text = await pageContent.textContent();
+    expect(text).not.toBe("");
   });
 
-  test("should display trace metadata", async ({ page, sidecar, sendTestEnvelope }) => {
+  test("should display Python transaction traces", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
 
-    // Send trace envelope
-    await sendTestEnvelope("envelope_angular.txt");
+    // Send Python transaction envelope
+    await sendTestEnvelope("envelope_python.txt");
     // Wait a bit for the event to be processed
     await page.waitForTimeout(1000);
 
@@ -37,106 +75,7 @@ test.describe("Trace Display UI Tests", () => {
     // Wait for trace to appear
     await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
-    // Look for duration or timing information (ms, seconds, etc.)
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-
-    // Traces typically show duration/timing information
-    const hasTimingInfo = /\d+\s*(ms|s|sec)/i.test(text || "");
-    expect(hasTimingInfo).toBe(true);
-
-    // Should have some trace content
-    expect(text).not.toBe("");
-  });
-
-  test("should display trace details", async ({ page, sidecar, sendTestEnvelope }) => {
-    await page.goto(sidecar.baseURL);
-
-    // Send trace envelope
-    await sendTestEnvelope("envelope_angular.txt");
-    // Wait a bit for the event to be processed
-    await page.waitForTimeout(1000);
-
-    // Navigate to Traces tab
-    const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
-    await tracesTab.click();
-
-    // Wait for trace item and click on it
-    const traceItem = page.locator('[data-test-id="trace-item"], article, .event-item').first();
-    await traceItem.click({ timeout: 5000 }).catch(() => {
-      // Item might already be expanded
-    });
-
-    // Wait a moment for details to load
-    await page.waitForTimeout(500);
-
-    // Verify details are shown
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
-  });
-
-  test("should display span information", async ({ page, sidecar, sendTestEnvelope }) => {
-    await page.goto(sidecar.baseURL);
-
-    // Send trace envelope
-    await sendTestEnvelope("envelope_angular.txt");
-    // Wait a bit for the event to be processed
-    await page.waitForTimeout(1000);
-
-    // Navigate to Traces tab
-    const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
-    await tracesTab.click();
-
-    // Wait for trace and click on it
-    const traceItem = page.locator('[data-test-id="trace-item"], article, .event-item').first();
-    await traceItem.click({ timeout: 5000 }).catch(() => {});
-
-    // Look for span-related content
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-
-    // Should have trace content displayed
-    expect(text).not.toBe("");
-  });
-
-  test("should handle transaction envelope", async ({ page, sidecar, sendTestEnvelope }) => {
-    await page.goto(sidecar.baseURL);
-
-    // Send transaction envelope
-    await sendTestEnvelope("Capture.Message.in.a.transaction.txt");
-    // Wait a bit for the event to be processed
-    await page.waitForTimeout(1000);
-
-    // Navigate to Traces tab
-    const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
-    await tracesTab.click();
-
-    // Wait for content to appear
-    await page.waitForTimeout(1000);
-
-    // Check if trace/transaction appears
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
-  });
-
-  test("should display Angular trace", async ({ page, sidecar, sendTestEnvelope }) => {
-    await page.goto(sidecar.baseURL);
-
-    // Send Angular envelope (likely contains traces)
-    await sendTestEnvelope("envelope_angular.txt");
-    // Wait a bit for the event to be processed
-    await page.waitForTimeout(1000);
-
-    // Navigate to Traces tab
-    const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
-    await tracesTab.click();
-
-    // Wait for content
-    await page.waitForTimeout(1000);
-
-    // Verify content is displayed
+    // Verify trace is displayed
     const pageContent = page.locator("body");
     const text = await pageContent.textContent();
     expect(text).not.toBe("");
@@ -166,10 +105,11 @@ test.describe("Trace Display UI Tests", () => {
   test("should handle multiple traces", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
 
-    // Send multiple trace envelopes
+    // Send multiple different trace envelopes
+    await sendTestEnvelope("envelope_java.txt");
+    await sendTestEnvelope("envelope_python.txt");
     await sendTestEnvelope("envelope_angular.txt");
-    await sendTestEnvelope("envelope_angular.txt");
-    // Wait a bit for the event to be processed
+    // Wait a bit for the events to be processed
     await page.waitForTimeout(1000);
 
     // Navigate to Traces tab
