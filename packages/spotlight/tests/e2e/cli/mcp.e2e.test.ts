@@ -70,7 +70,7 @@ describe("spotlight mcp e2e tests", () => {
     // Start sidecar server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 60000);
+    await waitForSidecarReady(port, 10000);
 
     // Create and connect MCP client
     const client = await createMCPClient(port);
@@ -85,7 +85,7 @@ describe("spotlight mcp e2e tests", () => {
     // Start sidecar server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 60000);
+    await waitForSidecarReady(port, 10000);
 
     // Create and connect MCP client
     const client = await createMCPClient(port);
@@ -111,7 +111,7 @@ describe("spotlight mcp e2e tests", () => {
     // Start sidecar server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 60000);
+    await waitForSidecarReady(port, 10000);
 
     // Send test error envelope
     const errorPath = getFixturePath("envelope_javascript.txt");
@@ -150,7 +150,7 @@ describe("spotlight mcp e2e tests", () => {
     // Start sidecar server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 60000);
+    await waitForSidecarReady(port, 10000);
 
     // Send test log envelope
     const logPath = getFixturePath("log_envelope.txt");
@@ -188,7 +188,7 @@ describe("spotlight mcp e2e tests", () => {
     // Start sidecar server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 60000);
+    await waitForSidecarReady(port, 10000);
 
     // Send test trace envelope
     const tracePath = getFixturePath("envelope_with_only_span.txt");
@@ -226,7 +226,7 @@ describe("spotlight mcp e2e tests", () => {
     // Start sidecar server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 60000);
+    await waitForSidecarReady(port, 10000);
 
     // Send test trace envelope
     const tracePath = getFixturePath("envelope_python.txt");
@@ -268,7 +268,7 @@ describe("spotlight mcp e2e tests", () => {
     // Start sidecar server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 60000);
+    await waitForSidecarReady(port, 10000);
 
     // Create and connect MCP client
     const client = await createMCPClient(port);
@@ -288,7 +288,7 @@ describe("spotlight mcp e2e tests", () => {
     // Start a regular server first
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 60000);
+    await waitForSidecarReady(port, 10000);
 
     // Send test error envelope to the server
     const errorPath = getFixturePath("envelope_javascript.txt");

@@ -41,12 +41,12 @@ describe("spotlight run e2e tests", () => {
     activeProcesses.push(run);
 
     // Wait for the run command to detect child exit
-    await waitForOutput(run, /exited/, 60000, "stderr");
+    await waitForOutput(run, /exited/, 15000, "stderr");
 
     // Verify we got exit message in stderr
     const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
-  }, 150000);
+  }, 20000);
 
   it("should set SENTRY_SPOTLIGHT environment variable", async () => {
     // Create a temp script that checks for SENTRY_SPOTLIGHT
@@ -71,13 +71,13 @@ describe("spotlight run e2e tests", () => {
     activeProcesses.push(run);
 
     // Wait for the run command to finish
-    await waitForOutput(run, /exited/, 60000, "stderr");
+    await waitForOutput(run, /exited/, 15000, "stderr");
 
     const stderr = run.stderr.join("");
 
     // Should have exited message
     expect(stderr).toMatch(/exited/);
-  }, 150000);
+  }, 20000);
 
   it("should set SENTRY_SPOTLIGHT with correct port format", async () => {
     const scriptPath = path.join(process.cwd(), `test-port-${Date.now()}.js`);
@@ -138,11 +138,11 @@ describe("spotlight run e2e tests", () => {
     activeProcesses.push(run);
 
     // Wait for completion
-    await waitForOutput(run, /exited/, 60000, "stderr");
+    await waitForOutput(run, /exited/, 15000, "stderr");
 
     const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
-  }, 150000);
+  }, 20000);
 
   it("should run with custom port", async () => {
     const port = await findFreePort();
@@ -164,11 +164,11 @@ describe("spotlight run e2e tests", () => {
     activeProcesses.push(run);
 
     // Wait for completion
-    await waitForOutput(run, /exited/, 60000, "stderr");
+    await waitForOutput(run, /exited/, 15000, "stderr");
 
     const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
-  }, 150000);
+  }, 20000);
 
   it("should set NEXT_PUBLIC_SENTRY_SPOTLIGHT for Next.js", async () => {
     const scriptPath = path.join(process.cwd(), `test-nextjs-${Date.now()}.js`);
@@ -192,11 +192,11 @@ describe("spotlight run e2e tests", () => {
     activeProcesses.push(run);
 
     // Wait for completion
-    await waitForOutput(run, /exited/, 60000, "stderr");
+    await waitForOutput(run, /exited/, 15000, "stderr");
 
     const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
-  }, 150000);
+  }, 20000);
 
   it("should set SENTRY_TRACES_SAMPLE_RATE", async () => {
     const scriptPath = path.join(process.cwd(), `test-sample-rate-${Date.now()}.js`);
@@ -215,9 +215,9 @@ describe("spotlight run e2e tests", () => {
     activeProcesses.push(run);
 
     // Wait for completion
-    await waitForOutput(run, /exited/, 60000, "stderr");
+    await waitForOutput(run, /exited/, 15000, "stderr");
 
     const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
-  }, 150000);
+  }, 20000);
 });
