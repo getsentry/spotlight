@@ -13,6 +13,9 @@ defaults:
   run:
     shell: bash
 
+env:
+  TURBO_TELEMETRY_MESSAGE_DISABLED: 1
+
 jobs:
   build:
     name: Build
