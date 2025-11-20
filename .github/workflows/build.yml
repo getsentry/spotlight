@@ -187,6 +187,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     strategy:
       matrix:
         node_version: [20, 22, 24]
