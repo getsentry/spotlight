@@ -4,7 +4,6 @@ import App from "./ui/App";
 import { DEFAULT_SIDECAR_STREAM_URL } from "./ui/constants";
 import globalStyles from "./ui/index.css?inline";
 import { Router } from "./ui/lib/Router";
-import initSentry from "./ui/lib/instrumentation";
 import { activateLogger, log } from "./ui/lib/logger";
 import { removeURLSuffix } from "./ui/lib/removeURLSuffix";
 import { getDataFromServerTiming } from "./ui/lib/serverTimingMeta";
@@ -62,7 +61,6 @@ export async function _init(initOptions: SpotlightInitOptions = {}) {
   const styleElement = document.createElement("style");
   styleElement.textContent = `${fontStyles}\n${globalStyles}`;
   document.head.appendChild(styleElement);
-  initSentry();
 
   const context = {
     sidecarUrl: sidecarBaseUrl,
