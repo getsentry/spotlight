@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
 import showHelp from "./cli/help.ts";
+import list from "./cli/list.ts";
 import mcp from "./cli/mcp.ts";
 import run from "./cli/run.ts";
 import server from "./cli/server.ts";
@@ -118,6 +119,7 @@ export const CLI_CMD_MAP = new Map<string | undefined, CLIHandler>([
   ["mcp", mcp],
   ["tail", tail],
   ["run", run],
+  ["list", list],
   ["server", server],
   [undefined, server],
 ]);

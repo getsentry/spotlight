@@ -9,6 +9,9 @@ import { uuidv7 } from "uuidv7";
 import { SENTRY_CONTENT_TYPE } from "../constants.ts";
 import { logger } from "../logger.ts";
 import type { SentryLogEvent } from "../parser/types.ts";
+import { getRegistry } from "../registry/manager.ts";
+import type { InstanceMetadata } from "../registry/types.ts";
+import { getProcessStartTime } from "../registry/utils.ts";
 import type { CLIHandlerOptions } from "../types/cli.ts";
 import { buildDockerComposeCommand, detectDockerCompose } from "../utils/docker-compose.ts";
 import { getSpotlightURL } from "../utils/extras.ts";
@@ -107,6 +110,45 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
   return Buffer.from(`${parts.join("\n")}\n`, "utf-8");
 }
 
+/**
+ * Ping the control center to notify it of this instance
+ */
+async function pingControlCenter(metadata: InstanceMetadata): Promise<void> {
+  try {
+    const response = await fetch("http://localhost:8969/api/instances/ping", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(metadata),
+      signal: AbortSignal.timeout(500),
+    });
+    
+    if (response.ok) {
+      logger.debug("Successfully pinged control center");
+    }
+  } catch (err) {
+    // Fire-and-forget - don't block if control center isn't running
+    logger.debug("Could not ping control center (this is okay if no control center is running)");
+  }
+}
+
+/**
+ * Detect project name from package.json or directory name
+ */
+function detectProjectName(): string {
+  try {
+    const packageJson = JSON.parse(readFileSync("./package.json", "utf-8"));
+    if (packageJson.name) {
+      return packageJson.name;
+    }
+  } catch {
+    // Fall through to directory name
+  }
+  
+  return path.basename(process.cwd());
+}
+
 export default async function run({ port, cmdArgs, basePath, filesToServe, format }: CLIHandlerOptions) {
   let relayStdioAsLogs = true;
 
@@ -159,8 +201,14 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   // or started in a weird manner (like over a unix socket)
   const actualServerPort = (serverInstance.address() as AddressInfo).port;
   const spotlightUrl = getSpotlightURL(actualServerPort, LOCALHOST_HOST);
+  
+  // Generate instance ID and prepare metadata (before spawning child process)
+  const instanceId = uuidv7();
+  const pidStartTime = await getProcessStartTime(process.pid);
+  
   let shell = false;
   let stdin: string | undefined = undefined;
+  let detectedType = "unknown";
   const env = {
     ...process.env,
     SENTRY_SPOTLIGHT: spotlightUrl,
@@ -199,12 +247,14 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
         const command = buildDockerComposeCommand(dockerCompose);
         cmdArgs = command.cmdArgs;
         stdin = command.stdin;
+        detectedType = "docker-compose";
         // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-        env.COMPOSE_FILE = undefined;
+        delete env.COMPOSE_FILE;
       } else {
         logger.info(`Using package.json script: ${packageJson.scriptName}`);
         cmdArgs = [packageJson.scriptCommand];
         shell = true;
+        detectedType = "package.json";
         env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
       }
     } else if (dockerCompose) {
@@ -217,12 +267,14 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
       const command = buildDockerComposeCommand(dockerCompose);
       cmdArgs = command.cmdArgs;
       stdin = command.stdin;
+      detectedType = "docker-compose";
       // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-      env.COMPOSE_FILE = undefined;
+      delete env.COMPOSE_FILE;
     } else if (packageJson) {
       logger.info(`Using package.json script: ${packageJson.scriptName}`);
       cmdArgs = [packageJson.scriptCommand];
       shell = true;
+      detectedType = "package.json";
       env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
     }
   }
@@ -232,6 +284,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   }
   const cmdStr = cmdArgs.join(" ");
   logger.info(`Starting command: ${cmdStr}`);
+  
   // When we have Docker Compose override YAML (for -f -), we need to pipe stdin
   // Otherwise, inherit stdin to relay user input to the downstream process
   const stdinMode: "pipe" | "inherit" = stdin ? "pipe" : "inherit";
@@ -331,9 +384,58 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     stderr.destroy();
     runCmd.kill();
   };
-  runCmd.on("spawn", () => {
+  runCmd.on("spawn", async () => {
     runCmd.removeAllListeners("spawn");
     runCmd.removeAllListeners("error");
+    
+    // Register instance after child process has spawned
+    try {
+      const childPidStartTime = await getProcessStartTime(runCmd.pid);
+      const projectName = detectProjectName();
+      
+      const metadata: InstanceMetadata = {
+        instanceId,
+        port: actualServerPort,
+        pid: process.pid,
+        pidStartTime,
+        childPid: runCmd.pid || null,
+        childPidStartTime: runCmd.pid ? childPidStartTime : null,
+        command: cmdStr,
+        cmdArgs,
+        cwd: process.cwd(),
+        startTime: new Date().toISOString(),
+        projectName,
+        detectedType,
+      };
+      
+      // Register in local registry
+      await getRegistry().register(metadata);
+      
+      // Ping control center (fire-and-forget)
+      pingControlCenter(metadata);
+      
+      // Register cleanup to remove metadata on exit
+      const cleanup = async () => {
+        await getRegistry().unregister(instanceId);
+      };
+      
+      process.on("exit", () => {
+        // Use sync operation here since we can't await in exit handler
+        getRegistry().unregister(instanceId).catch(() => {});
+      });
+      process.on("SIGINT", async () => {
+        await cleanup();
+        killRunCmd();
+      });
+      process.on("SIGTERM", async () => {
+        await cleanup();
+        killRunCmd();
+      });
+    } catch (err) {
+      logger.error(`Failed to register instance: ${err}`);
+      // Don't fail the whole process if registration fails
+    }
+    
     process.on("SIGINT", killRunCmd);
     process.on("SIGTERM", killRunCmd);
     process.on("beforeExit", killRunCmd);

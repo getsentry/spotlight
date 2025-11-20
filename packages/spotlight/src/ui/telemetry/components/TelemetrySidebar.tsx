@@ -138,6 +138,17 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
         <NavigationLink to="insights/envelopes" title="Envelopes" isActive={isActive("insights/envelopes")} isSubItem />
         <NavigationLink to="insights/sdks" title="SDKs" isActive={isActive("insights/sdks")} isSubItem />
         <NavigationLink to="insights/aitraces" title="AI Traces" isActive={isActive("insights/aitraces")} isSubItem />
+
+        {/* Control Center link */}
+        <div className="px-3 py-2 text-md font-semibold tracking-wide text-primary-200 mt-2">
+          System
+        </div>
+        <Link
+          to="/control-center"
+          className="relative flex items-center gap-x-2 p-3 pl-6 font-medium transition text-primary-300 hover:bg-primary-800 hover:text-primary-100"
+        >
+          Instances
+        </Link>
       </div>
 
       <footer className="p-4 border-t border-primary-700">
