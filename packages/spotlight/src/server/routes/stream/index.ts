@@ -72,8 +72,11 @@ const router = new Hono<HonoEnv>()
     const arrayBuffer = await ctx.req.arrayBuffer();
     let body: Buffer = Buffer.from(arrayBuffer);
 
+    body = decompressBody(body, ctx.req.header("Content-Encoding"));
+
     const container = pushToSpotlightBuffer({
       body,
+      overrideBufferDecoding: true,
       spotlightBuffer: getBuffer(),
       headers: {
         contentEncoding: ctx.req.header("Content-Encoding"),
@@ -99,8 +102,6 @@ const router = new Hono<HonoEnv>()
       const contentType = typeof container !== "boolean" ? container.getContentType() : undefined;
       const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
       const filename = `${contentType?.replace(/[^a-z0-9]/gi, "_") || "no_content_type"}-${timestamp}.txt`;
-
-      body = decompressBody(body);
 
       if (incomingPayload) {
         incomingPayload(body.toString("binary"));
