@@ -221,7 +221,8 @@ jobs:
           path: packages/spotlight/dist/
 
       - name: Run CLI E2E tests
-        run: pnpm -r test:e2e:cli
+        working-directory: packages/spotlight
+        run: pnpm test:e2e:cli
 
   test-e2e-ui:
     name: E2E UI Tests
@@ -268,9 +269,8 @@ jobs:
           path: packages/spotlight/dist-electron/
 
       - name: Run UI E2E tests
-        run: pnpm -r test:e2e:ui
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+        working-directory: packages/spotlight
+        run: pnpm test:e2e:ui
 
       - name: Test results
         if: always()
