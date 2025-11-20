@@ -189,8 +189,6 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
       options: --user 1001
-      env:
-        PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     strategy:
       matrix:
         node_version: [20, 22, 24]
@@ -232,9 +230,7 @@ jobs:
           path: packages/spotlight/dist-electron/
 
       - name: Run tests
-        run: pnpm test:e2e
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+        run: PLAYWRIGHT_BROWSERS_PATH='/ms-playwright' pnpm test:e2e
 
       - name: Test results
         if: always()
