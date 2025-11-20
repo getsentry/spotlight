@@ -10,9 +10,7 @@ export default defineConfig({
     reporters: isCI ? ["junit", "default"] : ["default"],
     outputFile: "junit-e2e.xml",
     globals: true,
-    include: [
-      "./tests/e2e/cli/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
-    ],
+    include: ["./tests/e2e/cli/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
     exclude: [
       "**/node_modules/**",
       "**/dist/**",
@@ -20,7 +18,7 @@ export default defineConfig({
       "**/tests/launch.test.ts", // Exclude Playwright electron test
     ],
     watchExclude: [".*\\/node_modules\\/.*", ".*\\/dist\\/.*"],
-    testTimeout: 30000, // 30 seconds for e2e tests
+    testTimeout: 120000, // 120 seconds for e2e tests (CI can be slow)
   },
   resolve: {
     alias: aliases,

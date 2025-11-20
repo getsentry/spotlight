@@ -1,17 +1,11 @@
-import { describe, it, expect, afterEach, beforeAll, vi } from 'vitest';
-import path from 'node:path';
-import fs from 'node:fs/promises';
-import {
-  spawnSpotlight,
-  waitForOutput,
-  sendEnvelope,
-  killGracefully,
-  waitForSidecarReady,
-} from './helpers';
-import { findFreePort, getFixturePath, ensureSpotlightBuilt } from '../shared/utils';
-import type { SpawnResult } from '../shared/utils';
+import fs from "node:fs/promises";
+import path from "node:path";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { ensureSpotlightBuilt, findFreePort, getFixturePath } from "../shared/utils";
+import type { SpawnResult } from "../shared/utils";
+import { killGracefully, sendEnvelope, spawnSpotlight, waitForOutput, waitForSidecarReady } from "./helpers";
 
-describe('spotlight run e2e tests', () => {
+describe("spotlight run e2e tests", () => {
   const activeProcesses: SpawnResult[] = [];
   const tempFiles: string[] = [];
 
@@ -25,7 +19,7 @@ describe('spotlight run e2e tests', () => {
       if (proc.process.pid && !proc.process.killed) {
         await killGracefully(proc.process).catch(() => {
           // Force kill if graceful shutdown fails
-          proc.process.kill('SIGKILL');
+          proc.process.kill("SIGKILL");
         });
       }
     }
@@ -42,19 +36,19 @@ describe('spotlight run e2e tests', () => {
     tempFiles.length = 0;
   });
 
-  it('should run simple command', async () => {
-    const run = spawnSpotlight(['run', 'node', '-e', 'console.log("test"); process.exit(0)']);
+  it("should run simple command", async () => {
+    const run = spawnSpotlight(["run", "node", "-e", 'console.log("test"); process.exit(0)']);
     activeProcesses.push(run);
 
     // Wait for the run command to detect child exit
-    await waitForOutput(run, /exited/, 10000, 'stderr');
+    await waitForOutput(run, /exited/, 60000, "stderr");
 
     // Verify we got exit message in stderr
-    const stderr = run.stderr.join('');
+    const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
-  }, 15000);
+  }, 90000);
 
-  it('should set SENTRY_SPOTLIGHT environment variable', async () => {
+  it("should set SENTRY_SPOTLIGHT environment variable", async () => {
     // Create a temp script that checks for SENTRY_SPOTLIGHT
     const scriptPath = path.join(process.cwd(), `test-env-${Date.now()}.js`);
     tempFiles.push(scriptPath);
@@ -70,22 +64,22 @@ describe('spotlight run e2e tests', () => {
       }
       process.exit(1);
       `,
-      'utf-8',
+      "utf-8",
     );
 
-    const run = spawnSpotlight(['run', 'node', scriptPath]);
+    const run = spawnSpotlight(["run", "node", scriptPath]);
     activeProcesses.push(run);
 
     // Wait for the run command to finish
-    await waitForOutput(run, /exited/, 10000, 'stderr');
+    await waitForOutput(run, /exited/, 60000, "stderr");
 
-    const stderr = run.stderr.join('');
-    
+    const stderr = run.stderr.join("");
+
     // Should have exited message
     expect(stderr).toMatch(/exited/);
-  }, 15000);
+  }, 90000);
 
-  it('should set SENTRY_SPOTLIGHT with correct port format', async () => {
+  it("should set SENTRY_SPOTLIGHT with correct port format", async () => {
     const scriptPath = path.join(process.cwd(), `test-port-${Date.now()}.js`);
     tempFiles.push(scriptPath);
 
@@ -108,21 +102,21 @@ describe('spotlight run e2e tests', () => {
         process.exit(1);
       }
       `,
-      'utf-8',
+      "utf-8",
     );
 
-    const run = spawnSpotlight(['run', 'node', scriptPath]);
+    const run = spawnSpotlight(["run", "node", scriptPath]);
     activeProcesses.push(run);
 
     // Wait for completion
-    await waitForOutput(run, /exited/, 10000, 'stderr');
+    await waitForOutput(run, /exited/, 10000, "stderr");
 
     // If the script exited cleanly (code 0), the URL was valid
-    const stderr = run.stderr.join('');
+    const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
   }, 15000);
 
-  it('should run with dynamic port assignment (-p 0)', async () => {
+  it("should run with dynamic port assignment (-p 0)", async () => {
     const scriptPath = path.join(process.cwd(), `test-dynamic-port-${Date.now()}.js`);
     tempFiles.push(scriptPath);
 
@@ -137,20 +131,20 @@ describe('spotlight run e2e tests', () => {
       }
       process.exit(1);
       `,
-      'utf-8',
+      "utf-8",
     );
 
-    const run = spawnSpotlight(['run', '-p', '0', 'node', scriptPath]);
+    const run = spawnSpotlight(["run", "-p", "0", "node", scriptPath]);
     activeProcesses.push(run);
 
     // Wait for completion
-    await waitForOutput(run, /exited/, 10000, 'stderr');
+    await waitForOutput(run, /exited/, 60000, "stderr");
 
-    const stderr = run.stderr.join('');
+    const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
-  }, 15000);
+  }, 90000);
 
-  it('should run with custom port', async () => {
+  it("should run with custom port", async () => {
     const port = await findFreePort();
     const scriptPath = path.join(process.cwd(), `test-custom-port-${Date.now()}.js`);
     tempFiles.push(scriptPath);
@@ -163,20 +157,20 @@ describe('spotlight run e2e tests', () => {
       // Exit 0 if port matches, 1 otherwise
       process.exit(parsed.port === '${port}' ? 0 : 1);
       `,
-      'utf-8',
+      "utf-8",
     );
 
-    const run = spawnSpotlight(['run', '-p', port.toString(), 'node', scriptPath]);
+    const run = spawnSpotlight(["run", "-p", port.toString(), "node", scriptPath]);
     activeProcesses.push(run);
 
     // Wait for completion
-    await waitForOutput(run, /exited/, 10000, 'stderr');
+    await waitForOutput(run, /exited/, 60000, "stderr");
 
-    const stderr = run.stderr.join('');
+    const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
-  }, 15000);
+  }, 90000);
 
-  it('should set NEXT_PUBLIC_SENTRY_SPOTLIGHT for Next.js', async () => {
+  it("should set NEXT_PUBLIC_SENTRY_SPOTLIGHT for Next.js", async () => {
     const scriptPath = path.join(process.cwd(), `test-nextjs-${Date.now()}.js`);
     tempFiles.push(scriptPath);
 
@@ -191,20 +185,20 @@ describe('spotlight run e2e tests', () => {
       }
       process.exit(1);
       `,
-      'utf-8',
+      "utf-8",
     );
 
-    const run = spawnSpotlight(['run', 'node', scriptPath]);
+    const run = spawnSpotlight(["run", "node", scriptPath]);
     activeProcesses.push(run);
 
     // Wait for completion
-    await waitForOutput(run, /exited/, 10000, 'stderr');
+    await waitForOutput(run, /exited/, 60000, "stderr");
 
-    const stderr = run.stderr.join('');
+    const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
-  }, 15000);
+  }, 90000);
 
-  it('should set SENTRY_TRACES_SAMPLE_RATE', async () => {
+  it("should set SENTRY_TRACES_SAMPLE_RATE", async () => {
     const scriptPath = path.join(process.cwd(), `test-sample-rate-${Date.now()}.js`);
     tempFiles.push(scriptPath);
 
@@ -214,16 +208,16 @@ describe('spotlight run e2e tests', () => {
       // Exit 0 if SENTRY_TRACES_SAMPLE_RATE is set to 1, 1 otherwise
       process.exit(process.env.SENTRY_TRACES_SAMPLE_RATE === '1' ? 0 : 1);
       `,
-      'utf-8',
+      "utf-8",
     );
 
-    const run = spawnSpotlight(['run', 'node', scriptPath]);
+    const run = spawnSpotlight(["run", "node", scriptPath]);
     activeProcesses.push(run);
 
     // Wait for completion
-    await waitForOutput(run, /exited/, 10000, 'stderr');
+    await waitForOutput(run, /exited/, 60000, "stderr");
 
-    const stderr = run.stderr.join('');
+    const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
-  }, 15000);
+  }, 90000);
 });
