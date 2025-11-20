@@ -269,6 +269,10 @@ jobs:
         with:
           name: electron-build
           path: packages/spotlight/dist-electron/
+      
+      - name: Build
+        working-directory: packages/spotlight
+        run: pnpm build
 
       - name: Run UI E2E tests
         working-directory: packages/spotlight
