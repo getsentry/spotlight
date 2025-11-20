@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/react";
+import type { Integration } from "@sentry/types";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
 import { useEffect } from "../react-instance";
 import { getDataFromServerTiming } from "./serverTimingMeta";
@@ -6,7 +7,7 @@ import { getDataFromServerTiming } from "./serverTimingMeta";
 const TRACE_PARENT_KEYS = ["sentryTrace", "baggage"];
 
 // Export for reuse in electron-index.tsx
-export function getIntegrations(instrumentPageLoad = true): Sentry.Integration[] {
+export function getIntegrations(instrumentPageLoad = true): Integration[] {
   const integrations = [
     // See docs for support of different versions of variation of react router
     // https://docs.sentry.io/platforms/javascript/guides/react/configuration/integrations/react-router/
