@@ -163,7 +163,7 @@ jobs:
         run: pnpm install
 
       - name: Run tests
-        run: pnpm test
+        run: pnpm -r test
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@cf701569b05ccdd861a76b8607a66d76f6fd4857
@@ -230,7 +230,7 @@ jobs:
           path: packages/spotlight/dist-electron/
 
       - name: Run tests
-        run: pnpm test:e2e
+        run: pnpm -r test:e2e
 
       - name: Test results
         if: always()

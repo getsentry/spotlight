@@ -10,6 +10,7 @@
       "Bash(jq:*)",
       "Bash(pnpx vitest:*)",
       "Bash(pnpm test:*)",
+      "Bash(pnpm -r test:*)",
       "Bash(pnpm run typecheck:*)",
       "Bash(pnpm run check:*)",
       "Bash(pnpm run:*)",

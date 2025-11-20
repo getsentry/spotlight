@@ -336,8 +336,8 @@ turbo build           # Direct turbo build command
 turbo build --filter=@spotlightjs/overlay  # Build specific package
 
 # Testing
-pnpm test             # Run package tests
-pnpm test:e2e         # Run end-to-end tests
+pnpm -r test             # Run package tests
+pnpm -r test:e2e         # Run end-to-end tests
 
 # Code Quality
 pnpm lint             # Check code with Biome
