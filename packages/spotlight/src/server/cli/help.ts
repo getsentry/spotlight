@@ -21,7 +21,7 @@ Commands:
 Options:
   -p, --port <port>      Port to listen on (default: 8969, or 0 for random)
   -d, --debug            Enable debug logging
-  -f, --format <format>  Output format for tail/list command (default: human)
+  -f, --format <format>  Output format for commands like run, tail, and list command (default: human)
                          Available formats: ${[...AVAILABLE_FORMATTERS].join(", ")}
   -h, --help             Show this help message
 
