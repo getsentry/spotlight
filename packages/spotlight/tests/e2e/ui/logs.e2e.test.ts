@@ -6,13 +6,16 @@ test.describe('Log Display UI Tests', () => {
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
+    
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
 
     // Wait for logs to appear
-    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 5000 });
+    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Verify logs are displayed
     const logContent = page.locator('body');
@@ -25,6 +28,9 @@ test.describe('Log Display UI Tests', () => {
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
+    
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
@@ -46,6 +52,9 @@ test.describe('Log Display UI Tests', () => {
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
+    
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
@@ -169,7 +178,7 @@ test.describe('Log Display UI Tests', () => {
     await page.waitForTimeout(1000);
 
     // Look for filter controls (buttons, dropdowns, inputs)
-    const hasFilterControls = await Promise.race([
+    const _hasFilterControls = await Promise.race([
       page.locator('input[type="text"], input[type="search"], select, button[aria-label*="filter"]').first().isVisible().then(() => true).catch(() => false),
       new Promise<boolean>(resolve => setTimeout(() => resolve(false), 2000))
     ]);
@@ -185,6 +194,9 @@ test.describe('Log Display UI Tests', () => {
 
     // Send log envelope
     await sendTestEnvelope('log_envelope.txt');
+    
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();

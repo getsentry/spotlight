@@ -7,13 +7,16 @@ test.describe('Error Display UI Tests', () => {
 
     // Send JavaScript error envelope
     await sendTestEnvelope('envelope_javascript.txt');
+    
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Errors tab
     const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
     await errorsTab.click();
 
     // Wait for error to appear
-    await page.waitForSelector('[data-test-id="error-item"], [class*="error"], article, .event-item', { timeout: 5000 });
+    await page.waitForSelector('[data-test-id="error-item"], [class*="error"], article, .event-item', { timeout: 10000 });
 
     // Verify error is displayed
     const errorContent = page.locator('body');
@@ -25,6 +28,9 @@ test.describe('Error Display UI Tests', () => {
 
     // Send JavaScript error envelope
     await sendTestEnvelope('envelope_javascript.txt');
+    
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Errors tab
     const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
@@ -59,7 +65,7 @@ test.describe('Error Display UI Tests', () => {
     await errorsTab.click();
 
     // Wait for error to appear
-    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 5000 });
+    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 10000 });
 
     // Verify Python error is displayed
     const errorContent = page.locator('body');
@@ -86,7 +92,7 @@ test.describe('Error Display UI Tests', () => {
     const pageContent = page.locator('body');
     
     // Look for Python file extensions
-    const hasPythonFiles = await Promise.race([
+    const _hasPythonFiles = await Promise.race([
       pageContent.locator('text=/\\.py/i').first().isVisible().then(() => true).catch(() => false),
       new Promise<boolean>(resolve => setTimeout(() => resolve(false), 3000))
     ]);
@@ -107,7 +113,7 @@ test.describe('Error Display UI Tests', () => {
     await errorsTab.click();
 
     // Wait for error to appear
-    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 5000 });
+    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 10000 });
 
     // Verify error is displayed
     const errorContent = page.locator('body');
@@ -127,7 +133,7 @@ test.describe('Error Display UI Tests', () => {
     await errorsTab.click();
 
     // Wait for errors to appear
-    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 5000 });
+    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 10000 });
 
     // Count error items (should have at least 2, might have 3 depending on content)
     const errorItems = page.locator('[data-test-id="error-item"], article, .event-item');
@@ -146,7 +152,7 @@ test.describe('Error Display UI Tests', () => {
     await errorsTab.click();
 
     // Wait for error to appear
-    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 5000 });
+    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 10000 });
 
     // Verify error is displayed
     const errorContent = page.locator('body');

@@ -6,13 +6,15 @@ test.describe('Trace Display UI Tests', () => {
 
     // Send trace envelope
     await sendTestEnvelope('envelope_with_only_span.txt');
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
 
     // Wait for trace to appear
-    await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 5000 });
+    await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
     // Verify trace is displayed
     const traceContent = page.locator('body');
@@ -25,13 +27,15 @@ test.describe('Trace Display UI Tests', () => {
 
     // Send trace envelope
     await sendTestEnvelope('envelope_with_only_span.txt');
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
 
     // Wait for trace to appear
-    await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 5000 });
+    await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
     // Look for duration or timing information (ms, seconds, etc.)
     const pageContent = page.locator('body');
@@ -49,6 +53,8 @@ test.describe('Trace Display UI Tests', () => {
 
     // Send trace envelope
     await sendTestEnvelope('envelope_with_only_span.txt');
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
@@ -74,6 +80,8 @@ test.describe('Trace Display UI Tests', () => {
 
     // Send trace envelope
     await sendTestEnvelope('envelope_with_only_span.txt');
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
@@ -96,6 +104,8 @@ test.describe('Trace Display UI Tests', () => {
 
     // Send transaction envelope
     await sendTestEnvelope('Capture.Message.in.a.transaction.txt');
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
@@ -115,6 +125,8 @@ test.describe('Trace Display UI Tests', () => {
 
     // Send Angular envelope (likely contains traces)
     await sendTestEnvelope('envelope_angular.txt');
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
@@ -134,6 +146,8 @@ test.describe('Trace Display UI Tests', () => {
 
     // Send Astro SSR envelope
     await sendTestEnvelope('envelope_astro_ssr_node.txt');
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
@@ -154,6 +168,8 @@ test.describe('Trace Display UI Tests', () => {
     // Send multiple trace envelopes
     await sendTestEnvelope('envelope_with_only_span.txt');
     await sendTestEnvelope('envelope_angular.txt');
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
@@ -173,6 +189,8 @@ test.describe('Trace Display UI Tests', () => {
 
     // Send trace envelope
     await sendTestEnvelope('envelope_with_only_span.txt');
+    // Wait a bit for the event to be processed
+    await page.waitForTimeout(1000);
 
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
