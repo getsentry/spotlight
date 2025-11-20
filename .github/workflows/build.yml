@@ -25,8 +25,6 @@ jobs:
       playwright-version: ${{ steps.playwright-version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Cache turbo build setup
         uses: actions/cache@v4
@@ -142,8 +140,6 @@ jobs:
         node_version: [20, 22, 24]
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Cache turbo build setup
         uses: actions/cache@v4
@@ -194,8 +190,6 @@ jobs:
         node_version: [20, 22, 24]
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Cache turbo build setup
         uses: actions/cache@v4
@@ -235,8 +229,6 @@ jobs:
       options: --user 1001
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Cache turbo build setup
         uses: actions/cache@v4
@@ -290,8 +282,6 @@ jobs:
       MULTI_ARCH_BUILD: ${{ ((github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') && github.actor != 'dependabot[bot]') && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Download spotlight binaries
         uses: actions/download-artifact@v4
