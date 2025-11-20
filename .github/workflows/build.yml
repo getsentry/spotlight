@@ -186,6 +186,8 @@ jobs:
     name: E2E Tests
     needs: build
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
     strategy:
       matrix:
         node_version: [20, 22, 24]
@@ -226,12 +228,10 @@ jobs:
           name: electron-build
           path: packages/spotlight/dist-electron/
 
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
-        working-directory: packages/spotlight
-
       - name: Run tests
         run: pnpm test:e2e
+        env:
+          HOME: /root
 
       - name: Test results
         if: always()
