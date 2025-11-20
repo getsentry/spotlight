@@ -49,8 +49,6 @@ export function pushToSpotlightBuffer(options: PushToSpotlightBufferOptions) {
 
     return container;
   }
-
-  return false;
 }
 
 export function decompressBody(body: Buffer, contentEncoding?: string) {

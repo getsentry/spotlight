@@ -99,7 +99,7 @@ const router = new Hono<HonoEnv>()
     const incomingPayload = ctx.get("incomingPayload");
 
     if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
-      const contentType = typeof container !== "boolean" ? container.getContentType() : undefined;
+      const contentType = container?.getContentType();
       const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
       const filename = `${contentType?.replace(/[^a-z0-9]/gi, "_") || "no_content_type"}-${timestamp}.txt`;
 
