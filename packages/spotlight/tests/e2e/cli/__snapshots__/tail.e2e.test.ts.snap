@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`spotlight tail e2e tests > should output in human format (default) 1`] = `
-"13:45:24 [ERROR]   [browser] SyntaxError: Unexpected end of JSON input [webpack-internal:///../../spotlight/packages/core/dist/sentry-spotlight.js:23135:61] [EventSource.m]
+"[90m13:45:24[39m [31m[1m[ERROR]  [22m[39m [33m[browser][39m SyntaxError: Unexpected end of JSON input [webpack-internal:///../../spotlight/packages/core/dist/sentry-spotlight.js:23135:61] [EventSource.m]
 "
 `;
 

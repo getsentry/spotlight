@@ -6,7 +6,7 @@ import { aliases } from "./vite.config.base";
 const isCI = Boolean(process.env.CI);
 export default defineConfig({
   test: {
-    environment: "happy-dom",
+    maxConcurrency: isCI ? 1 : undefined,
     reporters: isCI ? ["junit", "default"] : ["default"],
     outputFile: "junit-e2e.xml",
     globals: true,
