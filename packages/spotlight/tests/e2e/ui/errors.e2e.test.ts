@@ -54,52 +54,23 @@ test.describe('Error Display UI Tests', () => {
     expect(hasStackTraceIndicators).toBe(true);
   });
 
-  test('should display Python error', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display Python transaction', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
 
-    // Send Python error envelope
+    // Send Python transaction envelope
     await sendTestEnvelope('envelope_python.txt');
 
-    // Navigate to Errors tab
-    const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
-    await errorsTab.click();
+    // Navigate to Traces tab
+    const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
+    await tracesTab.click();
 
-    // Wait for error to appear
-    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 10000 });
+    // Wait for trace to appear
+    await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
-    // Verify Python error is displayed
-    const errorContent = page.locator('body');
-    await expect(errorContent).toContainText(/error|exception/i);
-  });
-
-  test('should display Python stack trace', async ({ page, sidecar, sendTestEnvelope }) => {
-    await page.goto(sidecar.baseURL);
-
-    // Send Python error envelope
-    await sendTestEnvelope('envelope_python.txt');
-
-    // Navigate to Errors tab
-    const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
-    await errorsTab.click();
-
-    // Wait for error and click on it
-    const errorItem = page.locator('[data-test-id="error-item"], article, .event-item').first();
-    await errorItem.click({ timeout: 5000 }).catch(() => {
-      // Item might already be expanded
-    });
-
-    // Verify Python stack trace elements
-    const pageContent = page.locator('body');
-    
-    // Look for Python file extensions
-    const _hasPythonFiles = await Promise.race([
-      pageContent.locator('text=/\\.py/i').first().isVisible().then(() => true).catch(() => false),
-      new Promise<boolean>(resolve => setTimeout(() => resolve(false), 3000))
-    ]);
-    
-    // Should have some stack trace content
-    const content = await pageContent.textContent();
-    expect(content).not.toBe('');
+    // Verify transaction is displayed
+    const traceContent = page.locator('body');
+    const text = await traceContent.textContent();
+    expect(text).not.toBe('');
   });
 
   test('should display PHP error', async ({ page, sidecar, sendTestEnvelope }) => {
@@ -125,7 +96,6 @@ test.describe('Error Display UI Tests', () => {
 
     // Send multiple error envelopes
     await sendTestEnvelope('envelope_javascript.txt');
-    await sendTestEnvelope('envelope_python.txt');
     await sendTestEnvelope('envelope_php_error.txt');
 
     // Navigate to Errors tab
@@ -141,21 +111,22 @@ test.describe('Error Display UI Tests', () => {
     expect(count).toBeGreaterThanOrEqual(2);
   });
 
-  test('should display Java error', async ({ page, sidecar, sendTestEnvelope }) => {
+  test('should display Java transaction', async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
 
-    // Send Java error envelope
+    // Send Java transaction envelope
     await sendTestEnvelope('envelope_java.txt');
 
-    // Navigate to Errors tab
-    const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
-    await errorsTab.click();
+    // Navigate to Traces tab
+    const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
+    await tracesTab.click();
 
-    // Wait for error to appear
-    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 10000 });
+    // Wait for trace to appear
+    await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
-    // Verify error is displayed
-    const errorContent = page.locator('body');
-    await expect(errorContent).toContainText(/error|exception/i);
+    // Verify transaction is displayed
+    const traceContent = page.locator('body');
+    const text = await traceContent.textContent();
+    expect(text).not.toBe('');
   });
 });

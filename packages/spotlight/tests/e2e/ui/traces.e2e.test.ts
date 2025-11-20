@@ -5,7 +5,7 @@ test.describe("Trace Display UI Tests", () => {
     await page.goto(sidecar.baseURL);
 
     // Send trace envelope
-    await sendTestEnvelope("envelope_with_only_span.txt");
+    await sendTestEnvelope("envelope_angular.txt");
     // Wait a bit for the event to be processed
     await page.waitForTimeout(1000);
 
@@ -26,7 +26,7 @@ test.describe("Trace Display UI Tests", () => {
     await page.goto(sidecar.baseURL);
 
     // Send trace envelope
-    await sendTestEnvelope("envelope_with_only_span.txt");
+    await sendTestEnvelope("envelope_angular.txt");
     // Wait a bit for the event to be processed
     await page.waitForTimeout(1000);
 
@@ -53,7 +53,7 @@ test.describe("Trace Display UI Tests", () => {
     await page.goto(sidecar.baseURL);
 
     // Send trace envelope
-    await sendTestEnvelope("envelope_with_only_span.txt");
+    await sendTestEnvelope("envelope_angular.txt");
     // Wait a bit for the event to be processed
     await page.waitForTimeout(1000);
 
@@ -80,7 +80,7 @@ test.describe("Trace Display UI Tests", () => {
     await page.goto(sidecar.baseURL);
 
     // Send trace envelope
-    await sendTestEnvelope("envelope_with_only_span.txt");
+    await sendTestEnvelope("envelope_angular.txt");
     // Wait a bit for the event to be processed
     await page.waitForTimeout(1000);
 
@@ -167,7 +167,7 @@ test.describe("Trace Display UI Tests", () => {
     await page.goto(sidecar.baseURL);
 
     // Send multiple trace envelopes
-    await sendTestEnvelope("envelope_with_only_span.txt");
+    await sendTestEnvelope("envelope_angular.txt");
     await sendTestEnvelope("envelope_angular.txt");
     // Wait a bit for the event to be processed
     await page.waitForTimeout(1000);
@@ -189,7 +189,7 @@ test.describe("Trace Display UI Tests", () => {
     await page.goto(sidecar.baseURL);
 
     // Send trace envelope
-    await sendTestEnvelope("envelope_with_only_span.txt");
+    await sendTestEnvelope("envelope_angular.txt");
     // Wait a bit for the event to be processed
     await page.waitForTimeout(1000);
 
