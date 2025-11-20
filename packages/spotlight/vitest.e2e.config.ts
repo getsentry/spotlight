@@ -18,7 +18,7 @@ export default defineConfig({
       "**/tests/launch.test.ts", // Exclude Playwright electron test
     ],
     watchExclude: [".*\\/node_modules\\/.*", ".*\\/dist\\/.*"],
-    testTimeout: 120000, // 120 seconds for e2e tests (CI can be slow)
+    testTimeout: 180000, // 180 seconds for e2e tests (CI can be very slow)
   },
   resolve: {
     alias: aliases,

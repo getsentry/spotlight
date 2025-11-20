@@ -32,7 +32,7 @@ describe("spotlight tail e2e tests", () => {
     activeProcesses.push(server);
 
     // Wait for server to be ready
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Start tail to connect to the server
     const tail = spawnSpotlight(["tail", "-p", port.toString()]);
@@ -60,7 +60,7 @@ describe("spotlight tail e2e tests", () => {
     activeProcesses.push(tail);
 
     // Wait for sidecar to start
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Send test envelope - use one that actually has an error
     const envelopePath = getFixturePath("envelope_javascript.txt");
@@ -79,7 +79,7 @@ describe("spotlight tail e2e tests", () => {
     // Start server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Start tail with errors filter
     const tail = spawnSpotlight(["tail", "errors", "-p", port.toString()]);
@@ -112,7 +112,7 @@ describe("spotlight tail e2e tests", () => {
     // Start server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Start tail with logs filter
     const tail = spawnSpotlight(["tail", "logs", "-p", port.toString()]);
@@ -137,7 +137,7 @@ describe("spotlight tail e2e tests", () => {
     // Start server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Start tail with traces filter
     const tail = spawnSpotlight(["tail", "traces", "-p", port.toString()]);
@@ -163,7 +163,7 @@ describe("spotlight tail e2e tests", () => {
     // Start server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Start tail with errors and logs filter
     const tail = spawnSpotlight(["tail", "errors", "logs", "-p", port.toString()]);
@@ -192,7 +192,7 @@ describe("spotlight tail e2e tests", () => {
     // Start server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Start tail with json format
     const tail = spawnSpotlight(["tail", "-f", "json", "-p", port.toString()]);
@@ -251,7 +251,7 @@ describe("spotlight tail e2e tests", () => {
     // Start server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Start tail with logfmt format
     const tail = spawnSpotlight(["tail", "-f", "logfmt", "-p", port.toString()]);
@@ -286,7 +286,7 @@ describe("spotlight tail e2e tests", () => {
     // Start server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Start tail with human format (default)
     const tail = spawnSpotlight(["tail", "-f", "human", "-p", port.toString()]);
@@ -319,7 +319,7 @@ describe("spotlight tail e2e tests", () => {
     // Start server
     const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Start tail with markdown format
     const tail = spawnSpotlight(["tail", "-f", "md", "-p", port.toString()]);

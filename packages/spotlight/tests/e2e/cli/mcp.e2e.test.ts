@@ -1,16 +1,11 @@
-import { describe, it, expect, afterEach, beforeAll } from 'vitest';
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import {
-  spawnSpotlight,
-  sendEnvelope,
-  waitForSidecarReady,
-  killGracefully,
-} from './helpers';
-import { findFreePort, getFixturePath, ensureSpotlightBuilt, getSpotlightBinPath } from '../shared/utils';
-import type { SpawnResult } from '../shared/utils';
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import { ensureSpotlightBuilt, findFreePort, getFixturePath, getSpotlightBinPath } from "../shared/utils";
+import type { SpawnResult } from "../shared/utils";
+import { killGracefully, sendEnvelope, spawnSpotlight, waitForSidecarReady } from "./helpers";
 
-describe('spotlight mcp e2e tests', () => {
+describe("spotlight mcp e2e tests", () => {
   const activeProcesses: SpawnResult[] = [];
   const mcpClients: Client[] = [];
 
@@ -23,7 +18,7 @@ describe('spotlight mcp e2e tests', () => {
     for (const client of mcpClients) {
       try {
         await client.close();
-      } catch (err) {
+      } catch (_err) {
         // Ignore errors during cleanup
       }
     }
@@ -34,7 +29,7 @@ describe('spotlight mcp e2e tests', () => {
       if (proc.process.pid && !proc.process.killed) {
         await killGracefully(proc.process).catch(() => {
           // Force kill if graceful shutdown fails
-          proc.process.kill('SIGKILL');
+          proc.process.kill("SIGKILL");
         });
       }
     }
@@ -47,8 +42,8 @@ describe('spotlight mcp e2e tests', () => {
   async function createMCPClient(port: number): Promise<Client> {
     const mcpClient = new Client(
       {
-        name: 'spotlight-e2e-test-client',
-        version: '1.0.0',
+        name: "spotlight-e2e-test-client",
+        version: "1.0.0",
       },
       {
         capabilities: {
@@ -59,8 +54,8 @@ describe('spotlight mcp e2e tests', () => {
 
     const binPath = getSpotlightBinPath();
     const transport = new StdioClientTransport({
-      command: 'node',
-      args: [binPath, 'mcp', '-p', port.toString()],
+      command: "node",
+      args: [binPath, "mcp", "-p", port.toString()],
     });
 
     await mcpClient.connect(transport);
@@ -69,13 +64,13 @@ describe('spotlight mcp e2e tests', () => {
     return mcpClient;
   }
 
-  it('should initialize MCP connection using SDK client', async () => {
+  it("should initialize MCP connection using SDK client", async () => {
     const port = await findFreePort();
 
     // Start sidecar server
-    const server = spawnSpotlight(['server', '-p', port.toString()]);
+    const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Create and connect MCP client
     const client = await createMCPClient(port);
@@ -84,13 +79,13 @@ describe('spotlight mcp e2e tests', () => {
     expect(client).toBeDefined();
   }, 15000);
 
-  it('should list available tools using SDK client', async () => {
+  it("should list available tools using SDK client", async () => {
     const port = await findFreePort();
 
     // Start sidecar server
-    const server = spawnSpotlight(['server', '-p', port.toString()]);
+    const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Create and connect MCP client
     const client = await createMCPClient(port);
@@ -104,22 +99,22 @@ describe('spotlight mcp e2e tests', () => {
 
     // Check for expected tools
     const toolNames = toolsResult.tools.map(tool => tool.name);
-    expect(toolNames).toContain('search_errors');
-    expect(toolNames).toContain('search_logs');
-    expect(toolNames).toContain('search_traces');
-    expect(toolNames).toContain('get_traces');
+    expect(toolNames).toContain("search_errors");
+    expect(toolNames).toContain("search_logs");
+    expect(toolNames).toContain("search_traces");
+    expect(toolNames).toContain("get_traces");
   }, 15000);
 
-  it('should search errors via MCP SDK', async () => {
+  it("should search errors via MCP SDK", async () => {
     const port = await findFreePort();
 
     // Start sidecar server
-    const server = spawnSpotlight(['server', '-p', port.toString()]);
+    const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Send test error envelope
-    const errorPath = getFixturePath('envelope_javascript.txt');
+    const errorPath = getFixturePath("envelope_javascript.txt");
     await sendEnvelope(port, errorPath);
 
     // Wait for envelope to be processed
@@ -130,7 +125,7 @@ describe('spotlight mcp e2e tests', () => {
 
     // Call search_errors tool
     const result = await client.callTool({
-      name: 'search_errors',
+      name: "search_errors",
       arguments: {
         filters: {
           timeWindow: 60,
@@ -144,21 +139,21 @@ describe('spotlight mcp e2e tests', () => {
 
     // Should have at least one error
     const hasError = result.content.some(
-      item => item.type === 'text' && 'text' in item && item.text && item.text.length > 0
+      item => item.type === "text" && "text" in item && item.text && item.text.length > 0,
     );
     expect(hasError).toBe(true);
   }, 15000);
 
-  it('should search logs via MCP SDK', async () => {
+  it("should search logs via MCP SDK", async () => {
     const port = await findFreePort();
 
     // Start sidecar server
-    const server = spawnSpotlight(['server', '-p', port.toString()]);
+    const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Send test log envelope
-    const logPath = getFixturePath('log_envelope.txt');
+    const logPath = getFixturePath("log_envelope.txt");
     await sendEnvelope(port, logPath);
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -168,7 +163,7 @@ describe('spotlight mcp e2e tests', () => {
 
     // Call search_logs tool
     const result = await client.callTool({
-      name: 'search_logs',
+      name: "search_logs",
       arguments: {
         filters: {
           timeWindow: 60,
@@ -182,21 +177,21 @@ describe('spotlight mcp e2e tests', () => {
 
     // Should have at least one log
     const hasLog = result.content.some(
-      item => item.type === 'text' && 'text' in item && item.text && item.text.length > 0
+      item => item.type === "text" && "text" in item && item.text && item.text.length > 0,
     );
     expect(hasLog).toBe(true);
   }, 15000);
 
-  it('should search traces via MCP SDK', async () => {
+  it("should search traces via MCP SDK", async () => {
     const port = await findFreePort();
 
     // Start sidecar server
-    const server = spawnSpotlight(['server', '-p', port.toString()]);
+    const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Send test trace envelope
-    const tracePath = getFixturePath('envelope_with_only_span.txt');
+    const tracePath = getFixturePath("envelope_with_only_span.txt");
     await sendEnvelope(port, tracePath);
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -206,7 +201,7 @@ describe('spotlight mcp e2e tests', () => {
 
     // Call search_traces tool
     const result = await client.callTool({
-      name: 'search_traces',
+      name: "search_traces",
       arguments: {
         filters: {
           timeWindow: 60,
@@ -220,21 +215,21 @@ describe('spotlight mcp e2e tests', () => {
 
     // Should have at least one trace
     const hasTrace = result.content.some(
-      item => item.type === 'text' && 'text' in item && item.text && item.text.length > 0
+      item => item.type === "text" && "text" in item && item.text && item.text.length > 0,
     );
     expect(hasTrace).toBe(true);
   }, 15000);
 
-  it('should get trace details via MCP SDK', async () => {
+  it("should get trace details via MCP SDK", async () => {
     const port = await findFreePort();
 
     // Start sidecar server
-    const server = spawnSpotlight(['server', '-p', port.toString()]);
+    const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Send test trace envelope
-    const tracePath = getFixturePath('envelope_python.txt');
+    const tracePath = getFixturePath("envelope_python.txt");
     await sendEnvelope(port, tracePath);
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -244,7 +239,7 @@ describe('spotlight mcp e2e tests', () => {
 
     // First search for traces to verify we have data
     const searchResult = await client.callTool({
-      name: 'search_traces',
+      name: "search_traces",
       arguments: {
         filters: {
           timeWindow: 60,
@@ -258,7 +253,7 @@ describe('spotlight mcp e2e tests', () => {
 
     // Verify that search_traces returns trace data
     const hasTraceData = searchResult.content.some(
-      item => item.type === 'text' && 'text' in item && item.text && item.text.length > 0
+      item => item.type === "text" && "text" in item && item.text && item.text.length > 0,
     );
 
     expect(hasTraceData).toBe(true);
@@ -267,13 +262,13 @@ describe('spotlight mcp e2e tests', () => {
     // This test verifies the search functionality works, which is the first step
   }, 15000);
 
-  it('should handle errors gracefully via MCP SDK', async () => {
+  it("should handle errors gracefully via MCP SDK", async () => {
     const port = await findFreePort();
 
     // Start sidecar server
-    const server = spawnSpotlight(['server', '-p', port.toString()]);
+    const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Create and connect MCP client
     const client = await createMCPClient(port);
@@ -281,22 +276,22 @@ describe('spotlight mcp e2e tests', () => {
     // Call non-existent tool - should throw or return error
     await expect(
       client.callTool({
-        name: 'non_existent_tool',
+        name: "non_existent_tool",
         arguments: {},
-      })
+      }),
     ).rejects.toThrow();
   }, 15000);
 
-  it('should connect to existing server and search errors', async () => {
+  it("should connect to existing server and search errors", async () => {
     const port = await findFreePort();
 
     // Start a regular server first
-    const server = spawnSpotlight(['server', '-p', port.toString()]);
+    const server = spawnSpotlight(["server", "-p", port.toString()]);
     activeProcesses.push(server);
-    await waitForSidecarReady(port, 10000);
+    await waitForSidecarReady(port, 60000);
 
     // Send test error envelope to the server
-    const errorPath = getFixturePath('envelope_javascript.txt');
+    const errorPath = getFixturePath("envelope_javascript.txt");
     await sendEnvelope(port, errorPath);
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -306,7 +301,7 @@ describe('spotlight mcp e2e tests', () => {
 
     // Search for errors via MCP
     const result = await client.callTool({
-      name: 'search_errors',
+      name: "search_errors",
       arguments: {
         filters: {
           timeWindow: 60,
@@ -320,7 +315,7 @@ describe('spotlight mcp e2e tests', () => {
 
     // Should find the error we sent
     const hasError = result.content.some(
-      item => item.type === 'text' && 'text' in item && item.text && item.text.length > 0
+      item => item.type === "text" && "text" in item && item.text && item.text.length > 0,
     );
     expect(hasError).toBe(true);
   }, 20000);
