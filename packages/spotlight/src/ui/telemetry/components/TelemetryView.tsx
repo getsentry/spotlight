@@ -39,7 +39,7 @@ export default function TelemetryView({
 
   const logCount = store.getLogs().length;
 
-  const isElectron = typeof process !== 'undefined' && process.versions?.electron;
+  const isElectron = typeof process !== "undefined" && process.versions?.electron;
 
   return (
     <div className="from-primary-900 to-primary-950 flex h-full overflow-hidden bg-gradient-to-br from-0% to-20% font-sans text-white">

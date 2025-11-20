@@ -11,7 +11,7 @@ import { serveFilesHandler } from "./handlers/index.ts";
 import { activateLogger, logger } from "./logger.ts";
 import routes from "./routes/index.ts";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.ts";
-import { getBuffer, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.ts";
+import { getBuffer, isAllowedOrigin, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.ts";
 
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
@@ -30,7 +30,11 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
     }
   }
 
-  const app = new Hono<HonoEnv>().use(cors());
+  const app = new Hono<HonoEnv>().use(
+    cors({
+      origin: origin => (isAllowedOrigin(origin) ? origin : null),
+    }),
+  );
 
   app
     .use(async (ctx, next) => {

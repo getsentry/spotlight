@@ -22,4 +22,3 @@ ElectronSentryInit(
 
 // Now initialize the app after Sentry is ready
 _init();
-

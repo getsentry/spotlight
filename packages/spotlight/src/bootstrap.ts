@@ -1,8 +1,8 @@
 // Bootstrap script to load the appropriate entry point based on the environment
 // With nodeIntegration: true, process is available in Electron renderer
-if (typeof process !== 'undefined' && process.versions?.electron) {
+if (typeof process !== "undefined" && process.versions?.electron) {
   // Load Electron entry point with proper Sentry initialization
-  import('./electron-index.tsx');
+  import("./electron-index.tsx");
 } else {
   // Load web entry point
   // Initialize Sentry first, then the app
@@ -11,4 +11,3 @@ if (typeof process !== 'undefined' && process.versions?.electron) {
     return index._init();
   });
 }
-
