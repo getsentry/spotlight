@@ -81,7 +81,6 @@ jobs:
           echo "APPLE_API_KEY_ID=$(cat /tmp/apple_key.json | jq .key_id -r | tr -d '\n\r')" >> $GITHUB_ENV
           echo "APPLE_API_KEY_P8_PATH=/tmp/apple_key.pem" >> $GITHUB_ENV
           echo 'APPLE_API_KEY_PATH=/tmp/apple_key.json' >> $GITHUB_ENV
-          
 
       - name: Build packages
         env:
@@ -125,7 +124,7 @@ jobs:
           name: electron-build
           if-no-files-found: error
           path: packages/spotlight/dist-electron/
-      
+
       # This will be used for the base image name in e2e tests below
       # which depends on the build job, hence why we do this here
       - name: Playwright Version
@@ -220,6 +219,10 @@ jobs:
           name: built-packages
           path: packages/spotlight/dist/
 
+      - name: Build
+        working-directory: packages/spotlight
+        run: pnpm build
+
       - name: Run CLI E2E tests
         working-directory: packages/spotlight
         run: pnpm test:e2e:cli
@@ -248,7 +251,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: "pnpm"
 
       - name: Setup dependencies
