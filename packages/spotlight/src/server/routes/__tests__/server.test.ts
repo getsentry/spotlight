@@ -72,14 +72,14 @@ describe("encoded envelopes", () => {
   const compressors: Record<string, (buf: Buffer) => Buffer> = {
     gzip: gzipSync,
     deflate: deflateSync,
-    brotli: brotliCompressSync,
+    br: brotliCompressSync,
   };
 
   function testEncodedEnvelope(encoding: string) {
     return async () => {
       const sendResponse = await app.request("/stream", {
         method: "POST",
-        body: compressors[encoding](Buffer.from(JSON.stringify(envelopeReactClientSideError))),
+        body: new Uint8Array(compressors[encoding](Buffer.from(JSON.stringify(envelopeReactClientSideError)))),
         headers: {
           "Content-Type": "application/x-sentry-envelope",
           "Content-Encoding": encoding,
