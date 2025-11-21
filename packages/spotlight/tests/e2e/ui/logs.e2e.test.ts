@@ -9,8 +9,8 @@ test.describe('Log Display UI Tests', () => {
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear
-    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+    // Wait for logs to appear - use more flexible selector that matches table rows or log items
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Verify logs are displayed
     const logContent = page.locator('body');
@@ -26,8 +26,8 @@ test.describe('Log Display UI Tests', () => {
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear
-    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+    // Wait for logs to appear - use more flexible selector that matches table rows or log items
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Look for log level indicators (info, error, warning, debug)
     const pageContent = page.locator('body');
@@ -45,8 +45,8 @@ test.describe('Log Display UI Tests', () => {
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear
-    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+    // Wait for logs to appear - use more flexible selector that matches table rows or log items
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Look for timestamp patterns
     const pageContent = page.locator('body');
@@ -65,8 +65,8 @@ test.describe('Log Display UI Tests', () => {
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear
-    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+    // Wait for logs to appear - use more flexible selector that matches table rows or log items
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Verify multiple entries are displayed
     const pageContent = page.locator('body');
@@ -82,8 +82,8 @@ test.describe('Log Display UI Tests', () => {
     // Check Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear
-    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+    // Wait for logs to appear - use more flexible selector that matches table rows or log items
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Verify content
     const pageContent = page.locator('body');
@@ -110,8 +110,8 @@ test.describe('Log Display UI Tests', () => {
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear
-    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+    // Wait for logs to appear - use more flexible selector that matches table rows or log items
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Verify content is displayed
     const pageContent = page.locator('body');
@@ -127,8 +127,8 @@ test.describe('Log Display UI Tests', () => {
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear
-    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+    // Wait for logs to appear - use more flexible selector that matches table rows or log items
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Verify logs are displayed (ANSI escapes should be handled)
     const pageContent = page.locator('body');
@@ -144,8 +144,8 @@ test.describe('Log Display UI Tests', () => {
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear
-    await page.waitForSelector('[data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+    // Wait for logs to appear - use more flexible selector that matches table rows or log items
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
 
     // Look for filter controls (buttons, dropdowns, inputs)
     const _hasFilterControls = await Promise.race([
@@ -171,7 +171,7 @@ test.describe('Log Display UI Tests', () => {
     await page.waitForSelector('[data-test-id="log-item"], article, .event-item', { timeout: 10000 });
 
     // Try to click on a log item
-    const logItem = page.locator('[data-test-id="log-item"], article, .event-item').first();
+    const logItem = page.locator('table tbody tr, [data-test-id="log-item"], article, .event-item').first();
     await logItem.click({ timeout: 2000 }).catch(() => {
       // Might not be clickable or already expanded
     });

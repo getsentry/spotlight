@@ -11,8 +11,8 @@ test.describe('Error Display UI Tests', () => {
     const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
     await errorsTab.click();
 
-    // Wait for error to appear
-    await page.waitForSelector('[data-test-id="error-item"], [class*="error"], article, .event-item', { timeout: 10000 });
+    // Wait for error to appear - use more flexible selector that matches actual rendered structure
+    await page.waitForSelector('a[href*="/telemetry/errors/"], [data-test-id="error-item"], [class*="error"], article, .event-item', { timeout: 10000 });
 
     // Verify error is displayed
     const errorContent = page.locator('body');
@@ -27,8 +27,10 @@ test.describe('Error Display UI Tests', () => {
     // Navigate to Errors tab
     const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
     await errorsTab.click();
+    // Wait for error to appear first
+    await page.waitForSelector('a[href*="/telemetry/errors/"], [data-test-id="error-item"], article, .event-item', { timeout: 10000 });
     // Wait for error item and click on it
-    const errorItem = page.locator('[data-test-id="error-item"], article, .event-item').first();
+    const errorItem = page.locator('a[href*="/telemetry/errors/"], [data-test-id="error-item"], article, .event-item').first();
     await errorItem.click({ timeout: 5000 }).catch(() => {
       // Item might already be expanded
     });
@@ -54,8 +56,8 @@ test.describe('Error Display UI Tests', () => {
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
 
-    // Wait for trace to appear
-    await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
+    // Wait for trace to appear - use more flexible selector
+    await page.waitForSelector('a[href*="/telemetry/traces/"], [data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
     // Verify transaction is displayed
     const traceContent = page.locator('body');
@@ -72,8 +74,8 @@ test.describe('Error Display UI Tests', () => {
     const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
     await errorsTab.click();
 
-    // Wait for error to appear
-    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 10000 });
+    // Wait for error to appear - use more flexible selector
+    await page.waitForSelector('a[href*="/telemetry/errors/"], [data-test-id="error-item"], article, .event-item', { timeout: 10000 });
 
     // Verify error is displayed
     const errorContent = page.locator('body');
@@ -89,11 +91,11 @@ test.describe('Error Display UI Tests', () => {
     // Navigate to Errors tab
     const errorsTab = page.locator('[data-test-id="tab-errors"], a[href*="errors"], button:has-text("Errors")').first();
     await errorsTab.click();
-    // Wait for errors to appear
-    await page.waitForSelector('[data-test-id="error-item"], article, .event-item', { timeout: 10000 });
+    // Wait for errors to appear - use more flexible selector
+    await page.waitForSelector('a[href*="/telemetry/errors/"], [data-test-id="error-item"], article, .event-item', { timeout: 10000 });
 
     // Count error items (should have at least 2, might have 3 depending on content)
-    const errorItems = page.locator('[data-test-id="error-item"], article, .event-item');
+    const errorItems = page.locator('a[href*="/telemetry/errors/"], [data-test-id="error-item"], article, .event-item');
     const count = await errorItems.count();
     expect(count).toBeGreaterThanOrEqual(2);
   });
@@ -107,8 +109,8 @@ test.describe('Error Display UI Tests', () => {
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
 
-    // Wait for trace to appear
-    await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
+    // Wait for trace to appear - use more flexible selector
+    await page.waitForSelector('a[href*="/telemetry/traces/"], [data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
     // Verify transaction is displayed
     const traceContent = page.locator('body');
