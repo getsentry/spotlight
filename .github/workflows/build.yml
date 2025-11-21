@@ -109,12 +109,9 @@ jobs:
         with:
           name: built-packages
           if-no-files-found: error
+          include-hidden-files: true
           path: |
             packages/spotlight/dist/
-            !packages/spotlight/dist/**/*.map
-            # Explicitly include dist/node_modules and dist/_virtual which are needed at runtime
-            packages/spotlight/dist/node_modules/
-            packages/spotlight/dist/_virtual/
 
       - name: Store standalone spotlight binaries
         uses: actions/upload-artifact@v4
@@ -128,6 +125,7 @@ jobs:
         with:
           name: electron-build
           if-no-files-found: error
+          include-hidden-files: true
           path: packages/spotlight/dist-electron/
 
       # This will be used for the base image name in e2e tests below
