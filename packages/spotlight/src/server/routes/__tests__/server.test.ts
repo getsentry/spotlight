@@ -103,7 +103,7 @@ describe("encoded envelopes", () => {
 
   it("gzip", testEncodedEnvelope("gzip"));
   it("deflate", testEncodedEnvelope("deflate"));
-  it("brotli", testEncodedEnvelope("brotli"));
+  it("br", testEncodedEnvelope("br"));
 });
 
 describe("mcp", () => {
