@@ -2,11 +2,12 @@ import { brotliDecompressSync, gunzipSync, inflateSync } from "node:zlib";
 import { MessageBuffer } from "./messageBuffer.ts";
 import { EventContainer } from "./utils/eventContainer.ts";
 
-const decompressors: Record<string, ((buf: Buffer) => Buffer) | undefined> = {
+const decompressors: Record<"gzip" | "deflate" | "br", (buf: Buffer) => Buffer> = {
   gzip: gunzipSync,
   deflate: inflateSync,
   br: brotliDecompressSync,
 };
+type ContentEncoding = keyof typeof decompressors;
 
 export function createSpotlightBuffer() {
   return new MessageBuffer<EventContainer>();
@@ -15,8 +16,7 @@ export function createSpotlightBuffer() {
 type PushToSpotlightBufferOptions = {
   spotlightBuffer: MessageBuffer<EventContainer>;
   body: Buffer;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  encoding?: "gzip" | "deflate" | "br" | (string & {});
+  encoding?: ContentEncoding;
   contentType?: string;
   userAgent?: string;
 };
@@ -38,7 +38,9 @@ export function pushToSpotlightBuffer(options: PushToSpotlightBufferOptions) {
   }
 }
 
-export function decompressBody(body: Buffer, contentEncoding?: string) {
-  const decompressor = decompressors[contentEncoding ?? ""];
-  return decompressor ? decompressor(body) : body;
+export function decompressBody(body: Buffer, contentEncoding?: ContentEncoding) {
+  if (!contentEncoding) {
+    return body;
+  }
+  return decompressors[contentEncoding](body);
 }
