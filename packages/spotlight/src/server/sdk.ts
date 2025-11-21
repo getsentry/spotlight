@@ -15,30 +15,26 @@ export function createSpotlightBuffer() {
 type PushToSpotlightBufferOptions = {
   spotlightBuffer: MessageBuffer<EventContainer>;
   body: Buffer;
-  headers: {
-    contentEncoding?: string;
-    contentType?: string;
-    userAgent?: string;
-    origin?: string;
-  };
-  query: {
-    sentry_client?: string;
-  };
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  encoding?: "gzip" | "deflate" | "br" | (string & {});
+  contentType?: string;
+  userAgent?: string;
+  origin?: string;
+  sentryClient?: string;
 };
 
 export function pushToSpotlightBuffer(options: PushToSpotlightBufferOptions) {
-  const body = decompressBody(options.body, options.headers.contentEncoding);
+  const body = decompressBody(options.body, options.encoding);
 
-  let contentType = options.headers.contentType?.split(";")[0].toLocaleLowerCase();
-  if (options.query.sentry_client?.startsWith("sentry.javascript.browser") && options.headers.origin) {
+  let contentType = options.contentType?.split(";")[0].toLocaleLowerCase();
+  if (options.sentryClient?.startsWith("sentry.javascript.browser") && options.origin) {
     // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
     contentType = "application/x-sentry-envelope";
   }
 
   if (contentType) {
     // Create event container and add to buffer
-    const senderUserAgent = options.headers.userAgent;
-    const container = new EventContainer(contentType, body, senderUserAgent);
+    const container = new EventContainer(contentType, body, options.userAgent);
 
     // Add to buffer - this will automatically trigger all subscribers
     // including the onEnvelope callback if one is registered
@@ -50,8 +46,5 @@ export function pushToSpotlightBuffer(options: PushToSpotlightBufferOptions) {
 
 export function decompressBody(body: Buffer, contentEncoding?: string) {
   const decompressor = decompressors[contentEncoding ?? ""];
-  if (decompressor) {
-    return decompressor(body);
-  }
-  return body;
+  return decompressor ? decompressor(body) : body;
 }

@@ -77,14 +77,10 @@ const router = new Hono<HonoEnv>()
     const container = pushToSpotlightBuffer({
       body,
       spotlightBuffer: getBuffer(),
-      headers: {
-        contentType: ctx.req.header("content-type"),
-        userAgent: ctx.req.header("User-Agent"),
-        origin: ctx.req.header("Origin"),
-      },
-      query: {
-        sentry_client: ctx.req.query("sentry_client"),
-      },
+      contentType: ctx.req.header("content-type"),
+      userAgent: ctx.req.header("User-Agent"),
+      origin: ctx.req.header("Origin"),
+      sentryClient: ctx.req.query("sentry_client"),
     });
 
     if (container) {
