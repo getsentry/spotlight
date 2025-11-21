@@ -15,7 +15,6 @@ export function createSpotlightBuffer() {
 type PushToSpotlightBufferOptions = {
   spotlightBuffer: MessageBuffer<EventContainer>;
   body: Buffer;
-  overrideBufferDecoding?: boolean;
   headers: {
     contentEncoding?: string;
     contentType?: string;
@@ -28,9 +27,7 @@ type PushToSpotlightBufferOptions = {
 };
 
 export function pushToSpotlightBuffer(options: PushToSpotlightBufferOptions) {
-  const body = options.overrideBufferDecoding
-    ? options.body
-    : decompressBody(options.body, options.headers.contentEncoding);
+  const body = decompressBody(options.body, options.headers.contentEncoding);
 
   let contentType = options.headers.contentType?.split(";")[0].toLocaleLowerCase();
   if (options.query.sentry_client?.startsWith("sentry.javascript.browser") && options.headers.origin) {

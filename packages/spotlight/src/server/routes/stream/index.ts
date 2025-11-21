@@ -76,10 +76,8 @@ const router = new Hono<HonoEnv>()
 
     const container = pushToSpotlightBuffer({
       body,
-      overrideBufferDecoding: true,
       spotlightBuffer: getBuffer(),
       headers: {
-        contentEncoding: ctx.req.header("Content-Encoding"),
         contentType: ctx.req.header("content-type"),
         userAgent: ctx.req.header("User-Agent"),
         origin: ctx.req.header("Origin"),
