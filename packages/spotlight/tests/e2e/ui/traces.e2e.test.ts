@@ -100,8 +100,8 @@ test.describe("Trace Display UI Tests", () => {
     // Navigate to Traces tab
     const tracesTab = page.locator('[data-test-id="tab-traces"], a[href*="traces"], button:has-text("Traces")').first();
     await tracesTab.click();
-    // Wait for traces to appear
-    await page.waitForSelector('[data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
+    // Wait for traces to appear - use flexible selector that matches links to trace details
+    await page.waitForSelector('a[href*="/telemetry/traces/"], [data-test-id="trace-item"], article, .event-item', { timeout: 10000 });
 
     // Should have content from multiple traces
     const pageContent = page.locator("body");

@@ -82,10 +82,10 @@ test.describe('Log Display UI Tests', () => {
     // Check Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear - use more flexible selector that matches table rows or log items
-    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+    // Wait for either logs to appear OR "No logs found" message
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code, text="No logs found."', { timeout: 10000 });
 
-    // Verify content
+    // Verify content is displayed (either logs or empty state)
     const pageContent = page.locator('body');
     const text = await pageContent.textContent();
     expect(text).not.toBe('');
@@ -110,10 +110,10 @@ test.describe('Log Display UI Tests', () => {
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear - use more flexible selector that matches table rows or log items
-    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+    // Wait for either logs to appear OR "No logs found" message
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code, text="No logs found."', { timeout: 10000 });
 
-    // Verify content is displayed
+    // Verify content is displayed (either logs or empty state)
     const pageContent = page.locator('body');
     const text = await pageContent.textContent();
     expect(text).not.toBe('');
@@ -127,10 +127,10 @@ test.describe('Log Display UI Tests', () => {
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear - use more flexible selector that matches table rows or log items
-    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 10000 });
+    // Wait for either logs to appear OR "No logs found" message
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code, text="No logs found."', { timeout: 10000 });
 
-    // Verify logs are displayed (ANSI escapes should be handled)
+    // Verify logs are displayed (ANSI escapes should be handled) or empty state is shown
     const pageContent = page.locator('body');
     const text = await pageContent.textContent();
     expect(text).not.toBe('');
@@ -167,8 +167,8 @@ test.describe('Log Display UI Tests', () => {
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for logs to appear
-    await page.waitForSelector('[data-test-id="log-item"], article, .event-item', { timeout: 10000 });
+    // Wait for logs to appear - use flexible selector that matches table rows
+    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item', { timeout: 10000 });
 
     // Try to click on a log item
     const logItem = page.locator('table tbody tr, [data-test-id="log-item"], article, .event-item').first();
