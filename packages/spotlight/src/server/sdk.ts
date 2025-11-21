@@ -19,18 +19,12 @@ type PushToSpotlightBufferOptions = {
   encoding?: "gzip" | "deflate" | "br" | (string & {});
   contentType?: string;
   userAgent?: string;
-  origin?: string;
-  sentryClient?: string;
 };
 
 export function pushToSpotlightBuffer(options: PushToSpotlightBufferOptions) {
   const body = decompressBody(options.body, options.encoding);
 
-  let contentType = options.contentType?.split(";")[0].toLocaleLowerCase();
-  if (options.sentryClient?.startsWith("sentry.javascript.browser") && options.origin) {
-    // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
-    contentType = "application/x-sentry-envelope";
-  }
+  const contentType = options.contentType?.split(";")[0].toLocaleLowerCase();
 
   if (contentType) {
     // Create event container and add to buffer

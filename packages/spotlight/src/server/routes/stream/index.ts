@@ -72,6 +72,7 @@ const router = new Hono<HonoEnv>()
     const arrayBuffer = await ctx.req.arrayBuffer();
     let body: Buffer = Buffer.from(arrayBuffer);
 
+    // manually decompress body to use it below without another decompression
     body = decompressBody(body, ctx.req.header("Content-Encoding"));
 
     const container = pushToSpotlightBuffer({
@@ -79,8 +80,6 @@ const router = new Hono<HonoEnv>()
       spotlightBuffer: getBuffer(),
       contentType: ctx.req.header("content-type"),
       userAgent: ctx.req.header("User-Agent"),
-      origin: ctx.req.header("Origin"),
-      sentryClient: ctx.req.query("sentry_client"),
     });
 
     if (container) {
