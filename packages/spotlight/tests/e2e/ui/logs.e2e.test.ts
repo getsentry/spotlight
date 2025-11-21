@@ -83,7 +83,10 @@ test.describe('Log Display UI Tests', () => {
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
     // Wait for either logs to appear OR "No logs found" message
-    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code, text="No logs found."', { timeout: 10000 });
+    await Promise.race([
+      page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 3000 }),
+      page.waitForSelector('text=/No logs found/i', { timeout: 3000 })
+    ]);
 
     // Verify content is displayed (either logs or empty state)
     const pageContent = page.locator('body');
@@ -111,7 +114,10 @@ test.describe('Log Display UI Tests', () => {
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
     // Wait for either logs to appear OR "No logs found" message
-    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code, text="No logs found."', { timeout: 10000 });
+    await Promise.race([
+      page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 3000 }),
+      page.waitForSelector('text=/No logs found/i', { timeout: 3000 })
+    ]);
 
     // Verify content is displayed (either logs or empty state)
     const pageContent = page.locator('body');
@@ -128,7 +134,10 @@ test.describe('Log Display UI Tests', () => {
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
     // Wait for either logs to appear OR "No logs found" message
-    await page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code, text="No logs found."', { timeout: 10000 });
+    await Promise.race([
+      page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', { timeout: 3000 }),
+      page.waitForSelector('text=/No logs found/i', { timeout: 3000 })
+    ]);
 
     // Verify logs are displayed (ANSI escapes should be handled) or empty state is shown
     const pageContent = page.locator('body');
