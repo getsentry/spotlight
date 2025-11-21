@@ -26,13 +26,12 @@
     "lint:react-refresh": "eslint 'src/ui/**/*.{ts,tsx}'",
     "test": "vitest run",
     "test:dev": "vitest",
-    "test:e2e": "pnpm run test:e2e:cli && pnpm run test:e2e:ui",
+    "test:e2e": "pnpm run test:e2e:cli && pnpm run test:e2e:ui && pnpm run test:e2e:electron",
     "test:e2e:cli": "vitest run --config vitest.cli.config.ts",
-    "test:e2e:ui": "playwright test tests/e2e/ui"
+    "test:e2e:ui": "playwright test tests/e2e/ui",
+    "test:e2e:electron": "playwright test tests/electron.test.ts"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "bin": {
     "spotlight": "./dist/run.js"
   },
