@@ -7,6 +7,7 @@ import { getBuffer } from "../../utils/index.ts";
 import { logIncomingEvent, logOutgoingEvent } from "./debugLogging.ts";
 import { streamSSE } from "./streaming.ts";
 import { parseBrowserFromUserAgent } from "./userAgent.ts";
+import { SENTRY_CONTENT_TYPE } from "@spotlight/shared/constants.ts";
 
 const router = new Hono<HonoEnv>()
   .get("/stream", ctx => {
@@ -69,16 +70,19 @@ const router = new Hono<HonoEnv>()
     });
   })
   .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {
-    const arrayBuffer = await ctx.req.arrayBuffer();
-    let body: Buffer = Buffer.from(arrayBuffer);
+    let contentType = ctx.req.header("content-type")?.split(";")[0].toLocaleLowerCase();
+    if (ctx.req.query("sentry_client")?.startsWith("sentry.javascript.browser") && ctx.req.header("Origin")) {
+      // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
+      contentType = SENTRY_CONTENT_TYPE;
+    }
 
     // manually decompress body to use it below without another decompression
-    body = decompressBody(body, ctx.req.header("Content-Encoding"));
+    const body = decompressBody(Buffer.from(await ctx.req.arrayBuffer()), ctx.req.header("Content-Encoding"));
 
     const container = pushToSpotlightBuffer({
       body,
       spotlightBuffer: getBuffer(),
-      contentType: ctx.req.header("content-type"),
+      contentType,
       userAgent: ctx.req.header("User-Agent"),
     });
 
