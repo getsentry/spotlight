@@ -29,10 +29,10 @@ jobs:
     outputs:
       playwright-version: ${{ steps.playwright-version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Cache turbo build setup
-        uses: actions/cache@v4
+        uses: actions/checkout@v6
         with:
           path: .turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}
@@ -43,7 +43,7 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: "package.json"
           cache: "pnpm"
@@ -105,7 +105,7 @@ jobs:
           kill -2 $SPOTLIGHT_PID
 
       - name: Store built packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: built-packages
           if-no-files-found: error
@@ -114,14 +114,14 @@ jobs:
             packages/spotlight/dist/
 
       - name: Store standalone spotlight binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: spotlight-binaries
           if-no-files-found: error
           path: packages/spotlight/dist-bin/spotlight-*
 
       - name: Store Electron build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: electron-build
           if-no-files-found: error
@@ -144,7 +144,7 @@ jobs:
       matrix:
         node_version: [20, 22, 24]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Cache turbo build setup
         uses: actions/cache@v4
@@ -158,7 +158,7 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
           cache: "pnpm"
@@ -194,13 +194,13 @@ jobs:
       matrix:
         node_version: [20, 22, 24]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
           cache: "pnpm"
@@ -212,7 +212,7 @@ jobs:
         run: rm -rf packages/spotlight/dist/
 
       - name: Download Spotlight build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: built-packages
           path: packages/spotlight/dist/
@@ -229,13 +229,13 @@ jobs:
       image: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
       options: --user 1001
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: "pnpm"
@@ -249,13 +249,13 @@ jobs:
           rm -rf packages/spotlight/dist-electron/
 
       - name: Download Spotlight build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: built-packages
           path: packages/spotlight/dist/
 
       - name: Download Electron build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: electron-build
           path: packages/spotlight/dist-electron/
@@ -266,7 +266,7 @@ jobs:
 
       - name: Test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-results-ui
           path: packages/spotlight/test-results/**
@@ -280,10 +280,10 @@ jobs:
     env:
       MULTI_ARCH_BUILD: ${{ ((github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') && github.actor != 'dependabot[bot]') && 'true' || 'false' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Download spotlight binaries
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: spotlight-binaries
           path: packages/spotlight/dist-bin/

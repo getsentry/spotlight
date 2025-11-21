@@ -42,7 +42,7 @@ jobs:
       ) || inputs.target == 'npm' || inputs.target == 'all'
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ env.SHA }}
           fetch-depth: 0
@@ -51,7 +51,7 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: 'package.json'
           cache: 'pnpm'
@@ -60,7 +60,7 @@ jobs:
         run: pnpm install
 
       - name: Download built packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: built-packages
           path: packages/spotlight/dist/
@@ -68,7 +68,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Download spotlight binaries
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: spotlight-binaries
           path: packages/spotlight/dist-bin/
@@ -139,7 +139,7 @@ jobs:
       ) || inputs.target == 'electron' || inputs.target == 'all'
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ env.SHA }}
 
@@ -147,7 +147,7 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: 'package.json'
           cache: 'pnpm'
@@ -156,7 +156,7 @@ jobs:
         run: pnpm install
 
       - name: Download Electron build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: electron-build
           path: ${{ runner.temp }}/electron-artifact/
