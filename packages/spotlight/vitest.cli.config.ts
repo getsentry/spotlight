@@ -14,7 +14,7 @@ export default defineConfig({
       "**/node_modules/**",
       "**/dist/**",
       "**/tests/e2e/ui/**", // Exclude Playwright tests
-      "**/tests/launch.test.ts", // Exclude Playwright electron test
+      "**/tests/electron.test.ts", // Exclude Playwright electron test
     ],
     watchExclude: [".*\\/node_modules\\/.*", ".*\\/dist\\/.*"],
   },
