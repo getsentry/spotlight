@@ -19,7 +19,8 @@ export function isAllowedOrigin(origin: string): boolean {
     const hostname = url.hostname.toLowerCase();
 
     // Allow localhost with any port and protocol (http or https)
-    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]") {
+    // Check both [::1] and ::1 formats for IPv6 localhost compatibility
+    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]" || hostname === "::1") {
       return true;
     }
 
