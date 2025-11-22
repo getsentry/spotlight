@@ -46,8 +46,8 @@ pnpm dev:electron          # electron app
 pnpm build
 
 # Run tests
-pnpm test                  # all package tests
-pnpm test:e2e             # e2e tests (electron)
+pnpm -r test                  # all package tests
+pnpm -r test:e2e             # e2e tests (electron)
 
 # Linting and formatting
 pnpm lint                  # check code

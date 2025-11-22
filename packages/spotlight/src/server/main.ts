@@ -59,14 +59,8 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
           },
         },
         async span => {
-          if (path === "/mcp" || path === "/health") {
-            await next();
-          } else {
-            await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, () => next());
-          }
-
           const traceData = getTraceData();
-          ctx.res.headers.append(
+          ctx.header(
             "server-timing",
             [
               `sentryTrace;desc="${traceData["sentry-trace"]}"`,
@@ -74,6 +68,12 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
               `sentrySpotlightPort;desc=${ctx.env.incoming.socket.localPort}`,
             ].join(", "),
           );
+
+          if (path === "/mcp" || path === "/health") {
+            await next();
+          } else {
+            await startSpan({ name: "enableCORS", op: "sidecar.http.middleware.cors" }, () => next());
+          }
 
           span.setAttribute("http.response.status_code", ctx.res.status);
         },

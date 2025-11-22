@@ -14,7 +14,7 @@ export function initializeTrace(event: SentryEvent): Trace {
 
   return {
     ...traceCtx,
-    trace_id: traceCtx.trace_id,
+    trace_id: traceCtx.trace_id!,
     spans: new Map(),
     spanTree: [] as Span[],
     transactions: [] as SentryTransactionEvent[],

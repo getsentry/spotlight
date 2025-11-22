@@ -75,7 +75,7 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
   const isInsightsActive = pathname.startsWith("/telemetry/insights");
 
   // This is used to determine if the UI is running inside electron
-  const isElectron = globalThis.IN_DESKTOP_ENV;
+  const isElectron = (globalThis as { IN_DESKTOP_ENV?: boolean }).IN_DESKTOP_ENV;
 
   return (
     <nav

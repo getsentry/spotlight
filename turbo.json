@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "dist-bin/**", ".next/**", "!.next/cache/**", "out/**"],
+      "outputs": ["dist/**", "dist-bin/**", ".next/**", "!.next/cache/**", "dist-electron/**"],
       "env": [
         "FOSSILIZE_PLATFORMS",
         "FOSSILIZE_SIGN",
