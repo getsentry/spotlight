@@ -8,6 +8,7 @@ import type {
   SentryProcessedProfile,
   Trace,
 } from "../types";
+import type { InstanceInfo } from "./slices/instancesSlice";
 
 export type SentryProfileWithTraceMeta = SentryProcessedProfile & {
   timestamp: number;
@@ -92,6 +93,22 @@ export interface SDKsSliceActions {
   getSdks: () => Sdk[];
 }
 
+export interface InstancesSliceState {
+  instances: InstanceInfo[];
+  currentInstanceId: string | null;
+  isLoadingInstances: boolean;
+}
+
+export interface InstancesSliceActions {
+  setInstances: (instances: InstanceInfo[]) => void;
+  addOrUpdateInstance: (instance: InstanceInfo) => void;
+  removeInstance: (instanceId: string) => void;
+  setCurrentInstance: (instanceId: string | null) => void;
+  setLoadingInstances: (isLoading: boolean) => void;
+  fetchInstances: () => Promise<void>;
+  terminateInstance: (instanceId: string) => Promise<boolean>;
+}
+
 export interface SharedSliceActions {
   getEventById: (id: string) => SentryEvent | undefined;
   getTraceById: (id: string) => Trace | undefined;
@@ -107,7 +124,8 @@ export type SentryStoreState = EventsSliceState &
   SettingsSliceState &
   EnvelopesSliceState &
   LogsSliceState &
-  SDKsSliceState;
+  SDKsSliceState &
+  InstancesSliceState;
 
 export type SentryStoreActions = EventsSliceActions &
   TracesSliceActions &
@@ -117,6 +135,7 @@ export type SentryStoreActions = EventsSliceActions &
   EnvelopesSliceActions &
   LogsSliceActions &
   SDKsSliceActions &
+  InstancesSliceActions &
   SharedSliceActions;
 
 export type SentryStore = SentryStoreState & SentryStoreActions;

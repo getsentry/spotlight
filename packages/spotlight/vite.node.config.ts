@@ -44,6 +44,7 @@ export default defineConfig({
         "uuidv7",
         "yaml",
         "zod",
+        "pidusage",
       ],
       output: {
         entryFileNames: "[name].js",

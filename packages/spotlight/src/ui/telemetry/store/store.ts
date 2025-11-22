@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createEnvelopesSlice } from "./slices/envelopesSlice";
 import { createEventsSlice } from "./slices/eventsSlice";
+import { createInstancesSlice } from "./slices/instancesSlice";
 import { createLogsSlice } from "./slices/logsSlice";
 import { createProfilesSlice } from "./slices/profilesSlice";
 import { createSDKsSlice } from "./slices/sdksSlice";
@@ -19,6 +20,7 @@ const useSentryStore = create<SentryStore & SharedSliceActions>()((...a) => ({
   ...createEnvelopesSlice(...a),
   ...createSDKsSlice(...a),
   ...createLogsSlice(...a),
+  ...createInstancesSlice(...a),
   ...createSharedSlice(...a),
 }));
 

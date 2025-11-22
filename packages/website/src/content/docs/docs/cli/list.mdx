@@ -1,0 +1,371 @@
+---
+title: Spotlight List
+description: View and manage all running Spotlight instances
+sidebar:
+  order: 3
+---
+
+The `list` command displays all running Spotlight instances created with `spotlight run`. You can view instance details, check their health status, and manage multiple instances across different projects.
+
+## Basic Usage
+
+```bash
+spotlight list [options]
+```
+
+**Key features:**
+- See all running `spotlight run` instances
+- Check health status of each instance
+- Identify which instance you're currently in with `[self]` indicator
+- Multiple output formats for different use cases
+- Filter to show only healthy instances or include all
+
+## Quick Start
+
+```bash
+# Show all healthy instances
+spotlight list
+
+# Show all instances including unhealthy ones
+spotlight list --all
+
+# Output as JSON
+spotlight list --format json
+
+# Output as markdown table
+spotlight list --format md
+```
+
+## Output Formats
+
+### Human-Readable Format (Default)
+
+Colored, easy-to-read format perfect for terminal viewing:
+
+```bash
+spotlight list
+# or explicitly:
+spotlight list --format human
+```
+
+**Example output:**
+```
+11:30:45 [INFO]    [server]  my-app@8969 (npm run dev) - http://localhost:8969
+11:32:10 [INFO]    [server]  api-server [self]@54321 (node server.js) - http://localhost:54321
+11:35:22 [INFO]    [server]  frontend@3000 (pnpm dev) - http://localhost:3000
+```
+
+**Features:**
+- Timestamp of when instance started
+- Project name with `[self]` indicator for current instance
+- Port number
+- Command being run
+- Direct URL to access Spotlight UI
+
+### JSON Format
+
+Structured JSON output for programmatic processing:
+
+```bash
+spotlight list --format json
+```
+
+**Example output:**
+```json
+[
+  {
+    "instanceId": "019aa118-31a2-7f6f-8a81-2e4bad249d6d",
+    "port": 8969,
+    "pid": 12345,
+    "pidStartTime": 1763639308263,
+    "childPid": 12346,
+    "childPidStartTime": 1763639308716,
+    "command": "npm run dev",
+    "cmdArgs": ["npm", "run", "dev"],
+    "cwd": "/home/user/my-app",
+    "startTime": "2025-11-20T11:30:45.000Z",
+    "projectName": "my-app",
+    "detectedType": "package.json",
+    "status": "healthy",
+    "uptime": 125000
+  }
+]
+```
+
+**Perfect for:**
+- Scripting and automation
+- CI/CD pipelines  
+- Integration with other tools via `jq`
+- Monitoring systems
+
+### Logfmt Format
+
+Machine-readable key-value format:
+
+```bash
+spotlight list --format logfmt
+```
+
+**Example output:**
+```
+instanceId=019aa118-31a2-7f6f-8a81-2e4bad249d6d projectName=my-app port=8969 command="npm run dev" cwd=/home/user/my-app pid=12345 childPid=12346 startTime=2025-11-20T11:30:45.000Z detectedType=package.json status=healthy uptime=125 isSelf=false
+```
+
+**Perfect for:**
+- Log aggregation tools
+- Structured logging systems
+- Parsing with standard Unix tools
+- Monitoring and alerting
+
+### Markdown Format
+
+Formatted table perfect for documentation:
+
+```bash
+spotlight list --format md
+```
+
+**Example output:**
+```markdown
+| Project | Port | Command | Started | PID | URL | Status |
+|---------|------|---------|---------|-----|-----|--------|
+| my-app | 8969 | npm run dev | 11/20/2025, 11:30:45 AM (125s) | 12345 | http://localhost:8969 | healthy |
+| api-server [self] | 54321 | node server.js | 11/20/2025, 11:32:10 AM (40s) | 12400 | http://localhost:54321 | healthy |
+```
+
+**Perfect for:**
+- Documentation
+- Status reports
+- GitHub issues or PRs
+- Team communication
+
+## Instance Status
+
+Each instance shows a health status:
+
+- **healthy** ✅ - Instance is running and responding
+- **unresponsive** ⚠️ - Process is alive but not responding to health checks
+- **dead** ❌ - Process has terminated
+- **orphaned** ⚠️ - Child process is alive but Spotlight crashed
+
+By default, only healthy instances are shown. Use `--all` to see all statuses.
+
+## The `[self]` Indicator
+
+When you run `spotlight list` from within a Spotlight instance, that instance is marked with `[self]`:
+
+```bash
+# From terminal running inside a spotlight instance
+spotlight list
+
+# Output:
+11:32:10 [INFO]    [server]  my-app [self]@54321 (npm run dev) - http://localhost:54321
+```
+
+This helps you identify which instance you're currently working in when managing multiple instances.
+
+## Options
+
+### Include All Instances
+
+By default, only healthy instances are shown. Use `--all` to include unhealthy instances:
+
+```bash
+# Show only healthy instances (default)
+spotlight list
+
+# Show all instances including unresponsive/orphaned
+spotlight list --all
+```
+
+### Format Selection
+
+```bash
+# Human-readable (default)
+spotlight list -f human
+
+# JSON for automation
+spotlight list -f json
+
+# Logfmt for parsing
+spotlight list -f logfmt  
+
+# Markdown for documentation
+spotlight list -f md
+```
+
+## Common Use Cases
+
+### Check Running Instances
+
+See what Spotlight instances are currently active:
+
+```bash
+spotlight list
+```
+
+### Monitor Multiple Projects
+
+When working on multiple projects simultaneously:
+
+```bash
+# Terminal 1: Frontend
+cd frontend && spotlight run npm run dev
+
+# Terminal 2: Backend API
+cd api && spotlight run node server.js
+
+# Terminal 3: Check both
+spotlight list
+# Shows both frontend and backend instances
+```
+
+### Automation and Scripting
+
+Get instance data programmatically:
+
+```bash
+# Get all ports
+spotlight list -f json | jq -r '.[].port'
+
+# Find instance by project name
+spotlight list -f json | jq '.[] | select(.projectName == "my-app")'
+
+# Count running instances
+spotlight list -f json | jq 'length'
+
+# Get URLs for all instances
+spotlight list -f json | jq -r '.[] | "http://localhost:\(.port)"'
+```
+
+### Status Monitoring
+
+Check health of all instances:
+
+```bash
+# Check if any instances are unhealthy
+spotlight list --all -f json | jq '.[] | select(.status != "healthy")'
+
+# Monitor uptime
+spotlight list -f json | jq -r '.[] | "\(.projectName): \(.uptime / 1000)s"'
+```
+
+### Documentation Generation
+
+Create status reports:
+
+```bash
+# Generate markdown report
+spotlight list -f md > instances-status.md
+
+# Create JSON report for processing
+spotlight list -f json > instances.json
+```
+
+## Integration Examples
+
+### Shell Scripts
+
+```bash
+#!/bin/bash
+# Check if any Spotlight instances are running
+
+INSTANCES=$(spotlight list -f json)
+COUNT=$(echo "$INSTANCES" | jq 'length')
+
+if [ "$COUNT" -eq 0 ]; then
+  echo "No Spotlight instances running"
+  exit 1
+else
+  echo "Found $COUNT running instances"
+  echo "$INSTANCES" | jq -r '.[] | "\(.projectName) on port \(.port)"'
+fi
+```
+
+### GitHub Actions
+
+```yaml
+- name: Check Spotlight Instances
+  run: |
+    spotlight list -f json > spotlight-instances.json
+    cat spotlight-instances.json | jq '.'
+```
+
+### Monitoring Scripts
+
+```bash
+# Watch for instance changes
+watch -n 5 'spotlight list'
+
+# Log instance status every minute
+while true; do
+  spotlight list -f logfmt >> spotlight-monitoring.log
+  sleep 60
+done
+```
+
+## Understanding Instance Data
+
+### Instance ID
+Unique identifier (UUIDv7) for each instance. Used for management operations.
+
+### Port
+Port where the Spotlight UI is accessible. Visit `http://localhost:<port>` to view the UI.
+
+### PIDs
+- **pid**: Main Spotlight process ID
+- **childPid**: Your application's process ID
+- Both include start times to prevent false matches from PID reuse
+
+### Command & Arguments
+The exact command and arguments used to start your application.
+
+### Working Directory
+The directory from which the instance was started.
+
+### Start Time
+ISO 8601 timestamp of when the instance started.
+
+### Project Name  
+Detected from `package.json` name field, or directory name if not available.
+
+### Detected Type
+How Spotlight detected what to run:
+- `package.json` - Found and used npm script
+- `docker-compose` - Detected Docker Compose project
+- `unknown` - Explicit command provided
+
+### Uptime
+Milliseconds since the instance started (in JSON/logfmt) or human-readable format (in human/markdown).
+
+## Troubleshooting
+
+### No Instances Shown
+
+If `spotlight list` shows no instances:
+
+1. **Check if instances are running**: Only `spotlight run` instances are tracked
+2. **Verify registry location**: Instances are stored in `/tmp/spotlight-$USER/instances/`
+3. **Try --all flag**: Instances might be unhealthy
+
+```bash
+# Show all instances including unhealthy
+spotlight list --all
+```
+
+### `[self]` Not Appearing
+
+The `[self]` indicator only appears when:
+- You run `spotlight list` from within a terminal that is itself a Spotlight instance
+- The current process PID matches a tracked instance PID
+
+### Stale Instances
+
+Stale instances (where the process has died) are automatically cleaned up on the next `list` command. If you see dead instances, they'll be removed from the registry.
+
+## Next Steps
+
+- [Run applications with spotlight run](/docs/cli/run/)
+- [Stream events with spotlight tail](/docs/cli/tail/)
+- [See complete CLI reference](/docs/cli/reference/)
+- [Manage instances via Control Center UI](/docs/cli/control-center/)
