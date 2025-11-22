@@ -15,6 +15,7 @@ export default defineConfig({
       entry: {
         run: resolve(__dirname, "src/run.ts"),
         "server/main": resolve(__dirname, "src/server/main.ts"),
+        "server/sdk": resolve(__dirname, "src/server/sdk.ts"),
       },
       formats: ["es"],
     },

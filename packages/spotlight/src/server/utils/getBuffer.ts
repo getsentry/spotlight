@@ -1,7 +1,6 @@
-import { MessageBuffer } from "../messageBuffer.ts";
-import type { EventContainer } from "./eventContainer.ts";
+import { createSpotlightBuffer } from "../sdk.ts";
 
-const GLOBAL_BUFFER = new MessageBuffer<EventContainer>();
+const GLOBAL_BUFFER = createSpotlightBuffer();
 
 export function getBuffer() {
   return GLOBAL_BUFFER;

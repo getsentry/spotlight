@@ -39,6 +39,10 @@
     ".": {
       "import": "./dist/server/main.js",
       "types": "./dist/server/main.d.ts"
+    },
+    "./sdk": {
+      "import": "./dist/server/sdk.js",
+      "types": "./dist/server/sdk.d.ts"
     }
   },
   "dependencies": {
