@@ -1,8 +1,9 @@
+import { readdir, unlink } from "node:fs/promises";
 import { brotliCompressSync, deflateSync, gzipSync } from "node:zlib";
 import { events } from "fetch-event-stream";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { envelopeReactClientSideError } from "../../formatters/md/__tests__/test_envelopes.ts";
 import { isAllowedOrigin } from "../../utils/cors.ts";
 import routes from "../index.ts";
@@ -332,5 +333,73 @@ describe("CORS origin validation", () => {
       expect(response.status).toBe(200);
       expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
     });
+  });
+});
+
+describe("SPOTLIGHT_CAPTURE", () => {
+  afterEach(async () => {
+    process.env.SPOTLIGHT_CAPTURE = "";
+
+    // Clean up any capture files created during tests
+    const files = await readdir(".");
+    for (const file of files) {
+      if (file.startsWith("application_x_sentry_envelope-") && file.endsWith(".txt")) {
+        await unlink(file);
+      }
+    }
+  });
+
+  it("should write envelope to file when SPOTLIGHT_CAPTURE is enabled", async () => {
+    process.env.SPOTLIGHT_CAPTURE = "1";
+
+    const sendResponse = await app.request("/stream", {
+      method: "POST",
+      body: JSON.stringify(envelopeReactClientSideError),
+      headers: {
+        "Content-Type": "application/x-sentry-envelope",
+      },
+    });
+
+    expect(sendResponse.status).toBe(200);
+
+    // Wait for async file write to complete
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    // Check that a capture file was created
+    const files = await readdir(".");
+    const captureFiles = files.filter(f => f.startsWith("application_x_sentry_envelope-") && f.endsWith(".txt"));
+
+    expect(captureFiles.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("should not write envelope to file when SPOTLIGHT_CAPTURE is not set", async () => {
+    // Ensure SPOTLIGHT_CAPTURE is not set (empty string is falsy)
+    process.env.SPOTLIGHT_CAPTURE = "";
+
+    // Clean any existing files first
+    const filesBefore = await readdir(".");
+    for (const file of filesBefore) {
+      if (file.startsWith("application_x_sentry_envelope-") && file.endsWith(".txt")) {
+        await unlink(file);
+      }
+    }
+
+    const sendResponse = await app.request("/stream", {
+      method: "POST",
+      body: JSON.stringify(envelopeReactClientSideError),
+      headers: {
+        "Content-Type": "application/x-sentry-envelope",
+      },
+    });
+
+    expect(sendResponse.status).toBe(200);
+
+    // Wait to ensure no file is written
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const filesAfter = await readdir(".");
+    const captureFiles = filesAfter.filter(f => f.startsWith("application_x_sentry_envelope-") && f.endsWith(".txt"));
+
+    expect(captureFiles.length).toBe(0);
   });
 });
