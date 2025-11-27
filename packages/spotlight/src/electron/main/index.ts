@@ -4,6 +4,7 @@ import * as Sentry from "@sentry/electron/main";
 import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, session, shell } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
+import { sentryBaseConfig } from "../../sentry-config";
 import { DEFAULT_PORT } from "../../server/constants";
 import { clearBuffer, setupSpotlight } from "../../server/main";
 
@@ -99,11 +100,8 @@ app.on("ready", () => {
 });
 
 Sentry.init({
+  ...sentryBaseConfig,
   dsn: "https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976",
-  enabled: !!process.env.NODE_ENV && process.env.NODE_ENV !== "development",
-  tracesSampleRate: 1.0,
-  environment: process.env.NODE_ENV,
-  release: `spotlight@${process.env.npm_package_version}`,
   beforeSend: askForPermissionToSendToSentry,
 });
 

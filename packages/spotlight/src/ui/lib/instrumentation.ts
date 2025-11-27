@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/react";
 import type { Integration } from "@sentry/types";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
+import { sentryBaseConfig } from "../../sentry-config";
 import { useEffect } from "../react-instance";
 import { getDataFromServerTiming } from "./serverTimingMeta";
 
@@ -40,15 +41,12 @@ export default function initSentry() {
 
   // Web UI initialization
   const sentryClient = Sentry.init({
-    enabled: !!process.env.NODE_ENV && process.env.NODE_ENV !== "development",
+    ...sentryBaseConfig,
     transport: Sentry.makeBrowserOfflineTransport(Sentry.makeFetchTransport),
     dsn: "https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713",
-    environment: process.env.NODE_ENV || "development",
-    release: `spotlight@${process.env.npm_package_version}`,
 
     integrations,
 
-    tracesSampleRate: 1,
     tracePropagationTargets: [/^\//, document.location.origin],
     profilesSampleRate: 1,
 
