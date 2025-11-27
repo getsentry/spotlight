@@ -1,5 +1,6 @@
 import { createWriteStream } from "node:fs";
 import { decompressBody, pushToSpotlightBuffer } from "@spotlight/server/sdk.ts";
+import { SENTRY_CONTENT_TYPE } from "@spotlight/shared/constants.ts";
 import { Hono } from "hono";
 import { logger } from "../../logger.ts";
 import type { HonoEnv } from "../../types/env.ts";
@@ -7,7 +8,6 @@ import { getBuffer } from "../../utils/index.ts";
 import { logIncomingEvent, logOutgoingEvent } from "./debugLogging.ts";
 import { streamSSE } from "./streaming.ts";
 import { parseBrowserFromUserAgent } from "./userAgent.ts";
-import { SENTRY_CONTENT_TYPE } from "@spotlight/shared/constants.ts";
 
 const router = new Hono<HonoEnv>()
   .get("/stream", ctx => {
@@ -103,12 +103,14 @@ const router = new Hono<HonoEnv>()
       if (incomingPayload) {
         incomingPayload(body.toString("binary"));
       } else {
-        try {
-          createWriteStream(filename).write(body);
-          logger.info(`🗃️ Saved data to ${filename}`);
-        } catch (err) {
+        const stream = createWriteStream(filename);
+        stream.on("error", err => {
           logger.error(`Failed to save data to ${filename}: ${err}`);
-        }
+          stream.destroy();
+        });
+        stream.end(body, () => {
+          logger.info(`🗃️ Saved data to ${filename}`);
+        });
       }
     }
 
