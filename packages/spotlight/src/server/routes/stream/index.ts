@@ -107,7 +107,7 @@ const router = new Hono<HonoEnv>()
         stream.on("error", err => {
           logger.error(`Failed to save data to ${filename}: ${err}`);
         });
-        stream.write(body, () => {
+        stream.end(body, () => {
           logger.info(`🗃️ Saved data to ${filename}`);
         });
       }
