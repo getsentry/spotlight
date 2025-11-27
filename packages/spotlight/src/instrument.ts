@@ -54,7 +54,7 @@ if (spotlightEnv && instancePort !== 0) {
 
 const sentry = init({
   dsn: "https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713",
-  enabled: process.env.NODE_ENV !== "development",
+  enabled: !!process.env.NODE_ENV && process.env.NODE_ENV !== "development",
   environment: process.env.NODE_ENV || "development",
   release: `spotlight@${process.env.npm_package_version}`,
   debug: Boolean(process.env.SENTRY_DEBUG),
