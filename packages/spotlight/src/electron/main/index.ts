@@ -102,6 +102,11 @@ app.on("ready", () => {
 Sentry.init({
   ...sentryBaseConfig,
   dsn: "https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976",
+  integrations: [
+    Sentry.consoleLoggingIntegration({
+      levels: ["log", "info", "warn", "error", "debug"],
+    }),
+  ],
   beforeSend: askForPermissionToSendToSentry,
 });
 

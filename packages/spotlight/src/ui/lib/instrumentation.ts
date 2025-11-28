@@ -22,6 +22,9 @@ export function getIntegrations(instrumentPageLoad = true): Integration[] {
     }),
     Sentry.replayIntegration(),
     Sentry.browserProfilingIntegration(),
+    Sentry.consoleLoggingIntegration({
+      levels: ["log", "info", "warn", "error", "debug"],
+    }),
   ];
 
   const hash = document.location.hash.slice(1);
