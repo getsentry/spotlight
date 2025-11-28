@@ -57,7 +57,6 @@ const sentry = init({
   ...sentryBaseConfig,
   dsn: "https://51bcd92dba1128934afd1c5726c84442@o1.ingest.us.sentry.io/4508404727283713",
   debug: Boolean(process.env.SENTRY_DEBUG),
-  enableLogs: true,
   ...(disableSpotlight && { spotlight: false }),
 
   integrations: [
