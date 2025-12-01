@@ -1,4 +1,3 @@
-import { env as processEnv } from "node:process";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import sourcemaps from "rollup-plugin-sourcemaps2";
 import { defineConfig } from "vite";
@@ -10,7 +9,7 @@ export default defineConfig(({ mode }) => {
   let env: Record<string, string> = {};
 
   if (!isDev) {
-    env = processEnv as Record<string, string>;
+    env = process.env as Record<string, string>;
   }
 
   return {
