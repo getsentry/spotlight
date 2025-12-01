@@ -1,5 +1,32 @@
 # @spotlightjs/spotlight
 
+## 4.6.0
+
+### Minor Changes
+
+- Added spotlight sdk for helping others to build on top of it ([#1140](https://github.com/getsentry/spotlight/pull/1140))
+
+- Support COMPOSE_FILE environment variable for Docker Compose projects ([#1131](https://github.com/getsentry/spotlight/pull/1131))
+
+- Prompt user to choose between docker compose and package.json when both are present ([#1120](https://github.com/getsentry/spotlight/pull/1120))
+
+### Patch Changes
+
+- Refactor docker compose support ([#1121](https://github.com/getsentry/spotlight/pull/1121))
+
+- disable sentry in development mode ([#1143](https://github.com/getsentry/spotlight/pull/1143))
+
+- **Security:** Restrict CORS origins for Sidecar to prevent unauthorized access ([#1138](https://github.com/getsentry/spotlight/pull/1138))
+
+  The Sidecar now only accepts requests from trusted origins:
+
+  - `localhost` with any port or protocol (http/https)
+  - `https://spotlightjs.com` and `https://*.spotlightjs.com` (HTTPS only, default port)
+
+  ⚠️ **Potentially Breaking:** If you were accessing the Sidecar from other origins (e.g., custom domains, non-HTTPS spotlightjs.com), those connections will now be rejected. This change improves security by preventing malicious websites from connecting to your local Sidecar instance.
+
+- Fix file capture error handling to log errors instead of crashing when SPOTLIGHT_CAPTURE is enabled ([#1142](https://github.com/getsentry/spotlight/pull/1142))
+
 ## 4.5.1
 
 ### Patch Changes
