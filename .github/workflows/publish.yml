@@ -149,10 +149,15 @@ jobs:
     environment: Production
     needs: [get_run_id, npm]
     if: >-
-      (github.event.workflow_run.conclusion == 'success'
-      &&
-      contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
-      ) || inputs.target == 'electron' || inputs.target == 'all'
+      always() &&
+      needs.get_run_id.result == 'success' &&
+      (needs.npm.result == 'success' || needs.npm.result == 'skipped') &&
+      (
+        (github.event.workflow_run.conclusion == 'success'
+        &&
+        contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
+        ) || inputs.target == 'electron' || inputs.target == 'all'
+      )
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v6
