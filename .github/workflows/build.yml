@@ -91,10 +91,10 @@ jobs:
           MAIN_VITE_UI_SENTRY_PROJECT: ${{ vars.MAIN_VITE_UI_SENTRY_PROJECT }} # Spotlight UI
           MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
         run: |
-          echo "VITE_SENTRY_ORG=$MAIN_VITE_SENTRY_ORG" >> ./.env.production
-          echo "VITE_SENTRY_PROJECT=$MAIN_VITE_SENTRY_PROJECT" >> ./.env.production
-          echo "VITE_UI_SENTRY_PROJECT=$MAIN_VITE_UI_SENTRY_PROJECT" >> ./.env.production
-          echo "VITE_SENTRY_AUTH_TOKEN=$MAIN_VITE_SENTRY_AUTH_TOKEN" >> ./.env.production
+          echo "VITE_SENTRY_ORG=$MAIN_VITE_SENTRY_ORG" >> $GITHUB_ENV
+          echo "VITE_SENTRY_PROJECT=$MAIN_VITE_SENTRY_PROJECT" >> $GITHUB_ENV
+          echo "VITE_UI_SENTRY_PROJECT=$MAIN_VITE_UI_SENTRY_PROJECT" >> $GITHUB_ENV
+          echo "VITE_SENTRY_AUTH_TOKEN=$MAIN_VITE_SENTRY_AUTH_TOKEN" >> $GITHUB_ENV
 
       - name: Build packages
         env:

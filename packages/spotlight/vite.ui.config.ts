@@ -8,10 +8,9 @@ export default defineConfig(({ mode }) => {
   let env: Record<string, string> = {};
 
   if (!isDev) {
-    env = loadEnv(mode, process.cwd());
+    env = process.env as Record<string, string>;
   }
 
-  console.log("ENV", process.cwd());
   console.log("ENV", isDev);
   console.log("ENV", "VITE_UI_SENTRY_PROJECT" in process.env);
   console.log("ENV", "VITE_SENTRY_ORG" in process.env);
