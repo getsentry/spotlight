@@ -47,14 +47,10 @@ builder.build({
       output: "dist-electron",
     },
     files: [
-      "dist-electron/**/*",
-      "!**/.vscode/*",
-      "!src/*",
-      "!scripts/*",
-      "!electron.vite.config.{js,ts,mjs,cjs}",
-      "!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}",
-      "!{.env,.env.*,.npmrc,pnpm-lock.yaml}",
-      "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}",
+      "package.json",
+      "dist-electron/main/**/*",
+      "dist-electron/renderer/**/*",
+      "resources/**/*",
     ],
     mac,
     publish: {
