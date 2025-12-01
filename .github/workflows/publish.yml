@@ -217,7 +217,6 @@ jobs:
 
       - name: Build Electron
         env:
-          APPLE_TEAM_ID: ${{ vars.TEAMID }}
           MAIN_VITE_SENTRY_ORG: ${{ vars.MAIN_VITE_SENTRY_ORG }}
           MAIN_VITE_SENTRY_PROJECT: ${{ vars.MAIN_VITE_SENTRY_PROJECT }}
           MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
