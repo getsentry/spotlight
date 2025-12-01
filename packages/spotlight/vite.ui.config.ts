@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 import { aliases, defineProduction, reactPlugins } from "./vite.config.base";
 
 export default defineConfig(({ mode }) => {
@@ -10,11 +10,6 @@ export default defineConfig(({ mode }) => {
   if (!isDev) {
     env = process.env as Record<string, string>;
   }
-
-  console.log("ENV", isDev);
-  console.log("ENV", "VITE_UI_SENTRY_PROJECT" in process.env);
-  console.log("ENV", "VITE_SENTRY_ORG" in process.env);
-  console.log("ENV", "VITE_SENTRY_PROJECT" in process.env);
 
   return {
     plugins: [
