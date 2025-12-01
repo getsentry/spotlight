@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
     env = loadEnv(mode, process.cwd());
   }
 
-  console.log("ENV", Object.keys(env));
+  console.log("ENV", Object.keys(env), Object.keys(process.env));
 
   return {
     plugins: [
