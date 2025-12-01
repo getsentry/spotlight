@@ -88,7 +88,7 @@ jobs:
           name: spotlight-binaries
           path: packages/spotlight/dist-bin/
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ env.RUN_ID }}
+          run-id: ${{ needs.get_run_id.outputs.run-id }}
 
       - name: Publish to NPM
         uses: changesets/action@v1
