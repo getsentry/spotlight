@@ -147,7 +147,7 @@ jobs:
     name: Electron Build
     runs-on: macos-latest
     environment: Production
-    needs: get_run_id
+    needs: [get_run_id, npm]
     if: >-
       (github.event.workflow_run.conclusion == 'success'
       &&
@@ -237,7 +237,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: packages/spotlight/dist-electron/*.{dmg,zip,blockmap}
+          file: packages/spotlight/dist-electron/*.{dmg,zip,blockmap,yml}
           tag: ${{ steps.latest_release_info.outputs.tag_name }}
           file_glob: true
           make_latest: false
