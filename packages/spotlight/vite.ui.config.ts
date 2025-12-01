@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => {
     env = loadEnv(mode, process.cwd());
   }
 
+  console.log("ENV", process.cwd());
   console.log("ENV", isDev);
   console.log("ENV", "VITE_UI_SENTRY_PROJECT" in process.env);
   console.log("ENV", "VITE_SENTRY_ORG" in process.env);
