@@ -15,9 +15,9 @@ export default defineConfig(({ mode }) => {
     plugins: [
       dtsPlugin,
       sentryVitePlugin({
-        org: env.VITE_SENTRY_ORG,
-        project: env.VITE_UI_SENTRY_PROJECT,
-        authToken: env.VITE_SENTRY_AUTH_TOKEN,
+        org: env.MAIN_VITE_SENTRY_ORG,
+        project: env.MAIN_VITE_UI_SENTRY_PROJECT,
+        authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
         release: {
           name: process.env.npm_package_version,
         },
