@@ -47,6 +47,7 @@ builder.build({
       output: "dist-electron",
     },
     files: [
+      "dist-electron/**/*",
       "!**/.vscode/*",
       "!src/*",
       "!scripts/*",
