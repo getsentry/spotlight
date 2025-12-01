@@ -27,6 +27,8 @@
 
 - Fix file capture error handling to log errors instead of crashing when SPOTLIGHT_CAPTURE is enabled ([#1142](https://github.com/getsentry/spotlight/pull/1142))
 
+- Remove console logging integration from Sentry setup ([#1146](https://github.com/getsentry/spotlight/pull/1146))
+
 ## 4.5.1
 
 ### Patch Changes
