@@ -90,6 +90,10 @@ jobs:
           APPLE_TEAM_ID: ${{ vars.TEAMID }}
           FOSSILIZE_PLATFORMS: linux-x64,linux-arm64,win-x64,darwin-x64,darwin-arm64
           FOSSILIZE_SIGN: ${{ github.event_name == 'push' && (github.ref_name == 'main' || startsWith(github.ref_name, 'release/')) && 'y' || 'n' }}
+          MAIN_VITE_SENTRY_ORG: ${{ vars.MAIN_VITE_SENTRY_ORG }}
+          MAIN_VITE_SENTRY_PROJECT: ${{ vars.MAIN_VITE_SENTRY_PROJECT }} # Electron App
+          MAIN_VITE_UI_SENTRY_PROJECT: ${{ vars.MAIN_VITE_UI_SENTRY_PROJECT }} # Spotlight UI
+          MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
         run: pnpm build
 
       - name: Smoke test
