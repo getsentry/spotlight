@@ -1,6 +1,7 @@
+import { env as processEnv } from "node:process";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import sourcemaps from "rollup-plugin-sourcemaps2";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 import electron from "vite-plugin-electron/simple";
 import { aliases, defineDevelopment, defineProduction, reactPlugins } from "./vite.config.base";
 
@@ -9,7 +10,7 @@ export default defineConfig(({ mode }) => {
   let env: Record<string, string> = {};
 
   if (!isDev) {
-    env = loadEnv(mode, process.cwd());
+    env = processEnv as Record<string, string>;
   }
 
   return {

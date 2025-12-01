@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
+import { env as processEnv } from "node:process";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 import { aliases, defineProduction, dtsPlugin } from "./vite.config.base";
 
 export default defineConfig(({ mode }) => {
@@ -8,7 +9,7 @@ export default defineConfig(({ mode }) => {
   let env: Record<string, string> = {};
 
   if (!isDev) {
-    env = loadEnv(mode, process.cwd());
+    env = processEnv as Record<string, string>;
   }
 
   return {
