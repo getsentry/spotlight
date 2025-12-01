@@ -12,6 +12,8 @@ export default defineConfig(({ mode }) => {
     env = processEnv as Record<string, string>;
   }
 
+  console.log("ENV", "MAIN_VITE_UI_SENTRY_PROJECT" in env);
+
   return {
     plugins: [
       reactPlugins,
