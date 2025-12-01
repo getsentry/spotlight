@@ -11,6 +11,11 @@ export default defineConfig(({ mode }) => {
     env = process.env as Record<string, string>;
   }
 
+  console.log("ENV", Object.keys(process.env).includes("MAIN_VITE_UI_SENTRY_PROJECT"));
+  console.log("ENV", Object.keys(process.env).includes("MAIN_VITE_SENTRY_AUTH_TOKEN"));
+  console.log("ENV", Object.keys(process.env).includes("MAIN_VITE_SENTRY_ORG"));
+  console.log("ENV", Object.keys(process.env).includes("MAIN_VITE_SENTRY_PROJECT"));
+
   return {
     plugins: [
       reactPlugins,
