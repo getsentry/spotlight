@@ -11,6 +11,8 @@ export default defineConfig(({ mode }) => {
     env = loadEnv(mode, process.cwd());
   }
 
+  console.log("ENV", Object.keys(env));
+
   return {
     plugins: [
       reactPlugins,
