@@ -34,6 +34,7 @@ if (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD) {
 }
 
 builder.build({
+  publish: "never",
   config: {
     appId: "io.sentry.spotlight",
     productName: "Spotlight",
