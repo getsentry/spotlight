@@ -1,5 +1,11 @@
 # @spotlightjs/spotlight
 
+## 4.6.1
+
+### Patch Changes
+
+- Fix electron build ([#1154](https://github.com/getsentry/spotlight/pull/1154))
+
 ## 4.6.0
 
 ### Minor Changes
