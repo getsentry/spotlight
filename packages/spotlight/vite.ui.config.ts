@@ -13,10 +13,8 @@ export default defineConfig(({ mode }) => {
 
   console.log("ENV", isDev);
   console.log("ENV", "MAIN_VITE_UI_SENTRY_PROJECT" in process.env);
-  console.log("ENV", "MAIN_VITE_SENTRY_AUTH_TOKEN" in process.env);
   console.log("ENV", "MAIN_VITE_SENTRY_ORG" in process.env);
   console.log("ENV", "MAIN_VITE_SENTRY_PROJECT" in process.env);
-  console.log("ENV", process.env);
 
   return {
     plugins: [
