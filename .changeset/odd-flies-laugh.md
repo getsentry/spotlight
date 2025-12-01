@@ -1,5 +1,5 @@
 ---
-"@spotlightjs/sidecar": patch
+"@spotlightjs/spotlight": patch
 ---
 
 Refactor docker compose support
