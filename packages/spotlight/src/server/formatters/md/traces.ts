@@ -1,4 +1,5 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
+import { captureException } from "@sentry/node";
 import { type SentryTransactionEvent, processEnvelope } from "../../parser/index.ts";
 import type { EventContainer } from "../../utils/index.ts";
 import { formatTimestamp, getDuration } from "../utils.ts";
@@ -101,7 +102,7 @@ export function extractTracesFromEnvelopes(containers: EventContainer[]): Map<st
         }
       }
     } catch (err) {
-      console.error("Error extracting trace events:", err);
+      captureException(err, { extra: { context: "Error extracting trace events" } });
     }
   }
 
@@ -169,7 +170,7 @@ function extractTraceEventsFromContainer(container: EventContainer): TraceEvent[
       }
     }
   } catch (err) {
-    console.error("Error parsing envelope for traces:", err);
+    captureException(err, { extra: { context: "Error parsing envelope for traces" } });
   }
 
   return events;
