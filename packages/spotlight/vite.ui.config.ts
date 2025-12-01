@@ -30,6 +30,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: resolve(__dirname, "dist", "ui"),
       manifest: "manifest.json",
+      sourcemap: true,
       rollupOptions: {
         input: {
           main: resolve(__dirname, "index.html"),
