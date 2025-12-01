@@ -21,7 +21,7 @@
     "build:sea": "fossilize -m dist/ui/manifest.json -o spotlight dist/run.js",
     "build:watch": "vite build --watch",
     "build:electron": "vite build --config vite.electron.config.ts",
-    "build:mac": "./electron-builder.js",
+    "build:mac": "./electron-builder.cjs",
     "preview": "vite preview",
     "lint:react-refresh": "eslint 'src/ui/**/*.{ts,tsx}'",
     "test": "vitest run",

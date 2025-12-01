@@ -17,7 +17,7 @@ let mac = {
   cscLink: process.env.CSC_LINK,
   cscKeyPassword: process.env.CSC_KEY_PASSWORD,
 };
-let afterSign = "scripts/notarize.js";
+let afterSign = "scripts/notarize.cjs";
 
 if (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD) {
   mac = {
@@ -39,6 +39,9 @@ const config = {
   asarUnpack: ["resources/**"],
   afterSign,
   npmRebuild: false,
+  extraMetadata: {
+    main: "./dist-electron/main/index.js",
+  },
   files: [
     "!**/.vscode/*",
     "!src/*",
