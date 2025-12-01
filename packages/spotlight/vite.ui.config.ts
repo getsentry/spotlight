@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import { aliases, defineProduction, reactPlugins } from "./vite.config.base";
 
 export default defineConfig(({ mode }) => {
@@ -8,21 +8,21 @@ export default defineConfig(({ mode }) => {
   let env: Record<string, string> = {};
 
   if (!isDev) {
-    env = process.env as Record<string, string>;
+    env = loadEnv(mode, process.cwd());
   }
 
   console.log("ENV", isDev);
-  console.log("ENV", "MAIN_VITE_UI_SENTRY_PROJECT" in process.env);
-  console.log("ENV", "MAIN_VITE_SENTRY_ORG" in process.env);
-  console.log("ENV", "MAIN_VITE_SENTRY_PROJECT" in process.env);
+  console.log("ENV", "VITE_UI_SENTRY_PROJECT" in process.env);
+  console.log("ENV", "VITE_SENTRY_ORG" in process.env);
+  console.log("ENV", "VITE_SENTRY_PROJECT" in process.env);
 
   return {
     plugins: [
       reactPlugins,
       sentryVitePlugin({
-        org: env.MAIN_VITE_SENTRY_ORG,
-        project: env.MAIN_VITE_UI_SENTRY_PROJECT,
-        authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
+        org: env.VITE_SENTRY_ORG,
+        project: env.VITE_UI_SENTRY_PROJECT,
+        authToken: env.VITE_SENTRY_AUTH_TOKEN,
         release: {
           name: process.env.npm_package_version,
         },
