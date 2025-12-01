@@ -33,28 +33,31 @@ if (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD) {
   afterSign = undefined;
 }
 
-const config = {
-  appId: "io.sentry.spotlight",
-  productName: "Spotlight",
-  asarUnpack: ["resources/**"],
-  afterSign,
-  npmRebuild: false,
-  extraMetadata: {
-    main: "./dist-electron/main/index.js",
+builder.build({
+  config: {
+    appId: "io.sentry.spotlight",
+    productName: "Spotlight",
+    asarUnpack: ["resources/**"],
+    afterSign,
+    npmRebuild: false,
+    extraMetadata: {
+      main: "./dist-electron/main/index.js",
+    },
+    directories: {
+      output: "dist-electron",
+    },
+    files: [
+      "!**/.vscode/*",
+      "!src/*",
+      "!scripts/*",
+      "!electron.vite.config.{js,ts,mjs,cjs}",
+      "!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}",
+      "!{.env,.env.*,.npmrc,pnpm-lock.yaml}",
+      "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}",
+    ],
+    mac,
+    publish: {
+      provider: "github",
+    },
   },
-  files: [
-    "!**/.vscode/*",
-    "!src/*",
-    "!scripts/*",
-    "!electron.vite.config.{js,ts,mjs,cjs}",
-    "!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}",
-    "!{.env,.env.*,.npmrc,pnpm-lock.yaml}",
-    "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}",
-  ],
-  mac,
-  publish: {
-    provider: "github",
-  },
-};
-
-builder.build({ config });
+});
