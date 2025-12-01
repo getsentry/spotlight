@@ -1,28 +1,48 @@
 import { resolve } from "node:path";
-import { defineConfig } from "vite";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
+import { defineConfig, loadEnv } from "vite";
 import { aliases, defineProduction, reactPlugins } from "./vite.config.base";
 
-export default defineConfig({
-  plugins: reactPlugins,
-  define: defineProduction,
-  resolve: {
-    alias: aliases,
-  },
-  build: {
-    outDir: resolve(__dirname, "dist", "ui"),
-    manifest: "manifest.json",
-    rollupOptions: {
-      input: {
-        main: resolve(__dirname, "index.html"),
-      },
-      // We disable versioned filenames here explicitly
-      // so we can include the script when sidecar is running
-      // for server-side frameworks
-      output: {
-        entryFileNames: "assets/[name].js",
-        chunkFileNames: "assets/[name].js",
-        assetFileNames: "assets/[name].[ext]",
+export default defineConfig(({ mode }) => {
+  const isDev = mode === "development";
+  let env: Record<string, string> = {};
+
+  if (!isDev) {
+    env = loadEnv(mode, process.cwd());
+  }
+
+  return {
+    plugins: [
+      reactPlugins,
+      sentryVitePlugin({
+        org: env.MAIN_VITE_SENTRY_ORG,
+        project: env.MAIN_VITE_SENTRY_PROJECT,
+        authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
+        release: {
+          name: process.env.npm_package_version,
+        },
+      }),
+    ],
+    define: defineProduction,
+    resolve: {
+      alias: aliases,
+    },
+    build: {
+      outDir: resolve(__dirname, "dist", "ui"),
+      manifest: "manifest.json",
+      rollupOptions: {
+        input: {
+          main: resolve(__dirname, "index.html"),
+        },
+        // We disable versioned filenames here explicitly
+        // so we can include the script when sidecar is running
+        // for server-side frameworks
+        output: {
+          entryFileNames: "assets/[name].js",
+          chunkFileNames: "assets/[name].js",
+          assetFileNames: "assets/[name].[ext]",
+        },
       },
     },
-  },
+  };
 });
