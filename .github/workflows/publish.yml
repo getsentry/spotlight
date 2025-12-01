@@ -194,7 +194,7 @@ jobs:
         run: |
           echo "$APPLE_API_KEY_BUNDLE" | base64 -d > /tmp/apple_key.json
           cat /tmp/apple_key.json | jq .private_key -r > /tmp/apple_key.pem
-          echo "APPLE_API_KEY_ISSUER=$(cat /tmp/apple_key.json | jq .issuer_id -r | tr -d '\n\r')" >> $GITHUB_ENV
+          echo "APPLE_API_ISSUER=$(cat /tmp/apple_key.json | jq .issuer_id -r | tr -d '\n\r')" >> $GITHUB_ENV
           echo "APPLE_API_KEY_ID=$(cat /tmp/apple_key.json | jq .key_id -r | tr -d '\n\r')" >> $GITHUB_ENV
           echo "APPLE_API_KEY=/tmp/apple_key.pem" >> $GITHUB_ENV
 
