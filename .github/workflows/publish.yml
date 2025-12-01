@@ -36,12 +36,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+        run-id: ${{ steps.get_run_id.outputs.run-id }}
     steps:
       - name: Get Run ID
         id: get_run_id
         run: |
           RUN_ID=$(gh api -H "Accept: application/vnd.github.v3+json" -H "X-GitHub-Api-Version: 2022-11-28" '/repos/${{ github.repository }}/actions/runs?head_sha=${{ env.SHA }}&branch=main&status=success' -q '[.workflow_runs.[] | select(.name == "Build & Test")][0].run_number')
-          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
+          echo "run-id=$RUN_ID" >> $GITHUB_OUTPUT
 
   npm:
     name: NPM Package
@@ -78,7 +80,7 @@ jobs:
           name: built-packages
           path: packages/spotlight/dist/
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ env.RUN_ID }}
+          run-id: ${{ needs.get_run_id.outputs.run-id }}
 
       - name: Download spotlight binaries
         uses: actions/download-artifact@v5
@@ -175,7 +177,8 @@ jobs:
           name: electron-build
           path: ${{ runner.temp }}/electron-artifact/
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ env.RUN_ID }}
+          run-id: ${{ needs.get_run_id.outputs.run-id }}
+
 
       - name: Validate and copy Electron build files
         run: |
