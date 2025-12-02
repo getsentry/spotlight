@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
+import { metrics } from "@sentry/node";
 import showHelp from "./cli/help.ts";
 import mcp from "./cli/mcp.ts";
 import run from "./cli/run.ts";
@@ -132,6 +133,14 @@ export async function main({
   }
   const spotlightVersion = process.env.npm_package_version || "{unknown}";
   logger.info(`Spotlight by Sentry - v${spotlightVersion}`);
+
+  metrics.count("cli.invocation", 1, {
+    attributes: {
+      command: cmd || "server",
+      format,
+      debug: String(debug),
+    },
+  });
 
   if (help) {
     cmd = "help";
