@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
-      reactPlugins,
+      ...reactPlugins,
       sentryVitePlugin({
         org: env.MAIN_VITE_SENTRY_ORG,
         project: env.MAIN_VITE_UI_SENTRY_PROJECT,
