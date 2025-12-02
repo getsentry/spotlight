@@ -177,16 +177,35 @@ const createWindow = () => {
      */
     win.webContents.executeJavaScript(
       `(function() {
-        if (document.getElementById('electron-top-drag-bar')) return;
+        if (!document.getElementById('electron-top-drag-bar')) {
+          const dragBar = document.createElement('div');
+          dragBar.id = 'electron-top-drag-bar';
+          dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
+          document.body.appendChild(dragBar);
+        }
         
-        const dragBar = document.createElement('div');
-        dragBar.id = 'electron-top-drag-bar';
-        dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
-        document.body.appendChild(dragBar);
+        // Create error screen element for showing errors
+        if (!document.getElementById('error-screen')) {
+          const errorScreen = document.createElement('div');
+          errorScreen.id = 'error-screen';
+          errorScreen.style.display = 'none';
+          errorScreen.innerHTML = \`
+            <div class="error-page-navbar">
+              <img alt="spotlight-icon" src="./resources/sized.png" width="50" height="50" />
+              <p class="spotlight-title">Spotlight</p>
+            </div>
+            <h1 class="error header">Oops! An error occurred.</h1>
+            <p class="error description">Press Cmd + R to reload the app.</p>
+          \`;
+          document.body.appendChild(errorScreen);
+        }
         
-        // Re-create drag bar if body is replaced
+        // Re-create elements if body is replaced
         new MutationObserver(() => {
           if (!document.getElementById('electron-top-drag-bar')) {
+            const dragBar = document.createElement('div');
+            dragBar.id = 'electron-top-drag-bar';
+            dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
             document.body.appendChild(dragBar);
           }
         }).observe(document.body, { childList: true });
