@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { BrowserRouter, HashRouter } from "react-router-dom";
+import { isElectron } from "./isElectron";
 
 interface RouterProps {
   children: ReactNode;
@@ -11,10 +12,9 @@ interface RouterProps {
  * - HashRouter for Electron apps (file:// protocol)
  */
 export function Router({ children }: RouterProps) {
-  // Detect if we're running in Electron (file:// protocol)
-  const isElectron = typeof window !== "undefined" && window.location.protocol === "file:";
+  const inElectron = isElectron();
 
-  if (isElectron) {
+  if (inElectron) {
     return <HashRouter>{children}</HashRouter>;
   }
 

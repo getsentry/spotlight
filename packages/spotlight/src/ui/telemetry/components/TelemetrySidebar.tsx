@@ -1,6 +1,7 @@
 import { ReactComponent as DeleteIcon } from "@spotlight/ui/assets/deleteIcon.svg";
 import { ReactComponent as Logo } from "@spotlight/ui/assets/glyph.svg";
 import { cn } from "@spotlight/ui/lib/cn";
+import { isElectron } from "@spotlight/ui/lib/isElectron";
 import { useSpotlightContext } from "@spotlight/ui/lib/useSpotlightContext";
 import type { NotificationCount } from "@spotlight/ui/types";
 import { Badge } from "@spotlight/ui/ui/badge";
@@ -75,7 +76,7 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
   const isInsightsActive = pathname.startsWith("/telemetry/insights");
 
   // This is used to determine if the UI is running inside electron
-  const isElectron = (globalThis as { IN_DESKTOP_ENV?: boolean }).IN_DESKTOP_ENV;
+  const inElectron = isElectron();
 
   return (
     <nav
@@ -83,7 +84,7 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
       style={{ width: "240px", minWidth: "240px" }}
       aria-label="Navigation"
     >
-      <header className={cn("p-4", isElectron && "mt-4")}>
+      <header className={cn("p-4", inElectron && "mt-8")}>
         <div className="text-primary-200 flex flex-col gap-x-2">
           <div className="inline-flex items-center gap-x-2">
             <Logo height={24} width={24} />
