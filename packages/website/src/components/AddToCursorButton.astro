@@ -20,7 +20,7 @@ const { location = 'docs' } = Astro.props;
   document.querySelectorAll('.add-to-cursor-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const location = btn.getAttribute('data-location') || 'unknown';
-      Sentry.metrics.increment('add_to_cursor_click', 1, { attributes: { location } });
+      Sentry.metrics.count('add_to_cursor_click', 1, { attributes: { location } });
     });
   });
 </script>

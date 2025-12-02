@@ -99,7 +99,7 @@ const downloads = getDownloadLinks(assets);
     link.addEventListener('click', () => {
       const platform = link.getAttribute('data-platform') || 'unknown';
       const variant = link.getAttribute('data-variant') || 'unknown';
-      Sentry.metrics.increment('download_click', 1, { attributes: { platform, variant, location: 'homepage' } });
+      Sentry.metrics.count('download_click', 1, { attributes: { platform, variant, location: 'homepage' } });
     });
   });
 </script>

@@ -63,7 +63,7 @@
       const text = btn.getAttribute('data-copy');
       if (text) {
         await navigator.clipboard.writeText(text);
-        Sentry.metrics.increment('copy_claude_mcp_command');
+        Sentry.metrics.count('copy_claude_mcp_command', 1);
         const feedback = document.getElementById('copy-feedback');
         if (feedback) {
           feedback.classList.remove('opacity-0');
@@ -79,7 +79,7 @@
 
   document.querySelectorAll('.hero-add-to-cursor-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      Sentry.metrics.increment('add_to_cursor_click', 1, { attributes: { location: 'homepage' } });
+      Sentry.metrics.count('add_to_cursor_click', 1, { attributes: { location: 'homepage' } });
     });
   });
 </script>

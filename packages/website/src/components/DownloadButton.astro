@@ -52,7 +52,7 @@ const downloads = getDownloadLinks(assets);
     btn.addEventListener('click', () => {
       const platform = btn.getAttribute('data-platform') || 'unknown';
       const variant = btn.getAttribute('data-variant') || 'unknown';
-      Sentry.metrics.increment('download_click', 1, { attributes: { platform, variant, location: 'docs' } });
+      Sentry.metrics.count('download_click', 1, { attributes: { platform, variant, location: 'docs' } });
     });
   });
 </script>
