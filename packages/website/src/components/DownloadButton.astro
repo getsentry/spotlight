@@ -27,6 +27,7 @@ const downloads = getDownloadLinks(assets);
 
 <script>
   import { detectPlatform } from '../lib/platform';
+  import * as Sentry from '@sentry/astro';
 
   const detected = detectPlatform();
   const unknownMessage = document.getElementById('platform-unknown-message');
@@ -46,4 +47,12 @@ const downloads = getDownloadLinks(assets);
       (button as HTMLElement).style.display = 'inline-flex';
     }
   }
+
+  document.querySelectorAll('.download-button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const platform = btn.getAttribute('data-platform') || 'unknown';
+      const variant = btn.getAttribute('data-variant') || 'unknown';
+      Sentry.metrics.increment('download_click', 1, { tags: { platform, variant, location: 'docs' } });
+    });
+  });
 </script>
