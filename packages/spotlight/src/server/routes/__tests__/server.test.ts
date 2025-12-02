@@ -232,10 +232,38 @@ describe("CORS origin validation", () => {
       await expect(isAllowedOrigin("https://[::1]:8443")).resolves.toBe(true);
     });
 
-    it("should reject non-loopback IP addresses", async () => {
-      await expect(isAllowedOrigin("http://192.168.1.1")).resolves.toBe(false);
-      await expect(isAllowedOrigin("http://10.0.0.1")).resolves.toBe(false);
-      await expect(isAllowedOrigin("http://8.8.8.8")).resolves.toBe(false);
+    it("should reject external IP addresses not belonging to this machine", async () => {
+      // These are well-known public IPs that won't be assigned to a dev machine
+      await expect(isAllowedOrigin("http://8.8.8.8")).resolves.toBe(false); // Google DNS
+      await expect(isAllowedOrigin("http://1.1.1.1")).resolves.toBe(false); // Cloudflare DNS
+      await expect(isAllowedOrigin("http://93.184.216.34")).resolves.toBe(false); // example.com
+    });
+
+    it("should allow machine's own IP addresses from network interfaces", async () => {
+      // Get one of the machine's actual IPs to test
+      const os = await import("node:os");
+      const interfaces = os.networkInterfaces();
+      let machineIP: string | null = null;
+
+      // Find a non-loopback IPv4 address
+      for (const name in interfaces) {
+        const addrs = interfaces[name];
+        if (addrs) {
+          for (const addr of addrs) {
+            if (addr.family === "IPv4" && !addr.internal) {
+              machineIP = addr.address;
+              break;
+            }
+          }
+        }
+        if (machineIP) break;
+      }
+
+      // If we found a machine IP, test it
+      if (machineIP) {
+        await expect(isAllowedOrigin(`http://${machineIP}`)).resolves.toBe(true);
+        await expect(isAllowedOrigin(`http://${machineIP}:3000`)).resolves.toBe(true);
+      }
     });
   });
 

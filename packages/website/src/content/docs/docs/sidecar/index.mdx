@@ -267,12 +267,23 @@ Run one sidecar and point all your services to it for unified debugging across y
 
 The sidecar is designed exclusively for local development. It only accepts connections from:
 
-- **Localhost origins**: Any hostname that resolves to `127.0.0.0/8` (IPv4) or `::1` (IPv6)
+- **This machine's IPs**: Any hostname that resolves to an IP assigned to this machine, including:
+  - Loopback addresses (`127.0.0.0/8`, `::1`)
+  - Local network IPs (e.g., `192.168.x.x`, `10.x.x.x`)
+  - VPN IPs (e.g., Tailscale, Zerotier)
 - **spotlightjs.com**: The official Spotlight website (HTTPS only)
 
 ### Custom Local Hostnames
 
-You can use custom hostnames in your `/etc/hosts` file (e.g., `myapp.local` pointing to `127.0.0.1`). The sidecar resolves hostnames via DNS and allows them if they resolve to localhost addresses.
+You can use custom hostnames in your `/etc/hosts` file (e.g., `myapp.local` pointing to `127.0.0.1`). The sidecar resolves hostnames via DNS and allows them if they resolve to any of the machine's IP addresses.
+
+### VPN and Remote Access
+
+The sidecar supports access via VPN services like Tailscale or Zerotier. If your hostname resolves to a VPN IP assigned to your machine, it will be allowed. This is useful for:
+
+- Accessing Spotlight from other devices on your VPN
+- Using custom domains that point to your VPN IP
+- Debugging mobile apps via VPN connection
 
 ### DNS Rebinding Protection
 
@@ -282,18 +293,24 @@ The sidecar implements protection against [DNS rebinding attacks](https://en.wik
 1. An attacker controls `evil.com` with a short DNS TTL
 2. User visits `evil.com`, which initially resolves to the attacker's server
 3. The attacker's page loads malicious JavaScript
-4. The attacker rebinds `evil.com` to `127.0.0.1`
-5. JavaScript makes requests to `evil.com` (now pointing to localhost)
+4. The attacker rebinds `evil.com` to `127.0.0.1` (or another machine IP)
+5. JavaScript makes requests to `evil.com` (now pointing to the machine)
 
 **Our mitigation:**
 - DNS resolution results are cached for a **minimum of 6 hours**
 - This means an attacker would need to:
   - Trick the user into visiting their malicious site
   - Keep the user on the page (or have them revisit) for 6+ hours
-  - Then rebind the DNS to `127.0.0.1`
-- Even then, rebinding to `127.0.0.1` would make the attacker's site inaccessible for the cache duration
+  - Then rebind the DNS to the machine's IP
+- Even then, rebinding to a local IP would make the attacker's site inaccessible for the cache duration
 
-This makes DNS rebinding attacks impractical against Spotlight. The attacker would need to actively mislead users into visiting their site, wait at least 6 hours hoping users revisit (a revisit won't work if DNS is already rebound), and then rebind the DNS record to `127.0.0.1`. Even in that scenario, using a low TTL for the `127.0.0.1` record would cause their site to be down for 6 hours.
+This makes DNS rebinding attacks impractical against Spotlight. The attacker would need to actively mislead users into visiting their site, wait at least 6 hours hoping users revisit (a revisit won't work if DNS is already rebound), and then rebind the DNS record to a local IP. Even in that scenario, using a low TTL for the local IP record would cause their site to be down for 6 hours.
+
+**Additional protection for non-loopback IPs:**
+For machine IPs other than loopback (e.g., `192.168.x.x`), the risk is even lower because:
+- External access requires explicit port forwarding or firewall configuration
+- Most machines are behind NAT, which blocks inbound connections by default
+- VPN IPs are only accessible from within the VPN network
 
 ### Development Only
 

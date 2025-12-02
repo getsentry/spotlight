@@ -1,12 +1,13 @@
 import dns from "node:dns";
 import net from "node:net";
+import os from "node:os";
 import { promisify } from "node:util";
 
 /**
  * DNS Resolution Cache Entry
  */
 interface CacheEntry {
-  isLocalhost: boolean;
+  isLocal: boolean;
   expiresAt: number;
 }
 
@@ -21,7 +22,7 @@ interface DnsResult {
 /**
  * Cache for DNS resolution results.
  * Key: lowercase hostname
- * Value: { isLocalhost, expiresAt }
+ * Value: { isLocal, expiresAt }
  */
 const dnsCache = new Map<string, CacheEntry>();
 
@@ -64,6 +65,48 @@ const resolve6 = promisify(dns.resolve6);
 const lookup = promisify(dns.lookup);
 
 /**
+ * Cache for machine's own IP addresses.
+ * Refreshed periodically as network interfaces can change.
+ */
+let machineIPsCache: Set<string> | null = null;
+let machineIPsCacheTime = 0;
+const MACHINE_IPS_CACHE_TTL_MS = 60 * 1000; // 1 minute - refresh periodically for network changes
+
+/**
+ * Get all IP addresses assigned to this machine's network interfaces.
+ * This includes:
+ * - Local/private IPs (192.168.x.x, 10.x.x.x, etc.)
+ * - VPN IPs (e.g., Tailscale 100.x.x.x, Zerotier IPs)
+ * - Any other interface IPs
+ *
+ * Results are cached for 1 minute to handle network changes while
+ * avoiding repeated system calls.
+ */
+function getMachineIPs(): Set<string> {
+  const now = Date.now();
+  if (machineIPsCache && now - machineIPsCacheTime < MACHINE_IPS_CACHE_TTL_MS) {
+    return machineIPsCache;
+  }
+
+  const ips = new Set<string>();
+  const interfaces = os.networkInterfaces();
+
+  for (const name in interfaces) {
+    const addresses = interfaces[name];
+    if (addresses) {
+      for (const addr of addresses) {
+        // Add the IP address (normalized)
+        ips.add(addr.address);
+      }
+    }
+  }
+
+  machineIPsCache = ips;
+  machineIPsCacheTime = now;
+  return ips;
+}
+
+/**
  * Check if a string is an IP address (IPv4 or IPv6).
  * Uses Node's net module for reliable detection.
  */
@@ -96,6 +139,36 @@ function isLoopbackIP(ip: string): boolean {
   }
 
   return false;
+}
+
+/**
+ * Check if an IP address belongs to this machine.
+ *
+ * This includes:
+ * - Loopback addresses (127.0.0.0/8, ::1)
+ * - Any IP assigned to the machine's network interfaces
+ *   (local IPs, VPN IPs like Tailscale/Zerotier, etc.)
+ *
+ * This allows services like custom domains pointing to the machine,
+ * or VPN-based access, to work with Spotlight.
+ *
+ * Security note: This is safe because:
+ * - These are IPs the machine actually has assigned
+ * - External access requires explicit port forwarding/exposure
+ * - The 6-hour DNS cache still protects against rebinding attacks
+ */
+function isLocalMachineIP(ip: string): boolean {
+  // Handle bracketed IPv6
+  const cleanIP = ip.startsWith("[") && ip.endsWith("]") ? ip.slice(1, -1) : ip;
+
+  // Check loopback first (fast path)
+  if (isLoopbackIP(cleanIP)) {
+    return true;
+  }
+
+  // Check if it's one of the machine's own IPs
+  const machineIPs = getMachineIPs();
+  return machineIPs.has(cleanIP);
 }
 
 /**
@@ -174,10 +247,12 @@ function calculateCacheTtl(minTtl?: number): number {
 }
 
 /**
- * Clear the DNS cache. Useful for testing.
+ * Clear the DNS cache and machine IPs cache. Useful for testing.
  */
 export function clearDnsCache(): void {
   dnsCache.clear();
+  machineIPsCache = null;
+  machineIPsCacheTime = 0;
 }
 
 /**
@@ -191,22 +266,32 @@ export function getDnsCacheSize(): number {
  * Validates if an origin should be allowed to access the Sidecar.
  *
  * Allowed origins:
- * - Any origin whose hostname resolves to localhost (127.0.0.0/8 or ::1)
+ * - Any origin whose hostname resolves to this machine's IPs:
+ *   - Loopback addresses (127.0.0.0/8, ::1)
+ *   - Any IP assigned to the machine's network interfaces
+ *     (local IPs, VPN IPs like Tailscale/Zerotier, etc.)
  * - https://spotlightjs.com (HTTPS only, default port)
  * - https://*.spotlightjs.com (HTTPS only, default port)
  *
  * Security: DNS Rebinding Protection
  * ==================================
  * Instead of hardcoding "localhost" and known IPs, we resolve hostnames via DNS
- * and check if they point to loopback addresses. This allows custom local hostnames
- * (e.g., from /etc/hosts) while protecting against DNS rebinding attacks through
- * a minimum 6-hour cache TTL.
+ * and check if they point to this machine. This allows:
+ * - Custom local hostnames (e.g., from /etc/hosts)
+ * - VPN-based access (Tailscale, Zerotier, etc.)
+ * - Custom domains pointing to the machine
+ *
+ * We protect against DNS rebinding attacks through a minimum 6-hour cache TTL.
  *
  * Threat Model:
  * - An attacker controlling evil.com could try to rebind it to 127.0.0.1
  * - Our 6h minimum cache means the attacker must keep the user engaged for 6+ hours
  * - Even then, rebinding to 127.0.0.1 would make their site inaccessible
  * - This makes DNS rebinding attacks impractical against Spotlight
+ *
+ * For machine IPs (non-loopback), the risk is even lower because:
+ * - External access requires explicit port forwarding/exposure
+ * - Most machines are behind NAT, blocking inbound connections by default
  *
  * @param origin - The origin to validate
  * @returns Promise<boolean> - true if the origin is allowed, false otherwise
@@ -222,13 +307,13 @@ export async function isAllowedOrigin(origin: string): Promise<boolean> {
 
     // Fast path: If hostname is already an IP address, check directly
     if (isIPAddress(hostname)) {
-      return isLoopbackIP(hostname);
+      return isLocalMachineIP(hostname);
     }
 
     // Check cache first
     const cached = dnsCache.get(hostname);
     if (cached && cached.expiresAt > Date.now()) {
-      return cached.isLocalhost;
+      return cached.isLocal;
     }
 
     // Check for spotlightjs.com domains - must be HTTPS with default port
@@ -240,28 +325,28 @@ export async function isAllowedOrigin(origin: string): Promise<boolean> {
       return false;
     }
 
-    // Resolve hostname via DNS and check if it points to localhost
+    // Resolve hostname via DNS and check if it points to this machine
     try {
       const { addresses, minTtl } = await resolveHostname(hostname);
 
-      // Check if any resolved address is a loopback
-      const isLocalhost = addresses.some(result => isLoopbackIP(result.address));
+      // Check if any resolved address belongs to this machine
+      const isLocal = addresses.some(result => isLocalMachineIP(result.address));
 
       // Calculate cache TTL (enforcing minimum for security)
       const cacheTtl = calculateCacheTtl(minTtl);
 
       // Cache the result
       dnsCache.set(hostname, {
-        isLocalhost,
+        isLocal,
         expiresAt: Date.now() + cacheTtl,
       });
 
-      return isLocalhost;
+      return isLocal;
     } catch {
       // DNS resolution failed - cache the failure for a short time
       // to avoid hammering DNS servers
       dnsCache.set(hostname, {
-        isLocalhost: false,
+        isLocal: false,
         expiresAt: Date.now() + FAILURE_TTL_MS,
       });
       return false;
