@@ -32,7 +32,7 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
 
   const app = new Hono<HonoEnv>().use(
     cors({
-      origin: origin => (isAllowedOrigin(origin) ? origin : null),
+      origin: async origin => ((await isAllowedOrigin(origin)) ? origin : null),
     }),
   );
 

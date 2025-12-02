@@ -3,16 +3,16 @@ import { brotliCompressSync, deflateSync, gzipSync } from "node:zlib";
 import { events } from "fetch-event-stream";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { envelopeReactClientSideError } from "../../formatters/md/__tests__/test_envelopes.ts";
-import { isAllowedOrigin } from "../../utils/cors.ts";
+import { clearDnsCache, isAllowedOrigin } from "../../utils/cors.ts";
 import routes from "../index.ts";
 
-// Create test app with CORS middleware
+// Create test app with async CORS middleware
 const app = new Hono()
   .use(
     cors({
-      origin: origin => (isAllowedOrigin(origin) ? origin : null),
+      origin: async origin => ((await isAllowedOrigin(origin)) ? origin : null),
     }),
   )
   .route("/", routes);
@@ -207,69 +207,126 @@ describe("mcp", () => {
 });
 
 describe("CORS origin validation", () => {
-  describe("isAllowedOrigin function", () => {
-    it("should allow localhost with http", () => {
-      expect(isAllowedOrigin("http://localhost")).toBe(true);
-      expect(isAllowedOrigin("http://localhost:3000")).toBe(true);
-      expect(isAllowedOrigin("http://localhost:8080")).toBe(true);
+  // Clear DNS cache before each test to ensure isolation
+  beforeEach(() => {
+    clearDnsCache();
+  });
+
+  describe("isAllowedOrigin function - IP addresses", () => {
+    it("should allow 127.0.0.1 with any port (direct IP check)", async () => {
+      await expect(isAllowedOrigin("http://127.0.0.1")).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://127.0.0.1:3000")).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://127.0.0.1")).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://127.0.0.1:8443")).resolves.toBe(true);
     });
 
-    it("should allow localhost with https", () => {
-      expect(isAllowedOrigin("https://localhost")).toBe(true);
-      expect(isAllowedOrigin("https://localhost:3000")).toBe(true);
-      expect(isAllowedOrigin("https://localhost:8443")).toBe(true);
+    it("should allow other 127.x.x.x addresses", async () => {
+      await expect(isAllowedOrigin("http://127.0.0.2")).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://127.255.255.255")).resolves.toBe(true);
     });
 
-    it("should allow 127.0.0.1 with any port", () => {
-      expect(isAllowedOrigin("http://127.0.0.1")).toBe(true);
-      expect(isAllowedOrigin("http://127.0.0.1:3000")).toBe(true);
-      expect(isAllowedOrigin("https://127.0.0.1")).toBe(true);
-      expect(isAllowedOrigin("https://127.0.0.1:8443")).toBe(true);
+    it("should allow IPv6 localhost with any port", async () => {
+      await expect(isAllowedOrigin("http://[::1]")).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://[::1]:3000")).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://[::1]")).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://[::1]:8443")).resolves.toBe(true);
     });
 
-    it("should allow IPv6 localhost with any port", () => {
-      expect(isAllowedOrigin("http://[::1]")).toBe(true);
-      expect(isAllowedOrigin("http://[::1]:3000")).toBe(true);
-      expect(isAllowedOrigin("https://[::1]")).toBe(true);
-      expect(isAllowedOrigin("https://[::1]:8443")).toBe(true);
+    it("should reject non-loopback IP addresses", async () => {
+      await expect(isAllowedOrigin("http://192.168.1.1")).resolves.toBe(false);
+      await expect(isAllowedOrigin("http://10.0.0.1")).resolves.toBe(false);
+      await expect(isAllowedOrigin("http://8.8.8.8")).resolves.toBe(false);
+    });
+  });
+
+  describe("isAllowedOrigin function - DNS resolution", () => {
+    it("should allow localhost (resolves to 127.0.0.1)", async () => {
+      // localhost should resolve to 127.0.0.1 via /etc/hosts or DNS
+      await expect(isAllowedOrigin("http://localhost")).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://localhost:3000")).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://localhost:8080")).resolves.toBe(true);
     });
 
-    it("should allow https://spotlightjs.com", () => {
-      expect(isAllowedOrigin("https://spotlightjs.com")).toBe(true);
+    it("should allow localhost with https", async () => {
+      await expect(isAllowedOrigin("https://localhost")).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://localhost:3000")).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://localhost:8443")).resolves.toBe(true);
     });
 
-    it("should allow https subdomains of spotlightjs.com", () => {
-      expect(isAllowedOrigin("https://www.spotlightjs.com")).toBe(true);
-      expect(isAllowedOrigin("https://app.spotlightjs.com")).toBe(true);
-      expect(isAllowedOrigin("https://staging.spotlightjs.com")).toBe(true);
+    it("should allow localhost with ftp (any protocol)", async () => {
+      await expect(isAllowedOrigin("ftp://localhost")).resolves.toBe(true);
+    });
+  });
+
+  describe("isAllowedOrigin function - spotlightjs.com", () => {
+    it("should allow https://spotlightjs.com", async () => {
+      await expect(isAllowedOrigin("https://spotlightjs.com")).resolves.toBe(true);
     });
 
-    it("should reject http://spotlightjs.com (must be https)", () => {
-      expect(isAllowedOrigin("http://spotlightjs.com")).toBe(false);
-      expect(isAllowedOrigin("http://www.spotlightjs.com")).toBe(false);
+    it("should allow https subdomains of spotlightjs.com", async () => {
+      await expect(isAllowedOrigin("https://www.spotlightjs.com")).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://app.spotlightjs.com")).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://staging.spotlightjs.com")).resolves.toBe(true);
     });
 
-    it("should reject spotlightjs.com with non-standard ports", () => {
-      expect(isAllowedOrigin("https://spotlightjs.com:8080")).toBe(false);
-      expect(isAllowedOrigin("https://www.spotlightjs.com:3000")).toBe(false);
-      expect(isAllowedOrigin("https://app.spotlightjs.com:8443")).toBe(false);
+    it("should reject http://spotlightjs.com (must be https)", async () => {
+      await expect(isAllowedOrigin("http://spotlightjs.com")).resolves.toBe(false);
+      await expect(isAllowedOrigin("http://www.spotlightjs.com")).resolves.toBe(false);
     });
 
-    it("should reject random websites", () => {
-      expect(isAllowedOrigin("https://example.com")).toBe(false);
-      expect(isAllowedOrigin("https://evil.com")).toBe(false);
-      expect(isAllowedOrigin("https://google.com")).toBe(false);
+    it("should reject spotlightjs.com with non-standard ports", async () => {
+      await expect(isAllowedOrigin("https://spotlightjs.com:8080")).resolves.toBe(false);
+      await expect(isAllowedOrigin("https://www.spotlightjs.com:3000")).resolves.toBe(false);
+      await expect(isAllowedOrigin("https://app.spotlightjs.com:8443")).resolves.toBe(false);
+    });
+  });
+
+  describe("isAllowedOrigin function - rejected origins", () => {
+    it("should reject random websites", async () => {
+      await expect(isAllowedOrigin("https://example.com")).resolves.toBe(false);
+      await expect(isAllowedOrigin("https://evil.com")).resolves.toBe(false);
+      await expect(isAllowedOrigin("https://google.com")).resolves.toBe(false);
     });
 
-    it("should reject domains that just end with spotlightjs.com", () => {
-      expect(isAllowedOrigin("https://evilspotlightjs.com")).toBe(false);
-      expect(isAllowedOrigin("https://notspotlightjs.com")).toBe(false);
+    it("should reject domains that just end with spotlightjs.com", async () => {
+      await expect(isAllowedOrigin("https://evilspotlightjs.com")).resolves.toBe(false);
+      await expect(isAllowedOrigin("https://notspotlightjs.com")).resolves.toBe(false);
     });
 
-    it("should reject empty or invalid origins", () => {
-      expect(isAllowedOrigin("")).toBe(false);
-      expect(isAllowedOrigin("not-a-url")).toBe(false);
-      expect(isAllowedOrigin("ftp://localhost")).toBe(true); // localhost is allowed with any protocol
+    it("should reject empty or invalid origins", async () => {
+      await expect(isAllowedOrigin("")).resolves.toBe(false);
+      await expect(isAllowedOrigin("not-a-url")).resolves.toBe(false);
+    });
+  });
+
+  describe("isAllowedOrigin function - caching", () => {
+    it("should cache DNS resolution results", async () => {
+      // First call - triggers DNS resolution
+      await expect(isAllowedOrigin("http://localhost")).resolves.toBe(true);
+
+      // Second call - should use cached result (faster)
+      const start = Date.now();
+      await expect(isAllowedOrigin("http://localhost")).resolves.toBe(true);
+      const duration = Date.now() - start;
+
+      // Cached result should be very fast (< 5ms typically)
+      expect(duration).toBeLessThan(50);
+    });
+
+    it("should cache results for different ports of same hostname", async () => {
+      // Resolve with one port
+      await expect(isAllowedOrigin("http://localhost:3000")).resolves.toBe(true);
+
+      // Same hostname, different port - should use cache
+      await expect(isAllowedOrigin("http://localhost:8080")).resolves.toBe(true);
+    });
+
+    it("should cache negative results (non-localhost hostnames)", async () => {
+      // First call - DNS resolution
+      await expect(isAllowedOrigin("https://example.com")).resolves.toBe(false);
+
+      // Second call - should use cached negative result
+      await expect(isAllowedOrigin("https://example.com")).resolves.toBe(false);
     });
   });
 
@@ -282,6 +339,16 @@ describe("CORS origin validation", () => {
       });
       expect(response.status).toBe(200);
       expect(response.headers.get("Access-Control-Allow-Origin")).toBe("http://localhost:3000");
+    });
+
+    it("should set CORS headers for allowed 127.0.0.1 origins", async () => {
+      const response = await app.request("/health", {
+        headers: {
+          Origin: "http://127.0.0.1:3000",
+        },
+      });
+      expect(response.status).toBe(200);
+      expect(response.headers.get("Access-Control-Allow-Origin")).toBe("http://127.0.0.1:3000");
     });
 
     it("should set CORS headers for allowed spotlightjs.com origins", async () => {
