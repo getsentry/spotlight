@@ -176,7 +176,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     SENTRY_SPOTLIGHT: string;
     NEXT_PUBLIC_SENTRY_SPOTLIGHT: string;
     SENTRY_TRACES_SAMPLE_RATE: string;
-    [key: string]: string | undefined;
+    [key: string]: string;
   };
   if (cmdArgs.length === 0) {
     const dockerCompose = detectDockerCompose();
@@ -203,7 +203,8 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
         cmdArgs = command.cmdArgs;
         stdin = command.stdin;
         // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-        env.COMPOSE_FILE = undefined;
+        // biome-ignore lint/performance/noDelete: need to remove env var entirely
+        delete env.COMPOSE_FILE;
       } else {
         logger.info(`Using package.json script: ${packageJson.scriptName}`);
         metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
@@ -223,7 +224,8 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
       cmdArgs = command.cmdArgs;
       stdin = command.stdin;
       // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-      env.COMPOSE_FILE = undefined;
+      // biome-ignore lint/performance/noDelete: need to remove env var entirely
+      delete env.COMPOSE_FILE;
     } else if (packageJson) {
       logger.info(`Using package.json script: ${packageJson.scriptName}`);
       metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
