@@ -117,37 +117,13 @@ function isIPAddress(hostname: string): boolean {
 }
 
 /**
- * Check if an IP address is a loopback address.
- *
- * Loopback addresses:
- * - IPv4: 127.0.0.0/8 (127.0.0.1 through 127.255.255.255)
- * - IPv6: ::1
- */
-function isLoopbackIP(ip: string): boolean {
-  // Handle bracketed IPv6
-  const cleanIP = ip.startsWith("[") && ip.endsWith("]") ? ip.slice(1, -1) : ip;
-
-  // IPv4 loopback: 127.0.0.0/8
-  if (net.isIPv4(cleanIP)) {
-    return cleanIP.startsWith("127.");
-  }
-
-  // IPv6 loopback: ::1
-  if (net.isIPv6(cleanIP)) {
-    // Normalize and compare - ::1 is the only loopback
-    return cleanIP === "::1" || cleanIP === "0:0:0:0:0:0:0:1";
-  }
-
-  return false;
-}
-
-/**
  * Check if an IP address belongs to this machine.
  *
- * This includes:
- * - Loopback addresses (127.0.0.0/8, ::1)
- * - Any IP assigned to the machine's network interfaces
- *   (local IPs, VPN IPs like Tailscale/Zerotier, etc.)
+ * This checks against IPs assigned to the machine's network interfaces,
+ * which includes:
+ * - Loopback (127.0.0.1, ::1)
+ * - Local network IPs (192.168.x.x, 10.x.x.x, etc.)
+ * - VPN IPs (e.g., Tailscale 100.x.x.x, Zerotier IPs)
  *
  * This allows services like custom domains pointing to the machine,
  * or VPN-based access, to work with Spotlight.
@@ -160,11 +136,6 @@ function isLoopbackIP(ip: string): boolean {
 function isLocalMachineIP(ip: string): boolean {
   // Handle bracketed IPv6
   const cleanIP = ip.startsWith("[") && ip.endsWith("]") ? ip.slice(1, -1) : ip;
-
-  // Check loopback first (fast path)
-  if (isLoopbackIP(cleanIP)) {
-    return true;
-  }
 
   // Check if it's one of the machine's own IPs
   const machineIPs = getMachineIPs();
@@ -267,7 +238,7 @@ export function getDnsCacheSize(): number {
  *
  * Allowed origins:
  * - Any origin whose hostname resolves to this machine's IPs:
- *   - Loopback addresses (127.0.0.0/8, ::1)
+ *   - Loopback addresses (127.0.0.1, ::1)
  *   - Any IP assigned to the machine's network interfaces
  *     (local IPs, VPN IPs like Tailscale/Zerotier, etc.)
  * - https://spotlightjs.com (HTTPS only, default port)

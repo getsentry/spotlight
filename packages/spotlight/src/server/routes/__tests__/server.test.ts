@@ -220,11 +220,6 @@ describe("CORS origin validation", () => {
       await expect(isAllowedOrigin("https://127.0.0.1:8443")).resolves.toBe(true);
     });
 
-    it("should allow other 127.x.x.x addresses", async () => {
-      await expect(isAllowedOrigin("http://127.0.0.2")).resolves.toBe(true);
-      await expect(isAllowedOrigin("http://127.255.255.255")).resolves.toBe(true);
-    });
-
     it("should allow IPv6 localhost with any port", async () => {
       await expect(isAllowedOrigin("http://[::1]")).resolves.toBe(true);
       await expect(isAllowedOrigin("http://[::1]:3000")).resolves.toBe(true);
