@@ -207,7 +207,7 @@ export default async function run({
         cmdArgs = command.cmdArgs;
         stdin = command.stdin;
         // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-        env.COMPOSE_FILE = undefined;
+        delete env.COMPOSE_FILE;
       } else {
         logger.info(`Using package.json script: ${packageJson.scriptName}`);
         cmdArgs = [packageJson.scriptCommand];
@@ -225,7 +225,7 @@ export default async function run({
       cmdArgs = command.cmdArgs;
       stdin = command.stdin;
       // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-      env.COMPOSE_FILE = undefined;
+      delete env.COMPOSE_FILE;
     } else if (packageJson) {
       logger.info(`Using package.json script: ${packageJson.scriptName}`);
       cmdArgs = [packageJson.scriptCommand];
