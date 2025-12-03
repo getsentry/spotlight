@@ -305,7 +305,52 @@ function isSpotlightOrigin(url: URL, hostname: string): boolean {
 }
 
 /**
- * Check if an origin matches an entry in the custom allowed origins list.
+ * Pre-normalized allowed origins for efficient matching.
+ */
+interface NormalizedAllowedOrigins {
+  /** Full origins (lowercased, trailing slash removed) for exact matching */
+  fullOrigins: Set<string>;
+  /** Plain domains (lowercased) for permissive matching */
+  domains: Set<string>;
+}
+
+/**
+ * Cache for normalized allowed origins.
+ * Uses WeakMap so the cache entry is garbage collected when the array is no longer referenced.
+ */
+const normalizedOriginsCache = new WeakMap<string[], NormalizedAllowedOrigins>();
+
+/**
+ * Normalize and classify allowed origins for efficient matching.
+ * Results are memoized per array reference to ensure normalization is a one-time cost.
+ */
+function normalizeAllowedOrigins(allowedOrigins: string[]): NormalizedAllowedOrigins {
+  const cached = normalizedOriginsCache.get(allowedOrigins);
+  if (cached) {
+    return cached;
+  }
+
+  const fullOrigins = new Set<string>();
+  const domains = new Set<string>();
+
+  for (const entry of allowedOrigins) {
+    const normalized = entry.toLowerCase();
+    if (normalized.includes("://")) {
+      // Full origin - normalize by removing trailing slash
+      fullOrigins.add(normalized.replace(/\/$/, ""));
+    } else {
+      // Plain domain
+      domains.add(normalized);
+    }
+  }
+
+  const result = { fullOrigins, domains };
+  normalizedOriginsCache.set(allowedOrigins, result);
+  return result;
+}
+
+/**
+ * Check if an origin matches an entry in the pre-normalized allowed origins.
  *
  * Supports two formats:
  * - Full origins (e.g., "https://ngrok.io:443") - exact match required
@@ -313,29 +358,17 @@ function isSpotlightOrigin(url: URL, hostname: string): boolean {
  *
  * @param origin - The origin to check (e.g., "https://myapp.local:3000")
  * @param hostname - The lowercase hostname from the origin URL
- * @param allowedOrigins - List of allowed origins/domains
+ * @param normalized - Pre-normalized allowed origins
  */
-function isCustomAllowedOrigin(origin: string, hostname: string, allowedOrigins: string[]): boolean {
-  const normalizedOrigin = origin.toLowerCase();
-
-  for (const entry of allowedOrigins) {
-    const normalizedEntry = entry.toLowerCase();
-
-    if (normalizedEntry.includes("://")) {
-      // Full origin match - compare exact origin strings
-      // Normalize both by removing trailing slashes for comparison
-      if (normalizedOrigin.replace(/\/$/, "") === normalizedEntry.replace(/\/$/, "")) {
-        return true;
-      }
-    } else {
-      // Plain domain match - match hostname regardless of protocol/port
-      if (hostname === normalizedEntry) {
-        return true;
-      }
-    }
+function isCustomAllowedOrigin(origin: string, hostname: string, normalized: NormalizedAllowedOrigins): boolean {
+  // Check plain domain match first (more common case)
+  if (normalized.domains.has(hostname)) {
+    return true;
   }
 
-  return false;
+  // Check full origin match
+  const normalizedOrigin = origin.toLowerCase().replace(/\/$/, "");
+  return normalized.fullOrigins.has(normalizedOrigin);
 }
 
 /**
@@ -392,8 +425,10 @@ export async function isAllowedOrigin(origin: string, allowedOrigins?: string[])
     }
 
     // Fast path: Check custom allowed origins (no DNS lookup needed)
-    if (allowedOrigins && allowedOrigins.length > 0 && isCustomAllowedOrigin(origin, hostname, allowedOrigins)) {
-      return true;
+      const normalized = normalizeAllowedOrigins(allowedOrigins);
+      if (isCustomAllowedOrigin(origin, hostname, normalized)) {
+        return true;
+      }
     }
 
     // Fast path: If hostname is already an IP address, check directly
