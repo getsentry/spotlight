@@ -81,8 +81,8 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
       style={{ width: "240px", minWidth: "240px" }}
       aria-label="Navigation"
     >
-      {/* mt-8 adds top margin in Electron to account for the 40px drag bar */}
-      <header className={cn("p-4", IS_ELECTRON && "mt-8")}>
+      {/* mt-10 (40px) adds top margin in Electron to account for the 40px drag bar */}
+      <header className={cn("p-4", IS_ELECTRON && "mt-10")}>
         <div className="text-primary-200 flex flex-col gap-x-2">
           <div className="inline-flex items-center gap-x-2">
             <Logo height={24} width={24} />
