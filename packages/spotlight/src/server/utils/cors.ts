@@ -305,6 +305,64 @@ function isSpotlightOrigin(url: URL, hostname: string): boolean {
 }
 
 /**
+ * Pre-normalized allowed origins for efficient matching.
+ * Call normalizeAllowedOrigins() once at server startup to create this structure.
+ */
+export interface NormalizedAllowedOrigins {
+  /** Full origins (lowercased, trailing slash removed) for exact matching */
+  fullOrigins: Set<string>;
+  /** Plain domains (lowercased) for permissive matching */
+  domains: Set<string>;
+}
+
+/**
+ * Normalize and classify allowed origins for efficient matching.
+ * Call this once at server startup, then pass the result to isAllowedOrigin().
+ *
+ * @param allowedOrigins - Raw list of allowed origins/domains from config
+ * @returns Pre-normalized structure for O(1) lookups
+ */
+export function normalizeAllowedOrigins(allowedOrigins: string[]): NormalizedAllowedOrigins {
+  const fullOrigins = new Set<string>();
+  const domains = new Set<string>();
+
+  for (const entry of allowedOrigins) {
+    const normalized = entry.toLowerCase();
+    if (normalized.includes("://")) {
+      // Full origin - normalize by removing trailing slash
+      fullOrigins.add(normalized.replace(/\/$/, ""));
+    } else {
+      // Plain domain
+      domains.add(normalized);
+    }
+  }
+
+  return { fullOrigins, domains };
+}
+
+/**
+ * Check if an origin matches an entry in the pre-normalized allowed origins.
+ *
+ * Supports two formats:
+ * - Full origins (e.g., "https://ngrok.io:443") - exact match required
+ * - Plain domains (e.g., "myapp.local") - matches any protocol/port
+ *
+ * @param origin - The origin to check (e.g., "https://myapp.local:3000")
+ * @param hostname - The lowercase hostname from the origin URL
+ * @param normalized - Pre-normalized allowed origins
+ */
+function isCustomAllowedOrigin(origin: string, hostname: string, normalized: NormalizedAllowedOrigins): boolean {
+  // Check plain domain match first (more common case)
+  if (normalized.domains.has(hostname)) {
+    return true;
+  }
+
+  // Check full origin match
+  const normalizedOrigin = origin.toLowerCase().replace(/\/$/, "");
+  return normalized.fullOrigins.has(normalizedOrigin);
+}
+
+/**
  * Clear the DNS cache, pending resolutions, and machine IPs cache. Useful for testing.
  */
 export function clearDnsCache(): void {
@@ -328,13 +386,18 @@ export function getDnsCacheSize(): number {
  * - localhost (RFC 6761 reserved name, always trusted)
  * - Any origin whose hostname resolves to this machine's IPs (with TTL >= 1h)
  * - https://spotlightjs.com and subdomains (HTTPS only, default port)
+ * - Custom origins/domains from the normalizedAllowedOrigins list
  *
  * For DNS rebinding protection details, see the TTL Constants section above.
  *
  * @param origin - The origin to validate
+ * @param normalizedAllowedOrigins - Optional pre-normalized allowed origins (from normalizeAllowedOrigins())
  * @returns Promise<boolean> - true if the origin is allowed, false otherwise
  */
-export async function isAllowedOrigin(origin: string): Promise<boolean> {
+export async function isAllowedOrigin(
+  origin: string,
+  normalizedAllowedOrigins?: NormalizedAllowedOrigins,
+): Promise<boolean> {
   if (!origin) {
     return false;
   }
@@ -352,6 +415,11 @@ export async function isAllowedOrigin(origin: string): Promise<boolean> {
 
     // Fast path: spotlightjs.com domains (no DNS lookup needed)
     if (isSpotlightOrigin(url, hostname)) {
+      return true;
+    }
+
+    // Fast path: Check custom allowed origins (no DNS lookup needed)
+    if (normalizedAllowedOrigins && isCustomAllowedOrigin(origin, hostname, normalizedAllowedOrigins)) {
       return true;
     }
 

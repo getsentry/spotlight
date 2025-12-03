@@ -1,4 +1,5 @@
 import type { ParsedEnvelope } from "../parser/processEnvelope.ts";
+import type { NormalizedAllowedOrigins } from "../utils/cors.ts";
 
 export type IncomingPayloadCallback = (body: string) => void;
 export type OnEnvelopeCallback = (envelope: ParsedEnvelope["envelope"]) => void;
@@ -48,8 +49,20 @@ export type SideCarOptions = {
   isStandalone?: boolean;
 
   stdioMCP?: boolean;
+
+  /**
+   * Additional origins to allow for CORS requests.
+   * Useful for custom local domains, tunnels, etc.
+   *
+   * Accepts two formats:
+   * - Full origins (e.g., "https://ngrok.io:443") for strict matching
+   * - Plain domains (e.g., "myapp.local") to allow any protocol/port
+   */
+  allowedOrigins?: string[];
 };
 
 export type StartServerOptions = Pick<SideCarOptions, "basePath" | "filesToServe" | "incomingPayload"> & {
   port: number;
+  /** Pre-normalized allowed origins for CORS (use normalizeAllowedOrigins() to create) */
+  normalizedAllowedOrigins?: NormalizedAllowedOrigins;
 };

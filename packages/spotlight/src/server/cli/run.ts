@@ -108,7 +108,14 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
   return Buffer.from(`${parts.join("\n")}\n`, "utf-8");
 }
 
-export default async function run({ port, cmdArgs, basePath, filesToServe, format }: CLIHandlerOptions) {
+export default async function run({
+  port,
+  cmdArgs,
+  basePath,
+  filesToServe,
+  format,
+  allowedOrigins,
+}: CLIHandlerOptions) {
   let relayStdioAsLogs = true;
 
   const fuzzySearcher = new Searcher([] as string[], {
@@ -148,7 +155,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     return true;
   };
 
-  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe, format }, logChecker);
+  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe, format, allowedOrigins }, logChecker);
   if (!serverInstance) {
     logger.error("Failed to start Spotlight sidecar server.");
     logger.error(`The port ${port} might already be in use — most likely by another Spotlight instance.`);

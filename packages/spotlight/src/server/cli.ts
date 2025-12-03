@@ -33,6 +33,12 @@ const PARSE_ARGS_CONFIG = {
       short: "f",
       default: "human",
     },
+    "allowed-origin": {
+      type: "string",
+      short: "A",
+      multiple: true,
+      default: [] as string[],
+    },
     // Deprecated -- use the positional `mcp` argument instead
     "stdio-mcp": {
       type: "boolean",
@@ -55,6 +61,7 @@ export type CLIArgs = {
   format: FormatterType;
   cmd: string | undefined;
   cmdArgs: string[];
+  allowedOrigins: string[];
 };
 
 export function parseCLIArgs(): CLIArgs {
@@ -103,6 +110,10 @@ export function parseCLIArgs(): CLIArgs {
     process.exit(1);
   }
 
+  // Parse allowed origins - supports both repeatable flags and comma-separated values
+  const allowedOriginInput = values["allowed-origin"] as string[];
+  const allowedOrigins = allowedOriginInput.flatMap(origin => origin.split(",").map(o => o.trim())).filter(Boolean);
+
   const result: CLIArgs = {
     debug: values.debug as boolean,
     help: values.help as boolean,
@@ -110,6 +121,7 @@ export function parseCLIArgs(): CLIArgs {
     port,
     cmd: positionals[0],
     cmdArgs: cmdArgs ?? positionals.slice(1),
+    allowedOrigins,
   };
 
   return result;
@@ -127,7 +139,7 @@ export async function main({
   basePath,
   filesToServe,
 }: { basePath?: CLIHandlerOptions["basePath"]; filesToServe?: CLIHandlerOptions["filesToServe"] } = {}) {
-  let { cmd, cmdArgs, help, port, debug, format } = parseCLIArgs();
+  let { cmd, cmdArgs, help, port, debug, format, allowedOrigins } = parseCLIArgs();
   if (debug || process.env.SPOTLIGHT_DEBUG) {
     enableDebugLogging(true);
   }
@@ -149,5 +161,5 @@ export async function main({
 
   const handler = CLI_CMD_MAP.get(cmd) || showHelp;
 
-  return await handler({ cmd, cmdArgs, port, help, debug, format, basePath, filesToServe });
+  return await handler({ cmd, cmdArgs, port, help, debug, format, basePath, filesToServe, allowedOrigins });
 }
