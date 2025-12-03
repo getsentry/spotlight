@@ -16,7 +16,7 @@ spotlight run [options] [command]
 ```
 
 **Key points:**
-- If you don't provide a command, Spotlight automatically detects and runs your development script from `package.json`
+- If you don't provide a command, Spotlight automatically detects Docker Compose projects or runs your development script from `package.json` (prompts you to choose if both are found)
 - Works with any language or framework
 - Automatically configures environment variables for Spotlight integration
 
@@ -45,6 +45,64 @@ This makes it incredibly easy to get started - just add Spotlight to your existi
   }
 }
 ```
+
+## Auto-Detection with Docker Compose
+
+Spotlight also automatically detects Docker Compose projects. When you run `spotlight run` without a command, it checks:
+
+1. **`COMPOSE_FILE` environment variable** - If set, Spotlight uses the compose file(s) specified there
+2. **Compose files in the current directory** - Otherwise, it looks for:
+   - `docker-compose.yml`
+   - `docker-compose.yaml`
+   - `compose.yml`
+   - `compose.yaml`
+
+It also automatically includes override files (e.g., `docker-compose.override.yml`) when detecting files in the current directory.
+
+```bash
+# In a directory with docker-compose.yml
+spotlight run
+# ✓ Automatically runs: docker compose up (with Spotlight injection)
+```
+
+### What Spotlight Does for Docker Compose
+
+When a Docker Compose project is detected, Spotlight:
+
+1. **Uses `host.docker.internal`** instead of `localhost` so containers can reach Spotlight running on your host machine
+2. **Injects environment variables** into all services:
+   - `SENTRY_SPOTLIGHT`
+   - `NEXT_PUBLIC_SENTRY_SPOTLIGHT`
+   - `SENTRY_TRACES_SAMPLE_RATE`
+3. **Adds `extra_hosts` mapping** for Linux compatibility (`host.docker.internal:host-gateway`)
+
+:::note[Requirements]
+Docker Compose auto-detection requires Docker version 20.10.0 or higher for `host.docker.internal` support on Linux.
+:::
+
+### When Both Are Detected
+
+If Spotlight finds both a Docker Compose file and a `package.json` with runnable scripts, it will prompt you to choose which one to use:
+
+```bash
+spotlight run
+# ⚠️  Both Docker Compose and package.json detected!
+# 
+# Which would you like to use?
+#   1) docker compose
+#   2) package.json
+# Enter your choice (1 or 2):
+```
+
+:::caution[Non-Interactive Mode]
+In non-interactive environments (like CI/CD pipelines), Spotlight will exit with an error if both are detected. Specify a command explicitly to avoid this:
+
+```bash
+spotlight run docker compose up
+# or
+spotlight run npm run dev
+```
+:::
 
 ## Running Specific Commands
 
@@ -78,7 +136,7 @@ When you run `spotlight run`, it:
 
 1. **Starts the Spotlight Sidecar** on the specified port (default: dynamically assigned)
 2. **Sets Environment Variables**:
-   - `SENTRY_SPOTLIGHT=http://localhost:<port>/stream`
+   - `SENTRY_SPOTLIGHT=http://localhost:<port>/stream` (or `http://host.docker.internal:<port>/stream` for Docker Compose)
    - `SENTRY_TRACES_SAMPLE_RATE=1` (enables 100% trace sampling)
 3. **Runs Your Command** with these environment variables
 4. **Captures stdout/stderr** as log events automatically
