@@ -325,6 +325,7 @@ export function getDnsCacheSize(): number {
  * Validates if an origin should be allowed to access the Sidecar.
  *
  * Allowed origins:
+ * - localhost (RFC 6761 reserved name, always trusted)
  * - Any origin whose hostname resolves to this machine's IPs (with TTL >= 1h)
  * - https://spotlightjs.com and subdomains (HTTPS only, default port)
  *
@@ -341,6 +342,13 @@ export async function isAllowedOrigin(origin: string): Promise<boolean> {
   try {
     const url = new URL(origin);
     const hostname = url.hostname.toLowerCase();
+
+    // Fast path: localhost is always allowed (RFC 6761 reserved name)
+    // This is safe because "localhost" is guaranteed to resolve to loopback
+    // and cannot be registered as a public domain name.
+    if (hostname === "localhost") {
+      return true;
+    }
 
     // Fast path: spotlightjs.com domains (no DNS lookup needed)
     if (isSpotlightOrigin(url, hostname)) {

@@ -323,18 +323,31 @@ describe("CORS origin validation", () => {
   });
 
   describe("isAllowedOrigin function - caching", () => {
-    it("should cache DNS resolution results", async () => {
+    it("should bypass cache for localhost (special-cased)", async () => {
       // Cache should be empty after clearDnsCache() in beforeEach
       expect(getDnsCacheSize()).toBe(0);
 
-      // First call - triggers DNS resolution and caches result
+      // localhost is special-cased and doesn't use the DNS cache
       await expect(isAllowedOrigin("http://localhost")).resolves.toBe(true);
 
-      // Cache should now have one entry
+      // Cache should still be empty - localhost bypasses caching
+      expect(getDnsCacheSize()).toBe(0);
+
+      // Multiple calls should all succeed without caching
+      await expect(isAllowedOrigin("http://localhost:3000")).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://localhost:8080")).resolves.toBe(true);
+      expect(getDnsCacheSize()).toBe(0);
+    });
+
+    it("should cache DNS resolution results for non-localhost hostnames", async () => {
+      expect(getDnsCacheSize()).toBe(0);
+
+      // First call - triggers DNS resolution and caches result
+      await expect(isAllowedOrigin("https://example.com")).resolves.toBe(false);
       expect(getDnsCacheSize()).toBe(1);
 
       // Second call - should use cached result (cache size unchanged)
-      await expect(isAllowedOrigin("http://localhost")).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://example.com")).resolves.toBe(false);
       expect(getDnsCacheSize()).toBe(1);
     });
 
@@ -342,11 +355,11 @@ describe("CORS origin validation", () => {
       expect(getDnsCacheSize()).toBe(0);
 
       // Resolve with one port - adds to cache
-      await expect(isAllowedOrigin("http://localhost:3000")).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://example.com:443")).resolves.toBe(false);
       expect(getDnsCacheSize()).toBe(1);
 
       // Same hostname, different port - should use existing cache entry
-      await expect(isAllowedOrigin("http://localhost:8080")).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://example.com:8443")).resolves.toBe(false);
       expect(getDnsCacheSize()).toBe(1); // Still 1, not 2
     });
 

@@ -267,6 +267,7 @@ Run one sidecar and point all your services to it for unified debugging across y
 
 The sidecar is designed exclusively for local development. It only accepts connections from:
 
+- **localhost**: Always allowed (RFC 6761 reserved name)
 - **This machine's IPs**: Any hostname that resolves to an IP assigned to this machine, including:
   - Loopback addresses (`127.0.0.1`, `::1`)
   - Local network IPs (e.g., `192.168.x.x`, `10.x.x.x`)
