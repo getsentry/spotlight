@@ -129,6 +129,7 @@ const createWindow = () => {
     // frame: false,
     // transparent: true,
     titleBarStyle: "hidden",
+    trafficLightPosition: { x: 16, y: 16 },
     // titleBarOverlay: {
     //   color: '#2f3241',
     //   symbolColor: '#74b1be',
@@ -175,39 +176,44 @@ const createWindow = () => {
      * We need the error-screen to be in the tree to show when an error occurs.
      */
     win.webContents.executeJavaScript(
-      `const spotlightRoot = document.getElementById('spotlight-root');
-       if (spotlightRoot) {
-         const dragHandle = document.createElement('div');
-         dragHandle.style.cssText = \`
-           position: fixed;
-           top: 0;
-           left: 0;
-           right: 0;
-           height: 32px;
-           -webkit-app-region: drag;
-           z-index: 9999;
-           background: transparent;
-         \`;
-         dragHandle.id = 'electron-drag-handle';
-         
-         if (!document.getElementById('electron-drag-handle')) {
-           document.body.appendChild(dragHandle);
-         }
-       }
-         
-       // Creating the error component
-       const errorScreen = document.createElement('div');
-       errorScreen.id = 'error-screen';
-       errorScreen.style.display = 'none';
-       errorScreen.innerHTML = \`
-        <div class="error-page-navbar">
-        <img alt="spotlight-icon" src="./resources/sized.png" width="50" height="50" />
-        <p class="spotlight-title">Spotlight</p>
-      </div>
-      <h1 class="error header">Oops! An error occurred.</h1>
-      <p class="error description">Press Cmd + R to reload the app.</p>
-       \`;
-       document.body.appendChild(errorScreen);`,
+      `(function() {
+        if (!document.getElementById('electron-top-drag-bar')) {
+          const dragBar = document.createElement('div');
+          dragBar.id = 'electron-top-drag-bar';
+          dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
+          document.body.appendChild(dragBar);
+        }
+        
+        // Create error screen element for showing errors
+        if (!document.getElementById('error-screen')) {
+          const errorScreen = document.createElement('div');
+          errorScreen.id = 'error-screen';
+          errorScreen.style.display = 'none';
+          errorScreen.innerHTML = \`
+            <div class="error-page-navbar">
+              <img alt="spotlight-icon" src="./resources/sized.png" width="50" height="50" />
+              <p class="spotlight-title">Spotlight</p>
+            </div>
+            <h1 class="error header">Oops! An error occurred.</h1>
+            <p class="error description">Press Cmd + R to reload the app.</p>
+          \`;
+          document.body.appendChild(errorScreen);
+        }
+        
+        // Re-create elements if body is replaced.
+        // This can happen when Spotlight.init() replaces the entire body content
+        // during hot module replacement (HMR) in development mode, or when the
+        // React app fully remounts after initial hydration.
+        new MutationObserver(() => {
+          if (!document.getElementById('electron-top-drag-bar')) {
+            const dragBar = document.createElement('div');
+            dragBar.id = 'electron-top-drag-bar';
+            dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
+            document.body.appendChild(dragBar);
+          }
+        }).observe(document.body, { childList: true });
+      })();
+    `,
     );
   });
 };

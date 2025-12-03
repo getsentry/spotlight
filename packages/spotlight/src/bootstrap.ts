@@ -1,6 +1,7 @@
 // Bootstrap script to load the appropriate entry point based on the environment
-// With nodeIntegration: true, process is available in Electron renderer
-if (typeof process !== "undefined" && process.versions?.electron) {
+// __IS_ELECTRON__ is set to true at build time by vite.electron.config.ts
+
+if (typeof __IS_ELECTRON__ !== "undefined" && __IS_ELECTRON__) {
   // Load Electron entry point with proper Sentry initialization
   import("./electron-index.tsx");
 } else {
