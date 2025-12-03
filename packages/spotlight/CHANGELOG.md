@@ -1,5 +1,17 @@
 # @spotlightjs/spotlight
 
+## 4.7.0
+
+### Minor Changes
+
+- Add `--allowed-origin` / `-A` CLI option and `allowedOrigins` API option for configuring additional CORS origins. Supports both full origins (e.g., `https://ngrok.io:443`) for strict matching and plain domains (e.g., `myapp.local`) for permissive matching. Fixes [#1171](https://github.com/getsentry/spotlight/issues/1171). ([#1176](https://github.com/getsentry/spotlight/pull/1176))
+
+### Patch Changes
+
+- Restore draggable electron app and recover semaphore buttons ([#1173](https://github.com/getsentry/spotlight/pull/1173))
+
+- Allow any DNS pointing to localhost in CORS ([#1175](https://github.com/getsentry/spotlight/pull/1175))
+
 ## 4.6.0
 
 ### Minor Changes
