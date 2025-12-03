@@ -4,6 +4,7 @@ import type { AddressInfo } from "node:net";
 import * as path from "node:path";
 import * as readline from "node:readline";
 import type { SerializedLog } from "@sentry/core";
+import { metrics } from "@sentry/node";
 import { Searcher } from "fast-fuzzy";
 import { uuidv7 } from "uuidv7";
 import { SENTRY_CONTENT_TYPE } from "../constants.ts";
@@ -189,20 +190,24 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
         process.exit(1);
       }
       const choice = await promptUserChoice();
+      metrics.count("cli.run.prompt_choice", 1, { attributes: { choice } });
 
       if (choice === "docker") {
         logger.info(
           `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
         );
+        metrics.count("cli.run.autodetect", 1, { attributes: { type: "docker-compose" } });
         // Use host.docker.internal for backend services to access the host machine
         env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
         const command = buildDockerComposeCommand(dockerCompose);
         cmdArgs = command.cmdArgs;
         stdin = command.stdin;
         // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
+        // biome-ignore lint/performance/noDelete: need to remove env var entirely
         delete env.COMPOSE_FILE;
       } else {
         logger.info(`Using package.json script: ${packageJson.scriptName}`);
+        metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
         cmdArgs = [packageJson.scriptCommand];
         shell = true;
         env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
@@ -211,6 +216,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
       logger.info(
         `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
       );
+      metrics.count("cli.run.autodetect", 1, { attributes: { type: "docker-compose" } });
       // Use host.docker.internal for backend services to access the host machine
       env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
 
@@ -218,9 +224,11 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
       cmdArgs = command.cmdArgs;
       stdin = command.stdin;
       // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
+      // biome-ignore lint/performance/noDelete: need to remove env var entirely
       delete env.COMPOSE_FILE;
     } else if (packageJson) {
       logger.info(`Using package.json script: ${packageJson.scriptName}`);
+      metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
       cmdArgs = [packageJson.scriptCommand];
       shell = true;
       env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;

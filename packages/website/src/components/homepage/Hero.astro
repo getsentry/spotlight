@@ -30,7 +30,7 @@
           </button>
         </div>
         
-        <a href="cursor://anysphere.cursor-deeplink/mcp/install?name=spotlight&config=eyJjb21tYW5kIjoibnB4IC15IC0tcHJlZmVyLW9ubGluZSBAc3BvdGxpZ2h0anMvc3BvdGxpZ2h0QGxhdGVzdCBtY3AgIn0%3D" class="flex items-center"><img src="https://cursor.com/deeplink/mcp-install-light.svg" alt="Add spotlight MCP server to Cursor" height="37" /></a></div>
+        <a href="cursor://anysphere.cursor-deeplink/mcp/install?name=spotlight&config=eyJjb21tYW5kIjoibnB4IC15IC0tcHJlZmVyLW9ubGluZSBAc3BvdGxpZ2h0anMvc3BvdGxpZ2h0QGxhdGVzdCBtY3AgIn0%3D" class="flex items-center hero-add-to-cursor-btn"><img src="https://cursor.com/deeplink/mcp-install-light.svg" alt="Add spotlight MCP server to Cursor" height="37" /></a></div>
         <div id="copy-feedback" class="text-center text-green-500 italic text-sm opacity-0 transition-opacity duration-300">
         Copied to clipboard
       </div>
@@ -56,11 +56,14 @@
 </div>
 
 <script>
+  import * as Sentry from '@sentry/astro';
+
   document.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const text = btn.getAttribute('data-copy');
       if (text) {
         await navigator.clipboard.writeText(text);
+        Sentry.metrics.count('copy_claude_mcp_command', 1);
         const feedback = document.getElementById('copy-feedback');
         if (feedback) {
           feedback.classList.remove('opacity-0');
@@ -71,6 +74,12 @@
           }, 2000);
         }
       }
+    });
+  });
+
+  document.querySelectorAll('.hero-add-to-cursor-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      Sentry.metrics.count('add_to_cursor_click', 1, { attributes: { location: 'homepage' } });
     });
   });
 </script>

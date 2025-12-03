@@ -1,5 +1,6 @@
 import type { ServerType } from "@hono/node-server";
 import { captureException } from "@sentry/core";
+import { metrics } from "@sentry/node";
 import { EventSource } from "eventsource";
 import { SENTRY_CONTENT_TYPE } from "../constants.ts";
 import {
@@ -63,6 +64,11 @@ export default async function tail(
       logger.error(`Supported arguments are: ${[...SUPPORTED_TAIL_ARGS].join(", ")}`);
       process.exit(1);
     }
+  }
+
+  // Track which event types users tail
+  for (const eventType of eventTypes) {
+    metrics.count("cli.tail.event_type", 1, { attributes: { type: eventType } });
   }
 
   const formatter = FORMATTERS[format];

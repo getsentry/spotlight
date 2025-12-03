@@ -1,0 +1,27 @@
+---
+interface Props {
+  location?: string;
+}
+
+const { location = 'docs' } = Astro.props;
+---
+
+<a 
+  href="cursor://anysphere.cursor-deeplink/mcp/install?name=spotlight&config=eyJjb21tYW5kIjoibnB4IC15IC0tcHJlZmVyLW9ubGluZSBAc3BvdGxpZ2h0anMvc3BvdGxpZ2h0QGxhdGVzdCBtY3AgIn0%3D" 
+  class="add-to-cursor-btn" 
+  data-location={location}
+>
+  <img src="https://cursor.com/deeplink/mcp-install-light.svg" alt="Add spotlight MCP server to Cursor" height="32" />
+</a>
+
+<script>
+  import * as Sentry from '@sentry/astro';
+  
+  document.querySelectorAll('.add-to-cursor-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const location = btn.getAttribute('data-location') || 'unknown';
+      Sentry.metrics.count('add_to_cursor_click', 1, { attributes: { location } });
+    });
+  });
+</script>
+
