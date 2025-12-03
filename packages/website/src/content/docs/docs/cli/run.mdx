@@ -48,20 +48,37 @@ This makes it incredibly easy to get started - just add Spotlight to your existi
 
 ## Auto-Detection with Docker Compose
 
-Spotlight also automatically detects Docker Compose projects. When you run `spotlight run` without a command, it looks for these files in the current directory:
+Spotlight also automatically detects Docker Compose projects. When you run `spotlight run` without a command, it checks:
 
-- `docker-compose.yml`
-- `docker-compose.yaml`
-- `compose.yml`
-- `compose.yaml`
+1. **`COMPOSE_FILE` environment variable** - If set, Spotlight uses the compose file(s) specified there
+2. **Compose files in the current directory** - Otherwise, it looks for:
+   - `docker-compose.yml`
+   - `docker-compose.yaml`
+   - `compose.yml`
+   - `compose.yaml`
 
-It also automatically includes override files (e.g., `docker-compose.override.yml`) and respects the `COMPOSE_FILE` environment variable if set.
+It also automatically includes override files (e.g., `docker-compose.override.yml`) when detecting files in the current directory.
 
 ```bash
 # In a directory with docker-compose.yml
 spotlight run
 # ✓ Automatically runs: docker compose up (with Spotlight injection)
 ```
+
+### What Spotlight Does for Docker Compose
+
+When a Docker Compose project is detected, Spotlight:
+
+1. **Uses `host.docker.internal`** instead of `localhost` so containers can reach Spotlight running on your host machine
+2. **Injects environment variables** into all services:
+   - `SENTRY_SPOTLIGHT`
+   - `NEXT_PUBLIC_SENTRY_SPOTLIGHT`
+   - `SENTRY_TRACES_SAMPLE_RATE`
+3. **Adds `extra_hosts` mapping** for Linux compatibility (`host.docker.internal:host-gateway`)
+
+:::note[Requirements]
+Docker Compose auto-detection requires Docker version 20.10.0 or higher for `host.docker.internal` support on Linux.
+:::
 
 ### When Both Are Detected
 
