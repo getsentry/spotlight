@@ -1,6 +1,7 @@
 import { ReactComponent as DeleteIcon } from "@spotlight/ui/assets/deleteIcon.svg";
 import { ReactComponent as Logo } from "@spotlight/ui/assets/glyph.svg";
 import { cn } from "@spotlight/ui/lib/cn";
+import { IS_ELECTRON } from "@spotlight/ui/lib/isElectron";
 import { useSpotlightContext } from "@spotlight/ui/lib/useSpotlightContext";
 import type { NotificationCount } from "@spotlight/ui/types";
 import { Badge } from "@spotlight/ui/ui/badge";
@@ -81,7 +82,7 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
       aria-label="Navigation"
     >
       {/* mt-8 adds top margin in Electron to account for the 40px drag bar */}
-      <header className={cn("p-4", __IS_ELECTRON__ && "mt-8")}>
+      <header className={cn("p-4", IS_ELECTRON && "mt-8")}>
         <div className="text-primary-200 flex flex-col gap-x-2">
           <div className="inline-flex items-center gap-x-2">
             <Logo height={24} width={24} />

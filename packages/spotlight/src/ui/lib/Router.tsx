@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { BrowserRouter, HashRouter } from "react-router-dom";
+import { IS_ELECTRON } from "./isElectron";
 
 interface RouterProps {
   children: ReactNode;
@@ -16,7 +17,7 @@ interface RouterProps {
  * - HashRouter uses URL fragments (#/path) which work with any protocol
  */
 export function Router({ children }: RouterProps) {
-  if (__IS_ELECTRON__) {
+  if (IS_ELECTRON) {
     return <HashRouter>{children}</HashRouter>;
   }
 

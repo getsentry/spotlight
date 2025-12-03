@@ -1,4 +1,5 @@
 import { cn } from "@spotlight/ui/lib/cn";
+import { IS_ELECTRON } from "@spotlight/ui/lib/isElectron";
 import { log } from "@spotlight/ui/lib/logger";
 import { getRouteStorageKey } from "@spotlight/ui/lib/routePersistence";
 import { useEffect } from "react";
@@ -43,7 +44,7 @@ export default function TelemetryView({
     <div className="from-primary-900 to-primary-950 flex h-full overflow-hidden bg-gradient-to-br from-0% to-20% font-sans text-white">
       <TelemetrySidebar errorCount={errorCount} traceCount={traceCount} logCount={logCount} isOnline={isOnline} />
       {/* pt-8 adds top padding in Electron to account for the 40px drag bar */}
-      <div className={cn("flex-1 overflow-auto", __IS_ELECTRON__ && "pt-8")}>
+      <div className={cn("flex-1 overflow-auto", IS_ELECTRON && "pt-8")}>
         <Routes>
           <Route path="not-found" element={<p>Not Found - How'd you manage to get here?</p>} key="not-found" />
           <Route path="traces/*" element={<TracesTab />} key="traces" />
