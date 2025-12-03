@@ -5,7 +5,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { envelopeReactClientSideError } from "../../formatters/md/__tests__/test_envelopes.ts";
-import { clearDnsCache, getDnsCacheSize, isAllowedOrigin } from "../../utils/cors.ts";
+import { clearDnsCache, getDnsCacheSize, isAllowedOrigin, normalizeAllowedOrigins } from "../../utils/cors.ts";
 import routes from "../index.ts";
 
 // Create test app with async CORS middleware
@@ -324,69 +324,70 @@ describe("CORS origin validation", () => {
 
   describe("isAllowedOrigin function - custom allowedOrigins", () => {
     it("should allow origins matching full origin entries (exact match)", async () => {
-      const allowedOrigins = ["https://ngrok.io:443", "http://tunnel.localtunnel.me:8080"];
+      const normalized = normalizeAllowedOrigins(["https://ngrok.io:443", "http://tunnel.localtunnel.me:8080"]);
 
       // Exact match should work
-      await expect(isAllowedOrigin("https://ngrok.io:443", allowedOrigins)).resolves.toBe(true);
-      await expect(isAllowedOrigin("http://tunnel.localtunnel.me:8080", allowedOrigins)).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://ngrok.io:443", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://tunnel.localtunnel.me:8080", normalized)).resolves.toBe(true);
     });
 
     it("should reject origins that don't exactly match full origin entries", async () => {
-      const allowedOrigins = ["https://ngrok.io:443"];
+      const normalized = normalizeAllowedOrigins(["https://ngrok.io:443"]);
 
       // Different port
-      await expect(isAllowedOrigin("https://ngrok.io:8443", allowedOrigins)).resolves.toBe(false);
+      await expect(isAllowedOrigin("https://ngrok.io:8443", normalized)).resolves.toBe(false);
       // Different protocol
-      await expect(isAllowedOrigin("http://ngrok.io:443", allowedOrigins)).resolves.toBe(false);
+      await expect(isAllowedOrigin("http://ngrok.io:443", normalized)).resolves.toBe(false);
       // No port (default)
-      await expect(isAllowedOrigin("https://ngrok.io", allowedOrigins)).resolves.toBe(false);
+      await expect(isAllowedOrigin("https://ngrok.io", normalized)).resolves.toBe(false);
     });
 
     it("should allow origins matching plain domain entries (any protocol/port)", async () => {
-      const allowedOrigins = ["myapp.local", "dev.company.internal"];
+      const normalized = normalizeAllowedOrigins(["myapp.local", "dev.company.internal"]);
 
       // Any protocol and port should work for plain domains
-      await expect(isAllowedOrigin("http://myapp.local", allowedOrigins)).resolves.toBe(true);
-      await expect(isAllowedOrigin("https://myapp.local", allowedOrigins)).resolves.toBe(true);
-      await expect(isAllowedOrigin("http://myapp.local:3000", allowedOrigins)).resolves.toBe(true);
-      await expect(isAllowedOrigin("https://myapp.local:8443", allowedOrigins)).resolves.toBe(true);
-      await expect(isAllowedOrigin("http://dev.company.internal:5000", allowedOrigins)).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://myapp.local", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://myapp.local", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://myapp.local:3000", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://myapp.local:8443", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://dev.company.internal:5000", normalized)).resolves.toBe(true);
     });
 
     it("should reject origins with hostnames not in plain domain entries", async () => {
-      const allowedOrigins = ["myapp.local"];
+      const normalized = normalizeAllowedOrigins(["myapp.local"]);
 
-      await expect(isAllowedOrigin("http://other.local", allowedOrigins)).resolves.toBe(false);
-      await expect(isAllowedOrigin("http://myapp.local.evil.com", allowedOrigins)).resolves.toBe(false);
-      await expect(isAllowedOrigin("http://subdomain.myapp.local", allowedOrigins)).resolves.toBe(false);
+      await expect(isAllowedOrigin("http://other.local", normalized)).resolves.toBe(false);
+      await expect(isAllowedOrigin("http://myapp.local.evil.com", normalized)).resolves.toBe(false);
+      await expect(isAllowedOrigin("http://subdomain.myapp.local", normalized)).resolves.toBe(false);
     });
 
     it("should handle mixed allowed origins (both full origins and plain domains)", async () => {
-      const allowedOrigins = ["https://strict.tunnel.io:443", "permissive.local"];
+      const normalized = normalizeAllowedOrigins(["https://strict.tunnel.io:443", "permissive.local"]);
 
       // Full origin - strict match required
-      await expect(isAllowedOrigin("https://strict.tunnel.io:443", allowedOrigins)).resolves.toBe(true);
-      await expect(isAllowedOrigin("http://strict.tunnel.io:443", allowedOrigins)).resolves.toBe(false);
+      await expect(isAllowedOrigin("https://strict.tunnel.io:443", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://strict.tunnel.io:443", normalized)).resolves.toBe(false);
 
       // Plain domain - permissive match
-      await expect(isAllowedOrigin("http://permissive.local", allowedOrigins)).resolves.toBe(true);
-      await expect(isAllowedOrigin("https://permissive.local:8080", allowedOrigins)).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://permissive.local", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://permissive.local:8080", normalized)).resolves.toBe(true);
     });
 
     it("should be case-insensitive for both origin types", async () => {
-      const allowedOrigins = ["https://NGROK.IO:443", "MYAPP.LOCAL"];
+      const normalized = normalizeAllowedOrigins(["https://NGROK.IO:443", "MYAPP.LOCAL"]);
 
-      await expect(isAllowedOrigin("https://ngrok.io:443", allowedOrigins)).resolves.toBe(true);
-      await expect(isAllowedOrigin("https://NGROK.IO:443", allowedOrigins)).resolves.toBe(true);
-      await expect(isAllowedOrigin("http://myapp.local", allowedOrigins)).resolves.toBe(true);
-      await expect(isAllowedOrigin("http://MYAPP.LOCAL:3000", allowedOrigins)).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://ngrok.io:443", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://NGROK.IO:443", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://myapp.local", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("http://MYAPP.LOCAL:3000", normalized)).resolves.toBe(true);
     });
 
     it("should handle empty allowedOrigins array", async () => {
-      // Empty array should not affect default behavior
-      await expect(isAllowedOrigin("http://localhost", [])).resolves.toBe(true);
-      await expect(isAllowedOrigin("https://spotlightjs.com", [])).resolves.toBe(true);
-      await expect(isAllowedOrigin("https://evil.com", [])).resolves.toBe(false);
+      const normalized = normalizeAllowedOrigins([]);
+      // Empty normalized should not affect default behavior
+      await expect(isAllowedOrigin("http://localhost", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://spotlightjs.com", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://evil.com", normalized)).resolves.toBe(false);
     });
 
     it("should handle undefined allowedOrigins", async () => {
@@ -397,11 +398,11 @@ describe("CORS origin validation", () => {
     });
 
     it("should normalize trailing slashes in full origin matching", async () => {
-      const allowedOrigins = ["https://ngrok.io/"];
+      const normalized = normalizeAllowedOrigins(["https://ngrok.io/"]);
 
       // Both with and without trailing slash should match
-      await expect(isAllowedOrigin("https://ngrok.io", allowedOrigins)).resolves.toBe(true);
-      await expect(isAllowedOrigin("https://ngrok.io/", allowedOrigins)).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://ngrok.io", normalized)).resolves.toBe(true);
+      await expect(isAllowedOrigin("https://ngrok.io/", normalized)).resolves.toBe(true);
     });
   });
 

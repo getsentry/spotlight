@@ -1,4 +1,5 @@
 import type { ParsedEnvelope } from "../parser/processEnvelope.ts";
+import type { NormalizedAllowedOrigins } from "../utils/cors.ts";
 
 export type IncomingPayloadCallback = (body: string) => void;
 export type OnEnvelopeCallback = (envelope: ParsedEnvelope["envelope"]) => void;
@@ -60,9 +61,8 @@ export type SideCarOptions = {
   allowedOrigins?: string[];
 };
 
-export type StartServerOptions = Pick<
-  SideCarOptions,
-  "basePath" | "filesToServe" | "incomingPayload" | "allowedOrigins"
-> & {
+export type StartServerOptions = Pick<SideCarOptions, "basePath" | "filesToServe" | "incomingPayload"> & {
   port: number;
+  /** Pre-normalized allowed origins for CORS (use normalizeAllowedOrigins() to create) */
+  normalizedAllowedOrigins?: NormalizedAllowedOrigins;
 };

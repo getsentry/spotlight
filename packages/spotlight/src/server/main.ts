@@ -11,7 +11,14 @@ import { serveFilesHandler } from "./handlers/index.ts";
 import { activateLogger, logger } from "./logger.ts";
 import routes from "./routes/index.ts";
 import type { HonoEnv, SideCarOptions, StartServerOptions } from "./types/index.ts";
-import { getBuffer, isAllowedOrigin, isSidecarRunning, isValidPort, logSpotlightUrl } from "./utils/index.ts";
+import {
+  getBuffer,
+  isAllowedOrigin,
+  isSidecarRunning,
+  isValidPort,
+  logSpotlightUrl,
+  normalizeAllowedOrigins,
+} from "./utils/index.ts";
 
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
@@ -32,7 +39,7 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
 
   const app = new Hono<HonoEnv>().use(
     cors({
-      origin: async origin => ((await isAllowedOrigin(origin, options.allowedOrigins)) ? origin : null),
+      origin: async origin => ((await isAllowedOrigin(origin, options.normalizedAllowedOrigins)) ? origin : null),
     }),
   );
 
@@ -173,7 +180,7 @@ export async function setupSpotlight(
     basePath,
     filesToServe,
     incomingPayload,
-    allowedOrigins,
+    normalizedAllowedOrigins: allowedOrigins ? normalizeAllowedOrigins(allowedOrigins) : undefined,
   });
   setShutdownHandlers(serverInstance);
   return serverInstance;

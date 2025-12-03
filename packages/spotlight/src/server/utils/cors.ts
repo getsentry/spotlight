@@ -306,8 +306,9 @@ function isSpotlightOrigin(url: URL, hostname: string): boolean {
 
 /**
  * Pre-normalized allowed origins for efficient matching.
+ * Call normalizeAllowedOrigins() once at server startup to create this structure.
  */
-interface NormalizedAllowedOrigins {
+export interface NormalizedAllowedOrigins {
   /** Full origins (lowercased, trailing slash removed) for exact matching */
   fullOrigins: Set<string>;
   /** Plain domains (lowercased) for permissive matching */
@@ -315,21 +316,13 @@ interface NormalizedAllowedOrigins {
 }
 
 /**
- * Cache for normalized allowed origins.
- * Uses WeakMap so the cache entry is garbage collected when the array is no longer referenced.
- */
-const normalizedOriginsCache = new WeakMap<string[], NormalizedAllowedOrigins>();
-
-/**
  * Normalize and classify allowed origins for efficient matching.
- * Results are memoized per array reference to ensure normalization is a one-time cost.
+ * Call this once at server startup, then pass the result to isAllowedOrigin().
+ *
+ * @param allowedOrigins - Raw list of allowed origins/domains from config
+ * @returns Pre-normalized structure for O(1) lookups
  */
-function normalizeAllowedOrigins(allowedOrigins: string[]): NormalizedAllowedOrigins {
-  const cached = normalizedOriginsCache.get(allowedOrigins);
-  if (cached) {
-    return cached;
-  }
-
+export function normalizeAllowedOrigins(allowedOrigins: string[]): NormalizedAllowedOrigins {
   const fullOrigins = new Set<string>();
   const domains = new Set<string>();
 
@@ -344,9 +337,7 @@ function normalizeAllowedOrigins(allowedOrigins: string[]): NormalizedAllowedOri
     }
   }
 
-  const result = { fullOrigins, domains };
-  normalizedOriginsCache.set(allowedOrigins, result);
-  return result;
+  return { fullOrigins, domains };
 }
 
 /**
@@ -395,15 +386,18 @@ export function getDnsCacheSize(): number {
  * - localhost (RFC 6761 reserved name, always trusted)
  * - Any origin whose hostname resolves to this machine's IPs (with TTL >= 1h)
  * - https://spotlightjs.com and subdomains (HTTPS only, default port)
- * - Custom origins/domains from the allowedOrigins list
+ * - Custom origins/domains from the normalizedAllowedOrigins list
  *
  * For DNS rebinding protection details, see the TTL Constants section above.
  *
  * @param origin - The origin to validate
- * @param allowedOrigins - Optional list of additional allowed origins/domains
+ * @param normalizedAllowedOrigins - Optional pre-normalized allowed origins (from normalizeAllowedOrigins())
  * @returns Promise<boolean> - true if the origin is allowed, false otherwise
  */
-export async function isAllowedOrigin(origin: string, allowedOrigins?: string[]): Promise<boolean> {
+export async function isAllowedOrigin(
+  origin: string,
+  normalizedAllowedOrigins?: NormalizedAllowedOrigins,
+): Promise<boolean> {
   if (!origin) {
     return false;
   }
@@ -425,10 +419,8 @@ export async function isAllowedOrigin(origin: string, allowedOrigins?: string[])
     }
 
     // Fast path: Check custom allowed origins (no DNS lookup needed)
-      const normalized = normalizeAllowedOrigins(allowedOrigins);
-      if (isCustomAllowedOrigin(origin, hostname, normalized)) {
-        return true;
-      }
+    if (normalizedAllowedOrigins && isCustomAllowedOrigin(origin, hostname, normalizedAllowedOrigins)) {
+      return true;
     }
 
     // Fast path: If hostname is already an IP address, check directly

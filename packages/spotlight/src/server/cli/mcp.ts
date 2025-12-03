@@ -6,19 +6,21 @@ import { logger } from "../logger.ts";
 import { setShutdownHandlers, startServer } from "../main.ts";
 import { createMCPInstance } from "../mcp/mcp.ts";
 import type { CLIHandlerOptions } from "../types/cli.ts";
+import type { NormalizedAllowedOrigins } from "../types/utils.ts";
+import { normalizeAllowedOrigins } from "../utils/cors.ts";
 import { isSidecarRunning } from "../utils/extras.ts";
 
 async function startServerWithStdioMCP(
   port: CLIHandlerOptions["port"],
   basePath: CLIHandlerOptions["basePath"],
   filesToServe: CLIHandlerOptions["filesToServe"],
-  allowedOrigins: CLIHandlerOptions["allowedOrigins"],
+  normalizedAllowedOrigins: NormalizedAllowedOrigins | undefined,
 ) {
   const serverInstance = await startServer({
     port,
     basePath,
     filesToServe,
-    allowedOrigins,
+    normalizedAllowedOrigins,
   });
   setShutdownHandlers(serverInstance);
 
@@ -40,7 +42,7 @@ async function startMCPStdioHTTPProxy(
   port: CLIHandlerOptions["port"],
   basePath: CLIHandlerOptions["basePath"],
   filesToServe: CLIHandlerOptions["filesToServe"],
-  allowedOrigins: CLIHandlerOptions["allowedOrigins"],
+  normalizedAllowedOrigins: NormalizedAllowedOrigins | undefined,
 ) {
   let intentionalShutdown = false;
   let client: Client | null = null;
@@ -111,26 +113,29 @@ async function startMCPStdioHTTPProxy(
     process.stdin.resume();
 
     try {
-      await startMCPStdioHTTPProxy(port, basePath, filesToServe, allowedOrigins);
+      await startMCPStdioHTTPProxy(port, basePath, filesToServe, normalizedAllowedOrigins);
       logger.info("Connection restored");
     } catch (_err) {
       try {
-        return await startServerWithStdioMCP(port, basePath, filesToServe, allowedOrigins);
+        return await startServerWithStdioMCP(port, basePath, filesToServe, normalizedAllowedOrigins);
       } catch (_err2) {
         logger.error("Failed to restart sidecar server after MCP stdio proxy closed.");
         captureException(_err2);
-        await startMCPStdioHTTPProxy(port, basePath, filesToServe, allowedOrigins);
+        await startMCPStdioHTTPProxy(port, basePath, filesToServe, normalizedAllowedOrigins);
       }
     }
   };
 }
 
 export default async function mcp({ port, basePath, filesToServe, allowedOrigins }: CLIHandlerOptions) {
+  // Normalize allowed origins once at startup
+  const normalizedAllowedOrigins = allowedOrigins ? normalizeAllowedOrigins(allowedOrigins) : undefined;
+
   if (port > 0 && (await isSidecarRunning(port))) {
     logger.info("Connecting to existing MCP instance with stdio proxy...");
-    await startMCPStdioHTTPProxy(port, basePath, filesToServe, allowedOrigins);
+    await startMCPStdioHTTPProxy(port, basePath, filesToServe, normalizedAllowedOrigins);
     logger.info(`Connected to existing MCP instance on port ${port}`);
   } else {
-    return await startServerWithStdioMCP(port, basePath, filesToServe, allowedOrigins);
+    return await startServerWithStdioMCP(port, basePath, filesToServe, normalizedAllowedOrigins);
   }
 }
