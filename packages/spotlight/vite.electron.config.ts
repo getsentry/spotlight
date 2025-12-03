@@ -54,7 +54,10 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: aliases,
     },
-    define: isDev ? defineDevelopment : defineProduction,
+    define: {
+      ...(isDev ? defineDevelopment : defineProduction),
+      __IS_ELECTRON__: true,
+    },
     build: {
       outDir: "dist-electron/renderer",
       sourcemap: true,

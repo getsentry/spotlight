@@ -1,6 +1,6 @@
 import { createWriteStream } from "node:fs";
-import { decompressBody, pushToSpotlightBuffer } from "@spotlight/server/sdk.ts";
-import { SENTRY_CONTENT_TYPE } from "@spotlight/shared/constants.ts";
+import { decompressBody, pushToSpotlightBuffer } from "../../sdk.ts";
+import { SENTRY_CONTENT_TYPE } from "../../../shared/constants.ts";
 import { Hono } from "hono";
 import { logger } from "../../logger.ts";
 import type { HonoEnv } from "../../types/env.ts";

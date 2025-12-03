@@ -200,7 +200,10 @@ const createWindow = () => {
           document.body.appendChild(errorScreen);
         }
         
-        // Re-create elements if body is replaced
+        // Re-create elements if body is replaced.
+        // This can happen when Spotlight.init() replaces the entire body content
+        // during hot module replacement (HMR) in development mode, or when the
+        // React app fully remounts after initial hydration.
         new MutationObserver(() => {
           if (!document.getElementById('electron-top-drag-bar')) {
             const dragBar = document.createElement('div');
