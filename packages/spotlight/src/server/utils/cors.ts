@@ -27,6 +27,13 @@ interface DnsResult {
 const dnsCache = new Map<string, CacheEntry>();
 
 /**
+ * In-flight DNS resolutions for request coalescing.
+ * Prevents duplicate DNS lookups when multiple requests come in
+ * for the same hostname before the first one completes.
+ */
+const pendingResolutions = new Map<string, Promise<boolean>>();
+
+/**
  * TTL Constants (in milliseconds)
  *
  * DNS Rebinding Attack Protection:
@@ -178,19 +185,10 @@ async function resolveHostname(hostname: string): Promise<{ addresses: DnsResult
 }
 
 /**
- * Check if a hostname resolves to this machine, with DNS rebinding protection.
- *
- * Returns true if the hostname resolves to a local IP AND has a safe TTL.
- * DNS records with TTL < 1 hour are rejected to prevent rebinding attacks.
- * Results are cached to avoid repeated DNS lookups.
+ * Perform the actual DNS resolution and cache the result.
+ * This is separated from isHostnameLocal to enable request coalescing.
  */
-async function isHostnameLocal(hostname: string): Promise<boolean> {
-  // Check cache first
-  const cached = dnsCache.get(hostname);
-  if (cached && cached.expiresAt > Date.now()) {
-    return cached.isLocal;
-  }
-
+async function resolveAndCacheHostname(hostname: string): Promise<boolean> {
   try {
     const { addresses, minTtl } = await resolveHostname(hostname);
 
@@ -227,6 +225,40 @@ async function isHostnameLocal(hostname: string): Promise<boolean> {
 }
 
 /**
+ * Check if a hostname resolves to this machine, with DNS rebinding protection.
+ *
+ * Returns true if the hostname resolves to a local IP AND has a safe TTL.
+ * DNS records with TTL < 1 hour are rejected to prevent rebinding attacks.
+ * Results are cached to avoid repeated DNS lookups.
+ *
+ * Uses request coalescing: if multiple requests come in for the same hostname
+ * before the first resolution completes, they all share the same promise.
+ */
+async function isHostnameLocal(hostname: string): Promise<boolean> {
+  // Check cache first
+  const cached = dnsCache.get(hostname);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.isLocal;
+  }
+
+  // Check if there's already an in-flight resolution for this hostname
+  const pending = pendingResolutions.get(hostname);
+  if (pending) {
+    return pending;
+  }
+
+  // Start a new resolution and track it
+  const resolution = resolveAndCacheHostname(hostname);
+  pendingResolutions.set(hostname, resolution);
+
+  try {
+    return await resolution;
+  } finally {
+    pendingResolutions.delete(hostname);
+  }
+}
+
+/**
  * Check if an origin is from spotlightjs.com (HTTPS only, default port).
  */
 function isSpotlightOrigin(url: URL, hostname: string): boolean {
@@ -237,10 +269,11 @@ function isSpotlightOrigin(url: URL, hostname: string): boolean {
 }
 
 /**
- * Clear the DNS cache and machine IPs cache. Useful for testing.
+ * Clear the DNS cache, pending resolutions, and machine IPs cache. Useful for testing.
  */
 export function clearDnsCache(): void {
   dnsCache.clear();
+  pendingResolutions.clear();
   machineIPsCache = null;
   machineIPsCacheTime = 0;
 }
