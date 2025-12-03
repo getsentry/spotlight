@@ -268,7 +268,7 @@ Run one sidecar and point all your services to it for unified debugging across y
 The sidecar is designed exclusively for local development. It only accepts connections from:
 
 - **This machine's IPs**: Any hostname that resolves to an IP assigned to this machine, including:
-  - Loopback addresses (`127.0.0.0/8`, `::1`)
+  - Loopback addresses (`127.0.0.1`, `::1`)
   - Local network IPs (e.g., `192.168.x.x`, `10.x.x.x`)
   - VPN IPs (e.g., Tailscale, Zerotier)
 - **spotlightjs.com**: The official Spotlight website (HTTPS only)
@@ -297,14 +297,11 @@ The sidecar implements protection against [DNS rebinding attacks](https://en.wik
 5. JavaScript makes requests to `evil.com` (now pointing to the machine)
 
 **Our mitigation:**
-- DNS resolution results are cached for a **minimum of 6 hours**
-- This means an attacker would need to:
-  - Trick the user into visiting their malicious site
-  - Keep the user on the page (or have them revisit) for 6+ hours
-  - Then rebind the DNS to the machine's IP
-- Even then, rebinding to a local IP would make the attacker's site inaccessible for the cache duration
+- DNS records with TTL less than 1 hour are **rejected** as potentially unsafe
+- This means an attacker would need to set a TTL >= 1 hour to have their hostname resolve to localhost
+- With such a high TTL, rebinding to localhost would make the attacker's site inaccessible for at least 1 hour
 
-This makes DNS rebinding attacks impractical against Spotlight. The attacker would need to actively mislead users into visiting their site, wait at least 6 hours hoping users revisit (a revisit won't work if DNS is already rebound), and then rebind the DNS record to a local IP. Even in that scenario, using a low TTL for the local IP record would cause their site to be down for 6 hours.
+This makes DNS rebinding attacks impractical against Spotlight. Hostnames from `/etc/hosts` (which have no TTL) are trusted since they're under local control.
 
 **Additional protection for non-loopback IPs:**
 For machine IPs other than loopback (e.g., `192.168.x.x`), the risk is even lower because:

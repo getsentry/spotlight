@@ -5,7 +5,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { envelopeReactClientSideError } from "../../formatters/md/__tests__/test_envelopes.ts";
-import { clearDnsCache, isAllowedOrigin } from "../../utils/cors.ts";
+import { clearDnsCache, getDnsCacheSize, isAllowedOrigin } from "../../utils/cors.ts";
 import routes from "../index.ts";
 
 // Create test app with async CORS middleware
@@ -324,32 +324,53 @@ describe("CORS origin validation", () => {
 
   describe("isAllowedOrigin function - caching", () => {
     it("should cache DNS resolution results", async () => {
-      // First call - triggers DNS resolution
+      // Cache should be empty after clearDnsCache() in beforeEach
+      expect(getDnsCacheSize()).toBe(0);
+
+      // First call - triggers DNS resolution and caches result
       await expect(isAllowedOrigin("http://localhost")).resolves.toBe(true);
 
-      // Second call - should use cached result (faster)
-      const start = Date.now();
-      await expect(isAllowedOrigin("http://localhost")).resolves.toBe(true);
-      const duration = Date.now() - start;
+      // Cache should now have one entry
+      expect(getDnsCacheSize()).toBe(1);
 
-      // Cached result should be very fast (< 5ms typically)
-      expect(duration).toBeLessThan(50);
+      // Second call - should use cached result (cache size unchanged)
+      await expect(isAllowedOrigin("http://localhost")).resolves.toBe(true);
+      expect(getDnsCacheSize()).toBe(1);
     });
 
     it("should cache results for different ports of same hostname", async () => {
-      // Resolve with one port
-      await expect(isAllowedOrigin("http://localhost:3000")).resolves.toBe(true);
+      expect(getDnsCacheSize()).toBe(0);
 
-      // Same hostname, different port - should use cache
+      // Resolve with one port - adds to cache
+      await expect(isAllowedOrigin("http://localhost:3000")).resolves.toBe(true);
+      expect(getDnsCacheSize()).toBe(1);
+
+      // Same hostname, different port - should use existing cache entry
       await expect(isAllowedOrigin("http://localhost:8080")).resolves.toBe(true);
+      expect(getDnsCacheSize()).toBe(1); // Still 1, not 2
     });
 
     it("should cache negative results (non-localhost hostnames)", async () => {
-      // First call - DNS resolution
+      expect(getDnsCacheSize()).toBe(0);
+
+      // First call - DNS resolution, caches negative result
       await expect(isAllowedOrigin("https://example.com")).resolves.toBe(false);
+      expect(getDnsCacheSize()).toBe(1);
 
       // Second call - should use cached negative result
       await expect(isAllowedOrigin("https://example.com")).resolves.toBe(false);
+      expect(getDnsCacheSize()).toBe(1); // Still 1
+    });
+
+    it("should not cache IP address lookups", async () => {
+      expect(getDnsCacheSize()).toBe(0);
+
+      // IP addresses are checked directly, not cached
+      await expect(isAllowedOrigin("http://127.0.0.1")).resolves.toBe(true);
+      expect(getDnsCacheSize()).toBe(0); // No cache entry for IP addresses
+
+      await expect(isAllowedOrigin("http://8.8.8.8")).resolves.toBe(false);
+      expect(getDnsCacheSize()).toBe(0); // Still no cache entry
     });
   });
 
