@@ -275,7 +275,7 @@ The sidecar is designed exclusively for local development. It only accepts conne
 
 ### Custom Local Hostnames
 
-You can use custom hostnames in your `/etc/hosts` file (e.g., `myapp.local` pointing to `127.0.0.1`). The sidecar resolves hostnames via DNS and allows them if they resolve to any of the machine's IP addresses.
+You can use custom hostnames in your `/etc/hosts` file (e.g., `myapp.local` pointing to `127.0.0.1`). These are trusted without TTL validation because they're under your local control. The sidecar determines that a hostname is from `/etc/hosts` when DNS lookup fails but the OS resolver finds it.
 
 ### VPN and Remote Access
 
@@ -301,7 +301,7 @@ The sidecar implements protection against [DNS rebinding attacks](https://en.wik
 - This means an attacker would need to set a TTL >= 1 hour to have their hostname resolve to localhost
 - With such a high TTL, rebinding to localhost would make the attacker's site inaccessible for at least 1 hour
 
-This makes DNS rebinding attacks impractical against Spotlight. Hostnames from `/etc/hosts` (which have no TTL) are trusted since they're under local control.
+This makes DNS rebinding attacks impractical against Spotlight. Hostnames defined only in `/etc/hosts` (not in public DNS) are automatically trusted since they're under local control and DNS rebinding cannot affect them.
 
 **Additional protection for non-loopback IPs:**
 For machine IPs other than loopback (e.g., `192.168.x.x`), the risk is even lower because:

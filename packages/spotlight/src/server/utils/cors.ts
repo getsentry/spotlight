@@ -1,7 +1,6 @@
-import dns from "node:dns";
+import dns from "node:dns/promises";
 import net from "node:net";
 import os from "node:os";
-import { promisify } from "node:util";
 
 /**
  * DNS Resolution Cache Entry
@@ -55,16 +54,15 @@ const DEFAULT_TTL_MS = 60 * 60 * 1000; // 1 hour - used when DNS doesn't provide
 const FAILURE_TTL_MS = 5 * 60 * 1000; // 5 minutes - cache failed lookups to avoid hammering DNS
 
 /**
- * Promisified DNS functions.
+ * DNS resolution notes:
  * We use both resolve4/6 AND lookup because:
  * - dns.resolve4/6: Queries DNS servers directly, can return TTL
- * - dns.lookup: Uses OS resolver (getaddrinfo), reads /etc/hosts
+ * - dns.lookup: Uses OS resolver (getaddrinfo), checks /etc/hosts first, then DNS
  *
  * A hostname in /etc/hosts won't be found by resolve4/6, hence we need both.
+ * We can only trust lookup results when DNS (resolve4/6) fails - that means
+ * the result came from /etc/hosts rather than DNS.
  */
-const resolve4 = promisify(dns.resolve4);
-const resolve6 = promisify(dns.resolve6);
-const lookup = promisify(dns.lookup);
 
 /**
  * Cache for machine's own IP addresses.
@@ -128,32 +126,51 @@ function isLocalMachineIP(ip: string): boolean {
 }
 
 /**
+ * Resolution result with source information for trust decisions.
+ */
+interface ResolutionResult {
+  /** Addresses from dns.resolve4/6() with TTL */
+  dnsAddresses: DnsResult[];
+  /** Addresses from dns.lookup() when DNS failed - these are from /etc/hosts */
+  hostsFileAddresses: string[];
+  /** Minimum TTL from DNS results (seconds) */
+  minTtl?: number;
+}
+
+/**
  * Resolve a hostname to IP addresses using both DNS and OS resolver.
  *
  * Why both dns.resolve() and dns.lookup()?
  * - dns.resolve4/6: Direct DNS query, returns TTL when available
  * - dns.lookup: Uses OS resolver (getaddrinfo), which reads /etc/hosts
  *
- * This ensures we handle both standard DNS hostnames and local hostnames
- * defined in /etc/hosts (common in development).
+ * A hostname in /etc/hosts won't be found by resolve4/6, hence we need both.
  *
- * @returns Array of resolved IPs with optional TTL, and the minimum TTL found
+ * Trust model:
+ * - If dns.resolve() succeeds → result is from DNS, needs TTL validation
+ * - If dns.resolve() fails but dns.lookup() succeeds → result is from /etc/hosts, trusted
+ *
+ * We can only trust lookup results when DNS failed, because lookup also queries
+ * DNS servers (via the OS resolver) if the hostname isn't in /etc/hosts.
  */
-async function resolveHostname(hostname: string): Promise<{ addresses: DnsResult[]; minTtl?: number }> {
-  const results: DnsResult[] = [];
+async function resolveHostname(hostname: string): Promise<ResolutionResult> {
+  const dnsAddresses: DnsResult[] = [];
+  const hostsFileAddresses: string[] = [];
   let minTtl: number | undefined;
 
   // Run all resolution methods in parallel for efficiency
   const [resolve4Result, resolve6Result, lookupResult] = await Promise.allSettled([
-    resolve4(hostname, { ttl: true }),
-    resolve6(hostname, { ttl: true }),
-    lookup(hostname, { all: true }),
+    dns.resolve4(hostname, { ttl: true }),
+    dns.resolve6(hostname, { ttl: true }),
+    dns.lookup(hostname, { all: true }),
   ]);
+
+  const dnsSucceeded = resolve4Result.status === "fulfilled" || resolve6Result.status === "fulfilled";
 
   // Process IPv4 DNS results (with TTL)
   if (resolve4Result.status === "fulfilled") {
     for (const record of resolve4Result.value) {
-      results.push({ address: record.address, ttl: record.ttl });
+      dnsAddresses.push({ address: record.address, ttl: record.ttl });
       if (record.ttl !== undefined) {
         minTtl = minTtl === undefined ? record.ttl : Math.min(minTtl, record.ttl);
       }
@@ -163,25 +180,24 @@ async function resolveHostname(hostname: string): Promise<{ addresses: DnsResult
   // Process IPv6 DNS results (with TTL)
   if (resolve6Result.status === "fulfilled") {
     for (const record of resolve6Result.value) {
-      results.push({ address: record.address, ttl: record.ttl });
+      dnsAddresses.push({ address: record.address, ttl: record.ttl });
       if (record.ttl !== undefined) {
         minTtl = minTtl === undefined ? record.ttl : Math.min(minTtl, record.ttl);
       }
     }
   }
 
-  // Process OS resolver results (no TTL available - from /etc/hosts or system DNS cache)
-  if (lookupResult.status === "fulfilled") {
+  // Process OS resolver results - ONLY trusted if DNS failed
+  // If DNS succeeded, lookup would return the same DNS result (not trusted separately)
+  // If DNS failed but lookup succeeded, it must be from /etc/hosts (trusted)
+  if (!dnsSucceeded && lookupResult.status === "fulfilled") {
     const lookupAddresses = Array.isArray(lookupResult.value) ? lookupResult.value : [lookupResult.value];
     for (const record of lookupAddresses) {
-      // Avoid duplicates from DNS resolve
-      if (!results.some(r => r.address === record.address)) {
-        results.push({ address: record.address }); // No TTL from lookup
-      }
+      hostsFileAddresses.push(record.address);
     }
   }
 
-  return { addresses: results, minTtl };
+  return { dnsAddresses, hostsFileAddresses, minTtl };
 }
 
 /**
@@ -190,30 +206,50 @@ async function resolveHostname(hostname: string): Promise<{ addresses: DnsResult
  */
 async function resolveAndCacheHostname(hostname: string): Promise<boolean> {
   try {
-    const { addresses, minTtl } = await resolveHostname(hostname);
+    const { dnsAddresses, hostsFileAddresses, minTtl } = await resolveHostname(hostname);
 
-    // Check if any resolved address belongs to this machine
-    const resolvesToLocal = addresses.some(result => isLocalMachineIP(result.address));
-
-    // DNS rebinding protection: reject records with TTL < 1 hour
-    // Records from /etc/hosts (no TTL) are trusted
-    if (resolvesToLocal && minTtl !== undefined && minTtl < MIN_TTL_SECONDS) {
-      // Low TTL is suspicious - reject and cache as non-local
+    // First check /etc/hosts addresses (trusted - DNS failed, so these must be from hosts file)
+    // These are under local control and don't need TTL validation
+    const hostsLocal = hostsFileAddresses.some(addr => isLocalMachineIP(addr));
+    if (hostsLocal) {
+      // /etc/hosts entry resolves to local - cache and allow
       dnsCache.set(hostname, {
-        isLocal: false,
-        expiresAt: Date.now() + FAILURE_TTL_MS,
+        isLocal: true,
+        expiresAt: Date.now() + DEFAULT_TTL_MS,
       });
-      return false;
+      return true;
     }
 
-    // Cache the result using DNS TTL or default
+    // Check DNS addresses (need TTL validation for rebinding protection)
+    const dnsLocal = dnsAddresses.some(result => isLocalMachineIP(result.address));
+
+    if (dnsLocal) {
+      // DNS rebinding protection: reject records with TTL < 1 hour
+      if (minTtl !== undefined && minTtl < MIN_TTL_SECONDS) {
+        // Low TTL is suspicious - reject and cache as non-local
+        dnsCache.set(hostname, {
+          isLocal: false,
+          expiresAt: Date.now() + FAILURE_TTL_MS,
+        });
+        return false;
+      }
+
+      // DNS resolves to local with safe TTL
+      const cacheTtl = minTtl !== undefined ? minTtl * 1000 : DEFAULT_TTL_MS;
+      dnsCache.set(hostname, {
+        isLocal: true,
+        expiresAt: Date.now() + cacheTtl,
+      });
+      return true;
+    }
+
+    // Not a local address - cache the negative result
     const cacheTtl = minTtl !== undefined ? minTtl * 1000 : DEFAULT_TTL_MS;
     dnsCache.set(hostname, {
-      isLocal: resolvesToLocal,
+      isLocal: false,
       expiresAt: Date.now() + cacheTtl,
     });
-
-    return resolvesToLocal;
+    return false;
   } catch {
     // DNS resolution failed - cache the failure briefly
     dnsCache.set(hostname, {
