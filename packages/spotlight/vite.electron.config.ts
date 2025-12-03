@@ -1,16 +1,11 @@
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import sourcemaps from "rollup-plugin-sourcemaps2";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 import electron from "vite-plugin-electron/simple";
-import { aliases, defineDevelopment, defineProduction, reactPlugins } from "./vite.config.base";
+import { aliases, defineDevelopment, defineProduction, reactPlugins, sentryPluginOptions } from "./vite.config.base";
 
 export default defineConfig(({ mode }) => {
   const isDev = mode === "development";
-  let env: Record<string, string> = {};
-
-  if (!isDev) {
-    env = loadEnv(mode, process.cwd());
-  }
 
   return {
     root: ".",
@@ -32,12 +27,8 @@ export default defineConfig(({ mode }) => {
             define: isDev ? defineDevelopment : defineProduction,
             plugins: [
               sentryVitePlugin({
-                org: env.MAIN_VITE_SENTRY_ORG,
-                project: env.MAIN_VITE_SENTRY_PROJECT,
-                authToken: env.MAIN_VITE_SENTRY_AUTH_TOKEN,
-                release: {
-                  name: process.env.npm_package_version,
-                },
+                ...sentryPluginOptions,
+                project: process.env.MAIN_VITE_SENTRY_PROJECT,
               }),
             ],
             build: {

@@ -83,6 +83,18 @@ jobs:
           echo "APPLE_API_KEY_ID=$(cat /tmp/apple_key.json | jq .key_id -r | tr -d '\n\r')" >> $GITHUB_ENV
           echo "APPLE_API_KEY_P8_PATH=/tmp/apple_key.pem" >> $GITHUB_ENV
           echo 'APPLE_API_KEY_PATH=/tmp/apple_key.json' >> $GITHUB_ENV
+      
+      - name: Setup Sentry Environment Variables
+        env:
+          MAIN_VITE_SENTRY_ORG: ${{ vars.MAIN_VITE_SENTRY_ORG }}
+          MAIN_VITE_SENTRY_PROJECT: ${{ vars.MAIN_VITE_SENTRY_PROJECT }} # Electron App
+          MAIN_VITE_UI_SENTRY_PROJECT: ${{ vars.MAIN_VITE_UI_SENTRY_PROJECT }} # Spotlight UI
+          MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
+        run: |
+          echo "MAIN_VITE_SENTRY_ORG=$MAIN_VITE_SENTRY_ORG" >> $GITHUB_ENV
+          echo "MAIN_VITE_SENTRY_PROJECT=$MAIN_VITE_SENTRY_PROJECT" >> $GITHUB_ENV
+          echo "MAIN_VITE_UI_SENTRY_PROJECT=$MAIN_VITE_UI_SENTRY_PROJECT" >> $GITHUB_ENV
+          echo "MAIN_VITE_SENTRY_AUTH_TOKEN=$MAIN_VITE_SENTRY_AUTH_TOKEN" >> $GITHUB_ENV
 
       - name: Build packages
         env:

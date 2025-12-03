@@ -1,9 +1,16 @@
 import { resolve } from "node:path";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { defineConfig } from "vite";
-import { aliases, defineProduction, dtsPlugin } from "./vite.config.base";
+import { aliases, defineProduction, dtsPlugin, sentryPluginOptions } from "./vite.config.base";
 
 export default defineConfig({
-  plugins: [dtsPlugin],
+  plugins: [
+    dtsPlugin,
+    sentryVitePlugin({
+      ...sentryPluginOptions,
+      project: process.env.MAIN_VITE_UI_SENTRY_PROJECT,
+    }),
+  ],
   define: defineProduction,
   resolve: {
     alias: aliases,

@@ -1,9 +1,16 @@
 import { resolve } from "node:path";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { defineConfig } from "vite";
-import { aliases, defineProduction, reactPlugins } from "./vite.config.base";
+import { aliases, defineProduction, reactPlugins, sentryPluginOptions } from "./vite.config.base";
 
 export default defineConfig({
-  plugins: reactPlugins,
+  plugins: [
+    ...reactPlugins,
+    sentryVitePlugin({
+      ...sentryPluginOptions,
+      project: process.env.MAIN_VITE_UI_SENTRY_PROJECT,
+    }),
+  ],
   define: defineProduction,
   resolve: {
     alias: aliases,
@@ -11,6 +18,7 @@ export default defineConfig({
   build: {
     outDir: resolve(__dirname, "dist", "ui"),
     manifest: "manifest.json",
+    sourcemap: true,
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),

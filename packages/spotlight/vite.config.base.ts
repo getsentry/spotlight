@@ -37,3 +37,11 @@ export const reactPlugins = [
 export const dtsPlugin = dts({
   insertTypesEntry: true,
 });
+
+export const sentryPluginOptions = {
+  org: process.env.MAIN_VITE_SENTRY_ORG,
+  authToken: process.env.MAIN_VITE_SENTRY_AUTH_TOKEN,
+  release: {
+    name: process.env.npm_package_version,
+  },
+};
