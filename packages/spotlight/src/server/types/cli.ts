@@ -10,6 +10,7 @@ export type CLIHandlerOptions = {
   format?: FormatterType;
   basePath?: SideCarOptions["basePath"];
   filesToServe?: SideCarOptions["filesToServe"];
+  allowedOrigins?: SideCarOptions["allowedOrigins"];
 };
 export type CLIHandlerReturnType = Promise<any> | any;
 export type CLIHandler = ((options: CLIHandlerOptions) => CLIHandlerReturnType) | (() => CLIHandlerReturnType);

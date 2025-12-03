@@ -53,7 +53,7 @@ const connectUpstream = async (port: number) =>
   });
 
 export default async function tail(
-  { port, cmdArgs, basePath, filesToServe, format = "logfmt" }: CLIHandlerOptions,
+  { port, cmdArgs, basePath, filesToServe, format = "logfmt", allowedOrigins }: CLIHandlerOptions,
   onItem?: OnItemCallback,
 ): Promise<ServerType | undefined> {
   const eventTypes = cmdArgs.length > 0 ? cmdArgs.map(arg => arg.toLowerCase()) : ["everything"];
@@ -114,7 +114,7 @@ export default async function tail(
     }
   }
 
-  const serverInstance = await setupSpotlight({ port, filesToServe, basePath, isStandalone: true });
+  const serverInstance = await setupSpotlight({ port, filesToServe, basePath, isStandalone: true, allowedOrigins });
 
   // Subscribe the onEnvelope callback to the message buffer
   // This ensures it gets called whenever any envelope is added to the buffer

@@ -107,7 +107,14 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
   return Buffer.from(`${parts.join("\n")}\n`, "utf-8");
 }
 
-export default async function run({ port, cmdArgs, basePath, filesToServe, format }: CLIHandlerOptions) {
+export default async function run({
+  port,
+  cmdArgs,
+  basePath,
+  filesToServe,
+  format,
+  allowedOrigins,
+}: CLIHandlerOptions) {
   let relayStdioAsLogs = true;
 
   const fuzzySearcher = new Searcher([] as string[], {
@@ -147,7 +154,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     return true;
   };
 
-  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe, format }, logChecker);
+  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe, format, allowedOrigins }, logChecker);
   if (!serverInstance) {
     logger.error("Failed to start Spotlight sidecar server.");
     logger.error(`The port ${port} might already be in use — most likely by another Spotlight instance.`);
@@ -200,7 +207,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
         cmdArgs = command.cmdArgs;
         stdin = command.stdin;
         // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-        delete env.COMPOSE_FILE;
+        env.COMPOSE_FILE = undefined;
       } else {
         logger.info(`Using package.json script: ${packageJson.scriptName}`);
         cmdArgs = [packageJson.scriptCommand];
@@ -218,7 +225,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
       cmdArgs = command.cmdArgs;
       stdin = command.stdin;
       // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-      delete env.COMPOSE_FILE;
+      env.COMPOSE_FILE = undefined;
     } else if (packageJson) {
       logger.info(`Using package.json script: ${packageJson.scriptName}`);
       cmdArgs = [packageJson.scriptCommand];

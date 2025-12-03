@@ -305,6 +305,40 @@ function isSpotlightOrigin(url: URL, hostname: string): boolean {
 }
 
 /**
+ * Check if an origin matches an entry in the custom allowed origins list.
+ *
+ * Supports two formats:
+ * - Full origins (e.g., "https://ngrok.io:443") - exact match required
+ * - Plain domains (e.g., "myapp.local") - matches any protocol/port
+ *
+ * @param origin - The origin to check (e.g., "https://myapp.local:3000")
+ * @param hostname - The lowercase hostname from the origin URL
+ * @param allowedOrigins - List of allowed origins/domains
+ */
+function isCustomAllowedOrigin(origin: string, hostname: string, allowedOrigins: string[]): boolean {
+  const normalizedOrigin = origin.toLowerCase();
+
+  for (const entry of allowedOrigins) {
+    const normalizedEntry = entry.toLowerCase();
+
+    if (normalizedEntry.includes("://")) {
+      // Full origin match - compare exact origin strings
+      // Normalize both by removing trailing slashes for comparison
+      if (normalizedOrigin.replace(/\/$/, "") === normalizedEntry.replace(/\/$/, "")) {
+        return true;
+      }
+    } else {
+      // Plain domain match - match hostname regardless of protocol/port
+      if (hostname === normalizedEntry) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
  * Clear the DNS cache, pending resolutions, and machine IPs cache. Useful for testing.
  */
 export function clearDnsCache(): void {
@@ -328,13 +362,15 @@ export function getDnsCacheSize(): number {
  * - localhost (RFC 6761 reserved name, always trusted)
  * - Any origin whose hostname resolves to this machine's IPs (with TTL >= 1h)
  * - https://spotlightjs.com and subdomains (HTTPS only, default port)
+ * - Custom origins/domains from the allowedOrigins list
  *
  * For DNS rebinding protection details, see the TTL Constants section above.
  *
  * @param origin - The origin to validate
+ * @param allowedOrigins - Optional list of additional allowed origins/domains
  * @returns Promise<boolean> - true if the origin is allowed, false otherwise
  */
-export async function isAllowedOrigin(origin: string): Promise<boolean> {
+export async function isAllowedOrigin(origin: string, allowedOrigins?: string[]): Promise<boolean> {
   if (!origin) {
     return false;
   }
@@ -352,6 +388,11 @@ export async function isAllowedOrigin(origin: string): Promise<boolean> {
 
     // Fast path: spotlightjs.com domains (no DNS lookup needed)
     if (isSpotlightOrigin(url, hostname)) {
+      return true;
+    }
+
+    // Fast path: Check custom allowed origins (no DNS lookup needed)
+    if (allowedOrigins && allowedOrigins.length > 0 && isCustomAllowedOrigin(origin, hostname, allowedOrigins)) {
       return true;
     }
 

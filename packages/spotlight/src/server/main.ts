@@ -32,7 +32,7 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
 
   const app = new Hono<HonoEnv>().use(
     cors({
-      origin: async origin => ((await isAllowedOrigin(origin)) ? origin : null),
+      origin: async origin => ((await isAllowedOrigin(origin, options.allowedOrigins)) ? origin : null),
     }),
   );
 
@@ -136,7 +136,15 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
 }
 
 export async function setupSpotlight(
-  { port, logger: customLogger, basePath, filesToServe, incomingPayload, isStandalone }: SideCarOptions = {
+  {
+    port,
+    logger: customLogger,
+    basePath,
+    filesToServe,
+    incomingPayload,
+    isStandalone,
+    allowedOrigins,
+  }: SideCarOptions = {
     port: DEFAULT_PORT,
   },
 ): Promise<Server | undefined> {
@@ -165,6 +173,7 @@ export async function setupSpotlight(
     basePath,
     filesToServe,
     incomingPayload,
+    allowedOrigins,
   });
   setShutdownHandlers(serverInstance);
   return serverInstance;

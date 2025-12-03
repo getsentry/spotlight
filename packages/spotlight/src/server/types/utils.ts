@@ -48,8 +48,21 @@ export type SideCarOptions = {
   isStandalone?: boolean;
 
   stdioMCP?: boolean;
+
+  /**
+   * Additional origins to allow for CORS requests.
+   * Useful for custom local domains, tunnels, etc.
+   *
+   * Accepts two formats:
+   * - Full origins (e.g., "https://ngrok.io:443") for strict matching
+   * - Plain domains (e.g., "myapp.local") to allow any protocol/port
+   */
+  allowedOrigins?: string[];
 };
 
-export type StartServerOptions = Pick<SideCarOptions, "basePath" | "filesToServe" | "incomingPayload"> & {
+export type StartServerOptions = Pick<
+  SideCarOptions,
+  "basePath" | "filesToServe" | "incomingPayload" | "allowedOrigins"
+> & {
   port: number;
 };

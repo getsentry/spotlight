@@ -12,11 +12,13 @@ async function startServerWithStdioMCP(
   port: CLIHandlerOptions["port"],
   basePath: CLIHandlerOptions["basePath"],
   filesToServe: CLIHandlerOptions["filesToServe"],
+  allowedOrigins: CLIHandlerOptions["allowedOrigins"],
 ) {
   const serverInstance = await startServer({
     port,
     basePath,
     filesToServe,
+    allowedOrigins,
   });
   setShutdownHandlers(serverInstance);
 
@@ -38,6 +40,7 @@ async function startMCPStdioHTTPProxy(
   port: CLIHandlerOptions["port"],
   basePath: CLIHandlerOptions["basePath"],
   filesToServe: CLIHandlerOptions["filesToServe"],
+  allowedOrigins: CLIHandlerOptions["allowedOrigins"],
 ) {
   let intentionalShutdown = false;
   let client: Client | null = null;
@@ -108,26 +111,26 @@ async function startMCPStdioHTTPProxy(
     process.stdin.resume();
 
     try {
-      await startMCPStdioHTTPProxy(port, basePath, filesToServe);
+      await startMCPStdioHTTPProxy(port, basePath, filesToServe, allowedOrigins);
       logger.info("Connection restored");
     } catch (_err) {
       try {
-        return await startServerWithStdioMCP(port, basePath, filesToServe);
+        return await startServerWithStdioMCP(port, basePath, filesToServe, allowedOrigins);
       } catch (_err2) {
         logger.error("Failed to restart sidecar server after MCP stdio proxy closed.");
         captureException(_err2);
-        await startMCPStdioHTTPProxy(port, basePath, filesToServe);
+        await startMCPStdioHTTPProxy(port, basePath, filesToServe, allowedOrigins);
       }
     }
   };
 }
 
-export default async function mcp({ port, basePath, filesToServe }: CLIHandlerOptions) {
+export default async function mcp({ port, basePath, filesToServe, allowedOrigins }: CLIHandlerOptions) {
   if (port > 0 && (await isSidecarRunning(port))) {
     logger.info("Connecting to existing MCP instance with stdio proxy...");
-    await startMCPStdioHTTPProxy(port, basePath, filesToServe);
+    await startMCPStdioHTTPProxy(port, basePath, filesToServe, allowedOrigins);
     logger.info(`Connected to existing MCP instance on port ${port}`);
   } else {
-    return await startServerWithStdioMCP(port, basePath, filesToServe);
+    return await startServerWithStdioMCP(port, basePath, filesToServe, allowedOrigins);
   }
 }

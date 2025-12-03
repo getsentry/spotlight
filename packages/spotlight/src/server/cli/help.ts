@@ -19,6 +19,12 @@ Options:
   -d, --debug            Enable debug logging
   -f, --format <format>  Output format for tail command (default: human)
                          Available formats: ${[...AVAILABLE_FORMATTERS].join(", ")}
+  -A, --allowed-origin <origin>
+                         Additional origins to allow for CORS requests.
+                         Can be specified multiple times or comma-separated.
+                         Accepts full origins (https://example.com:443) for
+                         strict matching or plain domains (myapp.local) to
+                         allow any protocol/port.
   -h, --help             Show this help message
 
 Examples:
@@ -30,6 +36,8 @@ Examples:
   spotlight mcp                      # Start in MCP mode
   spotlight --port 3000              # Start on port 3000
   spotlight -p 3000 -d               # Start on port 3000 with debug logging
+  spotlight -A myapp.local           # Allow requests from myapp.local
+  spotlight -A https://tunnel.ngrok.io -A dev.local  # Multiple origins
 `);
   process.exit(0);
 }
