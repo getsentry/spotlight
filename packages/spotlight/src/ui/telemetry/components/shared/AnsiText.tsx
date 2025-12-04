@@ -1,5 +1,4 @@
 import Anser from "anser";
-import type { CSSProperties } from "react";
 import { useMemo } from "react";
 
 interface AnsiTextProps {
@@ -8,55 +7,32 @@ interface AnsiTextProps {
 }
 
 /**
- * Sentinel theme terminal colors
- * Based on https://github.com/getsentry/sentinel
+ * Maps ANSI color codes to Tailwind CSS classes
  */
-const SENTINEL_COLORS = {
-  black: "#181225",
-  red: "#fe4144",
-  green: "#83da90",
-  yellow: "#FDB81B",
-  blue: "#226DFC",
-  magenta: "#FF45A8",
-  cyan: "#22D3EE",
-  white: "#f9f8f9",
-  brightBlack: "#898294",
-  brightRed: "#F87171",
-  brightGreen: "#83da90",
-  brightYellow: "#d8ab5a",
-  brightBlue: "#818CF8",
-  brightMagenta: "#F472B6",
-  brightCyan: "#67E8F9",
-  brightWhite: "#F9FAFB",
-} as const;
-
-/**
- * Maps ANSI color codes to Sentinel theme hex colors
- */
-const ANSI_FG_COLOR_MAP: Record<string, string> = {
+const ANSI_COLOR_MAP: Record<string, string> = {
   // Standard colors
-  "ansi-black": SENTINEL_COLORS.black,
-  "ansi-red": SENTINEL_COLORS.red,
-  "ansi-green": SENTINEL_COLORS.green,
-  "ansi-yellow": SENTINEL_COLORS.yellow,
-  "ansi-blue": SENTINEL_COLORS.blue,
-  "ansi-magenta": SENTINEL_COLORS.magenta,
-  "ansi-cyan": SENTINEL_COLORS.cyan,
-  "ansi-white": SENTINEL_COLORS.white,
+  "ansi-black": "text-gray-800",
+  "ansi-red": "text-red-400",
+  "ansi-green": "text-green-400",
+  "ansi-yellow": "text-yellow-400",
+  "ansi-blue": "text-blue-400",
+  "ansi-magenta": "text-purple-400",
+  "ansi-cyan": "text-cyan-400",
+  "ansi-white": "text-white",
   // Bright variants
-  "ansi-bright-black": SENTINEL_COLORS.brightBlack,
-  "ansi-bright-red": SENTINEL_COLORS.brightRed,
-  "ansi-bright-green": SENTINEL_COLORS.brightGreen,
-  "ansi-bright-yellow": SENTINEL_COLORS.brightYellow,
-  "ansi-bright-blue": SENTINEL_COLORS.brightBlue,
-  "ansi-bright-magenta": SENTINEL_COLORS.brightMagenta,
-  "ansi-bright-cyan": SENTINEL_COLORS.brightCyan,
-  "ansi-bright-white": SENTINEL_COLORS.brightWhite,
+  "ansi-bright-black": "text-gray-300",
+  "ansi-bright-red": "text-red-300",
+  "ansi-bright-green": "text-green-300",
+  "ansi-bright-yellow": "text-yellow-300",
+  "ansi-bright-blue": "text-blue-300",
+  "ansi-bright-magenta": "text-purple-300",
+  "ansi-bright-cyan": "text-cyan-300",
+  "ansi-bright-white": "text-white",
 };
 
 /**
- * Component that renders text containing ANSI escape codes with proper styling.
- * Uses inline styles for colors (Sentinel theme) and Tailwind classes for formatting.
+ * Component that renders text containing ANSI escape codes with proper styling
+ * using Tailwind CSS classes.
  */
 export default function AnsiText({ text, className }: AnsiTextProps) {
   const elements = useMemo(() => {
@@ -72,19 +48,24 @@ export default function AnsiText({ text, className }: AnsiTextProps) {
       .filter(token => token.content) // Filter out empty tokens
       .map((token, index) => {
         const classes: string[] = [];
-        const style: CSSProperties = {};
 
-        // Map foreground colors using inline styles
-        if (token.fg && ANSI_FG_COLOR_MAP[token.fg]) {
-          style.color = ANSI_FG_COLOR_MAP[token.fg];
+        // Map foreground colors
+        if (token.fg) {
+          const colorClass = ANSI_COLOR_MAP[token.fg];
+          if (colorClass) {
+            classes.push(colorClass);
+          }
         }
 
-        // Map background colors using inline styles
-        if (token.bg && ANSI_FG_COLOR_MAP[token.bg]) {
-          style.backgroundColor = ANSI_FG_COLOR_MAP[token.bg];
+        // Map background colors (optional, less common in logs)
+        if (token.bg) {
+          const bgColorClass = ANSI_COLOR_MAP[token.bg]?.replace("text-", "bg-");
+          if (bgColorClass) {
+            classes.push(bgColorClass);
+          }
         }
 
-        // Map formatting from decorations array using Tailwind classes
+        // Map formatting from decorations array
         if (token.decorations && token.decorations.length > 0) {
           if (token.decorations.includes("bold")) {
             classes.push("font-bold");
@@ -102,16 +83,12 @@ export default function AnsiText({ text, className }: AnsiTextProps) {
 
         // If no foreground color specified, use default text color
         // (applies to both unstyled text and text with only formatting like bold/italic)
-        if (!token.fg || !ANSI_FG_COLOR_MAP[token.fg]) {
+        if (!token.fg || !ANSI_COLOR_MAP[token.fg]) {
           classes.push("text-primary-300");
         }
 
         return (
-          <span
-            key={index}
-            className={classes.length > 0 ? classes.join(" ") : undefined}
-            style={Object.keys(style).length > 0 ? style : undefined}
-          >
+          <span key={index} className={classes.join(" ")}>
             {token.content}
           </span>
         );

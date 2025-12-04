@@ -29,12 +29,12 @@ export const SOURCE_COLORS: Record<SourceType, (text: string) => string> = {
 };
 
 export const LOG_LEVEL_COLORS: Record<LogLevel, (text: string) => string> = {
-  error: chalk.hex(SENTINEL.red).bold,
-  warning: chalk.hex(SENTINEL.yellow),
-  log: chalk.hex(SENTINEL.white),
-  info: chalk.hex(SENTINEL.magenta),
-  trace: chalk.hex(SENTINEL.green),
-  debug: chalk.hex(SENTINEL.muted),
+  error: chalk.red.bold,
+  warning: chalk.hex("#FFA500"), // Orange
+  log: chalk.white,
+  info: chalk.cyan,
+  trace: chalk.green,
+  debug: chalk.dim,
 };
 
 /**
