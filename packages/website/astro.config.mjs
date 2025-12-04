@@ -4,7 +4,7 @@ import sentry from "@sentry/astro";
 import { defineConfig } from "astro/config";
 import Inspect from "vite-plugin-inspect";
 import tailwindcss from "@tailwindcss/vite";
-
+import { sentinelDarkTheme } from "./src/sentinel-theme";
 
 import react from "@astrojs/react";
 
@@ -125,8 +125,7 @@ export default defineConfig({
         },
       ],
       expressiveCode: {
-        themes: ["starlight-dark", "starlight-light"],
-        useStarlightUiThemeColors: true,
+        themes: [sentinelDarkTheme],
       },
       editLink: {
         baseUrl:

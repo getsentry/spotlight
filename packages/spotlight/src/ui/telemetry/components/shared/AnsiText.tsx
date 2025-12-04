@@ -7,27 +7,50 @@ interface AnsiTextProps {
 }
 
 /**
- * Maps ANSI color codes to Tailwind CSS classes
+ * Sentinel theme terminal colors
+ * Based on https://github.com/getsentry/sentinel
+ */
+const SENTINEL_COLORS = {
+  black: "#181225",
+  red: "#fe4144",
+  green: "#83da90",
+  yellow: "#FDB81B",
+  blue: "#226DFC",
+  magenta: "#FF45A8",
+  cyan: "#FF45A8",
+  white: "#f9f8f9",
+  brightBlack: "#898294",
+  brightRed: "#F87171",
+  brightGreen: "#83da90",
+  brightYellow: "#d8ab5a",
+  brightBlue: "#818CF8",
+  brightMagenta: "#F472B6",
+  brightCyan: "#FF70BC",
+  brightWhite: "#F9FAFB",
+} as const;
+
+/**
+ * Maps ANSI color codes to Sentinel theme colors
  */
 const ANSI_COLOR_MAP: Record<string, string> = {
   // Standard colors
-  "ansi-black": "text-gray-800",
-  "ansi-red": "text-red-400",
-  "ansi-green": "text-green-400",
-  "ansi-yellow": "text-yellow-400",
-  "ansi-blue": "text-blue-400",
-  "ansi-magenta": "text-purple-400",
-  "ansi-cyan": "text-cyan-400",
-  "ansi-white": "text-white",
+  "ansi-black": `text-[${SENTINEL_COLORS.black}]`,
+  "ansi-red": `text-[${SENTINEL_COLORS.red}]`,
+  "ansi-green": `text-[${SENTINEL_COLORS.green}]`,
+  "ansi-yellow": `text-[${SENTINEL_COLORS.yellow}]`,
+  "ansi-blue": `text-[${SENTINEL_COLORS.blue}]`,
+  "ansi-magenta": `text-[${SENTINEL_COLORS.magenta}]`,
+  "ansi-cyan": `text-[${SENTINEL_COLORS.cyan}]`,
+  "ansi-white": `text-[${SENTINEL_COLORS.white}]`,
   // Bright variants
-  "ansi-bright-black": "text-gray-300",
-  "ansi-bright-red": "text-red-300",
-  "ansi-bright-green": "text-green-300",
-  "ansi-bright-yellow": "text-yellow-300",
-  "ansi-bright-blue": "text-blue-300",
-  "ansi-bright-magenta": "text-purple-300",
-  "ansi-bright-cyan": "text-cyan-300",
-  "ansi-bright-white": "text-white",
+  "ansi-bright-black": `text-[${SENTINEL_COLORS.brightBlack}]`,
+  "ansi-bright-red": `text-[${SENTINEL_COLORS.brightRed}]`,
+  "ansi-bright-green": `text-[${SENTINEL_COLORS.brightGreen}]`,
+  "ansi-bright-yellow": `text-[${SENTINEL_COLORS.brightYellow}]`,
+  "ansi-bright-blue": `text-[${SENTINEL_COLORS.brightBlue}]`,
+  "ansi-bright-magenta": `text-[${SENTINEL_COLORS.brightMagenta}]`,
+  "ansi-bright-cyan": `text-[${SENTINEL_COLORS.brightCyan}]`,
+  "ansi-bright-white": `text-[${SENTINEL_COLORS.brightWhite}]`,
 };
 
 /**
