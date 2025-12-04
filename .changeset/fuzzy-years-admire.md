@@ -2,4 +2,4 @@
 "@spotlightjs/spotlight": patch
 ---
 
-minor fixes
+Fix `npx @spotlightjs/spotlight` fail
