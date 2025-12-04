@@ -5,7 +5,6 @@ import { defineConfig } from "astro/config";
 import Inspect from "vite-plugin-inspect";
 import tailwindcss from "@tailwindcss/vite";
 
-
 import react from "@astrojs/react";
 
 // https://astro.build/config
