@@ -6,7 +6,7 @@ import { logger } from "../logger.ts";
 import { setShutdownHandlers, startServer } from "../main.ts";
 import { createMCPInstance } from "../mcp/mcp.ts";
 import type { CLIHandlerOptions } from "../types/cli.ts";
-import type { NormalizedAllowedOrigins } from "../types/utils.ts";
+import type { NormalizedAllowedOrigins } from "../utils/cors.ts";
 import { normalizeAllowedOrigins } from "../utils/cors.ts";
 import { isSidecarRunning } from "../utils/extras.ts";
 

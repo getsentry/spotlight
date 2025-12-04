@@ -7,7 +7,8 @@ const decompressors: Record<"gzip" | "deflate" | "br", (buf: Buffer) => Buffer> 
   deflate: inflateSync,
   br: brotliDecompressSync,
 };
-type ContentEncoding = keyof typeof decompressors;
+
+export type ContentEncoding = keyof typeof decompressors;
 
 export function createSpotlightBuffer() {
   return new MessageBuffer<EventContainer>();

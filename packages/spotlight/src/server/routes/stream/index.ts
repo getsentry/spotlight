@@ -1,8 +1,9 @@
 import { createWriteStream } from "node:fs";
-import { decompressBody, pushToSpotlightBuffer } from "../../sdk.ts";
-import { SENTRY_CONTENT_TYPE } from "../../../shared/constants.ts";
 import { Hono } from "hono";
+import { SENTRY_CONTENT_TYPE } from "../../../shared/constants.ts";
 import { logger } from "../../logger.ts";
+import { decompressBody, pushToSpotlightBuffer } from "../../sdk.ts";
+import type { ContentEncoding } from "../../sdk.ts";
 import type { HonoEnv } from "../../types/env.ts";
 import { getBuffer } from "../../utils/index.ts";
 import { logIncomingEvent, logOutgoingEvent } from "./debugLogging.ts";
@@ -77,7 +78,10 @@ const router = new Hono<HonoEnv>()
     }
 
     // manually decompress body to use it below without another decompression
-    const body = decompressBody(Buffer.from(await ctx.req.arrayBuffer()), ctx.req.header("Content-Encoding"));
+    const body = decompressBody(
+      Buffer.from(await ctx.req.arrayBuffer()),
+      ctx.req.header("Content-Encoding") as ContentEncoding,
+    );
 
     const container = pushToSpotlightBuffer({
       body,
