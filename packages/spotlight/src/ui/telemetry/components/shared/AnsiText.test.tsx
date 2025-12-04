@@ -9,26 +9,29 @@ describe("AnsiText", () => {
     expect(container.textContent).toBe("Hello World");
   });
 
-  it("should render green text", () => {
+  it("should render green text with inline style", () => {
     // Store in variable to avoid JSX attribute double-escaping issue
     const ansiText = "\u001b[32mGreen text\u001b[0m";
     const { container } = render(<AnsiText text={ansiText} />);
     const text = container.textContent;
     expect(text).toBe("Green text");
-    // Check that the green color class is applied
+    // Check that a color is applied via inline style (Sentinel green: #83da90)
     const spans = container.querySelectorAll("span");
-    const greenSpan = Array.from(spans).find(s => s.className.includes("text-green-400"));
+    const greenSpan = Array.from(spans).find(s => s instanceof HTMLElement && s.style.color !== "");
     expect(greenSpan).toBeDefined();
+    expect((greenSpan as HTMLElement).style.color).toMatch(/83da90|rgb\(131,\s*218,\s*144\)/i);
   });
 
-  it("should render red text", () => {
+  it("should render red text with inline style", () => {
     const ansiText = "\u001b[31mRed text\u001b[0m";
     const { container } = render(<AnsiText text={ansiText} />);
     const text = container.textContent;
     expect(text).toBe("Red text");
+    // Check that a color is applied via inline style (Sentinel red: #fe4144)
     const spans = container.querySelectorAll("span");
-    const redSpan = Array.from(spans).find(s => s.className.includes("text-red-400"));
+    const redSpan = Array.from(spans).find(s => s instanceof HTMLElement && s.style.color !== "");
     expect(redSpan).toBeDefined();
+    expect((redSpan as HTMLElement).style.color).toMatch(/fe4144|rgb\(254,\s*65,\s*68\)/i);
   });
 
   it("should render bold text with default color", () => {
@@ -73,15 +76,15 @@ describe("AnsiText", () => {
     const text = container.textContent;
     expect(text).toBe("Green Red Bold");
 
-    // Check that multiple spans are created with different classes
+    // Check that multiple spans are created
     const spans = container.querySelectorAll("span");
     expect(spans.length).toBeGreaterThan(1);
 
-    // Should have spans with respective classes
-    const greenSpan = Array.from(spans).find(s => s.className.includes("text-green-400"));
-    expect(greenSpan).toBeDefined();
-    const redSpan = Array.from(spans).find(s => s.className.includes("text-red-400"));
-    expect(redSpan).toBeDefined();
+    // Should have spans with colors (inline styles)
+    const coloredSpans = Array.from(spans).filter(s => s instanceof HTMLElement && s.style.color !== "");
+    expect(coloredSpans.length).toBeGreaterThanOrEqual(2);
+
+    // Bold uses Tailwind class
     const boldSpan = Array.from(spans).find(s => s.className.includes("font-bold"));
     expect(boldSpan).toBeDefined();
   });
@@ -109,5 +112,19 @@ describe("AnsiText", () => {
     // Should not contain raw escape sequences
     expect(text).not.toContain("\u001b[");
     expect(text).not.toContain("\\u001b");
+  });
+
+  it("should render cyan text with correct color (not magenta)", () => {
+    const ansiText = "\u001b[36mCyan text\u001b[0m";
+    const { container } = render(<AnsiText text={ansiText} />);
+    const text = container.textContent;
+    expect(text).toBe("Cyan text");
+    // Check that cyan color is applied (Sentinel cyan: #22D3EE)
+    const spans = container.querySelectorAll("span");
+    const cyanSpan = Array.from(spans).find(s => s instanceof HTMLElement && s.style.color !== "");
+    expect(cyanSpan).toBeDefined();
+    // Should be cyan (#22D3EE), NOT magenta (#FF45A8)
+    expect((cyanSpan as HTMLElement).style.color).toMatch(/22d3ee|rgb\(34,\s*211,\s*238\)/i);
+    expect((cyanSpan as HTMLElement).style.color).not.toMatch(/ff45a8|rgb\(255,\s*69,\s*168\)/i);
   });
 });
