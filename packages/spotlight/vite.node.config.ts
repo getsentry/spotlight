@@ -47,32 +47,8 @@ export default defineConfig({
       formats: ["es"],
     },
     rollupOptions: {
-      external: [
-        // Externalize all Node.js built-ins
-        /^node:.*/,
-        // Externalize all dependencies
-        "@hono/mcp",
-        "@hono/node-server",
-        "@jridgewell/trace-mapping",
-        "@modelcontextprotocol/sdk",
-        "@sentry/core",
-        "@sentry/electron",
-        "@sentry/node",
-        "chalk",
-        "electron-store",
-        "electron-updater",
-        "eventsource",
-        "fast-fuzzy",
-        "hono",
-        "import-meta-resolve",
-        "launch-editor",
-        "logfmt",
-        "mcp-proxy",
-        "semver",
-        "uuidv7",
-        "yaml",
-        "zod",
-      ],
+      // Externalize all Node.js built-ins
+      external: [/^node:.*/],
       output: {
         entryFileNames: "[name].js",
         chunkFileNames: "[name].js",
