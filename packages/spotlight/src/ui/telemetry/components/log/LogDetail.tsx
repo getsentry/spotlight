@@ -26,7 +26,7 @@ export default function LogDetails({ id }: { id: string }) {
       <div className="space-y-6">
         <div>
           <h2 className="mb-2 font-bold uppercase">Message</h2>
-          <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">
+          <pre className="whitespace-pre-wrap break-words font-mono text-sm">
             <AnsiText text={body} />
           </pre>
         </div>
