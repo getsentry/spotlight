@@ -21,6 +21,7 @@ import useColumnVisibility from "../../hooks/useColumnVisibility";
 import useSort from "../../hooks/useSort";
 import type { SentryLogEventItem } from "../../types";
 import { formatTimestamp } from "../../utils/duration";
+import AnsiText from "../shared/AnsiText";
 import LogDetails from "./LogDetail";
 
 type LogsComparator = (a: SentryLogEventItem, b: SentryLogEventItem) => number;
@@ -168,7 +169,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                     if (header.id === "message" && isColumnVisible("message")) {
                       return (
                         <td key="message" className={cn("text-sm truncate align-middle", paddings)}>
-                          <span>{log.body}</span>
+                          <AnsiText text={log.body} />
                         </td>
                       );
                     }

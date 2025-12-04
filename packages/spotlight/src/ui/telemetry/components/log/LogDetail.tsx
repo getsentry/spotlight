@@ -1,3 +1,4 @@
+import AnsiText from "@spotlight/ui/telemetry/components/shared/AnsiText";
 import JsonViewer from "@spotlight/ui/telemetry/components/shared/JsonViewer";
 import { useSentryLog } from "@spotlight/ui/telemetry/data/useSentryLogs";
 import SidePanel, { SidePanelHeader } from "@spotlight/ui/ui/sidePanel";
@@ -25,7 +26,9 @@ export default function LogDetails({ id }: { id: string }) {
       <div className="space-y-6">
         <div>
           <h2 className="mb-2 font-bold uppercase">Message</h2>
-          <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">{body}</pre>
+          <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">
+            <AnsiText text={body} />
+          </pre>
         </div>
 
         <div>
