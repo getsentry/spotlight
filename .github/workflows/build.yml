@@ -105,7 +105,7 @@ jobs:
         run: pnpm build
       
       - name: Checking npx
-        run: npx ./packages/spotlight
+        run: npx ./packages/spotlight --help
 
       - name: Smoke test
         env:
