@@ -1,5 +1,11 @@
 # @spotlightjs/spotlight
 
+## 4.7.2
+
+### Patch Changes
+
+- Fix ANSI escape code rendering in log viewer. Logs containing ANSI escape sequences (colors, bold, italic, etc.) are now properly styled in the UI instead of showing raw escape characters. ([#1187](https://github.com/getsentry/spotlight/pull/1187))
+
 ## 4.7.1
 
 ### Patch Changes
