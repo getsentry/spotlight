@@ -143,6 +143,6 @@ input:checked ~ .dot {
   }
 
   .highlighted {
-    @apply bg-primary-950 py-1 pl-2 -ml-2 -mr-4 min-w-full rounded-xs inline-block;
+    @apply bg-primary-950 py-1 pl-2 -ml-2 min-w-[calc(100%+0.5rem)] rounded-xs inline-block;
   }
 }
