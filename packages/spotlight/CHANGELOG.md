@@ -1,5 +1,13 @@
 # @spotlightjs/spotlight
 
+## 4.7.1
+
+### Patch Changes
+
+- Report `github-ci` environment to Sentry when running in GitHub Actions CI ([#1178](https://github.com/getsentry/spotlight/pull/1178))
+
+- Fix `npx @spotlightjs/spotlight` fail ([#1181](https://github.com/getsentry/spotlight/pull/1181))
+
 ## 4.7.0
 
 ### Minor Changes
