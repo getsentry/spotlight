@@ -31,7 +31,7 @@ describe("AnsiText", () => {
     expect(redSpan).toBeDefined();
   });
 
-  it("should render bold text", () => {
+  it("should render bold text with default color", () => {
     const ansiText = "\u001b[1mBold text\u001b[0m";
     const { container } = render(<AnsiText text={ansiText} />);
     const text = container.textContent;
@@ -39,9 +39,11 @@ describe("AnsiText", () => {
     const spans = container.querySelectorAll("span");
     const boldSpan = Array.from(spans).find(s => s.className.includes("font-bold"));
     expect(boldSpan).toBeDefined();
+    // Bold text without explicit color should still get default text color
+    expect(boldSpan?.className).toContain("text-primary-300");
   });
 
-  it("should render italic text", () => {
+  it("should render italic text with default color", () => {
     const ansiText = "\u001b[3mItalic text\u001b[0m";
     const { container } = render(<AnsiText text={ansiText} />);
     const text = container.textContent;
@@ -49,6 +51,20 @@ describe("AnsiText", () => {
     const spans = container.querySelectorAll("span");
     const italicSpan = Array.from(spans).find(s => s.className.includes("italic"));
     expect(italicSpan).toBeDefined();
+    // Italic text without explicit color should still get default text color
+    expect(italicSpan?.className).toContain("text-primary-300");
+  });
+
+  it("should render bold+italic text with default color", () => {
+    const ansiText = "\u001b[1;3mBold and italic\u001b[0m";
+    const { container } = render(<AnsiText text={ansiText} />);
+    const text = container.textContent;
+    expect(text).toBe("Bold and italic");
+    const spans = container.querySelectorAll("span");
+    const styledSpan = Array.from(spans).find(s => s.className.includes("font-bold") && s.className.includes("italic"));
+    expect(styledSpan).toBeDefined();
+    // Formatted text without explicit color should get default text color
+    expect(styledSpan?.className).toContain("text-primary-300");
   });
 
   it("should render multiple colors and styles", () => {

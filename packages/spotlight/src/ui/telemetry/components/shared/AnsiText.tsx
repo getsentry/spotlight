@@ -81,8 +81,9 @@ export default function AnsiText({ text, className }: AnsiTextProps) {
           }
         }
 
-        // If no styling, use default text color
-        if (classes.length === 0) {
+        // If no foreground color specified, use default text color
+        // (applies to both unstyled text and text with only formatting like bold/italic)
+        if (!token.fg || !ANSI_COLOR_MAP[token.fg]) {
           classes.push("text-primary-300");
         }
 
