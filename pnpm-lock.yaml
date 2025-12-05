@@ -82,13 +82,7 @@ importers:
         version: 5.9.2
 
   packages/spotlight:
-    devDependencies:
-      '@electron/notarize':
-        specifier: ^2.5.0
-        version: 2.5.0
-      '@fontsource/raleway':
-        specifier: 'catalog:'
-        version: 5.2.5
+    dependencies:
       '@hono/mcp':
         specifier: ^0.1.5
         version: 0.1.5(@modelcontextprotocol/sdk@1.16.0)(hono@4.10.3)
@@ -96,14 +90,63 @@ importers:
         specifier: ^1.19.3
         version: 1.19.3(hono@4.10.3)
       '@jridgewell/trace-mapping':
-        specifier: ^0.3.31
+        specifier: ^0.3.25
         version: 0.3.31
-      '@microlink/react-json-view':
-        specifier: ^1.23.4
-        version: 1.26.1(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@modelcontextprotocol/sdk':
         specifier: ^1.16.0
         version: 1.16.0
+      '@sentry/core':
+        specifier: 'catalog:'
+        version: 10.5.0
+      '@sentry/node':
+        specifier: 'catalog:'
+        version: 10.28.0
+      chalk:
+        specifier: ^5.6.2
+        version: 5.6.2
+      eventsource:
+        specifier: ^4.0.0
+        version: 4.0.0
+      fast-fuzzy:
+        specifier: ^1.12.0
+        version: 1.12.0
+      hono:
+        specifier: ^4.10.3
+        version: 4.10.3
+      import-meta-resolve:
+        specifier: ^4.1.0
+        version: 4.1.0
+      launch-editor:
+        specifier: ^2.9.1
+        version: 2.10.0
+      logfmt:
+        specifier: ^1.4.0
+        version: 1.4.0
+      mcp-proxy:
+        specifier: ^5.6.0
+        version: 5.6.0
+      semver:
+        specifier: ^7.7.3
+        version: 7.7.3
+      uuidv7:
+        specifier: ^1.0.2
+        version: 1.0.2
+      yaml:
+        specifier: ^2.8.1
+        version: 2.8.1
+      zod:
+        specifier: ^3
+        version: 3.25.76
+    devDependencies:
+      '@electron/notarize':
+        specifier: ^2.5.0
+        version: 2.5.0
+      '@fontsource/raleway':
+        specifier: 'catalog:'
+        version: 5.2.5
+      '@microlink/react-json-view':
+        specifier: ^1.23.4
+        version: 1.26.1(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@playwright/test':
         specifier: ^1.56.1
         version: 1.56.1
@@ -119,15 +162,9 @@ importers:
       '@sentry/browser':
         specifier: ^10.26.0
         version: 10.26.0
-      '@sentry/core':
-        specifier: 'catalog:'
-        version: 10.5.0
       '@sentry/electron':
         specifier: ^7.3.0
         version: 7.3.0
-      '@sentry/node':
-        specifier: 'catalog:'
-        version: 10.28.0
       '@sentry/react':
         specifier: ^10.26.0
         version: 10.26.0(react@18.3.1)
@@ -176,9 +213,6 @@ importers:
       beautify:
         specifier: ^0.0.8
         version: 0.0.8
-      chalk:
-        specifier: ^5.6.2
-        version: 5.6.2
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -215,12 +249,6 @@ importers:
       eslint-plugin-react-refresh:
         specifier: ^0.4.12
         version: 0.4.20(eslint@8.57.1)
-      eventsource:
-        specifier: ^4.0.0
-        version: 4.0.0
-      fast-fuzzy:
-        specifier: ^1.12.0
-        version: 1.12.0
       fetch-event-stream:
         specifier: ^0.1.5
         version: 0.1.5
@@ -230,24 +258,9 @@ importers:
       happy-dom:
         specifier: ^20.0.2
         version: 20.0.2
-      hono:
-        specifier: ^4.10.3
-        version: 4.10.3
-      import-meta-resolve:
-        specifier: ^4.1.0
-        version: 4.1.0
-      launch-editor:
-        specifier: ^2.10.0
-        version: 2.10.0
-      logfmt:
-        specifier: ^1.4.0
-        version: 1.4.0
       magic-string:
         specifier: ^0.30.11
         version: 0.30.21
-      mcp-proxy:
-        specifier: ^5.6.0
-        version: 5.6.0
       nanovis:
         specifier: ^0.1.3
         version: 0.1.3
@@ -269,9 +282,6 @@ importers:
       rollup-plugin-sourcemaps2:
         specifier: ^0.4.1
         version: 0.4.4(@types/node@22.15.28)(rollup@4.53.3)
-      semver:
-        specifier: ^7.7.3
-        version: 7.7.3
       shiki:
         specifier: ^3.13.0
         version: 3.13.0
@@ -296,9 +306,6 @@ importers:
       usehooks-ts:
         specifier: ^2.16.0
         version: 2.16.0(react@18.3.1)
-      uuidv7:
-        specifier: ^1.0.2
-        version: 1.0.2
       vite:
         specifier: 'catalog:'
         version: 5.4.19(@types/node@22.15.28)(lightningcss@1.30.1)(terser@5.43.1)
@@ -314,12 +321,6 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 0.34.6(happy-dom@20.0.2)(lightningcss@1.30.1)(playwright@1.56.1)(terser@5.43.1)
-      yaml:
-        specifier: ^2.8.1
-        version: 2.8.1
-      zod:
-        specifier: ^3.25.76
-        version: 3.25.76
       zustand:
         specifier: ^5.0.3
         version: 5.0.3(@types/react@18.3.20)(react@18.3.1)
