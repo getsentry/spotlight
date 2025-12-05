@@ -64,7 +64,6 @@ export default defineConfig({
         "eventsource",
         "fast-fuzzy",
         "hono",
-        "import-meta-resolve",
         "launch-editor",
         "logfmt",
         "mcp-proxy",
