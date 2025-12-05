@@ -9,9 +9,6 @@ catalogs:
     '@fontsource/raleway':
       specifier: ^5.1.0
       version: 5.2.5
-    '@sentry/astro':
-      specifier: ^10.28.0
-      version: 10.28.0
     '@sentry/core':
       specifier: ^10
       version: 10.5.0
@@ -113,9 +110,6 @@ importers:
       hono:
         specifier: ^4.10.3
         version: 4.10.3
-      import-meta-resolve:
-        specifier: ^4.1.0
-        version: 4.1.0
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
@@ -5609,9 +5603,6 @@ packages:
   import-lazy@4.0.0:
     resolution: {integrity: sha512-rKtvo6a868b5Hu3heneU+L4yEQ4jYKLtjpnPeUdK7h0yzXGmyBTypknlkCvHFBqfX9YlorEiMM6Dnq/5atfHkw==}
     engines: {node: '>=8'}
-
-  import-meta-resolve@4.1.0:
-    resolution: {integrity: sha512-I6fiaX09Xivtk+THaMfAwnA3MVA5Big1WHF1Dfx9hFuvNIWpXnorlkzhcQf6ehrqQiiZECRt1poOAkPmer3ruw==}
 
   import-meta-resolve@4.2.0:
     resolution: {integrity: sha512-Iqv2fzaTQN28s/FwZAoFq0ZSs/7hMAHJVX+w8PZl3cY19Pxk6jFFalxQoIfW2826i/fDLXv8IiEZRIT0lDuWcg==}
@@ -14376,8 +14367,6 @@ snapshots:
       module-details-from-path: 1.0.4
 
   import-lazy@4.0.0: {}
-
-  import-meta-resolve@4.1.0: {}
 
   import-meta-resolve@4.2.0: {}
 
