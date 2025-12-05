@@ -8,10 +8,24 @@ export type SourceType = (typeof SOURCE_TYPES)[number];
 export const LOG_LEVELS = ["error", "warning", "log", "info", "trace", "debug"] as const;
 export type LogLevel = (typeof LOG_LEVELS)[number];
 
+/**
+ * Sentinel theme terminal colors
+ * Based on https://github.com/getsentry/sentinel
+ */
+const SENTINEL = {
+  red: "#fe4144",
+  green: "#83da90",
+  yellow: "#FDB81B",
+  blue: "#226DFC",
+  magenta: "#FF45A8",
+  white: "#f9f8f9",
+  muted: "#898294",
+} as const;
+
 export const SOURCE_COLORS: Record<SourceType, (text: string) => string> = {
-  browser: chalk.yellow,
-  mobile: chalk.blue,
-  server: chalk.magenta,
+  browser: chalk.hex(SENTINEL.yellow),
+  mobile: chalk.hex(SENTINEL.blue),
+  server: chalk.hex(SENTINEL.magenta),
 };
 
 export const LOG_LEVEL_COLORS: Record<LogLevel, (text: string) => string> = {
