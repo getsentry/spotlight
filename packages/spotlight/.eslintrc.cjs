@@ -16,6 +16,21 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['react-refresh'],
+  overrides: [
+    {
+      files: ['**/*.cjs'],
+      env: {
+        node: true,
+      },
+      parserOptions: {
+        sourceType: 'script',
+      },
+      rules: {
+        '@typescript-eslint/no-require-imports': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+  ],
   rules: {
     // Only enable the react-refresh rule, let Biome handle everything else
     'react-refresh/only-export-components': [
