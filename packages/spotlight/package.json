@@ -50,7 +50,7 @@
     }
   },
   "dependencies": {
-    "@hono/mcp": "^0.1.5",
+    "@hono/mcp": "^0.2.2",
     "@hono/node-server": "^1.19.3",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@modelcontextprotocol/sdk": "^1.24.3",
@@ -67,7 +67,7 @@
     "semver": "^7.7.3",
     "uuidv7": "^1.0.2",
     "yaml": "^2.8.1",
-    "zod": "^3"
+    "zod": "^4"
   },
   "devDependencies": {
     "@electron/notarize": "^2.5.0",

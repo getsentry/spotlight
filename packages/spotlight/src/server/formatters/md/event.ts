@@ -5,7 +5,7 @@
  * for LLM consumption. Handles stacktraces, event details, issue summaries,
  * and contextual information with consistent formatting patterns.
  */
-import type { z } from "zod";
+import type { z } from "zod/v3";
 import type {
   ErrorEntrySchema,
   EventSchema,
