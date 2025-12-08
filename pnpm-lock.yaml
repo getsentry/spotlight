@@ -85,8 +85,8 @@ importers:
   packages/spotlight:
     dependencies:
       '@hono/mcp':
-        specifier: ^0.1.5
-        version: 0.1.5(@modelcontextprotocol/sdk@1.24.3(zod@3.25.76))(hono@4.10.3)
+        specifier: ^0.2.2
+        version: 0.2.2(@modelcontextprotocol/sdk@1.24.3(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.10.3))(hono@4.10.3)(zod@4.1.13)
       '@hono/node-server':
         specifier: ^1.19.3
         version: 1.19.3(hono@4.10.3)
@@ -95,7 +95,7 @@ importers:
         version: 0.3.31
       '@modelcontextprotocol/sdk':
         specifier: ^1.24.3
-        version: 1.24.3(zod@3.25.76)
+        version: 1.24.3(zod@4.1.13)
       '@sentry/core':
         specifier: 'catalog:'
         version: 10.5.0
@@ -136,8 +136,8 @@ importers:
         specifier: ^2.8.1
         version: 2.8.1
       zod:
-        specifier: ^3
-        version: 3.25.76
+        specifier: ^4
+        version: 4.1.13
     devDependencies:
       '@electron/notarize':
         specifier: ^2.5.0
@@ -1563,11 +1563,13 @@ packages:
   '@fontsource/raleway@5.2.5':
     resolution: {integrity: sha512-gVFV8Yi8Y5h8sQw0U/F6TQID53DVIWPuRxqBLOBxwLbQma42JAwqTZ+pi3eDjpm20/rjS2XoVJH5hnMx1KFB+g==}
 
-  '@hono/mcp@0.1.5':
-    resolution: {integrity: sha512-q6Yurx9VUwVEpqnwVXtzIYaq4kgQgWWq9lYLM7NFS2W0sg1RzL+RdKh6jO4/dGyvBLKrahPd2v+NC6rr0XWBvQ==}
+  '@hono/mcp@0.2.2':
+    resolution: {integrity: sha512-h1yHXsv08OWT8bXyIOoZVXw0qU1UmSDwm014fPnFXiyeS9iMMHftn907wNXTh07IorlGqPbZArev4nBz9Q3oKQ==}
     peerDependencies:
-      '@modelcontextprotocol/sdk': ^1.12.0
-      hono: '>=4.0.0'
+      '@modelcontextprotocol/sdk': ^1.23.0
+      hono: '*'
+      hono-rate-limiter: ^0.4.2
+      zod: ^3.25.0 || ^4.0.0
 
   '@hono/node-server@1.19.3':
     resolution: {integrity: sha512-Fjyxfux0rMPXMSob79OmddfpK5ArJa2xLkLCV+zamHkbeXQtSNKOi0keiBKyHZ/hCRKjigjmKGp4AJnDFq8PUw==}
@@ -5503,6 +5505,11 @@ packages:
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
 
+  hono-rate-limiter@0.4.2:
+    resolution: {integrity: sha512-AAtFqgADyrmbDijcRTT/HJfwqfvhalya2Zo+MgfdrMPas3zSMD8SU03cv+ZsYwRU1swv7zgVt0shwN059yzhjw==}
+    peerDependencies:
+      hono: ^4.1.1
+
   hono@4.10.3:
     resolution: {integrity: sha512-2LOYWUbnhdxdL8MNbNg9XZig6k+cZXm5IjHn2Aviv7honhBMOHb+jxrKIeJRZJRmn+htUCKhaicxwXuUDlchRA==}
     engines: {node: '>=16.9.0'}
@@ -8386,6 +8393,9 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
+  zod@4.1.13:
+    resolution: {integrity: sha512-AvvthqfqrAhNH9dnfmrfKzX5upOdjUVJYFqNSlkmGf64gRaTzlPwz99IHYnVs28qYAybvAlBV+H7pn0saFY4Ig==}
+
   zustand@5.0.3:
     resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
     engines: {node: '>=12.20.0'}
@@ -9509,10 +9519,13 @@ snapshots:
 
   '@fontsource/raleway@5.2.5': {}
 
-  '@hono/mcp@0.1.5(@modelcontextprotocol/sdk@1.24.3(zod@3.25.76))(hono@4.10.3)':
+  '@hono/mcp@0.2.2(@modelcontextprotocol/sdk@1.24.3(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.10.3))(hono@4.10.3)(zod@4.1.13)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.24.3(zod@3.25.76)
+      '@modelcontextprotocol/sdk': 1.24.3(zod@4.1.13)
       hono: 4.10.3
+      hono-rate-limiter: 0.4.2(hono@4.10.3)
+      pkce-challenge: 5.0.0
+      zod: 4.1.13
 
   '@hono/node-server@1.19.3(hono@4.10.3)':
     dependencies:
@@ -9858,7 +9871,7 @@ snapshots:
 
   '@microsoft/tsdoc@0.15.1': {}
 
-  '@modelcontextprotocol/sdk@1.24.3(zod@3.25.76)':
+  '@modelcontextprotocol/sdk@1.24.3(zod@4.1.13)':
     dependencies:
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
@@ -9872,8 +9885,8 @@ snapshots:
       jose: 6.1.3
       pkce-challenge: 5.0.0
       raw-body: 3.0.0
-      zod: 3.25.76
-      zod-to-json-schema: 3.25.0(zod@3.25.76)
+      zod: 4.1.13
+      zod-to-json-schema: 3.25.0(zod@4.1.13)
     transitivePeerDependencies:
       - supports-color
 
@@ -14248,6 +14261,10 @@ snapshots:
     dependencies:
       react-is: 16.13.1
 
+  hono-rate-limiter@0.4.2(hono@4.10.3):
+    dependencies:
+      hono: 4.10.3
+
   hono@4.10.3: {}
 
   hosted-git-info@4.1.0:
@@ -17444,12 +17461,18 @@ snapshots:
     dependencies:
       zod: 3.25.76
 
+  zod-to-json-schema@3.25.0(zod@4.1.13):
+    dependencies:
+      zod: 4.1.13
+
   zod-to-ts@1.2.0(typescript@5.9.2)(zod@3.25.76):
     dependencies:
       typescript: 5.9.2
       zod: 3.25.76
 
   zod@3.25.76: {}
+
+  zod@4.1.13: {}
 
   zustand@5.0.3(@types/react@18.3.20)(react@18.3.1):
     optionalDependencies:
