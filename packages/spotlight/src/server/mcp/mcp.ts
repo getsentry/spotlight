@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
 import { captureException, wrapMcpServerWithSentry } from "@sentry/node";
-import { z } from "zod/v3";
+import { z } from "zod";
 import { formatErrorEnvelope } from "../formatters/md/errors.ts";
 import { formatLogEnvelope } from "../formatters/md/logs.ts";
 import {
