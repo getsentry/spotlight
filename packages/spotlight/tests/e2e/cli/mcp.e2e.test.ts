@@ -274,12 +274,12 @@ describe("spotlight mcp e2e tests", () => {
     const client = await createMCPClient(port);
 
     // Call non-existent tool - should throw or return error
-    expect(
+    await expect(
       await client.callTool({
         name: "non_existent_tool",
         arguments: {},
       }),
-    ).matchSnapshot();
+    ).rejects.toThrow();
   }, 15000);
 
   it("should connect to existing server and search errors", async () => {
