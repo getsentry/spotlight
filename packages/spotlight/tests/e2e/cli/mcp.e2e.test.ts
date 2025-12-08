@@ -278,15 +278,13 @@ describe("spotlight mcp e2e tests", () => {
       arguments: {},
     });
 
-    console.log(result);
-
     // Call non-existent tool - should throw or return error
     expect(result).toMatchObject({
       isError: true,
       content: [
         {
           type: "text",
-          text: "Tool not found",
+          text: "MCP error -32602: Tool non_existent_tool not found",
         },
       ],
     });
