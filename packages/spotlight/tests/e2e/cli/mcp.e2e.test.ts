@@ -275,7 +275,7 @@ describe("spotlight mcp e2e tests", () => {
 
     // Call non-existent tool - should throw or return error
     await expect(
-      await client.callTool({
+      client.callTool({
         name: "non_existent_tool",
         arguments: {},
       }),
