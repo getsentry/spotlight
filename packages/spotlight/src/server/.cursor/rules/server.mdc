@@ -1,0 +1,215 @@
+---
+description: Server/sidecar development guidelines using Hono framework
+globs:
+alwaysApply: true
+---
+
+# Server Development Guidelines
+
+The Spotlight server (sidecar) is a Node.js HTTP server built with Hono that receives, stores, and streams telemetry data.
+
+## Framework
+
+Uses **Hono** with `@hono/node-server` for the HTTP server.
+
+## Project Structure
+
+```
+server/
+├── main.ts           # Server setup, startServer(), setupSpotlight()
+├── cli.ts            # CLI entry point and argument parsing
+├── cli/              # CLI command handlers (see cli/.cursor/rules)
+├── mcp/              # MCP server (see mcp/.cursor/rules)
+├── routes/           # HTTP route handlers
+│   ├── index.ts      # Route composition
+│   ├── stream/       # SSE streaming endpoints
+│   ├── health.ts     # Health check
+│   ├── clear.ts      # Buffer clear endpoint
+│   └── contextlines/ # Source context resolution
+├── parser/           # Envelope parsing logic
+├── formatters/       # Output formatters (human, json, logfmt, md)
+├── handlers/         # Request handlers
+├── utils/            # Utility functions
+├── types/            # TypeScript type definitions
+├── constants.ts      # Server constants
+├── logger.ts         # Logging utilities
+├── messageBuffer.ts  # Event storage buffer
+└── sdk.ts            # SDK utilities for external integrations
+```
+
+## Route Patterns
+
+Routes are modular Hono routers composed in `routes/index.ts`:
+
+```typescript
+import { Hono } from 'hono';
+import type { HonoEnv } from '../types/env';
+
+const router = new Hono<HonoEnv>()
+  .get('/path', ctx => {
+    return ctx.json({ status: 'ok' });
+  })
+  .post('/path', async ctx => {
+    const body = await ctx.req.json();
+    // Process...
+    return ctx.body(null, 200);
+  });
+
+export default router;
+```
+
+### Composing Routes
+
+```typescript
+// routes/index.ts
+import { Hono } from 'hono';
+import streamRouter from './stream/index';
+import healthRouter from './health';
+
+const router = new Hono();
+router.route('/stream', streamRouter);
+router.route('/health', healthRouter);
+
+export default router;
+```
+
+## Middleware
+
+### CORS
+
+```typescript
+import { cors } from 'hono/cors';
+
+app.use(cors({
+  origin: async origin => isAllowedOrigin(origin) ? origin : null,
+}));
+```
+
+### Custom Middleware
+
+```typescript
+app.use(async (ctx, next) => {
+  ctx.header('X-Custom-Header', 'value');
+  ctx.set('customKey', value); // Set context variable
+  await next();
+});
+```
+
+## Server-Sent Events (SSE)
+
+Streaming implemented in `routes/stream/streaming.ts`:
+
+```typescript
+import { streamSSE } from './streaming';
+
+router.get('/stream', ctx => {
+  return streamSSE(ctx, async stream => {
+    const sub = buffer.subscribe(container => {
+      stream.writeSSE({
+        id: container.id,
+        event: contentType,
+        data: JSON.stringify(data),
+      });
+    });
+
+    stream.onAbort(() => buffer.unsubscribe(sub));
+  });
+});
+```
+
+## Message Buffer
+
+`MessageBuffer` in `messageBuffer.ts` stores incoming envelopes:
+
+```typescript
+import { getBuffer } from './utils/index';
+
+const buffer = getBuffer();
+
+// Add data
+buffer.put(container);
+
+// Subscribe to new data
+const sub = buffer.subscribe(callback);
+buffer.unsubscribe(sub);
+
+// Read data with filters
+const envelopes = buffer.read({ timeWindow: 60 });
+const envelopes = buffer.read({ filename: 'auth.ts' });
+```
+
+## Envelope Parsing
+
+Parse incoming Sentry envelopes in `parser/`:
+
+```typescript
+import { processEnvelope } from './parser/index';
+
+const parsed = processEnvelope({
+  contentType: container.getContentType(),
+  data: container.getData(),
+});
+
+const [envelopeHeader, items] = parsed.envelope;
+```
+
+## Formatters
+
+Multiple output formats in `formatters/`:
+
+- `human/` - Human-readable terminal output
+- `json/` - JSON format
+- `logfmt/` - Logfmt format
+- `md/` - Markdown format (for MCP/AI)
+
+```typescript
+import { applyFormatter, humanFormatters } from './formatters/index';
+
+const output = applyFormatter(humanFormatters, type, payload, envelopeHeader);
+```
+
+## Tracing
+
+Use Sentry spans for request tracing:
+
+```typescript
+import { startSpan } from '@sentry/node';
+
+await startSpan({
+  name: `HTTP ${method} ${path}`,
+  op: 'sidecar.http.get',
+  attributes: { /* ... */ },
+}, async span => {
+  // Handle request
+  span.setAttribute('http.response.status_code', status);
+});
+```
+
+## Type Definitions
+
+```typescript
+// types/env.ts - Hono environment
+export type HonoEnv = {
+  Variables: {
+    basePath?: string;
+    incomingPayload?: (data: string) => void;
+  };
+};
+
+// types/cli.ts - CLI handler options
+export type CLIHandlerOptions = {
+  port: number;
+  cmdArgs: string[];
+  format: FormatterType;
+  // ...
+};
+```
+
+## Constants
+
+```typescript
+// constants.ts
+export const DEFAULT_PORT = 8969;
+export const SERVER_IDENTIFIER = 'spotlight-sidecar';
+export const SENTRY_CONTENT_TYPE = 'application/x-sentry-envelope';
+```
