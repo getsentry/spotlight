@@ -273,13 +273,21 @@ describe("spotlight mcp e2e tests", () => {
     // Create and connect MCP client
     const client = await createMCPClient(port);
 
+    const result = await client.callTool({
+      name: "non_existent_tool",
+      arguments: {},
+    });
+
     // Call non-existent tool - should throw or return error
-    await expect(
-      client.callTool({
-        name: "non_existent_tool",
-        arguments: {},
-      }),
-    ).rejects.toThrow();
+    expect(result).toMatchObject({
+      isError: true,
+      content: [
+        {
+          type: "text",
+          text: "MCP error -32602: Tool non_existent_tool not found",
+        },
+      ],
+    });
   }, 15000);
 
   it("should connect to existing server and search errors", async () => {
