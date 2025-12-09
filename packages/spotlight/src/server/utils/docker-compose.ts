@@ -15,7 +15,7 @@ export const DOCKER_MIN_VERSION = "20.10.0";
 export const DOCKER_HOST_INTERNAL = "host.docker.internal";
 export const DOCKER_HOST_GATEWAY = "host-gateway";
 
-interface DockerComposeConfig {
+export interface DockerComposeConfig {
   composeFiles: string[]; // Array of compose files
   command: string[];
   serviceNames: string[];
@@ -101,6 +101,78 @@ function generateSpotlightOverrideYaml(serviceNames: string[]): string {
 }
 
 /**
+ * Resolve compose files to use, with the following priority:
+ * 1. User-specified files (from -f flags)
+ * 2. COMPOSE_FILE environment variable
+ * 3. Auto-detect compose file + override file
+ */
+function resolveComposeFiles(userSpecifiedFiles?: string[]): string[] | null {
+  if (userSpecifiedFiles && userSpecifiedFiles.length > 0) {
+    logger.debug(`Using user-specified compose files: ${userSpecifiedFiles.join(", ")}`);
+    return userSpecifiedFiles;
+  }
+
+  const fromEnv = getComposeFilesFromEnv();
+  if (fromEnv) {
+    logger.debug(`Using COMPOSE_FILE environment variable: ${fromEnv.join(", ")}`);
+    return fromEnv;
+  }
+
+  const composeFile = findComposeFile();
+  if (!composeFile) {
+    logger.debug("No compose file found");
+    return null;
+  }
+
+  logger.debug(`Found compose file: ${composeFile}`);
+  const files = [composeFile];
+
+  const overrideFile = findOverrideFile(composeFile);
+  if (overrideFile) {
+    logger.debug(`Found override file: ${overrideFile}`);
+    files.push(overrideFile);
+  }
+
+  return files;
+}
+
+/**
+ * Collect and deduplicate service names from compose files
+ */
+function collectServices(composeFiles: string[]): string[] {
+  const serviceSet = new Set<string>();
+  for (const file of composeFiles) {
+    for (const service of getDockerComposeServices(file)) {
+      serviceSet.add(service);
+    }
+  }
+  return Array.from(serviceSet);
+}
+
+/**
+ * Parse -f/--file flags from command arguments
+ */
+function parseComposeFileFlags(args: string[]): string[] {
+  const files: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === "-f" || arg === "--file") {
+      const next = args[i + 1];
+      if (next && !next.startsWith("-")) {
+        files.push(next);
+        i++;
+      }
+    } else if (arg.startsWith("-f=") || arg.startsWith("--file=")) {
+      const file = arg.split("=")[1];
+      if (file) {
+        files.push(file);
+      }
+    }
+  }
+  return files;
+}
+
+/**
  * Build the Docker Compose command with Spotlight environment injection
  */
 export function buildDockerComposeCommand(config: DockerComposeConfig): {
@@ -151,44 +223,12 @@ export function detectDockerCompose(): DockerComposeConfig | null {
 
   logger.debug(`Detected Docker Compose version ${compose.version} (${compose.command.join(" ")})`);
 
-  // First check if COMPOSE_FILE env is set
-  const composeFilesFromEnv = getComposeFilesFromEnv();
-  let composeFiles: string[];
-
-  if (composeFilesFromEnv) {
-    // Use files from COMPOSE_FILE env variable
-    composeFiles = composeFilesFromEnv;
-    logger.debug(`Using COMPOSE_FILE environment variable: ${composeFiles.join(", ")}`);
-  } else {
-    // Use existing findComposeFile() + findOverrideFile() logic
-    const composeFile = findComposeFile();
-    if (!composeFile) {
-      logger.debug("No compose file found in current directory");
-      return null;
-    }
-
-    logger.debug(`Found compose file: ${composeFile}`);
-
-    composeFiles = [composeFile];
-
-    // Check for override file (only when COMPOSE_FILE is not set)
-    const overrideFile = findOverrideFile(composeFile);
-    if (overrideFile) {
-      logger.debug(`Found override file: ${overrideFile}`);
-      composeFiles.push(overrideFile);
-    }
+  const composeFiles = resolveComposeFiles();
+  if (!composeFiles) {
+    return null;
   }
 
-  // Parse services from all compose files using the refactored function
-  const serviceNamesSet = new Set<string>();
-  for (const file of composeFiles) {
-    const services = getDockerComposeServices(file);
-    for (const service of services) {
-      serviceNamesSet.add(service);
-    }
-  }
-
-  const serviceNames = Array.from(serviceNamesSet);
+  const serviceNames = collectServices(composeFiles);
   if (serviceNames.length === 0) {
     logger.debug("No services found in compose file(s)");
     return null;
@@ -199,6 +239,65 @@ export function detectDockerCompose(): DockerComposeConfig | null {
   return {
     composeFiles,
     command: compose.command,
+    serviceNames,
+  };
+}
+
+/**
+ * Parse an explicit Docker Compose command from cmdArgs
+ *
+ * This handles cases where the user runs:
+ * - `spotlight run docker compose up`
+ * - `spotlight run docker-compose up`
+ * - `spotlight run docker compose -f custom.yml up`
+ *
+ * Returns a DockerComposeConfig if the command is a docker compose up command,
+ * null otherwise.
+ */
+export function parseExplicitDockerComposeUp(cmdArgs: string[]): DockerComposeConfig | null {
+  if (cmdArgs.length < 2) {
+    return null;
+  }
+
+  let command: string[];
+  let argsStartIndex: number;
+
+  if (cmdArgs[0] === "docker-compose") {
+    command = ["docker-compose"];
+    argsStartIndex = 1;
+  } else if (cmdArgs[0] === "docker" && cmdArgs[1] === "compose") {
+    command = ["docker", "compose"];
+    argsStartIndex = 2;
+  } else {
+    return null;
+  }
+
+  const remainingArgs = cmdArgs.slice(argsStartIndex);
+  const upIndex = remainingArgs.indexOf("up");
+  if (upIndex === -1) {
+    logger.debug("Not a 'docker compose up' command, skipping Spotlight injection");
+    return null;
+  }
+
+  const argsBeforeUp = remainingArgs.slice(0, upIndex);
+  const userFiles = parseComposeFileFlags(argsBeforeUp);
+
+  const composeFiles = resolveComposeFiles(userFiles.length > 0 ? userFiles : undefined);
+  if (!composeFiles) {
+    return null;
+  }
+
+  const serviceNames = collectServices(composeFiles);
+  if (serviceNames.length === 0) {
+    logger.debug("No services found in compose file(s)");
+    return null;
+  }
+
+  logger.debug(`Found ${serviceNames.length} service(s): ${serviceNames.join(", ")}`);
+
+  return {
+    composeFiles,
+    command,
     serviceNames,
   };
 }

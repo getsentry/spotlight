@@ -11,7 +11,11 @@ import { SENTRY_CONTENT_TYPE } from "../constants.ts";
 import { logger } from "../logger.ts";
 import type { SentryLogEvent } from "../parser/types.ts";
 import type { CLIHandlerOptions } from "../types/cli.ts";
-import { buildDockerComposeCommand, detectDockerCompose } from "../utils/docker-compose.ts";
+import {
+  buildDockerComposeCommand,
+  detectDockerCompose,
+  parseExplicitDockerComposeUp,
+} from "../utils/docker-compose.ts";
 import { getSpotlightURL } from "../utils/extras.ts";
 import { EventContainer, getBuffer } from "../utils/index.ts";
 import tail, { type OnItemCallback } from "./tail.ts";
@@ -239,6 +243,25 @@ export default async function run({
       cmdArgs = [packageJson.scriptCommand];
       shell = true;
       env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
+    }
+  } else {
+    // Handle explicit docker compose commands (e.g., "spotlight run docker compose up")
+    const explicitDockerConfig = parseExplicitDockerComposeUp(cmdArgs);
+    if (explicitDockerConfig) {
+      logger.info(
+        `Detected explicit Docker Compose command with ${explicitDockerConfig.serviceNames.length} service(s): ${explicitDockerConfig.serviceNames.join(", ")}`,
+      );
+      metrics.count("cli.run.explicit_docker", 1, {
+        attributes: { services: explicitDockerConfig.serviceNames.length },
+      });
+      // Use host.docker.internal for backend services to access the host machine
+      env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
+      const command = buildDockerComposeCommand(explicitDockerConfig);
+      cmdArgs = command.cmdArgs;
+      stdin = command.stdin;
+      // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
+      // biome-ignore lint/performance/noDelete: need to remove env var entirely
+      delete env.COMPOSE_FILE;
     }
   }
   if (cmdArgs.length === 0) {
