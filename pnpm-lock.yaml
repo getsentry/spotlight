@@ -382,6 +382,9 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 4.1.11
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
     devDependencies:
       '@tailwindcss/typography':
         specifier: ^0.5.15
