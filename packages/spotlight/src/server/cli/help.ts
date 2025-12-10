@@ -16,6 +16,7 @@ Commands:
 
 Options:
   -p, --port <port>      Port to listen on (default: 8969, or 0 for random)
+  -o, --open             Open the Spotlight dashboard in your default browser
   -d, --debug            Enable debug logging
   -f, --format <format>  Output format for tail command (default: human)
                          Available formats: ${[...AVAILABLE_FORMATTERS].join(", ")}
@@ -29,6 +30,7 @@ Options:
 
 Examples:
   spotlight                          # Start on default port 8969
+  spotlight --open                   # Start and open dashboard in browser
   spotlight tail                     # Tail all event types (human format)
   spotlight tail errors              # Tail only errors
   spotlight tail errors logs         # Tail errors and logs

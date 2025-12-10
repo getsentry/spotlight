@@ -7,6 +7,7 @@ export type CLIHandlerOptions = {
   port: SideCarOptions["port"];
   help?: boolean;
   debug?: boolean;
+  open?: boolean;
   format?: FormatterType;
   basePath?: SideCarOptions["basePath"];
   filesToServe?: SideCarOptions["filesToServe"];
