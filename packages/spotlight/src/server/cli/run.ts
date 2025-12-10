@@ -12,7 +12,7 @@ import { logger } from "../logger.ts";
 import type { SentryLogEvent } from "../parser/types.ts";
 import type { CLIHandlerOptions } from "../types/cli.ts";
 import { detectDockerCompose, parseExplicitDockerCompose, prepareDockerComposeRun } from "../utils/docker-compose.ts";
-import { getSpotlightURL } from "../utils/extras.ts";
+import { getSpotlightURL, openInBrowser } from "../utils/extras.ts";
 import { EventContainer, getBuffer } from "../utils/index.ts";
 import tail, { type OnItemCallback } from "./tail.ts";
 
@@ -114,6 +114,7 @@ export default async function run({
   filesToServe,
   format,
   allowedOrigins,
+  open,
 }: CLIHandlerOptions) {
   let relayStdioAsLogs = true;
 
@@ -166,6 +167,10 @@ export default async function run({
   // or started in a weird manner (like over a unix socket)
   const actualServerPort = (serverInstance.address() as AddressInfo).port;
   const spotlightUrl = getSpotlightURL(actualServerPort, LOCALHOST_HOST);
+
+  if (open) {
+    openInBrowser(actualServerPort);
+  }
   let shell = false;
   let stdin: string | undefined = undefined;
   const env = {
