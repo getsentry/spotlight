@@ -11,7 +11,7 @@ import { SENTRY_CONTENT_TYPE } from "../constants.ts";
 import { logger } from "../logger.ts";
 import type { SentryLogEvent } from "../parser/types.ts";
 import type { CLIHandlerOptions } from "../types/cli.ts";
-import { detectDockerCompose, parseExplicitDockerComposeUp, prepareDockerComposeRun } from "../utils/docker-compose.ts";
+import { detectDockerCompose, parseExplicitDockerCompose, prepareDockerComposeRun } from "../utils/docker-compose.ts";
 import { getSpotlightURL } from "../utils/extras.ts";
 import { EventContainer, getBuffer } from "../utils/index.ts";
 import tail, { type OnItemCallback } from "./tail.ts";
@@ -226,7 +226,7 @@ export default async function run({
     }
   } else {
     // Handle explicit docker compose commands (e.g., "spotlight run docker compose up")
-    const explicitDockerConfig = parseExplicitDockerComposeUp(cmdArgs);
+    const explicitDockerConfig = parseExplicitDockerCompose(cmdArgs);
     if (explicitDockerConfig) {
       logger.info(
         `Detected explicit Docker Compose command with ${explicitDockerConfig.serviceNames.length} service(s): ${explicitDockerConfig.serviceNames.join(", ")}`,
@@ -234,7 +234,7 @@ export default async function run({
       metrics.count("cli.run.docker_compose.explicit", 1, {
         attributes: {
           services: explicitDockerConfig.serviceNames.length,
-          upArgs: explicitDockerConfig.upArgs.join(" "),
+          subcommand: explicitDockerConfig.subcommandArgs.join(" "),
         },
       });
       ({ cmdArgs, stdin } = prepareDockerComposeRun(explicitDockerConfig, actualServerPort, env));

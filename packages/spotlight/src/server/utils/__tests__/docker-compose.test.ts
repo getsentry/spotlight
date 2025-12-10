@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { buildDockerComposeCommand, parseExplicitDockerComposeUp } from "../docker-compose.ts";
+import { buildDockerComposeCommand, parseExplicitDockerCompose } from "../docker-compose.ts";
 
 // Mock the docker-compose-parser module
 vi.mock("../docker-compose-parser.ts", () => ({
@@ -17,7 +17,7 @@ import {
   getDockerComposeServices,
 } from "../docker-compose-parser.ts";
 
-describe("parseExplicitDockerComposeUp", () => {
+describe("parseExplicitDockerCompose", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Default: no COMPOSE_FILE env variable
@@ -30,42 +30,45 @@ describe("parseExplicitDockerComposeUp", () => {
 
   describe("command detection", () => {
     it("should return null for non-docker commands", () => {
-      expect(parseExplicitDockerComposeUp(["npm", "run", "dev"])).toBeNull();
-      expect(parseExplicitDockerComposeUp(["node", "app.js"])).toBeNull();
-      expect(parseExplicitDockerComposeUp(["pnpm", "dev"])).toBeNull();
+      expect(parseExplicitDockerCompose(["npm", "run", "dev"])).toBeNull();
+      expect(parseExplicitDockerCompose(["node", "app.js"])).toBeNull();
+      expect(parseExplicitDockerCompose(["pnpm", "dev"])).toBeNull();
     });
 
     it("should return null for commands with less than 2 arguments", () => {
-      expect(parseExplicitDockerComposeUp([])).toBeNull();
-      expect(parseExplicitDockerComposeUp(["docker"])).toBeNull();
+      expect(parseExplicitDockerCompose([])).toBeNull();
+      expect(parseExplicitDockerCompose(["docker"])).toBeNull();
     });
 
-    it("should return null for docker compose without 'up' subcommand", () => {
-      expect(parseExplicitDockerComposeUp(["docker", "compose", "build"])).toBeNull();
-      expect(parseExplicitDockerComposeUp(["docker", "compose", "down"])).toBeNull();
-      expect(parseExplicitDockerComposeUp(["docker", "compose", "logs"])).toBeNull();
-      expect(parseExplicitDockerComposeUp(["docker-compose", "build"])).toBeNull();
-      expect(parseExplicitDockerComposeUp(["docker-compose", "ps"])).toBeNull();
-    });
-
-    it("should detect 'docker compose up' command", () => {
+    it("should detect 'docker compose' command", () => {
       vi.mocked(findComposeFile).mockReturnValue("docker-compose.yml");
       vi.mocked(getDockerComposeServices).mockReturnValue(["web", "db"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "up"]);
 
       expect(result).not.toBeNull();
       expect(result?.command).toEqual(["docker", "compose"]);
     });
 
-    it("should detect 'docker-compose up' command", () => {
+    it("should detect 'docker-compose' command", () => {
       vi.mocked(findComposeFile).mockReturnValue("docker-compose.yml");
       vi.mocked(getDockerComposeServices).mockReturnValue(["web"]);
 
-      const result = parseExplicitDockerComposeUp(["docker-compose", "up"]);
+      const result = parseExplicitDockerCompose(["docker-compose", "up"]);
 
       expect(result).not.toBeNull();
       expect(result?.command).toEqual(["docker-compose"]);
+    });
+  });
+
+  describe("subcommand support", () => {
+    it("should pass through any subcommand and its args", () => {
+      vi.mocked(findComposeFile).mockReturnValue("docker-compose.yml");
+      vi.mocked(getDockerComposeServices).mockReturnValue(["app"]);
+
+      expect(parseExplicitDockerCompose(["docker", "compose", "up", "-d"])?.subcommandArgs).toEqual(["up", "-d"]);
+      expect(parseExplicitDockerCompose(["docker", "compose", "logs", "-f"])?.subcommandArgs).toEqual(["logs", "-f"]);
+      expect(parseExplicitDockerCompose(["docker", "compose"])?.subcommandArgs).toEqual([]);
     });
   });
 
@@ -75,7 +78,7 @@ describe("parseExplicitDockerComposeUp", () => {
       vi.mocked(findOverrideFile).mockReturnValue(null);
       vi.mocked(getDockerComposeServices).mockReturnValue(["app"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "up"]);
 
       expect(result).not.toBeNull();
       expect(result?.composeFiles).toEqual(["docker-compose.yml"]);
@@ -87,7 +90,7 @@ describe("parseExplicitDockerComposeUp", () => {
       vi.mocked(findOverrideFile).mockReturnValue("docker-compose.override.yml");
       vi.mocked(getDockerComposeServices).mockReturnValue(["app"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "up"]);
 
       expect(result?.composeFiles).toEqual(["docker-compose.yml", "docker-compose.override.yml"]);
     });
@@ -95,7 +98,7 @@ describe("parseExplicitDockerComposeUp", () => {
     it("should return null when no compose file found", () => {
       vi.mocked(findComposeFile).mockReturnValue(null);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "up"]);
 
       expect(result).toBeNull();
     });
@@ -104,7 +107,7 @@ describe("parseExplicitDockerComposeUp", () => {
       vi.mocked(getComposeFilesFromEnv).mockReturnValue(["custom.yml", "custom.override.yml"]);
       vi.mocked(getDockerComposeServices).mockReturnValue(["service1"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "up"]);
 
       expect(result?.composeFiles).toEqual(["custom.yml", "custom.override.yml"]);
       expect(findComposeFile).not.toHaveBeenCalled();
@@ -115,7 +118,7 @@ describe("parseExplicitDockerComposeUp", () => {
     it("should extract -f flag with space separator", () => {
       vi.mocked(getDockerComposeServices).mockReturnValue(["web"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "-f", "my-compose.yml", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "-f", "my-compose.yml", "up"]);
 
       expect(result?.composeFiles).toEqual(["my-compose.yml"]);
       expect(findComposeFile).not.toHaveBeenCalled();
@@ -124,7 +127,7 @@ describe("parseExplicitDockerComposeUp", () => {
     it("should extract --file flag with space separator", () => {
       vi.mocked(getDockerComposeServices).mockReturnValue(["web"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "--file", "custom.yml", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "--file", "custom.yml", "up"]);
 
       expect(result?.composeFiles).toEqual(["custom.yml"]);
     });
@@ -132,7 +135,7 @@ describe("parseExplicitDockerComposeUp", () => {
     it("should extract -f flag with = separator", () => {
       vi.mocked(getDockerComposeServices).mockReturnValue(["api"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "-f=production.yml", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "-f=production.yml", "up"]);
 
       expect(result?.composeFiles).toEqual(["production.yml"]);
     });
@@ -140,7 +143,7 @@ describe("parseExplicitDockerComposeUp", () => {
     it("should extract --file flag with = separator", () => {
       vi.mocked(getDockerComposeServices).mockReturnValue(["db"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "--file=staging.yml", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "--file=staging.yml", "up"]);
 
       expect(result?.composeFiles).toEqual(["staging.yml"]);
     });
@@ -148,7 +151,7 @@ describe("parseExplicitDockerComposeUp", () => {
     it("should extract multiple -f flags", () => {
       vi.mocked(getDockerComposeServices).mockReturnValue(["web", "worker"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "-f", "base.yml", "-f", "override.yml", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "-f", "base.yml", "-f", "override.yml", "up"]);
 
       expect(result?.composeFiles).toEqual(["base.yml", "override.yml"]);
     });
@@ -156,7 +159,7 @@ describe("parseExplicitDockerComposeUp", () => {
     it("should handle mixed -f and --file flags", () => {
       vi.mocked(getDockerComposeServices).mockReturnValue(["svc"]);
 
-      const result = parseExplicitDockerComposeUp([
+      const result = parseExplicitDockerCompose([
         "docker-compose",
         "-f",
         "base.yml",
@@ -175,7 +178,7 @@ describe("parseExplicitDockerComposeUp", () => {
       vi.mocked(findComposeFile).mockReturnValue("docker-compose.yml");
       vi.mocked(getDockerComposeServices).mockReturnValue(["web", "api", "db"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "up"]);
 
       expect(result?.serviceNames).toEqual(["web", "api", "db"]);
     });
@@ -187,7 +190,7 @@ describe("parseExplicitDockerComposeUp", () => {
         return [];
       });
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "-f", "base.yml", "-f", "override.yml", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "-f", "base.yml", "-f", "override.yml", "up"]);
 
       // Services should be deduplicated
       expect(result?.serviceNames).toContain("web");
@@ -200,75 +203,87 @@ describe("parseExplicitDockerComposeUp", () => {
       vi.mocked(findComposeFile).mockReturnValue("docker-compose.yml");
       vi.mocked(getDockerComposeServices).mockReturnValue([]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "up"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "up"]);
 
       expect(result).toBeNull();
     });
   });
 
   describe("complex command scenarios", () => {
-    it("should handle docker compose up with additional flags after up", () => {
+    it("should handle docker compose up with additional flags", () => {
       vi.mocked(findComposeFile).mockReturnValue("compose.yml");
       vi.mocked(getDockerComposeServices).mockReturnValue(["app"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "up", "-d", "--build"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "up", "-d", "--build"]);
 
       expect(result).not.toBeNull();
       expect(result?.command).toEqual(["docker", "compose"]);
-      expect(result?.upArgs).toEqual(["-d", "--build"]);
+      expect(result?.subcommandArgs).toEqual(["up", "-d", "--build"]);
     });
 
     it("should handle docker compose up with service names", () => {
       vi.mocked(findComposeFile).mockReturnValue("compose.yml");
       vi.mocked(getDockerComposeServices).mockReturnValue(["web", "worker", "db"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "up", "web", "worker"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "up", "web", "worker"]);
 
       expect(result).not.toBeNull();
-      expect(result?.upArgs).toEqual(["web", "worker"]);
+      expect(result?.subcommandArgs).toEqual(["up", "web", "worker"]);
     });
 
     it("should handle docker compose up with flags and service names combined", () => {
       vi.mocked(findComposeFile).mockReturnValue("compose.yml");
       vi.mocked(getDockerComposeServices).mockReturnValue(["web", "worker", "db"]);
 
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "up", "-d", "--build", "web", "worker"]);
+      const result = parseExplicitDockerCompose(["docker", "compose", "up", "-d", "--build", "web", "worker"]);
 
       expect(result).not.toBeNull();
-      expect(result?.upArgs).toEqual(["-d", "--build", "web", "worker"]);
-    });
-
-    it("should return empty upArgs when no arguments after up", () => {
-      vi.mocked(findComposeFile).mockReturnValue("compose.yml");
-      vi.mocked(getDockerComposeServices).mockReturnValue(["app"]);
-
-      const result = parseExplicitDockerComposeUp(["docker", "compose", "up"]);
-
-      expect(result).not.toBeNull();
-      expect(result?.upArgs).toEqual([]);
+      expect(result?.subcommandArgs).toEqual(["up", "-d", "--build", "web", "worker"]);
     });
 
     it("should handle docker-compose with project name flag", () => {
       vi.mocked(findComposeFile).mockReturnValue("docker-compose.yml");
       vi.mocked(getDockerComposeServices).mockReturnValue(["svc"]);
 
-      // -p flag is a global flag, not a file flag
-      const result = parseExplicitDockerComposeUp(["docker-compose", "-p", "myproject", "up"]);
+      // -p flag passes through to subcommandArgs (we only extract -f flags)
+      const result = parseExplicitDockerCompose(["docker-compose", "-p", "myproject", "up"]);
 
       expect(result).not.toBeNull();
+      // -p and its value pass through since we only care about -f flags
+      expect(result?.subcommandArgs).toEqual(["-p", "myproject", "up"]);
       // Should auto-detect since no -f was provided
       expect(findComposeFile).toHaveBeenCalled();
+    });
+
+    it("should extract -f flags and pass through other flags", () => {
+      vi.mocked(getDockerComposeServices).mockReturnValue(["app"]);
+
+      const result = parseExplicitDockerCompose([
+        "docker",
+        "compose",
+        "-f",
+        "custom.yml",
+        "-p",
+        "myproject",
+        "up",
+        "-d",
+      ]);
+
+      expect(result).not.toBeNull();
+      expect(result?.composeFiles).toEqual(["custom.yml"]);
+      // -p and its value pass through along with the subcommand
+      expect(result?.subcommandArgs).toEqual(["-p", "myproject", "up", "-d"]);
     });
   });
 });
 
 describe("buildDockerComposeCommand", () => {
-  it("should include upArgs in the final command", () => {
+  it("should include subcommandArgs in the final command", () => {
     const config = {
       composeFiles: ["docker-compose.yml"],
       command: ["docker", "compose"],
       serviceNames: ["web", "db"],
-      upArgs: ["-d", "--build"],
+      subcommandArgs: ["up", "-d", "--build"],
     };
 
     const result = buildDockerComposeCommand(config);
@@ -279,12 +294,12 @@ describe("buildDockerComposeCommand", () => {
     expect(result.cmdArgs.slice(upIndex)).toEqual(["up", "-d", "--build"]);
   });
 
-  it("should include service names from upArgs in the final command", () => {
+  it("should include service names from subcommandArgs in the final command", () => {
     const config = {
       composeFiles: ["docker-compose.yml"],
       command: ["docker", "compose"],
       serviceNames: ["web", "worker", "db"],
-      upArgs: ["-d", "web", "worker"],
+      subcommandArgs: ["up", "-d", "web", "worker"],
     };
 
     const result = buildDockerComposeCommand(config);
@@ -293,26 +308,26 @@ describe("buildDockerComposeCommand", () => {
     expect(result.cmdArgs.slice(upIndex)).toEqual(["up", "-d", "web", "worker"]);
   });
 
-  it("should work with empty upArgs", () => {
+  it("should work with empty subcommandArgs", () => {
     const config = {
       composeFiles: ["docker-compose.yml"],
       command: ["docker", "compose"],
       serviceNames: ["app"],
-      upArgs: [],
+      subcommandArgs: [],
     };
 
     const result = buildDockerComposeCommand(config);
 
-    const upIndex = result.cmdArgs.indexOf("up");
-    expect(result.cmdArgs.slice(upIndex)).toEqual(["up"]);
+    // Should end with -f - (no subcommand)
+    expect(result.cmdArgs[result.cmdArgs.length - 1]).toEqual("-");
   });
 
-  it("should build complete command with compose files and upArgs", () => {
+  it("should build complete command with compose files and subcommandArgs", () => {
     const config = {
       composeFiles: ["base.yml", "override.yml"],
       command: ["docker-compose"],
       serviceNames: ["api"],
-      upArgs: ["-d", "--build", "--force-recreate"],
+      subcommandArgs: ["up", "-d", "--build", "--force-recreate"],
     };
 
     const result = buildDockerComposeCommand(config);
@@ -330,5 +345,31 @@ describe("buildDockerComposeCommand", () => {
       "--build",
       "--force-recreate",
     ]);
+  });
+
+  it("should support non-up subcommands", () => {
+    const config = {
+      composeFiles: ["docker-compose.yml"],
+      command: ["docker", "compose"],
+      serviceNames: ["web"],
+      subcommandArgs: ["logs", "-f", "web"],
+    };
+
+    const result = buildDockerComposeCommand(config);
+
+    expect(result.cmdArgs).toEqual(["docker", "compose", "-f", "docker-compose.yml", "-f", "-", "logs", "-f", "web"]);
+  });
+
+  it("should support exec subcommand", () => {
+    const config = {
+      composeFiles: ["docker-compose.yml"],
+      command: ["docker", "compose"],
+      serviceNames: ["web"],
+      subcommandArgs: ["exec", "web", "bash"],
+    };
+
+    const result = buildDockerComposeCommand(config);
+
+    expect(result.cmdArgs).toEqual(["docker", "compose", "-f", "docker-compose.yml", "-f", "-", "exec", "web", "bash"]);
   });
 });

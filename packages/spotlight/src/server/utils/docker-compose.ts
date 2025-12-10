@@ -19,7 +19,7 @@ interface DockerComposeConfig {
   composeFiles: string[]; // Array of compose files
   command: string[];
   serviceNames: string[];
-  upArgs: string[]; // Arguments after 'up' (e.g., -d, --build, service names)
+  subcommandArgs: string[]; // Subcommand and its arguments (e.g., up -d --build, logs -f, exec web bash)
 }
 
 /**
@@ -150,27 +150,34 @@ function collectServices(composeFiles: string[]): string[] {
   return Array.from(serviceSet);
 }
 
+const FILE_FLAGS = ["-f", "--file"];
+
 /**
- * Parse -f/--file flags from command arguments
+ * Extract -f/--file flags from args. Everything else passes through.
  */
-function parseComposeFileFlags(args: string[]): string[] {
+function parseComposeFlags(args: string[]): { files: string[]; remainingArgs: string[] } {
   const files: string[] = [];
+  const remainingArgs: string[] = [];
+
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    if (arg === "-f" || arg === "--file") {
-      const next = args[i + 1];
-      if (next && !next.startsWith("-")) {
-        files.push(next);
-        i++;
-      }
-    } else if (arg.startsWith("-f=") || arg.startsWith("--file=")) {
-      const file = arg.split("=")[1];
-      if (file) {
-        files.push(file);
-      }
+
+    if (FILE_FLAGS.includes(arg) && args[i + 1]) {
+      files.push(args[++i]);
+      continue;
     }
+
+    // we support both -f=value and --file=value too
+    const matchedFlag = FILE_FLAGS.find(flag => arg.startsWith(`${flag}=`));
+    if (matchedFlag) {
+      files.push(arg.slice(matchedFlag.length + 1));
+      continue;
+    }
+
+    remainingArgs.push(arg);
   }
-  return files;
+
+  return { files, remainingArgs };
 }
 
 /**
@@ -189,11 +196,10 @@ export function buildDockerComposeCommand(config: DockerComposeConfig): {
 
   // Add our Spotlight override last
   cmdArgs.push("-f", "-");
-  cmdArgs.push("up");
 
-  // Add any arguments that were provided after 'up' (e.g., -d, --build, service names)
-  if (config.upArgs && config.upArgs.length > 0) {
-    cmdArgs.push(...config.upArgs);
+  // Add the subcommand and its arguments (e.g., up -d --build, logs -f)
+  if (config.subcommandArgs && config.subcommandArgs.length > 0) {
+    cmdArgs.push(...config.subcommandArgs);
   }
 
   const stdin = generateSpotlightOverrideYaml(config.serviceNames);
@@ -265,7 +271,7 @@ export function detectDockerCompose(): DockerComposeConfig | null {
     composeFiles,
     command: compose.command,
     serviceNames,
-    upArgs: [], // No extra args when auto-detecting
+    subcommandArgs: ["up"], // Default to 'up' when auto-detecting
   };
 }
 
@@ -273,14 +279,14 @@ export function detectDockerCompose(): DockerComposeConfig | null {
  * Parse an explicit Docker Compose command from cmdArgs
  *
  * This handles cases where the user runs:
- * - `spotlight run docker compose up`
- * - `spotlight run docker-compose up`
- * - `spotlight run docker compose -f custom.yml up`
+ * - `spotlight run docker compose up -d`
+ * - `spotlight run docker-compose logs -f`
+ * - `spotlight run docker compose -f custom.yml exec web bash`
  *
- * Returns a DockerComposeConfig if the command is a docker compose up command,
+ * Returns a DockerComposeConfig if the command is a docker compose command,
  * null otherwise.
  */
-export function parseExplicitDockerComposeUp(cmdArgs: string[]): DockerComposeConfig | null {
+export function parseExplicitDockerCompose(cmdArgs: string[]): DockerComposeConfig | null {
   if (cmdArgs.length < 2) {
     return null;
   }
@@ -298,16 +304,8 @@ export function parseExplicitDockerComposeUp(cmdArgs: string[]): DockerComposeCo
     return null;
   }
 
-  const remainingArgs = cmdArgs.slice(argsStartIndex);
-  const upIndex = remainingArgs.indexOf("up");
-  if (upIndex === -1) {
-    logger.debug("Not a 'docker compose up' command, skipping Spotlight injection");
-    return null;
-  }
-
-  const argsBeforeUp = remainingArgs.slice(0, upIndex);
-  const argsAfterUp = remainingArgs.slice(upIndex + 1);
-  const userFiles = parseComposeFileFlags(argsBeforeUp);
+  const argsAfterCommand = cmdArgs.slice(argsStartIndex);
+  const { files: userFiles, remainingArgs: subcommandArgs } = parseComposeFlags(argsAfterCommand);
 
   const composeFiles = resolveComposeFiles(userFiles.length > 0 ? userFiles : undefined);
   if (!composeFiles) {
@@ -326,6 +324,6 @@ export function parseExplicitDockerComposeUp(cmdArgs: string[]): DockerComposeCo
     composeFiles,
     command,
     serviceNames,
-    upArgs: argsAfterUp,
+    subcommandArgs,
   };
 }
