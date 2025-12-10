@@ -181,6 +181,15 @@ describe("parseExplicitDockerCompose", () => {
 
       expect(result?.composeFiles).toEqual(["base.yml", "dev.yml", "extra.yml"]);
     });
+
+    it("should extract -f even when other global flags appear before it", () => {
+      vi.mocked(getDockerComposeServices).mockReturnValue(["app"]);
+
+      const result = parseExplicitDockerCompose(["docker", "compose", "-p", "myproject", "-f", "custom.yml", "up"]);
+
+      expect(result?.composeFiles).toEqual(["custom.yml"]);
+      expect(result?.subcommandArgs).toEqual(["-p", "myproject", "up"]);
+    });
   });
 
   describe("service extraction", () => {

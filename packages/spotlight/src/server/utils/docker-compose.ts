@@ -172,6 +172,9 @@ function collectServices(composeFiles: string[]): string[] {
 
 const FILE_FLAGS = ["-f", "--file"];
 
+// Global flags that take a value (we need to skip over their values when finding the subcommand)
+const FLAGS_WITH_VALUES = ["-f", "--file", "-p", "--project-name", "--project-directory", "--env-file", "--profile"];
+
 /**
  * Extract -f/--file flags from global options (before the subcommand).
  * Once we hit the first non-flag argument (the subcommand), everything passes through.
@@ -186,18 +189,31 @@ function parseComposeFlags(args: string[]): { files: string[]; remainingArgs: st
     const arg = args[i];
 
     if (parsingGlobalFlags) {
+      // Extract -f/--file flags
       if (FILE_FLAGS.includes(arg) && args[i + 1]) {
         files.push(args[++i]);
         continue;
       }
 
-      const matchedFlag = FILE_FLAGS.find(flag => arg.startsWith(`${flag}=`));
-      if (matchedFlag) {
-        files.push(arg.slice(matchedFlag.length + 1));
+      const matchedFileFlag = FILE_FLAGS.find(flag => arg.startsWith(`${flag}=`));
+      if (matchedFileFlag) {
+        files.push(arg.slice(matchedFileFlag.length + 1));
         continue;
       }
 
-      // First non-flag argument is the subcommand - stop parsing -f as file flags
+      // Skip other global flags that take values (e.g., -p myproject)
+      if (FLAGS_WITH_VALUES.includes(arg) && args[i + 1]) {
+        remainingArgs.push(arg, args[++i]);
+        continue;
+      }
+
+      const matchedValueFlag = FLAGS_WITH_VALUES.find(flag => arg.startsWith(`${flag}=`));
+      if (matchedValueFlag) {
+        remainingArgs.push(arg);
+        continue;
+      }
+
+      // First non-flag argument is the subcommand - stop parsing global flags
       if (!arg.startsWith("-")) {
         parsingGlobalFlags = false;
       }
