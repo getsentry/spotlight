@@ -202,6 +202,25 @@ export function buildDockerComposeCommand(config: DockerComposeConfig): {
 }
 
 /**
+ * Prepare Docker Compose run by configuring environment and building command
+ *
+ * This helper sets up the SENTRY_SPOTLIGHT URL to use host.docker.internal
+ * (so containers can reach the host machine), builds the compose command,
+ * and removes COMPOSE_FILE from env to avoid conflicts with explicit -f flags.
+ */
+export function prepareDockerComposeRun(
+  config: DockerComposeConfig,
+  serverPort: number,
+  env: Record<string, string | undefined>,
+): { cmdArgs: string[]; stdin: string } {
+  env.SENTRY_SPOTLIGHT = `http://${DOCKER_HOST_INTERNAL}:${serverPort}/stream`;
+  const command = buildDockerComposeCommand(config);
+  // biome-ignore lint/performance/noDelete: need to remove env var entirely
+  delete env.COMPOSE_FILE;
+  return command;
+}
+
+/**
  * Detect and configure Docker Compose
  *
  * This function orchestrates the detection of Docker, Docker Compose,

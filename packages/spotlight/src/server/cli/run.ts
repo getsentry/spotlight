@@ -11,11 +11,7 @@ import { SENTRY_CONTENT_TYPE } from "../constants.ts";
 import { logger } from "../logger.ts";
 import type { SentryLogEvent } from "../parser/types.ts";
 import type { CLIHandlerOptions } from "../types/cli.ts";
-import {
-  buildDockerComposeCommand,
-  detectDockerCompose,
-  parseExplicitDockerComposeUp,
-} from "../utils/docker-compose.ts";
+import { detectDockerCompose, parseExplicitDockerComposeUp, prepareDockerComposeRun } from "../utils/docker-compose.ts";
 import { getSpotlightURL } from "../utils/extras.ts";
 import { EventContainer, getBuffer } from "../utils/index.ts";
 import tail, { type OnItemCallback } from "./tail.ts";
@@ -24,7 +20,6 @@ const SPOTLIGHT_VERSION = process.env.npm_package_version || "unknown";
 
 // Environment variable host configurations
 const LOCALHOST_HOST = "localhost";
-const DOCKER_HOST = "host.docker.internal";
 
 /**
  * Detect if there's a package.json with runnable scripts
@@ -208,14 +203,7 @@ export default async function run({
           `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
         );
         metrics.count("cli.run.autodetect", 1, { attributes: { type: "docker-compose" } });
-        // Use host.docker.internal for backend services to access the host machine
-        env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
-        const command = buildDockerComposeCommand(dockerCompose);
-        cmdArgs = command.cmdArgs;
-        stdin = command.stdin;
-        // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-        // biome-ignore lint/performance/noDelete: need to remove env var entirely
-        delete env.COMPOSE_FILE;
+        ({ cmdArgs, stdin } = prepareDockerComposeRun(dockerCompose, actualServerPort, env));
       } else {
         logger.info(`Using package.json script: ${packageJson.scriptName}`);
         metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
@@ -228,15 +216,7 @@ export default async function run({
         `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
       );
       metrics.count("cli.run.autodetect", 1, { attributes: { type: "docker-compose" } });
-      // Use host.docker.internal for backend services to access the host machine
-      env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
-
-      const command = buildDockerComposeCommand(dockerCompose);
-      cmdArgs = command.cmdArgs;
-      stdin = command.stdin;
-      // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-      // biome-ignore lint/performance/noDelete: need to remove env var entirely
-      delete env.COMPOSE_FILE;
+      ({ cmdArgs, stdin } = prepareDockerComposeRun(dockerCompose, actualServerPort, env));
     } else if (packageJson) {
       logger.info(`Using package.json script: ${packageJson.scriptName}`);
       metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
@@ -257,14 +237,7 @@ export default async function run({
           upArgs: explicitDockerConfig.upArgs.join(" "),
         },
       });
-      // Use host.docker.internal for backend services to access the host machine
-      env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
-      const command = buildDockerComposeCommand(explicitDockerConfig);
-      cmdArgs = command.cmdArgs;
-      stdin = command.stdin;
-      // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-      // biome-ignore lint/performance/noDelete: need to remove env var entirely
-      delete env.COMPOSE_FILE;
+      ({ cmdArgs, stdin } = prepareDockerComposeRun(explicitDockerConfig, actualServerPort, env));
     }
   }
   if (cmdArgs.length === 0) {
