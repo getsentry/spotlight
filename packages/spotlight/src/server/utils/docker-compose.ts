@@ -54,6 +54,26 @@ export function detectDocker(): { version: string; valid: boolean } | null {
 }
 
 /**
+ * Validate Docker is installed and meets minimum version requirement.
+ * Logs appropriate messages on failure.
+ */
+function validateDocker(): boolean {
+  const docker = detectDocker();
+  if (!docker) {
+    logger.debug("Docker is not installed or not in PATH");
+    return false;
+  }
+
+  if (!docker.valid) {
+    logger.error(`Docker version ${docker.version} does not meet the minimum required version ${DOCKER_MIN_VERSION}`);
+    return false;
+  }
+
+  logger.debug(`Detected Docker version ${docker.version}`);
+  return true;
+}
+
+/**
  * Detect which compose command to use and its version
  * Follows the logic from sentry/self-hosted
  */
@@ -233,18 +253,9 @@ export function prepareDockerComposeRun(
  * compose files, and services to build a complete configuration.
  */
 export function detectDockerCompose(): DockerComposeConfig | null {
-  const docker = detectDocker();
-  if (!docker) {
-    logger.debug("Docker is not installed or not in PATH");
+  if (!validateDocker()) {
     return null;
   }
-
-  if (!docker.valid) {
-    logger.error(`Docker version ${docker.version} does not meet the minimum required version ${DOCKER_MIN_VERSION}`);
-    return null;
-  }
-
-  logger.debug(`Detected Docker version ${docker.version}`);
 
   const compose = detectComposeCommand();
   if (!compose) {
@@ -301,6 +312,11 @@ export function parseExplicitDockerCompose(cmdArgs: string[]): DockerComposeConf
     command = ["docker", "compose"];
     argsStartIndex = 2;
   } else {
+    return null;
+  }
+
+  // Validate Docker version (required for host.docker.internal on Linux)
+  if (!validateDocker()) {
     return null;
   }
 
