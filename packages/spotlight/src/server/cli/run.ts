@@ -251,8 +251,11 @@ export default async function run({
       logger.info(
         `Detected explicit Docker Compose command with ${explicitDockerConfig.serviceNames.length} service(s): ${explicitDockerConfig.serviceNames.join(", ")}`,
       );
-      metrics.count("cli.run.explicit_docker", 1, {
-        attributes: { services: explicitDockerConfig.serviceNames.length },
+      metrics.count("cli.run.docker_compose.explicit", 1, {
+        attributes: {
+          services: explicitDockerConfig.serviceNames.length,
+          upArgs: explicitDockerConfig.upArgs.join(" "),
+        },
       });
       // Use host.docker.internal for backend services to access the host machine
       env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
