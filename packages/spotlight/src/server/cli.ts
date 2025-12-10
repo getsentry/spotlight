@@ -44,6 +44,11 @@ const PARSE_ARGS_CONFIG = {
       type: "boolean",
       default: false,
     },
+    open: {
+      type: "boolean",
+      short: "o",
+      default: false,
+    },
     help: {
       type: "boolean",
       short: "h",
@@ -58,6 +63,7 @@ export type CLIArgs = {
   port: number;
   debug: boolean;
   help: boolean;
+  open: boolean;
   format: FormatterType;
   cmd: string | undefined;
   cmdArgs: string[];
@@ -117,6 +123,7 @@ export function parseCLIArgs(): CLIArgs {
   const result: CLIArgs = {
     debug: values.debug as boolean,
     help: values.help as boolean,
+    open: values.open as boolean,
     format: format as FormatterType,
     port,
     cmd: positionals[0],
@@ -139,7 +146,7 @@ export async function main({
   basePath,
   filesToServe,
 }: { basePath?: CLIHandlerOptions["basePath"]; filesToServe?: CLIHandlerOptions["filesToServe"] } = {}) {
-  let { cmd, cmdArgs, help, port, debug, format, allowedOrigins } = parseCLIArgs();
+  let { cmd, cmdArgs, help, port, debug, format, allowedOrigins, open } = parseCLIArgs();
   if (debug || process.env.SPOTLIGHT_DEBUG) {
     enableDebugLogging(true);
   }
@@ -161,5 +168,5 @@ export async function main({
 
   const handler = CLI_CMD_MAP.get(cmd) || showHelp;
 
-  return await handler({ cmd, cmdArgs, port, help, debug, format, basePath, filesToServe, allowedOrigins });
+  return await handler({ cmd, cmdArgs, port, help, debug, format, basePath, filesToServe, allowedOrigins, open });
 }
