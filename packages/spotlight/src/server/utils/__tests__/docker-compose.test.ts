@@ -70,6 +70,16 @@ describe("parseExplicitDockerCompose", () => {
       expect(parseExplicitDockerCompose(["docker", "compose", "logs", "-f"])?.subcommandArgs).toEqual(["logs", "-f"]);
       expect(parseExplicitDockerCompose(["docker", "compose"])?.subcommandArgs).toEqual([]);
     });
+
+    it("should not confuse subcommand -f (follow) with file flag", () => {
+      vi.mocked(findComposeFile).mockReturnValue("docker-compose.yml");
+      vi.mocked(getDockerComposeServices).mockReturnValue(["app", "web"]);
+
+      // logs -f means "follow", not "file" - myservice should NOT be treated as a file
+      const result = parseExplicitDockerCompose(["docker", "compose", "logs", "-f", "myservice"]);
+      expect(result?.subcommandArgs).toEqual(["logs", "-f", "myservice"]);
+      expect(result?.composeFiles).toEqual(["docker-compose.yml"]); // auto-detected, not "myservice"
+    });
   });
 
   describe("compose file detection", () => {

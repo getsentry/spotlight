@@ -173,25 +173,34 @@ function collectServices(composeFiles: string[]): string[] {
 const FILE_FLAGS = ["-f", "--file"];
 
 /**
- * Extract -f/--file flags from args. Everything else passes through.
+ * Extract -f/--file flags from global options (before the subcommand).
+ * Once we hit the first non-flag argument (the subcommand), everything passes through.
+ * This prevents confusing `logs -f` (follow) with `-f file.yml` (compose file).
  */
 function parseComposeFlags(args: string[]): { files: string[]; remainingArgs: string[] } {
   const files: string[] = [];
   const remainingArgs: string[] = [];
+  let parsingGlobalFlags = true;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
 
-    if (FILE_FLAGS.includes(arg) && args[i + 1]) {
-      files.push(args[++i]);
-      continue;
-    }
+    if (parsingGlobalFlags) {
+      if (FILE_FLAGS.includes(arg) && args[i + 1]) {
+        files.push(args[++i]);
+        continue;
+      }
 
-    // we support both -f=value and --file=value too
-    const matchedFlag = FILE_FLAGS.find(flag => arg.startsWith(`${flag}=`));
-    if (matchedFlag) {
-      files.push(arg.slice(matchedFlag.length + 1));
-      continue;
+      const matchedFlag = FILE_FLAGS.find(flag => arg.startsWith(`${flag}=`));
+      if (matchedFlag) {
+        files.push(arg.slice(matchedFlag.length + 1));
+        continue;
+      }
+
+      // First non-flag argument is the subcommand - stop parsing -f as file flags
+      if (!arg.startsWith("-")) {
+        parsingGlobalFlags = false;
+      }
     }
 
     remainingArgs.push(arg);
