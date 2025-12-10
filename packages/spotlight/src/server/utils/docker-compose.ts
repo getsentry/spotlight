@@ -332,6 +332,11 @@ export function parseExplicitDockerCompose(cmdArgs: string[]): DockerComposeConf
   const argsAfterCommand = cmdArgs.slice(argsStartIndex);
   const { files: userFiles, remainingArgs: subcommandArgs } = parseComposeFlags(argsAfterCommand);
 
+  if (subcommandArgs.length === 0) {
+    logger.debug("No subcommand provided for docker compose");
+    return null;
+  }
+
   const composeFiles = resolveComposeFiles(userFiles.length > 0 ? userFiles : undefined);
   if (!composeFiles) {
     return null;

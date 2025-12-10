@@ -68,7 +68,7 @@ describe("parseExplicitDockerCompose", () => {
 
       expect(parseExplicitDockerCompose(["docker", "compose", "up", "-d"])?.subcommandArgs).toEqual(["up", "-d"]);
       expect(parseExplicitDockerCompose(["docker", "compose", "logs", "-f"])?.subcommandArgs).toEqual(["logs", "-f"]);
-      expect(parseExplicitDockerCompose(["docker", "compose"])?.subcommandArgs).toEqual([]);
+      expect(parseExplicitDockerCompose(["docker", "compose"])).toBeNull(); // no subcommand = not handled
     });
 
     it("should not confuse subcommand -f (follow) with file flag", () => {
