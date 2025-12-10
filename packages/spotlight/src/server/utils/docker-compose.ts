@@ -15,7 +15,7 @@ export const DOCKER_MIN_VERSION = "20.10.0";
 export const DOCKER_HOST_INTERNAL = "host.docker.internal";
 export const DOCKER_HOST_GATEWAY = "host-gateway";
 
-export interface DockerComposeConfig {
+interface DockerComposeConfig {
   composeFiles: string[]; // Array of compose files
   command: string[];
   serviceNames: string[];
