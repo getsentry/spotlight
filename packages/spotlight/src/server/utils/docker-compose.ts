@@ -19,6 +19,7 @@ interface DockerComposeConfig {
   composeFiles: string[]; // Array of compose files
   command: string[];
   serviceNames: string[];
+  upArgs: string[]; // Arguments after 'up' (e.g., -d, --build, service names)
 }
 
 /**
@@ -190,6 +191,11 @@ export function buildDockerComposeCommand(config: DockerComposeConfig): {
   cmdArgs.push("-f", "-");
   cmdArgs.push("up");
 
+  // Add any arguments that were provided after 'up' (e.g., -d, --build, service names)
+  if (config.upArgs && config.upArgs.length > 0) {
+    cmdArgs.push(...config.upArgs);
+  }
+
   const stdin = generateSpotlightOverrideYaml(config.serviceNames);
 
   return { cmdArgs, stdin };
@@ -240,6 +246,7 @@ export function detectDockerCompose(): DockerComposeConfig | null {
     composeFiles,
     command: compose.command,
     serviceNames,
+    upArgs: [], // No extra args when auto-detecting
   };
 }
 
@@ -280,6 +287,7 @@ export function parseExplicitDockerComposeUp(cmdArgs: string[]): DockerComposeCo
   }
 
   const argsBeforeUp = remainingArgs.slice(0, upIndex);
+  const argsAfterUp = remainingArgs.slice(upIndex + 1);
   const userFiles = parseComposeFileFlags(argsBeforeUp);
 
   const composeFiles = resolveComposeFiles(userFiles.length > 0 ? userFiles : undefined);
@@ -299,5 +307,6 @@ export function parseExplicitDockerComposeUp(cmdArgs: string[]): DockerComposeCo
     composeFiles,
     command,
     serviceNames,
+    upArgs: argsAfterUp,
   };
 }

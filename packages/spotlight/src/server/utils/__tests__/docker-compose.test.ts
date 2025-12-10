@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { parseExplicitDockerComposeUp } from "../docker-compose.ts";
+import { buildDockerComposeCommand, parseExplicitDockerComposeUp } from "../docker-compose.ts";
 
 // Mock the docker-compose-parser module
 vi.mock("../docker-compose-parser.ts", () => ({
@@ -211,11 +211,11 @@ describe("parseExplicitDockerComposeUp", () => {
       vi.mocked(findComposeFile).mockReturnValue("compose.yml");
       vi.mocked(getDockerComposeServices).mockReturnValue(["app"]);
 
-      // Note: flags after 'up' like -d, --build are preserved but we still detect it as 'up'
       const result = parseExplicitDockerComposeUp(["docker", "compose", "up", "-d", "--build"]);
 
       expect(result).not.toBeNull();
       expect(result?.command).toEqual(["docker", "compose"]);
+      expect(result?.upArgs).toEqual(["-d", "--build"]);
     });
 
     it("should handle docker compose up with service names", () => {
@@ -225,6 +225,27 @@ describe("parseExplicitDockerComposeUp", () => {
       const result = parseExplicitDockerComposeUp(["docker", "compose", "up", "web", "worker"]);
 
       expect(result).not.toBeNull();
+      expect(result?.upArgs).toEqual(["web", "worker"]);
+    });
+
+    it("should handle docker compose up with flags and service names combined", () => {
+      vi.mocked(findComposeFile).mockReturnValue("compose.yml");
+      vi.mocked(getDockerComposeServices).mockReturnValue(["web", "worker", "db"]);
+
+      const result = parseExplicitDockerComposeUp(["docker", "compose", "up", "-d", "--build", "web", "worker"]);
+
+      expect(result).not.toBeNull();
+      expect(result?.upArgs).toEqual(["-d", "--build", "web", "worker"]);
+    });
+
+    it("should return empty upArgs when no arguments after up", () => {
+      vi.mocked(findComposeFile).mockReturnValue("compose.yml");
+      vi.mocked(getDockerComposeServices).mockReturnValue(["app"]);
+
+      const result = parseExplicitDockerComposeUp(["docker", "compose", "up"]);
+
+      expect(result).not.toBeNull();
+      expect(result?.upArgs).toEqual([]);
     });
 
     it("should handle docker-compose with project name flag", () => {
@@ -238,5 +259,76 @@ describe("parseExplicitDockerComposeUp", () => {
       // Should auto-detect since no -f was provided
       expect(findComposeFile).toHaveBeenCalled();
     });
+  });
+});
+
+describe("buildDockerComposeCommand", () => {
+  it("should include upArgs in the final command", () => {
+    const config = {
+      composeFiles: ["docker-compose.yml"],
+      command: ["docker", "compose"],
+      serviceNames: ["web", "db"],
+      upArgs: ["-d", "--build"],
+    };
+
+    const result = buildDockerComposeCommand(config);
+
+    // Should end with: up -d --build
+    expect(result.cmdArgs).toContain("up");
+    const upIndex = result.cmdArgs.indexOf("up");
+    expect(result.cmdArgs.slice(upIndex)).toEqual(["up", "-d", "--build"]);
+  });
+
+  it("should include service names from upArgs in the final command", () => {
+    const config = {
+      composeFiles: ["docker-compose.yml"],
+      command: ["docker", "compose"],
+      serviceNames: ["web", "worker", "db"],
+      upArgs: ["-d", "web", "worker"],
+    };
+
+    const result = buildDockerComposeCommand(config);
+
+    const upIndex = result.cmdArgs.indexOf("up");
+    expect(result.cmdArgs.slice(upIndex)).toEqual(["up", "-d", "web", "worker"]);
+  });
+
+  it("should work with empty upArgs", () => {
+    const config = {
+      composeFiles: ["docker-compose.yml"],
+      command: ["docker", "compose"],
+      serviceNames: ["app"],
+      upArgs: [],
+    };
+
+    const result = buildDockerComposeCommand(config);
+
+    const upIndex = result.cmdArgs.indexOf("up");
+    expect(result.cmdArgs.slice(upIndex)).toEqual(["up"]);
+  });
+
+  it("should build complete command with compose files and upArgs", () => {
+    const config = {
+      composeFiles: ["base.yml", "override.yml"],
+      command: ["docker-compose"],
+      serviceNames: ["api"],
+      upArgs: ["-d", "--build", "--force-recreate"],
+    };
+
+    const result = buildDockerComposeCommand(config);
+
+    expect(result.cmdArgs).toEqual([
+      "docker-compose",
+      "-f",
+      "base.yml",
+      "-f",
+      "override.yml",
+      "-f",
+      "-",
+      "up",
+      "-d",
+      "--build",
+      "--force-recreate",
+    ]);
   });
 });
