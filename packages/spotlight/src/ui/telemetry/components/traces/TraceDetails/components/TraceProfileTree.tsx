@@ -33,12 +33,24 @@ const FlamegraphLegend = () => {
   );
 };
 
+/**
+ * Formats a sample count for display.
+ * Uses "k" suffix for thousands to keep the display compact.
+ */
+function formatSampleCount(count: number): string {
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}k samples`;
+  }
+  return `${count} samples`;
+}
+
 export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const visualizationRef = useRef<NanovisVisualization | null>(null);
   const [visualizationType, setVisualizationType] = useState<VisualizationType>("flame");
   const [hoveredNode, setHoveredNode] = useState<NanovisTreeNode | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [treeData, setTreeData] = useState<NanovisTreeNode | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -49,6 +61,7 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
       if (!containerRef.current || !profile) return;
 
       const tree = await convertSentryProfileToNormalizedTree(profile);
+      setTreeData(tree);
 
       const nanovisModule = await import("nanovis");
       const { Flamegraph, Treemap, Sunburst } = nanovisModule;
@@ -58,8 +71,18 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
         visualizationRef.current = null;
       }
 
+      // Custom palette for Spotlight's dark theme
       const options = {
         getColor: (node: TreeNode<unknown>) => node.color,
+        palette: {
+          text: "#e0e7ff", // primary-100 for better visibility
+          fg: "#fff",
+          bg: "#1e1b4b", // primary-950
+          stroke: "#4338ca", // primary-700
+          fallback: "#9ca3af", // Gray-400 fallback
+          hover: "#ffffff33", // Semi-transparent white for hover
+          shadow: "#00000066", // Semi-transparent black for shadows
+        },
       };
 
       let visualization: NanovisVisualization;
@@ -160,9 +183,18 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
       <div onMouseLeave={() => setHoveredNode(null)}>
         <div
           ref={containerRef}
-          className="w-full border border-primary-700 rounded-md overflow-auto p-2 my-4"
+          className="w-full border border-primary-700 rounded-md overflow-auto p-2 my-4 relative"
           {...mouseTrackingProps}
         >
+          {/* Sunburst center overlay - covers nanovis bytes display with sample count */}
+          {visualizationType === "sunburst" && treeData && (
+            <div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-950 px-3 py-1 rounded-md pointer-events-none z-10"
+              style={{ minWidth: "80px", textAlign: "center" }}
+            >
+              <span className="text-primary-100 font-bold text-sm">{formatSampleCount(treeData.sampleCount)}</span>
+            </div>
+          )}
           {hoveredNode && (
             <div
               className="bg-primary-900 border-primary-400 absolute flex flex-col min-w-[200px] rounded-lg border p-3 shadow-lg z-50"
@@ -174,7 +206,7 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
             >
               <span className="text-primary-200 font-semibold">{hoveredNode.text}</span>
               <span className="text-primary-400 text-xs">{hoveredNode.subtext}</span>
-              <span className="text-primary-400 text-xs">Total Time: {hoveredNode.size}</span>
+              <span className="text-primary-400 text-xs">Samples: {hoveredNode.sampleCount}</span>
             </div>
           )}
         </div>
