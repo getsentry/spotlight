@@ -1,23 +1,20 @@
-import type { ChildProcess } from 'node:child_process';
-import http from 'node:http';
-import fs from 'node:fs/promises';
+import type { ChildProcess } from "node:child_process";
+import fs from "node:fs/promises";
+import http from "node:http";
 import {
-  spawnProcess,
-  killProcess,
-  waitForOutputPattern,
-  getSpotlightBinPath,
   type SpawnResult,
-} from '../shared/utils';
+  getSpotlightBinPath,
+  killProcess,
+  spawnProcess,
+  waitForOutputPattern,
+} from "../shared/utils";
 
 /**
  * Spawn a spotlight CLI command
  */
-export function spawnSpotlight(
-  command: string[],
-  env: NodeJS.ProcessEnv = {},
-): SpawnResult {
+export function spawnSpotlight(command: string[], env: NodeJS.ProcessEnv = {}): SpawnResult {
   const binPath = getSpotlightBinPath();
-  return spawnProcess('node', [binPath, ...command], env);
+  return spawnProcess("node", [binPath, ...command], env);
 }
 
 /**
@@ -26,36 +23,36 @@ export function spawnSpotlight(
 export async function sendEnvelope(
   port: number,
   envelopeFilePath: string,
-  compression: 'none' | 'gzip' | 'br' | 'zstd' = 'none',
+  compression: "none" | "gzip" | "br" | "zstd" = "none",
 ): Promise<void> {
   const data = await fs.readFile(envelopeFilePath);
 
   const headers: Record<string, string> = {
-    'Content-Type': 'application/x-sentry-envelope',
+    "Content-Type": "application/x-sentry-envelope",
   };
 
   let body = data;
 
   // Handle compression if needed
-  if (compression !== 'none') {
-    const zlib = await import('node:zlib');
-    const { promisify } = await import('node:util');
-    
+  if (compression !== "none") {
+    const zlib = await import("node:zlib");
+    const { promisify } = await import("node:util");
+
     switch (compression) {
-      case 'gzip':
+      case "gzip":
         body = await promisify(zlib.gzip)(data);
-        headers['Content-Encoding'] = 'gzip';
+        headers["Content-Encoding"] = "gzip";
         break;
-      case 'br':
+      case "br":
         body = await promisify(zlib.brotliCompress)(data);
-        headers['Content-Encoding'] = 'br';
+        headers["Content-Encoding"] = "br";
         break;
-      case 'zstd':
-        if (typeof zlib.zstdCompress === 'function') {
+      case "zstd":
+        if (typeof zlib.zstdCompress === "function") {
           body = await promisify(zlib.zstdCompress)(data);
-          headers['Content-Encoding'] = 'zstd';
+          headers["Content-Encoding"] = "zstd";
         } else {
-          throw new Error('zstd compression not available in this Node.js version');
+          throw new Error("zstd compression not available in this Node.js version");
         }
         break;
     }
@@ -64,13 +61,13 @@ export async function sendEnvelope(
   return new Promise((resolve, reject) => {
     const req = http.request(
       {
-        hostname: 'localhost',
+        hostname: "localhost",
         port,
-        path: '/stream',
-        method: 'POST',
+        path: "/stream",
+        method: "POST",
         headers,
       },
-      (res) => {
+      res => {
         if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
           resolve();
         } else {
@@ -80,7 +77,7 @@ export async function sendEnvelope(
       },
     );
 
-    req.on('error', reject);
+    req.on("error", reject);
     req.write(body);
     req.end();
   });
@@ -92,10 +89,10 @@ export async function sendEnvelope(
 export async function waitForOutput(
   proc: SpawnResult,
   pattern: string | RegExp,
-  timeout: number = 5000,
-  source: 'stdout' | 'stderr' = 'stdout',
+  timeout = 5000,
+  source: "stdout" | "stderr" = "stdout",
 ): Promise<string> {
-  const output = source === 'stdout' ? proc.stdout : proc.stderr;
+  const output = source === "stdout" ? proc.stdout : proc.stderr;
   return waitForOutputPattern(output, pattern, timeout);
 }
 
@@ -108,7 +105,7 @@ export async function sendMCPRequest(
   params?: Record<string, unknown>,
 ): Promise<void> {
   const request = {
-    jsonrpc: '2.0',
+    jsonrpc: "2.0",
     id: Date.now(),
     method,
     params: params || {},
@@ -116,11 +113,11 @@ export async function sendMCPRequest(
 
   return new Promise((resolve, reject) => {
     if (!proc.stdin) {
-      reject(new Error('Process stdin is not available'));
+      reject(new Error("Process stdin is not available"));
       return;
     }
 
-    proc.stdin.write(JSON.stringify(request) + '\n', (err) => {
+    proc.stdin.write(`${JSON.stringify(request)}\n`, err => {
       if (err) {
         reject(err);
       } else {
@@ -133,21 +130,18 @@ export async function sendMCPRequest(
 /**
  * Read MCP response from stdout
  */
-export async function readMCPResponse(
-  output: string[],
-  timeout: number = 5000,
-): Promise<any> {
+export async function readMCPResponse(output: string[], timeout = 5000): Promise<any> {
   const startTime = Date.now();
-  
+
   while (Date.now() - startTime < timeout) {
-    const allOutput = output.join('');
-    const lines = allOutput.split('\n');
-    
+    const allOutput = output.join("");
+    const lines = allOutput.split("\n");
+
     for (const line of lines) {
       if (line.trim()) {
         try {
           const parsed = JSON.parse(line);
-          if (parsed.jsonrpc === '2.0') {
+          if (parsed.jsonrpc === "2.0") {
             return parsed;
           }
         } catch {
@@ -155,47 +149,38 @@ export async function readMCPResponse(
         }
       }
     }
-    
+
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-  
-  throw new Error('Timeout waiting for MCP response');
+
+  throw new Error("Timeout waiting for MCP response");
 }
 
 /**
  * Send SIGTERM and wait for graceful exit
  */
-export async function killGracefully(
-  proc: ChildProcess,
-  timeout: number = 5000,
-): Promise<void> {
-  return killProcess(proc, 'SIGTERM');
+export async function killGracefully(proc: ChildProcess, _timeout = 5000): Promise<void> {
+  return killProcess(proc, "SIGTERM");
 }
 
 /**
  * Wait for sidecar to be ready by checking health endpoint
  */
-export async function waitForSidecarReady(
-  port: number,
-  timeout: number = 5000,
-): Promise<void> {
+export async function waitForSidecarReady(port: number, timeout = 5000): Promise<void> {
   const startTime = Date.now();
-  
+
   while (Date.now() - startTime < timeout) {
     try {
       await new Promise<void>((resolve, reject) => {
-        const req = http.get(
-          `http://localhost:${port}/`,
-          (res) => {
-            res.resume();
-            if (res.statusCode && res.statusCode >= 200 && res.statusCode < 500) {
-              resolve();
-            } else {
-              reject(new Error(`Health check failed with status ${res.statusCode}`));
-            }
-          },
-        );
-        req.on('error', reject);
+        const req = http.get(`http://localhost:${port}/`, res => {
+          res.resume();
+          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 500) {
+            resolve();
+          } else {
+            reject(new Error(`Health check failed with status ${res.statusCode}`));
+          }
+        });
+        req.on("error", reject);
         req.setTimeout(1000);
       });
       return; // Success
@@ -204,7 +189,7 @@ export async function waitForSidecarReady(
       await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
-  
+
   throw new Error(`Sidecar not ready after ${timeout}ms`);
 }
 
@@ -213,9 +198,9 @@ export async function waitForSidecarReady(
  */
 export function parseJSONLines(output: string[]): any[] {
   const results: any[] = [];
-  const allOutput = output.join('');
-  const lines = allOutput.split('\n');
-  
+  const allOutput = output.join("");
+  const lines = allOutput.split("\n");
+
   for (const line of lines) {
     const trimmed = line.trim();
     if (trimmed) {
@@ -226,6 +211,6 @@ export function parseJSONLines(output: string[]): any[] {
       }
     }
   }
-  
+
   return results;
 }
