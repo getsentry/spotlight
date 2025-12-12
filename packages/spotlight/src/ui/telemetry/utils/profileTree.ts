@@ -108,7 +108,7 @@ function buildTree(profile: SentryProfileWithTraceMeta, options: FlamegraphUtilO
     let currentNode: TreeNodeWithMap = root;
     root.sampleCount++;
     for (let depth = 0; depth < stack.length; depth++) {
-      const frameId = stack[stack.length - 1 - depth];
+      const frameId = stack[depth];
       const frame = frames[frameId];
       if (!frame) continue;
       if (!currentNode.childrenMap) {
