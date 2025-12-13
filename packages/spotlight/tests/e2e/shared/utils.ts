@@ -1,7 +1,7 @@
-import { spawn, type ChildProcess } from 'node:child_process';
-import { createServer } from 'node:net';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { type ChildProcess, spawn } from "node:child_process";
+import { createServer } from "node:net";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -12,14 +12,14 @@ export async function findFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
     const server = createServer();
     server.unref();
-    server.on('error', reject);
+    server.on("error", reject);
     server.listen(0, () => {
       const address = server.address();
-      if (address && typeof address === 'object') {
+      if (address && typeof address === "object") {
         const { port } = address;
         server.close(() => resolve(port));
       } else {
-        reject(new Error('Unable to get port'));
+        reject(new Error("Unable to get port"));
       }
     });
   });
@@ -30,8 +30,8 @@ export async function findFreePort(): Promise<number> {
  */
 export async function waitFor(
   condition: () => boolean | Promise<boolean>,
-  timeout: number = 5000,
-  interval: number = 100,
+  timeout = 5000,
+  interval = 100,
 ): Promise<void> {
   const startTime = Date.now();
   while (Date.now() - startTime < timeout) {
@@ -46,7 +46,7 @@ export async function waitFor(
 /**
  * Kill a process and wait for it to exit
  */
-export async function killProcess(proc: ChildProcess, signal: NodeJS.Signals = 'SIGTERM'): Promise<void> {
+export async function killProcess(proc: ChildProcess, signal: NodeJS.Signals = "SIGTERM"): Promise<void> {
   return new Promise((resolve, reject) => {
     if (!proc.pid) {
       resolve();
@@ -55,12 +55,12 @@ export async function killProcess(proc: ChildProcess, signal: NodeJS.Signals = '
 
     const timeout = setTimeout(() => {
       if (proc.pid) {
-        proc.kill('SIGKILL');
+        proc.kill("SIGKILL");
       }
-      reject(new Error('Process did not exit gracefully'));
+      reject(new Error("Process did not exit gracefully"));
     }, 5000);
 
-    proc.on('exit', () => {
+    proc.on("exit", () => {
       clearTimeout(timeout);
       resolve();
     });
@@ -80,30 +80,26 @@ export interface SpawnResult {
   exitPromise: Promise<number | null>;
 }
 
-export function spawnProcess(
-  command: string,
-  args: string[] = [],
-  env: NodeJS.ProcessEnv = {},
-): SpawnResult {
+export function spawnProcess(command: string, args: string[] = [], env: NodeJS.ProcessEnv = {}): SpawnResult {
   const stdout: string[] = [];
   const stderr: string[] = [];
   let exitCode: number | null = null;
 
   const proc = spawn(command, args, {
     env: { ...process.env, ...env },
-    stdio: ['pipe', 'pipe', 'pipe'],
+    stdio: ["pipe", "pipe", "pipe"],
   });
 
-  proc.stdout?.on('data', (data: Buffer) => {
+  proc.stdout?.on("data", (data: Buffer) => {
     stdout.push(data.toString());
   });
 
-  proc.stderr?.on('data', (data: Buffer) => {
+  proc.stderr?.on("data", (data: Buffer) => {
     stderr.push(data.toString());
   });
 
-  const exitPromise = new Promise<number | null>((resolve) => {
-    proc.on('exit', (code) => {
+  const exitPromise = new Promise<number | null>(resolve => {
+    proc.on("exit", code => {
       exitCode = code;
       resolve(code);
     });
@@ -122,7 +118,7 @@ export function spawnProcess(
  * Get path to a fixture file
  */
 export function getFixturePath(filename: string): string {
-  return path.join(__dirname, '../../../_fixtures', filename);
+  return path.join(__dirname, "../../../_fixtures", filename);
 }
 
 /**
@@ -131,15 +127,13 @@ export function getFixturePath(filename: string): string {
 export async function waitForOutputPattern(
   output: string[],
   pattern: string | RegExp,
-  timeout: number = 5000,
+  timeout = 5000,
 ): Promise<string> {
   const startTime = Date.now();
   while (Date.now() - startTime < timeout) {
-    const allOutput = output.join('');
-    const match = typeof pattern === 'string' 
-      ? allOutput.includes(pattern)
-      : pattern.test(allOutput);
-    
+    const allOutput = output.join("");
+    const match = typeof pattern === "string" ? allOutput.includes(pattern) : pattern.test(allOutput);
+
     if (match) {
       return allOutput;
     }
@@ -154,7 +148,7 @@ export async function waitForOutputPattern(
 export function getSpotlightBinPath(): string {
   // In development, use the source files with ts-node
   // In tests, this should point to the built binary
-  return path.join(__dirname, '../../../dist/run.js');
+  return path.join(__dirname, "../../../dist/run.js");
 }
 
 /**
@@ -162,12 +156,10 @@ export function getSpotlightBinPath(): string {
  */
 export async function ensureSpotlightBuilt(): Promise<void> {
   const binPath = getSpotlightBinPath();
-  const fs = await import('node:fs/promises');
+  const fs = await import("node:fs/promises");
   try {
     await fs.access(binPath);
   } catch {
-    throw new Error(
-      `Spotlight binary not found at ${binPath}. Run 'pnpm build' first.`
-    );
+    throw new Error(`Spotlight binary not found at ${binPath}. Run 'pnpm build' first.`);
   }
 }

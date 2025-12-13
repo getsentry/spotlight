@@ -8,6 +8,7 @@ import type {
   SentryProcessedProfile,
   Trace,
 } from "../types";
+import type { ProcessedProfileChunk } from "./utils/profileChunkProcessor";
 
 export type SentryProfileWithTraceMeta = SentryProcessedProfile & {
   timestamp: number;
@@ -37,10 +38,14 @@ export interface TracesSliceActions {
 }
 
 export interface ProfilesSliceState {
+  /** Final merged profiles keyed by trace_id - works for both V1 and V2 */
   profilesByTraceId: Map<string, SentryProfileWithTraceMeta>;
+  /** Internal: V2 chunks being accumulated, keyed by profiler_id */
+  profileChunksByProfilerId: Map<string, ProcessedProfileChunk[]>;
 }
 
 export interface ProfilesSliceActions {
+  /** Get profile for a trace - unified access for both V1 and V2 profiles */
   getProfileByTraceId: (id: string) => SentryProfileWithTraceMeta | undefined;
   getAggregateCallData: () => AggregateCallData[];
 }

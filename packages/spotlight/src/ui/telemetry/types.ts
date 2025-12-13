@@ -208,6 +208,61 @@ export type SentryProfileV1Event = CommonEventAttrs & {
   profile: SentryProfile;
 };
 
+// V2 Profile (Continuous Profiling) Types
+export type ProfileV2Sample = {
+  timestamp: number; // Unix timestamp in seconds with microseconds precision
+  stack_id: number;
+  thread_id: string;
+};
+
+export type ProfileV2MeasurementValue = {
+  timestamp: number;
+  value: number;
+};
+
+export type ProfileV2Measurement = {
+  unit: string;
+  values: ProfileV2MeasurementValue[];
+};
+
+export type SentryProfileV2 = {
+  samples: ProfileV2Sample[];
+  stacks: number[][];
+  frames: EventFrame[];
+  thread_metadata: Record<
+    string,
+    {
+      name?: string;
+      priority?: number;
+    }
+  >;
+};
+
+export type SentryProfileV2ChunkEvent = {
+  type: "profile_chunk";
+  version: "2";
+  profiler_id: string; // Links chunks from same profiler session
+  chunk_id: string; // Unique ID for this chunk
+  platform: string;
+  release?: string;
+  environment?: string;
+  client_sdk?: {
+    name: string;
+    version: string;
+  };
+  debug_meta?: {
+    images?: Array<{
+      debug_id?: string;
+      image_addr?: string;
+      type?: string;
+      image_size?: number;
+      code_file?: string;
+    }>;
+  };
+  measurements?: Record<string, ProfileV2Measurement>;
+  profile: SentryProfileV2;
+};
+
 export type SentryLogEventItem = SerializedLog & {
   id: string; // Need to have a unique id for each log
   severity_number: number;
@@ -219,7 +274,12 @@ export type SentryLogEvent = CommonEventAttrs & {
   items: Array<SentryLogEventItem>;
 };
 
-export type SentryEvent = SentryErrorEvent | SentryTransactionEvent | SentryProfileV1Event | SentryLogEvent;
+export type SentryEvent =
+  | SentryErrorEvent
+  | SentryTransactionEvent
+  | SentryProfileV1Event
+  | SentryProfileV2ChunkEvent
+  | SentryLogEvent;
 
 export type Trace = TraceContext & {
   trace_id: string;

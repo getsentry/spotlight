@@ -1,10 +1,13 @@
 import { generateUuidv4 } from "@spotlight/ui/lib/uuid";
 import type { StateCreator } from "zustand";
+import { graftProfileSpans } from "../../data/profiles";
 import type { SentryEvent, SentryLogEventItem } from "../../types";
-import { isErrorEvent, isLogEvent, isProfileEvent, isTraceEvent } from "../../utils/sentry";
-import type { EventsSliceActions, EventsSliceState, SentryStore } from "../types";
+import type { SentryTransactionEvent } from "../../types";
+import { isErrorEvent, isLogEvent, isProfileChunkEvent, isProfileEvent, isTraceEvent } from "../../utils/sentry";
+import type { EventsSliceActions, EventsSliceState, SentryProfileWithTraceMeta, SentryStore } from "../types";
 import { toTimestamp } from "../utils";
 import { processLogItems } from "../utils/logProcessor";
+import { mergeChunksToProfile, processProfileChunkEvent } from "../utils/profileChunkProcessor";
 import { processProfileEvent } from "../utils/profileProcessor";
 import { initializeTrace } from "../utils/traceInitializer";
 import { processTransactionEvent, updateTraceMetadata } from "../utils/traceProcessor";
@@ -75,7 +78,7 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
 
     const traceCtx = event.contexts?.trace;
     if (traceCtx?.trace_id) {
-      const { tracesById, profilesByTraceId } = get();
+      const { tracesById, profilesByTraceId, profileChunksByProfilerId } = get();
       const existingTrace = tracesById.get(traceCtx.trace_id);
 
       // Initialize or get existing trace
@@ -85,13 +88,17 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       trace.start_timestamp = Math.min(event.start_timestamp ?? event.timestamp, trace.start_timestamp);
       trace.timestamp = Math.max(event.timestamp, trace.timestamp);
 
+      let mergedV2Profile: SentryProfileWithTraceMeta | undefined;
+
       if (isTraceEvent(event)) {
         // Process transaction event and update trace
         const result = processTransactionEvent(event, {
           existingTrace: trace,
           profilesByTraceId,
+          profileChunksByProfilerId,
         });
         trace = result.trace;
+        mergedV2Profile = result.mergedProfile;
       } else if (isErrorEvent(event)) {
         // For error events, increment error count
         trace.errors += 1;
@@ -107,7 +114,15 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       // Always save trace to store (whether new or updated)
       const newTracesById = new Map(tracesById);
       newTracesById.set(trace.trace_id, trace);
-      set({ tracesById: newTracesById });
+
+      // If we merged a V2 profile, store it by trace_id so the UI can find it
+      if (mergedV2Profile) {
+        const newProfilesByTraceId = new Map(profilesByTraceId);
+        newProfilesByTraceId.set(trace.trace_id, mergedV2Profile);
+        set({ tracesById: newTracesById, profilesByTraceId: newProfilesByTraceId });
+      } else {
+        set({ tracesById: newTracesById });
+      }
     }
 
     if (isProfileEvent(event)) {
@@ -120,6 +135,69 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
         newProfilesByTraceId.set(traceId, profile);
       }
       set({ profilesByTraceId: newProfilesByTraceId });
+    }
+
+    // Handle V2 profile chunks (continuous profiling)
+    if (isProfileChunkEvent(event)) {
+      const { profileChunksByProfilerId, tracesById, eventsById, profilesByTraceId } = get();
+      const { chunk } = processProfileChunkEvent(event);
+
+      // Update store with processed profile chunk
+      const newProfileChunksByProfilerId = new Map(profileChunksByProfilerId);
+      const existingChunks = newProfileChunksByProfilerId.get(chunk.profiler_id) || [];
+
+      // Check if this chunk already exists (by chunk_id)
+      if (!existingChunks.some(c => c.chunk_id === chunk.chunk_id)) {
+        const updatedChunks = [...existingChunks, chunk];
+        newProfileChunksByProfilerId.set(chunk.profiler_id, updatedChunks);
+
+        // Check if there's an existing transaction with this profiler_id that needs re-grafting
+        // This handles the case where profile chunks arrive AFTER the transaction
+        let traceToUpdate: string | undefined;
+        let activeThreadId: string | undefined;
+        for (const evt of eventsById.values()) {
+          if (isTraceEvent(evt)) {
+            const txn = evt as SentryTransactionEvent;
+            const profileCtx = txn.contexts?.profile as { profiler_id?: string } | undefined;
+            if (profileCtx?.profiler_id === chunk.profiler_id) {
+              traceToUpdate = txn.contexts.trace.trace_id;
+              activeThreadId = txn.contexts.trace.data?.["thread.id"] as string | undefined;
+              break;
+            }
+          }
+        }
+
+        if (traceToUpdate) {
+          // Re-graft with updated chunks
+          const existingTrace = tracesById.get(traceToUpdate);
+          if (existingTrace && !existingTrace.profileGrafted) {
+            const mergedProfile = mergeChunksToProfile(updatedChunks, activeThreadId);
+            if (mergedProfile) {
+              // Create a shallow copy of the trace to trigger React re-render
+              const trace = {
+                ...existingTrace,
+                spans: new Map(existingTrace.spans),
+                spanTree: [...existingTrace.spanTree],
+              };
+              graftProfileSpans(trace, mergedProfile);
+
+              // Store updated trace and profile
+              const newTracesById = new Map(tracesById);
+              newTracesById.set(traceToUpdate, trace);
+              const newProfilesByTraceId = new Map(profilesByTraceId);
+              newProfilesByTraceId.set(traceToUpdate, mergedProfile);
+              set({
+                profileChunksByProfilerId: newProfileChunksByProfilerId,
+                tracesById: newTracesById,
+                profilesByTraceId: newProfilesByTraceId,
+              });
+              return;
+            }
+          }
+        }
+
+        set({ profileChunksByProfilerId: newProfileChunksByProfilerId });
+      }
     }
   },
   getEvents: () => Array.from(get().eventsById.values()),

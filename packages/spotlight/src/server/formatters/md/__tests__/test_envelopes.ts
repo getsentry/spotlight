@@ -455,3 +455,216 @@ export const envelopeSecondTransactionEvent = {
     version: "9.42.1",
   },
 };
+
+// V1 Profile Event (transaction-based profiling)
+export const envelopeProfileV1Event = {
+  type: "profile" as const,
+  version: "1" as const,
+  event_id: "profile1234567890abcdef1234567890ab",
+  timestamp: 1754524400.5,
+  platform: "python",
+  device: {
+    architecture: "x86_64",
+    is_emulator: false,
+    locale: "en-US",
+    manufacturer: "Apple",
+    model: "MacBookPro18,3",
+  },
+  os: {
+    name: "macOS",
+    version: "14.0",
+    build_number: "23A344",
+  },
+  transactions: [
+    {
+      name: "/api/users",
+      id: "txn123456789abcdef",
+      trace_id: "71a8c5e41ae1044dee67f50a07538fe7",
+      active_thread_id: "1",
+      relative_start_ns: "0",
+      relative_end_ns: "100000000",
+    },
+  ],
+  profile: {
+    samples: [
+      { elapsed_since_start_ns: "0", stack_id: 0, thread_id: "1" },
+      { elapsed_since_start_ns: "10000000", stack_id: 1, thread_id: "1" },
+      { elapsed_since_start_ns: "20000000", stack_id: 2, thread_id: "1" },
+      { elapsed_since_start_ns: "30000000", stack_id: 1, thread_id: "1" },
+      { elapsed_since_start_ns: "40000000", stack_id: 0, thread_id: "1" },
+    ],
+    stacks: [
+      [0], // main
+      [1, 0], // handle_request -> main
+      [2, 1, 0], // query_database -> handle_request -> main
+    ],
+    frames: [
+      { function: "main", filename: "app.py", lineno: 10, in_app: true },
+      { function: "handle_request", filename: "views.py", lineno: 25, in_app: true },
+      { function: "query_database", filename: "db.py", lineno: 50, in_app: true },
+    ],
+    thread_metadata: {
+      "1": { name: "MainThread", priority: 5 },
+    },
+  },
+};
+
+// V2 Profile Chunk Event (continuous profiling)
+export const envelopeProfileV2ChunkEvent = {
+  type: "profile_chunk" as const,
+  version: "2" as const,
+  profiler_id: "71bba98d90b545c39f2ae73f702d7ef4",
+  chunk_id: "3e11a5c9831f4e49939c0a81944ea2cb",
+  platform: "cocoa",
+  release: "io.sentry.sample.iOS-Swift@8.36.0+1",
+  environment: "simulator",
+  client_sdk: {
+    name: "sentry.cocoa",
+    version: "8.36.0",
+  },
+  debug_meta: {
+    images: [
+      {
+        debug_id: "5819FF25-01CB-3D32-B84F-0634B37D3BBC",
+        image_addr: "0x00000001023a8000",
+        type: "macho",
+        image_size: 16384,
+        code_file:
+          "/Library/Developer/CoreSimulator/Volumes/iOS_21C62/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 17.2.simruntime/Contents/Resources/RuntimeRoot/usr/lib/libLogRedirect.dylib",
+      },
+    ],
+  },
+  measurements: {
+    frozen_frame_renders: {
+      unit: "nanosecond",
+      values: [{ timestamp: 1724777211.6403089, value: 16000000 }],
+    },
+  },
+  profile: {
+    samples: [
+      { timestamp: 1724777211.5037799, stack_id: 0, thread_id: "259" },
+      { timestamp: 1724777211.5137799, stack_id: 1, thread_id: "259" },
+      { timestamp: 1724777211.5237799, stack_id: 2, thread_id: "259" },
+      { timestamp: 1724777211.5337799, stack_id: 1, thread_id: "259" },
+      { timestamp: 1724777211.5437799, stack_id: 0, thread_id: "259" },
+    ],
+    stacks: [
+      [0], // _main
+      [1, 0], // UIApplicationMain -> _main
+      [2, 1, 0], // -[AppDelegate application:didFinishLaunchingWithOptions:] -> UIApplicationMain -> _main
+    ],
+    frames: [
+      {
+        instruction_addr: "0x000000010232d144",
+        function: "_main",
+        filename: "main.m",
+        in_app: true,
+      },
+      {
+        instruction_addr: "0x000000010232d200",
+        function: "UIApplicationMain",
+        module: "UIKit",
+        in_app: false,
+      },
+      {
+        instruction_addr: "0x000000010232d300",
+        function: "-[AppDelegate application:didFinishLaunchingWithOptions:]",
+        filename: "AppDelegate.swift",
+        lineno: 15,
+        in_app: true,
+      },
+    ],
+    thread_metadata: {
+      "259": { name: "main", priority: 31 },
+    },
+  },
+};
+
+// Second V2 chunk for the same profiler session (for testing chunk merging)
+export const envelopeProfileV2ChunkEvent2 = {
+  type: "profile_chunk" as const,
+  version: "2" as const,
+  profiler_id: "71bba98d90b545c39f2ae73f702d7ef4", // Same profiler_id
+  chunk_id: "abc123def456789012345678901234cd", // Different chunk_id
+  platform: "cocoa",
+  release: "io.sentry.sample.iOS-Swift@8.36.0+1",
+  environment: "simulator",
+  client_sdk: {
+    name: "sentry.cocoa",
+    version: "8.36.0",
+  },
+  profile: {
+    samples: [
+      { timestamp: 1724777211.553, stack_id: 0, thread_id: "259" },
+      { timestamp: 1724777211.563, stack_id: 1, thread_id: "259" },
+      { timestamp: 1724777211.573, stack_id: 0, thread_id: "259" },
+    ],
+    stacks: [
+      [0], // viewDidLoad
+      [1, 0], // loadData -> viewDidLoad
+    ],
+    frames: [
+      {
+        instruction_addr: "0x000000010232e100",
+        function: "-[ViewController viewDidLoad]",
+        filename: "ViewController.swift",
+        lineno: 20,
+        in_app: true,
+      },
+      {
+        instruction_addr: "0x000000010232e200",
+        function: "-[ViewController loadData]",
+        filename: "ViewController.swift",
+        lineno: 45,
+        in_app: true,
+      },
+    ],
+    thread_metadata: {
+      "259": { name: "main", priority: 31 },
+    },
+  },
+};
+
+// Transaction with profiler_id context (for V2 profile linking)
+export const envelopeTransactionWithProfilerContext = {
+  event_id: "txn_with_profiler_123",
+  type: "transaction",
+  transaction: "/ios/app/launch",
+  timestamp: 1724777211.6,
+  start_timestamp: 1724777211.5,
+  platform: "cocoa",
+  contexts: {
+    trace: {
+      trace_id: "f1e2d3c4b5a6978012345678901234ab",
+      span_id: "abc123def4567890",
+      parent_span_id: undefined,
+      data: {
+        "thread.id": "259",
+        "thread.name": "main",
+      },
+    },
+    profile: {
+      profiler_id: "71bba98d90b545c39f2ae73f702d7ef4", // Links to V2 profile chunks
+    },
+  },
+  spans: [
+    {
+      span_id: "span1234567890ab",
+      parent_span_id: "abc123def4567890",
+      trace_id: "f1e2d3c4b5a6978012345678901234ab",
+      op: "app.start",
+      description: "Application Launch",
+      start_timestamp: 1724777211.51,
+      timestamp: 1724777211.55,
+      duration: 40,
+      status: "ok",
+      data: {
+        "thread.id": "259",
+      },
+    },
+  ],
+  sdk: {
+    name: "sentry.cocoa",
+    version: "8.36.0",
+  },
+};

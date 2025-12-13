@@ -82,13 +82,7 @@ export const sentinelDarkTheme: ThemeRegistration = {
     },
     {
       name: "Type and Class Names",
-      scope: [
-        "entity.name.type",
-        "entity.name.class",
-        "entity.name.interface",
-        "support.type",
-        "support.class",
-      ],
+      scope: ["entity.name.type", "entity.name.class", "entity.name.interface", "support.type", "support.class"],
       settings: {
         foreground: "#FF45A8",
       },
@@ -395,11 +389,7 @@ export const sentinelDarkTheme: ThemeRegistration = {
     },
     {
       name: "Template Expression",
-      scope: [
-        "punctuation.definition.template-expression",
-        "punctuation.section.embedded",
-        "meta.template.expression",
-      ],
+      scope: ["punctuation.definition.template-expression", "punctuation.section.embedded", "meta.template.expression"],
       settings: {
         foreground: "#7553FF",
       },
@@ -435,4 +425,3 @@ export const sentinelDarkTheme: ThemeRegistration = {
     },
   ],
 };
-

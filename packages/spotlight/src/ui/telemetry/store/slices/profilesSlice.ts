@@ -5,6 +5,7 @@ import type { ProfilesSliceActions, ProfilesSliceState, SentryStore } from "../t
 
 const initialProfilesState: ProfilesSliceState = {
   profilesByTraceId: new Map(),
+  profileChunksByProfilerId: new Map(),
 };
 
 export const createProfilesSlice: StateCreator<SentryStore, [], [], ProfilesSliceState & ProfilesSliceActions> = (
@@ -12,9 +13,15 @@ export const createProfilesSlice: StateCreator<SentryStore, [], [], ProfilesSlic
   get,
 ) => ({
   ...initialProfilesState,
+
+  // Unified profile access - works for both V1 and merged V2 profiles
   getProfileByTraceId: (id: string) => get().profilesByTraceId.get(id),
+
+  // Aggregate call data from all profiles (both V1 and V2 are stored in profilesByTraceId)
   getAggregateCallData: () => {
     const aggregateCalls = new Map<string, AggregateCallData>();
+
+    // Process all profiles - unified storage for both V1 and merged V2
     for (const [traceId, profile] of get().profilesByTraceId) {
       for (let sampleIdx = 0; sampleIdx < profile.samples.length - 1; sampleIdx++) {
         const sample = profile.samples[sampleIdx];
