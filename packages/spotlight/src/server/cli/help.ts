@@ -1,17 +1,44 @@
-import { EVERYTHING_MAGIC_WORDS, NAME_TO_TYPE_MAPPING } from "../cli/tail.ts";
+import { COMMANDS } from "../cli.ts";
 import { AVAILABLE_FORMATTERS } from "../formatters/types.ts";
+import type { CLIHandlerOptions } from "../types/cli.ts";
 
-export default function showHelp() {
+function showCommandHelp(commandName: string): boolean {
+  const command = COMMANDS.find(c => c.meta.name === commandName);
+  if (!command) {
+    return false;
+  }
+
+  const { meta } = command;
+  console.log(`
+${meta.name} - ${meta.short}
+
+Usage: ${meta.usage || `spotlight ${meta.name} [options]`}
+${meta.long ? `\n${meta.long}` : ""}
+${
+  meta.examples && meta.examples.length > 0
+    ? `
+Examples:
+${meta.examples.map(ex => `  ${ex}`).join("\n")}`
+    : ""
+}
+`);
+  return true;
+}
+
+function showMainHelp() {
+  // Build commands section dynamically from COMMANDS
+  const commandsHelp = COMMANDS.map(({ meta }) => {
+    const name = meta.name.padEnd(20);
+    return `  ${name} ${meta.short}`;
+  }).join("\n");
+
   console.log(`
 Spotlight Sidecar - Development proxy server for Spotlight
 
 Usage: spotlight [command] [options]
 
 Commands:
-  tail [types...]      Tail Sentry events (default: everything)
-                       Available types: ${[...Object.keys(NAME_TO_TYPE_MAPPING)].join(", ")}
-                       Magic words: ${[...EVERYTHING_MAGIC_WORDS].join(", ")}
-  mcp                  Start in MCP (Model Context Protocol) mode
+${commandsHelp}
   help                 Show this help message
 
 Options:
@@ -29,17 +56,28 @@ Options:
   -h, --help             Show this help message
 
 Examples:
-  spotlight                          # Start on default port 8969
-  spotlight --open                   # Start and open dashboard in browser
-  spotlight tail                     # Tail all event types (human format)
-  spotlight tail errors              # Tail only errors
-  spotlight tail errors logs         # Tail errors and logs
-  spotlight tail --format json       # Explicitly use json format
-  spotlight mcp                      # Start in MCP mode
-  spotlight --port 3000              # Start on port 3000
-  spotlight -p 3000 -d               # Start on port 3000 with debug logging
-  spotlight -A myapp.local           # Allow requests from myapp.local
-  spotlight -A https://tunnel.ngrok.io -A dev.local  # Multiple origins
+${COMMANDS.flatMap(({ meta }) => meta.examples?.slice(0, 2) || [])
+  .map(ex => `  ${ex}`)
+  .join("\n")}
+
+Run 'spotlight help <command>' for more information on a specific command.
 `);
+}
+
+export default function showHelp({ cmdArgs }: CLIHandlerOptions) {
+  const targetCmd = cmdArgs?.[0];
+
+  if (targetCmd) {
+    // Show detailed help for specific command
+    if (!showCommandHelp(targetCmd)) {
+      console.error(`Unknown command: ${targetCmd}`);
+      console.error(`Run 'spotlight help' to see available commands.`);
+      process.exit(1);
+    }
+  } else {
+    // Show main help
+    showMainHelp();
+  }
+
   process.exit(0);
 }

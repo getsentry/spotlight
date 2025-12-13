@@ -10,11 +10,37 @@ import { uuidv7 } from "uuidv7";
 import { SENTRY_CONTENT_TYPE } from "../constants.ts";
 import { logger } from "../logger.ts";
 import type { SentryLogEvent } from "../parser/types.ts";
-import type { CLIHandlerOptions } from "../types/cli.ts";
+import type { CLIHandlerOptions, Command, CommandMeta } from "../types/cli.ts";
 import { detectDockerCompose, parseExplicitDockerCompose, prepareDockerComposeRun } from "../utils/docker-compose.ts";
 import { getSpotlightURL, openInBrowser } from "../utils/extras.ts";
 import { EventContainer, getBuffer } from "../utils/index.ts";
-import tail, { type OnItemCallback } from "./tail.ts";
+import { type OnItemCallback, handler as tail } from "./tail.ts";
+
+export const meta: CommandMeta = {
+  name: "run",
+  short: "Run your app with automatic Spotlight instrumentation",
+  usage: "spotlight run [options] [command...]",
+  long: `Run your application with Spotlight, automatically setting up the necessary
+environment variables and capturing telemetry data.
+
+If no command is provided, Spotlight auto-detects:
+  - Docker Compose projects (docker-compose.yml, compose.yml, etc.)
+  - package.json scripts (dev, develop, serve, start)
+
+Environment variables set automatically:
+  - SENTRY_SPOTLIGHT=http://localhost:<port>/stream
+  - NEXT_PUBLIC_SENTRY_SPOTLIGHT=http://localhost:<port>/stream
+  - SENTRY_TRACES_SAMPLE_RATE=1
+
+stdout/stderr are captured and sent to Spotlight as log events.`,
+  examples: [
+    "spotlight run                      # Auto-detect and run (package.json or docker-compose)",
+    "spotlight run node server.js       # Run a specific command with Spotlight",
+    "spotlight run -p 3000 npm start    # Run with custom port",
+    "spotlight run python manage.py runserver  # Run Python app",
+    "spotlight run docker compose up    # Run Docker Compose with Spotlight injection",
+  ],
+};
 
 const SPOTLIGHT_VERSION = process.env.npm_package_version || "unknown";
 
@@ -107,7 +133,7 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
   return Buffer.from(`${parts.join("\n")}\n`, "utf-8");
 }
 
-export default async function run({
+export async function handler({
   port,
   cmdArgs,
   basePath,
@@ -358,3 +384,5 @@ export default async function run({
     process.on("beforeExit", killRunCmd);
   });
 }
+
+export default { meta, handler } satisfies Command;
