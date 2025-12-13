@@ -1,7 +1,7 @@
 export const FRAME_COLOR = {
-  application: "#d0d1f5",
-  system: "#ffe0e4",
-  unknown: "#f3f4f6",
+  application: "#6366f1", // Indigo - matches primary-500
+  system: "#f87171", // Red-400 - distinct system color
+  unknown: "#9ca3af", // Gray-400
 };
 
 export const FRAME_TYPES = [
