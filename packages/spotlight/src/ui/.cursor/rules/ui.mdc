@@ -1,0 +1,272 @@
+---
+description: UI development guidelines for the Spotlight React application
+globs:
+alwaysApply: true
+---
+
+# UI Development Guidelines
+
+The Spotlight UI is a React application for visualizing telemetry data (errors, traces, logs).
+
+## Server Connection (SSE)
+
+The UI connects to the sidecar server via **Server-Sent Events (SSE)**.
+
+### Connection Flow
+
+```
+sidecar.ts (connectToSidecar)
+    ↓
+EventSource → GET /stream?base64=1&client=spotlight-ui
+    ↓
+Listens for content-type events (application/x-sentry-envelope)
+    ↓
+telemetry/index.tsx (listener callback)
+    ↓
+useSentryStore.getState().pushEnvelope(envelope)
+    ↓
+Store processes → events, traces, logs, profiles
+```
+
+### Key Files
+
+- `sidecar.ts` - `connectToSidecar()` establishes SSE connection
+- `telemetry/index.tsx` - `Telemetry` component manages connection lifecycle
+- `store/slices/envelopesSlice.ts` - `pushEnvelope()` processes incoming data
+
+### Connection Code
+
+```tsx
+// sidecar.ts
+export function connectToSidecar(
+  sidecarUrl: string,
+  contentTypeListeners: Record<string, (event: string) => void>,
+  setOnline: (online: boolean) => void,
+) {
+  const source = new EventSource(`${sidecarUrl}/stream?base64=1`);
+  
+  for (const [contentType, listener] of Object.entries(contentTypeListeners)) {
+    source.addEventListener(contentType, (event) => listener(event.data));
+  }
+  
+  source.addEventListener('open', () => setOnline(true));
+  source.addEventListener('error', () => setOnline(false));
+  
+  return () => { /* cleanup */ };
+}
+```
+
+### Usage in Telemetry Component
+
+```tsx
+// telemetry/index.tsx
+export function Telemetry({ sidecarUrl }: { sidecarUrl: string }) {
+  const [isOnline, setOnline] = useState(false);
+
+  const listener = useCallback((event: string) => {
+    const envelope = JSON.parse(event);
+    useSentryStore.getState().pushEnvelope(envelope);
+  }, []);
+
+  useEffect(
+    () => connectToSidecar(sidecarUrl, { [SENTRY_CONTENT_TYPE]: listener }, setOnline),
+    [sidecarUrl, listener],
+  );
+
+  return <TelemetryView isOnline={isOnline} />;
+}
+```
+
+## Routing
+
+Use **React Router v6** for all navigation. The URL is the source of truth for navigation state.
+
+### Router Setup
+
+`lib/Router.tsx` provides the appropriate router based on environment:
+- `BrowserRouter` for standalone web
+- `HashRouter` for Electron (file:// protocol)
+
+### Navigation Patterns
+
+```tsx
+import { Link, useParams, useSearchParams, useNavigate } from 'react-router-dom';
+
+// Get state from URL
+const { traceId, spanId } = useParams();
+const [searchParams] = useSearchParams();
+
+// Programmatic navigation
+const navigate = useNavigate();
+navigate('/telemetry/traces');
+
+// Link component
+<Link to={`/telemetry/traces/${trace.trace_id}/context`}>View Trace</Link>
+```
+
+### Route Structure
+
+```
+/telemetry/
+├── traces/
+│   └── :traceId/
+│       └── context
+├── errors/
+│   └── :eventId
+├── logs/
+│   └── :logId
+└── insights/
+```
+
+**Important**: Do NOT manage navigation state in local component state. Extract it from URL parameters.
+
+## State Management
+
+Use **Zustand** with the slice pattern for global state.
+
+### Store Structure
+
+```
+store/
+├── store.ts          # Combined store (creates all slices)
+├── types.ts          # Type definitions
+├── slices/
+│   ├── envelopesSlice.ts  # pushEnvelope(), raw envelope storage
+│   ├── eventsSlice.ts     # pushEvent(), error events
+│   ├── tracesSlice.ts     # Trace data
+│   ├── logsSlice.ts       # Log data
+│   ├── profilesSlice.ts   # Profile data
+│   ├── sdksSlice.ts       # SDK info
+│   ├── settingsSlice.ts   # UI settings
+│   ├── subscriptionsSlice.ts  # Event subscriptions
+│   └── sharedSlice.ts     # Shared helpers (getEventById, resetData, etc.)
+└── utils/            # Processing utilities
+    ├── traceProcessor.ts
+    ├── logProcessor.ts
+    └── profileProcessor.ts
+```
+
+### Data Flow
+
+1. `pushEnvelope(envelope)` - Entry point for all incoming data
+2. Extracts items from envelope, identifies SDK
+3. Calls `pushEvent()` for each supported item type
+4. `pushEvent()` routes to appropriate processor:
+   - Error events → store in eventsById
+   - Trace events → `processTransactionEvent()` → tracesById
+   - Log events → `processLogItems()` → logsById
+   - Profile events → `processProfileEvent()` → profilesByTraceId
+
+### Usage Pattern
+
+```tsx
+import useSentryStore from '../store';
+
+function Component() {
+  // Select specific state
+  const traces = useSentryStore(state => state.getTraces());
+  const events = useSentryStore(state => state.getEvents());
+  
+  // Get actions
+  const resetData = useSentryStore(state => state.resetData);
+  
+  // Direct store access (outside React)
+  useSentryStore.getState().pushEnvelope(envelope);
+}
+```
+
+## Styling
+
+Use **Tailwind CSS** with the `cn()` utility for conditional classes.
+
+```tsx
+import { cn } from '@spotlight/ui/lib/cn';
+
+<div className={cn(
+  'base-classes px-4 py-2',
+  isSelected && 'bg-primary-800',
+  variant === 'error' ? 'text-red-400' : 'text-green-400'
+)}>
+```
+
+## Component Organization
+
+```
+ui/
+├── sidecar.ts       # connectToSidecar() - SSE connection
+├── ui/              # Reusable primitives (badge, button, table, tooltip)
+├── lib/             # Utilities and hooks
+├── telemetry/
+│   ├── index.tsx    # Telemetry component (connection setup)
+│   ├── components/  # Feature components
+│   │   ├── shared/  # Shared components (DateTime, JsonViewer, etc.)
+│   │   ├── traces/  # Trace-specific components
+│   │   ├── events/  # Error event components
+│   │   └── log/     # Log components
+│   ├── tabs/        # Tab views (TracesTab, ErrorsTab, LogsTab, InsightsTab)
+│   ├── store/       # Zustand store
+│   └── hooks/       # Custom hooks
+└── assets/          # SVG icons
+```
+
+## Path Aliases
+
+- `@spotlight/ui/` maps to `src/ui/`
+- `@spotlight/shared/` maps to `src/shared/`
+
+```tsx
+import { cn } from '@spotlight/ui/lib/cn';
+import { SENTRY_CONTENT_TYPE } from '@spotlight/shared/constants';
+```
+
+## Electron Awareness
+
+Use `IS_ELECTRON` for conditional rendering:
+
+```tsx
+import { IS_ELECTRON } from '@spotlight/ui/lib/isElectron';
+
+<div className={cn('flex-1', IS_ELECTRON && 'pt-10')}>
+```
+
+## Component Patterns
+
+### Function Components with Inline Props
+
+```tsx
+export default function TraceItem({ trace, className }: { 
+  trace: Trace; 
+  className?: string;
+}) {
+  const { traceId } = useParams();
+  const isSelected = traceId === trace.trace_id;
+  
+  return (
+    <Link to={`/telemetry/traces/${trace.trace_id}`}>
+      {/* ... */}
+    </Link>
+  );
+}
+```
+
+### Custom Hooks
+
+```tsx
+// hooks/useDebounce.ts
+export function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  
+  return debouncedValue;
+}
+```
+
+## Testing
+
+- Use `@testing-library/react` for component tests
+- Test files: `*.test.tsx` or `*.spec.tsx`
+- Run with `pnpm test` or `pnpm test:dev` for watch mode

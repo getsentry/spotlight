@@ -1,0 +1,199 @@
+---
+description: CLI command development guidelines for Spotlight
+globs:
+alwaysApply: true
+---
+
+# CLI Development Guidelines
+
+This directory contains the implementation of the `spotlight` CLI commands.
+
+## User-Facing Commands
+
+The `spotlight` CLI is invoked by users from the terminal:
+
+| Command | Description | Implementation |
+|---------|-------------|----------------|
+| `spotlight run <cmd>` | Wraps and runs an application with Spotlight | `run.ts` |
+| `spotlight` / `spotlight server` | Starts the sidecar server | `server.ts` |
+| `spotlight tail [types]` | Streams events to terminal | `tail.ts` |
+| `spotlight mcp` | Starts MCP server for AI assistants | `mcp.ts` |
+| `spotlight help` | Shows help message | `help.ts` |
+
+## Architecture
+
+```
+cli/
+├── help.ts    # spotlight help
+├── mcp.ts     # spotlight mcp
+├── run.ts     # spotlight run <command>
+├── server.ts  # spotlight / spotlight server
+└── tail.ts    # spotlight tail [types]
+```
+
+Entry point is `../cli.ts` which handles argument parsing and command routing.
+
+## Command Routing
+
+Commands are registered in `CLI_CMD_MAP` in `../cli.ts`:
+
+```typescript
+export const CLI_CMD_MAP = new Map<string | undefined, CLIHandler>([
+  ['help', showHelp],
+  ['mcp', mcp],
+  ['tail', tail],
+  ['run', run],
+  ['server', server],
+  [undefined, server], // Default: no command = server
+]);
+```
+
+## CLI Handler Pattern
+
+Each command exports a default async function:
+
+```typescript
+import type { CLIHandlerOptions } from '../types/cli';
+
+export default async function commandName({
+  port,
+  cmdArgs,
+  basePath,
+  filesToServe,
+  format,
+  allowedOrigins,
+}: CLIHandlerOptions) {
+  // Command implementation
+}
+```
+
+### CLIHandlerOptions
+
+```typescript
+type CLIHandlerOptions = {
+  port: number;
+  cmdArgs: string[];         // Additional arguments after command
+  basePath?: string;         // Path for static files
+  filesToServe?: Record<string, Buffer>;
+  format: FormatterType;     // human | json | logfmt | md
+  allowedOrigins: string[];  // CORS origins
+};
+```
+
+## Argument Parsing
+
+Uses `parseArgs` from `node:util` in `../cli.ts`:
+
+```typescript
+import { parseArgs } from 'node:util';
+
+const { values, positionals } = parseArgs({
+  args: process.argv.slice(2),
+  options: {
+    port: { type: 'string', short: 'p' },
+    debug: { type: 'boolean', short: 'd', default: false },
+    format: { type: 'string', short: 'f', default: 'human' },
+    'allowed-origin': { type: 'string', short: 'A', multiple: true },
+    help: { type: 'boolean', short: 'h' },
+  },
+  allowPositionals: true,
+});
+```
+
+## Command Details
+
+### `spotlight run` (run.ts)
+
+Wraps and runs application processes with Spotlight environment:
+
+- Auto-detects Docker Compose (`docker-compose.yml`) or package.json scripts
+- Sets `SENTRY_SPOTLIGHT` environment variable for the child process
+- Captures stdout/stderr and sends as logs to Spotlight
+- Uses `host.docker.internal` for Docker containers to reach host
+
+```typescript
+const runCmd = spawn(cmdArgs[0], cmdArgs.slice(1), {
+  env: {
+    ...process.env,
+    SENTRY_SPOTLIGHT: spotlightUrl,
+    NEXT_PUBLIC_SENTRY_SPOTLIGHT: spotlightUrl,
+  },
+  stdio: ['inherit', 'pipe', 'pipe'],
+});
+```
+
+### `spotlight tail` (tail.ts)
+
+Streams events to terminal:
+
+```typescript
+// Supported event types
+const NAME_TO_TYPE_MAPPING = {
+  traces: ['transaction', 'span'],
+  logs: ['log'],
+  errors: ['event'],
+  attachments: ['attachment'],
+};
+
+// Magic words for all types
+const EVERYTHING_MAGIC_WORDS = ['everything', 'all', '*'];
+```
+
+### `spotlight mcp` (mcp.ts)
+
+Starts MCP server in stdio mode for AI assistants:
+
+```typescript
+import { createMCPInstance } from '../mcp/mcp';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+
+const mcpInstance = createMCPInstance();
+const transport = new StdioServerTransport();
+await mcpInstance.connect(transport);
+```
+
+## Output Formatters
+
+Support multiple output formats via `../formatters/`:
+
+- `human` - Human-readable colored output (default)
+- `json` - JSON format
+- `logfmt` - Logfmt format
+- `md` - Markdown format
+
+```bash
+spotlight tail --format json
+spotlight tail -f logfmt
+```
+
+## Logging
+
+Use the logger from `../logger.ts`:
+
+```typescript
+import { logger, enableDebugLogging } from '../logger';
+
+logger.info('Message');
+logger.error('Error message');
+logger.debug('Debug info'); // Only when --debug flag
+```
+
+## Metrics
+
+Track CLI usage with Sentry metrics:
+
+```typescript
+import { metrics } from '@sentry/node';
+
+metrics.count('cli.invocation', 1, {
+  attributes: { command: 'run', format: 'human' },
+});
+```
+
+## Testing
+
+CLI E2E tests in `tests/e2e/cli/`:
+
+```bash
+pnpm test:e2e:cli  # Run CLI E2E tests
+```

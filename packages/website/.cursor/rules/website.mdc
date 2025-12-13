@@ -1,0 +1,95 @@
+---
+description: Rules for the Spotlight documentation website
+globs:
+alwaysApply: true
+---
+
+# Website Package Guidelines
+
+This is the Spotlight documentation website built with Astro and Starlight.
+
+## Tech Stack
+
+- **Framework**: Astro 5 with Starlight documentation theme
+- **Styling**: Tailwind CSS v4 via `@tailwindcss/vite`
+- **Components**: Astro (`.astro`) for static content, React (`.tsx`) for interactive elements
+- **Content**: MDX files with frontmatter
+
+## Project Structure
+
+```
+src/
+├── components/          # Reusable components
+│   ├── docs/           # Documentation-specific components
+│   └── homepage/       # Landing page components
+├── content/
+│   ├── config.ts       # Content collection config
+│   └── docs/           # MDX documentation pages
+├── lib/                # Utility functions
+├── pages/              # Astro pages (index.astro)
+├── tailwind.css        # Tailwind entry point
+└── theme.css           # Custom theme styles
+public/                 # Static assets
+```
+
+## Documentation Pages
+
+MDX files in `src/content/docs/` require frontmatter:
+
+```mdx
+---
+title: Page Title
+description: Brief description for SEO
+sidebar:
+  order: 0  # Optional: controls sidebar position
+---
+
+Content here...
+```
+
+## Component Patterns
+
+### Astro Components (`.astro`)
+Use for static content, layouts, and server-rendered pages:
+
+```astro
+---
+import Layout from '../components/Layout.astro';
+const { title } = Astro.props;
+---
+
+<Layout title={title}>
+  <slot />
+</Layout>
+```
+
+### React Components (`.tsx`)
+Use for interactive elements that need client-side state:
+
+```tsx
+export default function InteractiveComponent({ prop }: { prop: string }) {
+  const [state, setState] = useState(false);
+  return <button onClick={() => setState(!state)}>{prop}</button>;
+}
+```
+
+## Configuration
+
+- `astro.config.mjs` - Astro configuration, Starlight sidebar, integrations
+- `tailwind.config.mjs` - Tailwind theme customization
+- `tsconfig.json` - TypeScript configuration
+
+## Starlight Features
+
+- Sidebar defined in `astro.config.mjs` under `starlight.sidebar`
+- Custom components override defaults via `starlight.components`
+- Use `@astrojs/starlight/components` for built-in components (Tabs, TabItem, etc.)
+
+## Commands
+
+```bash
+pnpm dev:website    # Start dev server (from root)
+pnpm dev            # Start dev server (from this directory)
+pnpm build          # Build for production
+pnpm preview        # Preview production build
+```
