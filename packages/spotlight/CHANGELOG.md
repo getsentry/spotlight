@@ -1,5 +1,17 @@
 # @spotlightjs/spotlight
 
+## 4.8.0
+
+### Minor Changes
+
+- Add `--open` / `-o` CLI flag to automatically open the Spotlight dashboard in your default browser when starting the sidecar ([#1200](https://github.com/getsentry/spotlight/pull/1200))
+
+### Patch Changes
+
+- Fixed flamechart tree building to iterate from root to leaf frames, resolving fragmented visualization ([#1201](https://github.com/getsentry/spotlight/pull/1201))
+
+- shifted electron dependencies to dev dependencies as there were getting installed with npx for spotlight run ([#1184](https://github.com/getsentry/spotlight/pull/1184))
+
 ## 4.7.2
 
 ### Patch Changes
