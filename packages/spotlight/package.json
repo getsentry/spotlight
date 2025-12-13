@@ -1,7 +1,7 @@
 {
   "name": "@spotlightjs/spotlight",
   "description": "Spotlight - Sentry for development. Containing the UI, sidecar, and electron app.",
-  "version": "4.7.2",
+  "version": "4.8.0",
   "productName": "Spotlight",
   "author": "Sentry",
   "license": "Apache-2.0",
