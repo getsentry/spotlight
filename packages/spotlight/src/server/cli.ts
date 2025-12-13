@@ -78,9 +78,12 @@ export function parseCLIArgs(): CLIArgs {
     tokens: true,
   });
   let cmdArgs: string[] | undefined = undefined;
-  const runToken = preParse.tokens.find(token => token.kind === "positional" && token.value === "run");
-  if (runToken) {
-    const cutOff = preParse.tokens.find(token => token.index > runToken.index && token.kind === "positional");
+  // Only apply special handling for "run" if it's the actual command (first positional),
+  // not when it appears as an argument to another command like "spotlight help run"
+  const firstPositional = preParse.tokens.find(token => token.kind === "positional");
+  const isRunCommand = firstPositional?.value === "run";
+  if (isRunCommand && firstPositional) {
+    const cutOff = preParse.tokens.find(token => token.index > firstPositional.index && token.kind === "positional");
     cmdArgs = cutOff ? args.splice(cutOff.index) : [];
   }
   const { values, positionals } = parseArgs({
@@ -91,7 +94,7 @@ export function parseCLIArgs(): CLIArgs {
   // Handle legacy positional argument for port (backwards compatibility)
   const portInput = positionals.length === 1 && /^\d{1,5}$/.test(positionals[0]) ? positionals.shift() : values.port;
 
-  const port = portInput != null ? Number(portInput) : runToken ? MAGIC_PORT_FOR_DYNAMIC_ASSIGNMENT : DEFAULT_PORT;
+  const port = portInput != null ? Number(portInput) : isRunCommand ? MAGIC_PORT_FOR_DYNAMIC_ASSIGNMENT : DEFAULT_PORT;
   if (Number.isNaN(port)) {
     // Validate port number
     console.error(`Error: Invalid port number '${portInput}'`);
