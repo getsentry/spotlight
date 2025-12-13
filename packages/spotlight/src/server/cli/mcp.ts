@@ -5,7 +5,7 @@ import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 import { logger } from "../logger.ts";
 import { setShutdownHandlers, startServer } from "../main.ts";
 import { createMCPInstance } from "../mcp/mcp.ts";
-import type { CLIHandlerOptions, CommandMeta } from "../types/cli.ts";
+import type { CLIHandlerOptions, Command, CommandMeta } from "../types/cli.ts";
 import type { NormalizedAllowedOrigins } from "../utils/cors.ts";
 import { normalizeAllowedOrigins } from "../utils/cors.ts";
 import { isSidecarRunning } from "../utils/extras.ts";
@@ -149,7 +149,7 @@ async function startMCPStdioHTTPProxy(
   };
 }
 
-export default async function mcp({ port, basePath, filesToServe, allowedOrigins }: CLIHandlerOptions) {
+export async function handler({ port, basePath, filesToServe, allowedOrigins }: CLIHandlerOptions) {
   // Normalize allowed origins once at startup
   const normalizedAllowedOrigins = allowedOrigins ? normalizeAllowedOrigins(allowedOrigins) : undefined;
 
@@ -161,3 +161,5 @@ export default async function mcp({ port, basePath, filesToServe, allowedOrigins
     return await startServerWithStdioMCP(port, basePath, filesToServe, normalizedAllowedOrigins);
   }
 }
+
+export default { meta, handler } satisfies Command;

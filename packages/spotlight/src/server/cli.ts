@@ -2,15 +2,15 @@
 import { parseArgs } from "node:util";
 import { metrics } from "@sentry/node";
 import showHelp from "./cli/help.ts";
-import mcp, { meta as mcpMeta } from "./cli/mcp.ts";
-import run, { meta as runMeta } from "./cli/run.ts";
-import server, { meta as serverMeta } from "./cli/server.ts";
-import tail, { meta as tailMeta } from "./cli/tail.ts";
+import mcp from "./cli/mcp.ts";
+import run from "./cli/run.ts";
+import server from "./cli/server.ts";
+import tail from "./cli/tail.ts";
 import { DEFAULT_PORT } from "./constants.ts";
 import { AVAILABLE_FORMATTERS } from "./formatters/types.ts";
 import type { FormatterType } from "./formatters/types.ts";
 import { enableDebugLogging, logger } from "./logger.ts";
-import type { CLIHandler, CLIHandlerOptions, CommandMeta } from "./types/cli.ts";
+import type { CLIHandlerOptions, Command } from "./types/cli.ts";
 
 // When port is set to `0` for a server to listen on,
 // it tells the OS to find a random available port.
@@ -134,18 +134,13 @@ export function parseCLIArgs(): CLIArgs {
   return result;
 }
 // Command registry - each command provides its own metadata
-export const COMMANDS: Array<{ meta: CommandMeta; handler: CLIHandler }> = [
-  { meta: runMeta, handler: run },
-  { meta: tailMeta, handler: tail },
-  { meta: mcpMeta, handler: mcp },
-  { meta: serverMeta, handler: server },
-];
+export const COMMANDS: Command[] = [run, tail, mcp, server];
 
 // Build command map from registry for fast lookup
-export const CLI_CMD_MAP = new Map<string | undefined, CLIHandler>([
+export const CLI_CMD_MAP = new Map<string | undefined, Command["handler"]>([
   ["help", showHelp],
-  ...COMMANDS.map(({ meta, handler }) => [meta.name, handler] as [string, CLIHandler]),
-  [undefined, server],
+  ...COMMANDS.map(cmd => [cmd.meta.name, cmd.handler] as [string, Command["handler"]]),
+  [undefined, server.handler],
 ]);
 
 export async function main({

@@ -15,7 +15,7 @@ import {
 import { logger } from "../logger.ts";
 import { setupSpotlight } from "../main.ts";
 import type { ParsedEnvelope } from "../parser/index.ts";
-import type { CLIHandlerOptions, CommandMeta } from "../types/cli.ts";
+import type { CLIHandlerOptions, Command, CommandMeta } from "../types/cli.ts";
 import { getSpotlightURL } from "../utils/extras.ts";
 import { getBuffer } from "../utils/index.ts";
 
@@ -76,7 +76,7 @@ const connectUpstream = async (port: number) =>
     client.onopen = () => resolve(client);
   });
 
-export default async function tail(
+export async function handler(
   { port, cmdArgs, basePath, filesToServe, format = "logfmt", allowedOrigins }: CLIHandlerOptions,
   onItem?: OnItemCallback,
 ): Promise<ServerType | undefined> {
@@ -156,3 +156,5 @@ export default async function tail(
 
   return serverInstance;
 }
+
+export default { meta, handler } satisfies Command;

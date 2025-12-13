@@ -10,11 +10,11 @@ import { uuidv7 } from "uuidv7";
 import { SENTRY_CONTENT_TYPE } from "../constants.ts";
 import { logger } from "../logger.ts";
 import type { SentryLogEvent } from "../parser/types.ts";
-import type { CLIHandlerOptions, CommandMeta } from "../types/cli.ts";
+import type { CLIHandlerOptions, Command, CommandMeta } from "../types/cli.ts";
 import { detectDockerCompose, parseExplicitDockerCompose, prepareDockerComposeRun } from "../utils/docker-compose.ts";
 import { getSpotlightURL, openInBrowser } from "../utils/extras.ts";
 import { EventContainer, getBuffer } from "../utils/index.ts";
-import tail, { type OnItemCallback } from "./tail.ts";
+import { type OnItemCallback, handler as tail } from "./tail.ts";
 
 export const meta: CommandMeta = {
   name: "run",
@@ -133,7 +133,7 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
   return Buffer.from(`${parts.join("\n")}\n`, "utf-8");
 }
 
-export default async function run({
+export async function handler({
   port,
   cmdArgs,
   basePath,
@@ -384,3 +384,5 @@ export default async function run({
     process.on("beforeExit", killRunCmd);
   });
 }
+
+export default { meta, handler } satisfies Command;

@@ -1,6 +1,6 @@
 import type { AddressInfo } from "node:net";
 import { setupSpotlight } from "../main.ts";
-import type { CLIHandlerOptions, CommandMeta } from "../types/cli.ts";
+import type { CLIHandlerOptions, Command, CommandMeta } from "../types/cli.ts";
 import { openInBrowser } from "../utils/extras.ts";
 
 export const meta: CommandMeta = {
@@ -25,7 +25,7 @@ The server provides:
   ],
 };
 
-export default async function server({ port, basePath, filesToServe, allowedOrigins, open }: CLIHandlerOptions) {
+export async function handler({ port, basePath, filesToServe, allowedOrigins, open }: CLIHandlerOptions) {
   const serverInstance = await setupSpotlight({
     port,
     basePath,
@@ -43,3 +43,5 @@ export default async function server({ port, basePath, filesToServe, allowedOrig
 
   return serverInstance;
 }
+
+export default { meta, handler } satisfies Command;

@@ -23,3 +23,8 @@ export type CommandMeta = {
   long?: string; // Detailed description for command-specific help
   examples?: string[]; // Command-specific examples
 };
+
+export type Command = {
+  meta: CommandMeta;
+  handler: CLIHandler;
+};

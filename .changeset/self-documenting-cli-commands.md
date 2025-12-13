@@ -1,5 +1,5 @@
 ---
-"@spotlightjs/spotlight": patch
+"@spotlightjs/spotlight": minor
 ---
 
 Add self-documenting CLI commands with per-command help support
