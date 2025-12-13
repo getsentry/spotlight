@@ -15,7 +15,7 @@ import {
 import { logger } from "../logger.ts";
 import { setupSpotlight } from "../main.ts";
 import type { ParsedEnvelope } from "../parser/index.ts";
-import type { CLIHandlerOptions } from "../types/cli.ts";
+import type { CLIHandlerOptions, CommandMeta } from "../types/cli.ts";
 import { getSpotlightURL } from "../utils/extras.ts";
 import { getBuffer } from "../utils/index.ts";
 
@@ -38,6 +38,29 @@ export const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
 const SUPPORTED_ENVELOPE_TYPES = new Set(Object.values(NAME_TO_TYPE_MAPPING).flat());
 export const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
 export const SUPPORTED_TAIL_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
+
+export const meta: CommandMeta = {
+  name: "tail",
+  short: `Tail Sentry events (types: ${Object.keys(NAME_TO_TYPE_MAPPING).join(", ")})`,
+  usage: "spotlight tail [types...] [options]",
+  long: `Stream Sentry events to your terminal in real-time.
+
+Available event types:
+  ${Object.keys(NAME_TO_TYPE_MAPPING).join(", ")}
+
+Magic words (to tail everything):
+  ${[...EVERYTHING_MAGIC_WORDS].join(", ")}
+
+Use -f/--format to change output format (human, logfmt, json, md).
+Connects to existing sidecar if running, otherwise starts a new one.`,
+  examples: [
+    "spotlight tail                     # Tail all event types (human format)",
+    "spotlight tail errors              # Tail only errors",
+    "spotlight tail errors logs         # Tail errors and logs",
+    "spotlight tail --format json       # Use JSON output format",
+    "spotlight tail traces -f logfmt    # Tail traces with logfmt format",
+  ],
+};
 
 const FORMATTERS: Record<FormatterType, FormatterRegistry> = {
   md: mdFormatters,

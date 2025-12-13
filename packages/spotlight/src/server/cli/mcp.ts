@@ -5,10 +5,32 @@ import { ServerType as ProxyServerType, startStdioServer } from "mcp-proxy";
 import { logger } from "../logger.ts";
 import { setShutdownHandlers, startServer } from "../main.ts";
 import { createMCPInstance } from "../mcp/mcp.ts";
-import type { CLIHandlerOptions } from "../types/cli.ts";
+import type { CLIHandlerOptions, CommandMeta } from "../types/cli.ts";
 import type { NormalizedAllowedOrigins } from "../utils/cors.ts";
 import { normalizeAllowedOrigins } from "../utils/cors.ts";
 import { isSidecarRunning } from "../utils/extras.ts";
+
+export const meta: CommandMeta = {
+  name: "mcp",
+  short: "Start in MCP (Model Context Protocol) mode",
+  usage: "spotlight mcp [options]",
+  long: `Start Spotlight in MCP (Model Context Protocol) stdio server mode for
+integration with AI coding assistants like Cursor, Claude, etc.
+
+Connects to existing sidecar if running, otherwise starts a new one.
+Provides MCP tools for AI assistants to query errors, logs, and traces.
+
+Available MCP Tools:
+  - search_errors: Search for errors
+  - search_logs: Search for logs
+  - search_traces: List traces
+  - get_traces: Get trace details`,
+  examples: [
+    "spotlight mcp                      # Start MCP server on default port",
+    "spotlight mcp -p 3000              # Start on custom port",
+    "spotlight mcp -d                   # Start with debug logging",
+  ],
+};
 
 async function startServerWithStdioMCP(
   port: CLIHandlerOptions["port"],

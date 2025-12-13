@@ -2,15 +2,15 @@
 import { parseArgs } from "node:util";
 import { metrics } from "@sentry/node";
 import showHelp from "./cli/help.ts";
-import mcp from "./cli/mcp.ts";
-import run from "./cli/run.ts";
-import server from "./cli/server.ts";
-import tail from "./cli/tail.ts";
+import mcp, { meta as mcpMeta } from "./cli/mcp.ts";
+import run, { meta as runMeta } from "./cli/run.ts";
+import server, { meta as serverMeta } from "./cli/server.ts";
+import tail, { meta as tailMeta } from "./cli/tail.ts";
 import { DEFAULT_PORT } from "./constants.ts";
 import { AVAILABLE_FORMATTERS } from "./formatters/types.ts";
 import type { FormatterType } from "./formatters/types.ts";
 import { enableDebugLogging, logger } from "./logger.ts";
-import type { CLIHandler, CLIHandlerOptions } from "./types/cli.ts";
+import type { CLIHandler, CLIHandlerOptions, CommandMeta } from "./types/cli.ts";
 
 // When port is set to `0` for a server to listen on,
 // it tells the OS to find a random available port.
@@ -133,12 +133,18 @@ export function parseCLIArgs(): CLIArgs {
 
   return result;
 }
+// Command registry - each command provides its own metadata
+export const COMMANDS: Array<{ meta: CommandMeta; handler: CLIHandler }> = [
+  { meta: runMeta, handler: run },
+  { meta: tailMeta, handler: tail },
+  { meta: mcpMeta, handler: mcp },
+  { meta: serverMeta, handler: server },
+];
+
+// Build command map from registry for fast lookup
 export const CLI_CMD_MAP = new Map<string | undefined, CLIHandler>([
   ["help", showHelp],
-  ["mcp", mcp],
-  ["tail", tail],
-  ["run", run],
-  ["server", server],
+  ...COMMANDS.map(({ meta, handler }) => [meta.name, handler] as [string, CLIHandler]),
   [undefined, server],
 ]);
 
@@ -146,7 +152,7 @@ export async function main({
   basePath,
   filesToServe,
 }: { basePath?: CLIHandlerOptions["basePath"]; filesToServe?: CLIHandlerOptions["filesToServe"] } = {}) {
-  let { cmd, cmdArgs, help, port, debug, format, allowedOrigins, open } = parseCLIArgs();
+  const { cmd, cmdArgs, help, port, debug, format, allowedOrigins, open } = parseCLIArgs();
   if (debug || process.env.SPOTLIGHT_DEBUG) {
     enableDebugLogging(true);
   }
@@ -161,9 +167,23 @@ export async function main({
     },
   });
 
-  if (help) {
-    cmd = "help";
-    cmdArgs = [];
+  // Handle help: `spotlight --help`, `spotlight help`, `spotlight help <cmd>`, or `spotlight <cmd> --help`
+  if (help || cmd === "help") {
+    // If `spotlight <cmd> --help`, show help for that specific command
+    // If `spotlight help <cmd>`, cmdArgs[0] contains the command name
+    const targetCmd = cmd === "help" ? cmdArgs[0] : cmd;
+    return showHelp({
+      cmd: "help",
+      cmdArgs: targetCmd ? [targetCmd] : [],
+      port,
+      help: true,
+      debug,
+      format,
+      basePath,
+      filesToServe,
+      allowedOrigins,
+      open,
+    });
   }
 
   const handler = CLI_CMD_MAP.get(cmd) || showHelp;

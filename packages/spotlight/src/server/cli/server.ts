@@ -1,7 +1,29 @@
 import type { AddressInfo } from "node:net";
 import { setupSpotlight } from "../main.ts";
-import type { CLIHandlerOptions } from "../types/cli.ts";
+import type { CLIHandlerOptions, CommandMeta } from "../types/cli.ts";
 import { openInBrowser } from "../utils/extras.ts";
+
+export const meta: CommandMeta = {
+  name: "server",
+  short: "Start the Spotlight sidecar server (default command)",
+  usage: "spotlight [server] [options]",
+  long: `Start the Spotlight sidecar HTTP server.
+
+This is the default command when running 'spotlight' without arguments.
+The server listens for events from Sentry SDKs and serves the Spotlight UI.
+
+The server provides:
+  - HTTP endpoint for receiving Sentry envelopes
+  - Server-Sent Events (SSE) stream for real-time updates
+  - Web UI at http://localhost:PORT`,
+  examples: [
+    "spotlight                          # Start on default port 8969",
+    "spotlight server                   # Explicit server command",
+    "spotlight --open                   # Start and open dashboard in browser",
+    "spotlight --port 3000              # Start on port 3000",
+    "spotlight -p 3000 -d               # Start on port 3000 with debug logging",
+  ],
+};
 
 export default async function server({ port, basePath, filesToServe, allowedOrigins, open }: CLIHandlerOptions) {
   const serverInstance = await setupSpotlight({
