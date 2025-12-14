@@ -8,6 +8,8 @@ Spotlight Sidecar - Development proxy server for Spotlight
 Usage: spotlight [command] [options]
 
 Commands:
+  server               Start the Spotlight sidecar server (default)
+  run [command...]     Run a command with Spotlight automatically configured
   tail [types...]      Tail Sentry events (default: everything)
                        Available types: ${[...Object.keys(NAME_TO_TYPE_MAPPING)].join(", ")}
                        Magic words: ${[...EVERYTHING_MAGIC_WORDS].join(", ")}
@@ -31,7 +33,10 @@ Options:
 Examples:
   spotlight                          # Start on default port 8969
   spotlight --open                   # Start and open dashboard in browser
+  spotlight run npm start            # Run npm start with Spotlight configured
+  spotlight run --open npm start     # Run and open dashboard in browser
   spotlight tail                     # Tail all event types (human format)
+  spotlight tail --open              # Tail events and open dashboard in browser
   spotlight tail errors              # Tail only errors
   spotlight tail errors logs         # Tail errors and logs
   spotlight tail --format json       # Explicitly use json format

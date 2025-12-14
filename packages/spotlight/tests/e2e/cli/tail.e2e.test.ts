@@ -367,4 +367,38 @@ describe("spotlight tail e2e tests", () => {
 
     expect(normalized).toMatchSnapshot();
   }, 15000);
+
+  it("should accept --open flag without error", async () => {
+    const port = await findFreePort();
+
+    // Start tail with --open flag
+    // Note: In CI/test environment, the browser won't actually open,
+    // but the command should not error
+    const tail = spawnSpotlight(["tail", "-p", port.toString(), "--open"]);
+    activeProcesses.push(tail);
+
+    // Wait for sidecar to start
+    await waitForSidecarReady(port, 10000);
+
+    // Server should be running despite --open flag (even if browser doesn't open)
+    const stderr = tail.stderr.join("");
+    expect(stderr).toMatch(/listening/i);
+    // Should not have any errors about unknown flags
+    expect(stderr).not.toMatch(/unknown.*option.*open/i);
+  }, 15000);
+
+  it("should accept -o short flag without error", async () => {
+    const port = await findFreePort();
+
+    // Start tail with -o flag
+    const tail = spawnSpotlight(["tail", "-p", port.toString(), "-o"]);
+    activeProcesses.push(tail);
+
+    // Wait for sidecar to start
+    await waitForSidecarReady(port, 10000);
+
+    // Server should be running
+    const stderr = tail.stderr.join("");
+    expect(stderr).toMatch(/listening/i);
+  }, 15000);
 });

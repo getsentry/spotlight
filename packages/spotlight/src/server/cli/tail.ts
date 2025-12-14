@@ -1,3 +1,4 @@
+import type { AddressInfo } from "node:net";
 import type { ServerType } from "@hono/node-server";
 import { captureException } from "@sentry/core";
 import { metrics } from "@sentry/node";
@@ -16,7 +17,7 @@ import { logger } from "../logger.ts";
 import { setupSpotlight } from "../main.ts";
 import type { ParsedEnvelope } from "../parser/index.ts";
 import type { CLIHandlerOptions } from "../types/cli.ts";
-import { getSpotlightURL } from "../utils/extras.ts";
+import { getSpotlightURL, openInBrowser } from "../utils/extras.ts";
 import { getBuffer } from "../utils/index.ts";
 
 export type OnItemCallback = (
@@ -54,7 +55,7 @@ const connectUpstream = async (port: number) =>
   });
 
 export default async function tail(
-  { port, cmdArgs, basePath, filesToServe, format = "logfmt", allowedOrigins }: CLIHandlerOptions,
+  { port, cmdArgs, basePath, filesToServe, format = "logfmt", allowedOrigins, open }: CLIHandlerOptions,
   onItem?: OnItemCallback,
 ): Promise<ServerType | undefined> {
   const eventTypes = cmdArgs.length > 0 ? cmdArgs.map(arg => arg.toLowerCase()) : ["everything"];
@@ -108,6 +109,12 @@ export default async function tail(
   try {
     const client = await connectUpstream(port);
     client.addEventListener(SENTRY_CONTENT_TYPE, event => onEnvelope!(JSON.parse(event.data)));
+
+    // Open browser if requested (connecting to existing server)
+    if (open) {
+      openInBrowser(port);
+    }
+
     // Early return - don't start our own server if we can connect to an upstream one
     return undefined;
   } catch (err) {
@@ -121,6 +128,14 @@ export default async function tail(
   }
 
   const serverInstance = await setupSpotlight({ port, filesToServe, basePath, isStandalone: true, allowedOrigins });
+
+  // Open browser if requested (starting our own server)
+  if (open) {
+    // Use actual port from server instance, or fall back to requested port
+    // (when serverInstance is undefined, a server is already running on the requested port)
+    const actualPort = serverInstance ? (serverInstance.address() as AddressInfo).port : port;
+    openInBrowser(actualPort);
+  }
 
   // Subscribe the onEnvelope callback to the message buffer
   // This ensures it gets called whenever any envelope is added to the buffer
