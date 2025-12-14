@@ -37,11 +37,26 @@ export function openInBrowser(port: number): void {
     args = [url];
   }
 
-  const child = spawn(cmd, args, { detached: true, stdio: "ignore" });
+  logger.info(`Opening ${url} in your browser...`);
+
+  // Use shell: true for better cross-runtime compatibility (Node.js, bun, etc.)
+  // and to ensure the command is found via PATH
+  const child = spawn(cmd, args, { shell: true, stdio: "ignore" });
+
   // Handle spawn errors gracefully (e.g., command not found in minimal environments)
   child.on("error", err => {
-    logger.debug(`Failed to open browser: ${err.message}`);
+    logger.warn(`Unable to open browser automatically: ${err.message}`);
+    logger.info(`Please open ${url} manually in your browser.`);
   });
+
+  // Handle non-zero exit codes (command failed to open browser)
+  child.on("close", code => {
+    if (code !== null && code !== 0) {
+      logger.warn(`Browser command exited with code ${code}`);
+      logger.info(`Please open ${url} manually in your browser.`);
+    }
+  });
+
   child.unref();
 }
 
