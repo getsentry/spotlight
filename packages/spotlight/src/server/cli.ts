@@ -73,7 +73,6 @@ export type CLIArgs = {
 export function parseCLIArgs(): CLIArgs {
   const args = Array.from(process.argv).slice(2);
   const preParse = parseArgs({
-    args,
     ...PARSE_ARGS_CONFIG,
     strict: false,
     tokens: true,
