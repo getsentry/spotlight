@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { exec } from "node:child_process";
 import { get } from "node:http";
 import { startSpan } from "@sentry/node";
 import { SERVER_IDENTIFIER } from "../constants.ts";
@@ -23,41 +23,26 @@ export function openInBrowser(port: number): void {
   const url = getSpotlightWebUrl(port);
   const platform = process.platform;
 
-  let cmd: string;
-  let args: string[];
+  let command: string;
 
   if (platform === "darwin") {
-    cmd = "open";
-    args = [url];
+    command = `open "${url}"`;
   } else if (platform === "win32") {
-    cmd = "cmd";
-    args = ["/c", "start", "", url];
+    command = `start "" "${url}"`;
   } else {
-    cmd = "xdg-open";
-    args = [url];
+    command = `xdg-open "${url}"`;
   }
 
   logger.info(`Opening ${url} in your browser...`);
 
-  // Use shell: true for better cross-runtime compatibility (Node.js, bun, etc.)
-  // and to ensure the command is found via PATH
-  const child = spawn(cmd, args, { shell: true, stdio: "ignore" });
-
-  // Handle spawn errors gracefully (e.g., command not found in minimal environments)
-  child.on("error", err => {
-    logger.warn(`Unable to open browser automatically: ${err.message}`);
-    logger.info(`Please open ${url} manually in your browser.`);
-  });
-
-  // Handle non-zero exit codes (command failed to open browser)
-  child.on("close", code => {
-    if (code !== null && code !== 0) {
-      logger.warn(`Browser command exited with code ${code}`);
+  // Use exec() for better cross-runtime compatibility (Node.js, bun, deno, etc.)
+  // exec() runs the command in a shell, which handles PATH resolution correctly
+  exec(command, error => {
+    if (error) {
+      logger.warn(`Unable to open browser automatically: ${error.message}`);
       logger.info(`Please open ${url} manually in your browser.`);
     }
   });
-
-  child.unref();
 }
 
 export const isValidPort = withTracing(
