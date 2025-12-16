@@ -140,8 +140,5 @@
   },
   "engines": {
     "node": ">=20"
-  },
-  "overrides": {
-    "@modelcontextprotocol/sdk": "1.24.3"
   }
 }
