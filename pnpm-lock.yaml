@@ -94,7 +94,7 @@ importers:
         specifier: ^0.3.25
         version: 0.3.31
       '@modelcontextprotocol/sdk':
-        specifier: ^1.24.3
+        specifier: 1.24.3
         version: 1.24.3(zod@4.1.13)
       '@sentry/core':
         specifier: 'catalog:'
