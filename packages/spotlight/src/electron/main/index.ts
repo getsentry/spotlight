@@ -168,7 +168,9 @@ const createWindow = () => {
 
   // Open external links in the default browser
   win.webContents.setWindowOpenHandler(details => {
-    shell.openExternal(details.url);
+    shell.openExternal(details.url).catch(error => {
+      Sentry.captureException(error);
+    });
     return { action: "deny" };
   });
 
