@@ -6,7 +6,7 @@ import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
 import { sentryBaseConfig } from "../../sentry-config";
 import { DEFAULT_PORT } from "../../server/constants";
-import { clearBuffer, setupSpotlight } from "../../server/main";
+import { setupSpotlight } from "../../server/main";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
