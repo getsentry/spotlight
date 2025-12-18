@@ -8,45 +8,17 @@ alwaysApply: true
 
 This directory contains the implementation of the `spotlight` CLI commands.
 
-## User-Facing Commands
+## Commands
 
-The `spotlight` CLI is invoked by users from the terminal:
-
-| Command | Description | Implementation |
-|---------|-------------|----------------|
+| Command | Description | Handler |
+|---------|-------------|---------|
 | `spotlight run <cmd>` | Wraps and runs an application with Spotlight | `run.ts` |
-| `spotlight` / `spotlight server` | Starts the sidecar server | `server.ts` |
+| `spotlight` / `spotlight server` | Starts the sidecar server (default) | `server.ts` |
 | `spotlight tail [types]` | Streams events to terminal | `tail.ts` |
 | `spotlight mcp` | Starts MCP server for AI assistants | `mcp.ts` |
 | `spotlight help` | Shows help message | `help.ts` |
 
-## Architecture
-
-```
-cli/
-├── help.ts    # spotlight help
-├── mcp.ts     # spotlight mcp
-├── run.ts     # spotlight run <command>
-├── server.ts  # spotlight / spotlight server
-└── tail.ts    # spotlight tail [types]
-```
-
-Entry point is `../cli.ts` which handles argument parsing and command routing.
-
-## Command Routing
-
-Commands are registered in `CLI_CMD_MAP` in `../cli.ts`:
-
-```typescript
-export const CLI_CMD_MAP = new Map<string | undefined, CLIHandler>([
-  ['help', showHelp],
-  ['mcp', mcp],
-  ['tail', tail],
-  ['run', run],
-  ['server', server],
-  [undefined, server], // Default: no command = server
-]);
-```
+Entry point is `../cli.ts` which handles argument parsing and routes via `CLI_CMD_MAP`.
 
 ## CLI Handler Pattern
 
