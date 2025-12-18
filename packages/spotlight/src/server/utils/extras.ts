@@ -1,3 +1,4 @@
+import { spawn } from "node:child_process";
 import { get } from "node:http";
 import { startSpan } from "@sentry/node";
 import { SERVER_IDENTIFIER } from "../constants.ts";
@@ -10,8 +11,38 @@ export const withTracing =
 
 export const getSpotlightURL = (port: number, host = "localhost") => `http://${host}:${port}/stream`;
 
+export function getSpotlightWebUrl(port: number): string {
+  return `http://localhost:${port}`;
+}
+
 export function logSpotlightUrl(port: number): void {
-  logger.info(`Open http://localhost:${port} to see the Spotlight UI`);
+  logger.info(`Open ${getSpotlightWebUrl(port)} to see the Spotlight UI`);
+}
+
+export function openInBrowser(port: number): void {
+  const url = getSpotlightWebUrl(port);
+  const platform = process.platform;
+
+  let cmd: string;
+  let args: string[];
+
+  if (platform === "darwin") {
+    cmd = "open";
+    args = [url];
+  } else if (platform === "win32") {
+    cmd = "cmd";
+    args = ["/c", "start", "", url];
+  } else {
+    cmd = "xdg-open";
+    args = [url];
+  }
+
+  const child = spawn(cmd, args, { detached: true, stdio: "ignore" });
+  // Handle spawn errors gracefully (e.g., command not found in minimal environments)
+  child.on("error", err => {
+    logger.debug(`Failed to open browser: ${err.message}`);
+  });
+  child.unref();
 }
 
 export const isValidPort = withTracing(

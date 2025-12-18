@@ -10,17 +10,42 @@ import { uuidv7 } from "uuidv7";
 import { SENTRY_CONTENT_TYPE } from "../constants.ts";
 import { logger } from "../logger.ts";
 import type { SentryLogEvent } from "../parser/types.ts";
-import type { CLIHandlerOptions } from "../types/cli.ts";
-import { buildDockerComposeCommand, detectDockerCompose } from "../utils/docker-compose.ts";
-import { getSpotlightURL } from "../utils/extras.ts";
+import type { CLIHandlerOptions, Command, CommandMeta } from "../types/cli.ts";
+import { detectDockerCompose, parseExplicitDockerCompose, prepareDockerComposeRun } from "../utils/docker-compose.ts";
+import { getSpotlightURL, openInBrowser } from "../utils/extras.ts";
 import { EventContainer, getBuffer } from "../utils/index.ts";
-import tail, { type OnItemCallback } from "./tail.ts";
+import { type OnItemCallback, handler as tail } from "./tail.ts";
+
+export const meta: CommandMeta = {
+  name: "run",
+  short: "Run your app with automatic Spotlight instrumentation",
+  usage: "spotlight run [options] [command...]",
+  long: `Run your application with Spotlight, automatically setting up the necessary
+environment variables and capturing telemetry data.
+
+If no command is provided, Spotlight auto-detects:
+  - Docker Compose projects (docker-compose.yml, compose.yml, etc.)
+  - package.json scripts (dev, develop, serve, start)
+
+Environment variables set automatically:
+  - SENTRY_SPOTLIGHT=http://localhost:<port>/stream
+  - NEXT_PUBLIC_SENTRY_SPOTLIGHT=http://localhost:<port>/stream
+  - SENTRY_TRACES_SAMPLE_RATE=1
+
+stdout/stderr are captured and sent to Spotlight as log events.`,
+  examples: [
+    "spotlight run                      # Auto-detect and run (package.json or docker-compose)",
+    "spotlight run node server.js       # Run a specific command with Spotlight",
+    "spotlight run -p 3000 npm start    # Run with custom port",
+    "spotlight run python manage.py runserver  # Run Python app",
+    "spotlight run docker compose up    # Run Docker Compose with Spotlight injection",
+  ],
+};
 
 const SPOTLIGHT_VERSION = process.env.npm_package_version || "unknown";
 
 // Environment variable host configurations
 const LOCALHOST_HOST = "localhost";
-const DOCKER_HOST = "host.docker.internal";
 
 /**
  * Detect if there's a package.json with runnable scripts
@@ -108,13 +133,14 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
   return Buffer.from(`${parts.join("\n")}\n`, "utf-8");
 }
 
-export default async function run({
+export async function handler({
   port,
   cmdArgs,
   basePath,
   filesToServe,
   format,
   allowedOrigins,
+  open,
 }: CLIHandlerOptions) {
   let relayStdioAsLogs = true;
 
@@ -167,6 +193,10 @@ export default async function run({
   // or started in a weird manner (like over a unix socket)
   const actualServerPort = (serverInstance.address() as AddressInfo).port;
   const spotlightUrl = getSpotlightURL(actualServerPort, LOCALHOST_HOST);
+
+  if (open) {
+    openInBrowser(actualServerPort);
+  }
   let shell = false;
   let stdin: string | undefined = undefined;
   const env = {
@@ -204,14 +234,7 @@ export default async function run({
           `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
         );
         metrics.count("cli.run.autodetect", 1, { attributes: { type: "docker-compose" } });
-        // Use host.docker.internal for backend services to access the host machine
-        env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
-        const command = buildDockerComposeCommand(dockerCompose);
-        cmdArgs = command.cmdArgs;
-        stdin = command.stdin;
-        // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-        // biome-ignore lint/performance/noDelete: need to remove env var entirely
-        delete env.COMPOSE_FILE;
+        ({ cmdArgs, stdin } = prepareDockerComposeRun(dockerCompose, actualServerPort, env));
       } else {
         logger.info(`Using package.json script: ${packageJson.scriptName}`);
         metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
@@ -224,21 +247,28 @@ export default async function run({
         `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
       );
       metrics.count("cli.run.autodetect", 1, { attributes: { type: "docker-compose" } });
-      // Use host.docker.internal for backend services to access the host machine
-      env.SENTRY_SPOTLIGHT = getSpotlightURL(actualServerPort, DOCKER_HOST);
-
-      const command = buildDockerComposeCommand(dockerCompose);
-      cmdArgs = command.cmdArgs;
-      stdin = command.stdin;
-      // Always unset COMPOSE_FILE to avoid conflicts with explicit -f flags
-      // biome-ignore lint/performance/noDelete: need to remove env var entirely
-      delete env.COMPOSE_FILE;
+      ({ cmdArgs, stdin } = prepareDockerComposeRun(dockerCompose, actualServerPort, env));
     } else if (packageJson) {
       logger.info(`Using package.json script: ${packageJson.scriptName}`);
       metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
       cmdArgs = [packageJson.scriptCommand];
       shell = true;
       env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
+    }
+  } else {
+    // Handle explicit docker compose commands (e.g., "spotlight run docker compose up")
+    const explicitDockerConfig = parseExplicitDockerCompose(cmdArgs);
+    if (explicitDockerConfig) {
+      logger.info(
+        `Detected explicit Docker Compose command with ${explicitDockerConfig.serviceNames.length} service(s): ${explicitDockerConfig.serviceNames.join(", ")}`,
+      );
+      metrics.count("cli.run.docker_compose.explicit", 1, {
+        attributes: {
+          services: explicitDockerConfig.serviceNames.length,
+          subcommand: explicitDockerConfig.subcommandArgs.join(" "),
+        },
+      });
+      ({ cmdArgs, stdin } = prepareDockerComposeRun(explicitDockerConfig, actualServerPort, env));
     }
   }
   if (cmdArgs.length === 0) {
@@ -354,3 +384,5 @@ export default async function run({
     process.on("beforeExit", killRunCmd);
   });
 }
+
+export default { meta, handler } satisfies Command;

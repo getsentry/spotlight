@@ -220,4 +220,29 @@ describe("spotlight run e2e tests", () => {
     const stderr = run.stderr.join("");
     expect(stderr).toMatch(/exited/);
   }, 20000);
+
+  it("should accept --open flag without error", async () => {
+    const run = spawnSpotlight(["run", "--open", "node", "-e", 'console.log("test"); process.exit(0)']);
+    activeProcesses.push(run);
+
+    // Wait for the run command to detect child exit
+    await waitForOutput(run, /exited/, 15000, "stderr");
+
+    // Verify we got exit message in stderr (not an error about unknown flag)
+    const stderr = run.stderr.join("");
+    expect(stderr).toMatch(/exited/);
+    expect(stderr).not.toMatch(/unknown.*option.*open/i);
+  }, 20000);
+
+  it("should accept -o short flag without error", async () => {
+    const run = spawnSpotlight(["run", "-o", "node", "-e", 'console.log("test"); process.exit(0)']);
+    activeProcesses.push(run);
+
+    // Wait for the run command to detect child exit
+    await waitForOutput(run, /exited/, 15000, "stderr");
+
+    // Verify we got exit message in stderr
+    const stderr = run.stderr.join("");
+    expect(stderr).toMatch(/exited/);
+  }, 20000);
 });
