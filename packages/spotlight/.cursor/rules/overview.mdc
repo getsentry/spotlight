@@ -1,0 +1,147 @@
+---
+description: Overview of the Spotlight package - the main package containing UI, server, and Electron app
+globs:
+alwaysApply: true
+---
+
+# Spotlight Package Overview
+
+The `@spotlightjs/spotlight` package is a unified package containing the UI, server (sidecar), CLI, and Electron desktop application.
+
+## The `spotlight` CLI
+
+Spotlight provides a CLI tool called `spotlight` that users run from the terminal. It's the main way developers interact with Spotlight.
+
+### Available Commands
+
+```bash
+# Run your app with Spotlight (wraps your process, sets env vars)
+spotlight run # detects package.json and docker compose
+spotlight run npm run dev
+spotlight run docker compose up
+
+# Start the sidecar server only (listens on port 8969)
+spotlight
+spotlight server
+spotlight --port 3000
+
+# Tail/stream events to terminal
+spotlight tail                    # All events
+spotlight tail errors             # Only errors
+spotlight tail traces logs        # Multiple types
+spotlight tail --format json      # Different output format
+
+# Start MCP server for AI assistants (Cursor, Claude, etc.)
+spotlight mcp
+
+# Show help
+spotlight help
+spotlight --help
+```
+
+### Key Points
+
+- `spotlight run <command>` - Most common usage. Wraps your application, auto-detects Docker Compose or package.json scripts, sets `SENTRY_SPOTLIGHT` env var
+- `spotlight` (no args) - Starts the sidecar server with UI on http://localhost:8969
+- `spotlight tail` - Streams events to terminal, useful for debugging without UI
+- `spotlight mcp` - Starts MCP server for AI coding assistants
+
+### CLI Implementation
+
+- Entry point: `src/run.ts` → `src/server/cli.ts`
+- Commands: `src/server/cli/` directory (run.ts, tail.ts, mcp.ts, server.ts, help.ts)
+- Binary defined in `package.json`: `"bin": { "spotlight": "./dist/run.js" }`
+
+## Electron Desktop App
+
+Spotlight is also available as a standalone desktop app (see `electron/.cursor/rules`).
+
+- **Main process**: `src/electron/main/index.ts` - Window, tray, menus, runs sidecar
+- **Renderer**: `src/electron-index.tsx` - Entry point for UI in Electron
+- **Build config**: `vite.electron.config.ts`
+- **Packaging**: `electron-builder.cjs`
+
+The desktop app:
+- Runs the sidecar server internally (no need for `spotlight run`)
+- Shows a system tray icon (macOS/Windows)
+- Supports auto-updates
+- Uses `IS_ELECTRON` constant for UI adaptations (see `ui/.cursor/rules`)
+
+```bash
+pnpm dev:electron    # Run Electron in development
+pnpm build:electron  # Build Electron app
+pnpm build:mac       # Package for macOS
+```
+
+## Package Structure
+
+```
+src/
+├── ui/              # React-based UI (see ui/.cursor/rules)
+├── server/          # Node.js server/sidecar (see server/.cursor/rules)
+│   ├── cli/        # CLI commands (see cli/.cursor/rules)
+│   └── mcp/        # MCP server (see mcp/.cursor/rules)
+├── electron/        # Electron main process (see electron/.cursor/rules)
+├── shared/          # Shared constants between UI and server
+├── index.tsx        # UI entry point (web)
+├── electron-index.tsx  # UI entry point (Electron)
+├── run.ts           # CLI entry point
+└── instrument.ts    # Sentry instrumentation
+```
+
+## Build System
+
+Multiple Vite configurations for different targets:
+
+- `vite.ui.config.ts` - UI bundle (web)
+- `vite.node.config.ts` - Server/CLI bundle
+- `vite.electron.config.ts` - Electron app (sets `__IS_ELECTRON__`)
+- `vite.dev.config.ts` - Development server
+
+## Development Commands
+
+```bash
+# From repository root
+pnpm dev            # UI + server concurrently
+pnpm dev:ui         # UI only (Vite dev server)
+pnpm dev:server     # Server only (Node with --watch)
+pnpm dev:electron   # Electron app with HMR
+
+# Testing
+pnpm test           # Run unit tests (Vitest)
+pnpm test:dev       # Run tests in watch mode
+pnpm test:e2e       # Run all E2E tests
+pnpm test:e2e:cli   # CLI E2E tests
+pnpm test:e2e:ui    # UI E2E tests (Playwright)
+```
+
+## Key Dependencies
+
+- **UI**: React, React Router, Zustand, Tailwind CSS, Shiki
+- **Server**: Hono, @hono/node-server, @sentry/node
+- **MCP**: @modelcontextprotocol/sdk, Zod
+- **Electron**: electron, electron-builder, electron-updater, electron-store
+
+## Testing
+
+- **Unit tests**: Vitest with happy-dom for UI components
+- **E2E tests**: Playwright for UI and CLI testing
+- **Config files**: `vitest.config.ts`, `vitest.cli.config.ts`, `playwright.config.ts`
+
+## Exports
+
+The package exports:
+
+```typescript
+// Main server API
+import { setupSpotlight } from '@spotlightjs/spotlight';
+
+// SDK utilities
+import { pushToSpotlightBuffer } from '@spotlightjs/spotlight/sdk';
+```
+
+## Environment Variables
+
+- `SENTRY_SPOTLIGHT` - URL to Spotlight sidecar (auto-set by `spotlight run`)
+- `SPOTLIGHT_DEBUG` - Enable debug logging
+- `SPOTLIGHT_CAPTURE` - Capture incoming envelopes to files

@@ -1,0 +1,208 @@
+---
+description: MCP (Model Context Protocol) server development guidelines
+globs:
+alwaysApply: true
+---
+
+# MCP Server Guidelines
+
+The MCP server enables AI coding assistants to access Spotlight telemetry data via the Model Context Protocol.
+
+## Overview
+
+- **SDK**: `@modelcontextprotocol/sdk` for MCP server implementation
+- **Transport**: stdio (standard input/output) for communication with AI clients
+- **Validation**: Zod v3 for input schema validation
+- **Output**: Markdown-formatted text for AI consumption
+
+## Files
+
+```
+mcp/
+├── mcp.ts         # createMCPInstance() - tool registration
+└── constants.ts   # Response constants (NO_ERRORS_CONTENT, etc.)
+```
+
+## Creating the MCP Instance
+
+```typescript
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { wrapMcpServerWithSentry } from '@sentry/node';
+
+export function createMCPInstance() {
+  const mcp = wrapMcpServerWithSentry(
+    new McpServer({
+      name: 'spotlight-mcp',
+      version: String(process.env.npm_package_version),
+    }),
+  );
+
+  // Register tools...
+
+  return mcp;
+}
+```
+
+## Tool Registration Pattern
+
+```typescript
+import { z } from 'zod/v3';
+import type { TextContent } from '@modelcontextprotocol/sdk/types.js';
+
+mcp.registerTool(
+  'tool_name',
+  {
+    title: 'Human-Readable Title',
+    description: `**Purpose:** Brief description of what the tool does.
+
+**When to use:**
+- Condition 1
+- Condition 2
+
+**Example calls:**
+\`\`\`json
+tool_name({ param: "value" })
+\`\`\`
+
+**Parameter hints:**
+• param: Description of parameter`,
+    inputSchema: {
+      param: z.string().describe('Parameter description'),
+      optionalParam: z.number().optional().describe('Optional parameter'),
+    },
+  },
+  async args => {
+    // Tool implementation
+    const data = getBuffer().read(args.filters);
+    
+    if (data.length === 0) {
+      return NO_DATA_CONTENT; // Return appropriate empty response
+    }
+
+    const content: TextContent[] = [];
+    
+    for (const item of data) {
+      content.push({
+        type: 'text',
+        text: formatItem(item), // Format for AI consumption
+      });
+    }
+
+    return { content };
+  },
+);
+```
+
+## Input Schema with Zod
+
+Use Zod v3 (`zod/v3`) for input validation:
+
+```typescript
+import { z } from 'zod/v3';
+
+const inputSchema = {
+  filters: z.union([
+    z.object({
+      timeWindow: z.number().describe('Seconds to look back'),
+    }),
+    z.object({
+      filename: z.string().describe('Filename to filter by'),
+    }),
+    z.object({
+      limit: z.number().describe('Max results'),
+      offset: z.number().default(0).describe('Skip N results'),
+    }).optional(),
+  ]),
+};
+```
+
+## Accessing Telemetry Data
+
+Use the message buffer to read stored envelopes:
+
+```typescript
+import { getBuffer } from '../utils/index';
+
+// Read with time window filter
+const envelopes = getBuffer().read({ timeWindow: 60 }); // Last 60 seconds
+
+// Read with filename filter
+const envelopes = getBuffer().read({ filename: 'auth.tsx' });
+
+// Read all
+const envelopes = getBuffer().read({ all: true });
+```
+
+## Formatters for AI Output
+
+Use markdown formatters from `formatters/md/` for AI-friendly output:
+
+```typescript
+import { formatErrorEnvelope } from '../formatters/md/errors';
+import { formatLogEnvelope } from '../formatters/md/logs';
+import { formatTraceSummary, buildSpanTree, renderSpanTree } from '../formatters/md/traces';
+
+// Format errors
+const errorText = await formatErrorEnvelope(envelope);
+
+// Format logs
+const logText = await formatLogEnvelope(envelope);
+
+// Format traces
+const traceSummary = formatTraceSummary(trace);
+const spanTree = buildSpanTree(trace);
+const treeLines = renderSpanTree(spanTree);
+```
+
+## Error Handling
+
+Always capture exceptions with context:
+
+```typescript
+import { captureException } from '@sentry/node';
+
+try {
+  // Process data
+} catch (err) {
+  captureException(err, { 
+    extra: { context: 'Error formatting envelope in MCP' } 
+  });
+}
+```
+
+## Response Constants
+
+Define in `constants.ts`:
+
+```typescript
+export const NO_ERRORS_CONTENT = {
+  content: [{
+    type: 'text',
+    text: 'No errors found in the specified time period.',
+  }],
+};
+
+export const NO_LOGS_CONTENT = {
+  content: [{
+    type: 'text',
+    text: 'No logs found in the specified time period.',
+  }],
+};
+```
+
+## Available Tools
+
+Current tools in `mcp.ts`:
+
+1. **search_errors** - Search for runtime errors and exceptions
+2. **search_logs** - Search application logs
+3. **search_traces** - List performance traces
+4. **get_traces** - Get detailed span tree for a trace
+
+## Testing
+
+Test MCP tools by running:
+
+```bash
+spotlight mcp  # Starts MCP server in stdio mode
+```
