@@ -1,4 +1,6 @@
 import CardList from "@spotlight/ui/telemetry/components/shared/CardList";
+import { Button } from "@spotlight/ui/ui/button";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@spotlight/ui/ui/empty";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { TraceSplitViewLayout } from "../../tabs/TracesTab";
@@ -30,7 +32,36 @@ export default function TraceList({ traceData }: TraceListProps) {
   }, [traceId]);
 
   if (traceData.all.length === 0) {
-    return <div className="text-primary-300 p-6">Looks like there are no traces recorded matching this query. 🤔</div>;
+    return (
+      <Empty className="h-full">
+        <EmptyHeader>
+          <EmptyTitle>No Traces</EmptyTitle>
+          <EmptyDescription>
+            Make sure you have setuped Sentry in your project and enabled Spotlight integration
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <div className="flex gap-4">
+            <a
+              href="https://docs.sentry.io/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-primary-400"
+            >
+              Sentry Docs
+            </a>
+            <a
+              href="https://spotlightjs.com/docs/setup/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-primary-400"
+            >
+              Spotlight Docs
+            </a>
+          </div>
+        </EmptyContent>
+      </Empty>
+    );
   }
 
   return (
