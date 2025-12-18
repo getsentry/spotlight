@@ -15,7 +15,7 @@ Electron App
 ├── Main Process (Node.js)
 │   ├── electron/main/index.ts   # Window, tray, menus, auto-update
 │   ├── Runs sidecar server      # setupSpotlight() on port 8969
-│   └── IPC handlers             # Badge count, etc.
+│   └── IPC handlers
 │
 └── Renderer Process (Chromium)
     ├── electron-index.tsx       # Entry point, Sentry init
@@ -215,21 +215,6 @@ In dev mode:
 - Main process rebuilds on change
 - Renderer uses Vite dev server (`VITE_DEV_SERVER_URL`)
 - Auto-update uses `dev-app-update.yml`
-
-## IPC Communication
-
-Main ↔ Renderer communication:
-
-```typescript
-// Main process
-ipcMain.on('set-badge-count', (event, count) => {
-  app.setBadgeCount(count);
-});
-
-// Renderer process (if needed)
-import { ipcRenderer } from 'electron';
-ipcRenderer.send('set-badge-count', 5);
-```
 
 ## Platform Differences
 
