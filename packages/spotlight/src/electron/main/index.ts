@@ -1,7 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as Sentry from "@sentry/electron/main";
-import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, session, shell } from "electron";
+import { BrowserWindow, Menu, Tray, app, dialog, nativeImage, shell } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
 import { sentryBaseConfig } from "../../sentry-config";
@@ -409,9 +409,6 @@ const template: Electron.MenuItemConstructorOptions[] = [
   },
 ];
 
-function handleBadgeCount(_event, count) {
-  app.setBadgeCount(count);
-}
 const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 
@@ -605,8 +602,6 @@ app.whenReady().then(() => {
   app.on("activate", () => {
     showOrCreateWindow();
   });
-
-  ipcMain.on("set-badge-count", handleBadgeCount);
 });
 
 const MAX_RETRIES = 3;
