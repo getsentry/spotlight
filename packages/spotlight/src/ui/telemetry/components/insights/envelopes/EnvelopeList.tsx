@@ -80,24 +80,14 @@ export default function EnvelopeList() {
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <div className="flex gap-4">
-          <a
-            href="https://docs.sentry.io/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-primary-400"
-          >
-            Sentry Docs
-          </a>
-          <a
-            href="https://spotlightjs.com/docs/setup/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-primary-400"
-          >
-            Spotlight Docs
-          </a>
-        </div>
+        <a
+          href="https://spotlightjs.com/docs/setup/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-primary-400"
+        >
+          Spotlight Docs
+        </a>
       </EmptyContent>
     </Empty>
   );
