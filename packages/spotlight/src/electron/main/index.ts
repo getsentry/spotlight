@@ -166,6 +166,12 @@ const createWindow = () => {
     win = null;
   });
 
+  // Open external links in the default browser
+  win.webContents.setWindowOpenHandler(details => {
+    shell.openExternal(details.url);
+    return { action: "deny" };
+  });
+
   win.webContents.on("did-finish-load", () => {
     app.setBadgeCount(0);
     /**
