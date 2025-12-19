@@ -27,8 +27,21 @@ const GEN_AI_RESPONSE_FINISH_REASONS_FIELD = "gen_ai.response.finish_reasons";
 const AI_RESPONSE_TEXT_FIELD = "gen_ai.response.text";
 const AI_RESPONSE_TOOL_CALLS_FIELD = "vercel.ai.response.toolCalls";
 
+// v1 operation names
 const AI_STREAM_TEXT_OPERATION = "ai.streamText";
 const AI_GENERATE_TEXT_OPERATION = "ai.generateText";
+
+// v2 operation names (OpenTelemetry semantic conventions)
+const AI_INVOKE_AGENT_OPERATION = "gen_ai.invoke_agent";
+const AI_STREAM_TEXT_V2_OPERATION = "gen_ai.stream_text";
+
+// v2 field names
+const GEN_AI_PROMPT_FIELD = "gen_ai.prompt";
+const GEN_AI_FUNCTION_ID_FIELD = "gen_ai.function_id";
+const GEN_AI_REQUEST_MODEL_FIELD = "gen_ai.request.model";
+const GEN_AI_RESPONSE_MODEL_FIELD = "gen_ai.response.model";
+const GEN_AI_SYSTEM_FIELD = "gen_ai.system";
+const GEN_AI_OPERATION_NAME_FIELD = "gen_ai.operation.name";
 
 const AI_USAGE_PROMPT_TOKENS_FIELD = "vercel.ai.usage.promptTokens";
 const AI_USAGE_COMPLETION_TOKENS_FIELD = "vercel.ai.usage.completionTokens";
@@ -110,12 +123,22 @@ export const vercelAISDKHandler: AILibraryHandler = {
       return "Tool-Call";
     }
 
+    // v1 operations
     if (trace.operation === AI_STREAM_TEXT_OPERATION) {
       return "Stream Text";
     }
 
     if (trace.operation === AI_GENERATE_TEXT_OPERATION) {
       return "Generate Text";
+    }
+
+    // v2 operations
+    if (trace.operation === AI_INVOKE_AGENT_OPERATION) {
+      return "Invoke Agent";
+    }
+
+    if (trace.operation === AI_STREAM_TEXT_V2_OPERATION) {
+      return "Stream Text";
     }
 
     return trace.operation.replace(/^(ai\.|gen_ai\.)/, "");
@@ -177,7 +200,10 @@ function determineOperation(
 
     if (!span.data) continue;
 
-    const operationId = (span.data[AI_OPERATION_ID_FIELD] || span.data[AI_OPERATION_NAME_FIELD]) as string | undefined;
+    // Check v1 fields first, then v2 fields
+    const operationId = (span.data[AI_OPERATION_ID_FIELD] ||
+      span.data[AI_OPERATION_NAME_FIELD] ||
+      span.data[GEN_AI_OPERATION_NAME_FIELD]) as string | undefined;
 
     // Handle tool call operation
     if (operationId === AI_TOOL_CALL_OPERATION) {
@@ -234,6 +260,24 @@ function formatTokensDisplay(promptTokens?: number, completionTokens?: number): 
   return UNKNOWN_OPERATION;
 }
 
+/**
+ * Normalizes message content from v1 (string) or v2 (array of content blocks) format to a string.
+ * v1: content = "text string"
+ * v2: content = [{ type: "text", text: "text string" }]
+ */
+function normalizeMessageContent(content: unknown): string {
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) {
+    return content
+      .filter(
+        (block): block is { type: string; text: string } => block.type === "text" && typeof block.text === "string",
+      )
+      .map(block => block.text)
+      .join("");
+  }
+  return "";
+}
+
 function parseSpanData(spans: Span[], trace: SpotlightAITrace) {
   for (const span of spans) {
     if (!span.data) continue;
@@ -249,16 +293,29 @@ function parseSpanData(spans: Span[], trace: SpotlightAITrace) {
 function extractAIMetadata(span: Span, trace: SpotlightAITrace) {
   if (!span.data) return;
 
-  if (span.data[AI_MODEL_ID_FIELD]) {
-    trace.metadata.modelId = String(span.data[AI_MODEL_ID_FIELD]);
+  // Model ID: check v1 field first, then v2 fields (request/response model)
+  if (!trace.metadata.modelId) {
+    const modelId =
+      span.data[AI_MODEL_ID_FIELD] ?? span.data[GEN_AI_REQUEST_MODEL_FIELD] ?? span.data[GEN_AI_RESPONSE_MODEL_FIELD];
+    if (modelId) {
+      trace.metadata.modelId = String(modelId);
+    }
   }
 
-  if (span.data[AI_MODEL_PROVIDER_FIELD]) {
-    trace.metadata.modelProvider = String(span.data[AI_MODEL_PROVIDER_FIELD]);
+  // Model Provider: check v1 field first, then v2 field
+  if (!trace.metadata.modelProvider) {
+    const provider = span.data[AI_MODEL_PROVIDER_FIELD] ?? span.data[GEN_AI_SYSTEM_FIELD];
+    if (provider) {
+      trace.metadata.modelProvider = String(provider);
+    }
   }
 
-  if (span.data[AI_TELEMETRY_FUNCTION_ID_FIELD]) {
-    trace.metadata.functionId = String(span.data[AI_TELEMETRY_FUNCTION_ID_FIELD]);
+  // Function ID: check v1 field first, then v2 field
+  if (!trace.metadata.functionId) {
+    const functionId = span.data[AI_TELEMETRY_FUNCTION_ID_FIELD] ?? span.data[GEN_AI_FUNCTION_ID_FIELD];
+    if (functionId) {
+      trace.metadata.functionId = String(functionId);
+    }
   }
 
   if (span.data[AI_SETTINGS_MAX_RETRIES_FIELD]) {
@@ -269,12 +326,19 @@ function extractAIMetadata(span: Span, trace: SpotlightAITrace) {
     trace.metadata.maxSteps = Number(span.data[AI_SETTINGS_MAX_STEPS_FIELD]);
   }
 
-  if (span.data[AI_USAGE_PROMPT_TOKENS_FIELD]) {
-    trace.metadata.promptTokens = Number(span.data[AI_USAGE_PROMPT_TOKENS_FIELD]);
+  // Token usage: check v1 fields first, then v2 fields
+  if (!trace.metadata.promptTokens) {
+    const promptTokens = span.data[AI_USAGE_PROMPT_TOKENS_FIELD] ?? span.data[GEN_AI_USAGE_INPUT_TOKENS_FIELD];
+    if (promptTokens !== undefined) {
+      trace.metadata.promptTokens = Number(promptTokens);
+    }
   }
 
-  if (span.data[AI_USAGE_COMPLETION_TOKENS_FIELD]) {
-    trace.metadata.completionTokens = Number(span.data[AI_USAGE_COMPLETION_TOKENS_FIELD]);
+  if (!trace.metadata.completionTokens) {
+    const completionTokens = span.data[AI_USAGE_COMPLETION_TOKENS_FIELD] ?? span.data[GEN_AI_USAGE_OUTPUT_TOKENS_FIELD];
+    if (completionTokens !== undefined) {
+      trace.metadata.completionTokens = Number(completionTokens);
+    }
   }
 }
 
@@ -292,10 +356,19 @@ function extractTelemetryMetadata(span: Span, trace: SpotlightAITrace) {
 function extractPromptData(span: Span, trace: SpotlightAITrace) {
   if (!span.data) return;
 
-  const promptField = span.data[AI_PROMPT_FIELD];
-  if (promptField) {
+  // Check v2 field first (gen_ai.prompt), then v1 field (vercel.ai.prompt)
+  const promptField = span.data[GEN_AI_PROMPT_FIELD] ?? span.data[AI_PROMPT_FIELD];
+  if (promptField && !trace.prompt) {
     try {
-      trace.prompt = JSON.parse(String(promptField));
+      const parsed = JSON.parse(String(promptField));
+      // Normalize message content from v2 array format to string
+      if (parsed.messages && Array.isArray(parsed.messages)) {
+        parsed.messages = parsed.messages.map((msg: { role: string; content: unknown }) => ({
+          ...msg,
+          content: normalizeMessageContent(msg.content),
+        }));
+      }
+      trace.prompt = parsed;
     } catch {
       trace.prompt = { messages: [{ role: "unknown", content: String(promptField) }] };
     }
@@ -305,7 +378,12 @@ function extractPromptData(span: Span, trace: SpotlightAITrace) {
   if (promptMessages && !trace.prompt) {
     try {
       const messages = JSON.parse(String(promptMessages));
-      trace.prompt = { messages };
+      // Normalize message content from v2 array format to string
+      const normalizedMessages = messages.map((msg: { role: string; content: unknown }) => ({
+        ...msg,
+        content: normalizeMessageContent(msg.content),
+      }));
+      trace.prompt = { messages: normalizedMessages };
     } catch {
       trace.prompt = { messages: [{ role: "unknown", content: String(promptMessages) }] };
     }
