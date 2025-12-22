@@ -37,7 +37,7 @@ export default function TraceList({ traceData }: TraceListProps) {
         <EmptyHeader>
           <EmptyTitle>No Traces</EmptyTitle>
           <EmptyDescription>
-            Make sure you have setuped Sentry in your project and enabled Spotlight integration
+            Make sure you have set Sentry up in your project and enabled Spotlight integration
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>

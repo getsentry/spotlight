@@ -76,7 +76,7 @@ export default function EnvelopeList() {
       <EmptyHeader>
         <EmptyTitle>No Envelopes</EmptyTitle>
         <EmptyDescription>
-          Make sure you have setuped Sentry in your project and enabled Spotlight integration
+          Make sure you have set Sentry up in your project and enabled Spotlight integration
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
