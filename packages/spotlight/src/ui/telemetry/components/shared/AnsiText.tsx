@@ -88,6 +88,7 @@ export default function AnsiText({ text, className }: AnsiTextProps) {
         }
 
         return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: ANSI tokens don't have stable IDs
           <span key={index} className={classes.join(" ")}>
             {token.content}
           </span>

@@ -1,6 +1,6 @@
 export const ERROR_EVENT_TYPES = new Set(["event", "error"]);
 export const TRACE_EVENT_TYPES = new Set(["transaction"]);
-export const PROFILE_EVENT_TYPES = new Set(["profile"]);
+export const PROFILE_EVENT_TYPES = new Set(["profile", "profile_chunk"]);
 export const LOG_EVENT_TYPES = new Set(["log"]);
 export const ATTACHMENT_EVENT_TYPES = new Set(["attachment"]);
 export const SUPPORTED_EVENT_TYPES = new Set([
