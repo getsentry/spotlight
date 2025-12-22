@@ -12,6 +12,9 @@ interface NanovisVisualization {
   events: {
     on(event: "select" | "hover", callback: (node: NanovisTreeNode) => void): void;
   };
+  resize(): void;
+  invalidate(): void;
+  draw(): void;
 }
 
 type VisualizationType = "flame" | "treemap" | "sunburst";
@@ -33,12 +36,25 @@ const FlamegraphLegend = () => {
   );
 };
 
+/**
+ * Formats a sample count for display.
+ * Uses "k" suffix for thousands to keep the display compact.
+ */
+function formatSampleCount(count: number): string {
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}k samples`;
+  }
+  return `${count} samples`;
+}
+
 export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const visualizationRef = useRef<NanovisVisualization | null>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const [visualizationType, setVisualizationType] = useState<VisualizationType>("flame");
   const [hoveredNode, setHoveredNode] = useState<NanovisTreeNode | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [treeData, setTreeData] = useState<NanovisTreeNode | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -49,6 +65,7 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
       if (!containerRef.current || !profile) return;
 
       const tree = await convertSentryProfileToNormalizedTree(profile);
+      setTreeData(tree);
 
       const nanovisModule = await import("nanovis");
       const { Flamegraph, Treemap, Sunburst } = nanovisModule;
@@ -58,8 +75,18 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
         visualizationRef.current = null;
       }
 
+      // Custom palette for Spotlight's dark theme
       const options = {
         getColor: (node: TreeNode<unknown>) => node.color,
+        palette: {
+          text: "#e0e7ff", // primary-100 for better visibility
+          fg: "#fff",
+          bg: "#1e1b4b", // primary-950
+          stroke: "#4338ca", // primary-700
+          fallback: "#9ca3af", // Gray-400 fallback
+          hover: "#ffffff33", // Semi-transparent white for hover
+          shadow: "#00000066", // Semi-transparent black for shadows
+        },
       };
 
       let visualization: NanovisVisualization;
@@ -86,12 +113,60 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
       });
 
       if (containerRef.current) {
-        containerRef.current.appendChild(visualization.el);
+        const container = containerRef.current;
+
+        container.appendChild(visualization.el);
+
+        // Helper to update visualization dimensions (called on resize)
+        // Only modifies visualization.el dimensions, NOT container dimensions
+        const updateVisualization = () => {
+          if (!container || !visualization) return;
+
+          // Get content area dimensions (excluding padding)
+          const style = getComputedStyle(container);
+          const paddingX = Number.parseFloat(style.paddingLeft) + Number.parseFloat(style.paddingRight);
+          const paddingY = Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom);
+          const contentWidth = container.clientWidth - paddingX;
+          const contentHeight = container.clientHeight - paddingY;
+
+          if (visualizationType === "treemap") {
+            visualization.el.style.width = `${contentWidth}px`;
+            visualization.el.style.height = `${Math.max(contentHeight, 400)}px`;
+          } else if (visualizationType === "sunburst") {
+            // Sunburst is square - use the smaller of width or a max height
+            const size = Math.min(contentWidth, window.innerHeight * 0.7);
+            visualization.el.style.width = `${size}px`;
+            visualization.el.style.height = `${size}px`;
+          } else {
+            // Flamegraph just needs width, calculates its own height
+            visualization.el.style.width = `${contentWidth}px`;
+          }
+
+          visualization.resize();
+          visualization.draw();
+        };
+
+        // Set up ResizeObserver to handle container resizes
+        resizeObserverRef.current = new ResizeObserver(() => {
+          updateVisualization();
+        });
+        resizeObserverRef.current.observe(container);
+
+        // Initial sizing after DOM is ready
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              updateVisualization();
+            });
+          });
+        });
       }
       window.addEventListener("mousemove", handleMouseMove);
     })();
 
     return () => {
+      resizeObserverRef.current?.disconnect();
+      resizeObserverRef.current = null;
       if (visualizationRef.current) {
         visualizationRef.current.el.remove();
         visualizationRef.current = null;
@@ -128,8 +203,8 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
   });
 
   return (
-    <div className="w-full h-full relative p-4">
-      <div className="mb-4">
+    <div className="w-full h-full flex flex-col p-4">
+      <div className="mb-4 flex-shrink-0">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold text-primary-200">Profile</h3>
           <div className="flex items-center space-x-2">
@@ -157,12 +232,29 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
         </p>
       </div>
       <FlamegraphLegend />
-      <div onMouseLeave={() => setHoveredNode(null)}>
+      <div onMouseLeave={() => setHoveredNode(null)} className="flex-1 min-h-0 mt-4">
         <div
           ref={containerRef}
-          className="w-full border border-primary-700 rounded-md overflow-auto p-2 my-4"
+          className={cn(
+            "border border-primary-700 rounded-md p-2 relative",
+            // Flamegraph: full width, auto height, allow scroll for deep trees
+            visualizationType === "flame" && "w-full overflow-auto",
+            // Treemap: full width and height, no scrollbars (we control exact size)
+            visualizationType === "treemap" && "w-full h-full min-h-[400px] overflow-hidden",
+            // Sunburst: shrink-wrap to content (w-fit) and center, so overlay positions correctly
+            visualizationType === "sunburst" && "mx-auto overflow-hidden",
+          )}
           {...mouseTrackingProps}
         >
+          {/* Sunburst center overlay - container is square so 50%/50% centers correctly */}
+          {visualizationType === "sunburst" && treeData && (
+            <div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-950 px-3 py-1 rounded-md pointer-events-none z-10"
+              style={{ minWidth: "80px", textAlign: "center" }}
+            >
+              <span className="text-primary-100 font-bold text-sm">{formatSampleCount(treeData.sampleCount)}</span>
+            </div>
+          )}
           {hoveredNode && (
             <div
               className="bg-primary-900 border-primary-400 absolute flex flex-col min-w-[200px] rounded-lg border p-3 shadow-lg z-50"
@@ -174,7 +266,8 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
             >
               <span className="text-primary-200 font-semibold">{hoveredNode.text}</span>
               <span className="text-primary-400 text-xs">{hoveredNode.subtext}</span>
-              <span className="text-primary-400 text-xs">Total Time: {hoveredNode.size}</span>
+              {/* Use sampleCount if available, fall back to size (sampleCount may be lost during normalization on child nodes) */}
+              <span className="text-primary-400 text-xs">Samples: {hoveredNode.sampleCount ?? hoveredNode.size}</span>
             </div>
           )}
         </div>
