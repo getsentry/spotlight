@@ -13,6 +13,10 @@ Spotlight started out as a [Hackweek project](https://syntax.fm/show/666/hackwee
 > Spotlight is Sentry for Development. Inspired by an old project, Django Debug Toolbar, Spotlight brings a rich debug
 overlay into development environments, and it does it by leveraging the existing power of Sentry's SDKs
 
+:::note[Historical Context]
+The original "overlay" concept has evolved. Spotlight now provides a [Desktop App](/docs/desktop-app/) and [CLI](/docs/cli/) with a browser-based UI instead of an embedded overlay.
+:::
+
 You get the power of Sentry's telemetry (through its SDKs) without needing Sentry's production monitoring. If you already use Sentry, that's great. All you need is enabling Spotlight in your SDK and run Spotlight locally. If you are not using Sentry, you need to install the free and open source Sentry SDKs to get started. If you want to use Sentry later on, this saves you the initial setup. Just add your Sentry DSNs into your projects and off you go!
 
 ## Three Ways to Use Spotlight
@@ -21,7 +25,7 @@ Spotlight provides three powerful tools for debugging and development:
 
 ### 1. Local Development Tool
 
-A real-time debugging overlay that displays errors, traces, logs, and profiles directly in your browser or dedicated desktop app. See everything happening in your application as it happens.
+A real-time debugging UI that displays errors, traces, logs, and profiles in the Desktop App or browser. See everything happening in your application as it happens.
 
 **Perfect for:**
 - Visual debugging during development
@@ -93,4 +97,4 @@ If you are already using Sentry SDKs in your application try the following:
 ---
 
 [^1]: Currently Python, Ruby, PHP, and all JS-based SDKs support this env variable. If your choice of SDK doesn't support it, you can still use Spotlight by enabling the `spotlight` option in its init configuration. Also you can let us know of your interest and we'll add support for the env variable.
-[^2]: If you don't have `npx` around, you can use `docker run -p 8969 ghcr.io/getsentry/spotlight:latest`, or head over to our [GitHub Releases page](https://github.com/getsentry/spotlight/releases/latest) and download a binary for your system. Alternatively, we provide an Electron-based application that can be used to run the Sidecar as well as a dedicated instance of the overlay. There are some limitations to this method, but it is particularly useful [for headless or mobile environments](/docs/setup/headless/). <DownloadButton>Download for Mac</DownloadButton>
+[^2]: If you don't have `npx` around, you can use `docker run -p 8969:8969 ghcr.io/getsentry/spotlight:latest`, or head over to our [GitHub Releases page](https://github.com/getsentry/spotlight/releases/latest) and download a binary for your system. Alternatively, we provide a [Desktop App](/docs/desktop-app/) that bundles everything together. <DownloadButton>Download for Mac</DownloadButton>
