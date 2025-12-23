@@ -1,5 +1,32 @@
 # @spotlightjs/spotlight
 
+## 4.9.0
+
+### Minor Changes
+
+- Add support for continuous profiling (Profiling V2) ([#1202](https://github.com/getsentry/spotlight/pull/1202))
+
+- Add self-documenting CLI commands with per-command help support ([#1206](https://github.com/getsentry/spotlight/pull/1206))
+
+  Each CLI command now provides its own metadata (short description, usage, detailed help, and examples). The main help output is generated dynamically from this metadata, and users can get detailed help for specific commands via `spotlight help <command>` or `spotlight <command> --help`.
+
+### Patch Changes
+
+- Remove dead code ([#1214](https://github.com/getsentry/spotlight/pull/1214))
+
+- Fix profile visualization issues in trace views: ([#1203](https://github.com/getsentry/spotlight/pull/1203))
+
+  - Update frame colors to use vibrant, high-contrast colors for better visibility
+  - Add custom nanovis palette for Spotlight's dark theme
+  - Fix sunburst center text showing bytes instead of sample counts
+  - Fix treemap visibility with proper color contrast
+
+- added support for AI SDK v2 in AI Mode ([#1216](https://github.com/getsentry/spotlight/pull/1216))
+
+- updated the empty pages of traces and envelopes ([#1213](https://github.com/getsentry/spotlight/pull/1213))
+
+- open external links in default browser ([#1212](https://github.com/getsentry/spotlight/pull/1212))
+
 ## 4.8.0
 
 ### Minor Changes
