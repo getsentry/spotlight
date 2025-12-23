@@ -65,7 +65,7 @@ const OPERATION_BADGE_MAP = new Map<string, string>([
   [AI_STREAM_TEXT_V2_OPERATION, "Stream Text"],
 ]);
 
-// Field mappings: first element is v1, subsequent are v2 alternatives
+// Field mappings: first element is v2, subsequent are v1 alternatives
 const AI_FIELD_MAPPINGS = {
   MODEL_ID: [AI_MODEL_ID_FIELD, GEN_AI_REQUEST_MODEL_FIELD, GEN_AI_RESPONSE_MODEL_FIELD],
   MODEL_PROVIDER: [AI_MODEL_PROVIDER_FIELD, GEN_AI_SYSTEM_FIELD],
