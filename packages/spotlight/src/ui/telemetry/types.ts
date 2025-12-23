@@ -380,9 +380,17 @@ export type AIToolCall = {
   step?: number;
 };
 
+// Content can be string (v1) or array of content blocks (v2)
+export type AIContentBlock = {
+  type: string;
+  text?: string;
+};
+
+export type AIMessageContent = string | AIContentBlock[];
+
 export type AIMessage = {
   role: string;
-  content: string;
+  content: AIMessageContent;
   toolInvocations?: AIToolCall[];
   parts?: unknown[];
 };

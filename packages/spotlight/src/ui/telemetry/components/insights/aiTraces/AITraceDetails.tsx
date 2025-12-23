@@ -158,7 +158,8 @@ function PromptSection({ trace }: { trace: SpotlightAITrace }) {
               }
               messageContent = trace.response.text;
             } else {
-              messageContent = message.content;
+              // Content is normalized to string by vercelAISDK handler
+              messageContent = typeof message.content === "string" ? message.content : "";
             }
 
             return (

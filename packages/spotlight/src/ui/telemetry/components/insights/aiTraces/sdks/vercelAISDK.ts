@@ -27,8 +27,21 @@ const GEN_AI_RESPONSE_FINISH_REASONS_FIELD = "gen_ai.response.finish_reasons";
 const AI_RESPONSE_TEXT_FIELD = "gen_ai.response.text";
 const AI_RESPONSE_TOOL_CALLS_FIELD = "vercel.ai.response.toolCalls";
 
+// v1 operation names
 const AI_STREAM_TEXT_OPERATION = "ai.streamText";
 const AI_GENERATE_TEXT_OPERATION = "ai.generateText";
+
+// v2 operation names (OpenTelemetry semantic conventions)
+const AI_INVOKE_AGENT_OPERATION = "gen_ai.invoke_agent";
+const AI_STREAM_TEXT_V2_OPERATION = "gen_ai.stream_text";
+
+// v2 field names
+const GEN_AI_PROMPT_FIELD = "gen_ai.prompt";
+const GEN_AI_FUNCTION_ID_FIELD = "gen_ai.function_id";
+const GEN_AI_REQUEST_MODEL_FIELD = "gen_ai.request.model";
+const GEN_AI_RESPONSE_MODEL_FIELD = "gen_ai.response.model";
+const GEN_AI_SYSTEM_FIELD = "gen_ai.system";
+const GEN_AI_OPERATION_NAME_FIELD = "gen_ai.operation.name";
 
 const AI_USAGE_PROMPT_TOKENS_FIELD = "vercel.ai.usage.promptTokens";
 const AI_USAGE_COMPLETION_TOKENS_FIELD = "vercel.ai.usage.completionTokens";
@@ -43,6 +56,41 @@ const TOKEN_FIELDS = {
 // Other constants
 const DEFAULT_TRACE_NAME = "AI Interaction";
 const UNKNOWN_OPERATION = "N/A";
+
+// Operation to badge mapping
+const OPERATION_BADGE_MAP = new Map<string, string>([
+  [AI_STREAM_TEXT_OPERATION, "Stream Text"],
+  [AI_GENERATE_TEXT_OPERATION, "Generate Text"],
+  [AI_INVOKE_AGENT_OPERATION, "Invoke Agent"],
+  [AI_STREAM_TEXT_V2_OPERATION, "Stream Text"],
+]);
+
+// Field mappings: first element is v2, subsequent are v1 alternatives
+const AI_FIELD_MAPPINGS = {
+  MODEL_ID: [AI_MODEL_ID_FIELD, GEN_AI_REQUEST_MODEL_FIELD, GEN_AI_RESPONSE_MODEL_FIELD],
+  MODEL_PROVIDER: [AI_MODEL_PROVIDER_FIELD, GEN_AI_SYSTEM_FIELD],
+  FUNCTION_ID: [AI_TELEMETRY_FUNCTION_ID_FIELD, GEN_AI_FUNCTION_ID_FIELD],
+  PROMPT_TOKENS: [AI_USAGE_PROMPT_TOKENS_FIELD, GEN_AI_USAGE_INPUT_TOKENS_FIELD],
+  COMPLETION_TOKENS: [AI_USAGE_COMPLETION_TOKENS_FIELD, GEN_AI_USAGE_OUTPUT_TOKENS_FIELD],
+  PROMPT: [GEN_AI_PROMPT_FIELD, AI_PROMPT_FIELD],
+  OPERATION_ID: [AI_OPERATION_ID_FIELD, AI_OPERATION_NAME_FIELD, GEN_AI_OPERATION_NAME_FIELD],
+} as const;
+
+/**
+ * Extracts a field value from span data, checking v1 fields first then v2 alternatives.
+ */
+function extractFieldFromSpan(
+  data: Record<string, unknown>,
+  fieldKey: keyof typeof AI_FIELD_MAPPINGS,
+): unknown | undefined {
+  const fields = AI_FIELD_MAPPINGS[fieldKey];
+  for (const field of fields) {
+    if (data[field] !== undefined) {
+      return data[field];
+    }
+  }
+  return undefined;
+}
 
 export const vercelAISDKHandler: AILibraryHandler = {
   id: "vercel-ai-sdk",
@@ -110,15 +158,7 @@ export const vercelAISDKHandler: AILibraryHandler = {
       return "Tool-Call";
     }
 
-    if (trace.operation === AI_STREAM_TEXT_OPERATION) {
-      return "Stream Text";
-    }
-
-    if (trace.operation === AI_GENERATE_TEXT_OPERATION) {
-      return "Generate Text";
-    }
-
-    return trace.operation.replace(/^(ai\.|gen_ai\.)/, "");
+    return OPERATION_BADGE_MAP.get(trace.operation) ?? trace.operation.replace(/^(ai\.|gen_ai\.)/, "");
   },
 
   getTokensDisplay: (trace: SpotlightAITrace): string => {
@@ -177,7 +217,7 @@ function determineOperation(
 
     if (!span.data) continue;
 
-    const operationId = (span.data[AI_OPERATION_ID_FIELD] || span.data[AI_OPERATION_NAME_FIELD]) as string | undefined;
+    const operationId = extractFieldFromSpan(span.data, "OPERATION_ID") as string | undefined;
 
     // Handle tool call operation
     if (operationId === AI_TOOL_CALL_OPERATION) {
@@ -234,6 +274,28 @@ function formatTokensDisplay(promptTokens?: number, completionTokens?: number): 
   return UNKNOWN_OPERATION;
 }
 
+/**
+ * Normalizes message content from v1 (string) or v2 (array of content blocks) format to a string.
+ * v1: content = "text string"
+ * v2: content = [{ type: "text", text: "text string" }]
+ *
+ * Only extracts text content blocks. Other block types (image, file, tool-call)
+ * would require UI changes to display properly and are filtered out for now.
+ */
+function normalizeMessageContent(content: unknown): string {
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) {
+    // Only extract text content - images/files would need UI changes to display
+    return content
+      .filter(
+        (block): block is { type: string; text: string } => block.type === "text" && typeof block.text === "string",
+      )
+      .map(block => block.text)
+      .join("");
+  }
+  return "";
+}
+
 function parseSpanData(spans: Span[], trace: SpotlightAITrace) {
   for (const span of spans) {
     if (!span.data) continue;
@@ -249,16 +311,28 @@ function parseSpanData(spans: Span[], trace: SpotlightAITrace) {
 function extractAIMetadata(span: Span, trace: SpotlightAITrace) {
   if (!span.data) return;
 
-  if (span.data[AI_MODEL_ID_FIELD]) {
-    trace.metadata.modelId = String(span.data[AI_MODEL_ID_FIELD]);
+  // Model ID
+  if (trace.metadata.modelId === undefined) {
+    const modelId = extractFieldFromSpan(span.data, "MODEL_ID");
+    if (modelId !== undefined) {
+      trace.metadata.modelId = String(modelId);
+    }
   }
 
-  if (span.data[AI_MODEL_PROVIDER_FIELD]) {
-    trace.metadata.modelProvider = String(span.data[AI_MODEL_PROVIDER_FIELD]);
+  // Model Provider
+  if (trace.metadata.modelProvider === undefined) {
+    const provider = extractFieldFromSpan(span.data, "MODEL_PROVIDER");
+    if (provider !== undefined) {
+      trace.metadata.modelProvider = String(provider);
+    }
   }
 
-  if (span.data[AI_TELEMETRY_FUNCTION_ID_FIELD]) {
-    trace.metadata.functionId = String(span.data[AI_TELEMETRY_FUNCTION_ID_FIELD]);
+  // Function ID
+  if (trace.metadata.functionId === undefined) {
+    const functionId = extractFieldFromSpan(span.data, "FUNCTION_ID");
+    if (functionId !== undefined) {
+      trace.metadata.functionId = String(functionId);
+    }
   }
 
   if (span.data[AI_SETTINGS_MAX_RETRIES_FIELD]) {
@@ -269,12 +343,19 @@ function extractAIMetadata(span: Span, trace: SpotlightAITrace) {
     trace.metadata.maxSteps = Number(span.data[AI_SETTINGS_MAX_STEPS_FIELD]);
   }
 
-  if (span.data[AI_USAGE_PROMPT_TOKENS_FIELD]) {
-    trace.metadata.promptTokens = Number(span.data[AI_USAGE_PROMPT_TOKENS_FIELD]);
+  // Token usage - use === undefined to allow 0 values
+  if (trace.metadata.promptTokens === undefined) {
+    const promptTokens = extractFieldFromSpan(span.data, "PROMPT_TOKENS");
+    if (promptTokens !== undefined) {
+      trace.metadata.promptTokens = Number(promptTokens);
+    }
   }
 
-  if (span.data[AI_USAGE_COMPLETION_TOKENS_FIELD]) {
-    trace.metadata.completionTokens = Number(span.data[AI_USAGE_COMPLETION_TOKENS_FIELD]);
+  if (trace.metadata.completionTokens === undefined) {
+    const completionTokens = extractFieldFromSpan(span.data, "COMPLETION_TOKENS");
+    if (completionTokens !== undefined) {
+      trace.metadata.completionTokens = Number(completionTokens);
+    }
   }
 }
 
@@ -292,10 +373,18 @@ function extractTelemetryMetadata(span: Span, trace: SpotlightAITrace) {
 function extractPromptData(span: Span, trace: SpotlightAITrace) {
   if (!span.data) return;
 
-  const promptField = span.data[AI_PROMPT_FIELD];
-  if (promptField) {
+  const promptField = extractFieldFromSpan(span.data, "PROMPT");
+  if (promptField && !trace.prompt) {
     try {
-      trace.prompt = JSON.parse(String(promptField));
+      const parsed = JSON.parse(String(promptField));
+      // Normalize message content from v2 array format to string
+      if (parsed.messages && Array.isArray(parsed.messages)) {
+        parsed.messages = parsed.messages.map((msg: { role: string; content: unknown }) => ({
+          ...msg,
+          content: normalizeMessageContent(msg.content),
+        }));
+      }
+      trace.prompt = parsed;
     } catch {
       trace.prompt = { messages: [{ role: "unknown", content: String(promptField) }] };
     }
@@ -305,7 +394,12 @@ function extractPromptData(span: Span, trace: SpotlightAITrace) {
   if (promptMessages && !trace.prompt) {
     try {
       const messages = JSON.parse(String(promptMessages));
-      trace.prompt = { messages };
+      // Normalize message content from v2 array format to string
+      const normalizedMessages = messages.map((msg: { role: string; content: unknown }) => ({
+        ...msg,
+        content: normalizeMessageContent(msg.content),
+      }));
+      trace.prompt = { messages: normalizedMessages };
     } catch {
       trace.prompt = { messages: [{ role: "unknown", content: String(promptMessages) }] };
     }

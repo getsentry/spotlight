@@ -45,7 +45,18 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
     if (aiTrace.prompt?.messages) {
       const userMessages = aiTrace.prompt.messages
         .filter(msg => msg.role === "user" || msg.role === "human")
-        .map(msg => msg.content)
+        .map(msg => {
+          let content = msg.content;
+
+          if (Array.isArray(content)) {
+            content = content
+              .filter(item => item.type === "text" && item.text)
+              .map(item => item.text)
+              .join("");
+          }
+
+          return content;
+        })
         .filter(content => content?.trim())
         .join("\n\n");
 
