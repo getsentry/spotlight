@@ -81,6 +81,10 @@ export default defineConfig({
               link: "/docs/about/",
             },
             {
+              label: "Getting Started",
+              link: "/docs/setup/",
+            },
+            {
               label: "Architecture",
               link: "/docs/architecture/",
             },
