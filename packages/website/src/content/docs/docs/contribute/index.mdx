@@ -42,7 +42,7 @@ pnpm build
 
 ## Development
 
-Depending on what you're doing there's two paths to develop against the overlay.
+Depending on what you're doing there's two paths to develop against Spotlight.
 
 ### With existing data
 
@@ -55,13 +55,13 @@ pnpm dev
 Send sample fixtures to the sidecar with:
 
 ```shell
-pnpm run --filter @spotlightjs/overlay sample
+pnpm run --filter @spotlightjs/spotlight sample
 ```
 
 This will send all the sample data to Spotlight. You can also pick a specific file and pass that as an argument to the script instead:
 
 ```shell
-pnpm run --filter @spotlightjs/overlay sample envelope_php_error.txt
+pnpm run --filter @spotlightjs/spotlight sample envelope_php_error.txt
 ```
 
 ### Linking against an existing project
@@ -89,9 +89,6 @@ The monorepo is mostly straight forward, but here's a quick summary:
 ```
 spotlight
 └── packages
-    ├── overlay      // @spotlightjs/overlay   - the main overlay
-    ├── sidecar      // @spotlightjs/sidecar   - the sidecar (proxy) for streaming data
-    ├── spotlight    // @spotlightjs/spotlight - the main spotlight package, combining overlay and sidecar
-    ├── tsconfig     // @spotlightjs/tsconfig  - shared tsconfig
-    └── website      // @spotlightjs/website   - the main overlay
+    ├── spotlight    // @spotlightjs/spotlight - main package (UI, sidecar, CLI, Electron app)
+    └── website      // @spotlightjs/website   - documentation website
 ```
