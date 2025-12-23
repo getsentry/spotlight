@@ -57,6 +57,41 @@ const TOKEN_FIELDS = {
 const DEFAULT_TRACE_NAME = "AI Interaction";
 const UNKNOWN_OPERATION = "N/A";
 
+// Operation to badge mapping
+const OPERATION_BADGE_MAP = new Map<string, string>([
+  [AI_STREAM_TEXT_OPERATION, "Stream Text"],
+  [AI_GENERATE_TEXT_OPERATION, "Generate Text"],
+  [AI_INVOKE_AGENT_OPERATION, "Invoke Agent"],
+  [AI_STREAM_TEXT_V2_OPERATION, "Stream Text"],
+]);
+
+// Field mappings: first element is v1, subsequent are v2 alternatives
+const AI_FIELD_MAPPINGS = {
+  MODEL_ID: [AI_MODEL_ID_FIELD, GEN_AI_REQUEST_MODEL_FIELD, GEN_AI_RESPONSE_MODEL_FIELD],
+  MODEL_PROVIDER: [AI_MODEL_PROVIDER_FIELD, GEN_AI_SYSTEM_FIELD],
+  FUNCTION_ID: [AI_TELEMETRY_FUNCTION_ID_FIELD, GEN_AI_FUNCTION_ID_FIELD],
+  PROMPT_TOKENS: [AI_USAGE_PROMPT_TOKENS_FIELD, GEN_AI_USAGE_INPUT_TOKENS_FIELD],
+  COMPLETION_TOKENS: [AI_USAGE_COMPLETION_TOKENS_FIELD, GEN_AI_USAGE_OUTPUT_TOKENS_FIELD],
+  PROMPT: [GEN_AI_PROMPT_FIELD, AI_PROMPT_FIELD],
+  OPERATION_ID: [AI_OPERATION_ID_FIELD, AI_OPERATION_NAME_FIELD, GEN_AI_OPERATION_NAME_FIELD],
+} as const;
+
+/**
+ * Extracts a field value from span data, checking v1 fields first then v2 alternatives.
+ */
+function extractFieldFromSpan(
+  data: Record<string, unknown>,
+  fieldKey: keyof typeof AI_FIELD_MAPPINGS,
+): unknown | undefined {
+  const fields = AI_FIELD_MAPPINGS[fieldKey];
+  for (const field of fields) {
+    if (data[field] !== undefined) {
+      return data[field];
+    }
+  }
+  return undefined;
+}
+
 export const vercelAISDKHandler: AILibraryHandler = {
   id: "vercel-ai-sdk",
   name: "Vercel AI SDK",
@@ -123,25 +158,7 @@ export const vercelAISDKHandler: AILibraryHandler = {
       return "Tool-Call";
     }
 
-    // v1 operations
-    if (trace.operation === AI_STREAM_TEXT_OPERATION) {
-      return "Stream Text";
-    }
-
-    if (trace.operation === AI_GENERATE_TEXT_OPERATION) {
-      return "Generate Text";
-    }
-
-    // v2 operations
-    if (trace.operation === AI_INVOKE_AGENT_OPERATION) {
-      return "Invoke Agent";
-    }
-
-    if (trace.operation === AI_STREAM_TEXT_V2_OPERATION) {
-      return "Stream Text";
-    }
-
-    return trace.operation.replace(/^(ai\.|gen_ai\.)/, "");
+    return OPERATION_BADGE_MAP.get(trace.operation) ?? trace.operation.replace(/^(ai\.|gen_ai\.)/, "");
   },
 
   getTokensDisplay: (trace: SpotlightAITrace): string => {
@@ -200,10 +217,7 @@ function determineOperation(
 
     if (!span.data) continue;
 
-    // Check v1 fields first, then v2 fields
-    const operationId = (span.data[AI_OPERATION_ID_FIELD] ||
-      span.data[AI_OPERATION_NAME_FIELD] ||
-      span.data[GEN_AI_OPERATION_NAME_FIELD]) as string | undefined;
+    const operationId = extractFieldFromSpan(span.data, "OPERATION_ID") as string | undefined;
 
     // Handle tool call operation
     if (operationId === AI_TOOL_CALL_OPERATION) {
@@ -264,10 +278,14 @@ function formatTokensDisplay(promptTokens?: number, completionTokens?: number): 
  * Normalizes message content from v1 (string) or v2 (array of content blocks) format to a string.
  * v1: content = "text string"
  * v2: content = [{ type: "text", text: "text string" }]
+ *
+ * Only extracts text content blocks. Other block types (image, file, tool-call)
+ * would require UI changes to display properly and are filtered out for now.
  */
 function normalizeMessageContent(content: unknown): string {
   if (typeof content === "string") return content;
   if (Array.isArray(content)) {
+    // Only extract text content - images/files would need UI changes to display
     return content
       .filter(
         (block): block is { type: string; text: string } => block.type === "text" && typeof block.text === "string",
@@ -293,27 +311,26 @@ function parseSpanData(spans: Span[], trace: SpotlightAITrace) {
 function extractAIMetadata(span: Span, trace: SpotlightAITrace) {
   if (!span.data) return;
 
-  // Model ID: check v1 field first, then v2 fields (request/response model)
-  if (!trace.metadata.modelId) {
-    const modelId =
-      span.data[AI_MODEL_ID_FIELD] ?? span.data[GEN_AI_REQUEST_MODEL_FIELD] ?? span.data[GEN_AI_RESPONSE_MODEL_FIELD];
-    if (modelId) {
+  // Model ID
+  if (trace.metadata.modelId === undefined) {
+    const modelId = extractFieldFromSpan(span.data, "MODEL_ID");
+    if (modelId !== undefined) {
       trace.metadata.modelId = String(modelId);
     }
   }
 
-  // Model Provider: check v1 field first, then v2 field
-  if (!trace.metadata.modelProvider) {
-    const provider = span.data[AI_MODEL_PROVIDER_FIELD] ?? span.data[GEN_AI_SYSTEM_FIELD];
-    if (provider) {
+  // Model Provider
+  if (trace.metadata.modelProvider === undefined) {
+    const provider = extractFieldFromSpan(span.data, "MODEL_PROVIDER");
+    if (provider !== undefined) {
       trace.metadata.modelProvider = String(provider);
     }
   }
 
-  // Function ID: check v1 field first, then v2 field
-  if (!trace.metadata.functionId) {
-    const functionId = span.data[AI_TELEMETRY_FUNCTION_ID_FIELD] ?? span.data[GEN_AI_FUNCTION_ID_FIELD];
-    if (functionId) {
+  // Function ID
+  if (trace.metadata.functionId === undefined) {
+    const functionId = extractFieldFromSpan(span.data, "FUNCTION_ID");
+    if (functionId !== undefined) {
       trace.metadata.functionId = String(functionId);
     }
   }
@@ -326,16 +343,16 @@ function extractAIMetadata(span: Span, trace: SpotlightAITrace) {
     trace.metadata.maxSteps = Number(span.data[AI_SETTINGS_MAX_STEPS_FIELD]);
   }
 
-  // Token usage: check v1 fields first, then v2 fields
-  if (!trace.metadata.promptTokens) {
-    const promptTokens = span.data[AI_USAGE_PROMPT_TOKENS_FIELD] ?? span.data[GEN_AI_USAGE_INPUT_TOKENS_FIELD];
+  // Token usage - use === undefined to allow 0 values
+  if (trace.metadata.promptTokens === undefined) {
+    const promptTokens = extractFieldFromSpan(span.data, "PROMPT_TOKENS");
     if (promptTokens !== undefined) {
       trace.metadata.promptTokens = Number(promptTokens);
     }
   }
 
-  if (!trace.metadata.completionTokens) {
-    const completionTokens = span.data[AI_USAGE_COMPLETION_TOKENS_FIELD] ?? span.data[GEN_AI_USAGE_OUTPUT_TOKENS_FIELD];
+  if (trace.metadata.completionTokens === undefined) {
+    const completionTokens = extractFieldFromSpan(span.data, "COMPLETION_TOKENS");
     if (completionTokens !== undefined) {
       trace.metadata.completionTokens = Number(completionTokens);
     }
@@ -356,8 +373,7 @@ function extractTelemetryMetadata(span: Span, trace: SpotlightAITrace) {
 function extractPromptData(span: Span, trace: SpotlightAITrace) {
   if (!span.data) return;
 
-  // Check v2 field first (gen_ai.prompt), then v1 field (vercel.ai.prompt)
-  const promptField = span.data[GEN_AI_PROMPT_FIELD] ?? span.data[AI_PROMPT_FIELD];
+  const promptField = extractFieldFromSpan(span.data, "PROMPT");
   if (promptField && !trace.prompt) {
     try {
       const parsed = JSON.parse(String(promptField));

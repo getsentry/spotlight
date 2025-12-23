@@ -49,7 +49,10 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
           let content = msg.content;
 
           if (Array.isArray(content)) {
-            content = content.map(item => item.text).join("");
+            content = content
+              .filter(item => item.type === "text" && item.text)
+              .map(item => item.text)
+              .join("");
           }
 
           return content;
