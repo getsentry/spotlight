@@ -18,6 +18,9 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
   pushEnvelope: (envelope: Envelope) => {
     const [header, items] = envelope;
     const lastSeen = new Date(header.sent_at as string).getTime();
+    // Read the inferred source type from the envelope header (set by server)
+    const sourceType = (header as { __spotlight_inferred_source?: "browser" | "server" | "mobile" })
+      .__spotlight_inferred_source;
     let sdk: Sdk;
 
     if (header.sdk?.name && header.sdk.version) {
@@ -85,6 +88,10 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
             item.contexts = {};
           }
           item.contexts.trace ??= traceContext;
+        }
+        // Attach the inferred source type to the event for UI display
+        if (sourceType) {
+          (item as { __sourceType?: typeof sourceType }).__sourceType = sourceType;
         }
         const eventId =
           item.event_id ?? ("event_id" in itemHeader ? (itemHeader.event_id as string | undefined) : undefined);

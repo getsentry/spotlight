@@ -1,11 +1,12 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
 import { type UUID, uuidv7obj } from "uuidv7";
 import { RAW_TYPES } from "../constants.ts";
+import { type SourceType, inferEnvelopeSource } from "../formatters/human/utils.ts";
 import { logger } from "../logger.ts";
 import type { RawEventContext } from "./types.ts";
 
 export type ParsedEnvelope = {
-  envelope: [Envelope[0] & { __spotlight_envelope_id: UUID }, Envelope[1]];
+  envelope: [Envelope[0] & { __spotlight_envelope_id: UUID; __spotlight_inferred_source?: SourceType }, Envelope[1]];
   rawEnvelope: RawEventContext;
 };
 
@@ -90,6 +91,10 @@ export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: str
 
     items.push([itemHeader, itemPayload] as EnvelopeItem);
   }
+
+  // Infer the envelope source (browser, server, or mobile) for UI display
+  const firstEvent = items.length > 0 ? items[0][1] : undefined;
+  envelopeHeader.__spotlight_inferred_source = inferEnvelopeSource(envelopeHeader, firstEvent);
 
   return {
     envelope: [envelopeHeader, items] as ParsedEnvelope["envelope"],

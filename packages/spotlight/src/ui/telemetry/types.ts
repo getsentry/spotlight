@@ -78,6 +78,8 @@ type CommonEventAttrs = {
   sdk?: Sdk;
   measurements?: Measurements;
   attachments?: EventAttachment[];
+  // Inferred source type for distinguishing browser/server/mobile events
+  __sourceType?: "browser" | "server" | "mobile";
 };
 
 // Note: For some reason the `sentry/core` module doesn't have these additional properties
