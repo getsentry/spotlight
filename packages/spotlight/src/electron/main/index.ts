@@ -166,6 +166,24 @@ const createWindow = () => {
     win = null;
   });
 
+  // Hide drag bar and notify renderer when entering fullscreen
+  win.on("enter-full-screen", () => {
+    win.webContents.executeJavaScript(`
+      window.__ELECTRON_IS_FULLSCREEN__ = true;
+      document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'none');
+      window.dispatchEvent(new CustomEvent('electron-fullscreen-change', { detail: true }));
+    `);
+  });
+
+  // Show drag bar and notify renderer when leaving fullscreen
+  win.on("leave-full-screen", () => {
+    win.webContents.executeJavaScript(`
+      window.__ELECTRON_IS_FULLSCREEN__ = false;
+      document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'block');
+      window.dispatchEvent(new CustomEvent('electron-fullscreen-change', { detail: false }));
+    `);
+  });
+
   // Open external links in the default browser
   win.webContents.setWindowOpenHandler(details => {
     shell.openExternal(details.url).catch(error => {
