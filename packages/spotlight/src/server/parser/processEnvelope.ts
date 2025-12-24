@@ -5,8 +5,17 @@ import { type SourceType, inferEnvelopeSource } from "../formatters/human/utils.
 import { logger } from "../logger.ts";
 import type { RawEventContext } from "./types.ts";
 
+/**
+ * Spotlight-specific extensions added to envelope headers for internal tracking
+ */
+export type SpotlightEnvelopeExtensions = {
+  __spotlight_envelope_id: UUID;
+  __spotlight_sender_user_agent?: string;
+  __spotlight_inferred_source?: SourceType;
+};
+
 export type ParsedEnvelope = {
-  envelope: [Envelope[0] & { __spotlight_envelope_id: UUID; __spotlight_inferred_source?: SourceType }, Envelope[1]];
+  envelope: [Envelope[0] & SpotlightEnvelopeExtensions, Envelope[1]];
   rawEnvelope: RawEventContext;
 };
 
@@ -93,8 +102,9 @@ export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: str
   }
 
   // Infer the envelope source (browser, server, or mobile) for UI display
-  const firstEvent = items.length > 0 ? items[0][1] : undefined;
-  envelopeHeader.__spotlight_inferred_source = inferEnvelopeSource(envelopeHeader, firstEvent);
+  // Scan all events to find a deterministic match
+  const eventPayloads = items.map(([, payload]) => payload);
+  envelopeHeader.__spotlight_inferred_source = inferEnvelopeSource(envelopeHeader, eventPayloads);
 
   return {
     envelope: [envelopeHeader, items] as ParsedEnvelope["envelope"],
