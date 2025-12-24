@@ -30,7 +30,7 @@ function ErrorFallback() {
   return (
     <div className="flex flex-col items-center justify-center h-full w-full">
       <div className="flex items-center gap-2 mb-4">
-        <Logo height={24} width={24} />
+        <Logo height={24} width={24} aria-hidden="true" />
         <p className="text-white text-2xl font-bold">Spotlight</p>
       </div>
       <h1 className="text-white text-4xl font-bold">Oops! An error occurred</h1>
