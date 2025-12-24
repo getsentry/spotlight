@@ -34,7 +34,7 @@ function ErrorFallback() {
         <p className="text-white text-2xl font-bold">Spotlight</p>
       </div>
       <h1 className="text-white text-4xl font-bold">Oops! An error occurred</h1>
-      <p className="text-white text-xl">Press Cmd + R to reload the app</p>
+      <p className="text-white text-xl">Press Cmd/Ctrl + R to reload the app</p>
     </div>
   );
 }
