@@ -144,6 +144,8 @@ export function updateTraceMetadata(trace: Trace): void {
       `[Spotlight] Orphan trace detected (trace_id: ${trace.trace_id}). ` +
         `Using first transaction "${trace.transactions[0].transaction}" as fallback.`,
     );
+    // use the first transcation for orphan traces
+    trace.rootTransaction = trace.transactions[0];
     trace.rootTransactionName = trace.transactions[0].transaction || "(orphan transaction)";
   } else {
     trace.rootTransactionName = "(missing root transaction)";
