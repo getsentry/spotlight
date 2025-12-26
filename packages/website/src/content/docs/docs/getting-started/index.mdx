@@ -81,23 +81,18 @@ import * as Sentry from "@sentry/browser";
 
 Sentry.init({
   dsn: "https://spotlight@local/0", // Placeholder DSN
-  
-  // Enable Spotlight integration
+
+  // Enable Spotlight integration and comprehensive logging
   integrations: [
     Sentry.spotlightBrowserIntegration(),
-  ],
-  
-  // Capture 100% of transactions locally
-  tracesSampleRate: 1.0,
-  
-  // Enable comprehensive logging
-  integrations: [
     Sentry.captureConsoleIntegration({
       levels: ['log', 'info', 'warn', 'error', 'debug'],
     }),
   ],
+
+  // Capture 100% of transactions locally
+  tracesSampleRate: 1.0,
 });
-```
 
 ### Backend Applications
 
