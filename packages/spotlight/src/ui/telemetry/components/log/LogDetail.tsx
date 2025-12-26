@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import AnsiText from "@spotlight/ui/telemetry/components/shared/AnsiText";
 import JsonViewer from "@spotlight/ui/telemetry/components/shared/JsonViewer";
 import { useSentryLog } from "@spotlight/ui/telemetry/data/useSentryLogs";
 import SidePanel, { SidePanelHeader } from "@spotlight/ui/ui/sidePanel";
 import Table from "@spotlight/ui/ui/table";
+import { Link } from "react-router-dom";
 import { LOG_LEVEL_COLORS } from "../../constants";
 import DateTime from "../shared/DateTime";
 
@@ -25,7 +26,9 @@ export default function LogDetails({ id }: { id: string }) {
       <div className="space-y-6">
         <div>
           <h2 className="mb-2 font-bold uppercase">Message</h2>
-          <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm">{body}</pre>
+          <pre className="whitespace-pre-wrap break-words font-mono text-sm">
+            <AnsiText text={body} />
+          </pre>
         </div>
 
         <div>

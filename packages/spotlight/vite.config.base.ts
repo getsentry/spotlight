@@ -13,11 +13,15 @@ export const aliases = {
 export const defineProduction = {
   "process.env.NODE_ENV": '"production"',
   "process.env.npm_package_version": JSON.stringify(process.env.npm_package_version),
+  // Set to false for tree-shaking; Electron config overrides to true
+  __IS_ELECTRON__: false,
 };
 
 export const defineDevelopment = {
   "process.env.NODE_ENV": '"development"',
   "process.env.npm_package_version": JSON.stringify(process.env.npm_package_version),
+  // Set to false for tree-shaking; Electron config overrides to true
+  __IS_ELECTRON__: false,
 };
 
 export const reactPlugins = [
@@ -34,3 +38,10 @@ export const dtsPlugin = dts({
   insertTypesEntry: true,
 });
 
+export const sentryPluginOptions = {
+  org: process.env.MAIN_VITE_SENTRY_ORG,
+  authToken: process.env.MAIN_VITE_SENTRY_AUTH_TOKEN,
+  release: {
+    name: process.env.npm_package_version,
+  },
+};

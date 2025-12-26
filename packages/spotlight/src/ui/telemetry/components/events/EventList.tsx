@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
 import CardList from "@spotlight/ui/telemetry/components/shared/CardList";
+import { OriginBadge } from "@spotlight/ui/telemetry/components/shared/OriginBadge";
 import TimeSince from "@spotlight/ui/telemetry/components/shared/TimeSince";
+import { Link } from "react-router-dom";
 import { useSentryEvents } from "../../data/useSentryEvents";
 import { isErrorEvent } from "../../utils/sentry";
 import { truncateId } from "../../utils/text";
@@ -25,6 +26,7 @@ export default function EventList({ traceId }: { traceId?: string }) {
             <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
               <div className="flex items-center gap-x-2">
                 <div>{truncateId(e.event_id)}</div>
+                <OriginBadge sourceType={e.__sourceType} />
               </div>
               <span />
               <TimeSince date={e.timestamp} />

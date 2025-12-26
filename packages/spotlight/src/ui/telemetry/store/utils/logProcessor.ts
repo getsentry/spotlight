@@ -12,10 +12,7 @@ export interface LogProcessingResult {
  * @param existingLogIds Set of already processed log IDs to avoid duplicates
  * @returns Processed log items ready to be stored
  */
-export function processLogItems(
-  event: SentryLogEvent,
-  existingLogIds: Set<string>,
-): LogProcessingResult {
+export function processLogItems(event: SentryLogEvent, existingLogIds: Set<string>): LogProcessingResult {
   const processedLogs: SentryLogEventItem[] = [];
 
   if (!event.items?.length) {
@@ -24,7 +21,7 @@ export function processLogItems(
 
   for (const logItem of event.items) {
     const logId = logItem.id || generateUuidv4();
-    
+
     // Skip if already processed
     if (existingLogIds.has(logId)) {
       continue;
@@ -37,7 +34,7 @@ export function processLogItems(
 
     // Extract SDK name from attributes
     logItem.sdk = logItem.attributes?.["sentry.sdk.name"]?.value as string;
-    
+
     // Normalize timestamp
     logItem.timestamp = toTimestamp(logItem.timestamp);
     logItem.id = logId;
@@ -47,4 +44,3 @@ export function processLogItems(
 
   return { processedLogs };
 }
-

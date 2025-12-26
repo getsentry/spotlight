@@ -1,53 +1,47 @@
 ---
-title: Architecture of Spotlight
+title: Architecture
+description: How Spotlight works under the hood
 ---
-import { LinkCard } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
 import Architecture from "../../../../public/images/simple-event-flow.png";
 
 <img src={Architecture.src} width="80%" alt="Spotlight Architecture" />
 
-### Description
+## How It Works
 
-At a high level, Spotlight consists of two components:
+Spotlight consists of two components bundled in `@spotlightjs/spotlight`:
 
-1. A standalone UI (`@spotlightjs/overlay`) that runs independently in your browser or as a desktop application. The UI is a React application that displays your application's telemetry data in real-time.
+1. **Sidecar Server** - A local HTTP server that receives telemetry from your application and streams it to connected clients using [Server-Sent Events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events).
 
-2. A proxy server (`@spotlightjs/sidecar`) which receives telemetry from your application and streams it to the UI. This is achieved via a simple HTTP relay, allowing SDKs to push events to it, and allowing the UI to receive events using [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events).
+2. **UI** - A React application that displays telemetry data in real-time. Available as a [Desktop App](/docs/desktop-app/) or browser-based UI at `localhost:8969`.
 
-For convenience, these packages are combined in a single package (`@spotlightjs/spotlight`), which is the recommended way to run Spotlight.
-This means that adoption in most projects is as simple as:
+## Data Flow
 
-```shell
-# Run the Spotlight sidecar with UI
-npx @spotlightjs/spotlight
-
-# Or install globally
-npm install -g @spotlightjs/spotlight
-spotlight
+```
+Your App → Sentry SDK → Sidecar (port 8969) → UI
+                              ↓
+                        [In-memory store]
+                              ↓
+                    Desktop App / Browser / MCP
 ```
 
-Enabling Spotlight in your application's SDK:
+1. Your application sends telemetry via Sentry SDK
+2. Sidecar receives and stores events in memory
+3. Connected clients (UI, MCP) receive events via SSE
+4. Events are displayed in real-time
 
-```typescript
-import * as Sentry from '@sentry/node';
+## Multiple Clients
 
-// Enable Spotlight for development
-Sentry.init({
-  dsn: 'your-dsn',
-  spotlight: process.env.NODE_ENV === 'development',
-});
-```
+A single sidecar can serve multiple clients simultaneously:
+- **Desktop App** - Dedicated window with built-in UI
+- **Browser** - Web UI at `http://localhost:8969`
+- **CLI** - Stream events to terminal with `spotlight tail`
+- **MCP** - AI assistants query events via Model Context Protocol
 
-Or simply set the environment variable:
+## Learn More
 
-```shell
-export SENTRY_SPOTLIGHT=1
-```
-
-You can send any kind of events to the Sidecar, it forwards them to the Spotlight UI where integrations process and display the data.
-
-<LinkCard title="Sidecar" description="Understand what the sidecar does" href="/docs/sidecar/" />
-
-Spotlight by default has a Sentry integration, if you are using a Sentry SDK and enable the Spotlight connection (only required on the Server), Spotlight is able
-to render Traces/Errors and more in your frontend.
+<CardGrid>
+  <LinkCard title="Getting Started" href="/docs/setup/" description="Choose how to run Spotlight" />
+  <LinkCard title="Sidecar Details" href="/docs/sidecar/" description="Configuration and SDK integration" />
+</CardGrid>

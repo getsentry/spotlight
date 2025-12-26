@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
+import { metrics } from "@sentry/node";
 import showHelp from "./cli/help.ts";
 import mcp from "./cli/mcp.ts";
 import run from "./cli/run.ts";
@@ -9,7 +10,7 @@ import { DEFAULT_PORT } from "./constants.ts";
 import { AVAILABLE_FORMATTERS } from "./formatters/types.ts";
 import type { FormatterType } from "./formatters/types.ts";
 import { enableDebugLogging, logger } from "./logger.ts";
-import type { CLIHandler, CLIHandlerOptions } from "./types/cli.ts";
+import type { CLIHandlerOptions, Command } from "./types/cli.ts";
 
 // When port is set to `0` for a server to listen on,
 // it tells the OS to find a random available port.
@@ -32,9 +33,20 @@ const PARSE_ARGS_CONFIG = {
       short: "f",
       default: "human",
     },
+    "allowed-origin": {
+      type: "string",
+      short: "A",
+      multiple: true,
+      default: [] as string[],
+    },
     // Deprecated -- use the positional `mcp` argument instead
     "stdio-mcp": {
       type: "boolean",
+      default: false,
+    },
+    open: {
+      type: "boolean",
+      short: "o",
       default: false,
     },
     help: {
@@ -51,9 +63,11 @@ export type CLIArgs = {
   port: number;
   debug: boolean;
   help: boolean;
+  open: boolean;
   format: FormatterType;
   cmd: string | undefined;
   cmdArgs: string[];
+  allowedOrigins: string[];
 };
 
 export function parseCLIArgs(): CLIArgs {
@@ -64,9 +78,12 @@ export function parseCLIArgs(): CLIArgs {
     tokens: true,
   });
   let cmdArgs: string[] | undefined = undefined;
-  const runToken = preParse.tokens.find(token => token.kind === "positional" && token.value === "run");
-  if (runToken) {
-    const cutOff = preParse.tokens.find(token => token.index > runToken.index && token.kind === "positional");
+  // Only apply special handling for "run" if it's the actual command (first positional),
+  // not when it appears as an argument to another command like "spotlight help run"
+  const firstPositional = preParse.tokens.find(token => token.kind === "positional");
+  const isRunCommand = firstPositional?.value === "run";
+  if (isRunCommand && firstPositional) {
+    const cutOff = preParse.tokens.find(token => token.index > firstPositional.index && token.kind === "positional");
     cmdArgs = cutOff ? args.splice(cutOff.index) : [];
   }
   const { values, positionals } = parseArgs({
@@ -77,7 +94,7 @@ export function parseCLIArgs(): CLIArgs {
   // Handle legacy positional argument for port (backwards compatibility)
   const portInput = positionals.length === 1 && /^\d{1,5}$/.test(positionals[0]) ? positionals.shift() : values.port;
 
-  const port = portInput != null ? Number(portInput) : runToken ? MAGIC_PORT_FOR_DYNAMIC_ASSIGNMENT : DEFAULT_PORT;
+  const port = portInput != null ? Number(portInput) : isRunCommand ? MAGIC_PORT_FOR_DYNAMIC_ASSIGNMENT : DEFAULT_PORT;
   if (Number.isNaN(port)) {
     // Validate port number
     console.error(`Error: Invalid port number '${portInput}'`);
@@ -102,43 +119,72 @@ export function parseCLIArgs(): CLIArgs {
     process.exit(1);
   }
 
+  // Parse allowed origins - supports both repeatable flags and comma-separated values
+  const allowedOriginInput = values["allowed-origin"] as string[];
+  const allowedOrigins = allowedOriginInput.flatMap(origin => origin.split(",").map(o => o.trim())).filter(Boolean);
+
   const result: CLIArgs = {
     debug: values.debug as boolean,
     help: values.help as boolean,
+    open: values.open as boolean,
     format: format as FormatterType,
     port,
     cmd: positionals[0],
     cmdArgs: cmdArgs ?? positionals.slice(1),
+    allowedOrigins,
   };
 
   return result;
 }
-export const CLI_CMD_MAP = new Map<string | undefined, CLIHandler>([
+// Command registry - each command provides its own metadata
+export const COMMANDS: Command[] = [run, tail, mcp, server];
+
+// Build command map from registry for fast lookup
+export const CLI_CMD_MAP = new Map<string | undefined, Command["handler"]>([
   ["help", showHelp],
-  ["mcp", mcp],
-  ["tail", tail],
-  ["run", run],
-  ["server", server],
-  [undefined, server],
+  ...COMMANDS.map(cmd => [cmd.meta.name, cmd.handler] as [string, Command["handler"]]),
+  [undefined, server.handler],
 ]);
 
 export async function main({
   basePath,
   filesToServe,
 }: { basePath?: CLIHandlerOptions["basePath"]; filesToServe?: CLIHandlerOptions["filesToServe"] } = {}) {
-  let { cmd, cmdArgs, help, port, debug, format } = parseCLIArgs();
+  const { cmd, cmdArgs, help, port, debug, format, allowedOrigins, open } = parseCLIArgs();
   if (debug || process.env.SPOTLIGHT_DEBUG) {
     enableDebugLogging(true);
   }
   const spotlightVersion = process.env.npm_package_version || "{unknown}";
   logger.info(`Spotlight by Sentry - v${spotlightVersion}`);
 
-  if (help) {
-    cmd = "help";
-    cmdArgs = [];
+  metrics.count("cli.invocation", 1, {
+    attributes: {
+      command: cmd || "server",
+      format,
+      debug: String(debug),
+    },
+  });
+
+  // Handle help: `spotlight --help`, `spotlight help`, `spotlight help <cmd>`, or `spotlight <cmd> --help`
+  if (help || cmd === "help") {
+    // If `spotlight <cmd> --help`, show help for that specific command
+    // If `spotlight help <cmd>`, cmdArgs[0] contains the command name
+    const targetCmd = cmd === "help" ? cmdArgs[0] : cmd;
+    return showHelp({
+      cmd: "help",
+      cmdArgs: targetCmd ? [targetCmd] : [],
+      port,
+      help: true,
+      debug,
+      format,
+      basePath,
+      filesToServe,
+      allowedOrigins,
+      open,
+    });
   }
 
   const handler = CLI_CMD_MAP.get(cmd) || showHelp;
 
-  return await handler({ cmd, cmdArgs, port, help, debug, format, basePath, filesToServe });
+  return await handler({ cmd, cmdArgs, port, help, debug, format, basePath, filesToServe, allowedOrigins, open });
 }

@@ -1,6 +1,6 @@
+import { cn } from "@spotlight/ui/lib/cn";
 import { useCallback, useRef, useState } from "react";
 import { Route, Routes } from "react-router-dom";
-import { cn } from "@spotlight/ui/lib/cn";
 import AITranscription from "../components/insights/aiTraces/AITranscription";
 import { hasAISpans } from "../components/insights/aiTraces/sdks/aiLibraries";
 import Resizer from "../components/shared/Resizer";

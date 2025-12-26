@@ -3,15 +3,20 @@ import type { SentryTransactionEvent, Span, Trace } from "../../types";
 import { compareSpans, groupSpans } from "../../utils/traces";
 import type { SentryProfileWithTraceMeta } from "../types";
 import { toTimestamp } from "../utils";
+import type { ProcessedProfileChunk } from "./profileChunkProcessor";
+import { mergeChunksToProfile } from "./profileChunkProcessor";
 
 export interface TraceProcessingContext {
   existingTrace?: Trace;
   profilesByTraceId: Map<string, SentryProfileWithTraceMeta>;
+  profileChunksByProfilerId?: Map<string, ProcessedProfileChunk[]>;
 }
 
 export interface TraceProcessingResult {
   trace: Trace;
   shouldUpdateTrace: boolean;
+  /** V2 profile merged from chunks, to be stored in profilesByTraceId */
+  mergedProfile?: SentryProfileWithTraceMeta;
 }
 
 /**
@@ -23,11 +28,11 @@ export function processTransactionEvent(
   context: TraceProcessingContext,
 ): TraceProcessingResult {
   const traceCtx = event.contexts.trace;
-  const { existingTrace, profilesByTraceId } = context;
+  const { existingTrace, profilesByTraceId, profileChunksByProfilerId } = context;
 
   // Add guard to ensure trace_id exists
   if (!traceCtx.trace_id) {
-    throw new Error('Transaction event missing required trace_id');
+    throw new Error("Transaction event missing required trace_id");
   }
 
   // Initialize or get existing trace
@@ -88,15 +93,36 @@ export function processTransactionEvent(
   trace.spans = spanMap;
   trace.spanTree = groupSpans(trace.spans);
 
-  // Graft profile data if available
+  // Graft profile data if available (V1 profiles keyed by trace_id)
   const profileForTrace = profilesByTraceId.get(trace.trace_id);
   if (profileForTrace) {
     graftProfileSpans(trace, profileForTrace);
   }
 
+  // Try V2 continuous profiling: look for profiler_id in transaction context
+  // V2 uses contexts.profile.profiler_id to link profiles
+  let mergedProfile: SentryProfileWithTraceMeta | undefined;
+  if (!trace.profileGrafted && profileChunksByProfilerId) {
+    const profileContext = event.contexts?.profile as { profiler_id?: string } | undefined;
+    const profilerId = profileContext?.profiler_id;
+
+    if (profilerId) {
+      const chunks = profileChunksByProfilerId.get(profilerId);
+      if (chunks && chunks.length > 0) {
+        // Get the active thread ID from trace context data if available
+        const activeThreadId = traceCtx.data?.["thread.id"] as string | undefined;
+        mergedProfile = mergeChunksToProfile(chunks, activeThreadId) ?? undefined;
+        if (mergedProfile) {
+          graftProfileSpans(trace, mergedProfile);
+        }
+      }
+    }
+  }
+
   return {
     trace,
     shouldUpdateTrace: true,
+    mergedProfile,
   };
 }
 
@@ -118,6 +144,8 @@ export function updateTraceMetadata(trace: Trace): void {
       `[Spotlight] Orphan trace detected (trace_id: ${trace.trace_id}). ` +
         `Using first transaction "${trace.transactions[0].transaction}" as fallback.`,
     );
+    // use the first transcation for orphan traces
+    trace.rootTransaction = trace.transactions[0];
     trace.rootTransactionName = trace.transactions[0].transaction || "(orphan transaction)";
   } else {
     trace.rootTransactionName = "(missing root transaction)";

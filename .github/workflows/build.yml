@@ -14,11 +14,12 @@ defaults:
     shell: bash
 
 env:
-  BUILD_CACHE_KEY: ${{ github.sha }}
-  CACHED_BUILD_PATHS: |
-    ${{ github.workspace }}/packages/*/dist
-    ${{ github.workspace }}/packages/*/dist-bin
-    ${{ github.workspace }}/packages/*/dist-electron
+  TURBO_TELEMETRY_MESSAGE_DISABLED: 1
+
+permissions:
+  contents: read
+  packages: write
+  checks: write
 
 jobs:
   build:
@@ -28,12 +29,10 @@ jobs:
     outputs:
       playwright-version: ${{ steps.playwright-version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v6
 
       - name: Cache turbo build setup
-        uses: actions/cache@v4
+        uses: actions/checkout@v6
         with:
           path: .turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}
@@ -44,7 +43,7 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: "package.json"
           cache: "pnpm"
@@ -52,7 +51,7 @@ jobs:
       - name: Get pnpm store directory
         shell: bash
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          echo "STORE_PATH=$(pnpm store path --silent | tr -d '\n\r')" >> $GITHUB_ENV
 
       - uses: actions/cache@v4
         name: Setup pnpm cache
@@ -80,11 +79,22 @@ jobs:
           echo 'APPLE_CERT_PATH=/tmp/certs.p12' >> $GITHUB_ENV
           echo "$APPLE_API_KEY" | base64 -d > /tmp/apple_key.json
           cat /tmp/apple_key.json | jq .private_key -r > /tmp/apple_key.pem
-          echo "APPLE_API_KEY_ISSUER_ID=$(cat /tmp/apple_key.json | jq .issuer_id -r)" >> $GITHUB_ENV
-          echo "APPLE_API_KEY_ID=$(cat /tmp/apple_key.json | jq .key_id -r)" >> $GITHUB_ENV
+          echo "APPLE_API_KEY_ISSUER_ID=$(cat /tmp/apple_key.json | jq .issuer_id -r | tr -d '\n\r')" >> $GITHUB_ENV
+          echo "APPLE_API_KEY_ID=$(cat /tmp/apple_key.json | jq .key_id -r | tr -d '\n\r')" >> $GITHUB_ENV
           echo "APPLE_API_KEY_P8_PATH=/tmp/apple_key.pem" >> $GITHUB_ENV
           echo 'APPLE_API_KEY_PATH=/tmp/apple_key.json' >> $GITHUB_ENV
-          
+      
+      - name: Setup Sentry Environment Variables
+        env:
+          MAIN_VITE_SENTRY_ORG: ${{ vars.MAIN_VITE_SENTRY_ORG }}
+          MAIN_VITE_SENTRY_PROJECT: ${{ vars.MAIN_VITE_SENTRY_PROJECT }} # Electron App
+          MAIN_VITE_UI_SENTRY_PROJECT: ${{ vars.MAIN_VITE_UI_SENTRY_PROJECT }} # Spotlight UI
+          MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
+        run: |
+          echo "MAIN_VITE_SENTRY_ORG=$MAIN_VITE_SENTRY_ORG" >> $GITHUB_ENV
+          echo "MAIN_VITE_SENTRY_PROJECT=$MAIN_VITE_SENTRY_PROJECT" >> $GITHUB_ENV
+          echo "MAIN_VITE_UI_SENTRY_PROJECT=$MAIN_VITE_UI_SENTRY_PROJECT" >> $GITHUB_ENV
+          echo "MAIN_VITE_SENTRY_AUTH_TOKEN=$MAIN_VITE_SENTRY_AUTH_TOKEN" >> $GITHUB_ENV
 
       - name: Build packages
         env:
@@ -93,6 +103,9 @@ jobs:
           FOSSILIZE_PLATFORMS: linux-x64,linux-arm64,win-x64,darwin-x64,darwin-arm64
           FOSSILIZE_SIGN: ${{ github.event_name == 'push' && (github.ref_name == 'main' || startsWith(github.ref_name, 'release/')) && 'y' || 'n' }}
         run: pnpm build
+      
+      - name: Checking npx
+        run: npx ./packages/spotlight --help
 
       - name: Smoke test
         env:
@@ -106,36 +119,30 @@ jobs:
           curl -sf --retry 3 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
           kill -2 $SPOTLIGHT_PID
 
-      - name: Store Spotlight CJS
-        uses: actions/upload-artifact@v4
+      - name: Store built packages
+        uses: actions/upload-artifact@v5
         with:
-          name: spotlight-cjs
+          name: built-packages
           if-no-files-found: error
+          include-hidden-files: true
           path: |
-            packages/spotlight/dist/spotlight.cjs
-            packages/spotlight/dist/ui/
+            packages/spotlight/dist/
 
       - name: Store standalone spotlight binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
-          name: spotlight
+          name: spotlight-binaries
           if-no-files-found: error
           path: packages/spotlight/dist-bin/spotlight-*
 
       - name: Store Electron build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: electron-build
           if-no-files-found: error
+          include-hidden-files: true
           path: packages/spotlight/dist-electron/
 
-      - name: Update build cache
-        uses: actions/cache/save@v4
-        with:
-          enableCrossOsArchive: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
-      
       # This will be used for the base image name in e2e tests below
       # which depends on the build job, hence why we do this here
       - name: Playwright Version
@@ -152,9 +159,7 @@ jobs:
       matrix:
         node_version: [20, 22, 24]
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v6
 
       - name: Cache turbo build setup
         uses: actions/cache@v4
@@ -168,7 +173,7 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
           cache: "pnpm"
@@ -177,7 +182,7 @@ jobs:
         run: pnpm install
 
       - name: Run tests
-        run: pnpm test
+        run: pnpm -r test
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@cf701569b05ccdd861a76b8607a66d76f6fd4857
@@ -196,32 +201,21 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  test-e2e:
-    name: E2E Tests
+  test-e2e-cli:
+    name: E2E CLI Tests
     needs: build
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
     strategy:
       matrix:
         node_version: [20, 22, 24]
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
+      - uses: actions/checkout@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
           cache: "pnpm"
@@ -229,34 +223,68 @@ jobs:
       - name: Setup dependencies
         run: pnpm install
 
+      - name: Clean dist directory before downloading artifacts
+        run: rm -rf packages/spotlight/dist/
+
+      - name: Download Spotlight build
+        uses: actions/download-artifact@v5
+        with:
+          name: built-packages
+          path: packages/spotlight/dist/
+
+      - name: Run CLI E2E tests
+        working-directory: packages/spotlight
+        run: pnpm test:e2e:cli
+
+  test-e2e-ui:
+    name: E2E UI Tests
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v${{needs.build.outputs.playwright-version}}-noble
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - name: Setup dependencies
+        run: pnpm install
+
+      - name: Clean dist directories before downloading artifacts
+        run: |
+          rm -rf packages/spotlight/dist/
+          rm -rf packages/spotlight/dist-electron/
+
+      - name: Download Spotlight build
+        uses: actions/download-artifact@v5
+        with:
+          name: built-packages
+          path: packages/spotlight/dist/
+
       - name: Download Electron build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: electron-build
           path: packages/spotlight/dist-electron/
 
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
-
-      - name: Run Xvfb (virtual display)
-        run: |
-          Xvfb :99 -screen 0 1920x1080x24 &
-          echo "DISPLAY=:99" >> $GITHUB_ENV
-
-      - name: Run tests
-        run: pnpm test:e2e
+      - name: Run UI E2E tests
+        working-directory: packages/spotlight
+        run: pnpm test:e2e:ui
 
       - name: Test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
-          name: test-results
-          path: e2e-tests/**/test-results/**
+          name: test-results-ui
+          path: packages/spotlight/test-results/**
 
   docker:
     name: Docker Image
@@ -267,17 +295,13 @@ jobs:
     env:
       MULTI_ARCH_BUILD: ${{ ((github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push') && github.actor != 'dependabot[bot]') && 'true' || 'false' }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v6
 
-      - name: Restore build cache
-        uses: actions/cache/restore@v4
+      - name: Download spotlight binaries
+        uses: actions/download-artifact@v5
         with:
-          enableCrossOsArchive: true
-          fail-on-cache-miss: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
+          name: spotlight-binaries
+          path: packages/spotlight/dist-bin/
 
       - name: Rename x64 to amd64
         # This is because Node ecosystem uses x64, but Docker uses amd64 :shrug:

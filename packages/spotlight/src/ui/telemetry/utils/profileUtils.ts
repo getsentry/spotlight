@@ -13,4 +13,3 @@ export function getFunctionNameFromFrame(frame: EventFrame): string {
   }
   return result;
 }
-

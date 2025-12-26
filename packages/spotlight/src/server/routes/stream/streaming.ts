@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/node";
 import type { Context } from "hono";
 import { SSEStreamingApi } from "hono/streaming";
 
@@ -17,7 +18,7 @@ const run = async (
         data: e.message,
       });
     } else {
-      console.error(e);
+      captureException(e, { extra: { context: "Unhandled error in SSE stream" } });
     }
   }
 };

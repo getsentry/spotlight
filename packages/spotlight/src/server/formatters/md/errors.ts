@@ -1,5 +1,5 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
-import type { z } from "zod";
+import type { z } from "zod/v3";
 import { type SentryErrorEvent, type SentryEvent, isErrorEvent } from "../../parser/index.ts";
 import type { EventContainer } from "../../utils/index.ts";
 import type { ErrorEventSchema } from "../schema.ts";

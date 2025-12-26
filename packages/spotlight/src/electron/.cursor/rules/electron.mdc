@@ -1,0 +1,233 @@
+---
+description: Electron desktop app development guidelines
+globs:
+alwaysApply: true
+---
+
+# Electron App Guidelines
+
+The Spotlight desktop app packages the UI and server into a standalone Electron application.
+
+## Architecture
+
+```
+Electron App
+├── Main Process (Node.js)
+│   ├── electron/main/index.ts   # Window, tray, menus, auto-update
+│   ├── Runs sidecar server      # setupSpotlight() on port 8969
+│   └── IPC handlers
+│
+└── Renderer Process (Chromium)
+    ├── electron-index.tsx       # Entry point, Sentry init
+    └── UI (React app)           # Same as web UI, with IS_ELECTRON=true
+```
+
+## Main Process (`electron/main/index.ts`)
+
+The main process handles:
+
+### Window Management
+```typescript
+const win = new BrowserWindow({
+  titleBarStyle: 'hidden',           // Custom title bar
+  trafficLightPosition: { x: 16, y: 16 },  // macOS traffic lights
+  webPreferences: {
+    nodeIntegration: true,
+    sandbox: false,
+  },
+});
+
+// Load UI
+if (process.env.VITE_DEV_SERVER_URL) {
+  win.loadURL(process.env.VITE_DEV_SERVER_URL);  // Dev
+} else {
+  win.loadFile(path.join(__dirname, '../renderer/index.html'));  // Prod
+}
+```
+
+### Sidecar Server
+The main process runs the sidecar server internally:
+```typescript
+import { setupSpotlight } from '../../server/main';
+
+await setupSpotlight({
+  port: DEFAULT_PORT,  // 8969
+  incomingPayload: storeIncomingPayload,
+  isStandalone: true,
+});
+```
+
+### System Tray
+- Tray icon with context menu
+- Click to show/hide window
+- "Start at Login" option
+- Linux: No tray (quit on window close)
+
+### Auto-Update
+```typescript
+import { autoUpdater } from 'electron-updater';
+
+autoUpdater.checkForUpdates();
+autoUpdater.on('update-downloaded', () => {
+  // Prompt user to restart
+});
+```
+
+### Menus
+- Application menu (File, Edit, View, Window, Settings, Help)
+- Settings: "Send Error Reports", "Send Payload to Sentry", "Start at Login"
+
+### Persistent Settings
+```typescript
+import Store from 'electron-store';
+const store = new Store();
+
+store.get('sentry-enabled');
+store.set('sentry-enabled', true);
+```
+
+### Drag Bar Injection
+The main process injects a drag bar element after the page loads:
+```typescript
+win.webContents.executeJavaScript(`
+  const dragBar = document.createElement('div');
+  dragBar.id = 'electron-top-drag-bar';
+  dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
+  document.body.appendChild(dragBar);
+`);
+```
+
+## Renderer Process (`electron-index.tsx`)
+
+Entry point for the UI in Electron:
+
+```typescript
+import { init as ElectronSentryInit } from '@sentry/electron/renderer';
+import { init as ReactSentryInit } from '@sentry/react';
+import { _init } from './index';
+
+// Electron-specific Sentry initialization
+ElectronSentryInit({
+  dsn: '...',
+  integrations: getIntegrations(true),
+}, ReactSentryInit);
+
+// Initialize the React app
+_init();
+```
+
+## UI Adaptations for Electron
+
+### `IS_ELECTRON` Constant
+
+Build-time constant set by `vite.electron.config.ts`:
+
+```typescript
+// vite.electron.config.ts
+define: {
+  __IS_ELECTRON__: true,
+}
+
+// lib/isElectron.ts
+export const IS_ELECTRON = typeof __IS_ELECTRON__ !== 'undefined' && __IS_ELECTRON__;
+```
+
+### Conditional Rendering
+
+Use `IS_ELECTRON` to adapt UI for the desktop app:
+
+```tsx
+import { IS_ELECTRON } from '@spotlight/ui/lib/isElectron';
+
+// Add padding for the 40px drag bar
+<div className={cn('flex-1', IS_ELECTRON && 'pt-10')}>
+
+// Sidebar header margin
+<header className={cn('p-4', IS_ELECTRON && 'mt-10')}>
+```
+
+### Router
+
+Electron uses `HashRouter` instead of `BrowserRouter` because it loads from `file://` protocol:
+
+```tsx
+// lib/Router.tsx
+if (IS_ELECTRON) {
+  return <HashRouter>{children}</HashRouter>;
+}
+return <BrowserRouter>{children}</BrowserRouter>;
+```
+
+## Build & Packaging
+
+### Vite Config (`vite.electron.config.ts`)
+
+```typescript
+import electron from 'vite-plugin-electron/simple';
+
+export default defineConfig({
+  plugins: [
+    electron({
+      main: {
+        entry: 'src/electron/main/index.ts',
+        vite: {
+          build: { outDir: 'dist-electron/main' },
+        },
+      },
+    }),
+  ],
+  define: {
+    __IS_ELECTRON__: true,
+  },
+  build: {
+    outDir: 'dist-electron/renderer',
+  },
+});
+```
+
+### Electron Builder (`electron-builder.cjs`)
+
+Packages the app for distribution:
+- macOS: `.dmg`, code signing, notarization
+- Windows: `.exe` installer
+- Linux: `.AppImage`
+
+### Resources
+
+```
+resources/
+├── icons/
+│   ├── mac/icon.icns
+│   ├── win/icon.ico
+│   └── png/              # Various sizes
+└── tray/
+    ├── logoTemplate.png  # macOS tray (template image)
+    └── logoTemplate.ico  # Windows tray
+```
+
+## Development
+
+```bash
+pnpm dev:electron    # Start Electron in dev mode with HMR
+```
+
+In dev mode:
+- Main process rebuilds on change
+- Renderer uses Vite dev server (`VITE_DEV_SERVER_URL`)
+- Auto-update uses `dev-app-update.yml`
+
+## Platform Differences
+
+| Feature | macOS | Windows | Linux |
+|---------|-------|---------|-------|
+| Tray icon | Yes | Yes | No (quit on close) |
+| Title bar | Hidden + traffic lights | Default | Default |
+| Auto-update | DMG | NSIS | AppImage |
+| Start at login | Yes | Yes | Depends on DE |
+
+## Sentry Integration
+
+- Main process: `@sentry/electron/main`
+- Renderer process: `@sentry/electron/renderer` + `@sentry/react`
+- User consent dialogs for error reporting
+- Optionally attach incoming payloads for debugging

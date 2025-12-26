@@ -1,5 +1,6 @@
 import type { ServerType } from "@hono/node-server";
 import { captureException } from "@sentry/core";
+import { metrics } from "@sentry/node";
 import { EventSource } from "eventsource";
 import { SENTRY_CONTENT_TYPE } from "../constants.ts";
 import {
@@ -14,7 +15,7 @@ import {
 import { logger } from "../logger.ts";
 import { setupSpotlight } from "../main.ts";
 import type { ParsedEnvelope } from "../parser/index.ts";
-import type { CLIHandlerOptions } from "../types/cli.ts";
+import type { CLIHandlerOptions, Command, CommandMeta } from "../types/cli.ts";
 import { getSpotlightURL } from "../utils/extras.ts";
 import { getBuffer } from "../utils/index.ts";
 
@@ -38,6 +39,29 @@ const SUPPORTED_ENVELOPE_TYPES = new Set(Object.values(NAME_TO_TYPE_MAPPING).fla
 export const EVERYTHING_MAGIC_WORDS = new Set(["everything", "all", "*"]);
 export const SUPPORTED_TAIL_ARGS = new Set([...Object.keys(NAME_TO_TYPE_MAPPING), ...EVERYTHING_MAGIC_WORDS]);
 
+export const meta: CommandMeta = {
+  name: "tail",
+  short: `Tail Sentry events (types: ${Object.keys(NAME_TO_TYPE_MAPPING).join(", ")})`,
+  usage: "spotlight tail [types...] [options]",
+  long: `Stream Sentry events to your terminal in real-time.
+
+Available event types:
+  ${Object.keys(NAME_TO_TYPE_MAPPING).join(", ")}
+
+Magic words (to tail everything):
+  ${[...EVERYTHING_MAGIC_WORDS].join(", ")}
+
+Use -f/--format to change output format (human, logfmt, json, md).
+Connects to existing sidecar if running, otherwise starts a new one.`,
+  examples: [
+    "spotlight tail                     # Tail all event types (human format)",
+    "spotlight tail errors              # Tail only errors",
+    "spotlight tail errors logs         # Tail errors and logs",
+    "spotlight tail --format json       # Use JSON output format",
+    "spotlight tail traces -f logfmt    # Tail traces with logfmt format",
+  ],
+};
+
 const FORMATTERS: Record<FormatterType, FormatterRegistry> = {
   md: mdFormatters,
   logfmt: logfmtFormatters,
@@ -52,8 +76,8 @@ const connectUpstream = async (port: number) =>
     client.onopen = () => resolve(client);
   });
 
-export default async function tail(
-  { port, cmdArgs, basePath, filesToServe, format = "logfmt" }: CLIHandlerOptions,
+export async function handler(
+  { port, cmdArgs, basePath, filesToServe, format = "logfmt", allowedOrigins }: CLIHandlerOptions,
   onItem?: OnItemCallback,
 ): Promise<ServerType | undefined> {
   const eventTypes = cmdArgs.length > 0 ? cmdArgs.map(arg => arg.toLowerCase()) : ["everything"];
@@ -63,6 +87,11 @@ export default async function tail(
       logger.error(`Supported arguments are: ${[...SUPPORTED_TAIL_ARGS].join(", ")}`);
       process.exit(1);
     }
+  }
+
+  // Track which event types users tail
+  for (const eventType of eventTypes) {
+    metrics.count("cli.tail.event_type", 1, { attributes: { type: eventType } });
   }
 
   const formatter = FORMATTERS[format];
@@ -114,7 +143,7 @@ export default async function tail(
     }
   }
 
-  const serverInstance = await setupSpotlight({ port, filesToServe, basePath, isStandalone: true });
+  const serverInstance = await setupSpotlight({ port, filesToServe, basePath, isStandalone: true, allowedOrigins });
 
   // Subscribe the onEnvelope callback to the message buffer
   // This ensures it gets called whenever any envelope is added to the buffer
@@ -127,3 +156,5 @@ export default async function tail(
 
   return serverInstance;
 }
+
+export default { meta, handler } satisfies Command;

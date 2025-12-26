@@ -1,5 +1,3 @@
-import { type KeyboardEvent, useMemo } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
 import { ReactComponent as Filter } from "@spotlight/ui/assets/filter.svg";
 import { ReactComponent as Sort } from "@spotlight/ui/assets/sort.svg";
 import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
@@ -15,12 +13,15 @@ import {
   DropdownMenuTrigger,
 } from "@spotlight/ui/ui/dropdownMenu";
 import Table from "@spotlight/ui/ui/table";
+import { type KeyboardEvent, useMemo } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { LOGS_HEADERS, LOGS_SORT_KEYS, LOG_LEVEL_COLORS } from "../../constants";
 import { useSentryLogs } from "../../data/useSentryLogs";
 import useColumnVisibility from "../../hooks/useColumnVisibility";
 import useSort from "../../hooks/useSort";
 import type { SentryLogEventItem } from "../../types";
 import { formatTimestamp } from "../../utils/duration";
+import AnsiText from "../shared/AnsiText";
 import LogDetails from "./LogDetail";
 
 type LogsComparator = (a: SentryLogEventItem, b: SentryLogEventItem) => number;
@@ -168,7 +169,7 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
                     if (header.id === "message" && isColumnVisible("message")) {
                       return (
                         <td key="message" className={cn("text-sm truncate align-middle", paddings)}>
-                          <span>{log.body}</span>
+                          <AnsiText text={log.body} />
                         </td>
                       );
                     }

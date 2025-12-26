@@ -4,6 +4,7 @@ import type {
   SentryEvent,
   SentryLogEvent,
   SentryProfileV1Event,
+  SentryProfileV2ChunkEvent,
   SentryTransactionEvent,
 } from "../types";
 
@@ -13,6 +14,10 @@ export function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
 
 export function isProfileEvent(event: SentryEvent): event is SentryProfileV1Event {
   return !!event.type && PROFILE_EVENT_TYPES.has(event.type) && (event as SentryProfileV1Event).version === "1";
+}
+
+export function isProfileChunkEvent(event: SentryEvent): event is SentryProfileV2ChunkEvent {
+  return event.type === "profile_chunk" && (event as SentryProfileV2ChunkEvent).version === "2";
 }
 
 export function isTraceEvent(event: SentryEvent): event is SentryTransactionEvent {

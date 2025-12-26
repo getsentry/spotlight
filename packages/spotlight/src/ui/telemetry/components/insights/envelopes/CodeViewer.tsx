@@ -1,7 +1,7 @@
 import { transformerNotationHighlight } from "@shikijs/transformers";
-import { bundledLanguages } from "shiki/bundle-web.mjs";
 import { useShiki } from "@spotlight/ui/ShikiProvider";
 import { SHIKI_DEFAULT_THEME } from "@spotlight/ui/shiki-constants";
+import { bundledLanguages } from "shiki/bundle-web.mjs";
 
 export function CodeViewer({ code, lang }: { code: string; lang: string }) {
   const highlighter = useShiki();
@@ -26,7 +26,7 @@ export function CodeViewer({ code, lang }: { code: string; lang: string }) {
   }
 
   return (
-    <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm p-2 bg-primary-950 rounded-sm">
+    <pre className="text-primary-300 whitespace-pre-wrap break-words font-mono text-sm bg-primary-950 rounded-sm">
       {code}
     </pre>
   );

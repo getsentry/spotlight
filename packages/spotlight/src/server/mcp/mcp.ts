@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { TextContent } from "@modelcontextprotocol/sdk/types.js";
-import { wrapMcpServerWithSentry } from "@sentry/node";
-import { z } from "zod";
+import { captureException, wrapMcpServerWithSentry } from "@sentry/node";
+import { z } from "zod/v3";
 import { formatErrorEnvelope } from "../formatters/md/errors.ts";
 import { formatLogEnvelope } from "../formatters/md/logs.ts";
 import {
@@ -132,7 +132,7 @@ search_errors({ filters: { limit: 10, offset: 0 } })
             }
           }
         } catch (err) {
-          console.error(err);
+          captureException(err, { extra: { context: "Error formatting error envelope in MCP" } });
         }
       }
 
@@ -227,7 +227,7 @@ search_logs({ filters: { limit: 20, offset: 0 } })
             }
           }
         } catch (err) {
-          console.error(err);
+          captureException(err, { extra: { context: "Error formatting log envelope in MCP" } });
         }
       }
 

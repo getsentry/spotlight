@@ -6,6 +6,7 @@ sidebar:
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
+import AddToCursorButton from '../../../../components/AddToCursorButton.astro';
 
 The Spotlight MCP (Model Context Protocol) server enables AI coding assistants like Cursor, Claude, and others to access your application's runtime data for debugging and development assistance.
 
@@ -43,9 +44,7 @@ claude mcp add sentry-spotlight -- npx -y --prefer-online @spotlightjs/spotlight
 
 Click the button below or add manually:
 
-<a href="cursor://anysphere.cursor-deeplink/mcp/install?name=spotlight&config=eyJjb21tYW5kIjoibnB4IC15IC0tcHJlZmVyLW9ubGluZSBAc3BvdGxpZ2h0anMvc3BvdGxpZ2h0QGxhdGVzdCBtY3AgIn0%3D">
-  <img src="https://cursor.com/deeplink/mcp-install-light.svg" alt="Add spotlight MCP server to Cursor" height="32" />
-</a>
+<AddToCursorButton />
 
 ### 2. Manual Configuration (Alternative)
 
@@ -259,7 +258,7 @@ Your application must have a Sentry SDK configured to send events to Spotlight:
 
     Sentry.init({
       dsn: 'your-dsn',
-      integrations: [Sentry.spotlightBrowserIntegration()],
+      integrations: [Sentry.browserTracingIntegration()],
     });
     ```
   </TabItem>

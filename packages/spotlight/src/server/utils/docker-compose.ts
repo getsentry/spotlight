@@ -1,34 +1,25 @@
 import { execSync } from "node:child_process";
+import semver from "semver";
 import { stringify as stringifyYaml } from "yaml";
 import { logger } from "../logger.ts";
-import { findComposeFile, findOverrideFile, parseComposeFile } from "./docker-compose-parser.ts";
+import {
+  findComposeFile,
+  findOverrideFile,
+  getComposeFilesFromEnv,
+  getDockerComposeServices,
+} from "./docker-compose-parser.ts";
 
+// minimum version of Docker required to use host.docker.internal on linux
+/// https://docs.docker.com/engine/release-notes/20.10/#bug-fixes-and-enhancements-1
 export const DOCKER_MIN_VERSION = "20.10.0";
 export const DOCKER_HOST_INTERNAL = "host.docker.internal";
 export const DOCKER_HOST_GATEWAY = "host-gateway";
 
 interface DockerComposeConfig {
-  composeFile: string;
-  overrideFile?: string;
+  composeFiles: string[]; // Array of compose files
   command: string[];
   serviceNames: string[];
-}
-
-/**
- * Check if the first version is greater than or equal to the second version
- * Returns true if v1 >= v2
- */
-function isVersionGreaterOrEqual(v1: string, v2: string): boolean {
-  const parts1 = v1.replace(/^v/, "").split(".").map(Number);
-  const parts2 = v2.replace(/^v/, "").split(".").map(Number);
-
-  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
-    const p1 = parts1[i] || 0;
-    const p2 = parts2[i] || 0;
-    if (p1 > p2) return true;
-    if (p1 < p2) return false;
-  }
-  return true;
+  subcommandArgs: string[]; // Subcommand and its arguments (e.g., up -d --build, logs -f, exec web bash)
 }
 
 /**
@@ -57,9 +48,29 @@ export function detectDocker(): { version: string; valid: boolean } | null {
   }
 
   const versionNumber = match[1];
-  const valid = isVersionGreaterOrEqual(versionNumber, DOCKER_MIN_VERSION);
+  const valid = semver.gte(versionNumber, DOCKER_MIN_VERSION);
 
   return { version: versionNumber, valid };
+}
+
+/**
+ * Validate Docker is installed and meets minimum version requirement.
+ * Logs appropriate messages on failure.
+ */
+function validateDocker(): boolean {
+  const docker = detectDocker();
+  if (!docker) {
+    logger.debug("Docker is not installed or not in PATH");
+    return false;
+  }
+
+  if (!docker.valid) {
+    logger.error(`Docker version ${docker.version} does not meet the minimum required version ${DOCKER_MIN_VERSION}`);
+    return false;
+  }
+
+  logger.debug(`Detected Docker version ${docker.version}`);
+  return true;
 }
 
 /**
@@ -74,43 +85,35 @@ function detectComposeCommand(): { command: string[]; version: string } | null {
     return null;
   }
 
-  if (!composePluginVersion && composeStandaloneVersion) {
-    return { command: ["docker-compose"], version: composeStandaloneVersion };
-  }
-
-  if (composePluginVersion && !composeStandaloneVersion) {
-    return { command: ["docker", "compose"], version: composePluginVersion };
-  }
-
-  // Use standalone if it's newer, otherwise prefer plugin
-  const pluginVer = composePluginVersion!.replace(/^v/, "");
-  const standaloneVer = composeStandaloneVersion!.replace(/^v/, "");
-
-  if (isVersionGreaterOrEqual(standaloneVer, pluginVer)) {
+  if (!composePluginVersion) {
     return { command: ["docker-compose"], version: composeStandaloneVersion! };
   }
 
-  return { command: ["docker", "compose"], version: composePluginVersion! };
+  if (!composeStandaloneVersion) {
+    return { command: ["docker", "compose"], version: composePluginVersion! };
+  }
+
+  // Use standalone if it's newer, otherwise prefer plugin
+  const pluginVer = composePluginVersion.replace(/^v/, "");
+  const standaloneVer = composeStandaloneVersion.replace(/^v/, "");
+
+  if (semver.gt(standaloneVer, pluginVer)) {
+    return { command: ["docker-compose"], version: composeStandaloneVersion };
+  }
+
+  return { command: ["docker", "compose"], version: composePluginVersion };
 }
 
 /**
  * Generate the override YAML for injecting Spotlight environment variables
  */
-function generateSpotlightOverrideYaml(serviceNames: string[], port: number): string {
-  const services: Record<string, unknown> = {};
-
-  // We use host.docker.internal to ensure the container can access the host machine
-  // for backend services that need to access the host machine to send events to Spotlight.
-  const spotlightUrl = `http://${DOCKER_HOST_INTERNAL}:${port}/stream`;
-  const publicSpotlightUrl = `http://localhost:${port}/stream`;
-
+function generateSpotlightOverrideYaml(serviceNames: string[]): string {
+  const services: Record<string, { environment: string[]; extra_hosts: string[] }> = {};
+  // Pass environment variables without values to inherit from parent process (run.ts)
+  // so the values set in run.ts are propagated correctly
   for (const serviceName of serviceNames) {
     services[serviceName] = {
-      environment: [
-        `SENTRY_SPOTLIGHT=${spotlightUrl}`,
-        `NEXT_PUBLIC_SENTRY_SPOTLIGHT=${publicSpotlightUrl}`, // This is needed for Next.js
-        "SENTRY_TRACES_SAMPLE_RATE=1",
-      ],
+      environment: ["SENTRY_SPOTLIGHT", "NEXT_PUBLIC_SENTRY_SPOTLIGHT", "SENTRY_TRACES_SAMPLE_RATE"],
       extra_hosts: [`${DOCKER_HOST_INTERNAL}:${DOCKER_HOST_GATEWAY}`],
     };
   }
@@ -119,27 +122,153 @@ function generateSpotlightOverrideYaml(serviceNames: string[], port: number): st
 }
 
 /**
- * Build the Docker Compose command with Spotlight environment injection
+ * Resolve compose files to use, with the following priority:
+ * 1. User-specified files (from -f flags)
+ * 2. COMPOSE_FILE environment variable
+ * 3. Auto-detect compose file + override file
  */
-export function buildDockerComposeCommand(
-  config: DockerComposeConfig,
-  port: number,
-): { cmdArgs: string[]; dockerComposeOverride: string } {
-  const cmdArgs = [...config.command];
-
-  cmdArgs.push("-f", config.composeFile);
-
-  if (config.overrideFile) {
-    cmdArgs.push("-f", config.overrideFile);
+function resolveComposeFiles(userSpecifiedFiles?: string[]): string[] | null {
+  if (userSpecifiedFiles && userSpecifiedFiles.length > 0) {
+    logger.debug(`Using user-specified compose files: ${userSpecifiedFiles.join(", ")}`);
+    return userSpecifiedFiles;
   }
 
+  const fromEnv = getComposeFilesFromEnv();
+  if (fromEnv) {
+    logger.debug(`Using COMPOSE_FILE environment variable: ${fromEnv.join(", ")}`);
+    return fromEnv;
+  }
+
+  const composeFile = findComposeFile();
+  if (!composeFile) {
+    logger.debug("No compose file found");
+    return null;
+  }
+
+  logger.debug(`Found compose file: ${composeFile}`);
+  const files = [composeFile];
+
+  const overrideFile = findOverrideFile(composeFile);
+  if (overrideFile) {
+    logger.debug(`Found override file: ${overrideFile}`);
+    files.push(overrideFile);
+  }
+
+  return files;
+}
+
+/**
+ * Collect and deduplicate service names from compose files
+ */
+function collectServices(composeFiles: string[]): string[] {
+  const serviceSet = new Set<string>();
+  for (const file of composeFiles) {
+    for (const service of getDockerComposeServices(file)) {
+      serviceSet.add(service);
+    }
+  }
+  return Array.from(serviceSet);
+}
+
+const FILE_FLAGS = ["-f", "--file"];
+
+// Global flags that take a value (we need to skip over their values when finding the subcommand)
+const FLAGS_WITH_VALUES = ["-f", "--file", "-p", "--project-name", "--project-directory", "--env-file", "--profile"];
+
+/**
+ * Extract -f/--file flags from global options (before the subcommand).
+ * Once we hit the first non-flag argument (the subcommand), everything passes through.
+ * This prevents confusing `logs -f` (follow) with `-f file.yml` (compose file).
+ */
+function parseComposeFlags(args: string[]): { files: string[]; remainingArgs: string[] } {
+  const files: string[] = [];
+  const remainingArgs: string[] = [];
+  let parsingGlobalFlags = true;
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+
+    if (parsingGlobalFlags) {
+      // Extract -f/--file flags
+      if (FILE_FLAGS.includes(arg) && args[i + 1]) {
+        files.push(args[++i]);
+        continue;
+      }
+
+      const matchedFileFlag = FILE_FLAGS.find(flag => arg.startsWith(`${flag}=`));
+      if (matchedFileFlag) {
+        files.push(arg.slice(matchedFileFlag.length + 1));
+        continue;
+      }
+
+      // Skip other global flags that take values (e.g., -p myproject)
+      if (FLAGS_WITH_VALUES.includes(arg) && args[i + 1]) {
+        remainingArgs.push(arg, args[++i]);
+        continue;
+      }
+
+      const matchedValueFlag = FLAGS_WITH_VALUES.find(flag => arg.startsWith(`${flag}=`));
+      if (matchedValueFlag) {
+        remainingArgs.push(arg);
+        continue;
+      }
+
+      // First non-flag argument is the subcommand - stop parsing global flags
+      if (!arg.startsWith("-")) {
+        parsingGlobalFlags = false;
+      }
+    }
+
+    remainingArgs.push(arg);
+  }
+
+  return { files, remainingArgs };
+}
+
+/**
+ * Build the Docker Compose command with Spotlight environment injection
+ */
+export function buildDockerComposeCommand(config: DockerComposeConfig): {
+  cmdArgs: string[];
+  stdin: string;
+} {
+  const cmdArgs = [...config.command];
+
+  // Add -f for each compose file
+  for (const file of config.composeFiles) {
+    cmdArgs.push("-f", file);
+  }
+
+  // Add our Spotlight override last
   cmdArgs.push("-f", "-");
 
-  cmdArgs.push("up");
+  // Add the subcommand and its arguments (e.g., up -d --build, logs -f)
+  if (config.subcommandArgs && config.subcommandArgs.length > 0) {
+    cmdArgs.push(...config.subcommandArgs);
+  }
 
-  const dockerComposeOverride = generateSpotlightOverrideYaml(config.serviceNames, port);
+  const stdin = generateSpotlightOverrideYaml(config.serviceNames);
 
-  return { cmdArgs, dockerComposeOverride };
+  return { cmdArgs, stdin };
+}
+
+/**
+ * Prepare Docker Compose run by configuring environment and building command
+ *
+ * This helper sets up the SENTRY_SPOTLIGHT URL to use host.docker.internal
+ * (so containers can reach the host machine), builds the compose command,
+ * and removes COMPOSE_FILE from env to avoid conflicts with explicit -f flags.
+ */
+export function prepareDockerComposeRun(
+  config: DockerComposeConfig,
+  serverPort: number,
+  env: Record<string, string | undefined>,
+): { cmdArgs: string[]; stdin: string } {
+  env.SENTRY_SPOTLIGHT = `http://${DOCKER_HOST_INTERNAL}:${serverPort}/stream`;
+  const command = buildDockerComposeCommand(config);
+  // biome-ignore lint/performance/noDelete: need to remove env var entirely
+  delete env.COMPOSE_FILE;
+  return command;
 }
 
 /**
@@ -149,17 +278,9 @@ export function buildDockerComposeCommand(
  * compose files, and services to build a complete configuration.
  */
 export function detectDockerCompose(): DockerComposeConfig | null {
-  const docker = detectDocker();
-  if (!docker) {
-    logger.debug("Docker is not installed or not in PATH");
+  if (!validateDocker()) {
     return null;
   }
-
-  if (!docker.valid) {
-    return null;
-  }
-
-  logger.debug(`Detected Docker version ${docker.version}`);
 
   const compose = detectComposeCommand();
   if (!compose) {
@@ -169,31 +290,86 @@ export function detectDockerCompose(): DockerComposeConfig | null {
 
   logger.debug(`Detected Docker Compose version ${compose.version} (${compose.command.join(" ")})`);
 
-  const composeFile = findComposeFile();
-  if (!composeFile) {
-    logger.debug("No compose file found in current directory");
+  const composeFiles = resolveComposeFiles();
+  if (!composeFiles) {
     return null;
   }
 
-  logger.debug(`Found compose file: ${composeFile}`);
-
-  const serviceNames = parseComposeFile(composeFile);
+  const serviceNames = collectServices(composeFiles);
   if (serviceNames.length === 0) {
-    logger.debug("No services found in compose file");
+    logger.debug("No services found in compose file(s)");
     return null;
   }
 
   logger.debug(`Found ${serviceNames.length} service(s): ${serviceNames.join(", ")}`);
 
-  const overrideFile = findOverrideFile(composeFile);
-  if (overrideFile) {
-    logger.debug(`Found override file: ${overrideFile}`);
-  }
-
   return {
-    composeFile,
-    overrideFile: overrideFile ?? undefined,
+    composeFiles,
     command: compose.command,
     serviceNames,
+    subcommandArgs: ["up"], // Default to 'up' when auto-detecting
+  };
+}
+
+/**
+ * Parse an explicit Docker Compose command from cmdArgs
+ *
+ * This handles cases where the user runs:
+ * - `spotlight run docker compose up -d`
+ * - `spotlight run docker-compose logs -f`
+ * - `spotlight run docker compose -f custom.yml exec web bash`
+ *
+ * Returns a DockerComposeConfig if the command is a docker compose command,
+ * null otherwise.
+ */
+export function parseExplicitDockerCompose(cmdArgs: string[]): DockerComposeConfig | null {
+  if (cmdArgs.length < 2) {
+    return null;
+  }
+
+  let command: string[];
+  let argsStartIndex: number;
+
+  if (cmdArgs[0] === "docker-compose") {
+    command = ["docker-compose"];
+    argsStartIndex = 1;
+  } else if (cmdArgs[0] === "docker" && cmdArgs[1] === "compose") {
+    command = ["docker", "compose"];
+    argsStartIndex = 2;
+  } else {
+    return null;
+  }
+
+  // Validate Docker version (required for host.docker.internal on Linux)
+  if (!validateDocker()) {
+    return null;
+  }
+
+  const argsAfterCommand = cmdArgs.slice(argsStartIndex);
+  const { files: userFiles, remainingArgs: subcommandArgs } = parseComposeFlags(argsAfterCommand);
+
+  if (subcommandArgs.length === 0) {
+    logger.debug("No subcommand provided for docker compose");
+    return null;
+  }
+
+  const composeFiles = resolveComposeFiles(userFiles.length > 0 ? userFiles : undefined);
+  if (!composeFiles) {
+    return null;
+  }
+
+  const serviceNames = collectServices(composeFiles);
+  if (serviceNames.length === 0) {
+    logger.debug("No services found in compose file(s)");
+    return null;
+  }
+
+  logger.debug(`Found ${serviceNames.length} service(s): ${serviceNames.join(", ")}`);
+
+  return {
+    composeFiles,
+    command,
+    serviceNames,
+    subcommandArgs,
   };
 }

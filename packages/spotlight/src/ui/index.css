@@ -15,9 +15,9 @@
   --color-primary-900: #312e81;
   --color-primary-950: #1e1b4b;
 
-  --color-frame-application: #d0d1f5;
-  --color-frame-system: #ffe0e4;
-  --color-frame-unknown: #f3f4f6;
+  --color-frame-application: #6366f1;
+  --color-frame-system: #f87171;
+  --color-frame-unknown: #9ca3af;
 }
 
 ul.tree {
@@ -136,9 +136,13 @@ input:checked ~ .dot {
 }
 
 .shiki {
-  @apply p-2 rounded-xs;
+  @apply rounded-xs;
+
+  code {
+    @apply block overflow-hidden py-0.5 pl-2
+  }
 
   .highlighted {
-    @apply bg-primary-600 py-1 px-2 rounded-xs;
+    @apply bg-primary-950 py-1 pl-2 -ml-2 min-w-[calc(100%+0.5rem)] rounded-xs inline-block;
   }
 }

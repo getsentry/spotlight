@@ -1,11 +1,11 @@
-import { useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
 import { ReactComponent as CrossIcon } from "@spotlight/ui/assets/cross.svg";
 import { cn } from "@spotlight/ui/lib/cn";
 import useSearchInput from "@spotlight/ui/telemetry/hooks/useSearchInput";
 import useSentryStore from "@spotlight/ui/telemetry/store";
 import type { SpotlightAITrace } from "@spotlight/ui/telemetry/types";
 import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
+import { useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import DateTime from "../../shared/DateTime";
 import { createAITraceFromSpan, extractAllAIRootSpans } from "./sdks/aiLibraries";
 
@@ -45,7 +45,18 @@ function parseAITracesToConversation(aiTraces: SpotlightAITrace[]): Conversation
     if (aiTrace.prompt?.messages) {
       const userMessages = aiTrace.prompt.messages
         .filter(msg => msg.role === "user" || msg.role === "human")
-        .map(msg => msg.content)
+        .map(msg => {
+          let content = msg.content;
+
+          if (Array.isArray(content)) {
+            content = content
+              .filter(item => item.type === "text" && item.text)
+              .map(item => item.text)
+              .join("");
+          }
+
+          return content;
+        })
         .filter(content => content?.trim())
         .join("\n\n");
 

@@ -1,8 +1,8 @@
-import { useMemo } from "react";
 import { ReactComponent as Sort } from "@spotlight/ui/assets/sort.svg";
 import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
 import { cn } from "@spotlight/ui/lib/cn";
 import Table from "@spotlight/ui/ui/table";
+import { useMemo } from "react";
 import { AGGREGATE_CALL_PROFILES_SORT_KEYS, AGGREGATE_PROFILES_HEADERS } from "../../constants";
 import useSort from "../../hooks/useSort";
 import useSentryStore from "../../store";

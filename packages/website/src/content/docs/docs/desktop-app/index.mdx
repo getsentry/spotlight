@@ -146,7 +146,7 @@ import * as Sentry from '@sentry/browser';
 Sentry.init({
   dsn: 'your-dsn', // Optional for local dev
   integrations: [
-    Sentry.spotlightBrowserIntegration()
+    Sentry.browserTracingIntegration()
   ],
   // Only enable in development
   enabled: process.env.NODE_ENV === 'development'
@@ -212,7 +212,7 @@ Customize the interface:
 - **Panel layout**: Configure which panels are visible
 
 ## When to Use Desktop App vs CLI vs Browser
-
+ 
 Choose the right tool for your workflow:
 
 ### Use Desktop App When:
@@ -227,10 +227,7 @@ Choose the right tool for your workflow:
 - ✅ You're automating with scripts
 - ✅ You want machine-readable output
 
-### Use Browser UI When:
-- ✅ You want overlay on your application
-- ✅ You're debugging frontend web apps
-- ✅ You want integrated developer experience
+Both options provide access to the same UI—the Desktop App has it built-in, while the CLI serves it at [http://localhost:8969](http://localhost:8969).
 
 [Learn more about CLI →](/docs/cli/)
 

@@ -8,10 +8,24 @@ export type SourceType = (typeof SOURCE_TYPES)[number];
 export const LOG_LEVELS = ["error", "warning", "log", "info", "trace", "debug"] as const;
 export type LogLevel = (typeof LOG_LEVELS)[number];
 
+/**
+ * Sentinel theme terminal colors
+ * Based on https://github.com/getsentry/sentinel
+ */
+const SENTINEL = {
+  red: "#fe4144",
+  green: "#83da90",
+  yellow: "#FDB81B",
+  blue: "#226DFC",
+  magenta: "#FF45A8",
+  white: "#f9f8f9",
+  muted: "#898294",
+} as const;
+
 export const SOURCE_COLORS: Record<SourceType, (text: string) => string> = {
-  browser: chalk.yellow,
-  mobile: chalk.blue,
-  server: chalk.magenta,
+  browser: chalk.hex(SENTINEL.yellow),
+  mobile: chalk.hex(SENTINEL.blue),
+  server: chalk.hex(SENTINEL.magenta),
 };
 
 export const LOG_LEVEL_COLORS: Record<LogLevel, (text: string) => string> = {
@@ -35,15 +49,70 @@ function isBrowserUserAgent(userAgent: string): boolean {
 }
 
 /**
+ * Check if a platform string indicates a server environment
+ */
+function isServerPlatform(platform: string | undefined): boolean {
+  return (
+    platform === "node" ||
+    platform === "python" ||
+    platform === "ruby" ||
+    platform === "php" ||
+    platform === "java" ||
+    platform === "go" ||
+    platform === "rust" ||
+    platform === "perl" ||
+    platform === "elixir" ||
+    platform === "csharp" ||
+    platform === "dotnet"
+  );
+}
+
+/**
+ * Try to infer source from a single event's properties
+ * Returns the source if deterministically detected, null otherwise
+ */
+function inferSourceFromEvent(event: any): SourceType | null {
+  if (!event) return null;
+
+  // Runtime tags check - deterministic browser
+  if (event.tags?.runtime === "browser") {
+    return "browser";
+  }
+
+  // Runtime context indicates server
+  if (event.contexts?.runtime?.name) {
+    return "server";
+  }
+
+  // server_name is a server-specific field
+  if (event.server_name) {
+    return "server";
+  }
+
+  // Platform check
+  if (isServerPlatform(event.platform)) {
+    return "server";
+  }
+
+  return null;
+}
+
+/**
  * Infer the source of an envelope as browser, mobile, or server using multiple signals
  * Priority order:
- * 1. Sender User-Agent (from HTTP request header)
- * 2. Platform & Runtime tags (from event payload)
- * 3. SDK name (fallback)
+ * 1. SDK name (mobile detection)
+ * 2. Sender User-Agent (from HTTP request header)
+ * 3. Platform & Runtime tags (from event payloads - scans all events)
+ * 4. SDK name (browser/server fallback)
  *
  * Rules based on https://release-registry.services.sentry.io/sdks
+ *
+ * @param envelopeHeader The envelope header containing SDK info and spotlight extensions
+ * @param eventsOrEvent Single event or array of events to scan for source signals (scans until deterministic match)
  */
-export function inferEnvelopeSource(envelopeHeader: Envelope[0], event?: any): SourceType {
+export function inferEnvelopeSource(envelopeHeader: Envelope[0], eventsOrEvent?: any | any[]): SourceType {
+  // Normalize to array for consistent handling
+  const events = eventsOrEvent ? (Array.isArray(eventsOrEvent) ? eventsOrEvent : [eventsOrEvent]) : [];
   const sdkName = envelopeHeader?.sdk?.name || "";
 
   // 1. Mobile check (unchanged - already reliable from SDK name)
@@ -73,40 +142,15 @@ export function inferEnvelopeSource(envelopeHeader: Envelope[0], event?: any): S
     // If we have a non-browser UA, we continue to further checks
   }
 
-  // 3. Runtime tags check
-  if (event?.tags?.runtime === "browser") {
-    return "browser";
+  // 3. Scan all events for deterministic source signals
+  for (const event of events) {
+    const source = inferSourceFromEvent(event);
+    if (source) {
+      return source;
+    }
   }
 
-  // 4. Platform & server-specific signals
-  if (event?.contexts?.runtime?.name) {
-    // Runtime context (node, CPython, etc.) indicates server
-    return "server";
-  }
-
-  if (event?.server_name) {
-    // server_name is a server-specific field
-    return "server";
-  }
-
-  const platform = event?.platform;
-  if (
-    platform === "node" ||
-    platform === "python" ||
-    platform === "ruby" ||
-    platform === "php" ||
-    platform === "java" ||
-    platform === "go" ||
-    platform === "rust" ||
-    platform === "perl" ||
-    platform === "elixir" ||
-    platform === "csharp" ||
-    platform === "dotnet"
-  ) {
-    return "server";
-  }
-
-  // 5. SDK name check (existing logic as fallback)
+  // 4. SDK name check (existing logic as fallback)
   // Browser: JavaScript frameworks/libraries (excluding server/native runtimes and meta-frameworks)
   if (
     sdkName.startsWith("sentry.javascript.") &&

@@ -29,16 +29,27 @@ concurrency: ${{ github.workflow }}-${{ github.event.workflow_run.head_sha || in
 
 env:
   SHA: ${{ github.event.workflow_run.head_sha || inputs.sha }}
-  BUILD_CACHE_KEY: ${{ github.event.workflow_run.head_sha || inputs.sha }}
-  CACHED_BUILD_PATHS: |
-    ${{ github.workspace }}/packages/*/dist
-    ${{ github.workspace }}/packages/*/dist-bin
 
 jobs:
+  get_run_id:
+    name: Get Run ID
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+        run-id: ${{ steps.get_run_id.outputs.run-id }}
+    steps:
+      - name: Get Run ID
+        id: get_run_id
+        run: |
+          RUN_ID=$(gh api -H "Accept: application/vnd.github.v3+json" -H "X-GitHub-Api-Version: 2022-11-28" '/repos/${{ github.repository }}/actions/runs?head_sha=${{ env.SHA }}&branch=main&status=success' -q '[.workflow_runs.[] | select(.name == "Build & Test")][0].id')
+          echo "run-id=$RUN_ID" >> $GITHUB_OUTPUT
+
   npm:
     name: NPM Package
     runs-on: ubuntu-latest
     environment: Production
+    needs: get_run_id
     if: >-
       (github.event.workflow_run.conclusion == 'success'
       &&
@@ -46,7 +57,7 @@ jobs:
       ) || inputs.target == 'npm' || inputs.target == 'all'
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ env.SHA }}
           fetch-depth: 0
@@ -55,7 +66,7 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: 'package.json'
           cache: 'pnpm'
@@ -63,13 +74,21 @@ jobs:
       - name: Setup NPM dependencies
         run: pnpm install
 
-      - name: Restore build cache
-        uses: actions/cache/restore@v4
+      - name: Download built packages
+        uses: actions/download-artifact@v5
         with:
-          enableCrossOsArchive: true
-          fail-on-cache-miss: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
+          name: built-packages
+          path: packages/spotlight/dist/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ needs.get_run_id.outputs.run-id }}
+
+      - name: Download spotlight binaries
+        uses: actions/download-artifact@v5
+        with:
+          name: spotlight-binaries
+          path: packages/spotlight/dist-bin/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ needs.get_run_id.outputs.run-id }}
 
       - name: Publish to NPM
         uses: changesets/action@v1
@@ -128,23 +147,28 @@ jobs:
     name: Electron Build
     runs-on: macos-latest
     environment: Production
+    needs: [get_run_id, npm]
     if: >-
-      (github.event.workflow_run.conclusion == 'success'
-      &&
-      contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
-      ) || inputs.target == 'electron' || inputs.target == 'all'
+      always() &&
+      needs.get_run_id.result == 'success' &&
+      (needs.npm.result == 'success' || needs.npm.result == 'skipped') &&
+      (
+        (github.event.workflow_run.conclusion == 'success'
+        &&
+        contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
+        ) || inputs.target == 'electron' || inputs.target == 'all'
+      )
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ env.SHA }}
-          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: 'package.json'
           cache: 'pnpm'
@@ -152,21 +176,52 @@ jobs:
       - name: Setup dependencies
         run: pnpm install
 
-      - name: Restore build cache
-        id: cache
-        uses: actions/cache/restore@v4
+      - name: Download Electron build
+        uses: actions/download-artifact@v5
         with:
-          enableCrossOsArchive: true
-          path: ${{ env.CACHED_BUILD_PATHS }}
-          key: ${{ env.BUILD_CACHE_KEY }}
+          name: electron-build
+          path: ${{ runner.temp }}/electron-artifact/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ needs.get_run_id.outputs.run-id }}
 
-      - name: Build
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm --filter '@spotlightjs/electron...' build
+
+      - name: Validate and copy Electron build files
+        run: |
+          # Create/empty the target directory
+          rm -rf packages/spotlight/dist-electron/
+          mkdir -p packages/spotlight/dist-electron/
+          
+          # Copy only expected directories (main and renderer) to prevent artifact poisoning
+          if [ -d "${{ runner.temp }}/electron-artifact/main" ]; then
+            cp -r "${{ runner.temp }}/electron-artifact/main" packages/spotlight/dist-electron/
+            echo "Copied main/ directory"
+          fi
+          
+          if [ -d "${{ runner.temp }}/electron-artifact/renderer" ]; then
+            cp -r "${{ runner.temp }}/electron-artifact/renderer" packages/spotlight/dist-electron/
+            echo "Copied renderer/ directory"
+          fi
+          
+          # Verify expected directories exist
+          if [ ! -d "packages/spotlight/dist-electron/main" ] || [ ! -d "packages/spotlight/dist-electron/renderer" ]; then
+            echo "Error: Expected directories (main/ and renderer/) not found in artifact"
+            exit 1
+          fi
+          
+          echo "Successfully validated and copied electron build files"
+
+      - name: Setup Apple API Key for Notarization
+        env:
+          APPLE_API_KEY_BUNDLE: ${{ secrets.APPLE_API_KEY }}
+        run: |
+          echo "$APPLE_API_KEY_BUNDLE" | base64 -d > /tmp/apple_key.json
+          cat /tmp/apple_key.json | jq .private_key -r > /tmp/apple_key.pem
+          echo "APPLE_API_ISSUER=$(cat /tmp/apple_key.json | jq .issuer_id -r | tr -d '\n\r')" >> $GITHUB_ENV
+          echo "APPLE_API_KEY_ID=$(cat /tmp/apple_key.json | jq .key_id -r | tr -d '\n\r')" >> $GITHUB_ENV
+          echo "APPLE_API_KEY=/tmp/apple_key.pem" >> $GITHUB_ENV
 
       - name: Build Electron
         env:
-          TEAMID: ${{ vars.TEAMID }}
           MAIN_VITE_SENTRY_ORG: ${{ vars.MAIN_VITE_SENTRY_ORG }}
           MAIN_VITE_SENTRY_PROJECT: ${{ vars.MAIN_VITE_SENTRY_PROJECT }}
           MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
@@ -175,7 +230,7 @@ jobs:
           # Needed by electron-builder's Github Provider for publishing,
           # This helps with auto-updater as we are using Github Releases
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: cd packages/electron && pnpm build:mac
+        run: cd packages/spotlight && pnpm build:mac
 
       - name: Gets latest created release info
         id: latest_release_info
@@ -187,7 +242,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: packages/electron/dist/*
+          file: packages/spotlight/dist-electron/*.{dmg,zip,blockmap,yml}
           tag: ${{ steps.latest_release_info.outputs.tag_name }}
           file_glob: true
           make_latest: false

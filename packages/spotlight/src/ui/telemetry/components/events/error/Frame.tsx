@@ -1,10 +1,10 @@
-import { useState } from "react";
 import { cn } from "@spotlight/ui/lib/cn";
 import { renderValue } from "@spotlight/ui/lib/values";
 import CopyToClipboard from "@spotlight/ui/telemetry/components/shared/CopyToClipboard";
 import OpenInEditor from "@spotlight/ui/telemetry/components/shared/OpenInEditor";
 import type { EventFrame, FrameVars } from "@spotlight/ui/telemetry/types";
 import Table from "@spotlight/ui/ui/table";
+import { useState } from "react";
 import { CodeViewer } from "../../insights/envelopes/CodeViewer";
 
 function resolveFilename(filename: string) {

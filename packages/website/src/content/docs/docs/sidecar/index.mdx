@@ -197,7 +197,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
     import * as Sentry from '@sentry/browser';
 
     Sentry.init({
-      integrations: [Sentry.spotlightBrowserIntegration()],
+      integrations: [Sentry.browserTracingIntegration()],
     });
     ```
   </TabItem>
@@ -260,6 +260,63 @@ Run one sidecar and point all your services to it for unified debugging across y
 - You're developing mobile or headless apps
 
 [Learn more about Desktop App →](/docs/desktop-app/)
+
+## Security
+
+### Local-Only by Design
+
+The sidecar is designed exclusively for local development. It only accepts connections from:
+
+- **localhost**: Always allowed (RFC 6761 reserved name)
+- **This machine's IPs**: Any hostname that resolves to an IP assigned to this machine, including:
+  - Loopback addresses (`127.0.0.1`, `::1`)
+  - Local network IPs (e.g., `192.168.x.x`, `10.x.x.x`)
+  - VPN IPs (e.g., Tailscale, Zerotier)
+- **spotlightjs.com**: The official Spotlight website (HTTPS only)
+
+### Custom Local Hostnames
+
+You can use custom hostnames in your `/etc/hosts` file (e.g., `myapp.local` pointing to `127.0.0.1`). These are trusted without TTL validation because they're under your local control. The sidecar determines that a hostname is from `/etc/hosts` when DNS lookup fails but the OS resolver finds it.
+
+### VPN and Remote Access
+
+The sidecar supports access via VPN services like Tailscale or Zerotier. If your hostname resolves to a VPN IP assigned to your machine, it will be allowed. This is useful for:
+
+- Accessing Spotlight from other devices on your VPN
+- Using custom domains that point to your VPN IP
+- Debugging mobile apps via VPN connection
+
+### DNS Rebinding Protection
+
+The sidecar implements protection against [DNS rebinding attacks](https://en.wikipedia.org/wiki/DNS_rebinding), which could potentially allow a malicious website to access your local sidecar.
+
+**How DNS rebinding works:**
+1. An attacker controls `evil.com` with a short DNS TTL
+2. User visits `evil.com`, which initially resolves to the attacker's server
+3. The attacker's page loads malicious JavaScript
+4. The attacker rebinds `evil.com` to `127.0.0.1` (or another machine IP)
+5. JavaScript makes requests to `evil.com` (now pointing to the machine)
+
+**Our mitigation:**
+- DNS records with TTL less than 1 hour are **rejected** as potentially unsafe
+- This means an attacker would need to set a TTL >= 1 hour to have their hostname resolve to localhost
+- With such a high TTL, rebinding to localhost would make the attacker's site inaccessible for at least 1 hour
+
+This makes DNS rebinding attacks impractical against Spotlight. Hostnames defined only in `/etc/hosts` (not in public DNS) are automatically trusted since they're under local control and DNS rebinding cannot affect them.
+
+**Additional protection for non-loopback IPs:**
+For machine IPs other than loopback (e.g., `192.168.x.x`), the risk is even lower because:
+- External access requires explicit port forwarding or firewall configuration
+- Most machines are behind NAT, which blocks inbound connections by default
+- VPN IPs are only accessible from within the VPN network
+
+### Development Only
+
+Spotlight should **never** be enabled in production environments:
+
+- Use environment checks to restrict to development only
+- The sidecar has no authentication - anyone who can reach it can read your telemetry
+- Events are stored in memory and cleared on restart
 
 ## Next Steps
 

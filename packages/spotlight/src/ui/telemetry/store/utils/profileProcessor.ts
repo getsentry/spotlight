@@ -1,10 +1,5 @@
 import { graftProfileSpans } from "../../data/profiles";
-import type {
-  ProfileSample,
-  SentryProfileV1Event,
-  SentryProfileTransactionInfo,
-  Trace,
-} from "../../types";
+import type { ProfileSample, SentryProfileTransactionInfo, SentryProfileV1Event, Trace } from "../../types";
 import type { SentryProfileWithTraceMeta } from "../types";
 import { relativeNsToTimestamp } from "../utils";
 
@@ -41,14 +36,11 @@ export function processProfileEvent(
 
     const profileTxn = txn as SentryProfileTransactionInfo;
     const trace = tracesById.get(profileTxn.trace_id);
-    
+
     // Calculate timestamp
     const timestamp =
       trace && profileTxn.relative_start_ns != null
-        ? relativeNsToTimestamp(
-            trace.start_timestamp,
-            profileTxn.relative_start_ns,
-          )
+        ? relativeNsToTimestamp(trace.start_timestamp, profileTxn.relative_start_ns)
         : event.timestamp;
 
     // Build profile data
@@ -59,10 +51,7 @@ export function processProfileEvent(
         stack_id: s.stack_id,
         thread_id: s.thread_id,
         elapsed_since_start_ns: s.elapsed_since_start_ns,
-        start_timestamp: relativeNsToTimestamp(
-          timestamp,
-          s.elapsed_since_start_ns,
-        ),
+        start_timestamp: relativeNsToTimestamp(timestamp, s.elapsed_since_start_ns),
       })),
       frames: event.profile.frames,
       stacks: event.profile.stacks.map((s: number[]) => Array.from(s).reverse()),
@@ -84,4 +73,3 @@ export function processProfileEvent(
 
   return { profiles };
 }
-

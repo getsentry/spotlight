@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { SearchProvider, useSearch } from "@spotlight/ui/telemetry/context/SearchContext";
 import useSearchInput from "@spotlight/ui/telemetry/hooks/useSearchInput";
 import useSentryStore from "@spotlight/ui/telemetry/store";
 import type { Trace } from "@spotlight/ui/telemetry/types";
+import { useState } from "react";
 import { getFormattedSpanDuration } from "../../../../utils/duration";
 
 import { ReactComponent as X } from "@spotlight/ui/assets/cross.svg";

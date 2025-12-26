@@ -11,7 +11,6 @@ const codeSnippet = `Sentry.init({
   integrations: [
     Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
     // For frontend apps, add:
-    Sentry.spotlightBrowserIntegration(),
     Sentry.browserTracingIntegration(),
   ],
     }

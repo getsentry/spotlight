@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; connect-src 'self' http://localhost:* ws://localhost:* https://*.sentry.io; img-src 'self' data: blob:"
+    />
     <title>Spotlight</title>
     <link href="/src/ui/index.css" rel="stylesheet" />
     <link
@@ -20,9 +24,6 @@
   </head>
 
   <body>
-    <script type="module">
-      import * as Spotlight from "./src/index.tsx";
-      Spotlight._init({ debug: true });
-    </script>
+    <script type="module" src="/src/bootstrap.ts"></script>
   </body>
 </html>

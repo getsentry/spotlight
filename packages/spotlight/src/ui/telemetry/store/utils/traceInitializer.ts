@@ -7,14 +7,14 @@ import type { SentryEvent, SentryTransactionEvent, Span, Trace } from "../../typ
 export function initializeTrace(event: SentryEvent): Trace {
   // Add guard to ensure contexts, trace context and trace_id exist
   if (!event.contexts?.trace || !event.contexts.trace.trace_id) {
-    throw new Error('Event missing required trace context or trace_id');
+    throw new Error("Event missing required trace context or trace_id");
   }
-  
+
   const traceCtx = event.contexts.trace;
 
   return {
     ...traceCtx,
-    trace_id: traceCtx.trace_id,
+    trace_id: traceCtx.trace_id!,
     spans: new Map(),
     spanTree: [] as Span[],
     transactions: [] as SentryTransactionEvent[],
@@ -27,4 +27,3 @@ export function initializeTrace(event: SentryEvent): Trace {
     profileGrafted: false,
   };
 }
-

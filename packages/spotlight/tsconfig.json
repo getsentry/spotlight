@@ -1,14 +1,29 @@
 {
-  "extends": "@spotlightjs/tsconfig/tsconfig.json",
   "compilerOptions": {
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "baseUrl": ".",
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
-    "declaration": true,
     "target": "esnext",
+    "useDefineForClassFields": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "esnext",
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "composite": false,
+    "declaration": true,
+    "noEmit": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Project specific */
+    "baseUrl": ".",
     "paths": {
       "@spotlight/ui/*": ["src/ui/*"],
       "@spotlight/server/*": ["src/server/*"],

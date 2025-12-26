@@ -1,7 +1,8 @@
-import { Link, useParams } from "react-router-dom";
 import { cn } from "@spotlight/ui/lib/cn";
+import { OriginBadge } from "@spotlight/ui/telemetry/components/shared/OriginBadge";
 import TimeSince from "@spotlight/ui/telemetry/components/shared/TimeSince";
 import { Badge } from "@spotlight/ui/ui/badge";
+import { Link, useParams } from "react-router-dom";
 import type { Span, Trace } from "../../types";
 import { getFormattedSpanDuration } from "../../utils/duration";
 import { truncateId } from "../../utils/text";
@@ -89,6 +90,7 @@ export default function TraceItem({ trace, className }: TraceItemProps) {
       <div className="text-primary-300 flex w-48 flex-col truncate font-mono text-sm">
         <div className="flex items-center gap-x-2">
           <div>{truncatedId}</div>
+          <OriginBadge sourceType={trace.rootTransaction?.__sourceType} />
         </div>
         <TimeSince date={trace.start_timestamp} />
       </div>

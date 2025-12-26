@@ -1,18 +1,14 @@
 import { createWriteStream } from "node:fs";
-import { brotliDecompressSync, gunzipSync, inflateSync } from "node:zlib";
 import { Hono } from "hono";
+import { SENTRY_CONTENT_TYPE } from "../../../shared/constants.ts";
 import { logger } from "../../logger.ts";
+import { decompressBody, pushToSpotlightBuffer } from "../../sdk.ts";
+import type { ContentEncoding } from "../../sdk.ts";
 import type { HonoEnv } from "../../types/env.ts";
-import { EventContainer, getBuffer } from "../../utils/index.ts";
+import { getBuffer } from "../../utils/index.ts";
 import { logIncomingEvent, logOutgoingEvent } from "./debugLogging.ts";
 import { streamSSE } from "./streaming.ts";
 import { parseBrowserFromUserAgent } from "./userAgent.ts";
-
-const decompressors: Record<string, ((buf: Buffer) => Buffer) | undefined> = {
-  gzip: gunzipSync,
-  deflate: inflateSync,
-  br: brotliDecompressSync,
-};
 
 const router = new Hono<HonoEnv>()
   .get("/stream", ctx => {
@@ -74,53 +70,51 @@ const router = new Hono<HonoEnv>()
       Connection: "keep-alive",
     });
   })
-  .on("POST", ["/stream", "/api/:id/envelope"], async ctx => {
-    const arrayBuffer = await ctx.req.arrayBuffer();
-    let body: Buffer = Buffer.from(arrayBuffer);
-
-    // Check for gzip or deflate encoding and create appropriate stream
-    const encoding = ctx.req.header("Content-Encoding");
-    const decompressor = decompressors[encoding ?? ""];
-    if (decompressor) {
-      body = decompressor(body);
-    }
-
+  .on("POST", ["/stream", "/api/:id/envelope", "/api/:id/envelope/"], async ctx => {
     let contentType = ctx.req.header("content-type")?.split(";")[0].toLocaleLowerCase();
     if (ctx.req.query("sentry_client")?.startsWith("sentry.javascript.browser") && ctx.req.header("Origin")) {
       // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
-      contentType = "application/x-sentry-envelope";
+      contentType = SENTRY_CONTENT_TYPE;
     }
 
-    if (!contentType) {
-      logger.warn("No content type, skipping payload...");
-    } else {
-      // Create event container and add to buffer
-      const senderUserAgent = ctx.req.header("User-Agent");
-      const container = new EventContainer(contentType, body, senderUserAgent);
+    // manually decompress body to use it below without another decompression
+    const body = decompressBody(
+      Buffer.from(await ctx.req.arrayBuffer()),
+      ctx.req.header("Content-Encoding") as ContentEncoding,
+    );
 
+    const container = pushToSpotlightBuffer({
+      body,
+      spotlightBuffer: getBuffer(),
+      contentType,
+      userAgent: ctx.req.header("User-Agent"),
+    });
+
+    if (container) {
       // Log incoming event details when debug is enabled
       logIncomingEvent(container);
-
-      // Add to buffer - this will automatically trigger all subscribers
-      // including the onEnvelope callback if one is registered
-      getBuffer().put(container);
+    } else {
+      logger.warn("No content type, skipping payload...");
     }
 
     const incomingPayload = ctx.get("incomingPayload");
 
     if (process.env.SPOTLIGHT_CAPTURE || incomingPayload) {
+      const contentType = container?.getContentType();
       const timestamp = BigInt(Date.now()) * 1_000_000n + (process.hrtime.bigint() % 1_000_000n);
       const filename = `${contentType?.replace(/[^a-z0-9]/gi, "_") || "no_content_type"}-${timestamp}.txt`;
 
       if (incomingPayload) {
         incomingPayload(body.toString("binary"));
       } else {
-        try {
-          createWriteStream(filename).write(body);
-          logger.info(`🗃️ Saved data to ${filename}`);
-        } catch (err) {
+        const stream = createWriteStream(filename);
+        stream.on("error", err => {
           logger.error(`Failed to save data to ${filename}: ${err}`);
-        }
+          stream.destroy();
+        });
+        stream.end(body, () => {
+          logger.info(`🗃️ Saved data to ${filename}`);
+        });
       }
     }
 

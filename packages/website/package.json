@@ -21,13 +21,14 @@
     "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@vercel/analytics": "^1.5.0",
-    "astro": "^5.14.3",
+    "@vercel/analytics": "^1.6.1",
+    "astro": "^5.15.9",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sharp": "^0.33.5",
     "shiki": "^3.13.0",
-    "tailwindcss": "catalog:"
+    "tailwindcss": "catalog:",
+    "zod": "^3.25.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",

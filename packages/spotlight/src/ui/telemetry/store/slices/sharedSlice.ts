@@ -1,8 +1,8 @@
-import type { StateCreator } from "zustand";
 import { log } from "@spotlight/ui/lib/logger";
 import type { SentryStore, SharedSliceActions } from "@spotlight/ui/telemetry/store/types";
 import type { SentryErrorEvent } from "@spotlight/ui/telemetry/types";
 import { getNativeFetchImplementation } from "@spotlight/ui/telemetry/utils/fetch";
+import type { StateCreator } from "zustand";
 
 export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceActions> = (set, get) => ({
   getEventById: (id: string) => get().eventsById.get(id),
@@ -61,6 +61,7 @@ export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceAct
       tracesById: new Map(),
       sdks: new Map(),
       profilesByTraceId: new Map(),
+      profileChunksByProfilerId: new Map(),
       logsById: new Map(),
       logsByTraceId: new Map(),
     });

@@ -1,5 +1,99 @@
 # @spotlightjs/spotlight
 
+## 4.9.0
+
+### Minor Changes
+
+- Add support for continuous profiling (Profiling V2) ([#1202](https://github.com/getsentry/spotlight/pull/1202))
+
+- Add self-documenting CLI commands with per-command help support ([#1206](https://github.com/getsentry/spotlight/pull/1206))
+
+  Each CLI command now provides its own metadata (short description, usage, detailed help, and examples). The main help output is generated dynamically from this metadata, and users can get detailed help for specific commands via `spotlight help <command>` or `spotlight <command> --help`.
+
+### Patch Changes
+
+- Remove dead code ([#1214](https://github.com/getsentry/spotlight/pull/1214))
+
+- Fix profile visualization issues in trace views: ([#1203](https://github.com/getsentry/spotlight/pull/1203))
+
+  - Update frame colors to use vibrant, high-contrast colors for better visibility
+  - Add custom nanovis palette for Spotlight's dark theme
+  - Fix sunburst center text showing bytes instead of sample counts
+  - Fix treemap visibility with proper color contrast
+
+- added support for AI SDK v2 in AI Mode ([#1216](https://github.com/getsentry/spotlight/pull/1216))
+
+- updated the empty pages of traces and envelopes ([#1213](https://github.com/getsentry/spotlight/pull/1213))
+
+- open external links in default browser ([#1212](https://github.com/getsentry/spotlight/pull/1212))
+
+## 4.8.0
+
+### Minor Changes
+
+- Add `--open` / `-o` CLI flag to automatically open the Spotlight dashboard in your default browser when starting the sidecar ([#1200](https://github.com/getsentry/spotlight/pull/1200))
+
+### Patch Changes
+
+- Fixed flamechart tree building to iterate from root to leaf frames, resolving fragmented visualization ([#1201](https://github.com/getsentry/spotlight/pull/1201))
+
+- shifted electron dependencies to dev dependencies as there were getting installed with npx for spotlight run ([#1184](https://github.com/getsentry/spotlight/pull/1184))
+
+## 4.7.2
+
+### Patch Changes
+
+- Fix ANSI escape code rendering in log viewer. Logs containing ANSI escape sequences (colors, bold, italic, etc.) are now properly styled in the UI instead of showing raw escape characters. ([#1187](https://github.com/getsentry/spotlight/pull/1187))
+
+## 4.7.1
+
+### Patch Changes
+
+- Report `github-ci` environment to Sentry when running in GitHub Actions CI ([#1178](https://github.com/getsentry/spotlight/pull/1178))
+
+- Fix `npx @spotlightjs/spotlight` fail ([#1181](https://github.com/getsentry/spotlight/pull/1181))
+
+## 4.7.0
+
+### Minor Changes
+
+- Add `--allowed-origin` / `-A` CLI option and `allowedOrigins` API option for configuring additional CORS origins. Supports both full origins (e.g., `https://ngrok.io:443`) for strict matching and plain domains (e.g., `myapp.local`) for permissive matching. Fixes [#1171](https://github.com/getsentry/spotlight/issues/1171). ([#1176](https://github.com/getsentry/spotlight/pull/1176))
+
+### Patch Changes
+
+- Restore draggable electron app and recover semaphore buttons ([#1173](https://github.com/getsentry/spotlight/pull/1173))
+
+- Allow any DNS pointing to localhost in CORS ([#1175](https://github.com/getsentry/spotlight/pull/1175))
+
+## 4.6.0
+
+### Minor Changes
+
+- Added spotlight sdk for helping others to build on top of it ([#1140](https://github.com/getsentry/spotlight/pull/1140))
+
+- Support COMPOSE_FILE environment variable for Docker Compose projects ([#1131](https://github.com/getsentry/spotlight/pull/1131))
+
+- Prompt user to choose between docker compose and package.json when both are present ([#1120](https://github.com/getsentry/spotlight/pull/1120))
+
+### Patch Changes
+
+- Refactor docker compose support ([#1121](https://github.com/getsentry/spotlight/pull/1121))
+
+- disable sentry in development mode ([#1143](https://github.com/getsentry/spotlight/pull/1143))
+
+- **Security:** Restrict CORS origins for Sidecar to prevent unauthorized access ([#1138](https://github.com/getsentry/spotlight/pull/1138))
+
+  The Sidecar now only accepts requests from trusted origins:
+
+  - `localhost` with any port or protocol (http/https)
+  - `https://spotlightjs.com` and `https://*.spotlightjs.com` (HTTPS only, default port)
+
+  ⚠️ **Potentially Breaking:** If you were accessing the Sidecar from other origins (e.g., custom domains, non-HTTPS spotlightjs.com), those connections will now be rejected. This change improves security by preventing malicious websites from connecting to your local Sidecar instance.
+
+- Fix file capture error handling to log errors instead of crashing when SPOTLIGHT_CAPTURE is enabled ([#1142](https://github.com/getsentry/spotlight/pull/1142))
+
+- Remove console logging integration from Sentry setup ([#1146](https://github.com/getsentry/spotlight/pull/1146))
+
 ## 4.5.1
 
 ### Patch Changes

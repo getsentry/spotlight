@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { ReactComponent as Sort } from "@spotlight/ui/assets/sort.svg";
 import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
 import { cn } from "@spotlight/ui/lib/cn";
@@ -10,6 +8,8 @@ import useSort from "@spotlight/ui/telemetry/hooks/useSort";
 import type { Span } from "@spotlight/ui/telemetry/types";
 import { getFormattedDuration, getSpanDurationClassName } from "@spotlight/ui/telemetry/utils/duration";
 import Table from "@spotlight/ui/ui/table";
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 type QueryInfo = {
   avgDuration: number;

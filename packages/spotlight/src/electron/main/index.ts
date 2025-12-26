@@ -1,11 +1,12 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as Sentry from "@sentry/electron/main";
-import { BrowserWindow, Menu, Tray, app, dialog, ipcMain, nativeImage, session, shell } from "electron";
+import { BrowserWindow, Menu, Tray, app, dialog, nativeImage, shell } from "electron";
 import Store from "electron-store";
 import { autoUpdater } from "electron-updater";
+import { sentryBaseConfig } from "../../sentry-config";
 import { DEFAULT_PORT } from "../../server/constants";
-import { clearBuffer, setupSpotlight } from "../../server/main";
+import { setupSpotlight } from "../../server/main";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,6 +62,7 @@ async function checkForUpdates() {
 
   isCheckingForUpdates = false;
   checkingForUpdatesTimeout = setTimeout(checkForUpdates, ONE_HOUR);
+  checkingForUpdatesTimeout.unref();
 }
 
 app.on("ready", () => {
@@ -98,10 +100,13 @@ app.on("ready", () => {
 });
 
 Sentry.init({
+  ...sentryBaseConfig,
   dsn: "https://192df1a78878de014eb416a99ff70269@o1.ingest.sentry.io/4506400311934976",
-  tracesSampleRate: 1.0,
-  environment: process.env.NODE_ENV,
-  release: `spotlight@${process.env.npm_package_version}`,
+  integrations: [
+    Sentry.consoleLoggingIntegration({
+      levels: ["log", "info", "warn", "error", "debug"],
+    }),
+  ],
   beforeSend: askForPermissionToSendToSentry,
 });
 
@@ -122,29 +127,26 @@ const createWindow = () => {
     show: false,
     title: "Spotlight",
     // frame: false,
-    // resizable: false,
-    // maximizable: false,
     // transparent: true,
-    // webPreferences: { nodeIntegration: true },
     titleBarStyle: "hidden",
+    trafficLightPosition: { x: 16, y: 16 },
     // titleBarOverlay: {
     //   color: '#2f3241',
     //   symbolColor: '#74b1be',
     //   height: 60,
     // },
     webPreferences: {
-      preload: path.join(__dirname, "../preload/index.js"),
+      nodeIntegration: true,
       sandbox: false,
     },
     backgroundColor: "#1e1b4b",
   });
 
-  // win.webContents.openDevTools();
-
-  if (!app.isPackaged && process.env.ELECTRON_RENDERER_URL) {
-    win.loadURL(process.env.ELECTRON_RENDERER_URL);
+  // vite-plugin-electron sets VITE_DEV_SERVER_URL during development
+  if (process.env.VITE_DEV_SERVER_URL) {
+    win.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
-    win.loadFile(path.join(__dirname, "../renderer/electron.html"));
+    win.loadFile(path.join(__dirname, "../renderer/index.html"));
   }
 
   win.once("ready-to-show", () => {
@@ -164,6 +166,14 @@ const createWindow = () => {
     win = null;
   });
 
+  // Open external links in the default browser
+  win.webContents.setWindowOpenHandler(details => {
+    shell.openExternal(details.url).catch(error => {
+      Sentry.captureException(error);
+    });
+    return { action: "deny" };
+  });
+
   win.webContents.on("did-finish-load", () => {
     app.setBadgeCount(0);
     /**
@@ -174,39 +184,28 @@ const createWindow = () => {
      * We need the error-screen to be in the tree to show when an error occurs.
      */
     win.webContents.executeJavaScript(
-      `const spotlightRoot = document.getElementById('spotlight-root');
-       if (spotlightRoot) {
-         const dragHandle = document.createElement('div');
-         dragHandle.style.cssText = \`
-           position: fixed;
-           top: 0;
-           left: 0;
-           right: 0;
-           height: 32px;
-           -webkit-app-region: drag;
-           z-index: 9999;
-           background: transparent;
-         \`;
-         dragHandle.id = 'electron-drag-handle';
-         
-         if (!document.getElementById('electron-drag-handle')) {
-           document.body.appendChild(dragHandle);
-         }
-       }
-         
-       // Creating the error component
-       const errorScreen = document.createElement('div');
-       errorScreen.id = 'error-screen';
-       errorScreen.style.display = 'none';
-       errorScreen.innerHTML = \`
-        <div class="error-page-navbar">
-        <img alt="spotlight-icon" src="./resources/sized.png" width="50" height="50" />
-        <p class="spotlight-title">Spotlight</p>
-      </div>
-      <h1 class="error header">Oops! An error occurred.</h1>
-      <p class="error description">Press Cmd + R to reload the app.</p>
-       \`;
-       document.body.appendChild(errorScreen);`,
+      `(function() {
+        if (!document.getElementById('electron-top-drag-bar')) {
+          const dragBar = document.createElement('div');
+          dragBar.id = 'electron-top-drag-bar';
+          dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
+          document.body.appendChild(dragBar);
+        }
+        
+        // Re-create elements if body is replaced.
+        // This can happen when Spotlight.init() replaces the entire body content
+        // during hot module replacement (HMR) in development mode, or when the
+        // React app fully remounts after initial hydration.
+        new MutationObserver(() => {
+          if (!document.getElementById('electron-top-drag-bar')) {
+            const dragBar = document.createElement('div');
+            dragBar.id = 'electron-top-drag-bar';
+            dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
+            document.body.appendChild(dragBar);
+          }
+        }).observe(document.body, { childList: true });
+      })();
+    `,
     );
   });
 };
@@ -394,9 +393,6 @@ const template: Electron.MenuItemConstructorOptions[] = [
   },
 ];
 
-function handleBadgeCount(_event, count) {
-  app.setBadgeCount(count);
-}
 const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 
@@ -414,21 +410,6 @@ store.onDidChange("sentry-send-envelopes", newValue => {
   }
 });
 
-const showErrorMessage = () => {
-  if (win) {
-    win.webContents.executeJavaScript(`{
-      const sentryRoot = document.getElementById('spotlight-root');
-      const errorScreen = document.getElementById('error-screen');
-      if (sentryRoot) {
-        sentryRoot.style.display = 'none';
-      }
-      if (errorScreen) {
-        errorScreen.style.display = 'block';
-      }
-    }`);
-  }
-};
-
 async function askForPermissionToSendToSentry(event: Sentry.Event, hint: Sentry.EventHint) {
   // Handle updater errors silently - no dialogs or error screens
   if (event.tags?.error_source === "updater") {
@@ -440,7 +421,6 @@ async function askForPermissionToSendToSentry(event: Sentry.Event, hint: Sentry.
     return event;
   }
 
-  showErrorMessage();
   if (store.get("sentry-enabled") === false) {
     return null;
   }
@@ -502,6 +482,7 @@ async function askToSendEnvelope(event: Sentry.Event, hint?: Sentry.EventHint) {
 
 function storeIncomingPayload(body: string) {
   if (store.get("sentry-send-envelopes") === true || store.get("sentry-send-envelopes") === undefined) {
+    // WARN: This will cause memory leaks if not cleared
     const scope = Sentry.getCurrentScope();
     scope.clearAttachments();
     scope.addAttachment({
@@ -589,8 +570,6 @@ app.whenReady().then(() => {
   app.on("activate", () => {
     showOrCreateWindow();
   });
-
-  ipcMain.on("set-badge-count", handleBadgeCount);
 });
 
 const MAX_RETRIES = 3;
@@ -634,6 +613,7 @@ async function makeSureSpotlightIsRunning() {
     }
 
     subscriber = setTimeout(handler, RECHECK_DELAY + retries * RETRY_DELAY_INCREMENT);
+    subscriber.unref();
   }
 
   handler();

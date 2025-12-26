@@ -2,19 +2,92 @@ import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import * as path from "node:path";
+import * as readline from "node:readline";
 import type { SerializedLog } from "@sentry/core";
+import { metrics } from "@sentry/node";
 import { Searcher } from "fast-fuzzy";
 import { uuidv7 } from "uuidv7";
 import { SENTRY_CONTENT_TYPE } from "../constants.ts";
 import { logger } from "../logger.ts";
 import type { SentryLogEvent } from "../parser/types.ts";
-import type { CLIHandlerOptions } from "../types/cli.ts";
-import { buildDockerComposeCommand, detectDockerCompose } from "../utils/docker-compose.ts";
-import { getSpotlightURL } from "../utils/extras.ts";
+import type { CLIHandlerOptions, Command, CommandMeta } from "../types/cli.ts";
+import { detectDockerCompose, parseExplicitDockerCompose, prepareDockerComposeRun } from "../utils/docker-compose.ts";
+import { getSpotlightURL, openInBrowser } from "../utils/extras.ts";
 import { EventContainer, getBuffer } from "../utils/index.ts";
-import tail, { type OnItemCallback } from "./tail.ts";
+import { type OnItemCallback, handler as tail } from "./tail.ts";
+
+export const meta: CommandMeta = {
+  name: "run",
+  short: "Run your app with automatic Spotlight instrumentation",
+  usage: "spotlight run [options] [command...]",
+  long: `Run your application with Spotlight, automatically setting up the necessary
+environment variables and capturing telemetry data.
+
+If no command is provided, Spotlight auto-detects:
+  - Docker Compose projects (docker-compose.yml, compose.yml, etc.)
+  - package.json scripts (dev, develop, serve, start)
+
+Environment variables set automatically:
+  - SENTRY_SPOTLIGHT=http://localhost:<port>/stream
+  - NEXT_PUBLIC_SENTRY_SPOTLIGHT=http://localhost:<port>/stream
+  - SENTRY_TRACES_SAMPLE_RATE=1
+
+stdout/stderr are captured and sent to Spotlight as log events.`,
+  examples: [
+    "spotlight run                      # Auto-detect and run (package.json or docker-compose)",
+    "spotlight run node server.js       # Run a specific command with Spotlight",
+    "spotlight run -p 3000 npm start    # Run with custom port",
+    "spotlight run python manage.py runserver  # Run Python app",
+    "spotlight run docker compose up    # Run Docker Compose with Spotlight injection",
+  ],
+};
 
 const SPOTLIGHT_VERSION = process.env.npm_package_version || "unknown";
+
+// Environment variable host configurations
+const LOCALHOST_HOST = "localhost";
+
+/**
+ * Detect if there's a package.json with runnable scripts
+ */
+function detectPackageJson(): { scriptName: string; scriptCommand: string } | null {
+  try {
+    const scripts = JSON.parse(readFileSync("./package.json", "utf-8")).scripts;
+    const scriptName = ["dev", "develop", "serve", "start"].find(name => scripts[name]);
+    if (!scriptName || !scripts[scriptName]) {
+      return null;
+    }
+    return { scriptName, scriptCommand: scripts[scriptName] };
+  } catch {
+    // pass
+  }
+  return null;
+}
+
+/**
+ * Prompt the user to choose between Docker Compose and package.json
+ */
+async function promptUserChoice(): Promise<"docker" | "package"> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise(resolve => {
+    console.log("\n⚠️  Both Docker Compose and package.json detected!");
+    console.log("\nWhich would you like to use?");
+    console.log("  1) docker compose");
+    console.log("  2) package.json");
+
+    rl.question("Enter your choice (1 or 2): ", answer => {
+      rl.close();
+      const choice = answer.trim();
+      const selected = choice === "2" ? "package" : "docker";
+      logger.info(`Selected: ${selected === "docker" ? "Docker compose" : "package.json"}`);
+      resolve(selected);
+    });
+  });
+}
 
 function createLogEnvelope(level: "info" | "error", body: string, timestamp: number): Buffer {
   const envelopeHeader = {
@@ -60,7 +133,15 @@ function createLogEnvelope(level: "info" | "error", body: string, timestamp: num
   return Buffer.from(`${parts.join("\n")}\n`, "utf-8");
 }
 
-export default async function run({ port, cmdArgs, basePath, filesToServe, format }: CLIHandlerOptions) {
+export async function handler({
+  port,
+  cmdArgs,
+  basePath,
+  filesToServe,
+  format,
+  allowedOrigins,
+  open,
+}: CLIHandlerOptions) {
   let relayStdioAsLogs = true;
 
   const fuzzySearcher = new Searcher([] as string[], {
@@ -100,7 +181,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     return true;
   };
 
-  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe, format }, logChecker);
+  const serverInstance = await tail({ port, cmdArgs: [], basePath, filesToServe, format, allowedOrigins }, logChecker);
   if (!serverInstance) {
     logger.error("Failed to start Spotlight sidecar server.");
     logger.error(`The port ${port} might already be in use — most likely by another Spotlight instance.`);
@@ -111,9 +192,13 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   // as not having that indicates either the server did not start
   // or started in a weird manner (like over a unix socket)
   const actualServerPort = (serverInstance.address() as AddressInfo).port;
-  const spotlightUrl = getSpotlightURL(actualServerPort);
+  const spotlightUrl = getSpotlightURL(actualServerPort, LOCALHOST_HOST);
+
+  if (open) {
+    openInBrowser(actualServerPort);
+  }
   let shell = false;
-  let dockerComposeOverride: string | undefined = undefined;
+  let stdin: string | undefined = undefined;
   const env = {
     ...process.env,
     SENTRY_SPOTLIGHT: spotlightUrl,
@@ -132,25 +217,58 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   };
   if (cmdArgs.length === 0) {
     const dockerCompose = detectDockerCompose();
-    // We check for docker-compose first: even if there is a package.json (for a JS project),
-    // if there's Docker configuration present, that's almost certainly the intended way to run the project
+    const packageJson = detectPackageJson();
 
-    if (dockerCompose) {
+    // If both Docker Compose and package.json are detected, ask the user which one to use
+    if (dockerCompose && packageJson) {
+      if (!process.stdin.isTTY) {
+        logger.error("Both Docker Compose and package.json detected, but cannot prompt in non-interactive mode.");
+        logger.error("Please specify a command explicitly or run in an interactive terminal.");
+        process.exit(1);
+      }
+      const choice = await promptUserChoice();
+      metrics.count("cli.run.prompt_choice", 1, { attributes: { choice } });
+
+      if (choice === "docker") {
+        logger.info(
+          `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
+        );
+        metrics.count("cli.run.autodetect", 1, { attributes: { type: "docker-compose" } });
+        ({ cmdArgs, stdin } = prepareDockerComposeRun(dockerCompose, actualServerPort, env));
+      } else {
+        logger.info(`Using package.json script: ${packageJson.scriptName}`);
+        metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
+        cmdArgs = [packageJson.scriptCommand];
+        shell = true;
+        env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
+      }
+    } else if (dockerCompose) {
       logger.info(
         `Detected Docker Compose project with ${dockerCompose.serviceNames.length} service(s): ${dockerCompose.serviceNames.join(", ")}`,
       );
-      const command = buildDockerComposeCommand(dockerCompose, actualServerPort);
-      cmdArgs = command.cmdArgs;
-      dockerComposeOverride = command.dockerComposeOverride;
-    } else {
-      try {
-        const scripts = JSON.parse(readFileSync("./package.json", "utf-8")).scripts;
-        cmdArgs = [scripts.dev ?? scripts.develop ?? scripts.serve ?? scripts.start];
-        shell = true;
-        env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
-      } catch {
-        // pass
-      }
+      metrics.count("cli.run.autodetect", 1, { attributes: { type: "docker-compose" } });
+      ({ cmdArgs, stdin } = prepareDockerComposeRun(dockerCompose, actualServerPort, env));
+    } else if (packageJson) {
+      logger.info(`Using package.json script: ${packageJson.scriptName}`);
+      metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
+      cmdArgs = [packageJson.scriptCommand];
+      shell = true;
+      env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
+    }
+  } else {
+    // Handle explicit docker compose commands (e.g., "spotlight run docker compose up")
+    const explicitDockerConfig = parseExplicitDockerCompose(cmdArgs);
+    if (explicitDockerConfig) {
+      logger.info(
+        `Detected explicit Docker Compose command with ${explicitDockerConfig.serviceNames.length} service(s): ${explicitDockerConfig.serviceNames.join(", ")}`,
+      );
+      metrics.count("cli.run.docker_compose.explicit", 1, {
+        attributes: {
+          services: explicitDockerConfig.serviceNames.length,
+          subcommand: explicitDockerConfig.subcommandArgs.join(" "),
+        },
+      });
+      ({ cmdArgs, stdin } = prepareDockerComposeRun(explicitDockerConfig, actualServerPort, env));
     }
   }
   if (cmdArgs.length === 0) {
@@ -161,7 +279,7 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
   logger.info(`Starting command: ${cmdStr}`);
   // When we have Docker Compose override YAML (for -f -), we need to pipe stdin
   // Otherwise, inherit stdin to relay user input to the downstream process
-  const stdinMode: "pipe" | "inherit" = dockerComposeOverride ? "pipe" : "inherit";
+  const stdinMode: "pipe" | "inherit" = stdin ? "pipe" : "inherit";
   const runCmd = spawn(cmdArgs[0], cmdArgs.slice(1), {
     cwd: process.cwd(),
     env,
@@ -177,9 +295,13 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     process.exit(1);
   }
 
-  // If we have Docker Compose override YAML, write it and close stdin
-  if (dockerComposeOverride && runCmd.stdin) {
-    runCmd.stdin.write(dockerComposeOverride);
+  // If our command has a stdin input _and_ we can send to stdin, write and close
+  if (stdin) {
+    if (!runCmd.stdin) {
+      logger.error("Failed to pipe Docker Compose override: stdin is not available");
+      process.exit(1);
+    }
+    runCmd.stdin.write(stdin);
     runCmd.stdin.end();
   }
 
@@ -262,3 +384,5 @@ export default async function run({ port, cmdArgs, basePath, filesToServe, forma
     process.on("beforeExit", killRunCmd);
   });
 }
+
+export default { meta, handler } satisfies Command;

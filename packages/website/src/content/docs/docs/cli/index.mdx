@@ -5,27 +5,85 @@ sidebar:
   order: 0
 ---
 
-import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { Tabs, TabItem, LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-The Spotlight CLI (`spotlight`) provides two modes for working with Spotlight in your terminal:
+The Spotlight CLI (`spotlight`) integrates Spotlight into your terminal workflow. Wrap your app to automatically capture telemetry, or stream events directly to your terminal.
 
-## Two Modes of Operation
+## Why Use the CLI?
+
+- **Automatic instrumentation**: `spotlight run` sets up environment variables and captures output automatically
+- **Real-time streaming**: View errors, logs, and traces directly in your terminal
+- **Multiple output formats**: Human-readable, JSON, logfmt, or Markdown
+- **Docker Compose support**: Auto-injects configuration into containerized services
+- **Scriptable**: Perfect for CI/CD pipelines and automation
+
+## Installation
+
+<Tabs>
+  <TabItem label="npx">
+    No installation needed:
+    ```bash
+    npx @spotlightjs/spotlight run
+    ```
+  </TabItem>
+  <TabItem label="npm global">
+    ```bash
+    npm install -g @spotlightjs/spotlight
+    ```
+  </TabItem>
+  <TabItem label="Binary">
+    Download standalone binary to `~/.local/bin/spotlight`:
+    ```bash
+    curl -sL https://spotlightjs.com/install.sh | sh
+    ```
+  </TabItem>
+  <TabItem label="Docker">
+    ```bash
+    docker run -p 8969:8969 ghcr.io/getsentry/spotlight:latest
+    ```
+  </TabItem>
+</Tabs>
+
+## Commands
 
 <CardGrid>
   <LinkCard 
-    title="Tail Command" 
-    href="/docs/cli/tail/" 
-    description="Stream and filter Spotlight events in real-time from your terminal"
+    title="spotlight run" 
+    href="/docs/cli/run/" 
+    description="Wrap your app to automatically capture telemetry and stream events."
   />
   <LinkCard 
-    title="Run Command" 
-    href="/docs/cli/run/" 
-    description="Wrap your application to automatically capture telemetry. Also streams events in real-time like the tail command."
+    title="spotlight tail" 
+    href="/docs/cli/tail/" 
+    description="Stream and filter events in real-time. Connect to an existing sidecar or start a new one."
   />
-
+  <LinkCard 
+    title="spotlight server" 
+    href="/docs/cli/reference/#server---start-standalone-server" 
+    description="Start the sidecar server with web UI at localhost:8969."
+  />
+  <LinkCard 
+    title="spotlight mcp" 
+    href="/docs/mcp/" 
+    description="Start MCP server for AI coding assistants like Cursor and Claude."
+  />
 </CardGrid>
 
-## Quick Reference
+## CLI vs Desktop App
 
-- [Complete CLI Reference](/docs/cli/reference/) - All commands and options
+| | CLI | Desktop App |
+|---|---|---|
+| **Best for** | Terminal workflows, automation | Visual debugging, dedicated window |
+| **Platform** | All (via Node.js or binary) | macOS (Win/Linux coming soon) |
+| **Output** | Terminal + browser UI | Built-in UI |
+| **Features** | Wrap apps, stream to files, CI/CD | Auto-updates, native experience |
 
+[Learn more about Desktop App →](/docs/desktop-app/)
+
+## Reference
+
+<LinkCard 
+  title="Complete CLI Reference" 
+  href="/docs/cli/reference/" 
+  description="All commands, options, and environment variables"
+/>

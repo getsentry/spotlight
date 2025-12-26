@@ -36,7 +36,9 @@ const downloads = getDownloadLinks(assets);
         <div class="text-center">
           <a
             href={link.url}
-            class="inline-flex items-center justify-between gap-3 px-2 py-2 text-sm font-medium text-black bg-white rounded-lg hover:bg-gray-100 transition-all no-underline"
+            class="download-link inline-flex items-center justify-between gap-3 px-2 py-2 text-sm font-medium text-black bg-white rounded-lg hover:bg-gray-100 transition-all no-underline"
+            data-platform={link.platform}
+            data-variant={link.variant}
           >
             <div class="flex items-center gap-2.5">
               <img
@@ -64,6 +66,7 @@ const downloads = getDownloadLinks(assets);
 
 <script>
   import { detectPlatform, isMobile } from '../../lib/platform';
+  import * as Sentry from '@sentry/astro';
 
   const mobileMessage = document.getElementById('mobile-message');
   const desktopDownloads = document.getElementById('desktop-downloads');
@@ -91,4 +94,12 @@ const downloads = getDownloadLinks(assets);
       }
     }
   }
+
+  document.querySelectorAll('.download-link').forEach(link => {
+    link.addEventListener('click', () => {
+      const platform = link.getAttribute('data-platform') || 'unknown';
+      const variant = link.getAttribute('data-variant') || 'unknown';
+      Sentry.metrics.count('download_click', 1, { attributes: { platform, variant, location: 'homepage' } });
+    });
+  });
 </script>
