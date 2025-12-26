@@ -4,15 +4,24 @@ import { useElectronFullscreen } from "@spotlight/ui/lib/useElectronFullscreen";
 
 /**
  * A spacer component that adds 40px (h-10) height to account for the Electron
- * drag bar. Only renders in Electron when NOT in fullscreen mode.
+ * drag bar. Animates to 0 height when in fullscreen mode.
  */
 export function ElectronDragbarSpacer({ className }: { className?: string }) {
   const isFullscreen = useElectronFullscreen();
 
-  // Only render spacer in Electron when NOT fullscreen
-  if (!IS_ELECTRON || isFullscreen) {
+  // Don't render at all outside Electron
+  if (!IS_ELECTRON) {
     return null;
   }
 
-  return <div className={cn("h-10", className)} />;
+  // Animate height transition in fullscreen
+  return (
+    <div
+      className={cn(
+        "overflow-hidden w-full transition-all duration-200 ease-out",
+        isFullscreen ? "h-0" : "h-10",
+        className,
+      )}
+    />
+  );
 }

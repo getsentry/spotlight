@@ -1,8 +1,6 @@
-import { cn } from "@spotlight/ui/lib/cn";
-import { IS_ELECTRON } from "@spotlight/ui/lib/isElectron";
 import { log } from "@spotlight/ui/lib/logger";
 import { getRouteStorageKey } from "@spotlight/ui/lib/routePersistence";
-import { useElectronFullscreen } from "@spotlight/ui/lib/useElectronFullscreen";
+import { ElectronDragbarSpacer } from "@spotlight/ui/ui/electronDragbarSpacer";
 import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import useSentryStore from "../store";
@@ -22,7 +20,6 @@ export default function TelemetryView({
 }) {
   const location = useLocation();
   const store = useSentryStore();
-  const isFullscreen = useElectronFullscreen();
 
   useEffect(() => {
     try {
@@ -45,17 +42,19 @@ export default function TelemetryView({
   return (
     <div className="from-primary-900 to-primary-950 flex h-full overflow-hidden bg-gradient-to-br from-0% to-20% font-sans text-white">
       <TelemetrySidebar errorCount={errorCount} traceCount={traceCount} logCount={logCount} isOnline={isOnline} />
-      {/* pt-10 (40px) adds top padding in Electron to account for the 40px drag bar (hidden in fullscreen) */}
-      <div className={cn("flex-1 overflow-auto", IS_ELECTRON && !isFullscreen && "pt-10")}>
-        <Routes>
-          <Route path="not-found" element={<p>Not Found - How'd you manage to get here?</p>} key="not-found" />
-          <Route path="traces/*" element={<TracesTab />} key="traces" />
-          <Route path="errors/*" element={<ErrorsTab />} key="errors" />
-          <Route path="logs/*" element={<LogsTab />} key="logs" />
-          <Route path="insights/*" element={<InsightsTab />} key="insights" />
-          <Route path="" element={<TracesTab />} key="default" />
-        </Routes>
-      </div>
+      <main className="flex flex-1 flex-col">
+        <ElectronDragbarSpacer />
+        <div className="flex-1 overflow-auto">
+          <Routes>
+            <Route path="not-found" element={<p>Not Found - How'd you manage to get here?</p>} key="not-found" />
+            <Route path="traces/*" element={<TracesTab />} key="traces" />
+            <Route path="errors/*" element={<ErrorsTab />} key="errors" />
+            <Route path="logs/*" element={<LogsTab />} key="logs" />
+            <Route path="insights/*" element={<InsightsTab />} key="insights" />
+            <Route path="" element={<TracesTab />} key="default" />
+          </Routes>
+        </div>
+      </main>
     </div>
   );
 }
