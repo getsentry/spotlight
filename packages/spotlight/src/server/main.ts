@@ -103,11 +103,10 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
       fetch: app.fetch,
       port,
     },
-    () => {
-      const realPort = (server.address() as AddressInfo).port;
-      logger.info(`Spotlight listening on ${realPort}`);
+    info => {
+      logger.info(`Spotlight listening on ${info.port}`);
       if (basePath) {
-        logSpotlightUrl(realPort);
+        logSpotlightUrl(info.port);
       }
       resolve(server as Server);
     },
