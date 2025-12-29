@@ -1,0 +1,337 @@
+---
+title: Next.js
+description: Get Spotlight running with Next.js in minutes
+---
+
+import DownloadButton from '../../../../components/DownloadButton.astro';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+This quickstart sets up everything you need to use Spotlight with your Next.js application - including the CLI, UI, and MCP server.
+
+## Step 1: Install Sentry SDKs
+
+To install the Sentry SDK for Next.js, run the following command within your project:
+
+```bash
+npx @sentry/wizard@latest -i nextjs --spotlight
+```
+
+The wizard will guide you through the setup process. When prompted for configuration options:
+
+* **DSN**: You can use any placeholder value like `https://spotlight@local/0` (no real Sentry account needed)
+* **Enable Tracing**: Select yes
+* **Enable Session Replay**: no need to enable this
+* **Enable Logs**: Select yes
+
+
+After the wizard completes, you'll have three configuration files generated: one for the client (`sentry.client.config.ts`), one for Edge Runtime (`sentry.edge.config.ts`), and one for the server (`sentry.server.config.ts`). These files will look like, or be very similar to, the examples below.
+
+
+#### Client-Side Configuration
+
+Update `sentry.client.config.ts` (or `.js`):
+
+```typescript
+import * as Sentry from "@sentry/nextjs";
+
+Sentry.init({
+  dsn: "https://spotlight@local/0", // Placeholder DSN
+
+  // Enable Spotlight integration for browser
+  integrations: [
+    Sentry.spotlightBrowserIntegration(),
+  ],
+
+  // Capture 100% of transactions for local development
+  tracesSampleRate: 1.0,
+
+  // Enable comprehensive logging
+  enableLogs: true,
+
+  // Optional: Enable session replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+});
+```
+
+#### Server-Side Configuration
+
+Update `sentry.server.config.ts` (or `.js`):
+
+```typescript
+import * as Sentry from "@sentry/nextjs";
+
+Sentry.init({
+  dsn: "https://spotlight@local/0", // Placeholder DSN
+
+  // Capture 100% of transactions for local development
+  tracesSampleRate: 1.0,
+
+  // Enable comprehensive logging
+  enableLogs: true,
+});
+```
+
+#### Edge Runtime Configuration
+
+If you're using Edge Runtime, update `sentry.edge.config.ts` (or `.js`):
+
+```typescript
+import * as Sentry from "@sentry/nextjs";
+
+Sentry.init({
+  dsn: "https://spotlight@local/0", // Placeholder DSN
+
+  // Capture 100% of transactions for local development
+  tracesSampleRate: 1.0,
+
+  // Enable comprehensive logging
+  enableLogs: true,
+});
+```
+
+## Step 2: Install and Run Spotlight
+
+Now that your Next.js app is instrumented, you can run Spotlight to capture and display events.
+
+### Choose Your Installation Method
+
+<Tabs>
+  <TabItem label="npx">
+    The quickest way to get started:
+
+    ```bash
+    npx @spotlightjs/spotlight
+    ```
+
+    This starts Spotlight on `http://localhost:8969` where you can access the web UI.
+  </TabItem>
+  <TabItem label="CLI">
+    Install the Spotlight CLI globally:
+
+    ```bash
+    npm install -g @spotlightjs/spotlight
+    ```
+
+    Then run:
+
+    ```bash
+    spotlight
+    ```
+
+    This starts Spotlight on `http://localhost:8969` where you can access the web UI.
+  </TabItem>
+  <TabItem label="Desktop App">
+    Download the Spotlight desktop application:
+
+    <DownloadButton>Download for Mac</DownloadButton>
+
+    The desktop app includes the sidecar and provides an enhanced interface for viewing events.
+  </TabItem>
+  <TabItem label="Docker">
+    Run Spotlight in a container:
+
+    ```bash
+    docker run --rm -p 8969:8969 ghcr.io/getsentry/spotlight:latest
+    ```
+  </TabItem>
+</Tabs>
+
+### Add environment variable to enable Spotlight
+
+:::note[When you don't need this]
+If you are using `spotlight run` to start Spotlight, you don't need to add this environment variable as we take care of it for you.
+:::
+
+ use the `SENTRY_SPOTLIGHT` environment variable:
+
+```bash
+# In your .env.local file
+NEXT_PUBLIC_SENTRY_SPOTLIGHT=1 # for frontend event sending
+SENTRY_SPOTLIGHT=1 # for backend event sending
+```
+
+Then in your SDK configuration:
+
+```typescript
+Sentry.init({
+  dsn: "https://spotlight@local/0",
+  spotlight: process.env.SENTRY_SPOTLIGHT === '1',
+  // ... other options
+});
+```
+
+## Step 3: Verify Everything Works
+
+1. **Start Spotlight** (if not already running):
+   ```bash
+   npx @spotlightjs/spotlight
+   ```
+
+2. **Run your Next.js application**:
+   ```bash
+   npm run dev
+   # or
+   pnpm dev
+   # or
+   yarn dev
+   ```
+
+3. **Open the Spotlight UI** in your browser:
+   ```
+   http://localhost:8969
+   ```
+
+4. **Trigger a test error** in your application. Create a test page or button that throws an error:
+
+```typescript
+// app/test-spotlight/page.tsx (App Router)
+'use client';
+
+export default function TestSpotlight() {
+  const triggerError = () => {
+    throw new Error("Test error for Spotlight!");
+  };
+
+  return (
+    <div>
+      <h1>Test Spotlight</h1>
+      <button onClick={triggerError}>Trigger Error</button>
+    </div>
+  );
+}
+```
+
+Or for Pages Router:
+
+```typescript
+// pages/test-spotlight.tsx
+export default function TestSpotlight() {
+  const triggerError = () => {
+    throw new Error("Test error for Spotlight!");
+  };
+
+  return (
+    <div>
+      <h1>Test Spotlight</h1>
+      <button onClick={triggerError}>Trigger Error</button>
+    </div>
+  );
+}
+```
+
+5. **Check the Spotlight UI** - you should see:
+   - The error appearing in the Errors tab
+   - Associated traces in the Traces tab
+   - Console logs in the Logs tab
+
+## App Router vs Pages Router
+
+Both Next.js routing approaches work with Spotlight. The main difference is in error boundary setup:
+
+### App Router
+
+The Sentry wizard should create a `global-error.tsx` file for you. If not, create it in your `app` directory:
+
+```typescript
+// app/global-error.tsx
+'use client';
+
+import * as Sentry from "@sentry/nextjs";
+import NextError from "next/error";
+import { useEffect } from "react";
+
+export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
+  return (
+    <html>
+      <body>
+        <NextError statusCode={undefined as any} />
+      </body>
+    </html>
+  );
+}
+```
+
+### Pages Router
+
+The wizard should create a custom `_error.tsx` file. If not, create it:
+
+```typescript
+// pages/_error.tsx
+import * as Sentry from "@sentry/nextjs";
+import type { NextPage } from "next";
+import type { ErrorProps } from "next/error";
+import NextError from "next/error";
+
+const CustomErrorComponent: NextPage<ErrorProps> = (props) => {
+  return <NextError statusCode={props.statusCode} />;
+};
+
+CustomErrorComponent.getInitialProps = async (contextData) => {
+  await Sentry.captureUnderscoreErrorException(contextData);
+  return NextError.getInitialProps(contextData);
+};
+
+export default CustomErrorComponent;
+```
+
+## Troubleshooting
+
+### Events Not Appearing in Spotlight
+
+**Issue**: You don't see any events in the Spotlight UI.
+
+**Solutions**:
+- Verify Spotlight is running on `http://localhost:8969`
+- Check that `spotlightBrowserIntegration()` is added to your client config
+- Ensure your Next.js dev server is running
+- Check the browser console for any connection errors
+- Try refreshing both the Spotlight UI and your application
+
+### Port Conflicts
+
+**Issue**: Port 8969 is already in use.
+
+**Solutions**:
+- Stop other services using port 8969
+- Or configure Spotlight to use a different port:
+  ```bash
+  npx @spotlightjs/spotlight --port 3001
+  ```
+  
+  Then update your SDK config:
+  ```typescript
+  Sentry.init({
+    spotlight: "http://localhost:3001/stream",
+    // ... other options
+  });
+  ```
+
+### Missing Server-Side Events
+
+**Issue**: Only seeing client-side events, no server-side errors or traces.
+
+**Solutions**:
+- Verify `sentry.server.config.ts` is properly configured
+- Ensure `instrumentation.ts` exists in your project root (created by the wizard)
+- Check that `tracesSampleRate: 1.0` is set in server config
+- Restart your Next.js dev server after configuration changes
+
+## Next Steps
+
+Now that Spotlight is running with your Next.js application, explore its powerful features:
+
+- [CLI](/docs/cli/) - Run apps with automatic instrumentation, stream events, and tail logs in real-time
+- [MCP Server](/docs/mcp/) - Connect Spotlight to AI assistants like Cursor and Claude for AI-powered debugging assistance
+- [Desktop App](/docs/desktop-app/) - Enhanced debugging experience with dedicated window, system integration, and better performance
+
+### Production Monitoring
+While Spotlight is perfect for local development, consider using [Sentry](https://sentry.io) for production monitoring. Since you've already installed the SDK, you just need to:
+1. Create a free Sentry account
+2. Replace the placeholder DSN with your real project DSN
+
+Your application will seamlessly send production telemetry to Sentry while keeping development data in Spotlight.

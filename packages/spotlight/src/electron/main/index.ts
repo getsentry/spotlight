@@ -210,22 +210,6 @@ const createWindow = () => {
           document.body.appendChild(dragBar);
         }
         
-        // Create error screen element for showing errors
-        if (!document.getElementById('error-screen')) {
-          const errorScreen = document.createElement('div');
-          errorScreen.id = 'error-screen';
-          errorScreen.style.display = 'none';
-          errorScreen.innerHTML = \`
-            <div class="error-page-navbar">
-              <img alt="spotlight-icon" src="./resources/sized.png" width="50" height="50" />
-              <p class="spotlight-title">Spotlight</p>
-            </div>
-            <h1 class="error header">Oops! An error occurred.</h1>
-            <p class="error description">Press Cmd + R to reload the app.</p>
-          \`;
-          document.body.appendChild(errorScreen);
-        }
-        
         // Re-create elements if body is replaced.
         // This can happen when Spotlight.init() replaces the entire body content
         // during hot module replacement (HMR) in development mode, or when the
@@ -444,21 +428,6 @@ store.onDidChange("sentry-send-envelopes", newValue => {
   }
 });
 
-const showErrorMessage = () => {
-  if (win) {
-    win.webContents.executeJavaScript(`{
-      const sentryRoot = document.getElementById('spotlight-root');
-      const errorScreen = document.getElementById('error-screen');
-      if (sentryRoot) {
-        sentryRoot.style.display = 'none';
-      }
-      if (errorScreen) {
-        errorScreen.style.display = 'block';
-      }
-    }`);
-  }
-};
-
 async function askForPermissionToSendToSentry(event: Sentry.Event, hint: Sentry.EventHint) {
   // Handle updater errors silently - no dialogs or error screens
   if (event.tags?.error_source === "updater") {
@@ -470,7 +439,6 @@ async function askForPermissionToSendToSentry(event: Sentry.Event, hint: Sentry.
     return event;
   }
 
-  showErrorMessage();
   if (store.get("sentry-enabled") === false) {
     return null;
   }

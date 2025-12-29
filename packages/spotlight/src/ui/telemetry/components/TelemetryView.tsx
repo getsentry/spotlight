@@ -40,7 +40,7 @@ export default function TelemetryView({
   const logCount = store.getLogs().length;
 
   return (
-    <div className="from-primary-900 to-primary-950 flex h-full overflow-hidden bg-gradient-to-br from-0% to-20% font-sans text-white">
+    <>
       <TelemetrySidebar errorCount={errorCount} traceCount={traceCount} logCount={logCount} isOnline={isOnline} />
       <main className="flex flex-1 flex-col">
         <ElectronDragbarSpacer />
@@ -55,6 +55,6 @@ export default function TelemetryView({
           </Routes>
         </div>
       </main>
-    </div>
+    </>
   );
 }
