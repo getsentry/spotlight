@@ -201,8 +201,9 @@ const createWindow = () => {
      *
      * We need the error-screen to be in the tree to show when an error occurs.
      */
-    win.webContents.executeJavaScript(
-      `(function() {
+    if (isMac) {
+      win.webContents.executeJavaScript(
+        `(function() {
         if (!document.getElementById('electron-top-drag-bar')) {
           const dragBar = document.createElement('div');
           dragBar.id = 'electron-top-drag-bar';
@@ -224,7 +225,8 @@ const createWindow = () => {
         }).observe(document.body, { childList: true });
       })();
     `,
-    );
+      );
+    }
   });
 };
 
