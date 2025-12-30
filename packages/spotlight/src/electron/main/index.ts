@@ -128,7 +128,7 @@ const createWindow = () => {
     title: "Spotlight",
     // frame: false,
     // transparent: true,
-    titleBarStyle: "hidden",
+    titleBarStyle: isMac ? "hidden" : undefined,
     trafficLightPosition: { x: 16, y: 16 },
     // titleBarOverlay: {
     //   color: '#2f3241',
