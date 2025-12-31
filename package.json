@@ -30,7 +30,19 @@
     "cross-spawn": ">=7.0.5",
     "form-data": ">=4.0.4",
     "devalue": ">=5.3.2",
-    "next": "^15.4.8"
+    "next": "^15.4.8",
+    "cookie": ">=0.7.0",
+    "esbuild": ">=0.25.0",
+    "brace-expansion": ">=2.0.2 <3",
+    "tmp": ">=0.2.4",
+    "js-yaml": ">=4.1.1",
+    "body-parser": ">=2.2.1",
+    "mdast-util-to-hast": ">=13.2.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite@>=6.0.0 <6.3.6": ">=6.3.6"
+    }
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged --concurrent false"
