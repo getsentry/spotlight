@@ -220,6 +220,10 @@ const createWindow = () => {
             const dragBar = document.createElement('div');
             dragBar.id = 'electron-top-drag-bar';
             dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
+            // Respect fullscreen state - hide drag bar if in fullscreen mode
+            if (window.__ELECTRON_IS_FULLSCREEN__) {
+              dragBar.style.display = 'none';
+            }
             document.body.appendChild(dragBar);
           }
         }).observe(document.body, { childList: true });
