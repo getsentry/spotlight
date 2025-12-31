@@ -414,7 +414,10 @@ const template: Electron.MenuItemConstructorOptions[] = [
 ];
 
 const menu = Menu.buildFromTemplate(template);
-Menu.setApplicationMenu(menu);
+
+if (isMac) {
+  Menu.setApplicationMenu(menu);
+}
 
 store.onDidChange("sentry-enabled", newValue => {
   const item = menu.getMenuItemById("sentry-enabled");
