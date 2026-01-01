@@ -128,7 +128,7 @@ const createWindow = () => {
     title: "Spotlight",
     // frame: false,
     // transparent: true,
-    titleBarStyle: "hidden",
+    titleBarStyle: isMac ? "hidden" : undefined,
     trafficLightPosition: { x: 16, y: 16 },
     // titleBarOverlay: {
     //   color: '#2f3241',
@@ -166,6 +166,24 @@ const createWindow = () => {
     win = null;
   });
 
+  // Hide drag bar and notify renderer when entering fullscreen
+  win.on("enter-full-screen", () => {
+    win.webContents.executeJavaScript(`
+      window.__ELECTRON_IS_FULLSCREEN__ = true;
+      document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'none');
+      window.dispatchEvent(new CustomEvent('electron-fullscreen-change', { detail: true }));
+    `);
+  });
+
+  // Show drag bar and notify renderer when leaving fullscreen
+  win.on("leave-full-screen", () => {
+    win.webContents.executeJavaScript(`
+      window.__ELECTRON_IS_FULLSCREEN__ = false;
+      document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'block');
+      window.dispatchEvent(new CustomEvent('electron-fullscreen-change', { detail: false }));
+    `);
+  });
+
   // Open external links in the default browser
   win.webContents.setWindowOpenHandler(details => {
     shell.openExternal(details.url).catch(error => {
@@ -183,8 +201,9 @@ const createWindow = () => {
      *
      * We need the error-screen to be in the tree to show when an error occurs.
      */
-    win.webContents.executeJavaScript(
-      `(function() {
+    if (isMac) {
+      win.webContents.executeJavaScript(
+        `(function() {
         if (!document.getElementById('electron-top-drag-bar')) {
           const dragBar = document.createElement('div');
           dragBar.id = 'electron-top-drag-bar';
@@ -201,12 +220,17 @@ const createWindow = () => {
             const dragBar = document.createElement('div');
             dragBar.id = 'electron-top-drag-bar';
             dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
+            // Respect fullscreen state - hide drag bar if in fullscreen mode
+            if (window.__ELECTRON_IS_FULLSCREEN__) {
+              dragBar.style.display = 'none';
+            }
             document.body.appendChild(dragBar);
           }
         }).observe(document.body, { childList: true });
       })();
     `,
-    );
+      );
+    }
   });
 };
 
@@ -394,7 +418,10 @@ const template: Electron.MenuItemConstructorOptions[] = [
 ];
 
 const menu = Menu.buildFromTemplate(template);
-Menu.setApplicationMenu(menu);
+
+if (isMac) {
+  Menu.setApplicationMenu(menu);
+}
 
 store.onDidChange("sentry-enabled", newValue => {
   const item = menu.getMenuItemById("sentry-enabled");
