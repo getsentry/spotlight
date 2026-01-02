@@ -1,0 +1,226 @@
+---
+title: SDK Integration
+description: Embed Spotlight's event buffering into your own HTTP server
+sidebar:
+    order: 0
+---
+
+The Spotlight SDK provides a programmatic API for integrating Spotlight's event buffering capabilities directly into your own HTTP server. Instead of running a separate sidecar process, you can embed the event receiving and storage functionality into your existing application.
+
+## When to Use the SDK
+
+Use the SDK when you need to:
+
+- **Embed Spotlight into an existing server**: You already have a Node.js HTTP server and want to add Spotlight endpoints without running a separate process
+- **Middleware pipelines**: You need fine-grained control over how telemetry data flows through your server
+- **Serverless functions**: You want Spotlight functionality in environments where running a separate sidecar isn't practical
+
+## Installation
+
+The SDK is included in the main `@spotlightjs/spotlight` package:
+
+```bash
+pnpm add @spotlightjs/spotlight
+```
+
+## API Reference
+
+### `createSpotlightBuffer()`
+
+Creates a new message buffer to store incoming telemetry events.
+
+```typescript
+import { createSpotlightBuffer } from '@spotlightjs/spotlight/sdk';
+
+const buffer = createSpotlightBuffer();
+```
+
+The buffer stores events in memory with a default capacity of 500 items. When full, oldest events are automatically evicted.
+
+### `pushToSpotlightBuffer(options)`
+
+Pushes a telemetry event into the buffer. This is typically called when receiving a POST request from a Sentry SDK.
+
+```typescript
+import { pushToSpotlightBuffer } from '@spotlightjs/spotlight/sdk';
+
+const container = pushToSpotlightBuffer({
+  spotlightBuffer: buffer,
+  body: requestBody,         // Buffer containing the raw request body
+  encoding: 'gzip',          // Optional: 'gzip' | 'deflate' | 'br'
+  contentType: 'application/x-sentry-envelope',
+  userAgent: 'sentry.javascript.browser/8.0.0',
+});
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `spotlightBuffer` | `MessageBuffer` | The buffer created by `createSpotlightBuffer()` |
+| `body` | `Buffer` | Raw request body (will be decompressed if encoding is set) |
+| `encoding` | `'gzip' \| 'deflate' \| 'br'` | Optional compression encoding |
+| `contentType` | `string` | Content-Type header value |
+| `userAgent` | `string` | User-Agent header value (for SDK identification) |
+
+**Returns:** An `EventContainer` with the parsed envelope, or `undefined` if no content type was provided.
+
+### `decompressBody(body, encoding)`
+
+Utility function to decompress request bodies. Supports gzip, deflate, and Brotli compression.
+
+```typescript
+import { decompressBody } from '@spotlightjs/spotlight/sdk';
+
+const decompressed = decompressBody(compressedBuffer, 'gzip');
+```
+
+## Hono.js Example
+
+Here's a complete example of integrating Spotlight into a [Hono](https://hono.dev) application:
+
+```typescript
+import { serve } from '@hono/node-server';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import {
+  createSpotlightBuffer,
+  pushToSpotlightBuffer,
+  decompressBody,
+} from '@spotlightjs/spotlight/sdk';
+
+// Create the buffer to store events
+const buffer = createSpotlightBuffer();
+
+const app = new Hono();
+
+// Enable CORS for browser SDKs
+app.use(cors());
+
+// Endpoint to receive telemetry from Sentry SDKs
+app.post('/stream', async (c) => {
+  // Get content type, normalizing for browser SDK CORS workaround
+  let contentType = c.req.header('content-type')?.split(';')[0].toLowerCase();
+
+  // Browser SDK may send as text/plain to avoid CORS preflight
+  if (c.req.query('sentry_client')?.startsWith('sentry.javascript.browser')) {
+    contentType = 'application/x-sentry-envelope';
+  }
+
+  // Decompress the body if needed
+  const rawBody = Buffer.from(await c.req.arrayBuffer());
+  const encoding = c.req.header('Content-Encoding') as 'gzip' | 'deflate' | 'br' | undefined;
+  const body = decompressBody(rawBody, encoding);
+
+  // Push to the buffer
+  const container = pushToSpotlightBuffer({
+    spotlightBuffer: buffer,
+    body,
+    contentType,
+    userAgent: c.req.header('User-Agent'),
+  });
+
+  if (container) {
+    console.log('Received event:', container.getEventTypesString());
+  }
+
+  return c.body(null, 200);
+});
+
+// Subscribe to events for real-time processing
+buffer.subscribe((container) => {
+  const envelope = container.getParsedEnvelope();
+  const types = container.getEventTypes();
+  console.log('New event received:', types);
+
+  // Process the event as needed
+  // envelope.envelope[0] contains the envelope header
+  // envelope.envelope[1] contains the items (errors, transactions, etc.)
+});
+
+serve({ fetch: app.fetch, port: 8969 }, (info) => {
+  console.log(`Spotlight SDK server running on http://localhost:${info.port}`);
+});
+```
+
+## Understanding the Event Flow
+
+```
+Your Application → Sentry SDK → Your Server (SDK) → Buffer → Subscribers
+```
+
+1. **Your application** instruments code with a Sentry SDK
+2. **Sentry SDK** sends telemetry to your server's `/stream` endpoint
+3. **Your server** uses `pushToSpotlightBuffer()` to store the event
+4. **Buffer** notifies all subscribers in real-time
+5. **Subscribers** can process, forward, or display events
+
+## Working with the Buffer
+
+### Reading Events
+
+The buffer supports filtering when reading events:
+
+```typescript
+// Get events from the last 60 seconds
+const recentEvents = buffer.read({ timeWindow: 60 });
+
+// Get events from a specific file (for errors with stack traces)
+const fileEvents = buffer.read({ filename: 'auth.ts' });
+
+// Get a specific event by envelope ID
+const specificEvent = buffer.read({ envelopeId: 'abc123...' });
+```
+
+### Subscribing to Events
+
+Subscribe to receive events as they arrive:
+
+```typescript
+const subscriptionId = buffer.subscribe((container) => {
+  // Called for each new event
+  const envelope = container.getParsedEnvelope();
+  console.log('Event:', envelope);
+});
+
+// Later, unsubscribe when done
+buffer.unsubscribe(subscriptionId);
+```
+
+### Clearing the Buffer
+
+```typescript
+// Clear all events
+buffer.clear();
+
+// Soft reset (preserves subscriber positions)
+buffer.reset();
+```
+
+## EventContainer API
+
+Each event in the buffer is wrapped in an `EventContainer`:
+
+```typescript
+const container = pushToSpotlightBuffer({ ... });
+
+// Get the content type
+container.getContentType();  // 'application/x-sentry-envelope'
+
+// Get the raw data buffer
+container.getData();  // Buffer
+
+// Get the parsed envelope (lazy parsing)
+container.getParsedEnvelope();  // { envelope: [header, items] }
+
+// Get event types for logging
+container.getEventTypes();        // ['error', 'transaction']
+container.getEventTypesString();  // 'error+transaction'
+```
+
+## Next Steps
+
+- [Sidecar Overview](/docs/sidecar/) - Learn about the standalone sidecar server
+- [CLI Commands](/docs/cli/) - Run Spotlight from the command line
+- [MCP Integration](/docs/mcp/) - Connect to AI assistants
+

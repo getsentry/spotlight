@@ -108,6 +108,12 @@ export default defineConfig({
           },
         },
         {
+          label: "SDK",
+          autogenerate: {
+            directory: "docs/sdk",
+          },
+        },
+        {
           label: "Contribute",
           autogenerate: {
             directory: "docs/contribute",
