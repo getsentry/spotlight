@@ -81,7 +81,7 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
       style={{ width: "240px", minWidth: "240px" }}
       aria-label="Navigation"
     >
-      <ElectronDragbarSpacer />
+      <ElectronDragbarSpacer isAboveLogo />
       <header className="p-4">
         <div className="text-primary-200 flex flex-col gap-x-2">
           <div className="inline-flex items-center gap-x-2">
