@@ -1,5 +1,5 @@
 import { cn } from "@spotlight/ui/lib/cn";
-import { IS_ELECTRON } from "@spotlight/ui/lib/isElectron";
+import { ELECTRON_PLATFORM, IS_ELECTRON } from "@spotlight/ui/lib/isElectron";
 import { useElectronFullscreen } from "@spotlight/ui/lib/useElectronFullscreen";
 
 /**
@@ -13,7 +13,7 @@ export function ElectronDragbarSpacer({
   const isFullscreen = useElectronFullscreen();
 
   // Don't render at all outside Electron
-  if (!IS_ELECTRON || (isAboveLogo && process.platform !== "darwin")) {
+  if (!IS_ELECTRON || (isAboveLogo && ELECTRON_PLATFORM !== "darwin")) {
     return null;
   }
 

@@ -193,6 +193,10 @@ const createWindow = () => {
 
   win.webContents.on("did-finish-load", () => {
     app.setBadgeCount(0);
+
+    // Inject platform info for the renderer
+    win.webContents.executeJavaScript(`window.__ELECTRON_PLATFORM__ = '${process.platform}';`);
+
     /**
      * Need to create these elements here as Spotlight.init() function
      * replaces the body content with the app root. This runs after the app
