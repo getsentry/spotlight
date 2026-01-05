@@ -107,15 +107,11 @@ app.post('/stream', async (c) => {
     contentType = 'application/x-sentry-envelope';
   }
 
-  // Decompress the body if needed
-  const rawBody = Buffer.from(await c.req.arrayBuffer());
-  const encoding = c.req.header('Content-Encoding') as 'gzip' | 'deflate' | 'br' | undefined;
-  const body = decompressBody(rawBody, encoding);
-
   // Push to the buffer
   const container = pushToSpotlightBuffer({
     spotlightBuffer: buffer,
-    body,
+    body: Buffer.from(await c.req.arrayBuffer()),
+    encoding: c.req.header('Content-Encoding'),
     contentType,
     userAgent: c.req.header('User-Agent'),
   });
