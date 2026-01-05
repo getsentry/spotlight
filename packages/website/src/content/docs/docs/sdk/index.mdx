@@ -198,7 +198,7 @@ buffer.unsubscribe(subscriptionId);
 // Clear all events
 buffer.clear();
 
-// Soft reset (preserves subscriber positions)
+// Soft reset (keeps subscribers; they continue from the new head position)
 buffer.reset();
 ```
 
