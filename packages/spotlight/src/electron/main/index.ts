@@ -128,14 +128,12 @@ const createWindow = () => {
     title: "Spotlight",
     // frame: false,
     // transparent: true,
-    titleBarStyle: isMac ? "hidden" : undefined,
-    ...(!isMac ? { titleBarOverlay: true } : {}),
+    titleBarStyle: "hidden",
     trafficLightPosition: { x: 16, y: 16 },
-    // titleBarOverlay: {
-    //   color: '#2f3241',
-    //   symbolColor: '#74b1be',
-    //   height: 60,
-    // },
+    titleBarOverlay: {
+      color: "#1e1b4b",
+      symbolColor: "#74b1be",
+    },
     webPreferences: {
       nodeIntegration: true,
       sandbox: false,
@@ -171,7 +169,7 @@ const createWindow = () => {
   win.on("enter-full-screen", () => {
     win.webContents.executeJavaScript(`
       window.__ELECTRON_IS_FULLSCREEN__ = true;
-      document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'none');
+      ${isMac ? "document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'none');" : ""}
       window.dispatchEvent(new CustomEvent('electron-fullscreen-change', { detail: true }));
     `);
   });
@@ -180,7 +178,7 @@ const createWindow = () => {
   win.on("leave-full-screen", () => {
     win.webContents.executeJavaScript(`
       window.__ELECTRON_IS_FULLSCREEN__ = false;
-      document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'block');
+      ${isMac ? "document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'block');" : ""}
       window.dispatchEvent(new CustomEvent('electron-fullscreen-change', { detail: false }));
     `);
   });
@@ -200,9 +198,8 @@ const createWindow = () => {
      * replaces the body content with the app root. This runs after the app
      * is loaded.
      */
-    if (isMac) {
-      win.webContents.executeJavaScript(
-        `(function() {
+    win.webContents.executeJavaScript(
+      `(function() {
         if (!document.getElementById('electron-top-drag-bar')) {
           const dragBar = document.createElement('div');
           dragBar.id = 'electron-top-drag-bar';
@@ -228,8 +225,7 @@ const createWindow = () => {
         }).observe(document.body, { childList: true });
       })();
     `,
-      );
-    }
+    );
   });
 };
 

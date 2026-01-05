@@ -10,7 +10,7 @@ export function ElectronDragbarSpacer({ className }: { className?: string }) {
   const isFullscreen = useElectronFullscreen();
 
   // Don't render at all outside Electron
-  if (!IS_ELECTRON || process.platform !== "darwin") {
+  if (!IS_ELECTRON) {
     return null;
   }
 
