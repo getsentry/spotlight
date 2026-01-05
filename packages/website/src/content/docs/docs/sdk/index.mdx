@@ -25,7 +25,7 @@ pnpm add @spotlightjs/spotlight
 
 ## API Reference
 
-### `createSpotlightBuffer()`
+### `createSpotlightBuffer(size?)`
 
 Creates a new message buffer to store incoming telemetry events.
 
@@ -36,6 +36,15 @@ const buffer = createSpotlightBuffer();
 ```
 
 The buffer stores events in memory with a default capacity of 500 items. When full, oldest events are automatically evicted.
+
+You can override the default capacity by passing a custom `size` parameter:
+
+```typescript
+// Create a buffer with capacity for 1000 events
+const buffer = createSpotlightBuffer(1000);
+```
+
+This is useful when you expect high event volumes or want to retain more history for debugging.
 
 ### `pushToSpotlightBuffer(options)`
 
