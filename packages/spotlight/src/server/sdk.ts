@@ -10,8 +10,8 @@ const decompressors: Record<"gzip" | "deflate" | "br", (buf: Buffer) => Buffer> 
 
 export type ContentEncoding = keyof typeof decompressors;
 
-export function createSpotlightBuffer() {
-  return new MessageBuffer<EventContainer>();
+export function createSpotlightBuffer(size?: number) {
+  return new MessageBuffer<EventContainer>(size);
 }
 
 type PushToSpotlightBufferOptions = {
