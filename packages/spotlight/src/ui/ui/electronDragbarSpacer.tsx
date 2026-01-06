@@ -1,28 +1,29 @@
 import { cn } from "@spotlight/ui/lib/cn";
-import { ELECTRON_PLATFORM, IS_ELECTRON } from "@spotlight/ui/lib/isElectron";
-import { useElectronFullscreen } from "@spotlight/ui/lib/useElectronFullscreen";
+import { IS_ELECTRON } from "@spotlight/ui/lib/isElectron";
 
 /**
  * A spacer component that adds 40px (h-10) height to account for the Electron
- * drag bar. Animates to 0 height when in fullscreen mode.
+ * drag bar. Uses CSS classes on body for state instead of JavaScript:
+ * - body.electron-fullscreen: Collapses to h-0
+ * - body.electron-darwin: Only shows when isAboveLogo on macOS
  */
 export function ElectronDragbarSpacer({
   className,
   isAboveLogo = false,
 }: { className?: string; isAboveLogo?: boolean }) {
-  const isFullscreen = useElectronFullscreen();
-
   // Don't render at all outside Electron
-  if (!IS_ELECTRON || (isAboveLogo && ELECTRON_PLATFORM !== "darwin")) {
+  if (!IS_ELECTRON) {
     return null;
   }
 
-  // Animate height transition in fullscreen
   return (
     <div
       className={cn(
-        "overflow-hidden w-full transition-all duration-200 ease-out",
-        isFullscreen ? "h-0" : "h-10",
+        "overflow-hidden w-full transition-all duration-200 ease-out h-10",
+        // Collapse to h-0 when body has electron-fullscreen class
+        "[body.electron-fullscreen_&]:h-0",
+        // Hide on non-darwin platforms when above logo
+        isAboveLogo && "[body:not(.electron-darwin)_&]:hidden",
         className,
       )}
     />

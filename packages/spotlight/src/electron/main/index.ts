@@ -165,21 +165,19 @@ const createWindow = () => {
     win = null;
   });
 
-  // Hide drag bar and notify renderer when entering fullscreen
+  // Add fullscreen class to body when entering fullscreen
   win.on("enter-full-screen", () => {
     win.webContents.executeJavaScript(`
-      window.__ELECTRON_IS_FULLSCREEN__ = true;
+      document.body.classList.add('electron-fullscreen');
       ${isMac ? "document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'none');" : ""}
-      window.dispatchEvent(new CustomEvent('electron-fullscreen-change', { detail: true }));
     `);
   });
 
-  // Show drag bar and notify renderer when leaving fullscreen
+  // Remove fullscreen class from body when leaving fullscreen
   win.on("leave-full-screen", () => {
     win.webContents.executeJavaScript(`
-      window.__ELECTRON_IS_FULLSCREEN__ = false;
+      document.body.classList.remove('electron-fullscreen');
       ${isMac ? "document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'block');" : ""}
-      window.dispatchEvent(new CustomEvent('electron-fullscreen-change', { detail: false }));
     `);
   });
 
@@ -194,9 +192,6 @@ const createWindow = () => {
   win.webContents.on("did-finish-load", () => {
     app.setBadgeCount(0);
 
-    // Inject platform info for the renderer
-    win.webContents.executeJavaScript(`window.__ELECTRON_PLATFORM__ = '${process.platform}';`);
-
     /**
      * Need to create these elements here as Spotlight.init() function
      * replaces the body content with the app root. This runs after the app
@@ -204,6 +199,9 @@ const createWindow = () => {
      */
     win.webContents.executeJavaScript(
       `(function() {
+        // Add platform class to body for CSS-based platform detection
+        document.body.classList.add('electron', 'electron-${process.platform}');
+
         if (!document.getElementById('electron-top-drag-bar')) {
           const dragBar = document.createElement('div');
           dragBar.id = 'electron-top-drag-bar';
@@ -216,12 +214,16 @@ const createWindow = () => {
         // during hot module replacement (HMR) in development mode, or when the
         // React app fully remounts after initial hydration.
         new MutationObserver(() => {
+          // Re-add platform classes if body was replaced
+          if (!document.body.classList.contains('electron')) {
+            document.body.classList.add('electron', 'electron-${process.platform}');
+          }
           if (!document.getElementById('electron-top-drag-bar')) {
             const dragBar = document.createElement('div');
             dragBar.id = 'electron-top-drag-bar';
             dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
             // Respect fullscreen state - hide drag bar if in fullscreen mode
-            if (window.__ELECTRON_IS_FULLSCREEN__) {
+            if (document.body.classList.contains('electron-fullscreen')) {
               dragBar.style.display = 'none';
             }
             document.body.appendChild(dragBar);
