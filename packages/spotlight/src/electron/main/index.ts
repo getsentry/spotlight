@@ -165,20 +165,13 @@ const createWindow = () => {
     win = null;
   });
 
-  // Add fullscreen class to body when entering fullscreen
+  // Toggle fullscreen class on body - CSS rules handle visibility
   win.on("enter-full-screen", () => {
-    win.webContents.executeJavaScript(`
-      document.body.classList.add('electron-fullscreen');
-      ${isMac ? "document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'none');" : ""}
-    `);
+    win.webContents.executeJavaScript(`document.body.classList.add('electron-fullscreen');`);
   });
 
-  // Remove fullscreen class from body when leaving fullscreen
   win.on("leave-full-screen", () => {
-    win.webContents.executeJavaScript(`
-      document.body.classList.remove('electron-fullscreen');
-      ${isMac ? "document.getElementById('electron-top-drag-bar')?.style.setProperty('display', 'block');" : ""}
-    `);
+    win.webContents.executeJavaScript(`document.body.classList.remove('electron-fullscreen');`);
   });
 
   // Open external links in the default browser
@@ -222,10 +215,6 @@ const createWindow = () => {
             const dragBar = document.createElement('div');
             dragBar.id = 'electron-top-drag-bar';
             dragBar.style.cssText = 'position:fixed;top:0;left:0;right:0;height:40px;-webkit-app-region:drag;z-index:99999;';
-            // Respect fullscreen state - hide drag bar if in fullscreen mode
-            if (document.body.classList.contains('electron-fullscreen')) {
-              dragBar.style.display = 'none';
-            }
             document.body.appendChild(dragBar);
           }
         }).observe(document.body, { childList: true });
