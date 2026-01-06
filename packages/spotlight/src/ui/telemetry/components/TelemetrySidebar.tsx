@@ -1,10 +1,10 @@
 import { ReactComponent as DeleteIcon } from "@spotlight/ui/assets/deleteIcon.svg";
 import { ReactComponent as Logo } from "@spotlight/ui/assets/glyph.svg";
 import { cn } from "@spotlight/ui/lib/cn";
-import { IS_ELECTRON } from "@spotlight/ui/lib/isElectron";
 import { useSpotlightContext } from "@spotlight/ui/lib/useSpotlightContext";
 import type { NotificationCount } from "@spotlight/ui/types";
 import { Badge } from "@spotlight/ui/ui/badge";
+import { ElectronDragbarSpacer } from "@spotlight/ui/ui/electronDragbarSpacer";
 import { useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import useSentryStore from "../store";
@@ -81,8 +81,8 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
       style={{ width: "240px", minWidth: "240px" }}
       aria-label="Navigation"
     >
-      {/* mt-10 (40px) adds top margin in Electron to account for the 40px drag bar */}
-      <header className={cn("p-4", IS_ELECTRON && "mt-10")}>
+      <ElectronDragbarSpacer isAboveLogo />
+      <header className="p-4">
         <div className="text-primary-200 flex flex-col gap-x-2">
           <div className="inline-flex items-center gap-x-2">
             <Logo height={24} width={24} />

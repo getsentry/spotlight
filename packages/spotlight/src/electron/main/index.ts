@@ -130,11 +130,10 @@ const createWindow = () => {
     // transparent: true,
     titleBarStyle: "hidden",
     trafficLightPosition: { x: 16, y: 16 },
-    // titleBarOverlay: {
-    //   color: '#2f3241',
-    //   symbolColor: '#74b1be',
-    //   height: 60,
-    // },
+    titleBarOverlay: {
+      color: "#1e1b4b",
+      symbolColor: "#74b1be",
+    },
     webPreferences: {
       nodeIntegration: true,
       sandbox: false,
@@ -166,6 +165,15 @@ const createWindow = () => {
     win = null;
   });
 
+  // Toggle fullscreen class on body - CSS rules handle visibility
+  win.on("enter-full-screen", () => {
+    win.webContents.executeJavaScript(`document.body.classList.add('electron-fullscreen');`);
+  });
+
+  win.on("leave-full-screen", () => {
+    win.webContents.executeJavaScript(`document.body.classList.remove('electron-fullscreen');`);
+  });
+
   // Open external links in the default browser
   win.webContents.setWindowOpenHandler(details => {
     shell.openExternal(details.url).catch(error => {
@@ -176,15 +184,17 @@ const createWindow = () => {
 
   win.webContents.on("did-finish-load", () => {
     app.setBadgeCount(0);
+
     /**
      * Need to create these elements here as Spotlight.init() function
      * replaces the body content with the app root. This runs after the app
      * is loaded.
-     *
-     * We need the error-screen to be in the tree to show when an error occurs.
      */
     win.webContents.executeJavaScript(
       `(function() {
+        // Add platform class to body for CSS-based platform detection
+        document.body.classList.add('electron', 'electron-${process.platform}');
+
         if (!document.getElementById('electron-top-drag-bar')) {
           const dragBar = document.createElement('div');
           dragBar.id = 'electron-top-drag-bar';
@@ -197,6 +207,10 @@ const createWindow = () => {
         // during hot module replacement (HMR) in development mode, or when the
         // React app fully remounts after initial hydration.
         new MutationObserver(() => {
+          // Re-add platform classes if body was replaced
+          if (!document.body.classList.contains('electron')) {
+            document.body.classList.add('electron', 'electron-${process.platform}');
+          }
           if (!document.getElementById('electron-top-drag-bar')) {
             const dragBar = document.createElement('div');
             dragBar.id = 'electron-top-drag-bar';
@@ -394,7 +408,7 @@ const template: Electron.MenuItemConstructorOptions[] = [
 ];
 
 const menu = Menu.buildFromTemplate(template);
-Menu.setApplicationMenu(menu);
+Menu.setApplicationMenu(isMac ? menu : null);
 
 store.onDidChange("sentry-enabled", newValue => {
   const item = menu.getMenuItemById("sentry-enabled");
