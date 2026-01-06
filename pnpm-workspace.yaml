@@ -14,5 +14,5 @@ catalog:
   react-dom: ^18.3.1
   tailwindcss: ^4.1.10
   typescript: ^5.6.2
-  vite: ^5.4.19
+  vite: ^5.4.21
   vitest: ^0.34.6
