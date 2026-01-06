@@ -2,4 +2,4 @@
 "@spotlightjs/spotlight": patch
 ---
 
-removed the top spacing in fullscreen mode
+Improved the spacing on the top and added custom titlebar for windows and linux
