@@ -140,7 +140,7 @@ export default defineConfig({
         },
       ],
       expressiveCode: {
-        themes: ["starlight-dark", "starlight-light"],
+        themes: ["starlight-dark"],
         useStarlightUiThemeColors: true,
       },
       editLink: {
