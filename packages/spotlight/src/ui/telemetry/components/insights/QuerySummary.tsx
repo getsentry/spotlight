@@ -1,5 +1,6 @@
 import { ReactComponent as Sort } from "@spotlight/ui/assets/sort.svg";
 import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
+import { safeAtob } from "@spotlight/ui/lib/base64";
 import { cn } from "@spotlight/ui/lib/cn";
 import Breadcrumbs from "@spotlight/ui/ui/breadcrumbs";
 import Table from "@spotlight/ui/ui/table";
@@ -37,7 +38,7 @@ const QuerySummary = () => {
   const { sort, toggleSortOrder } = useSort({ defaultSortType: QUERY_SUMMARY_SORT_KEYS.totalTime });
 
   // Ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/atob
-  const decodedType = type && atob(type);
+  const decodedType = type ? safeAtob(type) : null;
 
   const filteredDBSpans: Span[] = useMemo(() => {
     if (!decodedType) {
