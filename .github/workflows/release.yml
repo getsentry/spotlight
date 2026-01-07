@@ -2,7 +2,6 @@
 # https://getsentry.github.io/craft/
 
 name: Release
-
 on:
   workflow_dispatch:
     inputs:
