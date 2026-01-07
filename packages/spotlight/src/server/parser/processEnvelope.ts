@@ -55,6 +55,10 @@ export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: str
   const items: EnvelopeItem[] = [];
   while (buffer.length) {
     const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
+    if (!itemHeader) {
+      logger.error("Malformed envelope item header, skipping envelope...");
+      return null;
+    }
     const payloadLength = itemHeader.length;
     const itemPayloadRaw = readLine(payloadLength);
 
