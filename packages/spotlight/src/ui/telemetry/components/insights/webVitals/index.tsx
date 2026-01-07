@@ -55,6 +55,7 @@ const WebVitals = () => {
           normalizePerformanceScore(updatedEvent, PERFORMANCE_SCORE_PROFILES);
           return updatedEvent as unknown as SentryEventWithPerformanceData;
         })
+        .filter(event => event.measurements["score.total"] != null)
         .sort((a, b) => (sort.asc ? compareEvents(a, b) : compareEvents(b, a)))
     );
   }, [events, sort]);
