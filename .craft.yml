@@ -36,13 +36,13 @@ requireNames:
   - /^built-packages$/
   - /^spotlight-binaries$/
 
+# Targets - executed by getsentry/publish repo
 targets:
-  # Publish to NPM registry
+  # Publish @spotlightjs/spotlight to NPM registry
   - name: npm
     id: spotlight
-    includeNames: /^built-packages$/
+    path: packages/spotlight
 
-  # Create GitHub release with binaries
+  # Create GitHub release with standalone binaries
   - name: github
-    includeNames: /^spotlight-binaries$/
-
+    tagPrefix: "@spotlightjs/spotlight@"
