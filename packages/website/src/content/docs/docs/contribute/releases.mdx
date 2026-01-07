@@ -3,7 +3,62 @@ title: Publishing
 description: How-to publish a new release of Spotlight.
 ---
 
-When you want to publish a new version, you need to trigger the
-[Prepare Publish](https://github.com/getsentry/spotlight/actions/workflows/prepare-publish.yml) Github Action. This
-action will open a PR with all versions bumped & changelogs updated according to the currently pending changesets. If
-you approve & merge this PR, these versions will automatically be published to NPM.
+Spotlight uses [Craft](https://github.com/getsentry/craft) for release management. Craft automatically determines version bumps from conventional commits and generates changelogs.
+
+## Release Workflow
+
+### 1. Trigger the Release
+
+Go to the [Release](https://github.com/getsentry/spotlight/actions/workflows/release.yml) GitHub Action and click "Run workflow".
+
+You can specify:
+
+- **Version**: Leave as `auto` to determine from commits, or specify `major`, `minor`, `patch`, or an explicit version like `4.10.0`
+- **Force**: Check this to release even if there are release-blockers
+
+### 2. Review the Release Branch
+
+Craft creates a release branch (e.g., `release/4.10.0`) with:
+
+- Updated version in `packages/spotlight/package.json`
+- Generated changelog in `packages/spotlight/CHANGELOG.md`
+
+The CI will build and test this branch automatically.
+
+### 3. Merge and Publish
+
+Once the release branch CI passes:
+
+1. Review the changelog and version bump
+2. Merge the release branch to `main`
+3. The publish workflow triggers automatically and:
+   - Publishes to NPM
+   - Creates a GitHub release with binaries
+   - Tags the Docker image as `latest`
+   - Builds and signs the Electron app
+
+## Version Determination
+
+Craft analyzes commits since the last release to determine the version bump:
+
+| Commit Type | Example | Version Bump |
+| --- | --- | --- |
+| Breaking change | `feat!: remove API` | Major (1.0.0 → 2.0.0) |
+| New feature | `feat: add dark mode` | Minor (1.0.0 → 1.1.0) |
+| Bug fix | `fix: handle error` | Patch (1.0.0 → 1.0.1) |
+
+## Manual Publishing
+
+If you need to manually trigger a publish (e.g., to re-publish a specific target):
+
+1. Go to the [Publish](https://github.com/getsentry/spotlight/actions/workflows/publish.yml) workflow
+2. Click "Run workflow"
+3. Enter the version and select which targets to publish
+
+## Targets
+
+| Target | Description |
+| --- | --- |
+| `npm` | Publishes `@spotlightjs/spotlight` to NPM registry |
+| `docker` | Tags Docker image as `latest` and version tag |
+| `electron` | Builds, signs, and uploads macOS Electron app |
