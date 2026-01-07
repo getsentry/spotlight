@@ -8,7 +8,6 @@ import {
   defineProduction,
   reactPlugins,
   sentryPluginOptions,
-  shouldUseSentryPlugin,
 } from "./vite.config.base";
 
 export default defineConfig(({ mode }) => {
@@ -33,14 +32,10 @@ export default defineConfig(({ mode }) => {
             },
             define: isDev ? defineDevelopment : defineProduction,
             plugins: [
-              ...(shouldUseSentryPlugin()
-                ? [
-                    sentryVitePlugin({
-                      ...sentryPluginOptions,
-                      project: process.env.MAIN_VITE_SENTRY_PROJECT,
-                    }),
-                  ]
-                : []),
+              sentryVitePlugin({
+                ...sentryPluginOptions,
+                project: process.env.MAIN_VITE_SENTRY_PROJECT,
+              }),
             ],
             build: {
               outDir: "dist-electron/main",

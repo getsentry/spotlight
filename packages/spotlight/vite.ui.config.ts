@@ -1,25 +1,15 @@
 import { resolve } from "node:path";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { defineConfig } from "vite";
-import {
-  aliases,
-  defineProduction,
-  reactPlugins,
-  sentryPluginOptions,
-  shouldUseSentryPlugin,
-} from "./vite.config.base";
+import { aliases, defineProduction, reactPlugins, sentryPluginOptions } from "./vite.config.base";
 
 export default defineConfig({
   plugins: [
     ...reactPlugins,
-    ...(shouldUseSentryPlugin()
-      ? [
-          sentryVitePlugin({
-            ...sentryPluginOptions,
-            project: process.env.MAIN_VITE_UI_SENTRY_PROJECT,
-          }),
-        ]
-      : []),
+    sentryVitePlugin({
+      ...sentryPluginOptions,
+      project: process.env.MAIN_VITE_UI_SENTRY_PROJECT,
+    }),
   ],
   define: defineProduction,
   resolve: {
