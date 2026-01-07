@@ -1,0 +1,48 @@
+# Craft Release Configuration
+# https://getsentry.github.io/craft/configuration/
+
+minVersion: "2.16.0"
+
+github:
+  owner: getsentry
+  repo: spotlight
+
+# Use automatic versioning based on conventional commits
+versioning:
+  policy: auto
+
+# Automatically generate changelog from conventional commits
+changelog:
+  filePath: packages/spotlight/CHANGELOG.md
+  policy: auto
+  scopeGrouping: true
+
+# Pre-release script to bump version in package.json
+preReleaseCommand: bash scripts/bump-version.sh
+
+# Artifacts are uploaded by GitHub Actions
+artifactProvider:
+  name: github
+
+# Build status from GitHub Actions
+statusProvider:
+  name: github
+  config:
+    contexts:
+      - "Build"
+
+# Required artifacts before publishing
+requireNames:
+  - /^built-packages$/
+  - /^spotlight-binaries$/
+
+targets:
+  # Publish to NPM registry
+  - name: npm
+    id: spotlight
+    includeNames: /^built-packages$/
+
+  # Create GitHub release with binaries
+  - name: github
+    includeNames: /^spotlight-binaries$/
+
