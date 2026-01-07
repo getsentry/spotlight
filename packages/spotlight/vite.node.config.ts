@@ -2,7 +2,7 @@ import { resolve } from "node:path";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import type { Plugin } from "vite";
 import { defineConfig } from "vite";
-import { aliases, defineProduction, dtsPlugin, sentryPluginOptions } from "./vite.config.base";
+import { aliases, defineProduction, dtsPlugin, sentryPluginOptions, shouldUseSentryPlugin } from "./vite.config.base";
 
 // Custom plugin to add shebang to the CLI entry point
 // This runs after all other transformations to ensure the shebang is the first line
@@ -25,10 +25,14 @@ const shebangPlugin = (): Plugin => ({
 export default defineConfig({
   plugins: [
     dtsPlugin,
-    sentryVitePlugin({
-      ...sentryPluginOptions,
-      project: process.env.MAIN_VITE_UI_SENTRY_PROJECT,
-    }),
+    ...(shouldUseSentryPlugin()
+      ? [
+          sentryVitePlugin({
+            ...sentryPluginOptions,
+            project: process.env.MAIN_VITE_UI_SENTRY_PROJECT,
+          }),
+        ]
+      : []),
     shebangPlugin(),
   ],
   define: defineProduction,

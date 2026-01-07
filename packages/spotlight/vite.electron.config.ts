@@ -2,7 +2,14 @@ import { sentryVitePlugin } from "@sentry/vite-plugin";
 import sourcemaps from "rollup-plugin-sourcemaps2";
 import { defineConfig } from "vite";
 import electron from "vite-plugin-electron/simple";
-import { aliases, defineDevelopment, defineProduction, reactPlugins, sentryPluginOptions } from "./vite.config.base";
+import {
+  aliases,
+  defineDevelopment,
+  defineProduction,
+  reactPlugins,
+  sentryPluginOptions,
+  shouldUseSentryPlugin,
+} from "./vite.config.base";
 
 export default defineConfig(({ mode }) => {
   const isDev = mode === "development";
@@ -26,10 +33,14 @@ export default defineConfig(({ mode }) => {
             },
             define: isDev ? defineDevelopment : defineProduction,
             plugins: [
-              sentryVitePlugin({
-                ...sentryPluginOptions,
-                project: process.env.MAIN_VITE_SENTRY_PROJECT,
-              }),
+              ...(shouldUseSentryPlugin()
+                ? [
+                    sentryVitePlugin({
+                      ...sentryPluginOptions,
+                      project: process.env.MAIN_VITE_SENTRY_PROJECT,
+                    }),
+                  ]
+                : []),
             ],
             build: {
               outDir: "dist-electron/main",

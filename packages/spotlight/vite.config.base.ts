@@ -45,3 +45,10 @@ export const sentryPluginOptions = {
     name: process.env.npm_package_version,
   },
 };
+
+export const shouldUseSentryPlugin = () => {
+  // Only use Sentry plugin when auth token and org are configured
+  // This prevents the injection of the virtual sentry release file that causes
+  // circular dependency issues in Node 24.x
+  return !!(process.env.MAIN_VITE_SENTRY_AUTH_TOKEN && process.env.MAIN_VITE_SENTRY_ORG);
+};
