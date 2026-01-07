@@ -43,5 +43,8 @@ export const sentryPluginOptions = {
   authToken: process.env.MAIN_VITE_SENTRY_AUTH_TOKEN,
   release: {
     name: process.env.npm_package_version,
+    // Disable virtual module injection - release is set via Sentry.init() at runtime.
+    // This prevents circular dependency issues in Node 24.x when using preserveModules.
+    inject: false,
   },
 };
