@@ -5,6 +5,9 @@ import { formatTimestamp } from "../utils.ts";
 
 export function formatLogEnvelope(container: EventContainer) {
   const parsedEnvelope = container.getParsedEnvelope();
+  if (!parsedEnvelope) {
+    return [];
+  }
 
   const {
     envelope: [envelopeHeader, items],
