@@ -2,6 +2,9 @@
 # Posts a comment on linked issues to let users know their issue was resolved
 
 name: "Automation: Notify issues for release"
+permissions:
+  contents: read
+  issues: write
 
 on:
   release:
