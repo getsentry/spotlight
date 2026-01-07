@@ -3,7 +3,6 @@
 # https://getsentry.github.io/craft/
 
 name: Changelog Preview
-
 on:
   pull_request:
     types: [opened, synchronize, reopened, edited, labeled, unlabeled]
