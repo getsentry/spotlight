@@ -1,0 +1,28 @@
+# Release workflow using Craft
+# https://getsentry.github.io/craft/
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (semver, "auto", "major", "minor", "patch")'
+        required: false
+        default: "auto"
+        type: string
+      force:
+        description: "Force release even with blockers"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  release:
+    name: Prepare Release
+    uses: getsentry/craft/.github/workflows/release.yml@v2
+    with:
+      version: ${{ inputs.version || 'auto' }}
+      force: ${{ inputs.force }}
+    secrets: inherit
+

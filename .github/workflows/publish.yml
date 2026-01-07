@@ -1,23 +1,25 @@
+# Publish workflow using Craft
+# Triggers when a release branch is merged or manually
 name: Publish
+
 permissions: write-all
+
 on:
-  workflow_run:
-    workflows:
-      - Build & Test
-    types:
-      - completed
+  push:
     branches:
       - main
+    paths:
+      - "packages/spotlight/CHANGELOG.md"
   workflow_dispatch:
     inputs:
-      sha:
-        description: 'SHA to release from'
+      version:
+        description: "Version to publish (e.g., 4.10.0)"
         required: true
         type: string
       target:
-        description: 'Which targets to release'
+        description: "Which targets to release"
         required: true
-        default: 'all'
+        default: "all"
         type: choice
         options:
           - all
@@ -25,41 +27,64 @@ on:
           - docker
           - electron
 
-concurrency: ${{ github.workflow }}-${{ github.event.workflow_run.head_sha || inputs.sha }}
-
-env:
-  SHA: ${{ github.event.workflow_run.head_sha || inputs.sha }}
+concurrency: ${{ github.workflow }}-${{ github.sha }}
 
 jobs:
-  get_run_id:
-    name: Get Run ID
+  # Extract version from CHANGELOG or use input
+  get_version:
+    name: Get Version
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      run-id: ${{ steps.get_run_id.outputs.run-id }}
+      should_publish: ${{ steps.check.outputs.should_publish }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    outputs:
-        run-id: ${{ steps.get_run_id.outputs.run-id }}
     steps:
-      - name: Get Run ID
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Check if this is a release commit
+        id: check
+        run: |
+          # Check if the changelog was modified in the last commit
+          if git diff --name-only HEAD~1 HEAD | grep -q "packages/spotlight/CHANGELOG.md"; then
+            echo "should_publish=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_publish=${{ inputs.version != '' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Extract version
+        id: version
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            # Extract version from package.json
+            VERSION=$(node -p "require('./packages/spotlight/package.json').version")
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get Build Run ID
         id: get_run_id
         run: |
-          RUN_ID=$(gh api -H "Accept: application/vnd.github.v3+json" -H "X-GitHub-Api-Version: 2022-11-28" '/repos/${{ github.repository }}/actions/runs?head_sha=${{ env.SHA }}&branch=main&status=success' -q '[.workflow_runs.[] | select(.name == "Build & Test")][0].id')
+          RUN_ID=$(gh api -H "Accept: application/vnd.github.v3+json" -H "X-GitHub-Api-Version: 2022-11-28" '/repos/${{ github.repository }}/actions/runs?head_sha=${{ github.sha }}&status=success' -q '[.workflow_runs[] | select(.name == "Build & Test")][0].id')
           echo "run-id=$RUN_ID" >> $GITHUB_OUTPUT
 
   npm:
     name: NPM Package
     runs-on: ubuntu-latest
     environment: Production
-    needs: get_run_id
+    needs: get_version
     if: >-
-      (github.event.workflow_run.conclusion == 'success'
-      &&
-      contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
-      ) || inputs.target == 'npm' || inputs.target == 'all'
+      needs.get_version.outputs.should_publish == 'true' &&
+      (inputs.target == 'npm' || inputs.target == 'all' || inputs.target == '')
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v6
         with:
-          ref: ${{ env.SHA }}
           fetch-depth: 0
 
       - name: Setup pnpm
@@ -68,8 +93,9 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version-file: 'package.json'
-          cache: 'pnpm'
+          node-version-file: "package.json"
+          cache: "pnpm"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Setup NPM dependencies
         run: pnpm install
@@ -80,7 +106,7 @@ jobs:
           name: built-packages
           path: packages/spotlight/dist/
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ needs.get_run_id.outputs.run-id }}
+          run-id: ${{ needs.get_version.outputs.run-id }}
 
       - name: Download spotlight binaries
         uses: actions/download-artifact@v5
@@ -88,41 +114,38 @@ jobs:
           name: spotlight-binaries
           path: packages/spotlight/dist-bin/
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ needs.get_run_id.outputs.run-id }}
+          run-id: ${{ needs.get_version.outputs.run-id }}
 
       - name: Publish to NPM
-        uses: changesets/action@v1
+        working-directory: packages/spotlight
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          BUILD_PLATFORMS: 'linux-x64,linux-arm64,win-x64,darwin-x64,darwin-arm64'
-        with:
-          publish: pnpm changeset:publish
-          createGithubReleases: true
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm publish --access public
 
-      - name: Gets latest created release info
-        id: latest_release_info
-        uses: gregziegan/fetch-latest-release@v2.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file_glob: true
-          file: packages/spotlight/dist-bin/spotlight-*
-          tag: ${{ steps.latest_release_info.outputs.tag_name }}
-          make_latest: false
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ needs.get_version.outputs.version }}"
+          TAG="@spotlightjs/spotlight@${VERSION}"
+          
+          # Extract changelog for this version
+          CHANGELOG=$(awk '/^## '"$VERSION"'/{flag=1; next} /^## [0-9]+\.[0-9]+\.[0-9]+/{flag=0} flag' packages/spotlight/CHANGELOG.md)
+          
+          # Create the release
+          gh release create "$TAG" \
+            --title "@spotlightjs/spotlight@${VERSION}" \
+            --notes "$CHANGELOG" \
+            packages/spotlight/dist-bin/spotlight-*
 
   docker:
     name: Docker Image
     runs-on: ubuntu-latest
+    needs: get_version
     if: >-
-      (github.event.workflow_run.conclusion == 'success'
-      &&
-      contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
-      ) || inputs.target == 'docker' || inputs.target == 'all'
+      needs.get_version.outputs.should_publish == 'true' &&
+      (inputs.target == 'docker' || inputs.target == 'all' || inputs.target == '')
     steps:
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -134,35 +157,33 @@ jobs:
       - uses: docker/setup-buildx-action@v3
 
       - name: Push Docker Image as latest
+        env:
+          SHA: ${{ github.sha }}
         run: >-
           docker buildx imagetools create
           --tag ghcr.io/getsentry/spotlight:latest
+          --tag ghcr.io/getsentry/spotlight:${{ needs.get_version.outputs.version }}
           ghcr.io/getsentry/spotlight:$SHA
 
       - name: Summarize
         run: |
-          echo "**Tag:** ``ghcr.io/getsentry/spotlight:$SHA``" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ needs.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** \`ghcr.io/getsentry/spotlight:${{ needs.get_version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
 
   electron:
     name: Electron Build
     runs-on: macos-latest
     environment: Production
-    needs: [get_run_id, npm]
+    needs: [get_version, npm]
     if: >-
       always() &&
-      needs.get_run_id.result == 'success' &&
+      needs.get_version.result == 'success' &&
       (needs.npm.result == 'success' || needs.npm.result == 'skipped') &&
-      (
-        (github.event.workflow_run.conclusion == 'success'
-        &&
-        contains(github.event.workflow_run.head_commit.message, 'meta(changelog): Update package versions')
-        ) || inputs.target == 'electron' || inputs.target == 'all'
-      )
+      needs.get_version.outputs.should_publish == 'true' &&
+      (inputs.target == 'electron' || inputs.target == 'all' || inputs.target == '')
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v6
-        with:
-          ref: ${{ env.SHA }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -170,8 +191,8 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version-file: 'package.json'
-          cache: 'pnpm'
+          node-version-file: "package.json"
+          cache: "pnpm"
 
       - name: Setup dependencies
         run: pnpm install
@@ -182,32 +203,31 @@ jobs:
           name: electron-build
           path: ${{ runner.temp }}/electron-artifact/
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ needs.get_run_id.outputs.run-id }}
-
+          run-id: ${{ needs.get_version.outputs.run-id }}
 
       - name: Validate and copy Electron build files
         run: |
           # Create/empty the target directory
           rm -rf packages/spotlight/dist-electron/
           mkdir -p packages/spotlight/dist-electron/
-          
+
           # Copy only expected directories (main and renderer) to prevent artifact poisoning
           if [ -d "${{ runner.temp }}/electron-artifact/main" ]; then
             cp -r "${{ runner.temp }}/electron-artifact/main" packages/spotlight/dist-electron/
             echo "Copied main/ directory"
           fi
-          
+
           if [ -d "${{ runner.temp }}/electron-artifact/renderer" ]; then
             cp -r "${{ runner.temp }}/electron-artifact/renderer" packages/spotlight/dist-electron/
             echo "Copied renderer/ directory"
           fi
-          
+
           # Verify expected directories exist
           if [ ! -d "packages/spotlight/dist-electron/main" ] || [ ! -d "packages/spotlight/dist-electron/renderer" ]; then
             echo "Error: Expected directories (main/ and renderer/) not found in artifact"
             exit 1
           fi
-          
+
           echo "Successfully validated and copied electron build files"
 
       - name: Setup Apple API Key for Notarization
@@ -232,17 +252,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: cd packages/spotlight && pnpm build:mac
 
-      - name: Gets latest created release info
-        id: latest_release_info
-        uses: gregziegan/fetch-latest-release@v2.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: packages/spotlight/dist-electron/*.{dmg,zip,blockmap,yml}
-          tag: ${{ steps.latest_release_info.outputs.tag_name }}
-          file_glob: true
-          make_latest: false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="@spotlightjs/spotlight@${{ needs.get_version.outputs.version }}"
+          gh release upload "$TAG" packages/spotlight/dist-electron/*.{dmg,zip,blockmap,yml} --clobber
