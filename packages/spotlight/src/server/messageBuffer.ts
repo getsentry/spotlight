@@ -331,6 +331,9 @@ export class MessageBuffer<T> {
       }
 
       const data = (item[1] as EventContainer).getParsedEnvelope();
+      if (!data) {
+        return false;
+      }
 
       return data.envelope[0].__spotlight_envelope_id.equals(UUID.parse(value.envelopeId));
     },
@@ -340,6 +343,9 @@ export class MessageBuffer<T> {
       }
 
       const contents = (item[1] as EventContainer).getParsedEnvelope();
+      if (!contents) {
+        return false;
+      }
       const spotlightEnvelopeId = contents.envelope[0].__spotlight_envelope_id.toString();
 
       for (const [filename, envelopeIds] of ctx.filenameCache.entries()) {

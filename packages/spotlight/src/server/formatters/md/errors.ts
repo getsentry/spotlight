@@ -8,6 +8,9 @@ import { formatEventOutput } from "./event.ts";
 
 export function formatErrorEnvelope(container: EventContainer) {
   const processedEnvelope = container.getParsedEnvelope();
+  if (!processedEnvelope) {
+    return [];
+  }
 
   const {
     envelope: [envelopeHeader, items],
