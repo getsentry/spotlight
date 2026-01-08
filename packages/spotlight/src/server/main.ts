@@ -23,6 +23,18 @@ import {
 let portInUseRetryTimeout: NodeJS.Timeout | null = null;
 
 const MAX_RETRIES = 3;
+
+export class PortInUseError extends Error {
+  constructor(port: number, maxRetries: number) {
+    super(
+      `Port ${port} is already in use after ${maxRetries} retry attempts.\n` +
+        `Try one of the following:\n` +
+        `  - Use a different port: spotlight --port <PORT>\n` +
+        `  - Stop the process using port ${port}`,
+    );
+    this.name = "PortInUseError";
+  }
+}
 export async function startServer(options: StartServerOptions): Promise<Server> {
   const { port, basePath } = options;
   let filesToServe = options.filesToServe;
@@ -116,12 +128,12 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
   let retries = 0;
   function handleServerError(err: { code?: string }): void {
     if ("code" in err && err.code === "EADDRINUSE") {
-      logger.info(`Port ${options.port} in use, retrying...`);
+      logger.warn(`Port ${options.port} in use, retrying (${retries + 1}/${MAX_RETRIES})...`);
       server.close();
 
       retries++;
       if (retries > MAX_RETRIES) {
-        reject(err as Error);
+        reject(new PortInUseError(options.port, MAX_RETRIES));
         return;
       }
 

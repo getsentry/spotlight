@@ -1,5 +1,6 @@
 import type { AddressInfo } from "node:net";
-import { setupSpotlight } from "../main.ts";
+import { PortInUseError, setupSpotlight } from "../main.ts";
+import { logger } from "../logger.ts";
 import type { CLIHandlerOptions, Command, CommandMeta } from "../types/cli.ts";
 import { openInBrowser } from "../utils/extras.ts";
 
@@ -26,22 +27,30 @@ The server provides:
 };
 
 export async function handler({ port, basePath, filesToServe, allowedOrigins, open }: CLIHandlerOptions) {
-  const serverInstance = await setupSpotlight({
-    port,
-    basePath,
-    filesToServe,
-    isStandalone: true,
-    allowedOrigins,
-  });
+  try {
+    const serverInstance = await setupSpotlight({
+      port,
+      basePath,
+      filesToServe,
+      isStandalone: true,
+      allowedOrigins,
+    });
 
-  if (open) {
-    // Use actual port from server instance, or fall back to requested port
-    // (when serverInstance is undefined, a server is already running on the requested port)
-    const actualPort = serverInstance ? (serverInstance.address() as AddressInfo).port : port;
-    openInBrowser(actualPort);
+    if (open) {
+      // Use actual port from server instance, or fall back to requested port
+      // (when serverInstance is undefined, a server is already running on the requested port)
+      const actualPort = serverInstance ? (serverInstance.address() as AddressInfo).port : port;
+      openInBrowser(actualPort);
+    }
+
+    return serverInstance;
+  } catch (err) {
+    if (err instanceof PortInUseError) {
+      logger.error(err.message);
+      process.exit(1);
+    }
+    throw err; // Re-throw other errors (keeps normal behavior)
   }
-
-  return serverInstance;
 }
 
 export default { meta, handler } satisfies Command;
