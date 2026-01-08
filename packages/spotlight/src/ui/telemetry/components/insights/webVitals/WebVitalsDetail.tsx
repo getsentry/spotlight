@@ -14,80 +14,69 @@ import PerformanceChart from "./PerformanceChart";
 const WebVitalsDetail = () => {
   const events = useSentryEvents();
   const { page } = useParams();
-  const measurementEvents: SentryEventWithPerformanceData[] = [];
-
-  events
-    .filter(event => 
-      event.event_id === page && 
-      event.measurements && 
-      event?.contexts?.trace?.op === "pageload"
-    )
-    .map(event => {
+  
+  let measurementEvent: SentryEventWithPerformanceData | undefined;
+  for (const event of events) {
+    if (event.event_id === page && event.measurements && event?.contexts?.trace?.op === "pageload") {
       const updatedEvent = { ...event };
       normalizePerformanceScore(updatedEvent, PERFORMANCE_SCORE_PROFILES);
-      return updatedEvent as unknown as SentryEventWithPerformanceData;
-    })
-    .filter(event => event.measurements["score.total"] != null)
-    .forEach(event => measurementEvents.push(event));
+      if (updatedEvent.measurements["score.total"] != null) {
+        measurementEvent = updatedEvent as unknown as SentryEventWithPerformanceData;
+        break;
+      }
+    }
+  }
 
-  if (page && measurementEvents.length) {
+  if (page && measurementEvent) {
     const metricScore: MetricScoreProps = {
-      fcpScore: Math.trunc(measurementEvents[0].measurements["score.fcp"].value * 100),
-      lcpScore: Math.trunc(measurementEvents[0].measurements["score.lcp"].value * 100),
-      fidScore: Math.trunc(measurementEvents[0].measurements["score.fid"].value * 100),
-      clsScore: Math.trunc(measurementEvents[0].measurements["score.cls"].value * 100),
-      ttfbScore: Math.trunc(measurementEvents[0].measurements["score.ttfb"].value * 100),
+      fcpScore: Math.trunc(measurementEvent.measurements["score.fcp"].value * 100),
+      lcpScore: Math.trunc(measurementEvent.measurements["score.lcp"].value * 100),
+      fidScore: Math.trunc(measurementEvent.measurements["score.fid"].value * 100),
+      clsScore: Math.trunc(measurementEvent.measurements["score.cls"].value * 100),
+      ttfbScore: Math.trunc(measurementEvent.measurements["score.ttfb"].value * 100),
     };
 
     const metricWeights: MetricWeightsProps = {
-      fcp: Math.trunc(measurementEvents[0].measurements["score.weight.fcp"].value * 100),
-      lcp: Math.trunc(measurementEvents[0].measurements["score.weight.lcp"].value * 100),
-      fid: Math.trunc(measurementEvents[0].measurements["score.weight.fid"].value * 100),
-      cls: Math.trunc(measurementEvents[0].measurements["score.weight.cls"].value * 100),
-      ttfb: Math.trunc(measurementEvents[0].measurements["score.weight.ttfb"].value * 100),
+      fcp: Math.trunc(measurementEvent.measurements["score.weight.fcp"].value * 100),
+      lcp: Math.trunc(measurementEvent.measurements["score.weight.lcp"].value * 100),
+      fid: Math.trunc(measurementEvent.measurements["score.weight.fid"].value * 100),
+      cls: Math.trunc(measurementEvent.measurements["score.weight.cls"].value * 100),
+      ttfb: Math.trunc(measurementEvent.measurements["score.weight.ttfb"].value * 100),
     };
 
-    const totalScore: number = Math.trunc(measurementEvents[0].measurements["score.total"].value * 100);
+    const totalScore: number = Math.trunc(measurementEvent.measurements["score.total"].value * 100);
 
     const projectScoreHeaders = [
       {
         id: "fcpScore",
         description: "First Contentful Paint",
         label: "FCP",
-        score: measurementEvents[0].measurements?.fcp
-          ? getFormattedDuration(measurementEvents[0].measurements.fcp.value)
-          : "-",
+        score: measurementEvent.measurements?.fcp ? getFormattedDuration(measurementEvent.measurements.fcp.value) : "-",
       },
       {
         id: "lcpScore",
         description: "Largest Contentful Paint",
         label: "LCP",
-        score: measurementEvents[0].measurements?.lcp
-          ? getFormattedDuration(measurementEvents[0].measurements.lcp.value)
-          : "-",
+        score: measurementEvent.measurements?.lcp ? getFormattedDuration(measurementEvent.measurements.lcp.value) : "-",
       },
       {
         id: "fidScore",
         description: "First Input Delay",
         label: "FID",
-        score: measurementEvents[0].measurements?.fid
-          ? getFormattedDuration(measurementEvents[0].measurements.fid.value)
-          : "-",
+        score: measurementEvent.measurements?.fid ? getFormattedDuration(measurementEvent.measurements.fid.value) : "-",
       },
       {
         id: "clsScore",
         description: "Cumulative Layout Shift",
         label: "CLS",
-        score: measurementEvents[0].measurements?.cls
-          ? getFormattedDuration(measurementEvents[0].measurements.cls.value)
-          : "-",
+        score: measurementEvent.measurements?.cls ? getFormattedDuration(measurementEvent.measurements.cls.value) : "-",
       },
       {
         id: "ttfbScore",
         description: "Time to First Byte",
         label: "TTFB",
-        score: measurementEvents[0].measurements?.ttfb
-          ? getFormattedDuration(measurementEvents[0].measurements.ttfb.value)
+        score: measurementEvent.measurements?.ttfb
+          ? getFormattedDuration(measurementEvent.measurements.ttfb.value)
           : "-",
       },
     ];
