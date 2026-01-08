@@ -65,6 +65,17 @@ const sentry = init({
   },
 
   beforeSend: event => {
+    const message = event.exception?.values?.[0]?.value || "";
+
+    // Filter EADDRINUSE - user has multiple Spotlight instances running
+    if (message.includes("EADDRINUSE")) return null;
+
+    // Filter MCP abort errors - normal connection lifecycle when AI tools disconnect
+    if (message.includes("AbortError") && message.includes("aborted")) return null;
+
+    // Filter MCP timeout errors - external AI tool timeouts
+    if (message.includes("MCP error -32001") || message.includes("Request timed out")) return null;
+
     const exceptions = event.exception?.values;
     if (!exceptions) {
       return event;
