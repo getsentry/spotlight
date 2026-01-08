@@ -17,12 +17,18 @@ const WebVitalsDetail = () => {
   const measurementEvents: SentryEventWithPerformanceData[] = [];
 
   events
-    .filter(event => event.event_id === page)
+    .filter(event => 
+      event.event_id === page && 
+      event.measurements && 
+      event?.contexts?.trace?.op === "pageload"
+    )
     .map(event => {
       const updatedEvent = { ...event };
       normalizePerformanceScore(updatedEvent, PERFORMANCE_SCORE_PROFILES);
-      measurementEvents.push(updatedEvent as unknown as SentryEventWithPerformanceData);
-    });
+      return updatedEvent as unknown as SentryEventWithPerformanceData;
+    })
+    .filter(event => event.measurements["score.total"] != null)
+    .forEach(event => measurementEvents.push(event));
 
   if (page && measurementEvents.length) {
     const metricScore: MetricScoreProps = {
