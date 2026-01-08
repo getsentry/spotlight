@@ -23,8 +23,8 @@ export default function Attachment({
   const extension = inferExtension(header.content_type as string | null, header.type as string | null);
   const name = (header.filename as string) || `untitled.${extension}`;
 
-  // Create download URL for binary content types
-  // Returns: string (success), null (decode error)
+  // Create download URL for attachment
+  // Returns: string (success), null (decode error), undefined (not expanded yet)
   const downloadUrl = useMemo(() => {
     if (!expanded) {
       return undefined; // Not needed yet
@@ -34,19 +34,22 @@ export default function Attachment({
     let blobData: BlobPart;
 
     if (IMAGE_CONTENT_TYPES.has(contentType) || VIDEO_CONTENT_TYPES.has(contentType)) {
+      // Binary content types are base64-encoded
       const decoded = base64Decode(attachment);
       if (!decoded) {
         return null; // Decode error
       }
       blobData = decoded.buffer as BlobPart;
     } else if (extension === "bin") {
+      // Unknown binary files are base64-encoded
       const decoded = safeAtob(attachment);
       if (decoded === null) {
         return null; // Decode error
       }
       blobData = decoded;
     } else {
-      return undefined; // Not a binary type, no blob URL needed
+      // Text-based content types (json, txt, csv, code, etc.) - use raw attachment
+      blobData = attachment;
     }
 
     const blob = new Blob([blobData], { type: contentType || "application/octet-stream" });
