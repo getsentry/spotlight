@@ -425,8 +425,29 @@ store.onDidChange("sentry-send-envelopes", newValue => {
 });
 
 async function askForPermissionToSendToSentry(event: Sentry.Event, hint: Sentry.EventHint) {
+  const message = event.exception?.values?.[0]?.value || "";
+
+  // Network-related errors - user's network conditions
+  const networkErrors = [
+    "ERR_NAME_NOT_RESOLVED",
+    "ERR_INTERNET_DISCONNECTED",
+    "ERR_NETWORK_CHANGED",
+    "ERR_TIMED_OUT",
+    "net::ERR_",
+  ];
+  if (networkErrors.some(e => message.includes(e))) return null;
+
   // Handle updater errors silently - no dialogs or error screens
   if (event.tags?.error_source === "updater") {
+    // Drop 404s (release not found), 504s (timeout), checksum mismatches
+    if (
+      message.includes("404") ||
+      message.includes("504") ||
+      message.includes("sha512 checksum mismatch") ||
+      message.includes("latest-mac.yml")
+    ) {
+      return null;
+    }
     // Only send if user has explicitly enabled error reporting
     if (store.get("sentry-enabled") === false) {
       return null;
@@ -434,6 +455,18 @@ async function askForPermissionToSendToSentry(event: Sentry.Event, hint: Sentry.
     // For updater errors, send silently if enabled or not yet configured
     return event;
   }
+
+  // macOS read-only volume (Downloads folder restriction)
+  if (message.includes("read-only volume")) return null;
+
+  // Code signature validation errors (download corruption)
+  if (message.includes("Code signature") || message.includes("OSStatus error")) return null;
+
+  // Failed to open URL (external browser issues)
+  if (message.includes("Failed to open URL")) return null;
+
+  // EADDRINUSE - user has another instance running
+  if (message.includes("EADDRINUSE")) return null;
 
   if (store.get("sentry-enabled") === false) {
     return null;

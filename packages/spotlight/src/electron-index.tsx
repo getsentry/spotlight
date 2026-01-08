@@ -16,6 +16,16 @@ ElectronSentryInit(
     profilesSampleRate: 1.0,
     replaysSessionSampleRate: 0.01,
     replaysOnErrorSampleRate: 1.0,
+    beforeSend: event => {
+      const message = event.exception?.values?.[0]?.value || "";
+
+      // Dynamic import failures - network/caching issues
+      if (message.includes("Failed to fetch dynamically imported module")) {
+        return null;
+      }
+
+      return event;
+    },
   },
   ReactSentryInit,
 );
