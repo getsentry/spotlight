@@ -18,6 +18,10 @@ export default defineConfig(({ mode }) => {
     publicDir: "public",
     plugins: [
       ...reactPlugins,
+      sentryVitePlugin({
+        ...sentryPluginOptions,
+        project: process.env.MAIN_VITE_SENTRY_PROJECT,
+      }),
       electron({
         main: {
           entry: "src/electron/main/index.ts",
