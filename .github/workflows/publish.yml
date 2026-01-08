@@ -1,10 +1,6 @@
 # Post-release workflow for Docker and Electron
 # Triggered after getsentry/publish creates the GitHub release via craft publish
 #
-# NPM publishing and GitHub release creation are handled by:
-# 1. release.yml -> craft prepare -> creates publish issue in getsentry/publish
-# 2. getsentry/publish -> craft publish -> publishes to npm + creates GitHub release
-# 3. This workflow triggers on the release event to handle Docker and Electron
 
 name: Post-Release
 
