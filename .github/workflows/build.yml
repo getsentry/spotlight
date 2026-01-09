@@ -337,3 +337,72 @@ jobs:
         run: |
           docker run --rm -d -p 8969:8969 ghcr.io/getsentry/spotlight:${{ github.sha }}
           curl -sf --retry 3 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
+
+  electron-mac:
+    name: Build Electron App (macOS)
+    needs: build
+    runs-on: macos-latest
+    if: github.event_name == 'push' && (github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
+    environment: Production
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+
+      - name: Setup dependencies
+        run: pnpm install
+
+      - name: Download Electron build
+        uses: actions/download-artifact@v5
+        with:
+          name: electron-build
+          path: packages/spotlight/dist-electron/
+
+      - name: Validate Electron build files
+        run: |
+          if [ ! -d "packages/spotlight/dist-electron/main" ] || [ ! -d "packages/spotlight/dist-electron/renderer" ]; then
+            echo "Error: Expected directories not found in artifact"
+            ls -la packages/spotlight/dist-electron/
+            exit 1
+          fi
+          echo "Electron build files validated successfully"
+
+      - name: Setup Apple API Key for Notarization
+        env:
+          APPLE_API_KEY_BUNDLE: ${{ secrets.APPLE_API_KEY }}
+        run: |
+          echo "$APPLE_API_KEY_BUNDLE" | base64 -d > /tmp/apple_key.json
+          cat /tmp/apple_key.json | jq .private_key -r > /tmp/apple_key.pem
+          echo "APPLE_API_ISSUER=$(cat /tmp/apple_key.json | jq .issuer_id -r | tr -d '\n\r')" >> $GITHUB_ENV
+          echo "APPLE_API_KEY_ID=$(cat /tmp/apple_key.json | jq .key_id -r | tr -d '\n\r')" >> $GITHUB_ENV
+          echo "APPLE_API_KEY=/tmp/apple_key.pem" >> $GITHUB_ENV
+
+      - name: Build and Sign Electron App
+        env:
+          MAIN_VITE_SENTRY_ORG: ${{ vars.MAIN_VITE_SENTRY_ORG }}
+          MAIN_VITE_SENTRY_PROJECT: ${{ vars.MAIN_VITE_SENTRY_PROJECT }}
+          MAIN_VITE_SENTRY_AUTH_TOKEN: ${{ secrets.MAIN_VITE_SENTRY_AUTH_TOKEN }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: packages/spotlight
+        run: pnpm build:mac
+
+      - name: Store Electron binaries
+        uses: actions/upload-artifact@v5
+        with:
+          name: electron-binaries
+          if-no-files-found: error
+          path: |
+            packages/spotlight/dist-electron/*.dmg
+            packages/spotlight/dist-electron/*.zip
+            packages/spotlight/dist-electron/*.blockmap
+            packages/spotlight/dist-electron/*.yml

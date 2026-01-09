@@ -35,6 +35,7 @@ statusProvider:
 requireNames:
   - /^built-packages$/
   - /^spotlight-binaries$/
+  - /^electron-binaries$/
 
 # Targets - executed by getsentry/publish repo
 targets:
@@ -46,3 +47,15 @@ targets:
   # Create GitHub release with standalone binaries
   - name: github
     tagPrefix: "@spotlightjs/spotlight@"
+
+  # Tag Docker image with version (source is SHA-tagged by build.yml)
+  - name: docker
+    source: ghcr.io/getsentry/spotlight
+    target: ghcr.io/getsentry/spotlight
+
+  # Also tag as latest
+  - name: docker
+    source: ghcr.io/getsentry/spotlight
+    target:
+      image: ghcr.io/getsentry/spotlight
+      format: "{{{image}}}:latest"
