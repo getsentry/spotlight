@@ -13,6 +13,8 @@ export const aliases = {
 export const defineProduction = {
   "process.env.NODE_ENV": '"production"',
   "process.env.npm_package_version": JSON.stringify(process.env.npm_package_version),
+  // Injected version constant for runtime use (especially in fossilized binaries)
+  __SPOTLIGHT_VERSION__: JSON.stringify(process.env.npm_package_version),
   // Set to false for tree-shaking; Electron config overrides to true
   __IS_ELECTRON__: false,
 };
@@ -42,6 +44,12 @@ export const sentryPluginOptions = {
   org: process.env.MAIN_VITE_SENTRY_ORG,
   authToken: process.env.MAIN_VITE_SENTRY_AUTH_TOKEN,
   release: {
-    name: process.env.npm_package_version,
+    name: `spotlight@${process.env.npm_package_version}`, // Match runtime format
+    // Disable virtual module injection - release is set via Sentry.init() at runtime.
+    // This prevents circular dependency issues in Node 24.x when using preserveModules.
+    inject: false,
+  },
+  sourcemaps: {
+    filesToDeleteAfterUpload: ["**/*.js.map"],
   },
 };

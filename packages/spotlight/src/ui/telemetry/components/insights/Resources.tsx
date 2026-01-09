@@ -73,7 +73,7 @@ const Resources = () => {
 
   const resources = useMemo(() => {
     const filteredResourceSpans = getResourceSpans(allSpans, { regex: /resource\.[A-Za-z]+/ });
-    const uniqueResourceDescriptionsSet = new Set(filteredResourceSpans.map(span => String(span?.description).trim()));
+    const uniqueResourceDescriptionsSet = new Set(filteredResourceSpans.map(span => (span.description ?? "").trim()));
     // Clear out empty ones (they collapse as a single empty string since this is a set)
     uniqueResourceDescriptionsSet.delete("");
     const uniqueResourceDescriptions: string[] = [...uniqueResourceDescriptionsSet];

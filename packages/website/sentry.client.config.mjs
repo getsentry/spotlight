@@ -12,4 +12,35 @@ Sentry.init({
       blockAllMedia: false,
     }),
   ],
+  beforeSend: (event) => {
+    const message = event.exception?.values?.[0]?.value || "";
+    const userAgent =
+      event.request?.headers?.["User-Agent"] || (typeof navigator !== "undefined" ? navigator.userAgent : "");
+
+    // Filter bot/crawler errors
+    if (
+      userAgent.toLowerCase().includes("bot") ||
+      userAgent.includes("Spider") ||
+      userAgent.includes("WebPageTest")
+    ) {
+      return null;
+    }
+
+    // Dynamic import failures - network issues
+    if (message.includes("Failed to fetch dynamically imported module")) {
+      return null;
+    }
+
+    // Load failed (network issues)
+    if (message === "Load failed" || message.includes("TypeError: Load failed")) {
+      return null;
+    }
+
+    // NS_ERROR_FAILURE (Firefox-specific internal error)
+    if (message.includes("NS_ERROR_FAILURE")) {
+      return null;
+    }
+
+    return event;
+  },
 });

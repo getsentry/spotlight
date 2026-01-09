@@ -51,7 +51,7 @@ const Queries = () => {
     const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.totalTime];
     const spans = allSpans;
     const onlyDBSpans = spans.filter((span: Span) => DB_SPAN_REGEX.test(span.op || ""));
-    const uniqueSpansSet = new Set(onlyDBSpans.map(span => String(span?.description).trim()));
+    const uniqueSpansSet = new Set(onlyDBSpans.map(span => (span.description ?? "").trim()));
     // Clear out empty ones (they collapse as a single empty string since this is a set)
     uniqueSpansSet.delete("");
     return [...uniqueSpansSet]

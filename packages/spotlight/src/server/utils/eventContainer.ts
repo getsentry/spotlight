@@ -33,8 +33,9 @@ export class EventContainer {
 
   /**
    * Get parsed envelope data (lazy parsing)
+   * Returns null if the envelope is malformed
    */
-  getParsedEnvelope(): ParsedEnvelope {
+  getParsedEnvelope(): ParsedEnvelope | null {
     // Parse once and cache the result
     if (!this.isParsed) {
       this.parsedEnvelope = processEnvelope(
@@ -47,7 +48,7 @@ export class EventContainer {
       this.isParsed = true;
     }
 
-    return this.parsedEnvelope!;
+    return this.parsedEnvelope;
   }
 
   /**
