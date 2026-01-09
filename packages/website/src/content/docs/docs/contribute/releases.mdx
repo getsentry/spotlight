@@ -16,6 +16,10 @@ You can specify:
 - **Version**: Leave as `auto` to determine from commits, or specify `major`, `minor`, `patch`, or an explicit version like `4.10.0`
 - **Force**: Check this to release even if there are release-blockers
 
+:::note[Release Blockers]
+A release-blocker is any open PR with the `release-blocker` label. This prevents accidental releases when critical changes are pending. Use the **Force** option to override this check. See the [Craft documentation](https://getsentry.github.io/craft/github-actions/#workflow-inputs) for more details.
+:::
+
 ### 2. Review the Release Branch
 
 Craft creates a release branch (e.g., `release/4.10.0`) with:
@@ -31,11 +35,11 @@ Once the release branch CI passes:
 
 1. Review the changelog and version bump
 2. Merge the release branch to `main`
-3. The publish workflow triggers automatically and:
-   - Publishes to NPM
-   - Creates a GitHub release with binaries
-   - Tags the Docker image as `latest`
-   - Builds and signs the Electron app
+3. Craft creates a publish issue in [getsentry/publish](https://github.com/getsentry/publish)
+4. The publish workflow runs and:
+   - Publishes `@spotlightjs/spotlight` to NPM
+   - Creates a GitHub release with standalone binaries and Electron app
+   - Tags the Docker image with the version and `latest`
 
 ## Version Determination
 
@@ -47,18 +51,12 @@ Craft analyzes commits since the last release to determine the version bump:
 | New feature | `feat: add dark mode` | Minor (1.0.0 → 1.1.0) |
 | Bug fix | `fix: handle error` | Patch (1.0.0 → 1.0.1) |
 
-## Manual Publishing
+## Artifacts
 
-If you need to manually trigger a publish (e.g., to re-publish a specific target):
+The CI build produces these artifacts that Craft uploads to the GitHub release:
 
-1. Go to the [Publish](https://github.com/getsentry/spotlight/actions/workflows/publish.yml) workflow
-2. Click "Run workflow"
-3. Enter the version and select which targets to publish
-
-## Targets
-
-| Target | Description |
+| Artifact | Description |
 | --- | --- |
-| `npm` | Publishes `@spotlightjs/spotlight` to NPM registry |
-| `docker` | Tags Docker image as `latest` and version tag |
-| `electron` | Builds, signs, and uploads macOS Electron app |
+| `built-packages` | The npm package contents |
+| `spotlight-binaries` | Standalone CLI binaries for all platforms |
+| `electron-binaries` | Signed macOS Electron app (.dmg, .zip) |
