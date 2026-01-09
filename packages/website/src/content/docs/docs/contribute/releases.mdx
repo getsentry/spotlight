@@ -36,10 +36,15 @@ Once the release branch CI passes:
 1. Review the changelog and version bump
 2. Merge the release branch to `main`
 3. Craft creates a publish issue in [getsentry/publish](https://github.com/getsentry/publish)
-4. The publish workflow runs and:
+4. A release manager adds the `accepted` label to approve the release
+5. The publish workflow runs and:
    - Publishes `@spotlightjs/spotlight` to NPM
    - Creates a GitHub release with standalone binaries and Electron app
    - Tags the Docker image with the version and `latest`
+
+:::tip[Why getsentry/publish?]
+The [getsentry/publish](https://github.com/getsentry/publish) repository is Sentry's central publishing system. It keeps sensitive credentials (NPM tokens, signing keys, etc.) secure and requires formal approval from release managers before publishing. This ensures releases are reviewed and prevents accidental or unauthorized publishes.
+:::
 
 ## Version Determination
 
