@@ -46,16 +46,6 @@ Once the release branch CI passes:
 The [getsentry/publish](https://github.com/getsentry/publish) repository is Sentry's central publishing system. It keeps sensitive credentials (NPM tokens, signing keys, etc.) secure and requires formal approval from release managers before publishing. This ensures releases are reviewed and prevents accidental or unauthorized publishes.
 :::
 
-## Version Determination
-
-Craft analyzes commits since the last release to determine the version bump:
-
-| Commit Type | Example | Version Bump |
-| --- | --- | --- |
-| Breaking change | `feat!: remove API` | Major (1.0.0 → 2.0.0) |
-| New feature | `feat: add dark mode` | Minor (1.0.0 → 1.1.0) |
-| Bug fix | `fix: handle error` | Patch (1.0.0 → 1.0.1) |
-
 ## Artifacts
 
 The CI build produces these artifacts that Craft uploads to the GitHub release:
