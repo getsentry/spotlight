@@ -21,7 +21,7 @@ jobs:
     name: Prepare Release
     uses: getsentry/craft/.github/workflows/release.yml@v2
     with:
-      version: ${{ inputs.version || 'auto' }}
+      version: ${{ inputs.version }}
       force: ${{ inputs.force }}
     secrets: inherit
 
