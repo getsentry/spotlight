@@ -3,7 +3,55 @@ title: Publishing
 description: How-to publish a new release of Spotlight.
 ---
 
-When you want to publish a new version, you need to trigger the
-[Prepare Publish](https://github.com/getsentry/spotlight/actions/workflows/prepare-publish.yml) Github Action. This
-action will open a PR with all versions bumped & changelogs updated according to the currently pending changesets. If
-you approve & merge this PR, these versions will automatically be published to NPM.
+Spotlight uses [Craft](https://github.com/getsentry/craft) for release management. Craft automatically determines version bumps from conventional commits and generates changelogs.
+
+## Release Workflow
+
+### 1. Trigger the Release
+
+Go to the [Release](https://github.com/getsentry/spotlight/actions/workflows/release.yml) GitHub Action and click "Run workflow".
+
+You can specify:
+
+- **Version**: Leave as `auto` to determine from commits, or specify `major`, `minor`, `patch`, or an explicit version like `4.10.0`
+- **Force**: Check this to release even if there are release-blockers
+
+:::note[Release Blockers]
+A release-blocker is any open PR with the `release-blocker` label. This prevents accidental releases when critical changes are pending. Use the **Force** option to override this check. See the [Craft documentation](https://getsentry.github.io/craft/github-actions/#workflow-inputs) for more details.
+:::
+
+### 2. Review the Release Branch
+
+Craft creates a release branch (e.g., `release/4.10.0`) with:
+
+- Updated version in `packages/spotlight/package.json`
+- Generated changelog in `packages/spotlight/CHANGELOG.md`
+
+The CI will build and test this branch automatically.
+
+### 3. Merge and Publish
+
+Once the release branch CI passes:
+
+1. Review the changelog and version bump
+2. Merge the release branch to `main`
+3. Craft creates a publish issue in [getsentry/publish](https://github.com/getsentry/publish)
+4. A release manager adds the `accepted` label to approve the release
+5. The publish workflow runs and:
+   - Publishes `@spotlightjs/spotlight` to NPM
+   - Creates a GitHub release with standalone binaries and Electron app
+   - Tags the Docker image with the version and `latest`
+
+:::tip[Why getsentry/publish?]
+The [getsentry/publish](https://github.com/getsentry/publish) repository is Sentry's central publishing system. It keeps sensitive credentials (NPM tokens, signing keys, etc.) secure and requires formal approval from release managers before publishing. This ensures releases are reviewed and prevents accidental or unauthorized publishes.
+:::
+
+## Artifacts
+
+The CI build produces these artifacts that Craft uploads to the GitHub release:
+
+| Artifact | Description |
+| --- | --- |
+| `built-packages` | The npm package contents |
+| `spotlight-binaries` | Standalone CLI binaries for all platforms |
+| `electron-binaries` | Signed macOS Electron app (.dmg, .zip) |
