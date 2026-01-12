@@ -13,7 +13,7 @@ import {
   mdFormatters,
 } from "../formatters/index.ts";
 import { logger } from "../logger.ts";
-import { setupSpotlight } from "../main.ts";
+import { PortInUseError, setupSpotlight } from "../main.ts";
 import type { ParsedEnvelope } from "../parser/index.ts";
 import type { CLIHandlerOptions, Command, CommandMeta } from "../types/cli.ts";
 import { getSpotlightURL } from "../utils/extras.ts";
@@ -143,7 +143,16 @@ export async function handler(
     }
   }
 
-  const serverInstance = await setupSpotlight({ port, filesToServe, basePath, isStandalone: true, allowedOrigins });
+  let serverInstance: ServerType | undefined;
+  try {
+    serverInstance = await setupSpotlight({ port, filesToServe, basePath, isStandalone: true, allowedOrigins });
+  } catch (err) {
+    if (err instanceof PortInUseError) {
+      logger.error(err.message);
+      process.exit(1);
+    }
+    throw err; // Re-throw other errors (keeps normal behavior)
+  }
 
   // Subscribe the onEnvelope callback to the message buffer
   // This ensures it gets called whenever any envelope is added to the buffer
