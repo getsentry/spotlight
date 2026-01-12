@@ -1,0 +1,93 @@
+---
+title: Conventional Commits
+description: How to write commit messages for Spotlight.
+---
+
+Spotlight uses [Conventional Commits](https://www.conventionalcommits.org/) for commit messages. This allows us to automatically generate changelogs and determine version bumps.
+
+## Commit Message Format
+
+Each commit message should follow this format:
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+### Types
+
+| Type       | Description                                         | Version Bump |
+| ---------- | --------------------------------------------------- | ------------ |
+| `feat`     | A new feature                                       | Minor        |
+| `fix`      | A bug fix                                           | Patch        |
+| `docs`     | Documentation only changes                          | Patch        |
+| `refactor` | Code change that neither fixes a bug nor adds a feature | Patch    |
+| `perf`     | Performance improvement                             | Patch        |
+| `test`     | Adding or updating tests                            | Patch        |
+| `chore`    | Maintenance tasks, dependencies, etc.               | Patch        |
+| `ci`       | CI/CD changes                                       | Patch        |
+| `build`    | Build system changes                                | Patch        |
+
+### Breaking Changes
+
+For breaking changes, add `!` after the type/scope:
+
+```
+feat!: remove deprecated API
+
+BREAKING CHANGE: The old API has been removed.
+```
+
+This will trigger a **major** version bump.
+
+### Scopes
+
+Scopes are optional but help categorize changes:
+
+- `ui` - UI components
+- `server` - Sidecar server
+- `cli` - CLI commands
+- `electron` - Electron app
+- `mcp` - MCP server
+
+### Examples
+
+```shell
+# New feature
+feat(ui): add dark mode toggle
+
+# Bug fix
+fix(server): handle empty envelopes correctly
+
+# Breaking change
+feat(cli)!: change default port to 8970
+
+# Documentation
+docs: update installation guide
+
+# Chore (won't appear in changelog by default)
+chore: update dependencies
+```
+
+## Changelog Preview
+
+When you open a PR, [Craft](https://getsentry.github.io/craft/) will automatically generate a preview of how your changes will appear in the changelog. You can also add [custom changelog entries in your PR description](https://getsentry.github.io/craft/configuration/#custom-changelog-entries-from-pr-descriptions).
+
+## Skipping Changelog
+
+If your PR shouldn't appear in the changelog (e.g., internal refactoring), you can:
+
+1. Add the `skip-changelog` label to your PR
+
+:::note[Versioning]
+
+Spotlight follows [SemVer](https://semver.org/) for versioning. The version bump is determined automatically from your commit messages:
+
+- `feat:` → Minor bump (1.0.0 → 1.1.0)
+- `fix:` → Patch bump (1.0.0 → 1.0.1)
+- `feat!:` or `fix!:` → Major bump (1.0.0 → 2.0.0)
+
+:::
