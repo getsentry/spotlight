@@ -30,6 +30,7 @@ targets:
 
   - name: github
     tagPrefix: "@spotlightjs/spotlight@"
+    includeNames: /^(spotlight-|Spotlight).*$/
 
   - name: docker
     source: ghcr.io/getsentry/spotlight
