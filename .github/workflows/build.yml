@@ -121,6 +121,10 @@ jobs:
           curl -sf --retry 3 --retry-all-errors -o /dev/null 'http://localhost:8969/' && echo "Spotlight ran successfully"
           kill -2 $SPOTLIGHT_PID
 
+      - name: Pack npm package
+        working-directory: packages/spotlight
+        run: pnpm pack
+
       - name: Store built packages
         uses: actions/upload-artifact@v5
         with:
@@ -129,6 +133,13 @@ jobs:
           include-hidden-files: true
           path: |
             packages/spotlight/dist/
+
+      - name: Store npm package
+        uses: actions/upload-artifact@v5
+        with:
+          name: npm-package
+          if-no-files-found: error
+          path: packages/spotlight/*.tgz
 
       - name: Store standalone spotlight binaries
         uses: actions/upload-artifact@v5
@@ -416,7 +427,7 @@ jobs:
       - name: Download release artifacts
         uses: actions/download-artifact@v5
         with:
-          pattern: '{built-packages,spotlight-binaries,electron-binaries}'
+          pattern: '{npm-package,spotlight-binaries,electron-binaries}'
           path: artifacts/
           merge-multiple: true
 
