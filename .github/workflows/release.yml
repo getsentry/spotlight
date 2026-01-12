@@ -6,8 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version to release (or "auto")
+        description: 'Version to release (semver, "auto", "major", "minor", "patch")'
         required: false
+        default: 'auto'
       force:
         description: Force a release even when there are release-blockers
         required: false
