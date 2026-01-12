@@ -16,12 +16,11 @@ statusProvider:
   name: github
   config:
     contexts:
-      - "Build"
+      - "Merge Artifacts"
 
 requireNames:
-  - /^built-packages$/
-  - /^spotlight-binaries$/
-  - /^electron-binaries$/
+  - /^spotlight-/
+  - /\.dmg$/
 
 targets:
   - name: npm
