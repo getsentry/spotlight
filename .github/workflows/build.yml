@@ -406,3 +406,22 @@ jobs:
             packages/spotlight/dist-electron/*.zip
             packages/spotlight/dist-electron/*.blockmap
             packages/spotlight/dist-electron/*.yml
+
+  merge-artifacts:
+    name: Merge Artifacts
+    needs: [build, electron-mac]
+    if: always() && needs.build.result == 'success' && needs.electron-mac.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v5
+        with:
+          pattern: '{built-packages,spotlight-binaries,electron-binaries}'
+          path: artifacts/
+          merge-multiple: true
+
+      - name: Upload merged artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: ${{ github.sha }}
+          path: artifacts/
