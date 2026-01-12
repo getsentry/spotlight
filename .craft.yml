@@ -25,7 +25,6 @@ requireNames:
 
 targets:
   - name: npm
-    id: spotlight
     path: packages/spotlight
 
   - name: github
@@ -33,10 +32,12 @@ targets:
     includeNames: /^(spotlight-|Spotlight|latest-).*|.*\.(yml|blockmap)$/
 
   - name: docker
+    id: versioned
     source: ghcr.io/getsentry/spotlight
     target: ghcr.io/getsentry/spotlight
 
   - name: docker
+    id: latest
     source: ghcr.io/getsentry/spotlight
     target:
       image: ghcr.io/getsentry/spotlight
