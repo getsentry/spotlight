@@ -89,16 +89,16 @@ importers:
     dependencies:
       '@hono/mcp':
         specifier: ^0.2.2
-        version: 0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.10.3)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.10.3))(hono@4.10.3)(zod@4.1.13)
+        version: 0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.11.4)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.11.4))(hono@4.11.4)(zod@4.1.13)
       '@hono/node-server':
         specifier: ^1.19.3
-        version: 1.19.3(hono@4.10.3)
+        version: 1.19.3(hono@4.11.4)
       '@jridgewell/trace-mapping':
         specifier: ^0.3.25
         version: 0.3.31
       '@modelcontextprotocol/sdk':
         specifier: ^1.25.2
-        version: 1.25.2(hono@4.10.3)(zod@4.1.13)
+        version: 1.25.2(hono@4.11.4)(zod@4.1.13)
       '@sentry/core':
         specifier: 'catalog:'
         version: 10.32.1
@@ -118,8 +118,8 @@ importers:
         specifier: ^1.12.0
         version: 1.12.0
       hono:
-        specifier: ^4.10.3
-        version: 4.10.3
+        specifier: ^4.11.4
+        version: 4.11.4
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
@@ -491,6 +491,10 @@ packages:
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/code-frame@7.28.6':
+    resolution: {integrity: sha512-JYgintcMjRiCvS8mMECzaEn+m3PfoQiyqukOMCCVQtoJGYJw8j/8LBJEiqkHLkfwCcs74E3pbAUFNg7d9VNJ+Q==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/compat-data@7.27.1':
     resolution: {integrity: sha512-Q+E+rd/yBzNQhXkG+zQnF58e4zoZfBedaxwzPmicKsiK3nt8iJYrSrDbjwFFDGC4f+rPafqRaPH6TsDoSvMf7A==}
     engines: {node: '>=6.9.0'}
@@ -567,8 +571,8 @@ packages:
     resolution: {integrity: sha512-1x3D2xEk2fRo3PAhwQwu5UubzgiVWSXTBfWpVd2Mx2AzRqJuDJCsgaDVZ7HB5iGzDW1Hl1sWN2mFyKjmR9uAog==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/runtime@7.28.4':
-    resolution: {integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==}
+  '@babel/runtime@7.28.6':
+    resolution: {integrity: sha512-05WQkdpL9COIMz4LjTxGpPNCdlpyimKppYNoJ5Di5EUObifl8t4tuLuUBBZEpoLYOmfvIWrsp9fCl0HoPRVTdA==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.27.1':
@@ -3552,8 +3556,8 @@ packages:
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
-  baseline-browser-mapping@2.9.12:
-    resolution: {integrity: sha512-Mij6Lij93pTAIsSYy5cyBQ975Qh9uLEc5rwGTpomiZeXZL9yIS6uORJakb3ScHgfs0serMMfIbXzokPMuEiRyw==}
+  baseline-browser-mapping@2.9.14:
+    resolution: {integrity: sha512-B0xUquLkiGLgHhpPBqvl7GWegWBUNuujQ6kXd/r1U38ElPT6Ok8KZ8e+FpUGEc2ZoRQUzq/aUnaKFc/svWUGSg==}
     hasBin: true
 
   bcp-47-match@2.0.3:
@@ -3692,8 +3696,8 @@ packages:
   caniuse-lite@1.0.30001751:
     resolution: {integrity: sha512-A0QJhug0Ly64Ii3eIqHu5X51ebln3k4yTUkY1j8drqpWHVreg/VLijN48cZ1bYPiqOQuqpkIKnzr/Ul8V+p6Cw==}
 
-  caniuse-lite@1.0.30001762:
-    resolution: {integrity: sha512-PxZwGNvH7Ak8WX5iXzoK1KPZttBXNPuaOvI2ZYU7NrlM+d9Ov+TUvlLOBNGzVXAntMSMMlJPd+jY6ovrVjSmUw==}
+  caniuse-lite@1.0.30001764:
+    resolution: {integrity: sha512-9JGuzl2M+vPL+pz70gtMF9sHdMFbY9FJaQBi186cHKH3pSzDvzoUJUPV6fqiKIMyXbud9ZLg4F3Yza1vJ1+93g==}
 
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
@@ -4856,8 +4860,8 @@ packages:
     peerDependencies:
       hono: ^4.1.1
 
-  hono@4.10.3:
-    resolution: {integrity: sha512-2LOYWUbnhdxdL8MNbNg9XZig6k+cZXm5IjHn2Aviv7honhBMOHb+jxrKIeJRZJRmn+htUCKhaicxwXuUDlchRA==}
+  hono@4.11.4:
+    resolution: {integrity: sha512-U7tt8JsyrxSRKspfhtLET79pU8K+tInj5QZXs1jSugO1Vq5dFj3kmZsRldo29mTBfcjDRVRXrEZ6LS63Cog9ZA==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@4.1.0:
@@ -7842,6 +7846,12 @@ snapshots:
       js-tokens: 4.0.0
       picocolors: 1.1.1
 
+  '@babel/code-frame@7.28.6':
+    dependencies:
+      '@babel/helper-validator-identifier': 7.28.5
+      js-tokens: 4.0.0
+      picocolors: 1.1.1
+
   '@babel/compat-data@7.27.1': {}
 
   '@babel/core@7.27.1':
@@ -7931,7 +7941,7 @@ snapshots:
 
   '@babel/runtime@7.27.1': {}
 
-  '@babel/runtime@7.28.4': {}
+  '@babel/runtime@7.28.6': {}
 
   '@babel/template@7.27.1':
     dependencies:
@@ -8506,21 +8516,21 @@ snapshots:
 
   '@fontsource/raleway@5.2.5': {}
 
-  '@hono/mcp@0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.10.3)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.10.3))(hono@4.10.3)(zod@4.1.13)':
+  '@hono/mcp@0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.11.4)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.11.4))(hono@4.11.4)(zod@4.1.13)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.25.2(hono@4.10.3)(zod@4.1.13)
-      hono: 4.10.3
-      hono-rate-limiter: 0.4.2(hono@4.10.3)
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.4)(zod@4.1.13)
+      hono: 4.11.4
+      hono-rate-limiter: 0.4.2(hono@4.11.4)
       pkce-challenge: 5.0.0
       zod: 4.1.13
 
-  '@hono/node-server@1.19.3(hono@4.10.3)':
+  '@hono/node-server@1.19.3(hono@4.11.4)':
     dependencies:
-      hono: 4.10.3
+      hono: 4.11.4
 
-  '@hono/node-server@1.19.7(hono@4.10.3)':
+  '@hono/node-server@1.19.7(hono@4.11.4)':
     dependencies:
-      hono: 4.10.3
+      hono: 4.11.4
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -8846,9 +8856,9 @@ snapshots:
 
   '@microsoft/tsdoc@0.15.1': {}
 
-  '@modelcontextprotocol/sdk@1.25.2(hono@4.10.3)(zod@4.1.13)':
+  '@modelcontextprotocol/sdk@1.25.2(hono@4.11.4)(zod@4.1.13)':
     dependencies:
-      '@hono/node-server': 1.19.7(hono@4.10.3)
+      '@hono/node-server': 1.19.7(hono@4.11.4)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -10210,8 +10220,8 @@ snapshots:
 
   '@testing-library/dom@10.4.1':
     dependencies:
-      '@babel/code-frame': 7.27.1
-      '@babel/runtime': 7.28.4
+      '@babel/code-frame': 7.28.6
+      '@babel/runtime': 7.28.6
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       dom-accessibility-api: 0.5.16
@@ -11019,7 +11029,7 @@ snapshots:
   autoprefixer@10.4.23(postcss@8.5.6):
     dependencies:
       browserslist: 4.28.1
-      caniuse-lite: 1.0.30001762
+      caniuse-lite: 1.0.30001764
       fraction.js: 5.3.4
       picocolors: 1.1.1
       postcss: 8.5.6
@@ -11048,7 +11058,7 @@ snapshots:
 
   base64-js@1.5.1: {}
 
-  baseline-browser-mapping@2.9.12: {}
+  baseline-browser-mapping@2.9.14: {}
 
   bcp-47-match@2.0.3: {}
 
@@ -11139,8 +11149,8 @@ snapshots:
 
   browserslist@4.28.1:
     dependencies:
-      baseline-browser-mapping: 2.9.12
-      caniuse-lite: 1.0.30001762
+      baseline-browser-mapping: 2.9.14
+      caniuse-lite: 1.0.30001764
       electron-to-chromium: 1.5.267
       node-releases: 2.0.27
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
@@ -11229,7 +11239,7 @@ snapshots:
 
   caniuse-lite@1.0.30001751: {}
 
-  caniuse-lite@1.0.30001762: {}
+  caniuse-lite@1.0.30001764: {}
 
   ccount@2.0.1: {}
 
@@ -12768,11 +12778,11 @@ snapshots:
     dependencies:
       react-is: 16.13.1
 
-  hono-rate-limiter@0.4.2(hono@4.10.3):
+  hono-rate-limiter@0.4.2(hono@4.11.4):
     dependencies:
-      hono: 4.10.3
+      hono: 4.11.4
 
-  hono@4.10.3: {}
+  hono@4.11.4: {}
 
   hosted-git-info@4.1.0:
     dependencies:
