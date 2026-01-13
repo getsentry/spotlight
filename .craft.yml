@@ -40,4 +40,4 @@ targets:
     source: ghcr.io/getsentry/spotlight
     target:
       image: ghcr.io/getsentry/spotlight
-      format: "{{{image}}}:latest"
+      format: "{{{target}}}:latest"
