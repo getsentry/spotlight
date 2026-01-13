@@ -81,7 +81,7 @@ export default function EnvelopeList() {
       </EmptyHeader>
       <EmptyContent>
         <a
-          href="https://spotlightjs.com/docs/setup/"
+          href="https://spotlightjs.com/docs/getting-started/"
           target="_blank"
           rel="noopener noreferrer"
           className="underline hover:text-primary-400"

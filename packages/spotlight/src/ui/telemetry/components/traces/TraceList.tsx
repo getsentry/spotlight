@@ -42,7 +42,7 @@ export default function TraceList({ traceData }: TraceListProps) {
         </EmptyHeader>
         <EmptyContent>
           <a
-            href="https://spotlightjs.com/docs/setup/"
+            href="https://spotlightjs.com/docs/getting-started/"
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:text-primary-400"
