@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>For more information, <a href="https://spotlightjs.com/docs/setup/">see our documentation.</a></strong>
+  <strong>For more information, <a href="https://spotlightjs.com/docs/getting-started/">see our documentation.</a></strong>
 </p>
 
 # What's Spotlight? [![npm version](https://img.shields.io/npm/v/@spotlightjs/spotlight.svg)](https://www.npmjs.com/package/@spotlightjs/spotlight)
@@ -46,6 +46,6 @@ Spotlight uses Sentry SDKs to capture telemetry data and sends it to the Sidecar
 ## Resources
 
 - [Contribute](https://spotlightjs.com/docs/contribute/)
-- [Setup Spotlight](https://spotlightjs.com/docs/setup/)
+- [Setup Spotlight](https://spotlightjs.com/docs/getting-started)
 - [Configuration](https://spotlightjs.com/docs/reference/configuration/)
 - [Sidecar](https://spotlightjs.com/docs/sidecar/)
