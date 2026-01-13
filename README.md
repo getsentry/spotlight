@@ -46,6 +46,6 @@ Spotlight uses Sentry SDKs to capture telemetry data and sends it to the Sidecar
 ## Resources
 
 - [Contribute](https://spotlightjs.com/docs/contribute/)
-- [Setup Spotlight](https://spotlightjs.com/docs/setup/)
+- [Setup Spotlight](https://spotlightjs.com/docs/getting-started)
 - [Configuration](https://spotlightjs.com/docs/reference/configuration/)
 - [Sidecar](https://spotlightjs.com/docs/sidecar/)
