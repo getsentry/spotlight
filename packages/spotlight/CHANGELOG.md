@@ -1,5 +1,69 @@
 # @spotlightjs/spotlight
 
+## 4.10.0
+
+### New Features ✨
+
+- Added a dynamic header for dragbar by @MathurAditya724 in [#1223](https://github.com/getsentry/spotlight/pull/1223)
+- Better error message display by @MathurAditya724 in [#1222](https://github.com/getsentry/spotlight/pull/1222)
+
+### Bug Fixes 🐛
+
+#### Ui
+
+- Add validation guards to WebVitalsDetail to prevent crashes by @BYK in [#1243](https://github.com/getsentry/spotlight/pull/1243)
+- Handle null/undefined span.description safely by @BYK in [#1239](https://github.com/getsentry/spotlight/pull/1239)
+
+#### Other
+
+- (sentry) Upload and use source maps for all build targets by @BYK in [#1241](https://github.com/getsentry/spotlight/pull/1241)
+- Improve EADDRINUSE error handling and UX by @BYK in [#1240](https://github.com/getsentry/spotlight/pull/1240)
+- Updated react-router-dom version to latest by @MathurAditya724 in [#1245](https://github.com/getsentry/spotlight/pull/1245)
+- Add error handling for base64 decode operations by @BYK in [#1237](https://github.com/getsentry/spotlight/pull/1237)
+- Silence non-fixable Sentry errors by @BYK in [#1242](https://github.com/getsentry/spotlight/pull/1242)
+- Add null safety to WebVitals comparators by @BYK in [#1238](https://github.com/getsentry/spotlight/pull/1238)
+- Add null check for itemHeader in processEnvelope by @BYK in [#1233](https://github.com/getsentry/spotlight/pull/1233)
+- Shiki theme in light mode by @MathurAditya724 in [#1230](https://github.com/getsentry/spotlight/pull/1230)
+
+### Documentation 📚
+
+#### Website
+
+- Add feedback note for Spotlight SDK in documentation by @MathurAditya724 in [#1228](https://github.com/getsentry/spotlight/pull/1228)
+- Add NextJS guide by @betegon in [#1129](https://github.com/getsentry/spotlight/pull/1129)
+
+#### Other
+
+- Add section for the spotlight sdk by @MathurAditya724 in [#1227](https://github.com/getsentry/spotlight/pull/1227)
+
+### Build / dependencies / internal 🔧
+
+#### Craft
+
+- Fix Craft traget ids by @BYK in [#1248](https://github.com/getsentry/spotlight/pull/1248)
+- Bump craft version to fix releases by @BYK in [#1246](https://github.com/getsentry/spotlight/pull/1246)
+
+#### Release
+
+- Add npm pack step for Craft npm publishing by @BYK in [#1250](https://github.com/getsentry/spotlight/pull/1250)
+- Merge artifacts for Craft release discovery by @BYK in [#1249](https://github.com/getsentry/spotlight/pull/1249)
+- Add pnpm and Node.js setup to release workflow by @BYK in [#1247](https://github.com/getsentry/spotlight/pull/1247)
+- Migrate to Craft by @betegon in [#1232](https://github.com/getsentry/spotlight/pull/1232)
+
+#### Other
+
+- (deps) Bump @modelcontextprotocol/sdk from 1.24.3 to 1.25.2 by @dependabot in [#1234](https://github.com/getsentry/spotlight/pull/1234)
+- Add workflow to notify issues on release by @betegon in [#1236](https://github.com/getsentry/spotlight/pull/1236)
+- Using the param instead of calling a function by @MathurAditya724 in [#1224](https://github.com/getsentry/spotlight/pull/1224)
+
+### Other
+
+- Node 24.x support by @BYK in [#1235](https://github.com/getsentry/spotlight/pull/1235)
+- Vite windows deny bypass by @BYK in [#1229](https://github.com/getsentry/spotlight/pull/1229)
+- Qs security vulnerability fix by @BYK in [#1226](https://github.com/getsentry/spotlight/pull/1226)
+- Dependency security updates by @BYK in [#1225](https://github.com/getsentry/spotlight/pull/1225)
+- Event origin badges ui by @BYK in [#1221](https://github.com/getsentry/spotlight/pull/1221)
+
 ## 4.9.0
 
 ### Minor Changes
