@@ -22,6 +22,7 @@ permissions:
   contents: read
   packages: write
   checks: write
+  pull-requests: write  # Required for posting/updating PR comments
 
 jobs:
   build:
@@ -205,15 +206,10 @@ jobs:
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
+        uses: MathurAditya724/codecov-action@main
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          report_type: test_results
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          post-pr-comment: true
 
   test-e2e-cli:
     name: E2E CLI Tests
