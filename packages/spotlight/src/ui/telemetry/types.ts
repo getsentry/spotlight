@@ -240,7 +240,7 @@ export type SentryProfileV2 = {
   >;
 };
 
-export type SentryProfileV2ChunkEvent = {
+export type SentryProfileV2ChunkEvent = CommonEventAttrs & {
   type: "profile_chunk";
   version: "2";
   profiler_id: string; // Links chunks from same profiler session

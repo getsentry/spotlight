@@ -1,8 +1,8 @@
 import type { Envelope } from "@sentry/core";
 import { cn } from "@spotlight/ui/lib/cn";
 import CardList from "@spotlight/ui/telemetry/components/shared/CardList";
+import { EmptyState } from "@spotlight/ui/telemetry/components/shared/EmptyState";
 import TimeSince from "@spotlight/ui/telemetry/components/shared/TimeSince";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "@spotlight/ui/ui/empty";
 import { Link, useParams } from "react-router-dom";
 import { useSentryEnvelopes } from "../../../data/useSentryEnvelopes";
 import useSentryStore from "../../../store";
@@ -72,23 +72,12 @@ export default function EnvelopeList() {
     );
   }
   return (
-    <Empty className="min-h-screen">
-      <EmptyHeader>
-        <EmptyTitle>No Envelopes</EmptyTitle>
-        <EmptyDescription>
-          Make sure you have set Sentry up in your project and enabled Spotlight integration
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
-        <a
-          href="https://spotlightjs.com/docs/getting-started/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:text-primary-400"
-        >
-          Spotlight Docs
-        </a>
-      </EmptyContent>
-    </Empty>
+    <EmptyState
+      variant="full"
+      className="min-h-screen"
+      title="No Envelopes"
+      description="Make sure you have set Sentry up in your project and enabled Spotlight integration"
+      showDocsLink
+    />
   );
 }

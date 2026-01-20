@@ -12,7 +12,7 @@ import WebVitalsDetail from "./webVitals/WebVitalsDetail";
 export default function InsightsTabDetails() {
   return (
     <>
-      <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
+      <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto h-full">
         <Routes>
           <Route path="queries" element={<Queries />} />
           <Route path="queries/:type" element={<QuerySummary />} />

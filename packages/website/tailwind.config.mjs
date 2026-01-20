@@ -8,8 +8,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', ...defaultTheme.fontFamily.sans],
-        raleway: ['Raleway', ...defaultTheme.fontFamily.sans],
+        sans: ['Rubik', 'Avenir Next', 'Helvetica Neue', ...defaultTheme.fontFamily.sans],
       },
       animation: {
         fadeIn: '0.5s fadeIn forwards',

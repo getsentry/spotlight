@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import AITranscription from "../components/insights/aiTraces/AITranscription";
 import { hasAISpans } from "../components/insights/aiTraces/sdks/aiLibraries";
+import { EmptyState } from "../components/shared/EmptyState";
 import Resizer from "../components/shared/Resizer";
 import TraceDetails from "../components/traces/TraceDetails";
 import TraceTreeview from "../components/traces/TraceDetails/components/TraceTreeview";
@@ -82,7 +83,7 @@ export function TraceSplitViewLayout({ trace, span, aiConfig }: TraceSplitViewLa
   }, []);
 
   if (!trace) {
-    return <div className="text-primary-300 p-6">Trace not found. 🤔</div>;
+    return <EmptyState description="Trace not found." />;
   }
 
   return (

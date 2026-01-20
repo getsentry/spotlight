@@ -2,7 +2,7 @@ packages:
   - 'packages/*'
 
 catalog:
-  "@fontsource/raleway": ^5.1.0
+  "@fontsource/rubik": ^5.1.0
   "@tailwindcss/vite": ^4.1.11
   "@types/node": ^22.15.21
   "@types/react": ^18.3.11

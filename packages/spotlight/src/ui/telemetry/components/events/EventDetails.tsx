@@ -4,6 +4,7 @@ import type { SentryErrorEvent, SentryEvent } from "../../types";
 import { isErrorEvent } from "../../utils/sentry";
 import { createTab } from "../../utils/tabs";
 import TelemetryTabs from "../TelemetryTabs";
+import { EmptyState } from "../shared/EmptyState";
 import PlatformIcon from "../shared/PlatformIcon";
 import AICopyButton from "./AICopyButton";
 import Event, { EventTitle } from "./Event";
@@ -19,13 +20,13 @@ export default function EventDetails() {
   const getEventById = useSentryStore(state => state.getEventById);
 
   if (!eventId) {
-    return <p className="text-primary-300 p-6">Unknown event id</p>;
+    return <EmptyState description="Unknown event id" />;
   }
 
   const event = getEventById(eventId);
 
   if (!event) {
-    return <p className="text-primary-300 p-6">Event not found.</p>;
+    return <EmptyState description="Event not found." />;
   }
 
   const tabs = [

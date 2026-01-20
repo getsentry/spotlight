@@ -1,3 +1,5 @@
+@import "@fontsource/rubik/index.css";
+
 body {
   background: #05010d;
 }
@@ -11,7 +13,7 @@ dialog {
 }
 
 :root {
-  --sl-font: ui-sans-serif, sans-serif, system-ui, "Helvetica", "Arial";
+  --sl-font: "Rubik", "Avenir Next", "Helvetica Neue", ui-sans-serif, sans-serif, system-ui, "Helvetica", "Arial";
   --sl-font-monospace: ui-monospace, monospace, "Menlo", "Consolas", "Courier New";
 }
 

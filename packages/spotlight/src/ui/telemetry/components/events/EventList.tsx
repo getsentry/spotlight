@@ -1,4 +1,5 @@
 import CardList from "@spotlight/ui/telemetry/components/shared/CardList";
+import { EmptyState } from "@spotlight/ui/telemetry/components/shared/EmptyState";
 import { OriginBadge } from "@spotlight/ui/telemetry/components/shared/OriginBadge";
 import TimeSince from "@spotlight/ui/telemetry/components/shared/TimeSince";
 import { Link } from "react-router-dom";
@@ -39,6 +40,14 @@ export default function EventList({ traceId }: { traceId?: string }) {
       })}
     </CardList>
   ) : (
-    <div className="text-primary-300 p-6">Looks like there's no events recorded matching this query. 🤔</div>
+    <EmptyState
+      variant={!traceId ? "full" : "simple"}
+      className={!traceId ? "h-full" : undefined}
+      title={!traceId ? "No Events" : undefined}
+      description={
+        !traceId ? "Please make sure Sentry and Spotlight integration are enabled in your project." : "No events found."
+      }
+      showDocsLink={!traceId}
+    />
   );
 }

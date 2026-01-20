@@ -6,9 +6,9 @@ settings:
 
 catalogs:
   default:
-    '@fontsource/raleway':
+    '@fontsource/rubik':
       specifier: ^5.1.0
-      version: 5.2.5
+      version: 5.2.8
     '@sentry/astro':
       specifier: ^10.31.0
       version: 10.32.1
@@ -145,9 +145,9 @@ importers:
       '@electron/notarize':
         specifier: ^2.5.0
         version: 2.5.0
-      '@fontsource/raleway':
+      '@fontsource/rubik':
         specifier: 'catalog:'
-        version: 5.2.5
+        version: 5.2.8
       '@microlink/react-json-view':
         specifier: ^1.23.4
         version: 1.26.1(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -349,9 +349,9 @@ importers:
       '@astrojs/vercel':
         specifier: ^8.0.8
         version: 8.1.4(@sveltejs/kit@2.20.7(@sveltejs/vite-plugin-svelte@5.1.1(svelte@4.2.19)(vite@6.4.1(@types/node@24.10.1)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.2)))(svelte@4.2.19)(vite@6.4.1(@types/node@24.10.1)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.2)))(astro@5.15.9(@types/node@24.10.1)(jiti@2.4.2)(lightningcss@1.30.1)(rollup@4.53.3)(terser@5.43.1)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.2))(react@18.3.1)(rollup@4.53.3)(svelte@4.2.19)
-      '@fontsource/raleway':
+      '@fontsource/rubik':
         specifier: 'catalog:'
-        version: 5.2.5
+        version: 5.2.8
       '@sentry/astro':
         specifier: 'catalog:'
         version: 10.32.1(astro@5.15.9(@types/node@24.10.1)(jiti@2.4.2)(lightningcss@1.30.1)(rollup@4.53.3)(terser@5.43.1)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.2))
@@ -1378,8 +1378,8 @@ packages:
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
-  '@fontsource/raleway@5.2.5':
-    resolution: {integrity: sha512-gVFV8Yi8Y5h8sQw0U/F6TQID53DVIWPuRxqBLOBxwLbQma42JAwqTZ+pi3eDjpm20/rjS2XoVJH5hnMx1KFB+g==}
+  '@fontsource/rubik@5.2.8':
+    resolution: {integrity: sha512-PIc8QR7FqWPcYhbdRiGff56vQlKqg/ytES1YqecSq1GkgxiH4TBshrFvDEOZ9JonUF9m1qQ+qXxJj7wD5zgXEw==}
 
   '@hono/mcp@0.2.2':
     resolution: {integrity: sha512-h1yHXsv08OWT8bXyIOoZVXw0qU1UmSDwm014fPnFXiyeS9iMMHftn907wNXTh07IorlGqPbZArev4nBz9Q3oKQ==}
@@ -8514,7 +8514,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.9': {}
 
-  '@fontsource/raleway@5.2.5': {}
+  '@fontsource/rubik@5.2.8': {}
 
   '@hono/mcp@0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.11.4)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.11.4))(hono@4.11.4)(zod@4.1.13)':
     dependencies:

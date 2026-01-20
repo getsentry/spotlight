@@ -32,9 +32,7 @@
     "test:e2e:electron": "playwright test tests/electron.test.ts",
     "sample": "node ./_fixtures/send_to_sidecar.cjs"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "bin": {
     "spotlight": "./dist/run.js"
   },
@@ -73,7 +71,7 @@
   },
   "devDependencies": {
     "@electron/notarize": "^2.5.0",
-    "@fontsource/raleway": "catalog:",
+    "@fontsource/rubik": "catalog:",
     "@microlink/react-json-view": "^1.23.4",
     "@playwright/test": "^1.56.1",
     "@radix-ui/react-dropdown-menu": "^2.1.15",

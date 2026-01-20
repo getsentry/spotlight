@@ -12,6 +12,7 @@ import useSort from "../../hooks/useSort";
 import type { Span } from "../../types";
 import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
 import { truncateId } from "../../utils/text";
+import { EmptyState } from "../shared/EmptyState";
 import { TimeBar } from "../shared/TimeBar";
 
 type SpanInfoComparator = (a: Span, b: Span) => number;
@@ -53,7 +54,7 @@ const QuerySummary = () => {
   }, [allSpans, sort, decodedType]);
 
   if (!filteredDBSpans || !filteredDBSpans.length) {
-    return <p className="text-primary-300 px-6 py-4">Query not found.</p>;
+    return <EmptyState description="Query not found." />;
   }
 
   const maxTime = Math.max(...filteredDBSpans.map(dbSpan => dbSpan.timestamp - dbSpan.start_timestamp));

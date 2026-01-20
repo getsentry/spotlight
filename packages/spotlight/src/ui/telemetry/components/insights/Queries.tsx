@@ -10,6 +10,7 @@ import { getFormattedDuration, getSpanDurationClassName } from "@spotlight/ui/te
 import Table from "@spotlight/ui/ui/table";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { EmptyState } from "../shared/EmptyState";
 
 type QueryInfo = {
   avgDuration: number;
@@ -67,9 +68,13 @@ const Queries = () => {
 
   if (!queriesData?.length) {
     return (
-      <p className="text-primary-300 px-6 py-4">
-        No Database queries found. Add integration in Sentry initialization to track Database queries.
-      </p>
+      <EmptyState
+        variant="full"
+        className="h-full"
+        title="No Database Queries"
+        description="Please make sure Sentry and Spotlight integration are enabled in your project."
+        showDocsLink
+      />
     );
   }
 

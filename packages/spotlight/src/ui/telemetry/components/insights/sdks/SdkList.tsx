@@ -2,6 +2,7 @@ import CardList from "@spotlight/ui/telemetry/components/shared/CardList";
 import TimeSince from "@spotlight/ui/telemetry/components/shared/TimeSince";
 import { useSentrySdks } from "@spotlight/ui/telemetry/data/useSentrySdks";
 import { sdkToPlatform } from "@spotlight/ui/telemetry/utils/sdkToPlatform";
+import { EmptyState } from "../../shared/EmptyState";
 import PlatformIcon from "../../shared/PlatformIcon";
 
 export default function SdkList() {
@@ -24,7 +25,13 @@ export default function SdkList() {
           ))}
         </CardList>
       ) : (
-        <div className="text-primary-300 px-6 py-4">Looks like there's no SDKs that have reported yet. 🤔</div>
+        <EmptyState
+          variant="full"
+          className="h-full"
+          title="No SDKs"
+          description="Please make sure Sentry and Spotlight integration are enabled in your project."
+          showDocsLink
+        />
       )}
     </>
   );

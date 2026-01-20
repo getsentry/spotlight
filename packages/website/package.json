@@ -16,7 +16,7 @@
     "@astrojs/starlight": "^0.32.4",
     "@astrojs/starlight-tailwind": "^3.0.1",
     "@astrojs/vercel": "^8.0.8",
-    "@fontsource/raleway": "catalog:",
+    "@fontsource/rubik": "catalog:",
     "@sentry/astro": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",

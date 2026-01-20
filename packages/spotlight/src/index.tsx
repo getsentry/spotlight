@@ -1,4 +1,4 @@
-import fontStyles from "@fontsource/raleway/index.css?inline";
+import rubikFontStyles from "@fontsource/rubik/index.css?inline";
 import { CONTEXT_LINES_ENDPOINT } from "./shared/constants";
 import App from "./ui/App";
 import { DEFAULT_SIDECAR_STREAM_URL } from "./ui/constants";
@@ -59,7 +59,7 @@ export async function _init(initOptions: SpotlightInitOptions = {}) {
 
   // Add styles
   const styleElement = document.createElement("style");
-  styleElement.textContent = `${fontStyles}\n${globalStyles}`;
+  styleElement.textContent = `${rubikFontStyles}\n${globalStyles}`;
   document.head.appendChild(styleElement);
 
   const context = {

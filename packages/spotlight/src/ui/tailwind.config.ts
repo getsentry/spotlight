@@ -9,7 +9,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        raleway: ["Raleway", ...defaultTheme.fontFamily.sans],
+        sans: ["Rubik", "Avenir Next", "Helvetica Neue", ...defaultTheme.fontFamily.sans],
       },
       colors: {
         primary: colors.indigo,
