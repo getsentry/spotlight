@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useSentryEvents } from "../../data/useSentryEvents";
 import { isErrorEvent } from "../../utils/sentry";
 import { truncateId } from "../../utils/text";
+import EmptyState from "../shared/EmptyState";
 import PlatformIcon from "../shared/PlatformIcon";
 import { EventSummary } from "./Event";
 
@@ -39,6 +40,14 @@ export default function EventList({ traceId }: { traceId?: string }) {
       })}
     </CardList>
   ) : (
-    <div className="text-primary-300 p-6">Looks like there's no events recorded matching this query. 🤔</div>
+    <EmptyState
+      variant={!traceId ? "full" : "simple"}
+      className={!traceId ? "h-full" : undefined}
+      title={!traceId ? "No Events" : undefined}
+      description={
+        !traceId ? "Please make sure Sentry and Spotlight integration are enabled in your project." : "No events found."
+      }
+      showDocsLink={!traceId}
+    />
   );
 }

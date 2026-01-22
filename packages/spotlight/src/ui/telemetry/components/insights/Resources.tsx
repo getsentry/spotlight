@@ -9,6 +9,7 @@ import useSort from "../../hooks/useSort";
 import type { Span } from "../../types";
 import { formatBytes } from "../../utils/bytes";
 import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
+import EmptyState from "../shared/EmptyState";
 
 type ResourceInfo = {
   avgDuration: number;
@@ -87,7 +88,15 @@ const Resources = () => {
   }, [sort, allSpans]);
 
   if (!resources?.length) {
-    return <p className="text-primary-300 px-6 py-4">No Resource found.</p>;
+    return (
+      <EmptyState
+        variant="full"
+        className="h-full"
+        title="No Resources"
+        description="Enable Sentry and Spotlight integration in your project to record and view resources here."
+        showDocsLink
+      />
+    );
   }
   return (
     <Table variant="detail">

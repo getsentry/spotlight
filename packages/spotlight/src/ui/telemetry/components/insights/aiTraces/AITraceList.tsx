@@ -10,6 +10,7 @@ import { SearchProvider } from "../../../context/SearchContext";
 import { useSpotlightAITraces } from "../../../data/useSpotlightAITraces";
 import useSort from "../../../hooks/useSort";
 import useSentryStore from "../../../store";
+import EmptyState from "../../shared/EmptyState";
 import AITraceDetail from "./AITraceDetails";
 import AITraceItem from "./AITraceItem";
 
@@ -51,7 +52,15 @@ export default function AITraceList() {
   const selectedRawSpan = spanId ? traceContext?.spans.get(spanId) : null;
 
   if (spotlightAITraces.length === 0) {
-    return <div className="text-primary-300 p-6">No AI traces have been recorded yet. 🤔</div>;
+    return (
+      <EmptyState
+        variant="full"
+        className="h-full"
+        title="No AI traces have been recorded yet."
+        description="Enable Sentry and Spotlight integration in your project to record and view AI traces here."
+        showDocsLink
+      />
+    );
   }
 
   const handleTraceClick = (trace: SpotlightAITrace) => {
