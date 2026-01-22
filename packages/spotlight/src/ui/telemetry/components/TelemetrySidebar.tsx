@@ -1,3 +1,4 @@
+import { ReactComponent as ChevronDownIcon } from "@spotlight/ui/assets/chevronDown.svg";
 import { ReactComponent as DeleteIcon } from "@spotlight/ui/assets/deleteIcon.svg";
 import { ReactComponent as Logo } from "@spotlight/ui/assets/glyph.svg";
 import { cn } from "@spotlight/ui/lib/cn";
@@ -5,7 +6,7 @@ import { useSpotlightContext } from "@spotlight/ui/lib/useSpotlightContext";
 import type { NotificationCount } from "@spotlight/ui/types";
 import { Badge } from "@spotlight/ui/ui/badge";
 import { ElectronDragbarSpacer } from "@spotlight/ui/ui/electronDragbarSpacer";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import useSentryStore from "../store";
 
@@ -74,6 +75,11 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
   };
 
   const isInsightsActive = pathname.startsWith("/telemetry/insights");
+  const [isInsightsExpanded, setIsInsightsExpanded] = useState(true);
+
+  const toggleInsights = useCallback(() => {
+    setIsInsightsExpanded(prev => !prev);
+  }, []);
 
   return (
     <nav
@@ -118,25 +124,59 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
         <NavigationLink to="logs" title="Logs" notificationCount={{ count: logCount }} isActive={isActive("logs")} />
 
         {/* Insights section */}
-        <div
-          className={`px-3 py-2 text-md font-semibold tracking-wide ${
-            isInsightsActive ? "text-white" : "text-primary-200"
-          }`}
+        <button
+          type="button"
+          onClick={toggleInsights}
+          className={cn(
+            "flex w-full items-center justify-between px-3 py-2 text-md font-semibold tracking-wide transition-colors",
+            isInsightsActive ? "text-white" : "text-primary-200",
+            "hover:bg-primary-800 hover:text-primary-100 cursor-pointer",
+          )}
+          aria-expanded={isInsightsExpanded}
+          aria-controls="insights-submenu"
         >
-          Insights
-        </div>
-        <NavigationLink to="insights/queries" title="Queries" isActive={isActive("insights/queries")} isSubItem />
-        <NavigationLink
-          to="insights/webvitals"
-          title="Web Vitals"
-          isActive={isActive("insights/webvitals")}
-          isSubItem
-        />
-        <NavigationLink to="insights/resources" title="Resources" isActive={isActive("insights/resources")} isSubItem />
-        <NavigationLink to="insights/profiles" title="Profiles" isActive={isActive("insights/profiles")} isSubItem />
-        <NavigationLink to="insights/envelopes" title="Envelopes" isActive={isActive("insights/envelopes")} isSubItem />
-        <NavigationLink to="insights/sdks" title="SDKs" isActive={isActive("insights/sdks")} isSubItem />
-        <NavigationLink to="insights/aitraces" title="AI Traces" isActive={isActive("insights/aitraces")} isSubItem />
+          <span>Insights</span>
+          <ChevronDownIcon
+            className={cn("h-4 w-4 transition-transform duration-200", isInsightsExpanded ? "rotate-0" : "-rotate-90")}
+            aria-hidden="true"
+          />
+        </button>
+        {isInsightsExpanded && (
+          <div id="insights-submenu">
+            <NavigationLink to="insights/queries" title="Queries" isActive={isActive("insights/queries")} isSubItem />
+            <NavigationLink
+              to="insights/webvitals"
+              title="Web Vitals"
+              isActive={isActive("insights/webvitals")}
+              isSubItem
+            />
+            <NavigationLink
+              to="insights/resources"
+              title="Resources"
+              isActive={isActive("insights/resources")}
+              isSubItem
+            />
+            <NavigationLink
+              to="insights/profiles"
+              title="Profiles"
+              isActive={isActive("insights/profiles")}
+              isSubItem
+            />
+            <NavigationLink
+              to="insights/envelopes"
+              title="Envelopes"
+              isActive={isActive("insights/envelopes")}
+              isSubItem
+            />
+            <NavigationLink to="insights/sdks" title="SDKs" isActive={isActive("insights/sdks")} isSubItem />
+            <NavigationLink
+              to="insights/aitraces"
+              title="AI Traces"
+              isActive={isActive("insights/aitraces")}
+              isSubItem
+            />
+          </div>
+        )}
       </div>
 
       <footer className="p-4 border-t border-primary-700">
