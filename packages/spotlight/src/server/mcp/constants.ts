@@ -75,3 +75,45 @@ export const NO_LOGS_CONTENT: CallToolResult = {
     },
   ],
 };
+
+export const NO_METRICS_CONTENT: CallToolResult = {
+  content: [
+    {
+      type: "text",
+      text: `**No metrics detected in Spotlight**
+
+**This means:**
+- Application hasn't generated any metrics in the recent timeframe
+- No counter, gauge, or distribution metrics were captured
+- Application might not be instrumented with Sentry metrics SDK
+
+**Next debugging steps:**
+
+1. **If investigating application metrics:**
+   - Ensure your Sentry SDK has metrics enabled (JavaScript 10.25.0+, Python 2.44.0+)
+   - Verify metrics are being sent via \`trace_metric\` envelope items
+   - Check that Spotlight is correctly capturing metric envelopes
+
+2. **If checking for specific functionality:**
+   - Trigger the feature or workflow you're investigating
+   - Look for custom metric instrumentation in your code
+   - Consider adding metrics to critical paths if needed
+
+3. **If monitoring general health:**
+   - Check that metrics SDK is properly configured
+   - Verify that metrics are being emitted (check SDK logs)
+   - Test with known metric-generating actions (API calls, database operations)
+
+4. **Expand search timeframe:**
+   - Use a longer duration (300+ seconds) to capture older metrics
+   - Consider that some operations might generate metrics less frequently
+
+**Metric Types Available:**
+- **COUNTER**: Incrementing counts (e.g., request counts)
+- **GAUGE**: Fluctuating values (e.g., queue depth)
+- **DISTRIBUTION**: Statistical distributions (e.g., response times)
+
+**Pro tip:** Metrics are trace-connected in Sentry - every metric can be linked to a trace for enhanced debugging. This is Sentry's key differentiator for metrics!`,
+    },
+  ],
+};

@@ -7,6 +7,7 @@ import useSentryStore from "../store";
 import ErrorsTab from "../tabs/ErrorsTab";
 import InsightsTab from "../tabs/InsightsTab";
 import LogsTab from "../tabs/LogsTab";
+import MetricsTab from "../tabs/MetricsTab";
 import TracesTab from "../tabs/TracesTab";
 import { isErrorEvent } from "../utils/sentry";
 import TelemetrySidebar from "./TelemetrySidebar";
@@ -34,14 +35,19 @@ export default function TelemetryView({
 
   // Calculate notification counts for Sentry tabs
   const errorCount = store.getEvents().reduce((sum, e) => sum + Number(isErrorEvent(e)), 0);
-
   const traceCount = store.getTraces().length;
-
   const logCount = store.getLogs().length;
+  const metricCount = store.getMetrics().length;
 
   return (
     <>
-      <TelemetrySidebar errorCount={errorCount} traceCount={traceCount} logCount={logCount} isOnline={isOnline} />
+      <TelemetrySidebar
+        errorCount={errorCount}
+        traceCount={traceCount}
+        logCount={logCount}
+        metricCount={metricCount}
+        isOnline={isOnline}
+      />
       <main className="flex flex-1 flex-col">
         <ElectronDragbarSpacer />
         <div className="flex-1 overflow-auto">
@@ -50,6 +56,7 @@ export default function TelemetryView({
             <Route path="traces/*" element={<TracesTab />} key="traces" />
             <Route path="errors/*" element={<ErrorsTab />} key="errors" />
             <Route path="logs/*" element={<LogsTab />} key="logs" />
+            <Route path="metrics/*" element={<MetricsTab />} key="metrics" />
             <Route path="insights/*" element={<InsightsTab />} key="insights" />
             <Route path="" element={<TracesTab />} key="default" />
           </Routes>

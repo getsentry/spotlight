@@ -13,6 +13,7 @@ import EventList from "../../events/EventList";
 import AITraceSplitView from "../../insights/aiTraces/AITraceSplitView";
 import { hasAISpans } from "../../insights/aiTraces/sdks/aiLibraries";
 import LogsList from "../../log/LogsList";
+import MetricsList from "../../metrics/MetricsList";
 import DateTime from "../../shared/DateTime";
 import TraceProfileTree from "./components/TraceProfileTree";
 
@@ -87,6 +88,8 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
 
   const events = useSentryEvents(trace.trace_id);
   const profile = useSentryStore.getState().getProfileByTraceId(trace.trace_id);
+  const getMetricsByTraceId = useSentryStore.getState().getMetricsByTraceId;
+  const metrics = getMetricsByTraceId(trace.trace_id);
   const errorCount = useMemo(() => events.reduce((len, e) => (isErrorEvent(e) ? len + 1 : len), 0), [events]);
 
   const tabs = [
@@ -99,6 +102,16 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
       },
     }),
   ];
+
+  if (metrics.length > 0) {
+    tabs.push(
+      createTab("metrics", "Metrics", {
+        notificationCount: {
+          count: metrics.length,
+        },
+      }),
+    );
+  }
 
   if (profile) {
     tabs.push(createTab("profileTree", "Profile"));
@@ -117,6 +130,12 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
               <Route path="errors" element={<EventList traceId={trace.trace_id} />} />
               <Route path="logs" element={<LogsList traceId={trace.trace_id} />} />
               <Route path="logs/:id" element={<LogsList traceId={trace.trace_id} />} />
+              {metrics.length > 0 && (
+                <>
+                  <Route path="metrics" element={<MetricsList traceId={trace.trace_id} />} />
+                  <Route path="metrics/:metricId/*" element={<MetricsList traceId={trace.trace_id} />} />
+                </>
+              )}
               {profile && <Route path="profileTree" element={<TraceProfileTree profile={profile} />} />}
               {/* Default tab */}
               <Route path="*" element={<Navigate to="context" replace />} />
