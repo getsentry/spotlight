@@ -140,6 +140,7 @@ export default function MetricsList({ traceId }: MetricsListProps) {
     });
   }, []);
 
+  //TODO: to add Empty state here once #1264 is merged.
   if (allMetrics.length === 0) {
     return (
       <CardList>
@@ -239,6 +240,7 @@ export default function MetricsList({ traceId }: MetricsListProps) {
       </div>
 
       <CardList>
+        {/* TODO: to add Empty state here once #1264 is merged. */}
         {metricGroups.length === 0 ? (
           <p className="text-primary-300 px-6 py-4">No metrics match the current filters.</p>
         ) : (
