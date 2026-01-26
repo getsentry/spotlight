@@ -1,0 +1,148 @@
+---
+title: SpanTree
+description: Hierarchical waterfall visualization for distributed trace spans
+---
+
+# SpanTree
+
+A hierarchical waterfall visualization component for distributed trace spans. Displays timing information and parent-child relationships between spans.
+
+<ComponentPreview>
+  <SpanTreeDemo />
+</ComponentPreview>
+
+## Installation
+
+<InstallationTabs component="span-tree" />
+
+## Usage
+
+```tsx
+import { SpanTree } from "@/components/ui/span-tree";
+```
+
+```tsx
+<SpanTree
+  spans={spans}
+  traceStartTimestamp={startTime}
+  traceDuration={duration}
+  selectedSpanId={selectedId}
+  onSpanSelect={(spanId) => setSelectedId(spanId)}
+/>
+```
+
+## Examples
+
+### Basic Usage
+
+```tsx
+import { SpanTree } from "@/components/ui/span-tree";
+import type { SpanData } from "@/components/ui/span-tree/types";
+
+const spans: SpanData[] = [
+  {
+    span_id: "span-001",
+    op: "http.server",
+    description: "GET /api/users",
+    start_timestamp: 1700000000000,
+    timestamp: 1700000000450,
+    status: "ok",
+    children: [],
+  },
+];
+
+export function BasicExample() {
+  return (
+    <SpanTree
+      spans={spans}
+      traceStartTimestamp={1700000000000}
+      traceDuration={450}
+    />
+  );
+}
+```
+
+### With Selection
+
+```tsx
+import { SpanTree } from "@/components/ui/span-tree";
+import { useState } from "react";
+
+export function SelectionExample() {
+  const [selectedSpanId, setSelectedSpanId] = useState<string>();
+
+  return (
+    <SpanTree
+      spans={spans}
+      traceStartTimestamp={startTime}
+      traceDuration={duration}
+      selectedSpanId={selectedSpanId}
+      onSpanSelect={(spanId, span) => {
+        setSelectedSpanId(spanId);
+        console.log("Selected span:", span);
+      }}
+    />
+  );
+}
+```
+
+### With Highlighting
+
+```tsx
+import { SpanTree } from "@/components/ui/span-tree";
+
+const highlightedIds = new Set(["span-002", "span-003"]);
+
+export function HighlightExample() {
+  return (
+    <SpanTree
+      spans={spans}
+      traceStartTimestamp={startTime}
+      traceDuration={duration}
+      highlightedSpanIds={highlightedIds}
+    />
+  );
+}
+```
+
+## API Reference
+
+### SpanTree
+
+The main component for rendering a span tree visualization.
+
+<APITable props={[
+  { name: "spans", type: "SpanData[]", description: "Array of root spans with children populated", required: true },
+  { name: "traceStartTimestamp", type: "number", description: "Start timestamp of the entire trace (Unix ms)", required: true },
+  { name: "traceDuration", type: "number", description: "Total duration of the trace in milliseconds", required: true },
+  { name: "selectedSpanId", type: "string", description: "Currently selected span ID" },
+  { name: "onSpanSelect", type: "(spanId: string, span: SpanData) => void", description: "Callback when a span is clicked" },
+  { name: "highlightedSpanIds", type: "Set<string>", description: "Set of span IDs to highlight" },
+  { name: "initialNodeWidth", type: "number", default: "50", description: "Initial width percentage of span name column" },
+  { name: "className", type: "string", description: "Custom class name for the root element" }
+]} />
+
+### SpanData Type
+
+```tsx
+interface SpanData {
+  span_id: string;
+  trace_id?: string;
+  parent_span_id?: string | null;
+  op?: string | null;
+  description?: string | null;
+  start_timestamp: number;
+  timestamp: number;
+  status?: "ok" | "error" | string;
+  children?: SpanData[];
+  data?: Record<string, unknown>;
+  tags?: Record<string, string>;
+}
+```
+
+## Notes
+
+- The component uses a resizable column layout - drag the divider between the span name and waterfall columns
+- Spans with many children (more than 10) or deep nesting (depth 10 or more) are auto-collapsed for performance
+- Duration colors indicate performance: green (under 100ms), yellow (100-500ms), orange (500ms-1s), red (over 1s)
+- The component is fully keyboard accessible - use Tab to navigate and Enter/Space to select

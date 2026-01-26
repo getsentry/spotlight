@@ -1,0 +1,37 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "spotlight",
+  "homepage": "https://spotlightjs.com",
+  "items": [
+    {
+      "name": "span-tree",
+      "type": "registry:block",
+      "title": "SpanTree",
+      "description": "Hierarchical waterfall visualization for distributed trace spans",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [],
+      "files": [
+        { "path": "registry/new-york/span-tree/span-tree.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/span-tree/span-item.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/span-tree/span-resizer.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/span-tree/types.ts", "type": "registry:lib" },
+        { "path": "registry/new-york/span-tree/duration.ts", "type": "registry:lib" }
+      ]
+    },
+    {
+      "name": "trace-item",
+      "type": "registry:block",
+      "title": "TraceItem",
+      "description": "Summary row component for displaying distributed trace information",
+      "dependencies": ["lucide-react", "dayjs"],
+      "registryDependencies": [],
+      "files": [
+        { "path": "registry/new-york/trace-item/trace-item.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/trace-item/trace-badge.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/trace-item/time-since.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/trace-item/types.ts", "type": "registry:lib" },
+        { "path": "registry/new-york/trace-item/duration.ts", "type": "registry:lib" }
+      ]
+    }
+  ]
+}

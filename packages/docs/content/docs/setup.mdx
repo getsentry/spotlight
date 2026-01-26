@@ -1,0 +1,50 @@
+---
+title: Setup
+description: Getting started with Spotlight UI
+---
+
+# Setup
+
+Getting started with Spotlight UI components is straightforward. You can use the shadcn CLI with our custom registry for the fastest setup, or manually copy the component files.
+
+## Prerequisites
+
+Before installing Spotlight UI, make sure your environment meets the following requirements:
+
+- [Node.js](https://nodejs.org/) version 18 or later
+- A [Next.js](https://nextjs.org/) project (or any React framework)
+- [shadcn/ui](https://ui.shadcn.com/) setup in your project
+
+If you don't have shadcn/ui set up, running any install command will set it up for you.
+
+## Installing components
+
+You can install Spotlight UI components using the shadcn CLI with our custom registry:
+
+```bash
+pnpm dlx shadcn@latest add <component> -r https://spotlightjs.com/registry.json
+```
+
+For example, to install the SpanTree component:
+
+```bash
+pnpm dlx shadcn@latest add span-tree -r https://spotlightjs.com/registry.json
+```
+
+The CLI will download the component's code and integrate it into your project's directory (usually under your components folder).
+
+After running the command, you should see a confirmation in your terminal that the files were added. You can then proceed to use the component in your code.
+
+## Manual Installation
+
+If you prefer to manually install components, you can:
+
+1. Copy the component files from the registry
+2. Install any required dependencies
+3. Update import paths to match your project structure
+
+See each component's documentation page for specific manual installation instructions.
+
+## Next Steps
+
+Once you have components installed, check out the [Usage](/docs/usage) guide to learn how to use them in your application.

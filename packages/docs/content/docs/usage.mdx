@@ -1,0 +1,76 @@
+---
+title: Usage
+description: How to use Spotlight UI components in your application
+---
+
+# Usage
+
+Once a Spotlight UI component is installed, you can import it and use it in your application like any other React component. The components are added as part of your codebase (not hidden in a library), so you can edit them to suit your specific needs.
+
+## Example
+
+After installing Spotlight UI components, you can use them in your application. Here's an example using the SpanTree component:
+
+```tsx
+"use client";
+
+import { SpanTree } from "@/components/ui/span-tree";
+import type { SpanData } from "@/components/ui/span-tree/types";
+import { useState } from "react";
+
+const spans: SpanData[] = [
+  {
+    span_id: "span-001",
+    op: "http.server",
+    description: "GET /api/users",
+    start_timestamp: 1700000000000,
+    timestamp: 1700000000450,
+    status: "ok",
+    children: [
+      {
+        span_id: "span-002",
+        op: "db.query",
+        description: "SELECT * FROM users",
+        start_timestamp: 1700000000050,
+        timestamp: 1700000000200,
+        status: "ok",
+      },
+    ],
+  },
+];
+
+export default function TracePage() {
+  const [selectedSpanId, setSelectedSpanId] = useState<string>();
+
+  return (
+    <SpanTree
+      spans={spans}
+      traceStartTimestamp={1700000000000}
+      traceDuration={450}
+      selectedSpanId={selectedSpanId}
+      onSpanSelect={(spanId) => setSelectedSpanId(spanId)}
+    />
+  );
+}
+```
+
+## Customization
+
+Since the component code is added directly to your project, you can customize it as needed:
+
+- **Styling** - Modify Tailwind classes to match your design system
+- **Behavior** - Add new props or change existing behavior
+- **Types** - Extend the TypeScript interfaces for your use case
+
+## TypeScript Support
+
+All components come with full TypeScript support. Types are exported from each component's `types.ts` file:
+
+```tsx
+import type { SpanData, SpanTreeProps } from "@/components/ui/span-tree/types";
+import type { TraceData, TraceItemProps } from "@/components/ui/trace-item/types";
+```
+
+## Server Components
+
+Most Spotlight UI components are client components (marked with `"use client"`) because they require interactivity. Make sure to use them within client component boundaries in your Next.js app.
