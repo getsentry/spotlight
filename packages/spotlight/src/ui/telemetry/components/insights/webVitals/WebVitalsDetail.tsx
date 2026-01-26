@@ -14,7 +14,7 @@ import PerformanceChart from "./PerformanceChart";
 const WebVitalsDetail = () => {
   const events = useSentryEvents();
   const { page } = useParams();
-  
+
   let measurementEvent: SentryEventWithPerformanceData | undefined;
   for (const event of events) {
     if (event.event_id === page && event.measurements && event?.contexts?.trace?.op === "pageload") {

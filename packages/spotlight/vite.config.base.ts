@@ -8,6 +8,7 @@ export const aliases = {
   "@spotlight/ui": resolve(__dirname, "src/ui"),
   "@spotlight/server": resolve(__dirname, "src/server"),
   "@spotlight/shared": resolve(__dirname, "src/shared"),
+  "@/registry": resolve(__dirname, "registry"),
 };
 
 export const defineProduction = {

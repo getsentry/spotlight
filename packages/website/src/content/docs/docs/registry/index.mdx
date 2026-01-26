@@ -1,0 +1,158 @@
+---
+title: Component Registry
+description: Install Spotlight's trace visualization components in your project using shadcn CLI.
+---
+
+Spotlight provides a [shadcn/ui](https://ui.shadcn.com/) compatible component registry for trace visualization components. These components can be installed in any React project using the shadcn CLI.
+
+## Overview
+
+The Spotlight component registry includes:
+
+- **SpanTree** - A hierarchical waterfall visualization for distributed trace spans
+- **TraceItem** - A trace summary row component for displaying trace metadata
+
+These components are designed to be:
+
+- **Framework agnostic** - Works with Next.js, Vite, Remix, and any React setup
+- **Customizable** - Uses shadcn's design tokens for easy theming
+- **Lightweight** - Minimal dependencies (dayjs, lucide-react)
+- **Type-safe** - Full TypeScript support with exported types
+
+## Prerequisites
+
+Before installing components from this registry, ensure your project has:
+
+1. **shadcn/ui initialized** - Run `pnpm dlx shadcn@latest init` if not already set up
+2. **Required dependencies** - The CLI will automatically install these
+
+## Installation
+
+Install components using the shadcn CLI:
+
+```bash
+# Install SpanTree (includes SpanItem, SpanResizer)
+pnpm dlx shadcn@latest add https://spotlightjs.com/r/span-tree.json
+
+# Install TraceItem (includes TimeSince, TraceBadge)
+pnpm dlx shadcn@latest add https://spotlightjs.com/r/trace-item.json
+```
+
+## Quick Start
+
+After installation, import and use the components:
+
+```tsx
+import { SpanTree } from "@/components/span-tree";
+import { TraceItem } from "@/components/trace-item";
+import type { TraceData } from "@/lib/types";
+
+function TracePage({ traces }: { traces: TraceData[] }) {
+  const [selectedTraceId, setSelectedTraceId] = useState<string>();
+  const [selectedSpanId, setSelectedSpanId] = useState<string>();
+  
+  const selectedTrace = traces.find(t => t.trace_id === selectedTraceId);
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Trace list */}
+      <div className="border-b divide-y">
+        {traces.map((trace) => (
+          <TraceItem
+            key={trace.trace_id}
+            trace={trace}
+            isSelected={selectedTraceId === trace.trace_id}
+            onSelect={(id) => {
+              setSelectedTraceId(id);
+              setSelectedSpanId(undefined);
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Span tree for selected trace */}
+      {selectedTrace && (
+        <SpanTree
+          spans={selectedTrace.spanTree}
+          traceStartTimestamp={selectedTrace.start_timestamp}
+          traceDuration={selectedTrace.timestamp - selectedTrace.start_timestamp}
+          selectedSpanId={selectedSpanId}
+          onSpanSelect={(id) => setSelectedSpanId(id)}
+        />
+      )}
+    </div>
+  );
+}
+```
+
+## Data Format
+
+The components expect trace data in a specific format. Here's the TypeScript interface:
+
+```typescript
+interface SpanData {
+  span_id: string;
+  trace_id?: string;
+  parent_span_id?: string | null;
+  op?: string | null;
+  description?: string | null;
+  start_timestamp: number;  // Unix timestamp in ms
+  timestamp: number;        // End timestamp in ms
+  status?: "ok" | "error" | string;
+  children?: SpanData[];
+  data?: Record<string, unknown>;
+  tags?: Record<string, string>;
+}
+
+interface TraceData {
+  trace_id: string;
+  start_timestamp: number;
+  timestamp: number;
+  status?: "ok" | "error" | string;
+  spans: Map<string, SpanData>;
+  spanTree: SpanData[];
+  rootTransactionName: string;
+  rootTransactionMethod?: string;
+  transactionCount?: number;
+  spanCount?: number;
+  platform?: string;
+  environment?: string;
+}
+```
+
+## Converting from OpenTelemetry
+
+If you're using OpenTelemetry, you can convert spans to this format:
+
+```typescript
+function convertOtelSpan(otelSpan: OtelSpan): SpanData {
+  return {
+    span_id: otelSpan.spanContext().spanId,
+    trace_id: otelSpan.spanContext().traceId,
+    parent_span_id: otelSpan.parentSpanId,
+    op: otelSpan.name,
+    description: otelSpan.attributes?.['description'] as string,
+    start_timestamp: otelSpan.startTime[0] * 1000 + otelSpan.startTime[1] / 1e6,
+    timestamp: otelSpan.endTime[0] * 1000 + otelSpan.endTime[1] / 1e6,
+    status: otelSpan.status.code === 1 ? "ok" : "error",
+    data: otelSpan.attributes,
+  };
+}
+```
+
+## Theming
+
+Components use shadcn's CSS variables for styling, making them automatically compatible with your theme:
+
+- `--background` / `--foreground` - Base colors
+- `--muted` / `--muted-foreground` - Secondary colors
+- `--primary` - Accent color for highlights
+- `--destructive` - Error states
+- `--border` - Tree connector lines
+
+To customize the waterfall bar colors or timing thresholds, you can modify the `duration.ts` utility after installation.
+
+## Next Steps
+
+- [SpanTree Component](/docs/registry/span-tree) - Detailed API reference
+- [TraceItem Component](/docs/registry/trace-item) - Detailed API reference

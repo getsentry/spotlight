@@ -114,6 +114,12 @@ export default defineConfig({
           },
         },
         {
+          label: "Component Registry",
+          autogenerate: {
+            directory: "docs/registry",
+          },
+        },
+        {
           label: "Contribute",
           autogenerate: {
             directory: "docs/contribute",
