@@ -1,49 +1,14 @@
 "use client";
 
-import { TimeSince } from "@/registry/spotlight/components/time-since";
-import { EnvironmentBadge, MethodBadge, StatusBadge } from "@/registry/spotlight/components/trace-badge";
-import { formatDuration } from "@/registry/spotlight/lib/duration";
-import type { TraceItemProps } from "@/registry/spotlight/lib/types";
-import { cn } from "@/registry/spotlight/lib/utils";
-import { truncateId } from "@/registry/spotlight/lib/utils";
+import { TimeSince } from "@/components/time-since";
+import { EnvironmentBadge, MethodBadge, StatusBadge } from "@/components/trace-badge";
+import { formatDuration } from "@/lib/duration";
+import type { TraceItemProps } from "@/lib/types";
+import { cn, truncateId } from "@/lib/utils";
 import { Activity, AlertCircle } from "lucide-react";
 
 /**
  * TraceItem renders a summary row for a single distributed trace.
- * It displays the trace ID, timing, status, and transaction name.
- *
- * Features:
- * - Status icon (Activity for ok, AlertCircle for errors)
- * - Truncated trace ID with relative timestamp
- * - Transaction method and name display
- * - Duration and span count stats
- * - Optional environment badge
- *
- * @example
- * ```tsx
- * <TraceItem
- *   trace={traceData}
- *   isSelected={selectedTraceId === traceData.trace_id}
- *   onSelect={(id, trace) => {
- *     setSelectedTraceId(id);
- *     console.log("Selected trace:", trace);
- *   }}
- * />
- * ```
- *
- * @example In a list
- * ```tsx
- * <div className="divide-y">
- *   {traces.map((trace) => (
- *     <TraceItem
- *       key={trace.trace_id}
- *       trace={trace}
- *       isSelected={selectedId === trace.trace_id}
- *       onSelect={setSelectedId}
- *     />
- *   ))}
- * </div>
- * ```
  */
 export function TraceItem({ trace, isSelected = false, onSelect, className }: TraceItemProps) {
   const handleClick = () => {

@@ -42,10 +42,16 @@
           ".span-tree": {
             "position": "relative"
           },
-          ".span-tree ul": {
+          ".span-tree .span-tree": {
+            "position": "static"
+          },
+          ".span-tree, .span-tree ul": {
             "list-style": "none",
             "margin": "0",
             "padding": "0"
+          },
+          ".span-tree.deep > li > ul": {
+            "margin-left": "8px"
           },
           ".span-tree.deep > li": {
             "border-left": "1px solid hsl(var(--border))",
@@ -53,9 +59,12 @@
             "margin-left": "1rem"
           },
           ".span-tree li:last-child": {
-            "border-color": "transparent"
+            "border-left": "0"
           },
-          ".span-tree.deep > li:before": {
+          ".span-tree > li:first-child:before": {
+            "display": "none"
+          },
+          ".span-tree.deep > li:before, .span-tree .span-tree > li:before": {
             "content": "\"\"",
             "display": "inline-block",
             "position": "absolute",
@@ -70,9 +79,9 @@
           ".span-tree .node": {
             "display": "flex",
             "align-items": "center",
-            "gap": "0.25rem",
+            "column-gap": "0.25rem",
             "overflow": "hidden",
-            "padding": "0.25rem",
+            "padding": "0.25rem 0",
             "padding-left": "0.25rem"
           },
           ".span-tree .waterfall": {
@@ -80,7 +89,7 @@
             "right": "0",
             "height": "1.75rem",
             "border-left": "2px solid hsl(var(--border))",
-            "padding": "0.25rem",
+            "padding": "0.25rem 0",
             "padding-left": "0.25rem"
           }
         }

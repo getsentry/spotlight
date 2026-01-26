@@ -1,34 +1,15 @@
 "use client";
 
-import { SpanResizer } from "@/registry/spotlight/components/span-resizer";
-import { SpanTree } from "@/registry/spotlight/components/span-tree";
-import { formatDuration, getDurationClassName } from "@/registry/spotlight/lib/duration";
-import type { SpanData, SpanItemProps } from "@/registry/spotlight/lib/types";
-import { cn } from "@/registry/spotlight/lib/utils";
+import { SpanResizer } from "@/components/span-resizer";
+import { SpanTree } from "@/components/span-tree";
+import { formatDuration, getDurationClassName } from "@/lib/duration";
+import type { SpanItemProps } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import { useRef, useState } from "react";
 
 /**
  * SpanItem renders a single span row in the waterfall visualization.
- * It displays the span name, operation, and a timing bar showing duration
- * relative to the total trace duration.
- *
- * Features:
- * - Collapsible children with expand/collapse button
- * - Resizable split between name and waterfall columns
- * - Highlight support for search results
- * - Click selection with callback
- *
- * @example
- * <SpanItem
- *   span={spanData}
- *   startTimestamp={traceStart}
- *   totalDuration={traceDuration}
- *   selectedSpanId={selectedId}
- *   onSpanSelect={(id, span) => setSelectedSpan(span)}
- *   spanNodeWidth={50}
- *   onNodeWidthChange={setNodeWidth}
- * />
  */
 export function SpanItem({
   span,
@@ -134,7 +115,9 @@ export function SpanItem({
         {/* Waterfall column */}
         <div
           className={cn("waterfall overflow-hidden rounded-sm", "group-hover:bg-muted/50")}
-          style={{ left: `${spanNodeWidth}%` }}
+          style={{
+            left: `${spanNodeWidth}%`,
+          }}
         >
           <SpanResizer isResizing={isResizing} setIsResizing={setIsResizing} handleResize={handleResize} />
 
