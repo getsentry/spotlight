@@ -27,13 +27,6 @@ export function aggregateMetrics(
         count: metrics.length,
       };
     case "gauge":
-      return {
-        sum: values.reduce((a, b) => a + b, 0),
-        avg: values.reduce((a, b) => a + b, 0) / values.length,
-        min: Math.min(...values),
-        max: Math.max(...values),
-        count: metrics.length,
-      };
     case "distribution":
       return {
         sum: values.reduce((a, b) => a + b, 0),

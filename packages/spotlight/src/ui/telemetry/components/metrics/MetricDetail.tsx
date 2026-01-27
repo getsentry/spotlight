@@ -1,5 +1,3 @@
-import type { MetricType } from "@sentry/core";
-import { cn } from "@spotlight/ui/lib/cn";
 import SidePanel, { SidePanelHeader } from "@spotlight/ui/ui/sidePanel";
 import Table from "@spotlight/ui/ui/table";
 import { Link, useParams } from "react-router-dom";
@@ -7,6 +5,7 @@ import useSentryStore from "../../store";
 import { getFormattedNumber } from "../../utils/duration";
 import DateTime from "../shared/DateTime";
 import JsonViewer from "../shared/JsonViewer";
+import MetricTypeBadge from "./components/MetricTypeBadge";
 
 export default function MetricDetail({ traceId }: { traceId?: string }) {
   const { metricId } = useParams<{ metricId?: string }>();
@@ -115,25 +114,6 @@ export default function MetricDetail({ traceId }: { traceId?: string }) {
         </section>
       </div>
     </SidePanel>
-  );
-}
-
-function MetricTypeBadge({ type }: { type: MetricType }) {
-  const colors: Record<MetricType, string> = {
-    counter: "bg-blue-600/30 text-blue-300 border-blue-500/30",
-    gauge: "bg-green-600/30 text-green-300 border-green-500/30",
-    distribution: "bg-purple-600/30 text-purple-300 border-purple-500/30",
-  };
-
-  return (
-    <span
-      className={cn(
-        "rounded border px-1.5 py-0.5 text-xs uppercase",
-        colors[type] || "bg-primary-700 text-primary-100",
-      )}
-    >
-      {type}
-    </span>
   );
 }
 
