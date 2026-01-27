@@ -48,7 +48,7 @@ export default function TelemetryView({
         metricCount={metricCount}
         isOnline={isOnline}
       />
-      <main className="flex flex-1 flex-col">
+      <main className="flex min-w-0 flex-1 flex-col">
         <ElectronDragbarSpacer />
         <div className="flex-1 overflow-auto">
           <Routes>
