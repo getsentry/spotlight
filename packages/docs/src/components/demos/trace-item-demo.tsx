@@ -1,7 +1,7 @@
 "use client";
 
-import { TraceItem } from "@/components/ui/trace-item";
-import type { SpanData, TraceData } from "@/components/ui/trace-item/types";
+import { TraceItem } from "@/registry/new-york/trace-item/trace-item";
+import type { SpanData, TraceData } from "@/registry/new-york/trace-item/types";
 import { useState } from "react";
 
 // Helper to create a Map from an array

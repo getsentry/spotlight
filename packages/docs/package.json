@@ -7,7 +7,8 @@
     "dev": "next dev --turbo",
     "format": "biome check --write .",
     "start": "next start",
-    "postinstall": "fumadocs-mdx"
+    "postinstall": "fumadocs-mdx",
+    "registry:build": "shadcn build"
   },
   "dependencies": {
     "@radix-ui/react-hover-card": "^1.1.14",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.6",
+    "shadcn": "^2.5.0",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/mdx": "^2.0.13",
     "@types/node": "24.0.7",

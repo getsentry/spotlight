@@ -36,7 +36,7 @@
     },
     "registry:build": {
       "dependsOn": ["^build"],
-      "outputs": ["../website/public/r/**"],
+      "outputs": ["public/r/**"],
       "cache": false
     }
   },

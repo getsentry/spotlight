@@ -1,7 +1,7 @@
 "use client";
 
-import { SpanTree } from "@/components/ui/span-tree";
-import type { SpanData } from "@/components/ui/span-tree/types";
+import { SpanTree } from "@/registry/new-york/span-tree/span-tree";
+import type { SpanData } from "@/registry/new-york/span-tree/types";
 import { useState } from "react";
 
 // Mock span data representing a typical web request

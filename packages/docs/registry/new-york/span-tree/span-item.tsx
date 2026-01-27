@@ -1,10 +1,10 @@
 "use client";
 
-import { SpanResizer } from "@/components/span-resizer";
-import { SpanTree } from "@/components/span-tree";
-import { formatDuration, getDurationClassName } from "@/lib/duration";
-import type { SpanItemProps } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { formatDuration, getDurationClassName } from "@/registry/new-york/span-tree/duration";
+import { SpanResizer } from "@/registry/new-york/span-tree/span-resizer";
+import { SpanTree } from "@/registry/new-york/span-tree/span-tree";
+import type { SpanItemProps } from "@/registry/new-york/span-tree/types";
 import { ChevronDown } from "lucide-react";
 import { useRef, useState } from "react";
 
@@ -113,20 +113,15 @@ export function SpanItem({
         </div>
 
         {/* Waterfall column */}
-        <div
-          className={cn("waterfall overflow-hidden rounded-sm", "group-hover:bg-muted/50")}
-          style={{
-            left: `${spanNodeWidth}%`,
-          }}
-        >
+        <div className={cn("waterfall overflow-hidden rounded-sm", "group-hover:bg-muted/50")}>
           <SpanResizer isResizing={isResizing} setIsResizing={setIsResizing} handleResize={handleResize} />
 
           {/* Timing bar */}
           <div
-            className="absolute -m-0.5 w-full h-full p-0.5 bg-muted"
+            className="absolute h-full p-0.5 bg-muted rounded-sm"
             style={{
-              left: `calc(min(${((span.start_timestamp - startTimestamp) / totalDuration) * 100}%, 95% - 1px) + 4px)`,
-              width: `max(1px, ${(spanDuration / totalDuration) * 95}%)`,
+              left: `${Math.min(((span.start_timestamp - startTimestamp) / totalDuration) * 100, 95)}%`,
+              width: `${Math.max(1, Math.min((spanDuration / totalDuration) * 100, 100 - ((span.start_timestamp - startTimestamp) / totalDuration) * 100))}%`,
             }}
           >
             <span className={cn("whitespace-nowrap text-xs", getDurationClassName(spanDuration))}>

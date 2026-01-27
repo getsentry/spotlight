@@ -46,7 +46,7 @@ interface InstallationTabsProps {
   registryUrl?: string;
 }
 
-function CodeBlock({ code, language = "bash" }: { code: string; language?: string }) {
+function CodeBlock({ code }: { code: string; language?: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -57,9 +57,7 @@ function CodeBlock({ code, language = "bash" }: { code: string; language?: strin
 
   return (
     <div className="relative group">
-      <pre className={cn("overflow-x-auto rounded-lg border bg-muted/50 p-4 text-sm", "font-mono")}>
-        <code className={`language-${language}`}>{code}</code>
-      </pre>
+      <pre className="overflow-x-auto rounded-lg border bg-muted/50 p-4 text-sm font-mono">{code}</pre>
       <button
         type="button"
         onClick={handleCopy}
