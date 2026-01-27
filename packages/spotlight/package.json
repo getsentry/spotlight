@@ -30,8 +30,7 @@
     "test:e2e:cli": "vitest run --config vitest.cli.config.ts",
     "test:e2e:ui": "playwright test tests/e2e/ui",
     "test:e2e:electron": "playwright test tests/electron.test.ts",
-    "sample": "node ./_fixtures/send_to_sidecar.cjs",
-    "registry:build": "shadcn build --output ../website/public/r"
+    "sample": "node ./_fixtures/send_to_sidecar.cjs"
   },
   "files": ["dist"],
   "bin": {
@@ -71,8 +70,6 @@
     "zod": "^4"
   },
   "devDependencies": {
-    "shadcn": "^2.5.0",
-    "lucide-react": "^0.468.0",
     "@electron/notarize": "^2.5.0",
     "@fontsource/raleway": "catalog:",
     "@microlink/react-json-view": "^1.23.4",
