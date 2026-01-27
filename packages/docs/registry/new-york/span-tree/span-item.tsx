@@ -10,6 +10,27 @@ import { useRef, useState } from "react";
 
 /**
  * SpanItem renders a single span row in the waterfall visualization.
+ * It displays the span name, operation, and a timing bar showing duration
+ * relative to the total trace duration.
+ *
+ * Features:
+ * - Collapsible children with expand/collapse button
+ * - Resizable split between name and waterfall columns
+ * - Highlight support for search results
+ * - Click selection with callback
+ *
+ * @example
+ * ```tsx
+ * <SpanItem
+ *   span={spanData}
+ *   startTimestamp={traceStart}
+ *   totalDuration={traceDuration}
+ *   selectedSpanId={selectedId}
+ *   onSpanSelect={(id, span) => setSelectedSpan(span)}
+ *   spanNodeWidth={50}
+ *   onNodeWidthChange={setNodeWidth}
+ * />
+ * ```
  */
 export function SpanItem({
   span,

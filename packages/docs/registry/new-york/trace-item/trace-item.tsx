@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn, truncateId } from "@/lib/utils";
 import { formatDuration } from "@/registry/new-york/trace-item/duration";
 import { TimeSince } from "@/registry/new-york/trace-item/time-since";
 import { EnvironmentBadge, MethodBadge, StatusBadge } from "@/registry/new-york/trace-item/trace-badge";
@@ -8,14 +8,41 @@ import type { TraceItemProps } from "@/registry/new-york/trace-item/types";
 import { Activity, AlertCircle } from "lucide-react";
 
 /**
- * Truncates an ID string to a specified length.
- */
-function truncateId(id = "", length = 8): string {
-  return id.substring(0, length);
-}
-
-/**
  * TraceItem renders a summary row for a single distributed trace.
+ * It displays the trace ID, timing, status, and transaction name.
+ *
+ * Features:
+ * - Status icon (Activity for ok, AlertCircle for errors)
+ * - Truncated trace ID with relative timestamp
+ * - Transaction method and name display
+ * - Duration and span count stats
+ * - Optional environment badge
+ *
+ * @example
+ * ```tsx
+ * <TraceItem
+ *   trace={traceData}
+ *   isSelected={selectedTraceId === traceData.trace_id}
+ *   onSelect={(id, trace) => {
+ *     setSelectedTraceId(id);
+ *     console.log("Selected trace:", trace);
+ *   }}
+ * />
+ * ```
+ *
+ * @example In a list
+ * ```tsx
+ * <div className="divide-y">
+ *   {traces.map((trace) => (
+ *     <TraceItem
+ *       key={trace.trace_id}
+ *       trace={trace}
+ *       isSelected={selectedId === trace.trace_id}
+ *       onSelect={setSelectedId}
+ *     />
+ *   ))}
+ * </div>
+ * ```
  */
 export function TraceItem({ trace, isSelected = false, onSelect, className }: TraceItemProps) {
   const handleClick = () => {

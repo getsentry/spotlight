@@ -7,6 +7,42 @@ import { useState } from "react";
 
 /**
  * SpanTree renders a hierarchical waterfall visualization for distributed trace spans.
+ *
+ * Features:
+ * - Hierarchical display of parent-child span relationships
+ * - Resizable split between span name and waterfall timing columns
+ * - Timing bars showing span duration relative to total trace
+ * - Collapsible nodes for deep traces
+ * - Optional highlighting for search/filter results
+ * - Click selection with callback support
+ *
+ * @example
+ * ```tsx
+ * <SpanTree
+ *   spans={trace.spanTree}
+ *   traceStartTimestamp={trace.start_timestamp}
+ *   traceDuration={trace.timestamp - trace.start_timestamp}
+ *   selectedSpanId={selectedId}
+ *   onSpanSelect={(id, span) => {
+ *     console.log("Selected span:", span);
+ *     setSelectedId(id);
+ *   }}
+ * />
+ * ```
+ *
+ * @example With highlighting
+ * ```tsx
+ * const matchingSpanIds = new Set(
+ *   spans.filter(s => s.op?.includes(searchQuery)).map(s => s.span_id)
+ * );
+ *
+ * <SpanTree
+ *   spans={trace.spanTree}
+ *   traceStartTimestamp={trace.start_timestamp}
+ *   traceDuration={traceDuration}
+ *   highlightedSpanIds={matchingSpanIds}
+ * />
+ * ```
  */
 export function SpanTree({
   spans,
