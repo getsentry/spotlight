@@ -36,7 +36,7 @@ export default function TraceList({ traceData }: TraceListProps) {
         variant="full"
         className="h-full"
         title="No Traces"
-        description="Make sure you have set Sentry up in your project and enabled Spotlight integration"
+        description="Make sure you have set Sentry up in your project and enabled Spotlight integration."
         showDocsLink
       />
     );

@@ -177,7 +177,7 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
   }, [profile, visualizationType]);
 
   if (!profile) {
-    return <EmptyState description="No profile data available" />;
+    return <EmptyState description="No profile data available." />;
   }
 
   const getVisualizationName = (type: VisualizationType): string => {

@@ -79,7 +79,7 @@ const WebVitals = () => {
       <EmptyState
         variant="full"
         className="h-full"
-        title="No Measurements found."
+        title="No Measurements"
         description="Enable Sentry and Spotlight integration in your project to record and view web vitals here."
         showDocsLink
       />

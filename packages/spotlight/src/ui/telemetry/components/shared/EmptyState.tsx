@@ -30,7 +30,7 @@ export default function EmptyState({
   showDocsLink = false,
 }: EmptyStateProps) {
   if (variant === "simple") {
-    return <div className={cn("text-primary-300 px-6 py-4", className)}>{description}</div>;
+    return <p className={cn("text-primary-300 px-6 py-4", className)}>{description}</p>;
   }
 
   const content = showDocsLink ? (

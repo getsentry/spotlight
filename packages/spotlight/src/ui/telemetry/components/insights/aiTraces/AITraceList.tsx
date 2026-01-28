@@ -56,7 +56,7 @@ export default function AITraceList() {
       <EmptyState
         variant="full"
         className="h-full"
-        title="No AI traces have been recorded yet."
+        title="No AI Traces"
         description="Enable Sentry and Spotlight integration in your project to record and view AI traces here."
         showDocsLink
       />

@@ -20,13 +20,13 @@ export default function EventDetails() {
   const getEventById = useSentryStore(state => state.getEventById);
 
   if (!eventId) {
-    return <EmptyState description="Unknown event id" />;
+    return <EmptyState description="Unknown event id." />;
   }
 
   const event = getEventById(eventId);
 
   if (!event) {
-    return <EmptyState description="Event not found" />;
+    return <EmptyState description="Event not found." />;
   }
 
   const tabs = [
