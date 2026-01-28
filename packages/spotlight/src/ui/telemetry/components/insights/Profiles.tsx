@@ -8,6 +8,7 @@ import useSort from "../../hooks/useSort";
 import useSentryStore from "../../store";
 import type { AggregateCallData } from "../../types";
 import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
+import EmptyState from "../shared/EmptyState";
 import { TimeBar } from "../shared/TimeBar";
 
 type AggregateCallProfileComparator = (a: AggregateCallData, b: AggregateCallData) => number;
@@ -38,7 +39,15 @@ function Profiles() {
   }, [sort]);
 
   if (!aggregateCallData.length) {
-    return <p className="text-primary-300 px-6 py-4">No profiles found.</p>;
+    return (
+      <EmptyState
+        variant="full"
+        className="h-full"
+        title="No Profiles"
+        description="No profiles recorded. Enable profiling in your Sentry SDK to see function-level performance."
+        showDocsLink
+      />
+    );
   }
 
   // Calculate max time for bar visualization (100%, scaling form here)
