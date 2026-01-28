@@ -1,0 +1,96 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "spotlight",
+  "homepage": "https://spotlightjs.com",
+  "items": [
+    {
+      "name": "span-tree",
+      "type": "registry:block",
+      "title": "Span Tree",
+      "description": "A hierarchical waterfall visualization for distributed trace spans with collapsible nodes and resizable columns.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [],
+      "categories": ["traces", "observability"],
+      "files": [
+        { "path": "registry/new-york/span-tree/span-tree.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/span-tree/span-item.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/span-tree/span-resizer.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/span-tree/types.ts", "type": "registry:lib" },
+        { "path": "registry/new-york/span-tree/duration.ts", "type": "registry:lib" }
+      ],
+      "css": {
+        "@layer components": {
+          ".span-tree": {
+            "position": "relative"
+          },
+          ".span-tree .span-tree": {
+            "position": "static"
+          },
+          ".span-tree, .span-tree ul": {
+            "list-style": "none",
+            "margin": "0",
+            "padding": "0"
+          },
+          ".span-tree.deep > li > ul": {
+            "margin-left": "8px"
+          },
+          ".span-tree.deep > li": {
+            "border-left": "1px solid hsl(var(--border))",
+            "padding-left": "1rem",
+            "margin-left": "1rem"
+          },
+          ".span-tree li:last-child": {
+            "border-left": "0"
+          },
+          ".span-tree > li:first-child:before": {
+            "display": "none"
+          },
+          ".span-tree.deep > li:before, .span-tree .span-tree > li:before": {
+            "content": "\"\"",
+            "display": "inline-block",
+            "position": "absolute",
+            "height": "15px",
+            "width": "12px",
+            "margin-left": "-16px",
+            "border-bottom": "1px solid hsl(var(--border))"
+          },
+          ".span-tree li:last-child:before": {
+            "border-left": "1px solid hsl(var(--border))"
+          },
+          ".span-tree .node": {
+            "display": "flex",
+            "align-items": "center",
+            "column-gap": "0.25rem",
+            "overflow": "hidden",
+            "padding": "0.25rem 0",
+            "padding-left": "0.25rem"
+          },
+          ".span-tree .waterfall": {
+            "position": "absolute",
+            "right": "0",
+            "height": "1.75rem",
+            "border-left": "2px solid hsl(var(--border))",
+            "padding": "0.25rem 0",
+            "padding-left": "0.25rem"
+          }
+        }
+      }
+    },
+    {
+      "name": "trace-item",
+      "type": "registry:block",
+      "title": "Trace Item",
+      "description": "A trace summary row component showing ID, duration, status, and transaction name for distributed traces.",
+      "dependencies": ["lucide-react", "dayjs"],
+      "registryDependencies": [],
+      "categories": ["traces", "observability"],
+      "files": [
+        { "path": "registry/new-york/trace-item/trace-item.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/trace-item/trace-badge.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/trace-item/time-since.tsx", "type": "registry:component" },
+        { "path": "registry/new-york/trace-item/types.ts", "type": "registry:lib" },
+        { "path": "registry/new-york/trace-item/duration.ts", "type": "registry:lib" }
+      ]
+    }
+  ]
+}

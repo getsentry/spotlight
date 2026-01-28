@@ -1,6 +1,6 @@
 import type { AddressInfo } from "node:net";
-import { PortInUseError, setupSpotlight } from "../main.ts";
 import { logger } from "../logger.ts";
+import { PortInUseError, setupSpotlight } from "../main.ts";
 import type { CLIHandlerOptions, Command, CommandMeta } from "../types/cli.ts";
 import { openInBrowser } from "../utils/extras.ts";
 

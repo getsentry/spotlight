@@ -1,0 +1,178 @@
+---
+title: TraceItem
+description: Summary row component for displaying distributed trace information
+---
+
+# TraceItem
+
+A summary row component for displaying distributed trace information. Perfect for trace lists and overviews.
+
+<TraceItemDemo />
+
+## Installation
+
+<InstallationTabs component="trace-item" />
+
+## Usage
+
+```tsx
+import { TraceItem } from "@/components/ui/trace-item";
+```
+
+```tsx
+<TraceItem
+  trace={trace}
+  isSelected={selectedId === trace.trace_id}
+  onSelect={(traceId) => setSelectedId(traceId)}
+/>
+```
+
+## Examples
+
+### Basic Usage
+
+```tsx
+import { TraceItem } from "@/components/ui/trace-item";
+import type { TraceData } from "@/components/ui/trace-item/types";
+
+const trace: TraceData = {
+  trace_id: "abc123def456",
+  start_timestamp: Date.now() - 120000,
+  timestamp: Date.now() - 119550,
+  status: "ok",
+  spans: new Map(),
+  spanTree: [],
+  rootTransactionName: "/api/users",
+  rootTransactionMethod: "GET",
+  environment: "production",
+};
+
+export function BasicExample() {
+  return <TraceItem trace={trace} />;
+}
+```
+
+### With Selection
+
+```tsx
+import { TraceItem } from "@/components/ui/trace-item";
+import { useState } from "react";
+
+export function SelectionExample() {
+  const [selectedId, setSelectedId] = useState<string>();
+
+  return (
+    <TraceItem
+      trace={trace}
+      isSelected={selectedId === trace.trace_id}
+      onSelect={(traceId, trace) => {
+        setSelectedId(traceId);
+        console.log("Selected trace:", trace);
+      }}
+    />
+  );
+}
+```
+
+### Trace List
+
+```tsx
+import { TraceItem } from "@/components/ui/trace-item";
+import { useState } from "react";
+
+export function TraceList({ traces }) {
+  const [selectedId, setSelectedId] = useState<string>();
+
+  return (
+    <div className="border rounded-lg overflow-hidden">
+      {traces.map((trace) => (
+        <TraceItem
+          key={trace.trace_id}
+          trace={trace}
+          isSelected={selectedId === trace.trace_id}
+          onSelect={(traceId) => setSelectedId(traceId)}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+## API Reference
+
+### TraceItem
+
+The main component for rendering a trace summary row.
+
+<APITable props={[
+  { name: "trace", type: "TraceData", description: "The trace data to render", required: true },
+  { name: "isSelected", type: "boolean", default: "false", description: "Whether this trace is currently selected" },
+  { name: "onSelect", type: "(traceId: string, trace: TraceData) => void", description: "Callback when trace is clicked" },
+  { name: "className", type: "string", description: "Custom class name" }
+]} />
+
+### TraceData Type
+
+```tsx
+interface TraceData {
+  trace_id: string;
+  start_timestamp: number;
+  timestamp: number;
+  status?: "ok" | "error" | string;
+  spans: Map<string, SpanData>;
+  spanTree: SpanData[];
+  rootTransactionName: string;
+  rootTransactionMethod?: string;
+  transactionCount?: number;
+  spanCount?: number;
+  platform?: string;
+  environment?: string;
+}
+```
+
+### Additional Components
+
+The trace-item package also includes helper components:
+
+#### StatusBadge
+
+```tsx
+import { StatusBadge } from "@/components/ui/trace-item";
+
+<StatusBadge status="ok" />
+<StatusBadge status="error" />
+```
+
+#### MethodBadge
+
+```tsx
+import { MethodBadge } from "@/components/ui/trace-item";
+
+<MethodBadge method="GET" />
+<MethodBadge method="POST" />
+```
+
+#### EnvironmentBadge
+
+```tsx
+import { EnvironmentBadge } from "@/components/ui/trace-item";
+
+<EnvironmentBadge environment="production" />
+<EnvironmentBadge environment="staging" />
+```
+
+#### TimeSince
+
+```tsx
+import { TimeSince } from "@/components/ui/trace-item";
+
+<TimeSince date={timestamp} refreshInterval={5000} />
+```
+
+## Notes
+
+- The component displays a truncated trace ID (first 8 characters)
+- Relative time ("2 minutes ago") updates automatically every 5 seconds by default
+- Error traces are highlighted with a red icon and status badge
+- The component is fully keyboard accessible - use Tab to navigate and Enter/Space to select
+- Duration is calculated from `timestamp - start_timestamp`

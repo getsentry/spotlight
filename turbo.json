@@ -33,6 +33,11 @@
       "dependsOn": ["build"],
       "cache": false,
       "persistent": true
+    },
+    "registry:build": {
+      "dependsOn": ["^build"],
+      "outputs": ["public/r/**"],
+      "cache": false
     }
   },
   "globalDependencies": ["biome.json", "tsconfig.json", "package.json"]

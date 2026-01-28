@@ -1,0 +1,40 @@
+---
+title: Introduction
+description: Beautiful UI components for observability and distributed tracing
+---
+
+# Spotlight UI
+
+Spotlight UI is a component library built on top of shadcn/ui to help you build observability and distributed tracing experiences faster. It provides pre-built components for trace visualization, span trees, and more.
+
+Components are available via the shadcn CLI with our custom registry:
+
+```bash
+pnpm dlx shadcn@latest add span-tree -r https://spotlightjs.com/registry.json
+```
+
+## Features
+
+- **Trace Visualization** - Display distributed traces with hierarchical span trees
+- **Interactive Components** - Click, select, and explore trace data
+- **Customizable** - Built with Tailwind CSS and fully customizable
+- **shadcn/ui Compatible** - Uses the same design tokens and patterns
+
+## Getting Started
+
+1. **Setup your project** - Make sure you have shadcn/ui set up in your project
+2. **Install components** - Use the CLI to add components to your project
+3. **Use components** - Import and use components in your application
+
+Check out the [Setup](/docs/setup) guide to get started.
+
+## Components
+
+<Cards>
+  <Card title="SpanTree" href="/docs/components/span-tree">
+    Hierarchical waterfall visualization for distributed trace spans
+  </Card>
+  <Card title="TraceItem" href="/docs/components/trace-item">
+    Summary row component for displaying distributed trace information
+  </Card>
+</Cards>
