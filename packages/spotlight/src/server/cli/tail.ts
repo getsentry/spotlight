@@ -131,6 +131,22 @@ export async function handler(
   try {
     const client = await connectUpstream(port);
     client.addEventListener(SENTRY_CONTENT_TYPE, event => onEnvelope!(JSON.parse(event.data)));
+
+    // Set up cleanup handlers to close the EventSource connection
+    const cleanup = (): void => {
+      try {
+        if (client.readyState !== 2) {
+          client.close();
+        }
+      } catch (_err) {
+        // Ignore errors because maybe client is already closed
+      }
+    };
+
+    process.on("SIGINT", cleanup);
+    process.on("SIGTERM", cleanup);
+    process.on("beforeExit", cleanup);
+
     // Early return - don't start our own server if we can connect to an upstream one
     return undefined;
   } catch (err) {
