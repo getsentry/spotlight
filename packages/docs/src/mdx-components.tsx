@@ -11,9 +11,9 @@ import { ComponentPreview } from "@/components/docs/component-preview";
 // Documentation components
 import { InstallationTabs } from "@/components/docs/installation-tabs";
 
-// Demo components
-import { SpanTreeDemo, spanTreeDemoCode } from "@/components/demos/span-tree-demo";
-import { TraceItemDemo, traceItemDemoCode } from "@/components/demos/trace-item-demo";
+// Demo components (these include ComponentPreview internally)
+import { SpanTreeDemo } from "@/components/demos/span-tree-demo";
+import { TraceItemDemo } from "@/components/demos/trace-item-demo";
 
 // const generator = createGenerator();
 
@@ -32,9 +32,6 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     // Demo components
     SpanTreeDemo,
     TraceItemDemo,
-    // Demo code exports (for ComponentPreview)
-    spanTreeDemoCode,
-    traceItemDemoCode,
     ...components,
   };
 }

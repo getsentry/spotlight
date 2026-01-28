@@ -13,13 +13,28 @@ Before installing Spotlight UI, make sure your environment meets the following r
 
 - [Node.js](https://nodejs.org/) version 18 or later
 - A [Next.js](https://nextjs.org/) project (or any React framework)
-- [shadcn/ui](https://ui.shadcn.com/) setup in your project
+- [Tailwind CSS](https://tailwindcss.com/) configured in your project
+- [shadcn/ui](https://ui.shadcn.com/) setup in your project (or let the CLI set it up)
 
-If you don't have shadcn/ui set up, running any install command will set it up for you.
+### Setting up shadcn/ui
 
-## Installing components
+If you don't have shadcn/ui set up yet, you can initialize it first:
 
-You can install Spotlight UI components using the shadcn CLI with our custom registry:
+```bash
+pnpm dlx shadcn@latest init
+```
+
+Follow the prompts to configure your project. The CLI will:
+- Set up your `components.json` configuration
+- Configure path aliases in `tsconfig.json`
+- Add the `cn` utility function to `lib/utils.ts`
+- Set up CSS variables for theming
+
+## Installing Components
+
+### Using the CLI (Recommended)
+
+The fastest way to add components is using the shadcn CLI with our custom registry:
 
 ```bash
 pnpm dlx shadcn@latest add <component> -r https://spotlightjs.com/registry.json
@@ -31,19 +46,83 @@ For example, to install the SpanTree component:
 pnpm dlx shadcn@latest add span-tree -r https://spotlightjs.com/registry.json
 ```
 
-The CLI will download the component's code and integrate it into your project's directory (usually under your components folder).
+The CLI will:
+1. Download all component files to your `components/ui` directory
+2. Install any required npm dependencies (like `lucide-react`)
+3. Add any required CSS styles
 
-After running the command, you should see a confirmation in your terminal that the files were added. You can then proceed to use the component in your code.
+### Manual Installation
 
-## Manual Installation
+If you prefer to manually install components:
 
-If you prefer to manually install components, you can:
+1. **Install dependencies** - Each component lists its npm dependencies
+2. **Copy component files** - Download files from the registry
+3. **Add CSS** - Copy any required CSS to your global styles
+4. **Update imports** - Adjust import paths to match your project
 
-1. Copy the component files from the registry
-2. Install any required dependencies
-3. Update import paths to match your project structure
+See each component's documentation page for specific manual installation steps.
 
-See each component's documentation page for specific manual installation instructions.
+## Project Structure
+
+After installing components, your project structure should look like:
+
+```
+your-project/
+├── components/
+│   └── ui/
+│       ├── span-tree/
+│       │   ├── span-tree.tsx
+│       │   ├── span-item.tsx
+│       │   ├── span-resizer.tsx
+│       │   ├── types.ts
+│       │   └── duration.ts
+│       └── trace-item/
+│           └── ...
+├── lib/
+│   └── utils.ts          # cn() utility function
+└── app/
+    └── globals.css       # Global styles including component CSS
+```
+
+## Required Utilities
+
+Spotlight UI components use the `cn` utility from shadcn/ui for class merging:
+
+```tsx title="lib/utils.ts"
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+```
+
+Make sure this utility is available at `@/lib/utils` (or update component imports accordingly).
+
+## Troubleshooting
+
+### "Module not found" errors
+
+Make sure your `tsconfig.json` has the correct path aliases:
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
+```
+
+### Components not styled correctly
+
+Ensure you've imported the component CSS in your global stylesheet. Some components (like SpanTree) require specific CSS for the waterfall layout.
+
+### "use client" errors
+
+Spotlight UI components are client components. If you see hydration errors, make sure you're using them within client component boundaries.
 
 ## Next Steps
 

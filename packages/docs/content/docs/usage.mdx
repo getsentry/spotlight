@@ -7,7 +7,7 @@ description: How to use Spotlight UI components in your application
 
 Once a Spotlight UI component is installed, you can import it and use it in your application like any other React component. The components are added as part of your codebase (not hidden in a library), so you can edit them to suit your specific needs.
 
-## Example
+## Basic Example
 
 After installing Spotlight UI components, you can use them in your application. Here's an example using the SpanTree component:
 
@@ -54,13 +54,105 @@ export default function TracePage() {
 }
 ```
 
+## Working with Trace Data
+
+Spotlight UI components work with standard trace/span data structures. Here's how to integrate with common observability backends:
+
+### From Sentry SDK
+
+```tsx
+import { SpanTree } from "@/components/ui/span-tree";
+
+// Transform Sentry span data to SpanData format
+function transformSentrySpans(sentrySpans) {
+  return sentrySpans.map(span => ({
+    span_id: span.spanId,
+    trace_id: span.traceId,
+    parent_span_id: span.parentSpanId,
+    op: span.op,
+    description: span.description,
+    start_timestamp: span.startTimestamp * 1000,
+    timestamp: span.endTimestamp * 1000,
+    status: span.status,
+    children: transformSentrySpans(span.children || []),
+  }));
+}
+```
+
+### From OpenTelemetry
+
+```tsx
+// Transform OTLP spans to SpanData format
+function transformOTLPSpans(otlpSpans) {
+  return otlpSpans.map(span => ({
+    span_id: span.spanId,
+    trace_id: span.traceId,
+    parent_span_id: span.parentSpanId,
+    op: span.name,
+    description: span.attributes?.["http.url"] || span.name,
+    start_timestamp: Number(span.startTimeUnixNano) / 1_000_000,
+    timestamp: Number(span.endTimeUnixNano) / 1_000_000,
+    status: span.status?.code === 2 ? "error" : "ok",
+    children: [],
+  }));
+}
+```
+
 ## Customization
 
-Since the component code is added directly to your project, you can customize it as needed:
+Since the component code is added directly to your project, you have full control:
 
-- **Styling** - Modify Tailwind classes to match your design system
-- **Behavior** - Add new props or change existing behavior
-- **Types** - Extend the TypeScript interfaces for your use case
+### Styling
+
+Modify Tailwind classes to match your design system:
+
+```tsx
+// In span-tree.tsx, customize the container
+<ul className={cn(
+  "span-tree",
+  depth > 1 && "deep",
+  // Add your custom classes
+  "bg-card rounded-lg p-4",
+  className
+)}>
+```
+
+### Behavior
+
+Add new props or change existing behavior:
+
+```tsx
+// Add a new prop for compact mode
+interface SpanTreeProps {
+  // ... existing props
+  compact?: boolean;
+}
+
+export function SpanTree({ compact = false, ...props }: SpanTreeProps) {
+  return (
+    <ul className={cn("span-tree", compact && "text-xs")}>
+      {/* ... */}
+    </ul>
+  );
+}
+```
+
+### Types
+
+Extend the TypeScript interfaces for your use case:
+
+```tsx
+// In types.ts, extend SpanData with custom fields
+interface SpanData {
+  // ... existing fields
+  
+  // Custom fields for your application
+  customMetadata?: {
+    team: string;
+    service: string;
+  };
+}
+```
 
 ## TypeScript Support
 
@@ -74,3 +166,63 @@ import type { TraceData, TraceItemProps } from "@/components/ui/trace-item/types
 ## Server Components
 
 Most Spotlight UI components are client components (marked with `"use client"`) because they require interactivity. Make sure to use them within client component boundaries in your Next.js app.
+
+```tsx
+// app/traces/page.tsx (Server Component)
+import TraceViewer from "./trace-viewer";
+
+export default async function TracesPage() {
+  const traces = await fetchTraces();
+  
+  return (
+    <div>
+      <h1>Traces</h1>
+      {/* Client component handles interactivity */}
+      <TraceViewer traces={traces} />
+    </div>
+  );
+}
+
+// app/traces/trace-viewer.tsx (Client Component)
+"use client";
+
+import { SpanTree } from "@/components/ui/span-tree";
+
+export default function TraceViewer({ traces }) {
+  // ... interactive logic
+}
+```
+
+## Performance Tips
+
+### Large Traces
+
+For traces with many spans (100+), consider:
+
+1. **Virtualization** - Only render visible spans
+2. **Lazy loading** - Load children on demand
+3. **Pagination** - Split large traces into pages
+
+### Re-renders
+
+The components use `React.memo` and `useCallback` internally, but you should also:
+
+```tsx
+// Memoize span data to prevent unnecessary re-renders
+const spans = useMemo(() => transformSpans(rawData), [rawData]);
+
+// Memoize callbacks
+const handleSelect = useCallback((spanId: string) => {
+  setSelectedSpanId(spanId);
+}, []);
+```
+
+## Accessibility
+
+Spotlight UI components include accessibility features:
+
+- **Keyboard navigation** - Tab to navigate, Enter/Space to select
+- **ARIA attributes** - Proper roles and labels
+- **Focus management** - Visible focus indicators
+
+See each component's documentation for specific accessibility details.

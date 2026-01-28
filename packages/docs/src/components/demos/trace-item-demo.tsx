@@ -1,67 +1,89 @@
 "use client";
 
+import { ComponentPreview } from "@/components/docs/component-preview";
 import { TraceItem } from "@/registry/new-york/trace-item/trace-item";
-import type { SpanData, TraceData } from "@/registry/new-york/trace-item/types";
+import type { TraceData } from "@/registry/new-york/trace-item/types";
 import { useState } from "react";
-
-// Helper to create a Map from an array
-function createSpanMap(spans: SpanData[]): Map<string, SpanData> {
-  const map = new Map<string, SpanData>();
-  for (const span of spans) {
-    map.set(span.span_id, span);
-  }
-  return map;
-}
 
 // Mock trace data
 const mockTraces: TraceData[] = [
   {
-    trace_id: "abc123def456",
-    start_timestamp: Date.now() - 120000, // 2 minutes ago
+    trace_id: "abc123def456ghi789",
+    start_timestamp: Date.now() - 120000,
     timestamp: Date.now() - 119550,
     status: "ok",
-    spans: createSpanMap([
-      { span_id: "s1", start_timestamp: 0, timestamp: 100 },
-      { span_id: "s2", start_timestamp: 10, timestamp: 80 },
-      { span_id: "s3", start_timestamp: 20, timestamp: 90 },
-    ]),
+    spans: new Map(),
     spanTree: [],
     rootTransactionName: "/api/users",
     rootTransactionMethod: "GET",
     environment: "production",
   },
   {
-    trace_id: "xyz789ghi012",
-    start_timestamp: Date.now() - 300000, // 5 minutes ago
-    timestamp: Date.now() - 298500,
+    trace_id: "xyz789abc123def456",
+    start_timestamp: Date.now() - 300000,
+    timestamp: Date.now() - 298200,
     status: "error",
-    spans: createSpanMap([
-      { span_id: "s4", start_timestamp: 0, timestamp: 500 },
-      { span_id: "s5", start_timestamp: 50, timestamp: 400 },
-    ]),
+    spans: new Map(),
     spanTree: [],
-    rootTransactionName: "/api/orders/create",
+    rootTransactionName: "/api/orders/checkout",
     rootTransactionMethod: "POST",
-    environment: "staging",
+    environment: "production",
   },
   {
-    trace_id: "mno345pqr678",
-    start_timestamp: Date.now() - 600000, // 10 minutes ago
-    timestamp: Date.now() - 599800,
+    trace_id: "qrs456tuv789wxy012",
+    start_timestamp: Date.now() - 60000,
+    timestamp: Date.now() - 59800,
     status: "ok",
-    spans: createSpanMap([{ span_id: "s6", start_timestamp: 0, timestamp: 50 }]),
+    spans: new Map(),
     spanTree: [],
     rootTransactionName: "/health",
+    rootTransactionMethod: "GET",
+    environment: "staging",
+  },
+];
+
+const demoCode = `"use client";
+
+import { TraceItem } from "@/components/ui/trace-item";
+import type { TraceData } from "@/components/ui/trace-item/types";
+import { useState } from "react";
+
+const traces: TraceData[] = [
+  {
+    trace_id: "abc123def456",
+    start_timestamp: Date.now() - 120000,
+    timestamp: Date.now() - 119550,
+    status: "ok",
+    spans: new Map(),
+    spanTree: [],
+    rootTransactionName: "/api/users",
     rootTransactionMethod: "GET",
     environment: "production",
   },
 ];
 
-export function TraceItemDemo() {
+export function MyComponent() {
+  const [selectedId, setSelectedId] = useState<string>();
+
+  return (
+    <div className="border rounded-lg overflow-hidden">
+      {traces.map((trace) => (
+        <TraceItem
+          key={trace.trace_id}
+          trace={trace}
+          isSelected={selectedId === trace.trace_id}
+          onSelect={(traceId) => setSelectedId(traceId)}
+        />
+      ))}
+    </div>
+  );
+}`;
+
+function TraceItemDemoInner() {
   const [selectedTraceId, setSelectedTraceId] = useState<string | undefined>();
 
   return (
-    <div className="w-full max-w-3xl border rounded-lg overflow-hidden">
+    <div className="w-full border rounded-lg overflow-hidden">
       {mockTraces.map(trace => (
         <TraceItem
           key={trace.trace_id}
@@ -74,34 +96,13 @@ export function TraceItemDemo() {
   );
 }
 
-export const traceItemDemoCode = `"use client";
-
-import { TraceItem } from "@/components/ui/trace-item";
-import type { TraceData } from "@/components/ui/trace-item/types";
-import { useState } from "react";
-
-const trace: TraceData = {
-  trace_id: "abc123def456",
-  start_timestamp: Date.now() - 120000,
-  timestamp: Date.now() - 119550,
-  status: "ok",
-  spans: new Map(),
-  spanTree: [],
-  rootTransactionName: "/api/users",
-  rootTransactionMethod: "GET",
-  environment: "production",
-};
-
-export function MyComponent() {
-  const [selectedId, setSelectedId] = useState<string>();
-
+/** Standalone demo component for use in MDX */
+export function TraceItemDemo() {
   return (
-    <TraceItem
-      trace={trace}
-      isSelected={selectedId === trace.trace_id}
-      onSelect={(traceId) => setSelectedId(traceId)}
-    />
+    <ComponentPreview code={demoCode}>
+      <TraceItemDemoInner />
+    </ComponentPreview>
   );
-}`;
+}
 
 export default TraceItemDemo;

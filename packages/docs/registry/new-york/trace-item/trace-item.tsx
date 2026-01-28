@@ -6,6 +6,7 @@ import { TimeSince } from "@/registry/new-york/trace-item/time-since";
 import { EnvironmentBadge, MethodBadge, StatusBadge } from "@/registry/new-york/trace-item/trace-badge";
 import type { TraceItemProps } from "@/registry/new-york/trace-item/types";
 import { Activity, AlertCircle } from "lucide-react";
+import { memo, useCallback, useMemo } from "react";
 
 /**
  * TraceItem renders a summary row for a single distributed trace.
@@ -44,19 +45,25 @@ import { Activity, AlertCircle } from "lucide-react";
  * </div>
  * ```
  */
-export function TraceItem({ trace, isSelected = false, onSelect, className }: TraceItemProps) {
-  const handleClick = () => {
+function TraceItemComponent({ trace, isSelected = false, onSelect, className }: TraceItemProps) {
+  const handleClick = useCallback(() => {
     onSelect?.(trace.trace_id, trace);
-  };
+  }, [onSelect, trace]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleClick();
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onSelect?.(trace.trace_id, trace);
+      }
+    },
+    [onSelect, trace],
+  );
 
-  const duration = formatDuration(trace.timestamp - trace.start_timestamp);
+  const duration = useMemo(
+    () => formatDuration(trace.timestamp - trace.start_timestamp),
+    [trace.timestamp, trace.start_timestamp],
+  );
   const spanCount = trace.spans.size;
   const hasError = trace.status && trace.status !== "ok";
   const truncatedId = truncateId(trace.trace_id);
@@ -65,6 +72,8 @@ export function TraceItem({ trace, isSelected = false, onSelect, className }: Tr
     <div
       role="button"
       tabIndex={0}
+      aria-selected={isSelected}
+      aria-label={`Trace ${truncatedId}: ${trace.rootTransactionName}`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       className={cn(
@@ -75,7 +84,7 @@ export function TraceItem({ trace, isSelected = false, onSelect, className }: Tr
       )}
     >
       {/* Status Icon */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0" aria-hidden="true">
         {hasError ? (
           <AlertCircle className="h-5 w-5 text-destructive" />
         ) : (
@@ -105,13 +114,14 @@ export function TraceItem({ trace, isSelected = false, onSelect, className }: Tr
       {/* Stats */}
       <div className="flex items-center gap-4 text-sm text-muted-foreground font-mono">
         {hasError ? <StatusBadge status={trace.status!} /> : <span className="text-green-500">ok</span>}
-        <span>–</span>
+        <span aria-hidden="true">–</span>
         <span>{duration}</span>
-        <span>–</span>
+        <span aria-hidden="true">–</span>
         <span>{spanCount.toLocaleString()} spans</span>
       </div>
     </div>
   );
 }
 
+export const TraceItem = memo(TraceItemComponent);
 export default TraceItem;

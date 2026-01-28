@@ -1,8 +1,9 @@
 "use client";
 
+import { ComponentPreview } from "@/components/docs/component-preview";
 import { SpanTree } from "@/registry/new-york/span-tree/span-tree";
 import type { SpanData } from "@/registry/new-york/span-tree/types";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 // Mock span data representing a typical web request
 const mockSpans: SpanData[] = [
@@ -67,29 +68,10 @@ const mockSpans: SpanData[] = [
 const traceStartTimestamp = 1700000000000;
 const traceDuration = 450;
 
-export function SpanTreeDemo() {
-  const [selectedSpanId, setSelectedSpanId] = useState<string | undefined>();
+// IDs of database and cache spans to highlight
+const dbSpanIds = new Set(["span-002", "span-003"]);
 
-  return (
-    <div className="w-full overflow-hidden">
-      <SpanTree
-        spans={mockSpans}
-        traceStartTimestamp={traceStartTimestamp}
-        traceDuration={traceDuration}
-        selectedSpanId={selectedSpanId}
-        onSpanSelect={spanId => setSelectedSpanId(spanId)}
-        className="text-sm"
-      />
-      {selectedSpanId && (
-        <p className="mt-4 text-sm text-muted-foreground">
-          Selected span: <code className="bg-muted px-1 py-0.5 rounded">{selectedSpanId}</code>
-        </p>
-      )}
-    </div>
-  );
-}
-
-export const spanTreeDemoCode = `"use client";
+const demoCode = `"use client";
 
 import { SpanTree } from "@/components/ui/span-tree";
 import type { SpanData } from "@/components/ui/span-tree/types";
@@ -129,5 +111,53 @@ export function MyComponent() {
     />
   );
 }`;
+
+function SpanTreeDemoInner() {
+  const [selectedSpanId, setSelectedSpanId] = useState<string | undefined>();
+  const [highlightEnabled, setHighlightEnabled] = useState(false);
+
+  const highlightedSpanIds = useMemo(() => (highlightEnabled ? dbSpanIds : undefined), [highlightEnabled]);
+
+  return (
+    <div className="w-full overflow-hidden">
+      <div className="flex items-center gap-4 mb-4">
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={highlightEnabled}
+            onChange={e => setHighlightEnabled(e.target.checked)}
+            className="rounded border-muted-foreground"
+          />
+          <span>Highlight database spans</span>
+        </label>
+      </div>
+
+      <SpanTree
+        spans={mockSpans}
+        traceStartTimestamp={traceStartTimestamp}
+        traceDuration={traceDuration}
+        selectedSpanId={selectedSpanId}
+        highlightedSpanIds={highlightedSpanIds}
+        onSpanSelect={spanId => setSelectedSpanId(spanId)}
+        className="text-sm"
+      />
+
+      {selectedSpanId && (
+        <p className="mt-4 text-sm text-muted-foreground">
+          Selected span: <code className="bg-muted px-1 py-0.5 rounded">{selectedSpanId}</code>
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Standalone demo component for use in MDX */
+export function SpanTreeDemo() {
+  return (
+    <ComponentPreview code={demoCode}>
+      <SpanTreeDemoInner />
+    </ComponentPreview>
+  );
+}
 
 export default SpanTreeDemo;

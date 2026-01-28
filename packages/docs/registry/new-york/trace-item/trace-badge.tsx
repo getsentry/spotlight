@@ -2,29 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import type { TraceBadgeProps } from "@/registry/new-york/trace-item/types";
-
-/**
- * TraceBadge displays contextual badges for trace visualization.
- * Supports different variants for status, HTTP method, and environment.
- */
-export function TraceBadge({ variant, value, className }: TraceBadgeProps) {
-  if (!value) return null;
-
-  const baseClasses =
-    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors";
-
-  const variantClasses = {
-    status: getStatusClasses(value),
-    method: "border-transparent bg-muted text-foreground font-mono",
-    environment: "border-transparent bg-secondary text-secondary-foreground",
-  };
-
-  return (
-    <span className={cn(baseClasses, variantClasses[variant], className)}>
-      {variant === "status" ? value.toUpperCase() : value}
-    </span>
-  );
-}
+import { memo } from "react";
 
 /**
  * Returns appropriate classes based on status value.
@@ -45,9 +23,34 @@ function getStatusClasses(status: string): string {
 }
 
 /**
+ * TraceBadge displays contextual badges for trace visualization.
+ * Supports different variants for status, HTTP method, and environment.
+ */
+function TraceBadgeComponent({ variant, value, className }: TraceBadgeProps) {
+  if (!value) return null;
+
+  const baseClasses =
+    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors";
+
+  const variantClasses = {
+    status: getStatusClasses(value),
+    method: "border-transparent bg-muted text-foreground font-mono",
+    environment: "border-transparent bg-secondary text-secondary-foreground",
+  };
+
+  return (
+    <span className={cn(baseClasses, variantClasses[variant], className)}>
+      {variant === "status" ? value.toUpperCase() : value}
+    </span>
+  );
+}
+
+export const TraceBadge = memo(TraceBadgeComponent);
+
+/**
  * StatusBadge is a convenience wrapper for status variant.
  */
-export function StatusBadge({
+export const StatusBadge = memo(function StatusBadge({
   status,
   className,
 }: {
@@ -55,12 +58,12 @@ export function StatusBadge({
   className?: string;
 }) {
   return <TraceBadge variant="status" value={status} className={className} />;
-}
+});
 
 /**
  * MethodBadge is a convenience wrapper for HTTP method variant.
  */
-export function MethodBadge({
+export const MethodBadge = memo(function MethodBadge({
   method,
   className,
 }: {
@@ -68,12 +71,12 @@ export function MethodBadge({
   className?: string;
 }) {
   return <TraceBadge variant="method" value={method} className={className} />;
-}
+});
 
 /**
  * EnvironmentBadge is a convenience wrapper for environment variant.
  */
-export function EnvironmentBadge({
+export const EnvironmentBadge = memo(function EnvironmentBadge({
   environment,
   className,
 }: {
@@ -81,6 +84,6 @@ export function EnvironmentBadge({
   className?: string;
 }) {
   return <TraceBadge variant="environment" value={environment} className={className} />;
-}
+});
 
 export default TraceBadge;

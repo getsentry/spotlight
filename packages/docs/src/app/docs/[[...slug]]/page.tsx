@@ -5,7 +5,6 @@ import { getMDXComponents } from "@/mdx-components";
 import Link from "fumadocs-core/link";
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
-import SponsorPanel from "./SponsorPanel";
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;
@@ -17,13 +16,7 @@ export default async function Page(props: {
   const MDXContent = page.data.body;
 
   return (
-    <DocsPage
-      toc={page.data.toc}
-      full={page.data.full}
-      tableOfContent={{
-        footer: <SponsorPanel />,
-      }}
-    >
+    <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>

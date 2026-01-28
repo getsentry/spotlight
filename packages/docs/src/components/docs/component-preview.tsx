@@ -2,44 +2,12 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { Check, Copy } from "lucide-react";
-import { useState } from "react";
+import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 
 interface ComponentPreviewProps {
   children: React.ReactNode;
   code?: string;
   className?: string;
-}
-
-function CodeBlock({ code }: { code: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="relative group">
-      <pre className={cn("overflow-x-auto rounded-lg border bg-muted/50 p-4 text-sm", "font-mono max-h-[400px]")}>
-        <code>{code}</code>
-      </pre>
-      <button
-        type="button"
-        onClick={handleCopy}
-        className={cn(
-          "absolute right-2 top-2 p-2 rounded-md",
-          "opacity-0 group-hover:opacity-100 transition-opacity",
-          "bg-background/80 hover:bg-background border",
-          "text-muted-foreground hover:text-foreground",
-        )}
-        aria-label="Copy code"
-      >
-        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-      </button>
-    </div>
-  );
 }
 
 export function ComponentPreview({ children, code, className }: ComponentPreviewProps) {
@@ -87,8 +55,8 @@ export function ComponentPreview({ children, code, className }: ComponentPreview
         </div>
       </TabsContent>
 
-      <TabsContent value="code" className="mt-4">
-        <CodeBlock code={code} />
+      <TabsContent value="code" className="mt-4 max-h-[400px] overflow-auto rounded-lg">
+        <DynamicCodeBlock lang="tsx" code={code} />
       </TabsContent>
     </Tabs>
   );

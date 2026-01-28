@@ -1,87 +1,49 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
-import { Check, Copy } from "lucide-react";
-import { useState } from "react";
+import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
+import { useMemo } from "react";
+import registryData from "../../../registry.json";
 
-// Registry component metadata
-const COMPONENT_METADATA: Record<
-  string,
-  {
-    title: string;
-    description: string;
-    files: { path: string; type: string }[];
-    dependencies: string[];
-  }
-> = {
-  "span-tree": {
-    title: "SpanTree",
-    description: "Hierarchical waterfall visualization for distributed trace spans",
-    files: [
-      { path: "components/ui/span-tree/span-tree.tsx", type: "component" },
-      { path: "components/ui/span-tree/span-item.tsx", type: "component" },
-      { path: "components/ui/span-tree/span-resizer.tsx", type: "component" },
-      { path: "components/ui/span-tree/types.ts", type: "lib" },
-      { path: "components/ui/span-tree/duration.ts", type: "lib" },
-    ],
-    dependencies: ["lucide-react"],
-  },
-  "trace-item": {
-    title: "TraceItem",
-    description: "Summary row component for displaying distributed trace information",
-    files: [
-      { path: "components/ui/trace-item/trace-item.tsx", type: "component" },
-      { path: "components/ui/trace-item/trace-badge.tsx", type: "component" },
-      { path: "components/ui/trace-item/time-since.tsx", type: "component" },
-      { path: "components/ui/trace-item/types.ts", type: "lib" },
-      { path: "components/ui/trace-item/duration.ts", type: "lib" },
-    ],
-    dependencies: ["lucide-react", "dayjs"],
-  },
+// Transform registry.json into component metadata lookup
+type ComponentMetadata = {
+  title: string;
+  description: string;
+  files: { path: string; type: string }[];
+  dependencies: string[];
 };
 
+function getComponentMetadata(componentName: string): ComponentMetadata | null {
+  const item = registryData.items.find(item => item.name === componentName);
+  if (!item) return null;
+
+  return {
+    title: item.title,
+    description: item.description,
+    files: item.files.map(f => ({
+      // Convert registry paths to user-facing paths
+      path: f.path.replace("registry/new-york/", "components/ui/"),
+      type: f.type.replace("registry:", ""),
+    })),
+    dependencies: item.dependencies || [],
+  };
+}
+
 interface InstallationTabsProps {
-  component: keyof typeof COMPONENT_METADATA;
+  component: string;
   registryUrl?: string;
 }
 
-function CodeBlock({ code }: { code: string; language?: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="relative group">
-      <pre className="overflow-x-auto rounded-lg border bg-muted/50 p-4 text-sm font-mono">{code}</pre>
-      <button
-        type="button"
-        onClick={handleCopy}
-        className={cn(
-          "absolute right-2 top-2 p-2 rounded-md",
-          "opacity-0 group-hover:opacity-100 transition-opacity",
-          "bg-background/80 hover:bg-background border",
-          "text-muted-foreground hover:text-foreground",
-        )}
-        aria-label="Copy code"
-      >
-        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-      </button>
-    </div>
-  );
-}
-
 function PackageManagerTabs({ component, registryUrl }: { component: string; registryUrl: string }) {
-  const commands = {
-    pnpm: `pnpm dlx shadcn@latest add ${component} -r ${registryUrl}`,
-    npm: `npx shadcn@latest add ${component} -r ${registryUrl}`,
-    yarn: `npx shadcn@latest add ${component} -r ${registryUrl}`,
-    bun: `bunx shadcn@latest add ${component} -r ${registryUrl}`,
-  };
+  const commands = useMemo(
+    () => ({
+      pnpm: `pnpm dlx shadcn@latest add ${component} -r ${registryUrl}`,
+      npm: `npx shadcn@latest add ${component} -r ${registryUrl}`,
+      yarn: `npx shadcn@latest add ${component} -r ${registryUrl}`,
+      bun: `bunx shadcn@latest add ${component} -r ${registryUrl}`,
+    }),
+    [component, registryUrl],
+  );
 
   return (
     <Tabs defaultValue="pnpm" className="w-full">
@@ -98,7 +60,7 @@ function PackageManagerTabs({ component, registryUrl }: { component: string; reg
       </TabsList>
       {Object.entries(commands).map(([pm, cmd]) => (
         <TabsContent key={pm} value={pm} className="mt-4">
-          <CodeBlock code={cmd} />
+          <DynamicCodeBlock lang="bash" code={cmd} />
         </TabsContent>
       ))}
     </Tabs>
@@ -106,8 +68,10 @@ function PackageManagerTabs({ component, registryUrl }: { component: string; reg
 }
 
 function ManualInstallation({ component }: { component: string }) {
-  const metadata = COMPONENT_METADATA[component];
-  if (!metadata) return null;
+  const metadata = getComponentMetadata(component);
+  if (!metadata) {
+    return <p className="text-sm text-muted-foreground">Component &quot;{component}&quot; not found in registry.</p>;
+  }
 
   const dependencyCommand = metadata.dependencies.length > 0 ? `pnpm add ${metadata.dependencies.join(" ")}` : null;
 
@@ -116,7 +80,7 @@ function ManualInstallation({ component }: { component: string }) {
       {dependencyCommand && (
         <div>
           <h4 className="text-sm font-medium mb-2">1. Install dependencies</h4>
-          <CodeBlock code={dependencyCommand} />
+          <DynamicCodeBlock lang="bash" code={dependencyCommand} />
         </div>
       )}
 

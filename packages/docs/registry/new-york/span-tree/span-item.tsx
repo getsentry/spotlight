@@ -6,7 +6,7 @@ import { SpanResizer } from "@/registry/new-york/span-tree/span-resizer";
 import { SpanTree } from "@/registry/new-york/span-tree/span-tree";
 import type { SpanItemProps } from "@/registry/new-york/span-tree/types";
 import { ChevronDown } from "lucide-react";
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 /**
  * SpanItem renders a single span row in the waterfall visualization.
@@ -55,31 +55,53 @@ export function SpanItem({
   const isHighlighted = highlightedSpanIds?.has(span.span_id);
   const hasError = span.status && span.status !== "ok";
 
-  const handleResize = (e: MouseEvent) => {
-    if (containerRef.current && onNodeWidthChange) {
-      const rect = containerRef.current.getBoundingClientRect();
-      const newWidth = ((e.clientX - rect.left) / rect.width) * 100;
-      // Clamp width between 20% and 80%
-      onNodeWidthChange(Math.min(Math.max(newWidth, 20), 80));
-    }
-  };
+  // Memoize timing bar styles for performance with large traces
+  const timingBarStyle = useMemo(() => {
+    const leftPercent = ((span.start_timestamp - startTimestamp) / totalDuration) * 100;
+    const widthPercent = (spanDuration / totalDuration) * 100;
+    return {
+      left: `${Math.min(leftPercent, 95)}%`,
+      width: `${Math.max(1, Math.min(widthPercent, 100 - leftPercent))}%`,
+    };
+  }, [span.start_timestamp, startTimestamp, totalDuration, spanDuration]);
 
-  const handleClick = () => {
+  const handleResize = useCallback(
+    (e: MouseEvent) => {
+      if (containerRef.current && onNodeWidthChange) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const newWidth = ((e.clientX - rect.left) / rect.width) * 100;
+        // Clamp width between 20% and 80%
+        onNodeWidthChange(Math.min(Math.max(newWidth, 20), 80));
+      }
+    },
+    [onNodeWidthChange],
+  );
+
+  const handleClick = useCallback(() => {
     onSpanSelect?.(span.span_id, span);
-  };
+  }, [onSpanSelect, span]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleClick();
-    }
-  };
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onSpanSelect?.(span.span_id, span);
+      }
+    },
+    [onSpanSelect, span],
+  );
+
+  const handleToggleCollapse = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsCollapsed(prev => !prev);
+  }, []);
 
   return (
     <li ref={containerRef}>
       <div
         role="button"
         tabIndex={0}
+        aria-selected={isSelected}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         className={cn(
@@ -104,15 +126,14 @@ export function SpanItem({
           {childrenCount > 0 && (
             <button
               type="button"
+              aria-expanded={!isCollapsed}
+              aria-label={`${isCollapsed ? "Expand" : "Collapse"} ${childrenCount} child spans`}
               className={cn(
                 "z-10 mr-1 flex items-center gap-1 rounded-lg px-1",
                 "text-xs font-bold bg-primary text-primary-foreground",
                 "hover:bg-primary/90",
               )}
-              onClick={e => {
-                e.stopPropagation();
-                setIsCollapsed(prev => !prev);
-              }}
+              onClick={handleToggleCollapse}
             >
               {childrenCount}
               <ChevronDown className={cn("h-3 w-3 transition-transform", isCollapsed ? "rotate-0" : "rotate-180")} />
@@ -138,13 +159,7 @@ export function SpanItem({
           <SpanResizer isResizing={isResizing} setIsResizing={setIsResizing} handleResize={handleResize} />
 
           {/* Timing bar */}
-          <div
-            className="absolute h-full p-0.5 bg-muted rounded-sm"
-            style={{
-              left: `${Math.min(((span.start_timestamp - startTimestamp) / totalDuration) * 100, 95)}%`,
-              width: `${Math.max(1, Math.min((spanDuration / totalDuration) * 100, 100 - ((span.start_timestamp - startTimestamp) / totalDuration) * 100))}%`,
-            }}
-          >
+          <div className="absolute h-full p-0.5 bg-muted rounded-sm" style={timingBarStyle}>
             <span className={cn("whitespace-nowrap text-xs", getDurationClassName(spanDuration))}>
               {formatDuration(spanDuration)}
             </span>
