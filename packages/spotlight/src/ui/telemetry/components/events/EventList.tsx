@@ -43,9 +43,11 @@ export default function EventList({ traceId }: { traceId?: string }) {
     <EmptyState
       variant={!traceId ? "full" : "simple"}
       className={!traceId ? "h-full" : undefined}
-      title={!traceId ? "No Events" : undefined}
+      title={!traceId ? "No Errors" : undefined}
       description={
-        !traceId ? "Please make sure Sentry and Spotlight integration are enabled in your project." : "No events found."
+        !traceId
+          ? "No errors captured yet. That's either very good news or your SDK isn't set up."
+          : "No errors in this trace."
       }
       showDocsLink={!traceId}
     />

@@ -36,7 +36,7 @@ export default function TraceList({ traceData }: TraceListProps) {
         variant="full"
         className="h-full"
         title="No Traces"
-        description="Make sure you have set Sentry up in your project and enabled Spotlight integration."
+        description="No traces yet. Once you instrument your app with Sentry, they'll show up here."
         showDocsLink
       />
     );
@@ -67,7 +67,7 @@ export default function TraceList({ traceData }: TraceListProps) {
           );
         })
       ) : (
-        <EmptyState description="Looks like there are no traces recorded matching the applied search & filters." />
+        <EmptyState description="No traces match your current filters." />
       )}
     </CardList>
   );

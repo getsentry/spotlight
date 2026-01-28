@@ -29,7 +29,7 @@ export default function SdkList() {
           variant="full"
           className="h-full"
           title="No SDKs"
-          description="Enable Sentry and Spotlight integration in your project to record and view SDKs here."
+          description="No SDKs detected yet. Once Sentry sends data, we'll show what's running."
           showDocsLink
         />
       )}

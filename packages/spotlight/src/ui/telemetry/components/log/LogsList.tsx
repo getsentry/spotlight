@@ -78,12 +78,8 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
       <EmptyState
         variant={!traceId ? "full" : "simple"}
         className={!traceId ? "h-full" : undefined}
-        title={!traceId ? "No Logs Found" : undefined}
-        description={
-          !traceId
-            ? "Enable Sentry and Spotlight integration in your project to record and view logs here."
-            : "No logs found."
-        }
+        title={!traceId ? "No Logs" : undefined}
+        description={!traceId ? "No logs yet. Enable Sentry logging to capture them here." : "No logs in this trace."}
         showDocsLink={!traceId}
       />
     );

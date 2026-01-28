@@ -72,7 +72,7 @@ const Queries = () => {
         variant="full"
         className="h-full"
         title="No Database Queries"
-        description="Enable Sentry and Spotlight integration in your project to record and view database queries here."
+        description="No queries captured. Add a database integration to your Sentry setup to track them."
         showDocsLink
       />
     );

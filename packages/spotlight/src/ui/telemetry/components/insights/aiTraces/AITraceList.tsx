@@ -57,7 +57,7 @@ export default function AITraceList() {
         variant="full"
         className="h-full"
         title="No AI Traces"
-        description="Enable Sentry and Spotlight integration in your project to record and view AI traces here."
+        description="No AI traces recorded. Instrument your LLM calls with Sentry to see them here."
         showDocsLink
       />
     );

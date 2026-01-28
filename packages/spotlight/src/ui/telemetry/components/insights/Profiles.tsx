@@ -44,7 +44,7 @@ function Profiles() {
         variant="full"
         className="h-full"
         title="No Profiles"
-        description="Enable Sentry and Spotlight integration in your project to record and view profiles here."
+        description="No profiles recorded. Enable profiling in your Sentry SDK to see function-level performance."
         showDocsLink
       />
     );

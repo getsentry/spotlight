@@ -93,7 +93,7 @@ const Resources = () => {
         variant="full"
         className="h-full"
         title="No Resources"
-        description="Enable Sentry and Spotlight integration in your project to record and view resources here."
+        description="No resources tracked. Enable browser tracing to see asset loading performance."
         showDocsLink
       />
     );

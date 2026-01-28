@@ -79,8 +79,8 @@ const WebVitals = () => {
       <EmptyState
         variant="full"
         className="h-full"
-        title="No Measurements"
-        description="Enable Sentry and Spotlight integration in your project to record and view web vitals here."
+        title="No Web Vitals"
+        description="No performance data yet. Add Sentry's browser SDK to start measuring web vitals."
         showDocsLink
       />
     );
