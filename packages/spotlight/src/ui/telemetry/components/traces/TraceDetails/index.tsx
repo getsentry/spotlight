@@ -102,17 +102,12 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
         severe: errorCount > 0,
       },
     }),
+    createTab("metrics", "Metrics", {
+      notificationCount: {
+        count: metrics.length,
+      },
+    }),
   ];
-
-  if (metrics.length > 0) {
-    tabs.push(
-      createTab("metrics", "Metrics", {
-        notificationCount: {
-          count: metrics.length,
-        },
-      }),
-    );
-  }
 
   if (profile) {
     tabs.push(createTab("profileTree", "Profile"));
@@ -131,12 +126,8 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
               <Route path="errors" element={<EventList traceId={trace.trace_id} />} />
               <Route path="logs" element={<LogsList traceId={trace.trace_id} />} />
               <Route path="logs/:id" element={<LogsList traceId={trace.trace_id} />} />
-              {metrics.length > 0 && (
-                <>
-                  <Route path="metrics" element={<MetricsList traceId={trace.trace_id} />} />
-                  <Route path="metrics/:metricId/*" element={<MetricsList traceId={trace.trace_id} />} />
-                </>
-              )}
+              <Route path="metrics" element={<MetricsList traceId={trace.trace_id} />} />
+              <Route path="metrics/:metricId/*" element={<MetricsList traceId={trace.trace_id} />} />
               {profile && <Route path="profileTree" element={<TraceProfileTree profile={profile} />} />}
               {/* Default tab */}
               <Route path="*" element={<Navigate to="context" replace />} />

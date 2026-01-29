@@ -23,6 +23,7 @@ import type { SentryMetricPayload } from "../../types";
 import { getFormattedNumber } from "../../utils/duration";
 import { aggregateMetrics, calculatePercentiles, groupMetricsByName } from "../../utils/metrics";
 import { truncateId } from "../../utils/text";
+import EmptyState from "../shared/EmptyState";
 import MetricDetail from "./MetricDetail";
 import MetricTypeBadge from "./components/MetricTypeBadge";
 
@@ -141,18 +142,19 @@ export default function MetricsList({ traceId }: MetricsListProps) {
     });
   }, []);
 
-  //TODO: to add Empty state here once #1264 is merged.
   if (allMetrics.length === 0) {
     return (
-      <CardList>
-        <p className="text-primary-300 px-6 py-4">
-          No metrics yet. Send some trace-connected metrics to see them here.
-        </p>
-      </CardList>
+      <EmptyState
+        variant={traceId ? "simple" : "full"}
+        className={traceId ? undefined : "h-full"}
+        title={traceId ? undefined : "No Metrics"}
+        description="No metrics yet. Send some trace-connected metrics to see them here."
+        showDocsLink={!traceId}
+      />
     );
   }
 
-  const hasActiveFilters = selectedNames.size > 0 || searchQuery.length > 0;
+  const hasActiveFilters = selectedNames.size > 0;
 
   return (
     <>
@@ -241,9 +243,16 @@ export default function MetricsList({ traceId }: MetricsListProps) {
       </div>
 
       <CardList>
-        {/* TODO: to add Empty state here once #1264 is merged. */}
         {metricGroups.length === 0 ? (
-          <p className="text-primary-300 px-6 py-4">No metrics match the current filters.</p>
+          <EmptyState
+            variant="simple"
+            description={
+              traceId
+                ? "No metrics yet. Send some trace-connected metrics to see them here."
+                : "No metrics match the current filters."
+            }
+            showDocsLink={!traceId}
+          />
         ) : (
           metricGroups.map(group => {
             const isExpanded = expandedSections.has(group.name);
