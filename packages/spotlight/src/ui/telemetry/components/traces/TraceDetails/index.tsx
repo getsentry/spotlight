@@ -15,6 +15,7 @@ import { hasAISpans } from "../../insights/aiTraces/sdks/aiLibraries";
 import LogsList from "../../log/LogsList";
 import MetricsList from "../../metrics/MetricsList";
 import DateTime from "../../shared/DateTime";
+import EmptyState from "../../shared/EmptyState";
 import TraceProfileTree from "./components/TraceProfileTree";
 
 type TraceDetailsProps = {
@@ -83,7 +84,7 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
   const hasAI = trace ? hasAISpans(trace) : false;
 
   if (!trace) {
-    return <p className="text-primary-300 p-6">Trace not found.</p>;
+    return <EmptyState description="Trace not found." />;
   }
 
   const events = useSentryEvents(trace.trace_id);

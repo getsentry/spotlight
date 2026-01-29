@@ -90,12 +90,12 @@ test.describe("Log Display UI Tests", () => {
     // Check Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for either logs to appear OR "No logs found" message
+    // Wait for either logs to appear OR empty state message
     await Promise.race([
       page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', {
         timeout: 3000,
       }),
-      page.waitForSelector("text=/No logs found/i", { timeout: 3000 }),
+      page.waitForSelector("text=/No Logs|No logs yet/i", { timeout: 3000 }),
     ]);
 
     // Verify content is displayed (either logs or empty state)
@@ -123,12 +123,12 @@ test.describe("Log Display UI Tests", () => {
     // Navigate to Logs tab
     const logsTab = page.locator('[data-test-id="tab-logs"], a[href*="logs"], button:has-text("Logs")').first();
     await logsTab.click();
-    // Wait for either logs to appear OR "No logs found" message
+    // Wait for either logs to appear OR empty state message
     await Promise.race([
       page.waitForSelector('table tbody tr, [data-test-id="log-item"], article, .event-item, pre, code', {
         timeout: 3000,
       }),
-      page.waitForSelector("text=/No logs found/i", { timeout: 3000 }),
+      page.waitForSelector("text=/No Logs|No logs yet/i", { timeout: 3000 }),
     ]);
 
     // Verify content is displayed (either logs or empty state)

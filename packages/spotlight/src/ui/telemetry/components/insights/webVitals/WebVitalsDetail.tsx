@@ -9,12 +9,13 @@ import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
 import Breadcrumbs from "@spotlight/ui/ui/breadcrumbs";
 import { useParams } from "react-router-dom";
 import { normalizePerformanceScore } from "../../../utils/webVitals";
+import EmptyState from "../../shared/EmptyState";
 import PerformanceChart from "./PerformanceChart";
 
 const WebVitalsDetail = () => {
   const events = useSentryEvents();
   const { page } = useParams();
-  
+
   let measurementEvent: SentryEventWithPerformanceData | undefined;
   for (const event of events) {
     if (event.event_id === page && event.measurements && event?.contexts?.trace?.op === "pageload") {
@@ -118,7 +119,7 @@ const WebVitalsDetail = () => {
       </>
     );
   }
-  return <p className="text-primary-300 px-6 py-4">No measurement found.</p>;
+  return <EmptyState description="No measurement found." />;
 };
 
 export default WebVitalsDetail;

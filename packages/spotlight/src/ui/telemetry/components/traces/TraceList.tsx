@@ -1,10 +1,9 @@
 import CardList from "@spotlight/ui/telemetry/components/shared/CardList";
-import { Button } from "@spotlight/ui/ui/button";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@spotlight/ui/ui/empty";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { TraceSplitViewLayout } from "../../tabs/TracesTab";
 import type { Trace } from "../../types";
+import EmptyState from "../shared/EmptyState";
 import TraceItem from "./TraceItem";
 
 type TraceListProps = {
@@ -33,24 +32,13 @@ export default function TraceList({ traceData }: TraceListProps) {
 
   if (traceData.all.length === 0) {
     return (
-      <Empty className="h-full">
-        <EmptyHeader>
-          <EmptyTitle>No Traces</EmptyTitle>
-          <EmptyDescription>
-            Make sure you have set Sentry up in your project and enabled Spotlight integration
-          </EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
-          <a
-            href="https://spotlightjs.com/docs/getting-started/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-primary-400"
-          >
-            Spotlight Docs
-          </a>
-        </EmptyContent>
-      </Empty>
+      <EmptyState
+        variant="full"
+        className="h-full"
+        title="No Traces"
+        description="No traces yet. Once you instrument your app with Sentry, they'll show up here."
+        showDocsLink
+      />
     );
   }
 
@@ -79,9 +67,7 @@ export default function TraceList({ traceData }: TraceListProps) {
           );
         })
       ) : (
-        <div className="text-primary-300 p-6">
-          Looks like there are no traces recorded matching the applied search & filters. 🤔
-        </div>
+        <EmptyState description="No traces match your current filters." />
       )}
     </CardList>
   );

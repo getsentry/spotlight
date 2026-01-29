@@ -93,16 +93,16 @@ importers:
     dependencies:
       '@hono/mcp':
         specifier: ^0.2.2
-        version: 0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.11.4)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.11.4))(hono@4.11.4)(zod@4.1.13)
+        version: 0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.11.7)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.11.7))(hono@4.11.7)(zod@4.1.13)
       '@hono/node-server':
         specifier: ^1.19.3
-        version: 1.19.3(hono@4.11.4)
+        version: 1.19.3(hono@4.11.7)
       '@jridgewell/trace-mapping':
         specifier: ^0.3.25
         version: 0.3.31
       '@modelcontextprotocol/sdk':
         specifier: ^1.25.2
-        version: 1.25.2(hono@4.11.4)(zod@4.1.13)
+        version: 1.25.2(hono@4.11.7)(zod@4.1.13)
       '@sentry/core':
         specifier: 'catalog:'
         version: 10.36.0
@@ -122,8 +122,8 @@ importers:
         specifier: ^1.12.0
         version: 1.12.0
       hono:
-        specifier: ^4.11.4
-        version: 4.11.4
+        specifier: ^4.11.7
+        version: 4.11.7
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
@@ -5006,8 +5006,8 @@ packages:
     peerDependencies:
       hono: ^4.1.1
 
-  hono@4.11.4:
-    resolution: {integrity: sha512-U7tt8JsyrxSRKspfhtLET79pU8K+tInj5QZXs1jSugO1Vq5dFj3kmZsRldo29mTBfcjDRVRXrEZ6LS63Cog9ZA==}
+  hono@4.11.7:
+    resolution: {integrity: sha512-l7qMiNee7t82bH3SeyUCt9UF15EVmaBvsppY2zQtrbIhl/yzBTny+YUxsVjSjQ6gaqaeVtZmGocom8TzBlA4Yw==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@4.1.0:
@@ -8623,21 +8623,21 @@ snapshots:
 
   '@fontsource/raleway@5.2.5': {}
 
-  '@hono/mcp@0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.11.4)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.11.4))(hono@4.11.4)(zod@4.1.13)':
+  '@hono/mcp@0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.11.7)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.11.7))(hono@4.11.7)(zod@4.1.13)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.4)(zod@4.1.13)
-      hono: 4.11.4
-      hono-rate-limiter: 0.4.2(hono@4.11.4)
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.11.7)(zod@4.1.13)
+      hono: 4.11.7
+      hono-rate-limiter: 0.4.2(hono@4.11.7)
       pkce-challenge: 5.0.0
       zod: 4.1.13
 
-  '@hono/node-server@1.19.3(hono@4.11.4)':
+  '@hono/node-server@1.19.3(hono@4.11.7)':
     dependencies:
-      hono: 4.11.4
+      hono: 4.11.7
 
-  '@hono/node-server@1.19.7(hono@4.11.4)':
+  '@hono/node-server@1.19.7(hono@4.11.7)':
     dependencies:
-      hono: 4.11.4
+      hono: 4.11.7
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -8963,9 +8963,9 @@ snapshots:
 
   '@microsoft/tsdoc@0.15.1': {}
 
-  '@modelcontextprotocol/sdk@1.25.2(hono@4.11.4)(zod@4.1.13)':
+  '@modelcontextprotocol/sdk@1.25.2(hono@4.11.7)(zod@4.1.13)':
     dependencies:
-      '@hono/node-server': 1.19.7(hono@4.11.4)
+      '@hono/node-server': 1.19.7(hono@4.11.7)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -13073,11 +13073,11 @@ snapshots:
 
   he@1.2.0: {}
 
-  hono-rate-limiter@0.4.2(hono@4.11.4):
+  hono-rate-limiter@0.4.2(hono@4.11.7):
     dependencies:
-      hono: 4.11.4
+      hono: 4.11.7
 
-  hono@4.11.4: {}
+  hono@4.11.7: {}
 
   hosted-git-info@4.1.0:
     dependencies:

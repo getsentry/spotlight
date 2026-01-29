@@ -14,6 +14,7 @@ import Table from "@spotlight/ui/ui/table";
 import { type KeyboardEvent, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { normalizePerformanceScore } from "../../../utils/webVitals";
+import EmptyState from "../../shared/EmptyState";
 
 type SentryEventComparator = (a: SentryEventWithPerformanceData, b: SentryEventWithPerformanceData) => number;
 type WebVitalsSortTypes = (typeof WEB_VITALS_SORT_KEYS)[keyof typeof WEB_VITALS_SORT_KEYS];
@@ -74,7 +75,15 @@ const WebVitals = () => {
   };
 
   if (!measurementEvents?.length) {
-    return <p className="text-primary-300 px-6 py-4">No Measurements found.</p>;
+    return (
+      <EmptyState
+        variant="full"
+        className="h-full"
+        title="No Web Vitals"
+        description="No performance data yet. Add Sentry's browser SDK to start measuring web vitals."
+        showDocsLink
+      />
+    );
   }
   return (
     <>

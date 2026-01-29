@@ -6,6 +6,7 @@ import type { TreeNode } from "nanovis";
 import { useEffect, useRef, useState } from "react";
 import type { SentryProfileWithTraceMeta } from "../../../../store/types";
 import { convertSentryProfileToNormalizedTree } from "../../../../utils/profileTree";
+import EmptyState from "../../../shared/EmptyState";
 
 interface NanovisVisualization {
   el: HTMLElement;
@@ -176,7 +177,7 @@ export default function TraceProfileTree({ profile }: TraceProfileTreeProps) {
   }, [profile, visualizationType]);
 
   if (!profile) {
-    return <div className="text-primary-300 px-6 py-4">No profile data available</div>;
+    return <EmptyState description="No profile data available." />;
   }
 
   const getVisualizationName = (type: VisualizationType): string => {
