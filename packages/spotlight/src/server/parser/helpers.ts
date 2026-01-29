@@ -2,6 +2,7 @@ import type {
   SentryErrorEvent,
   SentryEvent,
   SentryLogEvent,
+  SentryMetricEvent,
   SentryProfileV1Event,
   SentryTransactionEvent,
 } from "./types.ts";
@@ -10,11 +11,13 @@ export const ERROR_EVENT_TYPES = new Set(["event", "error"]);
 export const TRACE_EVENT_TYPES = new Set(["transaction"]);
 export const PROFILE_EVENT_TYPES = new Set(["profile"]);
 export const LOG_EVENT_TYPES = new Set(["log"]);
+export const METRIC_EVENT_TYPES = new Set(["trace_metric"]);
 export const SUPPORTED_EVENT_TYPES = new Set([
   ...ERROR_EVENT_TYPES,
   ...TRACE_EVENT_TYPES,
   ...PROFILE_EVENT_TYPES,
   ...LOG_EVENT_TYPES,
+  ...METRIC_EVENT_TYPES,
 ]);
 
 export function isErrorEvent(event: SentryEvent): event is SentryErrorEvent {
@@ -34,4 +37,8 @@ export function isTraceEvent(event: SentryEvent): event is SentryTransactionEven
 
 export function isLogEvent(event: SentryEvent): event is SentryLogEvent {
   return !!event.type && LOG_EVENT_TYPES.has(event.type);
+}
+
+export function isMetricEvent(event: SentryEvent): event is SentryMetricEvent {
+  return !!event.type && METRIC_EVENT_TYPES.has(event.type);
 }

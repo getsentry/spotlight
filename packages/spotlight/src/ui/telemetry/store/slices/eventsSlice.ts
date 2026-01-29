@@ -1,12 +1,20 @@
 import { generateUuidv4 } from "@spotlight/ui/lib/uuid";
 import type { StateCreator } from "zustand";
 import { graftProfileSpans } from "../../data/profiles";
-import type { SentryEvent, SentryLogEventItem } from "../../types";
+import type { SentryEvent, SentryLogEventItem, SentryMetricPayload } from "../../types";
 import type { SentryTransactionEvent } from "../../types";
-import { isErrorEvent, isLogEvent, isProfileChunkEvent, isProfileEvent, isTraceEvent } from "../../utils/sentry";
+import {
+  isErrorEvent,
+  isLogEvent,
+  isMetricEvent,
+  isProfileChunkEvent,
+  isProfileEvent,
+  isTraceEvent,
+} from "../../utils/sentry";
 import type { EventsSliceActions, EventsSliceState, SentryProfileWithTraceMeta, SentryStore } from "../types";
 import { toTimestamp } from "../utils";
 import { processLogItems } from "../utils/logProcessor";
+import { processMetricItems } from "../utils/metricProcessor";
 import { mergeChunksToProfile, processProfileChunkEvent } from "../utils/profileChunkProcessor";
 import { processProfileEvent } from "../utils/profileProcessor";
 import { initializeTrace } from "../utils/traceInitializer";
@@ -62,6 +70,31 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
 
       // Set state once with all accumulated changes
       set({ logsById: newLogsById, logsByTraceId: newLogsByTraceId });
+    }
+
+    if (isMetricEvent(event) && event.items?.length) {
+      const { metricsById, metricsByTraceId, metricsByName } = get();
+      const { processedMetrics } = processMetricItems(event);
+
+      const newMetricsById = new Map(metricsById);
+      const newMetricsByTraceId = new Map(metricsByTraceId);
+      const newMetricsByName = new Map(metricsByName);
+
+      for (const metric of processedMetrics) {
+        newMetricsById.set(metric.id, metric);
+
+        if (metric.trace_id) {
+          const metricSet = newMetricsByTraceId.get(metric.trace_id) || new Set<SentryMetricPayload>();
+          metricSet.add(metric);
+          newMetricsByTraceId.set(metric.trace_id, metricSet);
+        }
+
+        const metricsWithName = newMetricsByName.get(metric.name) || [];
+        metricsWithName.push(metric);
+        newMetricsByName.set(metric.name, metricsWithName);
+      }
+
+      set({ metricsById: newMetricsById, metricsByTraceId: newMetricsByTraceId, metricsByName: newMetricsByName });
     }
 
     const { eventsById } = get();

@@ -1,4 +1,4 @@
-import type { EventEnvelopeHeaders, Measurements, SerializedLog } from "@sentry/core";
+import type { EventEnvelopeHeaders, Measurements, SerializedLog, SerializedMetric } from "@sentry/core";
 
 export type RawEventContext = {
   /**
@@ -289,9 +289,19 @@ export type SentryLogEvent = CommonEventAttrs & {
   items: Array<SentryLogEventItem>;
 };
 
+export type SentryMetricPayload = SerializedMetric & {
+  id: string;
+};
+
+export type SentryMetricEvent = CommonEventAttrs & {
+  type: "trace_metric";
+  items: SentryMetricPayload[];
+};
+
 export type SentryEvent =
   | SentryErrorEvent
   | SentryTransactionEvent
   | SentryProfileV1Event
   | SentryProfileV2ChunkEvent
-  | SentryLogEvent;
+  | SentryLogEvent
+  | SentryMetricEvent;

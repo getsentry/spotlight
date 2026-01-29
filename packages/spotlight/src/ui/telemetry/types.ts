@@ -1,4 +1,4 @@
-import type { EnvelopeItem, EventEnvelopeHeaders, Measurements, SerializedLog } from "@sentry/core";
+import type { EnvelopeItem, EventEnvelopeHeaders, Measurements, SerializedLog, SerializedMetric } from "@sentry/core";
 import type { ColorValue } from "nanovis";
 
 export type TraceId = string;
@@ -276,12 +276,22 @@ export type SentryLogEvent = CommonEventAttrs & {
   items: Array<SentryLogEventItem>;
 };
 
+export type SentryMetricPayload = SerializedMetric & {
+  id: string;
+};
+
+export type SentryMetricEvent = CommonEventAttrs & {
+  type: "trace_metric";
+  items: SentryMetricPayload[];
+};
+
 export type SentryEvent =
   | SentryErrorEvent
   | SentryTransactionEvent
   | SentryProfileV1Event
   | SentryProfileV2ChunkEvent
-  | SentryLogEvent;
+  | SentryLogEvent
+  | SentryMetricEvent;
 
 export type Trace = TraceContext & {
   trace_id: string;
