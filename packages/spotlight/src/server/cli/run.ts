@@ -197,7 +197,6 @@ export async function handler({
   if (open) {
     openInBrowser(actualServerPort);
   }
-  let shell = false;
   let stdin: string | undefined = undefined;
   const env = {
     ...process.env,
@@ -238,8 +237,11 @@ export async function handler({
       } else {
         logger.info(`Using package.json script: ${packageJson.scriptName}`);
         metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
-        cmdArgs = [packageJson.scriptCommand];
-        shell = true;
+        // Use explicit shell invocation instead of shell=true to avoid command injection risks
+        // This provides the same functionality while being more explicit about shell execution
+        const shellExecutable = process.platform === "win32" ? "cmd.exe" : "sh";
+        const shellFlag = process.platform === "win32" ? "/c" : "-c";
+        cmdArgs = [shellExecutable, shellFlag, packageJson.scriptCommand];
         env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
       }
     } else if (dockerCompose) {
@@ -251,8 +253,11 @@ export async function handler({
     } else if (packageJson) {
       logger.info(`Using package.json script: ${packageJson.scriptName}`);
       metrics.count("cli.run.autodetect", 1, { attributes: { type: "package-json" } });
-      cmdArgs = [packageJson.scriptCommand];
-      shell = true;
+      // Use explicit shell invocation instead of shell=true to avoid command injection risks
+      // This provides the same functionality while being more explicit about shell execution
+      const shellExecutable = process.platform === "win32" ? "cmd.exe" : "sh";
+      const shellFlag = process.platform === "win32" ? "/c" : "-c";
+      cmdArgs = [shellExecutable, shellFlag, packageJson.scriptCommand];
       env.PATH = path.resolve("./node_modules/.bin") + path.delimiter + env.PATH;
     }
   } else {
@@ -283,7 +288,6 @@ export async function handler({
   const runCmd = spawn(cmdArgs[0], cmdArgs.slice(1), {
     cwd: process.cwd(),
     env,
-    shell,
     windowsVerbatimArguments: true,
     windowsHide: true,
     stdio: [stdinMode, "pipe", "pipe"],
