@@ -95,8 +95,8 @@ importers:
         specifier: ^0.2.2
         version: 0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.12.4)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.12.4))(hono@4.12.4)(zod@4.1.13)
       '@hono/node-server':
-        specifier: ^1.19.3
-        version: 1.19.3(hono@4.12.4)
+        specifier: ^1.19.10
+        version: 1.19.10(hono@4.12.4)
       '@jridgewell/trace-mapping':
         specifier: ^0.3.25
         version: 0.3.31
@@ -1393,14 +1393,8 @@ packages:
       hono-rate-limiter: ^0.4.2
       zod: ^3.25.0 || ^4.0.0
 
-  '@hono/node-server@1.19.3':
-    resolution: {integrity: sha512-Fjyxfux0rMPXMSob79OmddfpK5ArJa2xLkLCV+zamHkbeXQtSNKOi0keiBKyHZ/hCRKjigjmKGp4AJnDFq8PUw==}
-    engines: {node: '>=18.14.1'}
-    peerDependencies:
-      hono: ^4
-
-  '@hono/node-server@1.19.7':
-    resolution: {integrity: sha512-vUcD0uauS7EU2caukW8z5lJKtoGMokxNbJtBiwHgpqxEXokaHCBkQUmCHhjFB1VUTWdqj25QoMkMKzgjq+uhrw==}
+  '@hono/node-server@1.19.10':
+    resolution: {integrity: sha512-hZ7nOssGqRgyV3FVVQdfi+U4q02uB23bpnYpdvNXkYTRRyWx84b7yf1ans+dnJ/7h41sGL3CeQTfO+ZGxuO+Iw==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -8456,11 +8450,7 @@ snapshots:
       pkce-challenge: 5.0.0
       zod: 4.1.13
 
-  '@hono/node-server@1.19.3(hono@4.12.4)':
-    dependencies:
-      hono: 4.12.4
-
-  '@hono/node-server@1.19.7(hono@4.12.4)':
+  '@hono/node-server@1.19.10(hono@4.12.4)':
     dependencies:
       hono: 4.12.4
 
@@ -8790,7 +8780,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.25.2(hono@4.12.4)(zod@4.1.13)':
     dependencies:
-      '@hono/node-server': 1.19.7(hono@4.12.4)
+      '@hono/node-server': 1.19.10(hono@4.12.4)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
