@@ -93,16 +93,16 @@ importers:
     dependencies:
       '@hono/mcp':
         specifier: ^0.2.2
-        version: 0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.12.4)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.12.4))(hono@4.12.4)(zod@4.1.13)
+        version: 0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.12.7)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.12.7))(hono@4.12.7)(zod@4.1.13)
       '@hono/node-server':
         specifier: ^1.19.10
-        version: 1.19.10(hono@4.12.4)
+        version: 1.19.10(hono@4.12.7)
       '@jridgewell/trace-mapping':
         specifier: ^0.3.25
         version: 0.3.31
       '@modelcontextprotocol/sdk':
         specifier: ^1.25.2
-        version: 1.25.2(hono@4.12.4)(zod@4.1.13)
+        version: 1.25.2(hono@4.12.7)(zod@4.1.13)
       '@sentry/core':
         specifier: 'catalog:'
         version: 10.32.1
@@ -122,8 +122,8 @@ importers:
         specifier: ^1.12.0
         version: 1.12.0
       hono:
-        specifier: ^4.12.4
-        version: 4.12.4
+        specifier: ^4.12.7
+        version: 4.12.7
       launch-editor:
         specifier: ^2.9.1
         version: 2.10.0
@@ -3670,8 +3670,8 @@ packages:
   caniuse-lite@1.0.30001751:
     resolution: {integrity: sha512-A0QJhug0Ly64Ii3eIqHu5X51ebln3k4yTUkY1j8drqpWHVreg/VLijN48cZ1bYPiqOQuqpkIKnzr/Ul8V+p6Cw==}
 
-  caniuse-lite@1.0.30001776:
-    resolution: {integrity: sha512-sg01JDPzZ9jGshqKSckOQthXnYwOEP50jeVFhaSFbZcOy05TiuuaffDOfcwtCisJ9kNQuLBFibYywv2Bgm9osw==}
+  caniuse-lite@1.0.30001777:
+    resolution: {integrity: sha512-tmN+fJxroPndC74efCdp12j+0rk0RHwV5Jwa1zWaFVyw2ZxAuPeG8ZgWC3Wz7uSjT3qMRQ5XHZ4COgQmsCMJAQ==}
 
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
@@ -4819,8 +4819,8 @@ packages:
     peerDependencies:
       hono: ^4.1.1
 
-  hono@4.12.4:
-    resolution: {integrity: sha512-ooiZW1Xy8rQ4oELQ++otI2T9DsKpV0M6c6cO6JGx4RTfav9poFFLlet9UMXHZnoM1yG0HWGlQLswBGX3RZmHtg==}
+  hono@4.12.7:
+    resolution: {integrity: sha512-jq9l1DM0zVIvsm3lv9Nw9nlJnMNPOcAtsbsgiUhWcFzPE99Gvo6yRTlszSLLYacMeQ6quHD6hMfId8crVHvexw==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@4.1.0:
@@ -8442,17 +8442,17 @@ snapshots:
 
   '@fontsource/raleway@5.2.5': {}
 
-  '@hono/mcp@0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.12.4)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.12.4))(hono@4.12.4)(zod@4.1.13)':
+  '@hono/mcp@0.2.2(@modelcontextprotocol/sdk@1.25.2(hono@4.12.7)(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.12.7))(hono@4.12.7)(zod@4.1.13)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.25.2(hono@4.12.4)(zod@4.1.13)
-      hono: 4.12.4
-      hono-rate-limiter: 0.4.2(hono@4.12.4)
+      '@modelcontextprotocol/sdk': 1.25.2(hono@4.12.7)(zod@4.1.13)
+      hono: 4.12.7
+      hono-rate-limiter: 0.4.2(hono@4.12.7)
       pkce-challenge: 5.0.0
       zod: 4.1.13
 
-  '@hono/node-server@1.19.10(hono@4.12.4)':
+  '@hono/node-server@1.19.10(hono@4.12.7)':
     dependencies:
-      hono: 4.12.4
+      hono: 4.12.7
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -8778,9 +8778,9 @@ snapshots:
 
   '@microsoft/tsdoc@0.15.1': {}
 
-  '@modelcontextprotocol/sdk@1.25.2(hono@4.12.4)(zod@4.1.13)':
+  '@modelcontextprotocol/sdk@1.25.2(hono@4.12.7)(zod@4.1.13)':
     dependencies:
-      '@hono/node-server': 1.19.10(hono@4.12.4)
+      '@hono/node-server': 1.19.10(hono@4.12.7)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -10905,7 +10905,7 @@ snapshots:
   autoprefixer@10.4.27(postcss@8.5.8):
     dependencies:
       browserslist: 4.28.1
-      caniuse-lite: 1.0.30001776
+      caniuse-lite: 1.0.30001777
       fraction.js: 5.3.4
       picocolors: 1.1.1
       postcss: 8.5.8
@@ -11026,7 +11026,7 @@ snapshots:
   browserslist@4.28.1:
     dependencies:
       baseline-browser-mapping: 2.10.0
-      caniuse-lite: 1.0.30001776
+      caniuse-lite: 1.0.30001777
       electron-to-chromium: 1.5.307
       node-releases: 2.0.36
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
@@ -11115,7 +11115,7 @@ snapshots:
 
   caniuse-lite@1.0.30001751: {}
 
-  caniuse-lite@1.0.30001776: {}
+  caniuse-lite@1.0.30001777: {}
 
   ccount@2.0.1: {}
 
@@ -12639,11 +12639,11 @@ snapshots:
     dependencies:
       react-is: 16.13.1
 
-  hono-rate-limiter@0.4.2(hono@4.12.4):
+  hono-rate-limiter@0.4.2(hono@4.12.7):
     dependencies:
-      hono: 4.12.4
+      hono: 4.12.7
 
-  hono@4.12.4: {}
+  hono@4.12.7: {}
 
   hosted-git-info@4.1.0:
     dependencies:
