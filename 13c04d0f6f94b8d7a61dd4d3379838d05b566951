@@ -1,0 +1,31 @@
+# Plan: Update Release Actions to Latest
+
+## Summary
+Update the release-related GitHub Actions workflows in Spotlight to use the latest action versions, matching the patterns from the CLI repo.
+
+## Changes
+
+### 1. `.github/workflows/release.yml`
+
+| Line | Current | Updated |
+|---|---|---|
+| 30 | `actions/create-github-app-token@d72941d...` (SHA pin) | `actions/create-github-app-token@v2.2.1` |
+| 35 | `actions/checkout@v4` | `actions/checkout@v6` |
+| 50 | `getsentry/craft@1c58bfd...` (SHA pin) | `getsentry/craft@v2` |
+
+**Keep as-is:** pnpm setup step, `actions/setup-node@v6` with `node-version-file`, and cache config (Spotlight needs pnpm for its release hooks).
+
+### 2. `.github/workflows/changelog-preview.yml`
+
+| Line | Current | Updated |
+|---|---|---|
+| 13 | `getsentry/craft/...changelog-preview.yml@1c58bfd...` (SHA pin) | `getsentry/craft/...changelog-preview.yml@v2` |
+| — | No permissions block | Add `permissions: contents: read, pull-requests: write, statuses: write` |
+
+## Files to Modify
+1. `/home/byk/Code/getsentry/spotlight/.github/workflows/release.yml`
+2. `/home/byk/Code/getsentry/spotlight/.github/workflows/changelog-preview.yml`
+
+## Verification
+- Review the diff to ensure only version references changed, no accidental config removal
+- Workflows are `workflow_dispatch` / `pull_request_target` triggered — verify by visual diff review
