@@ -1,5 +1,47 @@
 # @spotlightjs/spotlight
 
+## 4.11.0
+
+### New Features ✨
+
+- (telemetry) EmptyState component by @Shubhdeep12 in [#1264](https://github.com/getsentry/spotlight/pull/1264)
+- (ui) Collapsible insights section by @Shubhdeep12 in [#1263](https://github.com/getsentry/spotlight/pull/1263)
+- Added new codecov action by @MathurAditya724 in [#1255](https://github.com/getsentry/spotlight/pull/1255)
+
+### Bug Fixes 🐛
+
+#### Deps
+
+- Resolve security vulnerabilities via pnpm overrides by @BYK in [#1276](https://github.com/getsentry/spotlight/pull/1276)
+- Address Dependabot security alerts by @BYK in [#1261](https://github.com/getsentry/spotlight/pull/1261)
+
+#### Other
+
+- (cli) Show options in command-specific help output by @BYK in [#1260](https://github.com/getsentry/spotlight/pull/1260)
+- (ui) Update TelemetryView layout for better responsiveness by @Shubhdeep12 in [#1262](https://github.com/getsentry/spotlight/pull/1262)
+- Add cleanup handlers for EventSource connection in cli tail by @Shubhdeep12 in [#1258](https://github.com/getsentry/spotlight/pull/1258)
+- Updated the codecov action to point to getsentry by @MathurAditya724 in [#1259](https://github.com/getsentry/spotlight/pull/1259)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump @hono/node-server from 1.19.3 to 1.19.10 by @dependabot in [#1274](https://github.com/getsentry/spotlight/pull/1274)
+- Bump hono from 4.11.7 to 4.12.4 by @dependabot in [#1273](https://github.com/getsentry/spotlight/pull/1273)
+- Bump hono from 4.11.4 to 4.11.7 by @dependabot in [#1267](https://github.com/getsentry/spotlight/pull/1267)
+- Bump hono from 4.10.3 to 4.11.4 by @dependabot in [#1254](https://github.com/getsentry/spotlight/pull/1254)
+
+#### Other
+
+- (ci) Fix workflow warnings for cache action and codecov by @BYK in [#1251](https://github.com/getsentry/spotlight/pull/1251)
+- (release) Fix Docker Latest Target by @BYK in [#1252](https://github.com/getsentry/spotlight/pull/1252)
+- Update release actions to latest versions by @BYK in [#1277](https://github.com/getsentry/spotlight/pull/1277)
+- Use pull_request_target for changelog preview by @BYK in [#1256](https://github.com/getsentry/spotlight/pull/1256)
+
+### Other
+
+- Update documentation link in README.md by @sergical in [#1253](https://github.com/getsentry/spotlight/pull/1253)
+
 ## 4.10.0
 
 ### New Features ✨
