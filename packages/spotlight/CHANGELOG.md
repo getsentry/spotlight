@@ -1,5 +1,15 @@
 # @spotlightjs/spotlight
 
+## 4.11.1
+
+### Bug Fixes 🐛
+
+- (security) Resolve 3 dependabot alerts and dismiss 2 svelte alerts by @BYK in [#1279](https://github.com/getsentry/spotlight/pull/1279)
+
+### Internal Changes 🔧
+
+- (release) Use workflow-based artifact discovery, remove merge-artifacts job by @BYK in [#1278](https://github.com/getsentry/spotlight/pull/1278)
+
 ## 4.11.0
 
 ### New Features ✨
