@@ -1,5 +1,11 @@
 # @spotlightjs/spotlight
 
+## 4.11.3
+
+### Bug Fixes 🐛
+
+- (deps) Bump h3 and flatted overrides to fix security vulnerabilities by @BYK in [#1281](https://github.com/getsentry/spotlight/pull/1281)
+
 ## 4.11.2
 
 ### Bug Fixes 🐛
