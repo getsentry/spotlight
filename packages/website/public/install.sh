@@ -25,7 +25,7 @@ else
   exit 1
 fi
 
-spotlight_path='~/.local/bin/spotlight'
+spotlight_path="$HOME/.local/bin/spotlight"
 spotlight_file="spotlight-$os-$arch$suffix"
 mkdir -p $(dirname $spotlight_path)
 echo "Downloading $spotlight_file..."
