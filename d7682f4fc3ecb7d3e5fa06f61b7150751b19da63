@@ -1,0 +1,53 @@
+# Fix GitHub Security Reports (Round 2)
+
+## Summary
+
+**Security advisories**: 0 (none)
+**Dependabot alerts**: 2 open, 6 dismissed, 92 fixed
+
+Round 1 (PR #1279) resolved alerts #147, #142, #148 and dismissed #152, #153. Two new `h3` alerts have appeared since.
+
+## Open Alerts
+
+| # | Package | Severity | Vulnerable | Fix | Relationship | Action |
+|---|---------|----------|-----------|-----|--------------|--------|
+| 187 | `h3` | **HIGH** | `< 1.15.6` | `1.15.6` | transitive | **Bump existing override** |
+| 186 | `h3` | **MEDIUM** | `< 1.15.6` | `1.15.6` | transitive | **Bump existing override** |
+
+- **#187** (HIGH): SSE injection via unsanitized newlines in event stream fields (CVE-2026-33128)
+- **#186** (MEDIUM): Path traversal via percent-encoded dot segments in `serveStatic`
+
+Current state: override `"h3": ">=1.15.5"`, lockfile resolved to `h3@1.15.5`. Fix needs `>= 1.15.6`.
+
+## Plan
+
+### Step 1: Bump `h3` override
+
+In `/home/byk/Code/getsentry/spotlight/package.json`, change:
+```
+"h3": ">=1.15.5"  →  "h3": ">=1.15.6"
+```
+
+### Step 2: Regenerate lockfile, build, and test
+
+```bash
+pnpm install
+pnpm build
+pnpm turbo test
+```
+
+### Step 3: Amend into existing PR branch and force-push
+
+This is a follow-up to the same PR (#1279), so amend the commit on `fix/security-dependabot-alerts`.
+
+## Files to Modify
+
+- `package.json` — bump h3 override
+- `pnpm-lock.yaml` — regenerated
+
+## Verification
+
+1. `grep "h3@" pnpm-lock.yaml` — should show `>= 1.15.6`
+2. `pnpm build` succeeds
+3. `pnpm turbo test` — all 186 tests pass
+4. `gh api ... /dependabot/alerts?state=open` returns 0 alerts
