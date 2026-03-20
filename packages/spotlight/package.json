@@ -32,9 +32,7 @@
     "test:e2e:electron": "playwright test tests/electron.test.ts",
     "sample": "node ./_fixtures/send_to_sidecar.cjs"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "bin": {
     "spotlight": "./dist/run.js"
   },
