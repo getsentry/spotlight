@@ -1,5 +1,11 @@
 # @spotlightjs/spotlight
 
+## 4.11.2
+
+### Bug Fixes 🐛
+
+- Install script bin location by @raulparada in [#1280](https://github.com/getsentry/spotlight/pull/1280)
+
 ## 4.11.1
 
 ### Bug Fixes 🐛
