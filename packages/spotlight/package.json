@@ -104,7 +104,7 @@
     "concurrently": "^9.1.2",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
-    "electron": "^35.7.5",
+    "electron": "^39.8.5",
     "electron-builder": "^24.13.3",
     "electron-store": "^10.0.1",
     "electron-updater": "^6.6.2",
