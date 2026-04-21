@@ -1,7 +1,7 @@
 # Craft Release Configuration
 # https://getsentry.github.io/craft/configuration/
 
-minVersion: "2.16.0"
+minVersion: "2.21.1"
 
 versioning:
   policy: auto
@@ -12,15 +12,14 @@ changelog:
 
 preReleaseCommand: bash scripts/bump-version.sh
 
-statusProvider:
+artifactProvider:
   name: github
   config:
-    contexts:
-      - "Merge Artifacts"
-
-requireNames:
-  - /^spotlight-/
-  - /\.dmg$/
+    artifacts:
+      Build & Test:
+        - 'npm-package'
+        - 'spotlight-binaries'
+        - 'electron-binaries'
 
 targets:
   - name: npm
