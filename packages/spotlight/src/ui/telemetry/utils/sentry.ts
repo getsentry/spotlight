@@ -1,8 +1,15 @@
-import { ERROR_EVENT_TYPES, LOG_EVENT_TYPES, PROFILE_EVENT_TYPES, TRACE_EVENT_TYPES } from "../constants/sentry";
+import {
+  ERROR_EVENT_TYPES,
+  LOG_EVENT_TYPES,
+  METRIC_EVENT_TYPES,
+  PROFILE_EVENT_TYPES,
+  TRACE_EVENT_TYPES,
+} from "../constants/sentry";
 import type {
   SentryErrorEvent,
   SentryEvent,
   SentryLogEvent,
+  SentryMetricEvent,
   SentryProfileV1Event,
   SentryProfileV2ChunkEvent,
   SentryTransactionEvent,
@@ -26,4 +33,8 @@ export function isTraceEvent(event: SentryEvent): event is SentryTransactionEven
 
 export function isLogEvent(event: SentryEvent): event is SentryLogEvent {
   return !!event.type && LOG_EVENT_TYPES.has(event.type);
+}
+
+export function isMetricEvent(event: SentryEvent): event is SentryMetricEvent {
+  return !!event.type && METRIC_EVENT_TYPES.has(event.type);
 }

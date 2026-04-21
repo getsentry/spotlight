@@ -1,11 +1,18 @@
 import type { Envelope } from "@sentry/core";
-import type { SentryErrorEvent, SentryEvent, SentryLogEvent, SentryTransactionEvent } from "../parser/types.ts";
+import type {
+  SentryErrorEvent,
+  SentryEvent,
+  SentryLogEvent,
+  SentryMetricEvent,
+  SentryTransactionEvent,
+} from "../parser/types.ts";
 
 /**
  * Strongly-typed formatter functions (no type guards needed in implementation)
  */
 export type ErrorFormatterFn = (event: SentryErrorEvent, envelopeHeader: Envelope[0]) => string[];
 export type LogFormatterFn = (event: SentryLogEvent, envelopeHeader: Envelope[0]) => string[];
+export type MetricFormatterFn = (event: SentryMetricEvent, envelopeHeader: Envelope[0]) => string[];
 export type TraceFormatterFn = (event: SentryTransactionEvent, envelopeHeader: Envelope[0]) => string[];
 
 /**
@@ -22,6 +29,7 @@ export type FormatterEntry<T extends SentryEvent> = {
 export type FormatterRegistry = {
   event: FormatterEntry<SentryErrorEvent>;
   log: FormatterEntry<SentryLogEvent>;
+  metric: FormatterEntry<SentryMetricEvent>;
   transaction: FormatterEntry<SentryTransactionEvent>;
 };
 

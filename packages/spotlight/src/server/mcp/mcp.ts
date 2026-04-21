@@ -11,7 +11,8 @@ import {
   renderSpanTree,
 } from "../formatters/md/traces.ts";
 import { getBuffer } from "../utils/index.ts";
-import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT } from "./constants.ts";
+import { NO_ERRORS_CONTENT, NO_LOGS_CONTENT, NO_METRICS_CONTENT } from "./constants.ts";
+import { queryMetrics } from "./tools/metrics.ts";
 
 const inputSchema = {
   filters: z.union([
@@ -436,6 +437,128 @@ get_traces({ traceId: "71a8c5e41ae1044dee67f50a07538fe7" })
           },
         ],
       };
+    },
+  );
+
+  mcp.registerTool(
+    "query_metrics",
+    {
+      title: "Query Metrics",
+      description: `**Purpose:** Query metrics from collected telemetry. Returns all metrics when called without filters, or filter by name, type, trace ID, or time window.
+
+**Returns:**
+• List of metric samples (all or filtered)
+• Full metric payloads with attributes
+• Trace correlation information
+
+**When to use:**
+- Getting all available metrics (no filters)
+- Finding metrics by name or type
+- Filtering metrics by trace ID
+- Getting metrics within a time window
+
+**Example calls:**
+\`\`\`json
+// Get all metrics
+query_metrics({})
+
+// Query by name
+query_metrics({ name: "api.response_time" })
+
+// Query by type
+query_metrics({ type: "distribution" })
+
+// Query by trace ID
+query_metrics({ traceId: "71a8c5e4" })
+
+// Query with time window (last 5 minutes)
+query_metrics({ timeWindow: 300 })
+
+// Combined filters
+query_metrics({ name: "api", type: "counter", limit: 10 })
+\`\`\`
+
+**Parameter hints:**
+• name: Metric name (exact or partial match)
+• type: Metric type (counter, gauge, distribution)
+• traceId: Trace ID to filter by
+• timeWindow: Seconds to look back (60 = 1 min, 300 = 5 min)
+• limit: Maximum number of results to return`,
+      inputSchema: {
+        name: z.string().optional().describe("Metric name to filter by (exact or partial match)"),
+        type: z.enum(["counter", "gauge", "distribution"]).optional().describe("Metric type to filter by"),
+        traceId: z.string().optional().describe("Trace ID to filter metrics by"),
+        timeWindow: z
+          .number()
+          .optional()
+          .describe("Number of seconds to look back from now. Examples: 60 = last minute, 300 = last 5 minutes"),
+        limit: z.number().optional().describe("Maximum number of results to return"),
+      },
+    },
+    async args => {
+      try {
+        const metrics = queryMetrics({
+          name: args.name,
+          type: args.type,
+          traceId: args.traceId,
+          timeWindow: args.timeWindow,
+          limit: args.limit,
+        });
+
+        if (metrics.length === 0) {
+          return NO_METRICS_CONTENT;
+        }
+
+        const content: TextContent[] = [
+          {
+            type: "text",
+            text: `# Metrics Query Results (${metrics.length} found)\n\n`,
+          },
+        ];
+
+        for (const metric of metrics) {
+          const timestamp = new Date(metric.timestamp * 1000).toISOString();
+          let metricText = `## ${metric.name}\n`;
+          metricText += `- **Type:** ${metric.type}\n`;
+          const valueStr =
+            metric.unit && metric.unit !== "none"
+              ? `${metric.value.toLocaleString()} ${metric.unit}`
+              : metric.value.toLocaleString();
+          metricText += `- **Value:** ${valueStr}\n`;
+          metricText += `- **Timestamp:** ${timestamp}\n`;
+          if (metric.trace_id) {
+            metricText += `- **Trace ID:** ${metric.trace_id}\n`;
+          }
+          if (metric.span_id) {
+            metricText += `- **Span ID:** ${metric.span_id}\n`;
+          }
+          if (metric.attributes && Object.keys(metric.attributes).length > 0) {
+            metricText += "- **Attributes:**\n";
+            for (const [key, attr] of Object.entries(metric.attributes)) {
+              const value = typeof attr === "object" && "value" in attr ? attr.value : attr;
+              metricText += `  - ${key}: ${value}\n`;
+            }
+          }
+          metricText += "\n";
+
+          content.push({
+            type: "text",
+            text: metricText,
+          });
+        }
+
+        return { content };
+      } catch (err) {
+        captureException(err, { extra: { context: "Error querying metrics in MCP" } });
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error querying metrics: ${err instanceof Error ? err.message : String(err)}`,
+            },
+          ],
+        };
+      }
     },
   );
 

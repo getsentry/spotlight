@@ -1,5 +1,5 @@
 packages:
-  - 'packages/*'
+  - "packages/*"
 
 catalog:
   "@fontsource/raleway": ^5.1.0
@@ -7,9 +7,9 @@ catalog:
   "@types/node": ^22.15.21
   "@types/react": ^18.3.11
   "@types/react-dom": ^18.3.0
-  "@sentry/astro": ^10.31.0
-  "@sentry/core": ^10.31.0
-  "@sentry/node": ^10.31.0
+  "@sentry/astro": ^10.36.0
+  "@sentry/core": ^10.36.0
+  "@sentry/node": ^10.36.0
   react: ^18.3.1
   react-dom: ^18.3.1
   tailwindcss: ^4.1.10

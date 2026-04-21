@@ -64,6 +64,9 @@ export const createSharedSlice: StateCreator<SentryStore, [], [], SharedSliceAct
       profileChunksByProfilerId: new Map(),
       logsById: new Map(),
       logsByTraceId: new Map(),
+      metricsById: new Map(),
+      metricsByTraceId: new Map(),
+      metricsByName: new Map(),
     });
   },
 });

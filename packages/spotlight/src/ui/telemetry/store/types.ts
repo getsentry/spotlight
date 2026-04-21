@@ -5,6 +5,7 @@ import type {
   SentryErrorEvent,
   SentryEvent,
   SentryLogEventItem,
+  SentryMetricPayload,
   SentryProcessedProfile,
   Trace,
 } from "../types";
@@ -91,6 +92,20 @@ export interface LogsSliceActions {
   getLogsByTraceId: (traceId: string) => SentryLogEventItem[];
 }
 
+export interface MetricsSliceState {
+  metricsById: Map<string, SentryMetricPayload>;
+  metricsByTraceId: Map<string, Set<SentryMetricPayload>>;
+  metricsByName: Map<string, SentryMetricPayload[]>;
+}
+
+export interface MetricsSliceActions {
+  getMetricById: (id: string) => SentryMetricPayload | undefined;
+  getMetrics: () => SentryMetricPayload[];
+  getMetricsByTraceId: (traceId: string) => SentryMetricPayload[];
+  getMetricsByName: (name: string) => SentryMetricPayload[];
+  getMetricNames: () => string[];
+}
+
 export interface SDKsSliceActions {
   inferSdkFromEvent: (event: SentryEvent) => Sdk;
   storeSdkRecord: (sdk: Sdk) => Sdk;
@@ -112,6 +127,7 @@ export type SentryStoreState = EventsSliceState &
   SettingsSliceState &
   EnvelopesSliceState &
   LogsSliceState &
+  MetricsSliceState &
   SDKsSliceState;
 
 export type SentryStoreActions = EventsSliceActions &
@@ -121,6 +137,7 @@ export type SentryStoreActions = EventsSliceActions &
   SettingsSliceActions &
   EnvelopesSliceActions &
   LogsSliceActions &
+  MetricsSliceActions &
   SDKsSliceActions &
   SharedSliceActions;
 

@@ -28,6 +28,7 @@ export const NAME_TO_TYPE_MAPPING: Record<string, string[]> = Object.freeze({
   traces: ["transaction", "span"],
   // profiles: ["profile"],
   logs: ["log"],
+  metrics: ["trace_metric"],
   attachments: ["attachment"],
   errors: ["event"],
   // sessions: ["session"],

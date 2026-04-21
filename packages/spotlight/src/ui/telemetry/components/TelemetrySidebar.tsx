@@ -14,6 +14,7 @@ interface TelemetrySidebarProps {
   errorCount: number;
   traceCount: number;
   logCount: number;
+  metricCount: number;
   isOnline: boolean;
 }
 
@@ -45,7 +46,13 @@ function NavigationLink({
   );
 }
 
-export default function TelemetrySidebar({ errorCount, traceCount, logCount, isOnline }: TelemetrySidebarProps) {
+export default function TelemetrySidebar({
+  errorCount,
+  traceCount,
+  logCount,
+  metricCount,
+  isOnline,
+}: TelemetrySidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
   const { getSidecarUrl } = useSpotlightContext();
@@ -122,6 +129,12 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
           isActive={isActive("errors")}
         />
         <NavigationLink to="logs" title="Logs" notificationCount={{ count: logCount }} isActive={isActive("logs")} />
+        <NavigationLink
+          to="metrics"
+          title="Metrics"
+          notificationCount={{ count: metricCount }}
+          isActive={isActive("metrics")}
+        />
 
         {/* Insights section */}
         <button
