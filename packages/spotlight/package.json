@@ -32,9 +32,7 @@
     "test:e2e:electron": "playwright test tests/electron.test.ts",
     "sample": "node ./_fixtures/send_to_sidecar.cjs"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "bin": {
     "spotlight": "./dist/run.js"
   },
@@ -53,7 +51,7 @@
   },
   "dependencies": {
     "@hono/mcp": "^0.2.2",
-    "@hono/node-server": "^1.19.10",
+    "@hono/node-server": "^1.19.14",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@modelcontextprotocol/sdk": "^1.26.0",
     "@sentry/core": "catalog:",
@@ -62,7 +60,7 @@
     "chalk": "^5.6.2",
     "eventsource": "^4.0.0",
     "fast-fuzzy": "^1.12.0",
-    "hono": "^4.12.14",
+    "hono": "^4.12.18",
     "launch-editor": "^2.9.1",
     "logfmt": "^1.4.0",
     "mcp-proxy": "^5.6.0",
