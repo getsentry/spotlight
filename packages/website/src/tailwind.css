@@ -1,6 +1,26 @@
-@import "tailwindcss";
+@layer base, starlight, theme, components, utilities;
 
-@config "../tailwind.config.mjs";
+@import '@astrojs/starlight-tailwind';
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-raleway: 'Raleway', ui-sans-serif, system-ui, sans-serif;
+
+  --animate-fade-in: 0.5s fadeIn forwards;
+  --animate-fade-out: 0.5s fadeOut forwards;
+
+  @keyframes fadeIn {
+    0% { opacity: 0; transform: translate(-20px, 0); }
+    100% { opacity: 1; transform: translate(0, 0); }
+  }
+
+  @keyframes fadeOut {
+    0% { opacity: 1; transform: translate(0, 0); }
+    100% { opacity: 0; transform: translate(-20px, 0); }
+  }
+}
 
 .site-title {
   @apply font-raleway text-2xl font-light uppercase tracking-widest text-white;
