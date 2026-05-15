@@ -81,7 +81,7 @@ overrides:
   fast-uri: '>=3.1.2'
   ip-address: '>=10.1.1'
   lodash: '>=4.18.0'
-  plist: '>=3.1.1'
+  '@xmldom/xmldom': '>=0.8.13'
   postcss: '>=8.5.10'
   qs: '>=6.14.2'
   svelte: '>=5.55.7'
@@ -6131,9 +6131,9 @@ packages:
     resolution: {integrity: sha512-B7+VDyb8Tl6oMJT9oSO2CW8XC/T4UcJGrwOVoNGwOQsQYhlpfajmrMj5xeejqaASq3V/EqThyOeATEOMuSEXiA==}
     engines: {node: '>=12'}
 
-  plist@5.0.0:
-    resolution: {integrity: sha512-20N+g1DvMm/DFRbsvER7tT4wDryq0WunK7VMkDaiJcKNapAnUMkTsAnacFYf8n420F4Hf6/hefgmJRkMb1M0fg==}
-    engines: {node: '>=18'}
+  plist@3.1.1:
+    resolution: {integrity: sha512-ZIfcLJC+7E7FBFnDxm9MPmt7D+DidyQ26lewieO75AdhA2ayMtsJSES0iWzqJQbcVRSrTufQoy0DR94xHue0oA==}
+    engines: {node: '>=10.4.0'}
 
   portable-executable-signature@2.0.6:
     resolution: {integrity: sha512-VV+1GuJca0cJ0PFwnCW/xK8Ro9DDX38e4iUDh6ngPjd9vj7VLiemh9rSlqquvcVGtClkVzYaV/UseMVnUrxS/Q==}
@@ -8153,7 +8153,7 @@ snapshots:
       fs-extra: 10.1.0
       isbinaryfile: 4.0.10
       minimist: 1.2.8
-      plist: 5.0.0
+      plist: 3.1.1
     transitivePeerDependencies:
       - supports-color
 
@@ -8165,7 +8165,7 @@ snapshots:
       dir-compare: 3.3.0
       fs-extra: 9.1.0
       minimatch: 3.1.5
-      plist: 5.0.0
+      plist: 3.1.1
     transitivePeerDependencies:
       - supports-color
 
@@ -11638,7 +11638,7 @@ snapshots:
       ajv: 6.14.0
       crc: 3.8.0
       iconv-corefoundation: 1.1.7
-      plist: 5.0.0
+      plist: 3.1.1
       smart-buffer: 4.2.0
       verror: 1.10.1
     optional: true
@@ -14158,9 +14158,10 @@ snapshots:
     dependencies:
       queue-lit: 1.5.2
 
-  plist@5.0.0:
+  plist@3.1.1:
     dependencies:
       '@xmldom/xmldom': 0.9.10
+      base64-js: 1.5.1
       xmlbuilder: 15.1.1
 
   portable-executable-signature@2.0.6: {}
