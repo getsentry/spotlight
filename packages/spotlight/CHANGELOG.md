@@ -1,5 +1,40 @@
 # @spotlightjs/spotlight
 
+## 4.11.4
+
+### Security 🔒
+
+#### Deps
+
+- Replace plist override with @xmldom/xmldom to fix electron-builder by @BYK in [#1307](https://github.com/getsentry/spotlight/pull/1307)
+- Resolve 12 open dependabot alerts by @BYK in [#1303](https://github.com/getsentry/spotlight/pull/1303)
+
+### Bug Fixes 🐛
+
+- (deps) Cap esbuild override to <0.28.0 to avoid regression by @BYK in [#1301](https://github.com/getsentry/spotlight/pull/1301)
+- (security) Resolve dependabot alerts via dep updates and overrides by @BYK in [#1299](https://github.com/getsentry/spotlight/pull/1299)
+
+### Documentation 📚
+
+- Document turbo.json SENTRY_SPOTLIGHT env configuration by @SSDWGG in [#1306](https://github.com/getsentry/spotlight/pull/1306)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump picomatch from 2.3.1 to 4.0.4 by @dependabot in [#1305](https://github.com/getsentry/spotlight/pull/1305)
+- Bump brace-expansion from 2.0.2 to 2.1.0 by @dependabot in [#1304](https://github.com/getsentry/spotlight/pull/1304)
+- Bump postcss from 8.5.6 to 8.5.14 by @dependabot in [#1300](https://github.com/getsentry/spotlight/pull/1300)
+- Bump hono from 4.12.8 to 4.12.14 by @dependabot in [#1292](https://github.com/getsentry/spotlight/pull/1292)
+- Bump astro from 5.15.9 to 5.18.1 by @dependabot in [#1285](https://github.com/getsentry/spotlight/pull/1285)
+- Bump yaml from 2.8.1 to 2.8.3 by @dependabot in [#1283](https://github.com/getsentry/spotlight/pull/1283)
+
+#### Deps Dev
+
+- Bump electron from 35.7.5 to 39.8.5 by @dependabot in [#1289](https://github.com/getsentry/spotlight/pull/1289)
+- Bump happy-dom from 20.8.8 to 20.8.9 by @dependabot in [#1287](https://github.com/getsentry/spotlight/pull/1287)
+- Bump happy-dom from 20.0.2 to 20.8.8 by @dependabot in [#1286](https://github.com/getsentry/spotlight/pull/1286)
+
 ## 4.11.3
 
 ### Bug Fixes 🐛
