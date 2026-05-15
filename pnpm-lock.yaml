@@ -72,7 +72,7 @@ overrides:
   next: ^15.4.8
   cookie: '>=0.7.0'
   esbuild: '>=0.25.0 <0.28.0'
-  brace-expansion: '>=2.0.2 <3'
+  brace-expansion: '>=2.1.0 <3'
   tmp: '>=0.2.4'
   js-yaml: '>=4.1.1'
   body-parser: '>=2.2.1'
@@ -3609,8 +3609,8 @@ packages:
     resolution: {integrity: sha512-z0M+byMThzQmD9NILRniCUXYsYpjwnlO8N5uCFaCqIOpqRsJCrQL9NK3JsD67CN5a08nF5oIL2bD6loTdHOuKw==}
     engines: {node: '>= 5.10.0'}
 
-  brace-expansion@2.0.2:
-    resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
+  brace-expansion@2.1.0:
+    resolution: {integrity: sha512-TN1kCZAgdgweJhWWpgKYrQaMNHcDULHkWwQIspdtjV4Y5aurRdZpjAqn6yX3FPqTA9ngHCc4hJxMAMgGfve85w==}
 
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
@@ -11109,7 +11109,7 @@ snapshots:
     dependencies:
       big-integer: 1.6.52
 
-  brace-expansion@2.0.2:
+  brace-expansion@2.1.0:
     dependencies:
       balanced-match: 1.0.2
 
@@ -13797,23 +13797,23 @@ snapshots:
 
   minimatch@10.2.5:
     dependencies:
-      brace-expansion: 2.0.2
+      brace-expansion: 2.1.0
 
   minimatch@3.1.5:
     dependencies:
-      brace-expansion: 2.0.2
+      brace-expansion: 2.1.0
 
   minimatch@5.1.9:
     dependencies:
-      brace-expansion: 2.0.2
+      brace-expansion: 2.1.0
 
   minimatch@8.0.7:
     dependencies:
-      brace-expansion: 2.0.2
+      brace-expansion: 2.1.0
 
   minimatch@9.0.9:
     dependencies:
-      brace-expansion: 2.0.2
+      brace-expansion: 2.1.0
 
   minimist@1.2.8: {}
 
