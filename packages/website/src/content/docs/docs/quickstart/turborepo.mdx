@@ -1,0 +1,61 @@
+---
+title: Turborepo
+description: Configure Spotlight to work across packages in a Turborepo monorepo
+---
+
+When using Spotlight in a [Turborepo](https://turbo.build/) monorepo, the `SENTRY_SPOTLIGHT` environment variable must be declared in `turbo.json` for it to be available to all packages. Without this, Turborepo may not forward the variable to packages that consume the Sentry SDK, and Spotlight won't receive telemetry from those packages.
+
+:::note[Already set up Spotlight?]
+This guide assumes you've already installed the Sentry SDK and Spotlight in your project. If not, see the [Getting Started](/docs/getting-started/) guide first.
+:::
+
+## Option 1: Global Environment Variable
+
+The simplest approach is to declare `SENTRY_SPOTLIGHT` as a global environment variable. This makes it available to all tasks in every package:
+
+```json
+// turbo.json
+{
+  "globalEnv": ["SENTRY_SPOTLIGHT"]
+}
+```
+
+## Option 2: Scope to Specific Tasks
+
+If you prefer more granular control, you can scope the variable to specific tasks using the `tasks` configuration:
+
+```json
+// turbo.json
+{
+  "tasks": {
+    "dev": {
+      "env": ["SENTRY_SPOTLIGHT"]
+    },
+    "build": {
+      "env": ["SENTRY_SPOTLIGHT"]
+    }
+  }
+}
+```
+
+This ensures `SENTRY_SPOTLIGHT` is only forwarded to the `dev` and `build` tasks, keeping other tasks unaffected.
+
+## Verify It Works
+
+1. Set the environment variable in your `.env` file or shell:
+   ```bash
+   SENTRY_SPOTLIGHT=1
+   ```
+
+2. Run your Turborepo dev task:
+   ```bash
+   turbo dev
+   ```
+
+3. Open the [Spotlight UI](http://localhost:8969) and confirm that telemetry from all packages appears.
+
+## Next Steps
+
+- [Getting Started](/docs/getting-started/) - Initial Spotlight setup
+- [CLI](/docs/cli/) - Run apps with automatic instrumentation and stream events
+- [Sidecar](/docs/sidecar/) - Learn about the local proxy server that powers Spotlight
