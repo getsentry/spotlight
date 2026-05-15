@@ -43,6 +43,33 @@ Spotlight uses Sentry SDKs to capture telemetry data and sends it to the Sidecar
 - [![Stack Overflow](https://img.shields.io/badge/stack%20overflow-sentry-green.svg)](http://stackoverflow.com/questions/tagged/sentry)
 - [![Twitter Follow](https://img.shields.io/twitter/follow/getsentry?label=getsentry&style=social)](https://twitter.com/intent/follow?screen_name=getsentry)
 
+## Turborepo Setup
+
+When using Spotlight in a [Turborepo](https://turbo.build/) monorepo, declare `SENTRY_SPOTLIGHT` as a global environment variable in `turbo.json` so it's available to all packages during dev and build:
+
+```json
+{
+  "globalEnv": ["SENTRY_SPOTLIGHT"]
+}
+```
+
+Alternatively, scope the variable to specific pipeline tasks:
+
+```json
+{
+  "pipeline": {
+    "dev": {
+      "env": ["SENTRY_SPOTLIGHT"]
+    },
+    "build": {
+      "env": ["SENTRY_SPOTLIGHT"]
+    }
+  }
+}
+```
+
+Without this, `SENTRY_SPOTLIGHT` may not be forwarded to packages that consume the Sentry SDK, and Spotlight won't receive telemetry from those packages.
+
 ## Resources
 
 - [Contribute](https://spotlightjs.com/docs/contribute/)
