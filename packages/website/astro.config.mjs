@@ -1,5 +1,5 @@
 import starlight from "@astrojs/starlight";
-import vercelStatic from "@astrojs/vercel/static";
+import vercel from "@astrojs/vercel";
 import sentry from "@sentry/astro";
 import { defineConfig } from "astro/config";
 import Inspect from "vite-plugin-inspect";
@@ -37,10 +37,10 @@ export default defineConfig({
       logo: {
         src: "./public/images/glyph.svg",
       },
-      social: {
-        discord: "https://discord.gg/EJjqM3XtXQ",
-        github: "https://github.com/getsentry/spotlight",
-      },
+      social: [
+        { icon: "discord", label: "Discord", href: "https://discord.gg/EJjqM3XtXQ" },
+        { icon: "github", label: "GitHub", href: "https://github.com/getsentry/spotlight" },
+      ],
       components: {
         Header: "./src/components/docs/Header.astro",
         ThemeProvider: "./src/components/ThemeProvider.astro",
@@ -79,45 +79,31 @@ export default defineConfig({
         },
         {
           label: "Quick Starts",
-          autogenerate: {
-            directory: "docs/quickstart",
-          },
+          items: [{ autogenerate: { directory: "docs/quickstart" } }],
         },
         {
           label: "CLI",
-          autogenerate: {
-            directory: "docs/cli",
-          },
+          items: [{ autogenerate: { directory: "docs/cli" } }],
         },
         {
           label: "MCP Server",
-          autogenerate: {
-            directory: "docs/mcp",
-          },
+          items: [{ autogenerate: { directory: "docs/mcp" } }],
         },
         {
           label: "Desktop App",
-          autogenerate: {
-            directory: "docs/desktop-app",
-          },
+          items: [{ autogenerate: { directory: "docs/desktop-app" } }],
         },
         {
           label: "Sidecar",
-          autogenerate: {
-            directory: "docs/sidecar",
-          },
+          items: [{ autogenerate: { directory: "docs/sidecar" } }],
         },
         {
           label: "SDK",
-          autogenerate: {
-            directory: "docs/sdk",
-          },
+          items: [{ autogenerate: { directory: "docs/sdk" } }],
         },
         {
           label: "Contribute",
-          autogenerate: {
-            directory: "docs/contribute",
-          },
+          items: [{ autogenerate: { directory: "docs/contribute" } }],
         },
         {
           label: "About",
@@ -134,9 +120,7 @@ export default defineConfig({
         },
         {
           label: "Reference",
-          autogenerate: {
-            directory: "docs/reference",
-          },
+          items: [{ autogenerate: { directory: "docs/reference" } }],
         },
       ],
       expressiveCode: {
@@ -152,5 +136,5 @@ export default defineConfig({
     react(),
   ],
   output: "static",
-  adapter: vercelStatic(),
+  adapter: vercel(),
 });
