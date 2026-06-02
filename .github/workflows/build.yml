@@ -349,7 +349,7 @@ jobs:
   electron-mac:
     name: Build Electron App (macOS)
     needs: build
-    runs-on: macos-latest
+    runs-on: macos-15
     if: github.event_name == 'push' && (github.ref_name == 'main' || startsWith(github.ref_name, 'release/'))
     environment: Production
     steps:
