@@ -1,5 +1,21 @@
 # @spotlightjs/spotlight
 
+## 4.11.5
+
+### Security 🔒
+
+#### Deps
+
+- Add react-router override for open redirect (#273) by @BYK in [#1317](https://github.com/getsentry/spotlight/pull/1317)
+- Resolve 6 open dependabot alerts by @BYK in [#1316](https://github.com/getsentry/spotlight/pull/1316)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump js-cookie from 3.0.5 to 3.0.7 by @dependabot in [#1308](https://github.com/getsentry/spotlight/pull/1308)
+- Bump @tootallnate/once from 2.0.0 to 2.0.1 by @dependabot in [#1310](https://github.com/getsentry/spotlight/pull/1310)
+
 ## 4.11.4
 
 ### Security 🔒
