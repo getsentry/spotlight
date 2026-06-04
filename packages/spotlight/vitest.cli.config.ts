@@ -1,5 +1,3 @@
-/// <reference types="vitest" />
-
 import { defineConfig } from "vitest/config";
 import { aliases } from "./vite.config.base";
 
@@ -16,7 +14,6 @@ export default defineConfig({
       "**/tests/e2e/ui/**", // Exclude Playwright tests
       "**/tests/electron.test.ts", // Exclude Playwright electron test
     ],
-    watchExclude: [".*\\/node_modules\\/.*", ".*\\/dist\\/.*"],
   },
   resolve: {
     alias: aliases,
