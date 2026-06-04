@@ -1,5 +1,3 @@
-/// <reference types="vitest" />
-
 import { defineConfig } from "vitest/config";
 import { aliases } from "./vite.config.base";
 
@@ -21,7 +19,6 @@ export default defineConfig({
       "**/dist/**",
       "**/tests/**", // Exclude all e2e tests from unit test run
     ],
-    watchExclude: [".*\\/node_modules\\/.*", ".*\\/dist\\/.*"],
     testTimeout: 30000, // 30 seconds for e2e tests
   },
   resolve: {

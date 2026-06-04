@@ -1,4 +1,3 @@
-import type { Nullable } from "vitest";
 import type { SentryEvent } from "../../types";
 import Attachment from "../insights/envelopes/Attachment";
 import { CodeViewer } from "../insights/envelopes/CodeViewer";
@@ -24,7 +23,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
     return exampleContext;
   }
 
-  const contexts: Record<string, Nullable<Record<string, unknown>>> = {
+  const contexts: Record<string, Record<string, unknown> | null> = {
     request: event.request,
     ...event.contexts,
   };

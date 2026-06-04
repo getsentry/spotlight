@@ -19,6 +19,11 @@ export default defineConfig({
     outDir: resolve(__dirname, "dist", "ui"),
     manifest: "manifest.json",
     sourcemap: true,
+    // vite 6 bundles esbuild 0.27+, which errors (instead of warning) when it
+    // cannot down-transpile certain destructuring patterns to the default
+    // legacy target. es2022 has native support for these and is widely
+    // available (Chrome 94+, Firefox 93+, Safari 15.4+).
+    target: "es2022",
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),

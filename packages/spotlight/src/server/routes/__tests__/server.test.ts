@@ -1,3 +1,9 @@
+// @vitest-environment node
+// These tests exercise server-side Hono routing and CORS middleware, which rely on
+// the Node.js global fetch/Headers/Response implementation. The default happy-dom
+// environment overrides these globals in a way that breaks hono's cors() middleware
+// (the Access-Control-Allow-Origin header is dropped). Pin this file to the node
+// environment so server behavior is tested against the real runtime.
 import { readdir, unlink } from "node:fs/promises";
 import { brotliCompressSync, deflateSync, gzipSync } from "node:zlib";
 import { events } from "fetch-event-stream";
