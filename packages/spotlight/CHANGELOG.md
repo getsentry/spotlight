@@ -1,5 +1,15 @@
 # @spotlightjs/spotlight
 
+## 4.11.6
+
+### Security 🔒
+
+- (deps) Resolve 5 open dependabot alerts (shell-quote, hono) by @BYK in [#1321](https://github.com/getsentry/spotlight/pull/1321)
+
+### Other
+
+- Fix path stacking in sidebar and detail tabs (React Router v7 splat routes) by @zhiyan114 in [#1320](https://github.com/getsentry/spotlight/pull/1320)
+
 ## 4.11.5
 
 ### Security 🔒
