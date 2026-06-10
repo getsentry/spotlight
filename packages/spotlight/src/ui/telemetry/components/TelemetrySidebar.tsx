@@ -32,7 +32,7 @@ function NavigationLink({
 }) {
   return (
     <Link
-      to={to}
+      to={`/telemetry/${to}`}
       className={`relative flex items-center gap-x-2 p-3 font-medium transition ${isSubItem ? "pl-6" : ""} ${
         isActive ? "text-white bg-primary-600" : "text-primary-300 hover:bg-primary-800 hover:text-primary-100"
       }`}
