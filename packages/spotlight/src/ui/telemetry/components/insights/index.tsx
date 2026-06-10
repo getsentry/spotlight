@@ -1,4 +1,5 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { TELEMETRY_BASE_URL } from "../../constants";
 import Profiles from "./Profiles";
 import Queries from "./Queries";
 import QuerySummary from "./QuerySummary";
@@ -24,7 +25,7 @@ export default function InsightsTabDetails() {
           <Route path="profiles" element={<Profiles />} />
           <Route path="aitraces/*" element={<AItracesTab />} />
           {/* Default tab */}
-          <Route path="*" element={<Navigate to="queries" replace />} />
+          <Route path="*" element={<Navigate to={`${TELEMETRY_BASE_URL}/insights/queries`} replace />} />
         </Routes>
         <Outlet />
       </div>

@@ -2,9 +2,9 @@ import JsonViewer from "@spotlight/ui/telemetry/components/shared/JsonViewer";
 import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
 import { isErrorEvent } from "@spotlight/ui/telemetry/utils/sentry";
 import { createTab } from "@spotlight/ui/telemetry/utils/tabs";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { format as formatSQL } from "sql-formatter";
-import { DB_SPAN_REGEX } from "../../../constants";
+import { DB_SPAN_REGEX, TELEMETRY_BASE_URL } from "../../../constants";
 import useSentryStore from "../../../store";
 import type { Span } from "../../../types";
 import TelemetryTabs from "../../TelemetryTabs";
@@ -12,6 +12,7 @@ import EventList from "../../events/EventList";
 import LogsList from "../../log/LogsList";
 import { ContextView } from "../../shared/ContextView";
 import DateTime from "../../shared/DateTime";
+import EmptyState from "../../shared/EmptyState";
 
 function DBSpanDescription({ desc, dbType }: { desc: string; dbType?: string }) {
   if (desc.startsWith("{") || dbType === "mongodb") {
@@ -96,6 +97,9 @@ export default function SpanDetails({
 }: {
   span: Span;
 }) {
+  // Use the route params (always present for this route) rather than the span's
+  // optional `trace_id` so the absolute nav paths below are type-safe.
+  const { traceId, spanId } = useParams();
   const getEventsByTrace = useSentryStore(state => state.getEventsByTrace);
 
   // TODO: try to narrow errors to the span and its children?
@@ -114,9 +118,17 @@ export default function SpanDetails({
     }),
   ];
 
+  if (!traceId || !spanId) {
+    return <EmptyState description="Unknown span." />;
+  }
+
+  // Absolute base path for this span's tabs/redirects. Must be absolute because
+  // these links render inside a splat route (`spans/:spanId/*`); see TelemetryTabs.
+  const basePath = `${TELEMETRY_BASE_URL}/traces/${traceId}/spans/${spanId}`;
+
   return (
     <>
-      <TelemetryTabs tabs={tabs} nested />
+      <TelemetryTabs tabs={tabs} basePath={basePath} />
       <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
           <Route path="context" element={<SpanContext span={span} />} />
@@ -124,7 +136,7 @@ export default function SpanDetails({
           <Route path="logs" element={<LogsList traceId={span.trace_id} />} />
           <Route path="logs/:id" element={<LogsList traceId={span.trace_id} />} />
           {/* Default tab */}
-          <Route path="*" element={<Navigate to="context" replace />} />
+          <Route path="*" element={<Navigate to={`${basePath}/context`} replace />} />
         </Routes>
       </div>
     </>

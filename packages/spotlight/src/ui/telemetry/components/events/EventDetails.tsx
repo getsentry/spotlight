@@ -1,4 +1,5 @@
 import { Link, Outlet, Route, Routes, useParams } from "react-router-dom";
+import { TELEMETRY_BASE_URL } from "../../constants";
 import useSentryStore from "../../store";
 import type { SentryErrorEvent, SentryEvent } from "../../types";
 import { isErrorEvent } from "../../utils/sentry";
@@ -64,7 +65,7 @@ export default function EventDetails() {
           </div>
         )}
       </div>
-      <TelemetryTabs tabs={tabs} nested />
+      <TelemetryTabs tabs={tabs} basePath={`${TELEMETRY_BASE_URL}/errors/${eventId}`} />
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
           <Route path="breadcrumbs" element={<EventBreadcrumbs event={event} />} />

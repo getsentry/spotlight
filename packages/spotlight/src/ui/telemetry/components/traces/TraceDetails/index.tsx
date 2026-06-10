@@ -1,3 +1,4 @@
+import { TELEMETRY_BASE_URL } from "@spotlight/ui/telemetry/constants";
 import { createTab } from "@spotlight/ui/telemetry/utils/tabs";
 import { useMemo } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
@@ -105,13 +106,17 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
     tabs.push(createTab("profileTree", "Profile"));
   }
 
+  // Absolute base path for this trace's tabs/redirects. Must be absolute because
+  // these links render inside a splat route (`traces/:traceId/*`); see TelemetryTabs.
+  const basePath = `${TELEMETRY_BASE_URL}/traces/${trace.trace_id}`;
+
   return (
     <div className="flex h-full flex-col">
       {aiConfig.mode && hasAI ? (
         <AITraceSplitView trace={trace} />
       ) : (
         <>
-          <TelemetryTabs tabs={tabs} nested />
+          <TelemetryTabs tabs={tabs} basePath={basePath} />
           <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
             <Routes>
               <Route path="context" element={<TraceContext trace={trace} />} />
@@ -120,7 +125,7 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
               <Route path="logs/:id" element={<LogsList traceId={trace.trace_id} />} />
               {profile && <Route path="profileTree" element={<TraceProfileTree profile={profile} />} />}
               {/* Default tab */}
-              <Route path="*" element={<Navigate to="context" replace />} />
+              <Route path="*" element={<Navigate to={`${basePath}/context`} replace />} />
             </Routes>
           </div>
         </>

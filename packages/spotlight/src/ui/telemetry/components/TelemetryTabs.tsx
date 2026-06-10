@@ -3,14 +3,21 @@ import { NavLink } from "react-router-dom";
 
 type TabsProps = {
   tabs: TabPanel<unknown>[];
+  /**
+   * Absolute base path the tabs live under (e.g. `/telemetry/traces/<id>`).
+   * Required for tabs rendered inside splat routes: React Router v7 resolves
+   * relative links against the full current location (including splat
+   * segments), which would otherwise stack the path on repeated navigation.
+   */
+  basePath?: string;
   nested?: boolean;
 };
 
-export default function TelemetryTabs({ tabs, nested = false }: TabsProps) {
+export default function TelemetryTabs({ tabs, basePath, nested = false }: TabsProps) {
   return (
     <nav className="flex border-b border-primary-700">
       {tabs.map(tab => {
-        const tabPath = nested ? `./${tab.id}` : `/${tab.id}`;
+        const tabPath = basePath ? `${basePath}/${tab.id}` : nested ? `./${tab.id}` : `/${tab.id}`;
 
         return (
           <NavLink
