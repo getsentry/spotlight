@@ -111,7 +111,7 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
         <AITraceSplitView trace={trace} />
       ) : (
         <>
-          <TelemetryTabs tabs={tabs} nested />
+          <TelemetryTabs tabs={tabs} basePath={`/telemetry/traces/${trace.trace_id}`} nested />
           <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
             <Routes>
               <Route path="context" element={<TraceContext trace={trace} />} />
@@ -120,7 +120,7 @@ export default function TraceDetails({ trace, aiConfig }: TraceDetailsProps) {
               <Route path="logs/:id" element={<LogsList traceId={trace.trace_id} />} />
               {profile && <Route path="profileTree" element={<TraceProfileTree profile={profile} />} />}
               {/* Default tab */}
-              <Route path="*" element={<Navigate to="context" replace />} />
+              <Route path="*" element={<Navigate to={`/telemetry/traces/${trace.trace_id}/context`} replace />} />
             </Routes>
           </div>
         </>

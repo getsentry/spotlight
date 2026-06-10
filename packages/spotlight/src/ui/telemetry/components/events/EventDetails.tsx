@@ -64,7 +64,7 @@ export default function EventDetails() {
           </div>
         )}
       </div>
-      <TelemetryTabs tabs={tabs} nested />
+      <TelemetryTabs tabs={tabs} basePath={`/telemetry/errors/${eventId}`} nested />
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
           <Route path="breadcrumbs" element={<EventBreadcrumbs event={event} />} />

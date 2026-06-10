@@ -116,7 +116,7 @@ export default function SpanDetails({
 
   return (
     <>
-      <TelemetryTabs tabs={tabs} nested />
+      <TelemetryTabs tabs={tabs} basePath={`/telemetry/traces/${span.trace_id}/spans/${span.span_id}`} nested />
       <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <Routes>
           <Route path="context" element={<SpanContext span={span} />} />
@@ -124,7 +124,10 @@ export default function SpanDetails({
           <Route path="logs" element={<LogsList traceId={span.trace_id} />} />
           <Route path="logs/:id" element={<LogsList traceId={span.trace_id} />} />
           {/* Default tab */}
-          <Route path="*" element={<Navigate to="context" replace />} />
+          <Route
+            path="*"
+            element={<Navigate to={`/telemetry/traces/${span.trace_id}/spans/${span.span_id}/context`} replace />}
+          />
         </Routes>
       </div>
     </>
