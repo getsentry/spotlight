@@ -8,6 +8,7 @@ import { Badge } from "@spotlight/ui/ui/badge";
 import { ElectronDragbarSpacer } from "@spotlight/ui/ui/electronDragbarSpacer";
 import { useCallback, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { TELEMETRY_BASE_URL } from "../constants";
 import useSentryStore from "../store";
 
 interface TelemetrySidebarProps {
@@ -32,7 +33,7 @@ function NavigationLink({
 }) {
   return (
     <Link
-      to={`/telemetry/${to}`}
+      to={`${TELEMETRY_BASE_URL}/${to}`}
       className={`relative flex items-center gap-x-2 p-3 font-medium transition ${isSubItem ? "pl-6" : ""} ${
         isActive ? "text-white bg-primary-600" : "text-primary-300 hover:bg-primary-800 hover:text-primary-100"
       }`}
@@ -68,13 +69,13 @@ export default function TelemetrySidebar({ errorCount, traceCount, logCount, isO
   const isActive = (path: string) => {
     // case for primary path
     if (path === "traces") {
-      return pathname === "/telemetry" || pathname.startsWith("/telemetry/traces");
+      return pathname === TELEMETRY_BASE_URL || pathname.startsWith(`${TELEMETRY_BASE_URL}/traces`);
     }
     // case for all other paths
-    return pathname.startsWith(`/telemetry/${path}`);
+    return pathname.startsWith(`${TELEMETRY_BASE_URL}/${path}`);
   };
 
-  const isInsightsActive = pathname.startsWith("/telemetry/insights");
+  const isInsightsActive = pathname.startsWith(`${TELEMETRY_BASE_URL}/insights`);
   const [isInsightsExpanded, setIsInsightsExpanded] = useState(true);
 
   const toggleInsights = useCallback(() => {

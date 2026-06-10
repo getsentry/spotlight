@@ -1,5 +1,8 @@
 import type { NanovisTreeNode } from "./types";
 
+/** Base path the telemetry UI is mounted under (see `App.tsx` `/telemetry/*`). */
+export const TELEMETRY_BASE_URL = "/telemetry";
+
 export const DB_SPAN_REGEX = /^db(?:\.[A-Za-z]+)*$/;
 
 export const AGGREGATE_CALL_PROFILES_SORT_KEYS = {
