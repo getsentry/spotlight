@@ -18,6 +18,7 @@
     "@astrojs/vercel": "^10.0.7",
     "@fontsource/raleway": "catalog:",
     "@sentry/astro": "catalog:",
+    "@sentry/starlight-theme": "^0.3.0",
     "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

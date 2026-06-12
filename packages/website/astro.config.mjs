@@ -1,13 +1,17 @@
 import starlight from "@astrojs/starlight";
 import vercel from "@astrojs/vercel";
 import sentry from "@sentry/astro";
+import sentryStarlightTheme, {
+  monochromeCodeTheme,
+} from "@sentry/starlight-theme";
 import { defineConfig } from "astro/config";
 import Inspect from "vite-plugin-inspect";
 import tailwindcss from "@tailwindcss/vite";
 
 import react from "@astrojs/react";
 
-// https://astro.build/config
+// Website entry point: homepage remains custom Astro/Tailwind, while /docs is owned by
+// Starlight plus the shared Sentry theme and project-specific docs metadata.
 export default defineConfig({
   site: "https://spotlightjs.com",
   vite: {
@@ -41,8 +45,8 @@ export default defineConfig({
         { icon: "discord", label: "Discord", href: "https://discord.gg/EJjqM3XtXQ" },
         { icon: "github", label: "GitHub", href: "https://github.com/getsentry/spotlight" },
       ],
+      plugins: [sentryStarlightTheme()],
       components: {
-        Header: "./src/components/docs/Header.astro",
         ThemeProvider: "./src/components/ThemeProvider.astro",
       },
 
@@ -123,18 +127,19 @@ export default defineConfig({
           items: [{ autogenerate: { directory: "docs/reference" } }],
         },
       ],
-      expressiveCode: {
-        themes: ["starlight-dark"],
-        useStarlightUiThemeColors: true,
-      },
       editLink: {
         baseUrl:
           "https://github.com/getsentry/spotlight/edit/main/packages/website/",
       },
-      customCss: ["./src/tailwind.css", "./src/theme.css"],
+      customCss: ["./src/tailwind.css"],
     }),
     react(),
   ],
+  markdown: {
+    shikiConfig: {
+      theme: monochromeCodeTheme,
+    },
+  },
   output: "static",
   adapter: vercel(),
 });
