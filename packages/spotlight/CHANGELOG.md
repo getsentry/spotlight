@@ -1,5 +1,23 @@
 # @spotlightjs/spotlight
 
+## 4.11.7
+
+### Security 🔒
+
+#### Deps
+
+- Resolve js-yaml and @babel/core alerts by @BYK in [#1328](https://github.com/getsentry/spotlight/pull/1328)
+- Resolve 7 open dependabot alerts by @BYK in [#1326](https://github.com/getsentry/spotlight/pull/1326)
+- Upgrade esbuild to 0.28.1 to resolve dependabot alerts by @BYK in [#1323](https://github.com/getsentry/spotlight/pull/1323)
+
+### Documentation 📚
+
+- (website) Adopt Sentry Starlight theme by @dcramer in [#1322](https://github.com/getsentry/spotlight/pull/1322)
+
+### Internal Changes 🔧
+
+- (e2e) Fix flaky attachments UI tests with web-first wait by @BYK in [#1327](https://github.com/getsentry/spotlight/pull/1327)
+
 ## 4.11.6
 
 ### Security 🔒
