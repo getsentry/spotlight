@@ -13,16 +13,18 @@ import {
   DropdownMenuTrigger,
 } from "@spotlight/ui/ui/dropdownMenu";
 import Table from "@spotlight/ui/ui/table";
-import { type KeyboardEvent, useMemo } from "react";
+import { type KeyboardEvent, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { LOGS_HEADERS, LOGS_SORT_KEYS, LOG_LEVEL_COLORS } from "../../constants";
 import { useSentryLogs } from "../../data/useSentryLogs";
 import useColumnVisibility from "../../hooks/useColumnVisibility";
+import useLogsFiltering from "../../hooks/useLogsFiltering";
 import useSort from "../../hooks/useSort";
 import type { SentryLogEventItem } from "../../types";
 import { formatTimestamp } from "../../utils/duration";
 import AnsiText from "../shared/AnsiText";
 import EmptyState from "../shared/EmptyState";
+import ListFilter from "../shared/ListFilter";
 import LogDetails from "./LogDetail";
 
 type LogsComparator = (a: SentryLogEventItem, b: SentryLogEventItem) => number;
@@ -50,16 +52,24 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
   const { id: selectedLogId } = useParams();
   const navigate = useNavigate();
   const allLogs = useSentryLogs(traceId);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const { sort, toggleSortOrder } = useSort({ defaultSortType: LOGS_SORT_KEYS.timestamp });
   const { isColumnVisible, toggleColumn } = useColumnVisibility(LOGS_HEADERS.map(h => h.id));
+
+  const { LOGS_FILTER_CONFIGS, filteredLogs } = useLogsFiltering(allLogs, activeFilters, searchQuery);
+
+  // Filtering is only exposed on the top-level Logs tab, not inside a trace's log list.
+  const showFilter = !traceId && allLogs.length > 0;
+  const logs = traceId ? allLogs : filteredLogs;
 
   const logsData = useMemo(() => {
     const compareLogData = COMPARATORS[sort.active] || COMPARATORS[LOGS_SORT_KEYS.timestamp];
 
-    return allLogs.sort((a, b) => {
+    return [...logs].sort((a, b) => {
       return sort.asc ? compareLogData(a, b) : compareLogData(b, a);
     });
-  }, [allLogs, sort.active, sort.asc]);
+  }, [logs, sort.active, sort.asc]);
 
   const handleRowClick = (log: SentryLogEventItem) => {
     navigate(`/telemetry/logs/${log.id}`);
@@ -73,7 +83,8 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
 
   const visibleHeaders = LOGS_HEADERS.filter(header => isColumnVisible(header.id));
 
-  if (logsData.length === 0) {
+  // No logs at all (ignoring filters): show the docs-linked empty state.
+  if (allLogs.length === 0) {
     return (
       <EmptyState
         variant={!traceId ? "full" : "simple"}
@@ -85,8 +96,30 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
     );
   }
 
+  const filterBar = showFilter ? (
+    <ListFilter
+      searchQuery={searchQuery}
+      setSearchQuery={setSearchQuery}
+      activeFilters={activeFilters}
+      setActiveFilters={setActiveFilters}
+      filterConfigs={LOGS_FILTER_CONFIGS}
+      searchPlaceholder="Search by message..."
+    />
+  ) : null;
+
+  // Logs exist but the current filters exclude all of them.
+  if (logsData.length === 0) {
+    return (
+      <CardList>
+        {filterBar}
+        <EmptyState variant="simple" description="No logs match the current filters." />
+      </CardList>
+    );
+  }
+
   return (
     <CardList>
+      {filterBar}
       <div className="flex justify-end px-6 py-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
