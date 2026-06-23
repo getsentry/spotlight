@@ -51,8 +51,8 @@ catalogs:
 
 overrides:
   vite@>=6.0.0 <6.4.2: ~6.4.2
-  vite@>=7.0.0 <7.3.2: '>=7.3.2'
-  tar: '>=7.5.11'
+  vite@>=7.0.0 <7.3.5: '>=7.3.5 <8'
+  tar: '>=7.5.16'
   h3: '>=1.15.6'
   '@sveltejs/kit': '>=2.49.5'
   diff: '>=5.2.2'
@@ -68,7 +68,7 @@ overrides:
   ajv@>=7.0.0-alpha.0 <9.0.0: ~8.18.0
   path-to-regexp: ^6.3.0
   cross-spawn: '>=7.0.5'
-  form-data: '>=4.0.4'
+  form-data: '>=4.0.6'
   next: ^15.4.8
   cookie: '>=0.7.0'
   esbuild: '>=0.28.1'
@@ -82,6 +82,7 @@ overrides:
   ip-address: '>=10.1.1'
   lodash: '>=4.18.0'
   '@xmldom/xmldom': '>=0.8.13'
+  '@opentelemetry/core': '>=2.8.0'
   postcss: '>=8.5.10'
   qs: '>=6.15.2'
   svelte: '>=5.55.7'
@@ -365,25 +366,25 @@ importers:
         version: 5.0.5(@types/node@25.5.0)(@types/react-dom@18.3.7(@types/react@18.3.20))(@types/react@18.3.20)(jiti@2.4.2)(lightningcss@1.32.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
       '@astrojs/starlight':
         specifier: ^0.39.2
-        version: 0.39.2(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2)
+        version: 0.39.2(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2)
       '@astrojs/starlight-tailwind':
         specifier: ^5.0.0
-        version: 5.0.0(@astrojs/starlight@0.39.2(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2))(tailwindcss@4.1.11)
+        version: 5.0.0(@astrojs/starlight@0.39.2(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2))(tailwindcss@4.1.11)
       '@astrojs/vercel':
         specifier: ^10.0.7
-        version: 10.0.7(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(react@18.3.1)(rollup@4.60.0)
+        version: 10.0.7(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(react@18.3.1)(rollup@4.60.0)
       '@fontsource/raleway':
         specifier: 'catalog:'
         version: 5.2.5
       '@sentry/astro':
         specifier: 'catalog:'
-        version: 10.32.1(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
+        version: 10.32.1(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
       '@sentry/starlight-theme':
         specifier: ^0.3.0
-        version: 0.3.0(@astrojs/starlight@0.39.2(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2))
+        version: 0.3.0(@astrojs/starlight@0.39.2(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2))
       '@tailwindcss/vite':
         specifier: 'catalog:'
-        version: 4.1.11(vite@7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
+        version: 4.1.11(vite@7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
       '@types/react':
         specifier: 'catalog:'
         version: 18.3.20
@@ -394,8 +395,8 @@ importers:
         specifier: ^1.6.1
         version: 1.6.1(react@18.3.1)
       astro:
-        specifier: ^6.1.10
-        version: 6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+        specifier: ^6.4.6
+        version: 6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
       react:
         specifier: 'catalog:'
         version: 18.3.1
@@ -423,7 +424,7 @@ importers:
         version: 5.9.2
       vite-plugin-inspect:
         specifier: ^0.7.42
-        version: 0.7.42(rollup@4.60.0)(vite@7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
+        version: 0.7.42(rollup@4.60.0)(vite@7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
 
 packages:
 
@@ -449,11 +450,17 @@ packages:
   '@astrojs/compiler@4.0.0':
     resolution: {integrity: sha512-eouss7G8ygdZqHuke033VMcVw5HTZUu+PXd/h06DGDUg/jt5btPYPqh66ENWw/mU78rBrf/oeC4oqoBwMtDMNA==}
 
+  '@astrojs/internal-helpers@0.10.0':
+    resolution: {integrity: sha512-Ry2R3VPeIN4uPCSA4xQc+e+vsJXkalKpEbDc07hV+a/o5Bs2N/s/uDcPJH/05L19DKh9tAy7e6JM3YZ6Cxfezw==}
+
   '@astrojs/internal-helpers@0.9.1':
     resolution: {integrity: sha512-1pWuARqYom/TzuU3+0ZugsTrKlUydWKuULmDqSMTuonY+9IRDUEGKX/8PXQ1nBxRq3w85uGtd9q9SXfqEldMIQ==}
 
   '@astrojs/markdown-remark@7.1.2':
     resolution: {integrity: sha512-caXZ4Dc2St2dW8luEg22GlP0gupLdztCTQE4EzZOxW1pqWXz9mbeJEuHUkgDYcKWW8tjIHkydYDhWLVoxJ327Q==}
+
+  '@astrojs/markdown-remark@7.2.0':
+    resolution: {integrity: sha512-+YxmVQu1Bd+MFfSzjq1rOJvD9+nIOJzz5YIIhdIH01RrxRkKbyKoEgyIqP3yv51MhzMDgd79QaPv+kCVPT8vHw==}
 
   '@astrojs/mdx@5.0.6':
     resolution: {integrity: sha512-4dKe0ZMmqujofPNDHahzClkwinn9f8jHPcaXcgdGvPAlboD2mjzkUCofli2cBnxYAkdfhC6d50gBJ8i/cH8gHw==}
@@ -1357,8 +1364,8 @@ packages:
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
-  '@opentelemetry/core@2.2.0':
-    resolution: {integrity: sha512-FuabnnUm8LflnieVxs6eP7Z383hgQU4W1e3KJS6aOG3RxWxcHyBxH8fDMHNgu/gFx/M2jvTOW/4/PHhLz6bjWw==}
+  '@opentelemetry/core@2.8.0':
+    resolution: {integrity: sha512-hd1Lfh8p545nNz+jq1Ejfz+Mn1hyLuxYn1YzTfFNrxr8urEWMNQLPf1Th8kjOH+HxwawCrtgBp8JpBUR4ZSgww==}
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
@@ -2226,7 +2233,7 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
       '@opentelemetry/context-async-hooks': ^1.30.1 || ^2.1.0 || ^2.2.0
-      '@opentelemetry/core': ^1.30.1 || ^2.1.0 || ^2.2.0
+      '@opentelemetry/core': '>=2.8.0'
       '@opentelemetry/instrumentation': '>=0.57.1 <1'
       '@opentelemetry/resources': ^1.30.1 || ^2.1.0 || ^2.2.0
       '@opentelemetry/sdk-trace-base': ^1.30.1 || ^2.1.0 || ^2.2.0
@@ -2238,7 +2245,7 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
       '@opentelemetry/context-async-hooks': ^1.30.1 || ^2.1.0 || ^2.2.0
-      '@opentelemetry/core': ^1.30.1 || ^2.1.0 || ^2.2.0
+      '@opentelemetry/core': '>=2.8.0'
       '@opentelemetry/instrumentation': '>=0.57.1 <1'
       '@opentelemetry/resources': ^1.30.1 || ^2.1.0 || ^2.2.0
       '@opentelemetry/sdk-trace-base': ^1.30.1 || ^2.1.0 || ^2.2.0
@@ -2258,7 +2265,7 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
       '@opentelemetry/context-async-hooks': ^1.30.1 || ^2.1.0 || ^2.2.0
-      '@opentelemetry/core': ^1.30.1 || ^2.1.0 || ^2.2.0
+      '@opentelemetry/core': '>=2.8.0'
       '@opentelemetry/sdk-trace-base': ^1.30.1 || ^2.1.0 || ^2.2.0
       '@opentelemetry/semantic-conventions': ^1.37.0
 
@@ -2268,7 +2275,7 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
       '@opentelemetry/context-async-hooks': ^1.30.1 || ^2.1.0 || ^2.2.0
-      '@opentelemetry/core': ^1.30.1 || ^2.1.0 || ^2.2.0
+      '@opentelemetry/core': '>=2.8.0'
       '@opentelemetry/sdk-trace-base': ^1.30.1 || ^2.1.0 || ^2.2.0
       '@opentelemetry/semantic-conventions': ^1.37.0
 
@@ -3105,8 +3112,8 @@ packages:
     peerDependencies:
       astro: ^4.0.0-beta || ^5.0.0-beta || ^3.3.0 || ^6.0.0-beta
 
-  astro@6.3.3:
-    resolution: {integrity: sha512-wvLIZQYbBZt6U8gyflBW4SLBypaqdwLZUH93rT3oT53cmQ0bTGubvMAGjqBRoheOYzYcTJZtW6czztzbu4kQ5g==}
+  astro@6.4.8:
+    resolution: {integrity: sha512-KK5lX90uU9EeVaTjINyj3sy9/NFXVa59aowaqbWBDDKLXZh4rr7GwIaCFYVetE22MJtsCNFerQXn0vlCLmpP/Q==}
     engines: {node: '>=22.12.0', npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
 
@@ -4151,8 +4158,8 @@ packages:
     resolution: {integrity: sha512-Ld2g8rrAyMYFXBhEqMz8ZAHBi4J4uS1i/CxGMDnjyFWddMXLVcDp051DZfu+t7+ab7Wv6SMqpWmyFIj5UbfFvg==}
     engines: {node: '>=14'}
 
-  form-data@4.0.4:
-    resolution: {integrity: sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==}
+  form-data@4.0.6:
+    resolution: {integrity: sha512-vKatAh4SlVfgbv+YtmhiRjhEMJsYpsG1Y2rMQtR+SVSbytsSD1YGzDIcrAJmdFec88u/+VoGmxnl+80gL1tRCQ==}
     engines: {node: '>= 6'}
 
   forwarded-parse@2.1.2:
@@ -4358,6 +4365,10 @@ packages:
 
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
+    engines: {node: '>= 0.4'}
+
+  hasown@2.0.4:
+    resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
     engines: {node: '>= 0.4'}
 
   hast-util-embedded@3.0.0:
@@ -6431,8 +6442,8 @@ packages:
   tar-stream@3.1.7:
     resolution: {integrity: sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==}
 
-  tar@7.5.11:
-    resolution: {integrity: sha512-ChjMH33/KetonMTAtpYdgUFr0tbz69Fp2v7zWxQfYZX4g5ZN2nOBXm1R2xyA+lMIKrLKIoKAwFj93jE/avX9cQ==}
+  tar@7.5.16:
+    resolution: {integrity: sha512-56adEpPMouktRlBLXiaYFFzZ/3+JXa8P9n7WbR+ibIjtviN55mEaOkiysCnPnWm+7kkui1Dn8J9l+g6zV8731w==}
     engines: {node: '>=18'}
 
   temp-file@3.4.0:
@@ -6471,6 +6482,10 @@ packages:
 
   tinyglobby@0.2.16:
     resolution: {integrity: sha512-pn99VhoACYR8nFHhxqix+uvsbXineAasWm5ojXoN8xEwK5Kd3/TrhNn1wByuD52UxWRLy8pu+kRMniEi6Eq9Zg==}
+    engines: {node: '>=12.0.0'}
+
+  tinyglobby@0.2.17:
+    resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
 
   tinyrainbow@3.1.0:
@@ -6890,8 +6905,8 @@ packages:
       yaml:
         optional: true
 
-  vite@7.3.3:
-    resolution: {integrity: sha512-/4XH147Ui7OGTjg3HbdWe5arnZQSbfuRzdr9Ec7TQi5I7R+ir0Rlc9GIvD4v0XZurELqA035KVXJXpR61xhiTA==}
+  vite@7.3.5:
+    resolution: {integrity: sha512-KuOaNhcnGFN2zIPGA7wRmzF+lJA1sea7rHq17aiJ++9lzY1WWG6Jpwqwe1KNbRVPIqHmr8GLYx7jbrQcN/7/ww==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -7188,6 +7203,17 @@ snapshots:
 
   '@astrojs/compiler@4.0.0': {}
 
+  '@astrojs/internal-helpers@0.10.0':
+    dependencies:
+      '@types/hast': 3.0.4
+      '@types/mdast': 4.0.4
+      js-yaml: 4.1.1
+      picomatch: 4.0.4
+      retext-smartypants: 6.2.0
+      shiki: 4.0.2
+      smol-toml: 1.6.1
+      unified: 11.0.5
+
   '@astrojs/internal-helpers@0.9.1':
     dependencies:
       picomatch: 4.0.4
@@ -7218,12 +7244,34 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/mdx@5.0.6(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))':
+  '@astrojs/markdown-remark@7.2.0':
+    dependencies:
+      '@astrojs/internal-helpers': 0.10.0
+      '@astrojs/prism': 4.0.2
+      github-slugger: 2.0.0
+      hast-util-from-html: 2.0.3
+      hast-util-to-text: 4.0.2
+      mdast-util-definitions: 6.0.0
+      rehype-raw: 7.0.0
+      rehype-stringify: 10.0.1
+      remark-gfm: 4.0.1
+      remark-parse: 11.0.0
+      remark-rehype: 11.1.2
+      remark-smartypants: 3.0.2
+      unified: 11.0.5
+      unist-util-remove-position: 5.0.0
+      unist-util-visit: 5.1.0
+      unist-util-visit-parents: 6.0.2
+      vfile: 6.0.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@astrojs/mdx@5.0.6(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))':
     dependencies:
       '@astrojs/markdown-remark': 7.1.2
       '@mdx-js/mdx': 3.1.1
       acorn: 8.16.0
-      astro: 6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      astro: 6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
       es-module-lexer: 2.1.0
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.5
@@ -7246,12 +7294,12 @@ snapshots:
       '@astrojs/internal-helpers': 0.9.1
       '@types/react': 18.3.20
       '@types/react-dom': 18.3.7(@types/react@18.3.20)
-      '@vitejs/plugin-react': 5.2.0(vite@7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
+      '@vitejs/plugin-react': 5.2.0(vite@7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
       devalue: 5.8.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       ultrahtml: 1.6.0
-      vite: 7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -7272,22 +7320,22 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 4.4.3
 
-  '@astrojs/starlight-tailwind@5.0.0(@astrojs/starlight@0.39.2(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2))(tailwindcss@4.1.11)':
+  '@astrojs/starlight-tailwind@5.0.0(@astrojs/starlight@0.39.2(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2))(tailwindcss@4.1.11)':
     dependencies:
-      '@astrojs/starlight': 0.39.2(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2)
+      '@astrojs/starlight': 0.39.2(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2)
       tailwindcss: 4.1.11
 
-  '@astrojs/starlight@0.39.2(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2)':
+  '@astrojs/starlight@0.39.2(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2)':
     dependencies:
       '@astrojs/markdown-remark': 7.1.2
-      '@astrojs/mdx': 5.0.6(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
+      '@astrojs/mdx': 5.0.6(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
       '@astrojs/sitemap': 3.7.2
       '@pagefind/default-ui': 1.3.0
       '@types/hast': 3.0.4
       '@types/js-yaml': 4.0.9
       '@types/mdast': 4.0.4
-      astro: 6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
-      astro-expressive-code: 0.42.0(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
+      astro: 6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      astro-expressive-code: 0.42.0(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
       bcp-47: 2.1.0
       hast-util-from-html: 2.0.3
       hast-util-select: 6.0.4
@@ -7320,14 +7368,14 @@ snapshots:
       is-wsl: 3.1.1
       which-pm-runs: 1.1.0
 
-  '@astrojs/vercel@10.0.7(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(react@18.3.1)(rollup@4.60.0)':
+  '@astrojs/vercel@10.0.7(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(react@18.3.1)(rollup@4.60.0)':
     dependencies:
       '@astrojs/internal-helpers': 0.9.1
       '@vercel/analytics': 1.6.1(react@18.3.1)
       '@vercel/functions': 3.5.1
       '@vercel/nft': 1.5.0(rollup@4.60.0)
       '@vercel/routing-utils': 5.3.3
-      astro: 6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      astro: 6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
       esbuild: 0.28.1
       tinyglobby: 0.2.16
     transitivePeerDependencies:
@@ -8099,7 +8147,7 @@ snapshots:
 
   '@isaacs/fs-minipass@4.0.1':
     dependencies:
-      minipass: 7.1.2
+      minipass: 7.1.3
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -8147,7 +8195,7 @@ snapshots:
       node-fetch: 2.7.0
       nopt: 8.1.0
       semver: 7.7.4
-      tar: 7.5.11
+      tar: 7.5.16
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -8273,7 +8321,7 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.0
 
-  '@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0)':
+  '@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.37.0
@@ -8281,7 +8329,7 @@ snapshots:
   '@opentelemetry/instrumentation-amqplib@0.55.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
     transitivePeerDependencies:
       - supports-color
@@ -8289,7 +8337,7 @@ snapshots:
   '@opentelemetry/instrumentation-connect@0.52.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
       '@types/connect': 3.4.38
@@ -8306,7 +8354,7 @@ snapshots:
   '@opentelemetry/instrumentation-express@0.57.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
     transitivePeerDependencies:
@@ -8315,7 +8363,7 @@ snapshots:
   '@opentelemetry/instrumentation-fs@0.28.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
     transitivePeerDependencies:
       - supports-color
@@ -8337,7 +8385,7 @@ snapshots:
   '@opentelemetry/instrumentation-hapi@0.55.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
     transitivePeerDependencies:
@@ -8346,7 +8394,7 @@ snapshots:
   '@opentelemetry/instrumentation-http@0.208.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
       forwarded-parse: 2.1.2
@@ -8380,7 +8428,7 @@ snapshots:
   '@opentelemetry/instrumentation-koa@0.57.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
     transitivePeerDependencies:
@@ -8403,7 +8451,7 @@ snapshots:
   '@opentelemetry/instrumentation-mongoose@0.55.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
     transitivePeerDependencies:
       - supports-color
@@ -8428,7 +8476,7 @@ snapshots:
   '@opentelemetry/instrumentation-pg@0.61.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
       '@opentelemetry/sql-common': 0.41.2(@opentelemetry/api@1.9.0)
@@ -8457,7 +8505,7 @@ snapshots:
   '@opentelemetry/instrumentation-undici@0.19.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
     transitivePeerDependencies:
@@ -8477,13 +8525,13 @@ snapshots:
   '@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
 
   '@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
 
@@ -8492,7 +8540,7 @@ snapshots:
   '@opentelemetry/sql-common@0.41.2(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
 
   '@oslojs/encoding@1.1.0': {}
 
@@ -8969,13 +9017,13 @@ snapshots:
       '@sentry-internal/browser-utils': 10.32.1
       '@sentry/core': 10.32.1
 
-  '@sentry/astro@10.32.1(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))':
+  '@sentry/astro@10.32.1(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))':
     dependencies:
       '@sentry/browser': 10.32.1
       '@sentry/core': 10.32.1
       '@sentry/node': 10.32.1
       '@sentry/vite-plugin': 4.6.1
-      astro: 6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      astro: 6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -9124,34 +9172,34 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@sentry/node-core@10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)':
+  '@sentry/node-core@10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)':
     dependencies:
       '@apm-js-collab/tracing-hooks': 0.3.1
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/context-async-hooks': 2.2.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
       '@sentry/core': 10.29.0
-      '@sentry/opentelemetry': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
+      '@sentry/opentelemetry': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
       import-in-the-middle: 2.0.0
     transitivePeerDependencies:
       - supports-color
 
-  '@sentry/node-core@10.32.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)':
+  '@sentry/node-core@10.32.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)':
     dependencies:
       '@apm-js-collab/tracing-hooks': 0.3.1
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/context-async-hooks': 2.2.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
       '@sentry/core': 10.32.1
-      '@sentry/opentelemetry': 10.32.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
+      '@sentry/opentelemetry': 10.32.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
       import-in-the-middle: 2.0.0
     transitivePeerDependencies:
       - supports-color
@@ -9160,7 +9208,7 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/context-async-hooks': 2.2.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-amqplib': 0.55.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-connect': 0.52.0(@opentelemetry/api@1.9.0)
@@ -9189,8 +9237,8 @@ snapshots:
       '@opentelemetry/semantic-conventions': 1.37.0
       '@prisma/instrumentation': 6.19.0(@opentelemetry/api@1.9.0)
       '@sentry/core': 10.29.0
-      '@sentry/node-core': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
-      '@sentry/opentelemetry': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
+      '@sentry/node-core': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
+      '@sentry/opentelemetry': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
       import-in-the-middle: 2.0.0
       minimatch: 9.0.9
     transitivePeerDependencies:
@@ -9200,7 +9248,7 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/context-async-hooks': 2.2.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation': 0.208.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-amqplib': 0.55.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/instrumentation-connect': 0.52.0(@opentelemetry/api@1.9.0)
@@ -9229,27 +9277,27 @@ snapshots:
       '@opentelemetry/semantic-conventions': 1.37.0
       '@prisma/instrumentation': 6.19.0(@opentelemetry/api@1.9.0)
       '@sentry/core': 10.32.1
-      '@sentry/node-core': 10.32.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
-      '@sentry/opentelemetry': 10.32.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
+      '@sentry/node-core': 10.32.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
+      '@sentry/opentelemetry': 10.32.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
       import-in-the-middle: 2.0.0
       minimatch: 9.0.9
     transitivePeerDependencies:
       - supports-color
 
-  '@sentry/opentelemetry@10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)':
+  '@sentry/opentelemetry@10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/context-async-hooks': 2.2.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
       '@sentry/core': 10.29.0
 
-  '@sentry/opentelemetry@10.32.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)':
+  '@sentry/opentelemetry@10.32.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/context-async-hooks': 2.2.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.37.0
       '@sentry/core': 10.32.1
@@ -9261,9 +9309,9 @@ snapshots:
       hoist-non-react-statics: 3.3.2
       react: 18.3.1
 
-  '@sentry/starlight-theme@0.3.0(@astrojs/starlight@0.39.2(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2))':
+  '@sentry/starlight-theme@0.3.0(@astrojs/starlight@0.39.2(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2))':
     dependencies:
-      '@astrojs/starlight': 0.39.2(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2)
+      '@astrojs/starlight': 0.39.2(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))(typescript@5.9.2)
 
   '@sentry/vite-plugin@2.23.0':
     dependencies:
@@ -9490,7 +9538,7 @@ snapshots:
   '@tailwindcss/oxide@4.1.11':
     dependencies:
       detect-libc: 2.1.2
-      tar: 7.5.11
+      tar: 7.5.16
     optionalDependencies:
       '@tailwindcss/oxide-android-arm64': 4.1.11
       '@tailwindcss/oxide-darwin-arm64': 4.1.11
@@ -9520,12 +9568,12 @@ snapshots:
       tailwindcss: 4.1.11
       vite: 6.4.3(@types/node@22.15.28)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.3)
 
-  '@tailwindcss/vite@4.1.11(vite@7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))':
+  '@tailwindcss/vite@4.1.11(vite@7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))':
     dependencies:
       '@tailwindcss/node': 4.1.11
       '@tailwindcss/oxide': 4.1.11
       tailwindcss: 4.1.11
-      vite: 7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
 
   '@testing-library/dom@10.4.1':
     dependencies:
@@ -9898,7 +9946,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react@5.2.0(vite@7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))':
+  '@vitejs/plugin-react@5.2.0(vite@7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))':
     dependencies:
       '@babel/core': 7.29.0
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.29.0)
@@ -9906,7 +9954,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-rc.3
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -10120,7 +10168,7 @@ snapshots:
       ejs: 3.1.10
       electron-builder-squirrel-windows: 24.13.3(dmg-builder@24.13.3)
       electron-publish: 24.13.1
-      form-data: 4.0.4
+      form-data: 4.0.6
       fs-extra: 10.1.0
       hosted-git-info: 4.1.0
       is-ci: 3.0.1
@@ -10131,7 +10179,7 @@ snapshots:
       read-config-file: 6.3.2
       sanitize-filename: 1.6.3
       semver: 7.7.3
-      tar: 7.5.11
+      tar: 7.5.16
       temp-file: 3.4.0
     transitivePeerDependencies:
       - supports-color
@@ -10208,16 +10256,16 @@ snapshots:
 
   astring@1.9.0: {}
 
-  astro-expressive-code@0.42.0(astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)):
+  astro-expressive-code@0.42.0(astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)):
     dependencies:
-      astro: 6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      astro: 6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
       rehype-expressive-code: 0.42.0
 
-  astro@6.3.3(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0):
+  astro@6.4.8(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.4.2)(lightningcss@1.32.0)(rollup@4.60.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0):
     dependencies:
       '@astrojs/compiler': 4.0.0
-      '@astrojs/internal-helpers': 0.9.1
-      '@astrojs/markdown-remark': 7.1.2
+      '@astrojs/internal-helpers': 0.10.0
+      '@astrojs/markdown-remark': 7.2.0
       '@astrojs/telemetry': 3.3.2
       '@capsizecss/unpack': 4.0.0
       '@clack/prompts': 1.4.0
@@ -10265,8 +10313,8 @@ snapshots:
       unist-util-visit: 5.1.0
       unstorage: 1.17.5(@vercel/functions@3.5.1)
       vfile: 6.0.3
-      vite: 7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
-      vitefu: 1.1.2(vite@7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
+      vite: 7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      vitefu: 1.1.2(vite@7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0))
       xxhash-wasm: 1.1.0
       yargs-parser: 22.0.0
       zod: 4.4.3
@@ -11110,7 +11158,7 @@ snapshots:
       es-errors: 1.3.0
       get-intrinsic: 1.3.0
       has-tostringtag: 1.0.2
-      hasown: 2.0.2
+      hasown: 2.0.4
 
   es6-error@4.1.1:
     optional: true
@@ -11496,12 +11544,12 @@ snapshots:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
 
-  form-data@4.0.4:
+  form-data@4.0.6:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       es-set-tostringtag: 2.1.0
-      hasown: 2.0.2
+      hasown: 2.0.4
       mime-types: 2.1.35
 
   forwarded-parse@2.1.2: {}
@@ -11584,7 +11632,7 @@ snapshots:
       get-proto: 1.0.1
       gopd: 1.2.0
       has-symbols: 1.1.0
-      hasown: 2.0.2
+      hasown: 2.0.4
       math-intrinsics: 1.1.0
 
   get-nonce@1.0.1: {}
@@ -11641,7 +11689,7 @@ snapshots:
       foreground-child: 3.3.0
       jackspeak: 3.4.3
       minimatch: 9.0.9
-      minipass: 7.1.2
+      minipass: 7.1.3
       package-json-from-dist: 1.0.1
       path-scurry: 1.11.1
 
@@ -11761,6 +11809,10 @@ snapshots:
       has-symbols: 1.1.0
 
   hasown@2.0.2:
+    dependencies:
+      function-bind: 1.1.2
+
+  hasown@2.0.4:
     dependencies:
       function-bind: 1.1.2
 
@@ -13038,7 +13090,7 @@ snapshots:
 
   minizlib@3.1.0:
     dependencies:
-      minipass: 7.1.2
+      minipass: 7.1.3
 
   mlly@1.7.4:
     dependencies:
@@ -13286,7 +13338,7 @@ snapshots:
   path-scurry@1.11.1:
     dependencies:
       lru-cache: 10.4.3
-      minipass: 7.1.2
+      minipass: 7.1.3
 
   path-scurry@2.0.2:
     dependencies:
@@ -14298,11 +14350,11 @@ snapshots:
       fast-fifo: 1.3.2
       streamx: 2.22.0
 
-  tar@7.5.11:
+  tar@7.5.16:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0
-      minipass: 7.1.2
+      minipass: 7.1.3
       minizlib: 3.1.0
       yallist: 5.0.0
 
@@ -14338,6 +14390,11 @@ snapshots:
   tinyexec@1.0.4: {}
 
   tinyglobby@0.2.16:
+    dependencies:
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
+
+  tinyglobby@0.2.17:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
@@ -14649,7 +14706,7 @@ snapshots:
 
   vite-plugin-electron@0.29.0: {}
 
-  vite-plugin-inspect@0.7.42(rollup@4.60.0)(vite@7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)):
+  vite-plugin-inspect@0.7.42(rollup@4.60.0)(vite@7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)):
     dependencies:
       '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.1.2(rollup@4.60.0)
@@ -14659,7 +14716,7 @@ snapshots:
       open: 9.1.0
       picocolors: 1.1.0
       sirv: 2.0.4
-      vite: 7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -14692,14 +14749,14 @@ snapshots:
       tsx: 4.20.3
       yaml: 2.8.3
 
-  vite@7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0):
+  vite@7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0):
     dependencies:
       esbuild: 0.28.1
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
       postcss: 8.5.14
       rollup: 4.60.0
-      tinyglobby: 0.2.16
+      tinyglobby: 0.2.17
     optionalDependencies:
       '@types/node': 25.5.0
       fsevents: 2.3.3
@@ -14709,9 +14766,9 @@ snapshots:
       tsx: 4.20.3
       yaml: 2.9.0
 
-  vitefu@1.1.2(vite@7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)):
+  vitefu@1.1.2(vite@7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)):
     optionalDependencies:
-      vite: 7.3.3(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.5.0)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
 
   vitest@4.1.8(@opentelemetry/api@1.9.0)(@types/node@22.15.28)(@vitest/coverage-v8@4.1.8)(happy-dom@20.8.9)(vite@6.4.3(@types/node@22.15.28)(jiti@2.4.2)(lightningcss@1.32.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.3)):
     dependencies:
