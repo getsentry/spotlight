@@ -1,8 +1,10 @@
-import { expect, test } from "./fixtures";
+import { test, waitForAppReady } from "./fixtures";
 
 test.describe("Attachments Display UI Tests", () => {
   test("should display envelope with screenshot", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
+    await waitForAppReady(page);
+
     // Send envelope with screenshot (binary)
     await sendTestEnvelope("envelope_with_screenshot.bin");
 
@@ -14,102 +16,98 @@ test.describe("Attachments Display UI Tests", () => {
       .click()
       .catch(() => {});
 
-    // Wait and verify some content is displayed
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
+    // The app should still be rendered after interacting with it
+    await waitForAppReady(page);
   });
 
   test("should handle Flutter replay binary", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
+    await waitForAppReady(page);
+
     // Send Flutter replay binary
     await sendTestEnvelope("envelope_flutter_replay.bin");
 
-    // Verify content is displayed
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
+    // The UI should not crash on this payload
+    await waitForAppReady(page);
   });
 
   test("should handle browser JS profile", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
+    await waitForAppReady(page);
+
     // Send browser JS profile binary
     await sendTestEnvelope("enveplope_browser_js_profile.bin");
 
-    // Verify content is displayed
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
+    // The UI should not crash on this payload
+    await waitForAppReady(page);
   });
 
   test("should handle generic binary envelope", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
+    await waitForAppReady(page);
+
     // Send generic binary envelope
     await sendTestEnvelope("envelope_binary.bin");
 
-    // Verify the UI doesn't crash and displays something
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
+    // Verify the UI doesn't crash and is still rendered
+    await waitForAppReady(page);
   });
 
   test("should display attachments from fixture directory", async ({ page, sidecar }) => {
     await page.goto(sidecar.baseURL);
-    // The test verifies that the UI can handle attachment data
-    // Wait for page to be ready
-    const pageContent = page.locator("body");
-    await pageContent.waitFor({ timeout: 5000 });
 
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
+    // The test verifies that the UI renders without any telemetry present
+    await waitForAppReady(page);
   });
 
   test("should handle empty payload", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
+    await waitForAppReady(page);
+
     // Send empty payload envelope
     await sendTestEnvelope("envelope_empty_payload.txt");
 
     // Should not crash
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
+    await waitForAppReady(page);
   });
 
   test("should handle empty envelope", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
+    await waitForAppReady(page);
+
     // Send empty envelope
     await sendTestEnvelope("envelope_empty.txt");
 
     // Should not crash
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
+    await waitForAppReady(page);
   });
 
   test("should display image attachments if present", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
+    await waitForAppReady(page);
+
     // Send envelope with screenshot
     await sendTestEnvelope("envelope_with_screenshot.bin");
 
-    // Look for image elements
+    // Look for image elements (best-effort, the payload may not surface one)
     const _hasImage = await page
       .locator('img, [role="img"]')
       .first()
       .isVisible()
       .catch(() => false);
 
-    // At minimum, page should have content
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
+    // At minimum, the app should still be rendered
+    await waitForAppReady(page);
   });
 
   test("should provide download capability for attachments", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
+    await waitForAppReady(page);
+
     // Send envelope with attachment
     await sendTestEnvelope("envelope_with_screenshot.bin");
 
-    // Look for download buttons or links
+    // Look for download buttons or links (best-effort)
     const _hasDownloadLink = await Promise.race([
       page
         .locator('a[download], button[aria-label*="download"], [title*="download"]')
@@ -120,32 +118,30 @@ test.describe("Attachments Display UI Tests", () => {
       new Promise<boolean>(resolve => setTimeout(() => resolve(false), 2000)),
     ]);
 
-    // At minimum, page should render
-    const pageContent = page.locator("body");
-    await pageContent.waitFor({ timeout: 5000 });
-    expect(await pageContent.isVisible()).toBe(true);
+    // At minimum, the app should still be rendered
+    await waitForAppReady(page);
   });
 
   test("should handle various attachment content types", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
+    await waitForAppReady(page);
+
     // Send multiple envelopes with different content
     await sendTestEnvelope("envelope_javascript.txt");
     await sendTestEnvelope("envelope_python.txt");
 
     // Should handle various types without crashing
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
+    await waitForAppReady(page);
   });
 
   test("should handle envelope with no length and EOF", async ({ page, sidecar, sendTestEnvelope }) => {
     await page.goto(sidecar.baseURL);
+    await waitForAppReady(page);
+
     // Send envelope with no length and EOF
     await sendTestEnvelope("envelope_no_len_w_eof.txt");
 
     // Should not crash
-    const pageContent = page.locator("body");
-    const text = await pageContent.textContent();
-    expect(text).not.toBe("");
+    await waitForAppReady(page);
   });
 });
