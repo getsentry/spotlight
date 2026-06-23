@@ -54,6 +54,17 @@ export default function ListFilter({
     [filterConfigs],
   );
 
+  const labelForValue = useCallback(
+    (value: string) => {
+      for (const config of Object.values(filterConfigs)) {
+        const option = config.options.find(o => o.value === value);
+        if (option) return option.label;
+      }
+      return value;
+    },
+    [filterConfigs],
+  );
+
   return (
     <div className="p-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -97,7 +108,7 @@ export default function ListFilter({
         <div className="mt-4 flex flex-wrap gap-2">
           {activeFilters.map(filter => (
             <Badge key={filter} className="text-white">
-              {filter}
+              {labelForValue(filter)}
               <Button
                 variant="ghost"
                 size="icon"

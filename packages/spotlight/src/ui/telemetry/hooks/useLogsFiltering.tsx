@@ -13,8 +13,12 @@ function getLoggerName(log: SentryLogEventItem): string | undefined {
   return log.attributes?.["sentry.logger.name"]?.value as string | undefined;
 }
 
-const createFilterOptions = (items: Set<string>): FilterOption[] =>
-  Array.from(items).map(item => ({ label: item, value: item }));
+// Filter values are namespaced by dimension (e.g. "level:error") so a value
+// that exists in two dimensions doesn't get applied to both at once.
+const createFilterOptions = (dimension: string, items: Set<string>): FilterOption[] =>
+  Array.from(items).map(item => ({ label: item, value: `${dimension}:${item}` }));
+
+const stripDimension = (value: string): string => value.slice(value.indexOf(":") + 1);
 
 const useLogsFiltering = (logs: SentryLogEventItem[], activeFilters: string[], searchQuery: string) => {
   const { levelOptions, loggerOptions } = useMemo(() => {
@@ -28,8 +32,8 @@ const useLogsFiltering = (logs: SentryLogEventItem[], activeFilters: string[], s
     }
 
     return {
-      levelOptions: createFilterOptions(levels),
-      loggerOptions: createFilterOptions(loggers),
+      levelOptions: createFilterOptions(FILTER_TYPES.LEVEL, levels),
+      loggerOptions: createFilterOptions(FILTER_TYPES.LOGGER, loggers),
     };
   }, [logs]);
 
@@ -60,10 +64,8 @@ const useLogsFiltering = (logs: SentryLogEventItem[], activeFilters: string[], s
 
     if (!hasQuery && !hasFilters) return logs;
 
-    const levelValues = new Set(levelOptions.map(o => o.value));
-    const loggerValues = new Set(loggerOptions.map(o => o.value));
-    const activeLevels = activeFilters.filter(f => levelValues.has(f));
-    const activeLoggers = activeFilters.filter(f => loggerValues.has(f));
+    const activeLevels = activeFilters.filter(f => f.startsWith(`${FILTER_TYPES.LEVEL}:`)).map(stripDimension);
+    const activeLoggers = activeFilters.filter(f => f.startsWith(`${FILTER_TYPES.LOGGER}:`)).map(stripDimension);
 
     return logs.filter(log => {
       if (activeLevels.length > 0 && !activeLevels.includes(log.level)) {
@@ -81,7 +83,7 @@ const useLogsFiltering = (logs: SentryLogEventItem[], activeFilters: string[], s
 
       return true;
     });
-  }, [logs, activeFilters, searchQuery, levelOptions, loggerOptions]);
+  }, [logs, activeFilters, searchQuery]);
 
   return {
     LOGS_FILTER_CONFIGS,

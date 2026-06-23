@@ -19,8 +19,12 @@ function getEventMessage(event: SentryErrorEvent): string {
   return "";
 }
 
-const createFilterOptions = (items: Set<string>): FilterOption[] =>
-  Array.from(items).map(item => ({ label: item, value: item }));
+// Filter values are namespaced by dimension (e.g. "level:error") so a value
+// that exists in two dimensions doesn't get applied to both at once.
+const createFilterOptions = (dimension: string, items: Set<string>): FilterOption[] =>
+  Array.from(items).map(item => ({ label: item, value: `${dimension}:${item}` }));
+
+const stripDimension = (value: string): string => value.slice(value.indexOf(":") + 1);
 
 const useErrorFiltering = (events: SentryErrorEvent[], activeFilters: string[], searchQuery: string) => {
   const { levelOptions, typeOptions } = useMemo(() => {
@@ -35,8 +39,8 @@ const useErrorFiltering = (events: SentryErrorEvent[], activeFilters: string[], 
     }
 
     return {
-      levelOptions: createFilterOptions(levels),
-      typeOptions: createFilterOptions(types),
+      levelOptions: createFilterOptions(FILTER_TYPES.LEVEL, levels),
+      typeOptions: createFilterOptions(FILTER_TYPES.TYPE, types),
     };
   }, [events]);
 
@@ -67,10 +71,8 @@ const useErrorFiltering = (events: SentryErrorEvent[], activeFilters: string[], 
 
     if (!hasQuery && !hasFilters) return events;
 
-    const levelValues = new Set(levelOptions.map(o => o.value));
-    const typeValues = new Set(typeOptions.map(o => o.value));
-    const activeLevels = activeFilters.filter(f => levelValues.has(f));
-    const activeTypes = activeFilters.filter(f => typeValues.has(f));
+    const activeLevels = activeFilters.filter(f => f.startsWith(`${FILTER_TYPES.LEVEL}:`)).map(stripDimension);
+    const activeTypes = activeFilters.filter(f => f.startsWith(`${FILTER_TYPES.TYPE}:`)).map(stripDimension);
 
     return events.filter(event => {
       if (activeLevels.length > 0 && (!event.level || !activeLevels.includes(event.level))) {
@@ -90,7 +92,7 @@ const useErrorFiltering = (events: SentryErrorEvent[], activeFilters: string[], 
 
       return true;
     });
-  }, [events, activeFilters, searchQuery, levelOptions, typeOptions]);
+  }, [events, activeFilters, searchQuery]);
 
   return {
     ERROR_FILTER_CONFIGS,

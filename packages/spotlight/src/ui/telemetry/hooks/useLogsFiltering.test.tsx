@@ -27,21 +27,33 @@ describe("useLogsFiltering", () => {
     expect(result.current.filteredLogs).toHaveLength(3);
   });
 
-  it("builds severity and logger options", () => {
+  it("builds severity and logger options namespaced by dimension", () => {
     const { result } = renderHook(() => useLogsFiltering(logs, [], ""));
     const { LOGS_FILTER_CONFIGS } = result.current;
-    expect(LOGS_FILTER_CONFIGS.level.options.map(o => o.value).sort()).toEqual(["error", "info", "warn"]);
-    expect(LOGS_FILTER_CONFIGS.logger.options.map(o => o.value).sort()).toEqual(["auth", "db"]);
+    expect(LOGS_FILTER_CONFIGS.level.options.map(o => o.value).sort()).toEqual([
+      "level:error",
+      "level:info",
+      "level:warn",
+    ]);
+    expect(LOGS_FILTER_CONFIGS.logger.options.map(o => o.value).sort()).toEqual(["logger:auth", "logger:db"]);
   });
 
   it("filters by severity level", () => {
-    const { result } = renderHook(() => useLogsFiltering(logs, ["error"], ""));
+    const { result } = renderHook(() => useLogsFiltering(logs, ["level:error"], ""));
     expect(result.current.filteredLogs.map(l => l.body)).toEqual(["database connection failed"]);
   });
 
   it("filters by logger name", () => {
-    const { result } = renderHook(() => useLogsFiltering(logs, ["db"], ""));
+    const { result } = renderHook(() => useLogsFiltering(logs, ["logger:db"], ""));
     expect(result.current.filteredLogs).toHaveLength(2);
+  });
+
+  it("keeps dimensions independent when a value exists in both", () => {
+    // "db" is a logger name here, and also (contrived) a level — selecting the
+    // logger must not implicitly filter by level too.
+    const overlap = [makeLog("db", "level named like a logger", "auth"), makeLog("info", "real db log", "db")];
+    const { result } = renderHook(() => useLogsFiltering(overlap, ["logger:db"], ""));
+    expect(result.current.filteredLogs.map(l => l.body)).toEqual(["real db log"]);
   });
 
   it("matches the search query against the log body", () => {
