@@ -107,12 +107,15 @@ const LogsList = ({ traceId }: { traceId?: string }) => {
     />
   ) : null;
 
-  // Logs exist but the current filters exclude all of them.
+  // Logs exist but the current filters exclude all of them. Still render
+  // LogDetails so a directly-linked /telemetry/logs/:id panel opens even when
+  // the row is filtered out of the list.
   if (logsData.length === 0) {
     return (
       <CardList>
         {filterBar}
         <EmptyState variant="simple" description="No logs match the current filters." />
+        {selectedLogId && <LogDetails id={selectedLogId} />}
       </CardList>
     );
   }
