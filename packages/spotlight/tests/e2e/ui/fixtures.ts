@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { type Page, test as base } from "@playwright/test";
+import { type Page, test as base, expect } from "@playwright/test";
 import { findFreePort, getFixturePath, killProcess, spawnProcess } from "../shared/utils";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -118,6 +118,19 @@ async function sendEnvelopeToSidecar(
     req.write(body);
     req.end();
   });
+}
+
+/**
+ * Wait for the Spotlight UI to finish its initial render.
+ *
+ * The navigation sidebar (`nav[aria-label="Navigation"]`) is rendered
+ * unconditionally as soon as the React app mounts, regardless of whether any
+ * telemetry has been received. Asserting on it with a web-first (auto-retrying)
+ * assertion is far more reliable than reading `body.textContent()` once, which
+ * races React's first paint and previously made these tests flaky.
+ */
+export async function waitForAppReady(page: Page, timeout = 15000): Promise<void> {
+  await expect(page.locator('nav[aria-label="Navigation"]')).toBeVisible({ timeout });
 }
 
 /**
