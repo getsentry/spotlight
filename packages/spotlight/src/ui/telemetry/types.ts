@@ -113,6 +113,7 @@ export type SentryFormattedMessage =
 
 export type SentryErrorEvent = CommonEventAttrs & {
   type?: "error" | "event" | "message" | "default";
+  level?: "fatal" | "error" | "warning" | "info" | "debug";
   exception: EventException;
 };
 
