@@ -1,19 +1,22 @@
 import { getAllSpansInTree } from "@spotlight/ui/telemetry/store/helpers";
 import type { AILibraryHandler, AIToolCall, Span, SpotlightAITrace } from "@spotlight/ui/telemetry/types";
 
-// sentry-python emits OpenTelemetry `gen_ai.*` spans for its AI integrations
-// (PydanticAI, OpenAI, Anthropic, ...). They share the same span format, so a
-// single handler covers all of them.
-// https://github.com/getsentry/sentry-python/blob/master/sentry_sdk/consts.py
+// Generic handler for the standardized `gen_ai.*` span conventions. Any SDK
+// that follows sentry-conventions (sentry-python's PydanticAI/OpenAI/Anthropic
+// integrations, the OTel GenAI conventions, ...) maps through here regardless
+// of provider — the provider is just the `gen_ai.system` attribute, not a
+// reason to fork the handler. The Vercel AI SDK keeps its own handler only
+// because it emits proprietary `vercel.ai.*` fields on top of `gen_ai.*`.
+// https://github.com/getsentry/sentry-conventions/tree/main/model/attributes/gen_ai
 const GEN_AI_OP_PREFIX = "gen_ai.";
 const VERCEL_FIELD_PREFIX = "vercel.ai.";
 
-// Span ops (sentry_sdk.consts.OP)
+// Span ops
 const GEN_AI_CHAT_OP = "gen_ai.chat";
 const GEN_AI_INVOKE_AGENT_OP = "gen_ai.invoke_agent";
 const GEN_AI_EXECUTE_TOOL_OP = "gen_ai.execute_tool";
 
-// Span data fields (sentry_sdk.consts.SPANDATA)
+// Span data fields (sentry-conventions gen_ai.*)
 const GEN_AI_OPERATION_NAME_FIELD = "gen_ai.operation.name";
 const GEN_AI_AGENT_NAME_FIELD = "gen_ai.agent.name";
 const GEN_AI_SYSTEM_FIELD = "gen_ai.system";
@@ -48,12 +51,12 @@ function isGenAISpan(span: Span): boolean {
 }
 
 /**
- * Distinguishes sentry-python `gen_ai.*` spans from Vercel AI SDK spans. Both
+ * Claims any standard `gen_ai.*` span that isn't a Vercel AI SDK span. Both
  * carry the `gen_ai.` op prefix, but only the Vercel SDK sets `vercel.ai.*`
- * data fields. A sentry-python span has at least one `gen_ai.*` data key and no
- * `vercel.ai.*` key.
+ * data fields, so we defer those to the Vercel handler. A generic gen_ai span
+ * has at least one `gen_ai.*` data key and no `vercel.ai.*` key.
  */
-function isSentryPythonSpan(span: Span): boolean {
+function isGenAIConventionSpan(span: Span): boolean {
   if (!isGenAISpan(span) || !span.data) {
     return false;
   }
@@ -71,18 +74,18 @@ function isSentryPythonSpan(span: Span): boolean {
   return hasGenAIField;
 }
 
-export const sentryPythonAIHandler: AILibraryHandler = {
-  id: "sentry-python-gen-ai",
-  name: "Sentry Python AI",
+export const genAIHandler: AILibraryHandler = {
+  id: "gen-ai",
+  name: "Gen AI",
 
-  canHandleSpan: isSentryPythonSpan,
+  canHandleSpan: isGenAIConventionSpan,
 
   extractRootSpans: (spans: Span[]): Span[] => {
     const resultRoots: Span[] = [];
 
     const findAndCollectAIRoots = (spansToSearch: Span[]) => {
       for (const currentSpan of spansToSearch) {
-        if (isSentryPythonSpan(currentSpan)) {
+        if (isGenAIConventionSpan(currentSpan)) {
           resultRoots.push(currentSpan);
         } else if (!isGenAISpan(currentSpan) && currentSpan.children?.length) {
           // Stop at any gen_ai.* span: it's the shallowest AI root for its

@@ -1,11 +1,11 @@
 import type { AILibraryHandler, Span, SpotlightAITrace, Trace } from "@spotlight/ui/telemetry/types";
-import { sentryPythonAIHandler } from "./sentryPythonAI";
+import { genAIHandler } from "./genAI";
 import { vercelAISDKHandler } from "./vercelAISDK";
 
-// Registry of supported AI libraries. The sentry-python handler runs first
-// because it only claims `gen_ai.*` spans that lack `vercel.ai.*` fields, so the
-// Vercel handler still picks up its own spans.
-const aiLibraries: AILibraryHandler[] = [sentryPythonAIHandler, vercelAISDKHandler];
+// Registry of AI span handlers. The generic gen_ai handler runs first because
+// it only claims standard `gen_ai.*` spans that lack `vercel.ai.*` fields, so
+// the Vercel handler still picks up its own proprietary spans.
+const aiLibraries: AILibraryHandler[] = [genAIHandler, vercelAISDKHandler];
 
 export { aiLibraries };
 
