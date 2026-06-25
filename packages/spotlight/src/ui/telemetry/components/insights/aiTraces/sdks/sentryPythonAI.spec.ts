@@ -137,4 +137,26 @@ describe("aiLibraries registry", () => {
     expect(roots).toHaveLength(1);
     expect(roots[0].handler.id).toBe(sentryPythonAIHandler.id);
   });
+
+  test("does not surface nested gen_ai children of a Vercel root as extra roots", () => {
+    // A Vercel agent span (carries vercel.ai.*) with a nested gen_ai.chat
+    // child that lacks vercel.ai.* fields. Only the Vercel root should surface.
+    const vercelAgent = mockSpan({
+      span_id: "vercel-agent",
+      op: "gen_ai.invoke_agent",
+      data: { "vercel.ai.operationId": "ai.streamText", "gen_ai.usage.input_tokens": 5 },
+      children: [
+        mockSpan({
+          span_id: "nested-chat",
+          op: "gen_ai.chat",
+          data: { "gen_ai.operation.name": "chat", "gen_ai.usage.input_tokens": 5 },
+        }),
+      ],
+    });
+
+    const roots = extractAllAIRootSpans([vercelAgent]);
+    expect(roots).toHaveLength(1);
+    expect(roots[0].span.span_id).toBe("vercel-agent");
+    expect(roots[0].handler.id).toBe(vercelAISDKHandler.id);
+  });
 });

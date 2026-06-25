@@ -84,7 +84,10 @@ export const sentryPythonAIHandler: AILibraryHandler = {
       for (const currentSpan of spansToSearch) {
         if (isSentryPythonSpan(currentSpan)) {
           resultRoots.push(currentSpan);
-        } else if (currentSpan.children?.length) {
+        } else if (!isGenAISpan(currentSpan) && currentSpan.children?.length) {
+          // Stop at any gen_ai.* span: it's the shallowest AI root for its
+          // tree (claimed by this handler or the Vercel one), so its nested
+          // gen_ai.* children must not be surfaced as separate roots.
           findAndCollectAIRoots(currentSpan.children);
         }
       }
