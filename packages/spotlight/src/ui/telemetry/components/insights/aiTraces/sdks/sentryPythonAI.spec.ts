@@ -109,6 +109,30 @@ describe("sentryPythonAIHandler", () => {
     });
   });
 
+  test("response text reflects the last chat turn, not the first", () => {
+    const root = mockSpan({
+      span_id: "agent",
+      op: "gen_ai.invoke_agent",
+      data: { "gen_ai.agent.name": "assistant", "gen_ai.operation.name": "invoke_agent" },
+      children: [
+        mockSpan({
+          span_id: "chat-1",
+          op: "gen_ai.chat",
+          data: { "gen_ai.response.text": ["first reply"], "gen_ai.response.finish_reasons": ["tool_calls"] },
+        }),
+        mockSpan({
+          span_id: "chat-2",
+          op: "gen_ai.chat",
+          data: { "gen_ai.response.text": ["final reply"], "gen_ai.response.finish_reasons": ["stop"] },
+        }),
+      ],
+    });
+
+    const trace = sentryPythonAIHandler.processTrace(root);
+    expect(trace.response?.text).toBe("final reply");
+    expect(trace.response?.finishReason).toBe("stop");
+  });
+
   describe("getTypeBadge", () => {
     test("maps known operations", () => {
       const trace = sentryPythonAIHandler.processTrace(pydanticChatSpan());
