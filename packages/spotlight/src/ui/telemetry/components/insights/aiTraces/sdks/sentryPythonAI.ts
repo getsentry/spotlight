@@ -120,6 +120,8 @@ export const sentryPythonAIHandler: AILibraryHandler = {
       rawSpan: rootSpan,
       metadata: {
         metadata: {},
+        promptTokens: tokenUsage.promptTokens,
+        completionTokens: tokenUsage.completionTokens,
       },
       toolCalls: [],
     };
@@ -171,6 +173,10 @@ function determineTraceName(rootSpan: Span): string {
   return rootSpan.description || rootSpan.op || DEFAULT_TRACE_NAME;
 }
 
+/**
+ * Sums token usage across every span in the tree so an agent root with multiple
+ * chat turns reports the total, not just the first turn's usage.
+ */
 function extractTokenUsage(spans: Span[]): { promptTokens?: number; completionTokens?: number } {
   let promptTokens: number | undefined;
   let completionTokens: number | undefined;
@@ -178,16 +184,12 @@ function extractTokenUsage(spans: Span[]): { promptTokens?: number; completionTo
   for (const span of spans) {
     if (!span.data) continue;
 
-    if (promptTokens === undefined && span.data[GEN_AI_USAGE_INPUT_TOKENS_FIELD] !== undefined) {
-      promptTokens = Number(span.data[GEN_AI_USAGE_INPUT_TOKENS_FIELD]);
+    if (span.data[GEN_AI_USAGE_INPUT_TOKENS_FIELD] !== undefined) {
+      promptTokens = (promptTokens ?? 0) + Number(span.data[GEN_AI_USAGE_INPUT_TOKENS_FIELD]);
     }
 
-    if (completionTokens === undefined && span.data[GEN_AI_USAGE_OUTPUT_TOKENS_FIELD] !== undefined) {
-      completionTokens = Number(span.data[GEN_AI_USAGE_OUTPUT_TOKENS_FIELD]);
-    }
-
-    if (promptTokens !== undefined && completionTokens !== undefined) {
-      break;
+    if (span.data[GEN_AI_USAGE_OUTPUT_TOKENS_FIELD] !== undefined) {
+      completionTokens = (completionTokens ?? 0) + Number(span.data[GEN_AI_USAGE_OUTPUT_TOKENS_FIELD]);
     }
   }
 
@@ -236,14 +238,6 @@ function extractMetadata(span: Span, trace: SpotlightAITrace) {
 
   if (trace.metadata.modelProvider === undefined && span.data[GEN_AI_SYSTEM_FIELD] !== undefined) {
     trace.metadata.modelProvider = String(span.data[GEN_AI_SYSTEM_FIELD]);
-  }
-
-  if (trace.metadata.promptTokens === undefined && span.data[GEN_AI_USAGE_INPUT_TOKENS_FIELD] !== undefined) {
-    trace.metadata.promptTokens = Number(span.data[GEN_AI_USAGE_INPUT_TOKENS_FIELD]);
-  }
-
-  if (trace.metadata.completionTokens === undefined && span.data[GEN_AI_USAGE_OUTPUT_TOKENS_FIELD] !== undefined) {
-    trace.metadata.completionTokens = Number(span.data[GEN_AI_USAGE_OUTPUT_TOKENS_FIELD]);
   }
 }
 

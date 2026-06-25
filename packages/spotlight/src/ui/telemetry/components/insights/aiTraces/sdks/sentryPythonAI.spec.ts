@@ -133,6 +133,33 @@ describe("sentryPythonAIHandler", () => {
     expect(trace.response?.finishReason).toBe("stop");
   });
 
+  test("sums token usage across multiple chat turns", () => {
+    const root = mockSpan({
+      span_id: "agent",
+      op: "gen_ai.invoke_agent",
+      data: { "gen_ai.agent.name": "assistant", "gen_ai.operation.name": "invoke_agent" },
+      children: [
+        mockSpan({
+          span_id: "chat-1",
+          op: "gen_ai.chat",
+          data: { "gen_ai.usage.input_tokens": 10, "gen_ai.usage.output_tokens": 4 },
+        }),
+        mockSpan({
+          span_id: "chat-2",
+          op: "gen_ai.chat",
+          data: { "gen_ai.usage.input_tokens": 25, "gen_ai.usage.output_tokens": 9 },
+        }),
+      ],
+    });
+
+    const trace = sentryPythonAIHandler.processTrace(root);
+    expect(trace.promptTokens).toBe(35);
+    expect(trace.completionTokens).toBe(13);
+    expect(trace.metadata.promptTokens).toBe(35);
+    expect(trace.metadata.completionTokens).toBe(13);
+    expect(trace.tokensDisplay).toBe("35 / 13");
+  });
+
   describe("getTypeBadge", () => {
     test("maps known operations", () => {
       const trace = sentryPythonAIHandler.processTrace(pydanticChatSpan());
