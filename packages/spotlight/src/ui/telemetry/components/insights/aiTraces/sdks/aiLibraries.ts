@@ -1,8 +1,11 @@
 import type { AILibraryHandler, Span, SpotlightAITrace, Trace } from "@spotlight/ui/telemetry/types";
+import { sentryPythonAIHandler } from "./sentryPythonAI";
 import { vercelAISDKHandler } from "./vercelAISDK";
 
-// Registry of supported AI libraries
-const aiLibraries: AILibraryHandler[] = [vercelAISDKHandler];
+// Registry of supported AI libraries. The sentry-python handler runs first
+// because it only claims `gen_ai.*` spans that lack `vercel.ai.*` fields, so the
+// Vercel handler still picks up its own spans.
+const aiLibraries: AILibraryHandler[] = [sentryPythonAIHandler, vercelAISDKHandler];
 
 export { aiLibraries };
 
@@ -18,10 +21,18 @@ export function detectAILibraryHandler(span: Span): AILibraryHandler | null {
 
 export function extractAllAIRootSpans(spans: Span[]): { span: Span; handler: AILibraryHandler }[] {
   const results: { span: Span; handler: AILibraryHandler }[] = [];
+  // Handlers can match overlapping span shapes (both AI handlers key off the
+  // `gen_ai.` op prefix). Attribute each root span to the first handler that
+  // claims it so a span is never surfaced twice.
+  const claimed = new Set<string>();
 
   for (const handler of aiLibraries) {
     const rootSpans = handler.extractRootSpans(spans);
     for (const rootSpan of rootSpans) {
+      if (claimed.has(rootSpan.span_id)) {
+        continue;
+      }
+      claimed.add(rootSpan.span_id);
       results.push({ span: rootSpan, handler });
     }
   }
