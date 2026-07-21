@@ -81,7 +81,14 @@ jobs:
           echo "$APPLE_CERT_DATA" | base64 --decode > /tmp/certs.p12
           echo 'APPLE_CERT_PATH=/tmp/certs.p12' >> $GITHUB_ENV
           echo "$APPLE_API_KEY" | base64 -d > /tmp/apple_key.json
-          cat /tmp/apple_key.json | jq .private_key -r > /tmp/apple_key.pem
+          # The stored private_key may be a bare base64 DER body (no PEM armor).
+          # Older notarytool tolerated this; Xcode 26+ notarytool rejects it. Normalize to a proper PEM.
+          KEY_BODY="$(jq -r .private_key /tmp/apple_key.json)"
+          if printf '%s' "$KEY_BODY" | grep -q 'BEGIN PRIVATE KEY'; then
+            printf '%s\n' "$KEY_BODY" > /tmp/apple_key.pem
+          else
+            { echo "-----BEGIN PRIVATE KEY-----"; printf '%s' "$KEY_BODY" | tr -d ' \r\n' | fold -w 64; echo; echo "-----END PRIVATE KEY-----"; } > /tmp/apple_key.pem
+          fi
           echo "APPLE_API_KEY_ISSUER_ID=$(cat /tmp/apple_key.json | jq .issuer_id -r | tr -d '\n\r')" >> $GITHUB_ENV
           echo "APPLE_API_KEY_ID=$(cat /tmp/apple_key.json | jq .key_id -r | tr -d '\n\r')" >> $GITHUB_ENV
           echo "APPLE_API_KEY_P8_PATH=/tmp/apple_key.pem" >> $GITHUB_ENV
@@ -388,7 +395,14 @@ jobs:
           APPLE_API_KEY_BUNDLE: ${{ secrets.APPLE_API_KEY }}
         run: |
           echo "$APPLE_API_KEY_BUNDLE" | base64 -d > /tmp/apple_key.json
-          cat /tmp/apple_key.json | jq .private_key -r > /tmp/apple_key.pem
+          # The stored private_key may be a bare base64 DER body (no PEM armor).
+          # Older notarytool tolerated this; Xcode 26+ notarytool rejects it. Normalize to a proper PEM.
+          KEY_BODY="$(jq -r .private_key /tmp/apple_key.json)"
+          if printf '%s' "$KEY_BODY" | grep -q 'BEGIN PRIVATE KEY'; then
+            printf '%s\n' "$KEY_BODY" > /tmp/apple_key.pem
+          else
+            { echo "-----BEGIN PRIVATE KEY-----"; printf '%s' "$KEY_BODY" | tr -d ' \r\n' | fold -w 64; echo; echo "-----END PRIVATE KEY-----"; } > /tmp/apple_key.pem
+          fi
           echo "APPLE_API_ISSUER=$(cat /tmp/apple_key.json | jq .issuer_id -r | tr -d '\n\r')" >> $GITHUB_ENV
           echo "APPLE_API_KEY_ID=$(cat /tmp/apple_key.json | jq .key_id -r | tr -d '\n\r')" >> $GITHUB_ENV
           echo "APPLE_API_KEY=/tmp/apple_key.pem" >> $GITHUB_ENV
