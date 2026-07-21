@@ -262,6 +262,43 @@ describe("spotlight mcp e2e tests", () => {
     // This test verifies the search functionality works, which is the first step
   }, 15000);
 
+  // Regression test: Python (and other) SDKs send ISO 8601 string timestamps
+  // (e.g. "2023-11-22T16:23:50.406684Z") rather than the numeric Unix seconds
+  // used by the JavaScript SDK. formatTimestamp previously multiplied these
+  // strings by 1000, producing NaN and throwing "Invalid time value" from
+  // search_traces (and silently swallowing the error in search_errors).
+  it("should handle Python ISO-8601 string timestamps via MCP SDK", async () => {
+    const port = await findFreePort();
+
+    const server = spawnSpotlight(["server", "-p", port.toString()]);
+    activeProcesses.push(server);
+    await waitForSidecarReady(port, 10000);
+
+    // envelope_python.txt carries ISO-string timestamps on its transactions
+    const pythonPath = getFixturePath("envelope_python.txt");
+    await sendEnvelope(port, pythonPath);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const client = await createMCPClient(port);
+
+    // search_traces must not throw "Invalid time value" and must return a trace summary
+    const tracesResult = await client.callTool({
+      name: "search_traces",
+      arguments: { filters: { timeWindow: 3600 } },
+    });
+
+    expect(tracesResult.isError ?? false).toBe(false);
+    const traceText = (tracesResult.content as Array<{ type: string; text?: string }>)
+      .filter(item => item.type === "text" && item.text)
+      .map(item => item.text as string)
+      .join("\n");
+    expect(traceText).not.toContain("Invalid time value");
+    expect(traceText).toContain("Local Traces");
+    // The formatted timestamp must be a valid (non-epoch) ISO date derived from the ISO input
+    expect(traceText).toMatch(/2023-11-22T\d{2}:\d{2}:\d{2}/);
+  }, 15000);
+
   it("should handle errors gracefully via MCP SDK", async () => {
     const port = await findFreePort();
 

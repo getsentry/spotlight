@@ -1,28 +1,80 @@
 /**
- * Format a Sentry timestamp (in seconds) to ISO string.
- * Sentry timestamps are Unix timestamps in seconds, so we multiply by 1000 to convert to milliseconds.
- * Falls back to epoch (1970-01-01T00:00:00.000Z) if timestamp is missing/invalid.
+ * Format a Sentry timestamp to an ISO string.
+ *
+ * Sentry SDKs are inconsistent about the timestamp format they emit:
+ * - JavaScript SDKs send a numeric Unix timestamp in seconds (e.g. `1700660724.334`).
+ * - Python (and some other) SDKs send an ISO 8601 string (e.g. `"2023-11-22T16:23:50.406684Z"`).
+ *
+ * Numeric values are treated as Unix seconds and converted to milliseconds. String values that
+ * look numeric are handled the same way, while other strings are parsed as dates directly.
+ * Falls back to epoch (1970-01-01T00:00:00.000Z) if the timestamp is missing or invalid, so that
+ * downstream `.toISOString()` never throws a `RangeError: Invalid time value`.
  */
-export function formatTimestamp(timestamp?: number): string {
-  const date = timestamp ? new Date(timestamp * 1000) : new Date(0);
-  return date.toISOString();
+export function formatTimestamp(timestamp?: number | string): string {
+  const date = parseTimestamp(timestamp);
+  return (Number.isNaN(date.getTime()) ? new Date(0) : date).toISOString();
+}
+
+/**
+ * Parse a Sentry timestamp (numeric Unix seconds or ISO 8601 string) into a Date.
+ * Returns an invalid Date (NaN) if the value cannot be parsed.
+ */
+function parseTimestamp(timestamp?: number | string): Date {
+  if (timestamp === undefined || timestamp === null || timestamp === "") {
+    return new Date(0);
+  }
+
+  if (typeof timestamp === "number") {
+    return new Date(timestamp * 1000);
+  }
+
+  // Numeric string, e.g. "1700660724.334" -> treat as Unix seconds.
+  const numeric = Number(timestamp);
+  if (!Number.isNaN(numeric)) {
+    return new Date(numeric * 1000);
+  }
+
+  // Otherwise assume an ISO 8601 (or other Date-parseable) string.
+  return new Date(timestamp);
 }
 
 /**
  * Get the duration in milliseconds between two Sentry timestamps.
- * Accepts timestamps in seconds (as numbers or strings).
+ * Accepts timestamps as Unix seconds (numbers or numeric strings) or ISO 8601 strings.
  * Returns undefined if either timestamp is missing or invalid.
  */
 
 export function getDuration(endTimestamp?: number | string, startTimestamp?: number | string): number | undefined {
-  const end = typeof endTimestamp === "string" ? Number.parseFloat(endTimestamp) : endTimestamp;
-  const start = typeof startTimestamp === "string" ? Number.parseFloat(startTimestamp) : startTimestamp;
+  const end = toEpochSeconds(endTimestamp);
+  const start = toEpochSeconds(startTimestamp);
 
-  if (typeof end === "number" && typeof start === "number" && !Number.isNaN(end) && !Number.isNaN(start)) {
+  if (end !== undefined && start !== undefined) {
     return Math.round((end - start) * 1000);
   }
 
   return undefined;
+}
+
+/**
+ * Convert a Sentry timestamp (Unix seconds, numeric string, or ISO 8601 string) to Unix seconds.
+ * Returns undefined if the value is missing or cannot be parsed.
+ */
+function toEpochSeconds(timestamp?: number | string): number | undefined {
+  if (timestamp === undefined || timestamp === null || timestamp === "") {
+    return undefined;
+  }
+
+  if (typeof timestamp === "number") {
+    return Number.isNaN(timestamp) ? undefined : timestamp;
+  }
+
+  const numeric = Number(timestamp);
+  if (!Number.isNaN(numeric)) {
+    return numeric;
+  }
+
+  const parsed = new Date(timestamp).getTime();
+  return Number.isNaN(parsed) ? undefined : parsed / 1000;
 }
 
 /**
