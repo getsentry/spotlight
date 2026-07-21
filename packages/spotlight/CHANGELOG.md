@@ -1,5 +1,22 @@
 # @spotlightjs/spotlight
 
+## 4.11.8
+
+### New Features ✨
+
+- (ui) Add filter bars to Errors and Logs tabs by @jared-outpost in [#1329](https://github.com/getsentry/spotlight/pull/1329)
+
+### Bug Fixes 🐛
+
+- (ci) Armor Apple API key as PEM for Xcode 26 notarytool by @BYK in [#1334](https://github.com/getsentry/spotlight/pull/1334)
+- (deps) Repair electron-builder 26 dependency resolution by @MathurAditya724 in [#1337](https://github.com/getsentry/spotlight/pull/1337)
+- (mcp) Handle ISO 8601 string timestamps from non-JS SDKs by @MathurAditya724 in [#1332](https://github.com/getsentry/spotlight/pull/1332)
+
+### Internal Changes 🔧
+
+- (deps) Upgrade electron-builder 24 -> 26.15.7 by @BYK in [#1335](https://github.com/getsentry/spotlight/pull/1335)
+- (electron) Drop redundant notarize afterSign hook by @BYK in [#1336](https://github.com/getsentry/spotlight/pull/1336)
+
 ## 4.11.7
 
 ### Security 🔒
