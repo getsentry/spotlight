@@ -17,7 +17,6 @@ let mac = {
   cscLink: process.env.CSC_LINK,
   cscKeyPassword: process.env.CSC_KEY_PASSWORD,
 };
-let afterSign = "scripts/notarize.cjs";
 
 if (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD) {
   mac = {
@@ -30,7 +29,6 @@ if (!process.env.CSC_LINK || !process.env.CSC_KEY_PASSWORD) {
     ],
     identity: null,
   };
-  afterSign = undefined;
 }
 
 builder.build({
@@ -39,7 +37,6 @@ builder.build({
     appId: "io.sentry.spotlight",
     productName: "Spotlight",
     asarUnpack: ["resources/**"],
-    afterSign,
     npmRebuild: false,
     extraMetadata: {
       main: "./dist-electron/main/index.js",
