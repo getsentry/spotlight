@@ -26,7 +26,7 @@
     "astro": "^6.4.6",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sharp": "^0.33.5",
+    "sharp": "^0.35.0",
     "shiki": "^3.13.0",
     "tailwindcss": "catalog:",
     "zod": "^3.25.0"
