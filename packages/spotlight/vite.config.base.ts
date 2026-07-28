@@ -29,8 +29,11 @@ export const defineDevelopment = {
 export const reactPlugins = [
   react(),
   svgr({
+    include: ["**/*.svg", "**/*.svg?react"],
     svgrOptions: {
       titleProp: true,
+      exportType: "named",
+      namedExport: "ReactComponent",
     },
   }),
   tailwindcss(),

@@ -5,7 +5,6 @@ import sentryStarlightTheme, {
   monochromeCodeTheme,
 } from "@sentry/starlight-theme";
 import { defineConfig } from "astro/config";
-import Inspect from "vite-plugin-inspect";
 import tailwindcss from "@tailwindcss/vite";
 
 import react from "@astrojs/react";
@@ -15,13 +14,7 @@ import react from "@astrojs/react";
 export default defineConfig({
   site: "https://spotlightjs.com",
   vite: {
-    plugins: [
-      Inspect({
-        dev: true,
-        build: true,
-      }),
-      tailwindcss(),
-    ],
+    plugins: [tailwindcss()],
     build: {
       sourcemap: true,
     },
