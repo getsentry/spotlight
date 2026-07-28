@@ -3,7 +3,7 @@ packages:
 
 catalog:
   "@fontsource/raleway": ^5.1.0
-  "@tailwindcss/vite": ^4.1.11
+  "@tailwindcss/vite": ^4.3.3
   "@types/node": ^22.15.21
   "@types/react": ^18.3.11
   "@types/react-dom": ^18.3.0
@@ -14,5 +14,5 @@ catalog:
   react-dom: ^18.3.1
   tailwindcss: ^4.1.10
   typescript: ^5.6.2
-  vite: ^6.4.2
+  vite: ^8.1.0
   vitest: ^4.1.0
