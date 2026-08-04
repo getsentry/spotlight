@@ -72,7 +72,7 @@ export async function startServer(options: StartServerOptions): Promise<Server> 
           attributes: {
             "http.request.method": ctx.req.method,
             "http.request.url": ctx.req.url,
-            "http.request.query": ctx.req.query().toString(),
+            "http.request.query": new URL(ctx.req.url).searchParams.toString(),
             "server.address": host,
             "server.port": ctx.env.incoming.socket.localPort,
           },
