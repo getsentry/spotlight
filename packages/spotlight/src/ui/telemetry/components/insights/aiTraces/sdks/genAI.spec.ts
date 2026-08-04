@@ -159,6 +159,44 @@ describe("genAIHandler", () => {
     expect(trace.response?.finishReason).toBe("stop");
   });
 
+  test("surfaces the finish reason when a turn has no response text", () => {
+    // SDKs omit gen_ai.response.text when PII recording is disabled, but still
+    // report a finish reason.
+    const root = mockSpan({
+      span_id: "chat",
+      op: "gen_ai.chat",
+      data: { "gen_ai.response.finish_reasons": ["length"] },
+    });
+
+    const trace = genAIHandler.processTrace(root);
+    expect(trace.response?.text).toBeUndefined();
+    expect(trace.response?.finishReason).toBe("length");
+  });
+
+  test("a text-less finish reason does not override the one paired with the response text", () => {
+    const root = mockSpan({
+      span_id: "agent",
+      op: "gen_ai.invoke_agent",
+      data: { "gen_ai.agent.name": "assistant", "gen_ai.operation.name": "invoke_agent" },
+      children: [
+        mockSpan({
+          span_id: "chat-1",
+          op: "gen_ai.chat",
+          data: { "gen_ai.response.text": ["final reply"], "gen_ai.response.finish_reasons": ["stop"] },
+        }),
+        mockSpan({
+          span_id: "tool-turn",
+          op: "gen_ai.chat",
+          data: { "gen_ai.response.finish_reasons": ["tool_calls"] },
+        }),
+      ],
+    });
+
+    const trace = genAIHandler.processTrace(root);
+    expect(trace.response?.text).toBe("final reply");
+    expect(trace.response?.finishReason).toBe("stop");
+  });
+
   test("sums token usage across multiple chat turns", () => {
     const root = mockSpan({
       span_id: "agent",

@@ -129,11 +129,12 @@ export const genAIHandler: AILibraryHandler = {
       toolCalls: [],
     };
 
+    const responseState = { finishReasonFromText: false };
     for (const span of allSpans) {
       if (!span.data) continue;
       extractMetadata(span, trace);
       extractPromptData(span, trace);
-      extractResponseData(span, trace);
+      extractResponseData(span, trace, responseState);
       extractToolCallData(span, trace);
     }
 
@@ -270,7 +271,17 @@ function extractPromptData(span: Span, trace: SpotlightAITrace) {
   trace.prompt = { messages: [{ role: "unknown", content: String(promptMessages) }], system: systemText };
 }
 
-function extractResponseData(span: Span, trace: SpotlightAITrace) {
+function extractFinishReason(finishReasons: unknown): string | undefined {
+  if (Array.isArray(finishReasons) && finishReasons.length > 0) {
+    return String(finishReasons[0]);
+  }
+  if (typeof finishReasons === "string" && finishReasons) {
+    return finishReasons;
+  }
+  return undefined;
+}
+
+function extractResponseData(span: Span, trace: SpotlightAITrace, state: { finishReasonFromText: boolean }) {
   if (!span.data) return;
 
   trace.response = trace.response || {};
@@ -284,17 +295,21 @@ function extractResponseData(span: Span, trace: SpotlightAITrace) {
     : responseText
       ? String(responseText)
       : "";
+
+  const finishReason = extractFinishReason(span.data[GEN_AI_RESPONSE_FINISH_REASONS_FIELD]);
+
   if (text) {
     trace.response.text = text;
-
-    // Keep the finish reason paired with the turn that produced the text, so a
-    // later turn's text can't inherit an earlier turn's finish reason.
-    const finishReasons = span.data[GEN_AI_RESPONSE_FINISH_REASONS_FIELD];
-    if (Array.isArray(finishReasons) && finishReasons.length > 0) {
-      trace.response.finishReason = String(finishReasons[0]);
-    } else if (typeof finishReasons === "string" && finishReasons) {
-      trace.response.finishReason = finishReasons;
-    }
+    // Re-pair the finish reason with the turn that produced the surfaced text,
+    // even overwriting one an earlier text-less turn contributed, so the text
+    // and its reason always come from the same turn.
+    trace.response.finishReason = finishReason;
+    state.finishReasonFromText = true;
+  } else if (finishReason !== undefined && !state.finishReasonFromText) {
+    // SDKs omit gen_ai.response.text when PII recording is off, and tool-call
+    // turns carry a reason with no text — still surface the reason, but never
+    // let it override one already paired with a text turn.
+    trace.response.finishReason = finishReason;
   }
 
   const toolCalls = span.data[GEN_AI_RESPONSE_TOOL_CALLS_FIELD];
