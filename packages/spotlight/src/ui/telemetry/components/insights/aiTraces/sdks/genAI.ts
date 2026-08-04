@@ -276,18 +276,25 @@ function extractResponseData(span: Span, trace: SpotlightAITrace) {
   trace.response = trace.response || {};
 
   // Spans arrive in tree pre-order, so for an agent root with several chat
-  // children the last span wins — surfacing the latest model turn rather than
-  // the first.
-  const finishReasons = span.data[GEN_AI_RESPONSE_FINISH_REASONS_FIELD];
-  if (Array.isArray(finishReasons) && finishReasons.length > 0) {
-    trace.response.finishReason = String(finishReasons[0]);
-  } else if (typeof finishReasons === "string" && finishReasons) {
-    trace.response.finishReason = finishReasons;
-  }
-
+  // children the last span carrying a response wins — surfacing the latest
+  // model turn rather than the first.
   const responseText = span.data[GEN_AI_RESPONSE_TEXT_FIELD];
-  if (responseText) {
-    trace.response.text = Array.isArray(responseText) ? responseText.map(String).join("") : String(responseText);
+  const text = Array.isArray(responseText)
+    ? responseText.map(String).join("")
+    : responseText
+      ? String(responseText)
+      : "";
+  if (text) {
+    trace.response.text = text;
+
+    // Keep the finish reason paired with the turn that produced the text, so a
+    // later turn's text can't inherit an earlier turn's finish reason.
+    const finishReasons = span.data[GEN_AI_RESPONSE_FINISH_REASONS_FIELD];
+    if (Array.isArray(finishReasons) && finishReasons.length > 0) {
+      trace.response.finishReason = String(finishReasons[0]);
+    } else if (typeof finishReasons === "string" && finishReasons) {
+      trace.response.finishReason = finishReasons;
+    }
   }
 
   const toolCalls = span.data[GEN_AI_RESPONSE_TOOL_CALLS_FIELD];

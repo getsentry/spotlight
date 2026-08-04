@@ -133,6 +133,32 @@ describe("genAIHandler", () => {
     expect(trace.response?.finishReason).toBe("stop");
   });
 
+  test("empty response text from a later span does not clobber earlier text", () => {
+    const root = mockSpan({
+      span_id: "agent",
+      op: "gen_ai.invoke_agent",
+      data: { "gen_ai.agent.name": "assistant", "gen_ai.operation.name": "invoke_agent" },
+      children: [
+        mockSpan({
+          span_id: "chat-1",
+          op: "gen_ai.chat",
+          data: { "gen_ai.response.text": ["real reply"], "gen_ai.response.finish_reasons": ["stop"] },
+        }),
+        mockSpan({
+          span_id: "chat-2",
+          op: "gen_ai.chat",
+          data: { "gen_ai.response.text": [], "gen_ai.response.finish_reasons": ["tool_calls"] },
+        }),
+      ],
+    });
+
+    const trace = genAIHandler.processTrace(root);
+    // The empty [] turn must not erase the response, and the finish reason must
+    // stay paired with the turn that produced the surviving text.
+    expect(trace.response?.text).toBe("real reply");
+    expect(trace.response?.finishReason).toBe("stop");
+  });
+
   test("sums token usage across multiple chat turns", () => {
     const root = mockSpan({
       span_id: "agent",
