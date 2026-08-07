@@ -37,6 +37,8 @@ export function isLogEvent(event: SentryEvent): event is SentryLogEvent {
 
 export function isFeedbackEvent(event: SentryEvent): event is SentryFeedbackEvent {
   return (
-    (!!event.type && FEEDBACK_EVENT_TYPES.has(event.type)) || Boolean((event as SentryFeedbackEvent).contexts?.feedback)
+    !!event.type &&
+    FEEDBACK_EVENT_TYPES.has(event.type) &&
+    Boolean((event as SentryFeedbackEvent).contexts?.feedback)
   );
 }
