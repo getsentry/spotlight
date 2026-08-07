@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { aiLibraries } from "../components/insights/aiTraces/sdks/aiLibraries";
+import { aiLibraries, extractAllAIRootSpans } from "../components/insights/aiTraces/sdks/aiLibraries";
 import type { Span, SpotlightAITrace } from "../types";
 import { useSentryTraces } from "./useSentrySpans";
 
@@ -12,9 +12,8 @@ export function useAITraces(): Span[] {
     for (const trace of allTraces) {
       if (!trace.spanTree) continue;
 
-      for (const framework of aiLibraries) {
-        const frameworkRoots = framework.extractRootSpans(trace.spanTree);
-        rootSpans.push(...frameworkRoots);
+      for (const { span } of extractAllAIRootSpans(trace.spanTree)) {
+        rootSpans.push(span);
       }
     }
 
