@@ -1,7 +1,14 @@
-import { ERROR_EVENT_TYPES, LOG_EVENT_TYPES, PROFILE_EVENT_TYPES, TRACE_EVENT_TYPES } from "../constants/sentry";
+import {
+  ERROR_EVENT_TYPES,
+  FEEDBACK_EVENT_TYPES,
+  LOG_EVENT_TYPES,
+  PROFILE_EVENT_TYPES,
+  TRACE_EVENT_TYPES,
+} from "../constants/sentry";
 import type {
   SentryErrorEvent,
   SentryEvent,
+  SentryFeedbackEvent,
   SentryLogEvent,
   SentryProfileV1Event,
   SentryProfileV2ChunkEvent,
@@ -26,4 +33,10 @@ export function isTraceEvent(event: SentryEvent): event is SentryTransactionEven
 
 export function isLogEvent(event: SentryEvent): event is SentryLogEvent {
   return !!event.type && LOG_EVENT_TYPES.has(event.type);
+}
+
+export function isFeedbackEvent(event: SentryEvent): event is SentryFeedbackEvent {
+  return (
+    (!!event.type && FEEDBACK_EVENT_TYPES.has(event.type)) || Boolean((event as SentryFeedbackEvent).contexts?.feedback)
+  );
 }

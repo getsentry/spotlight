@@ -94,10 +94,21 @@ export type TraceContext = EventEnvelopeHeaders["trace"] & {
   op?: string;
 };
 
+export type FeedbackContext = {
+  message: string;
+  name?: string;
+  contact_email?: string;
+  source?: string;
+  url?: string;
+  associated_event_id?: string;
+  replay_id?: string;
+};
+
 export type Contexts = {
   trace?: TraceContext;
+  feedback?: FeedbackContext;
 } & {
-  [key: string]: Context;
+  [key: string]: Context | TraceContext | FeedbackContext | undefined;
 };
 
 export type Tags = {
@@ -277,12 +288,20 @@ export type SentryLogEvent = CommonEventAttrs & {
   items: Array<SentryLogEventItem>;
 };
 
+export type SentryFeedbackEvent = CommonEventAttrs & {
+  type: "feedback";
+  contexts: Contexts & {
+    feedback: FeedbackContext;
+  };
+};
+
 export type SentryEvent =
   | SentryErrorEvent
   | SentryTransactionEvent
   | SentryProfileV1Event
   | SentryProfileV2ChunkEvent
-  | SentryLogEvent;
+  | SentryLogEvent
+  | SentryFeedbackEvent;
 
 export type Trace = TraceContext & {
   trace_id: string;
