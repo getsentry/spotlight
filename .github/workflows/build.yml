@@ -213,7 +213,7 @@ jobs:
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: getsentry/codecov-action@main
+        uses: getsentry/coverage-action@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           post-pr-comment: true
