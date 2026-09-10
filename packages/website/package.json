@@ -23,7 +23,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vercel/analytics": "^1.6.1",
-    "astro": "^7.0.6",
+    "astro": "^7.2.8",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sharp": "^0.35.0",
