@@ -66,6 +66,30 @@ describe("envelopes", () => {
     }
   });
 
+  it("should parse text/plain envelopes sent by JS SDK variants like sentry.javascript.vue", async () => {
+    const sendResponse = await app.request("/stream?sentry_client=sentry.javascript.vue/8.0.0", {
+      method: "POST",
+      body: JSON.stringify(envelopeReactClientSideError),
+      headers: {
+        "Content-Type": "text/plain",
+        Origin: "http://localhost:3000",
+      },
+    });
+    expect(sendResponse.status).toBe(200);
+
+    const receiveResponse = await app.request("/stream");
+    expect(receiveResponse.status).toBe(200);
+
+    const stream = events(receiveResponse);
+
+    for await (const event of stream) {
+      const jsonEnvelope = JSON.parse(event.data!);
+      expect(jsonEnvelope[0].event_id).toEqual(envelopeReactClientSideError.event_id);
+
+      break;
+    }
+  });
+
   it("should be able to clear envelopes", async () => {
     const response = await app.request("/clear", {
       method: "DELETE",
