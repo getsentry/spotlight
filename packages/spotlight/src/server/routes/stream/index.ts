@@ -72,8 +72,8 @@ const router = new Hono<HonoEnv>()
   })
   .on("POST", ["/stream", "/api/:id/envelope", "/api/:id/envelope/"], async ctx => {
     let contentType = ctx.req.header("content-type")?.split(";")[0].toLocaleLowerCase();
-    if (ctx.req.query("sentry_client")?.startsWith("sentry.javascript.browser") && ctx.req.header("Origin")) {
-      // This is a correction we make as Sentry Browser SDK may send messages with text/plain to avoid CORS issues
+    if (ctx.req.query("sentry_client")?.startsWith("sentry.javascript") && ctx.req.header("Origin")) {
+      // This is a correction we make as Sentry JS SDKs may send messages with text/plain to avoid CORS issues
       contentType = SENTRY_CONTENT_TYPE;
     }
 
