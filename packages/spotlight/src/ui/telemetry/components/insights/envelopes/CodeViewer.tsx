@@ -31,20 +31,30 @@ export function CodeViewer({ code, lang }: { code: string; lang: string }) {
     }
 
     let cancelled = false;
-    highlighter.load(lang).then((render: HighlightFn | null) => {
-      if (cancelled || !render) {
-        setHtml(null);
-        return;
-      }
-      const { source, highlighted } = extractHighlights(code);
-      setHtml(
-        render(source, {
-          class_name: "twinkleplop",
-          structure: "classic",
-          overlays: highlighted.map(line => ({ line, class: "highlighted" })),
-        }),
-      );
-    });
+    highlighter
+      .load(lang)
+      .then((render: HighlightFn | null) => {
+        if (cancelled) {
+          return;
+        }
+        if (!render) {
+          setHtml(null);
+          return;
+        }
+        const { source, highlighted } = extractHighlights(code);
+        setHtml(
+          render(source, {
+            class_name: "twinkleplop",
+            structure: "classic",
+            overlays: highlighted.map(line => ({ line, class: "highlighted" })),
+          }),
+        );
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setHtml(null);
+        }
+      });
 
     return () => {
       cancelled = true;

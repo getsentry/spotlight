@@ -94,7 +94,12 @@ export function HighlighterProvider({ children }: PropsWithChildren) {
 
     let pending = cache.current.get(canonical);
     if (!pending) {
-      pending = importLanguage(canonical);
+      pending = importLanguage(canonical).catch(error => {
+        // Drop a failed load from the cache so a later render can retry it,
+        // instead of pinning this language to a permanently rejected promise.
+        cache.current.delete(canonical);
+        throw error;
+      });
       cache.current.set(canonical, pending);
     }
     return pending;
