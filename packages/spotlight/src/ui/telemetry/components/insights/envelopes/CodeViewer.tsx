@@ -25,8 +25,11 @@ export function CodeViewer({ code, lang }: { code: string; lang: string }) {
   const [html, setHtml] = useState<string | null>(null);
 
   useEffect(() => {
+    // Drop the previous snippet's markup so we fall back to plain text while the
+    // new code highlights, instead of briefly showing stale highlighted output.
+    setHtml(null);
+
     if (!highlighter || code.length === 0) {
-      setHtml(null);
       return;
     }
 
