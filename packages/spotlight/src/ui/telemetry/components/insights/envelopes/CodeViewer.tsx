@@ -8,7 +8,7 @@ const HIGHLIGHT_NOTATION = /\s*\/\/\s*\[!code highlight\]\s*$/;
  * Strip `[!code highlight]` line markers and collect the (1-based) line numbers
  * that carried one, so they can be re-applied as twinkleplop line overlays.
  */
-function extractHighlights(code: string): { source: string; highlighted: number[] } {
+export function extractHighlights(code: string): { source: string; highlighted: number[] } {
   const highlighted: number[] = [];
   const lines = code.split("\n").map((line, index) => {
     if (HIGHLIGHT_NOTATION.test(line)) {
