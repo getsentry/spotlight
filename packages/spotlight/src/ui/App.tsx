@@ -1,7 +1,7 @@
 import { ErrorBoundary } from "@sentry/react";
 import { ReactComponent as Logo } from "@spotlight/ui/assets/glyph.svg";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { ShikiProvider } from "./ShikiProvider";
+import { HighlighterProvider } from "./HighlighterProvider";
 // TODO: we'll lazy load this in case of multiple routes
 import { Telemetry } from "./telemetry";
 
@@ -13,14 +13,14 @@ export default function App({ sidecarUrl }: AppProps) {
   return (
     <div className="from-primary-900 to-primary-950 flex h-full overflow-hidden bg-gradient-to-br from-0% to-20% font-sans text-white">
       <ErrorBoundary fallback={<ErrorFallback />}>
-        <ShikiProvider>
+        <HighlighterProvider>
           <Routes>
             {/* Default route redirects to telemetry */}
             <Route path="/" element={<Navigate to="/telemetry" replace />} />
 
             <Route path="/telemetry/*" element={<Telemetry sidecarUrl={sidecarUrl} />} />
           </Routes>
-        </ShikiProvider>
+        </HighlighterProvider>
       </ErrorBoundary>
     </div>
   );

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./sentinel-theme.css";
 @config "./tailwind.config.ts";
 
 @theme {
@@ -135,11 +136,15 @@ input:checked ~ .dot {
   }
 }
 
-.shiki {
+.twinkleplop {
   @apply rounded-xs;
 
   code {
     @apply block overflow-hidden py-0.5 pl-2
+  }
+
+  .l {
+    @apply block;
   }
 
   .highlighted {
