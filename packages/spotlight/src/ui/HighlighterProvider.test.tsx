@@ -25,7 +25,8 @@ describe("resolveLanguage", () => {
     expect(resolveLanguage("PY")).toBe("python");
   });
 
-  it("returns null for unsupported languages", () => {
+  it("returns null for languages without a twinkleplop grammar", () => {
+    // These route to the shiki fallback (java) or the plain-text fallback.
     expect(resolveLanguage("java")).toBeNull();
     expect(resolveLanguage("text")).toBeNull();
     expect(resolveLanguage("")).toBeNull();

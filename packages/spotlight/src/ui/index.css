@@ -152,6 +152,18 @@ input:checked ~ .dot {
   }
 }
 
+.shiki {
+  @apply rounded-xs;
+
+  code {
+    @apply block overflow-hidden py-0.5 pl-2
+  }
+
+  .highlighted {
+    @apply bg-primary-950 py-1 pl-2 -ml-2 min-w-[calc(100%+0.5rem)] rounded-xs inline-block;
+  }
+}
+
 /* Electron-specific styles */
 body.electron-fullscreen #electron-top-drag-bar {
   display: none;
