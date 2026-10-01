@@ -1,7 +1,7 @@
 import type { EnvelopeItem } from "@sentry/core";
 import { ReactComponent as Download } from "@spotlight/ui/assets/download.svg";
 import { base64Decode, safeAtob } from "@spotlight/ui/lib/base64";
-import { type ReactNode, useEffect, useMemo } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import JsonViewer from "../../shared/JsonViewer";
 import { CodeViewer } from "./CodeViewer";
 import { inferExtension } from "./contentType";
@@ -23,10 +23,15 @@ export default function Attachment({
   const extension = inferExtension(header.content_type as string | null, header.type as string | null);
   const name = (header.filename as string) || `untitled.${extension}`;
 
+  // Lazily render the attachment: start from the `expanded` prop, but let the
+  // user expand it on demand so previews/downloads work wherever the component
+  // is used, without eagerly decoding every attachment.
+  const [isExpanded, setIsExpanded] = useState(expanded);
+
   // Create download URL for attachment
   // Returns: string (success), null (decode error), undefined (not expanded yet)
   const downloadUrl = useMemo(() => {
-    if (!expanded) {
+    if (!isExpanded) {
       return undefined; // Not needed yet
     }
 
@@ -54,7 +59,7 @@ export default function Attachment({
 
     const blob = new Blob([blobData], { type: contentType || "application/octet-stream" });
     return URL.createObjectURL(blob);
-  }, [expanded, attachment, extension, header.content_type]);
+  }, [isExpanded, attachment, extension, header.content_type]);
 
   // Cleanup blob URL on unmount or when URL changes
   useEffect(() => {
@@ -69,7 +74,7 @@ export default function Attachment({
 
   let content: ReactNode = null;
 
-  if (expanded) {
+  if (isExpanded) {
     if (decodeError) {
       content = (
         <pre className="text-destructive-400 whitespace-pre-wrap break-words font-mono text-sm rounded-sm bg-primary-900 p-2">
@@ -114,7 +119,28 @@ export default function Attachment({
           <Download className="inline h-4 w-4 opacity-60 transition-opacity group-hover:opacity-100" />
         </a>
       </h3>
-      {expanded ? content : <p className="text-primary-400 text-xs italic">Expand to preview attachment.</p>}
+      {isExpanded ? (
+        <div className="flex flex-col gap-1">
+          <button
+            type="button"
+            onClick={() => setIsExpanded(false)}
+            aria-expanded={true}
+            className="text-primary-400 hover:text-primary-200 cursor-pointer text-left text-xs italic"
+          >
+            Collapse attachment.
+          </button>
+          {content}
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setIsExpanded(true)}
+          aria-expanded={false}
+          className="text-primary-400 hover:text-primary-200 cursor-pointer text-left text-xs italic"
+        >
+          Expand to preview attachment.
+        </button>
+      )}
     </>
   );
 }

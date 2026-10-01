@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Attachment from "./Attachment";
 
@@ -198,6 +198,30 @@ describe("Attachment", () => {
       );
 
       expect(container.textContent).toContain("Expand to preview attachment");
+    });
+
+    it("should toggle between expanded and collapsed when the prompt is clicked", () => {
+      const { container } = render(
+        <Attachment
+          header={{ type: "attachment", content_type: "text/plain", filename: "test.txt" }}
+          attachment="Hello, World!"
+        />,
+      );
+
+      // Collapsed by default: shows the prompt, no content decoded yet.
+      expect(container.textContent).toContain("Expand to preview attachment");
+      expect(container.textContent).not.toContain("Hello, World!");
+      expect(mockCreateObjectURL).not.toHaveBeenCalled();
+
+      // Expanding renders the content and builds the download URL on demand.
+      fireEvent.click(screen.getByRole("button", { name: /expand to preview attachment/i }));
+      expect(container.textContent).toContain("Hello, World!");
+      expect(mockCreateObjectURL).toHaveBeenCalledTimes(1);
+
+      // Collapsing hides the content again.
+      fireEvent.click(screen.getByRole("button", { name: /collapse attachment/i }));
+      expect(container.textContent).toContain("Expand to preview attachment");
+      expect(container.textContent).not.toContain("Hello, World!");
     });
   });
 
