@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./sentinel-theme.css";
 @config "./tailwind.config.ts";
 
 @theme {
@@ -132,6 +133,22 @@ input:checked ~ .dot {
   }
   &::-webkit-scrollbar-corner {
     background: var(--color-primary-900);
+  }
+}
+
+.twinkleplop {
+  @apply rounded-xs;
+
+  code {
+    @apply block overflow-hidden py-0.5 pl-2
+  }
+
+  .l {
+    @apply block;
+  }
+
+  .highlighted {
+    @apply bg-primary-950 py-1 pl-2 -ml-2 min-w-[calc(100%+0.5rem)] rounded-xs inline-block;
   }
 }
 

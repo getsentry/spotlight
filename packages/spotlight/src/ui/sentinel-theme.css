@@ -1,0 +1,81 @@
+/*
+ * Sentry Sentinel Dark theme for twinkleplop-rendered code.
+ *
+ * twinkleplop emits `<pre class="twinkleplop"><code><span class="l">` per line
+ * and `<span class="tok <type>">` per token. This ports the colors from the
+ * former shiki `sentinel-dark` textmate theme onto twinkleplop's token classes.
+ * Based on the VS Code theme from https://github.com/getsentry/sentinel.
+ */
+.twinkleplop {
+  color: #f9f8f9;
+  background-color: #181225;
+}
+
+.twinkleplop .tok.comment {
+  color: #898294;
+  font-style: italic;
+}
+.twinkleplop .tok.keyword {
+  color: #9e86ff;
+  font-weight: bold;
+}
+.twinkleplop .tok.string,
+.twinkleplop .tok.template {
+  color: #83da90;
+}
+.twinkleplop .tok.regex {
+  color: #06b6d4;
+}
+.twinkleplop .tok.number,
+.twinkleplop .tok.unit {
+  color: #fdb81b;
+}
+.twinkleplop .tok.boolean,
+.twinkleplop .tok.constant {
+  color: #9e86ff;
+}
+.twinkleplop .tok.function {
+  color: #226dfc;
+}
+.twinkleplop .tok.builtin {
+  color: #8a76ff;
+}
+.twinkleplop .tok.class_name,
+.twinkleplop .tok.type {
+  color: #ff45a8;
+}
+.twinkleplop .tok.property {
+  color: #ff70bc;
+}
+.twinkleplop .tok.parameter {
+  color: #d8ab5a;
+  font-style: italic;
+}
+.twinkleplop .tok.operator {
+  color: #ff45a8;
+}
+.twinkleplop .tok.punctuation {
+  color: #d5d2da;
+}
+.twinkleplop .tok.namespace {
+  color: #7553ff;
+}
+.twinkleplop .tok.tag_name,
+.twinkleplop .tok.doctype {
+  color: #7553ff;
+}
+.twinkleplop .tok.attr_name {
+  color: #ff9838;
+}
+.twinkleplop .tok.selector,
+.twinkleplop .tok.selector_class,
+.twinkleplop .tok.selector_id,
+.twinkleplop .tok.selector_pseudo {
+  color: #7553ff;
+}
+.twinkleplop .tok.expression {
+  color: #f9f8f9;
+}
+.twinkleplop .tok.identifier {
+  color: #f9f8f9;
+}
