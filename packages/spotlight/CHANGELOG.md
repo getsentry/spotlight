@@ -1,5 +1,47 @@
 # @spotlightjs/spotlight
 
+## 4.12.0
+
+### New Features ✨
+
+#### Ui
+
+- Display Sentry User Feedback events by @jared-outpost in [#1346](https://github.com/getsentry/spotlight/pull/1346)
+- Surface gen_ai spans in AI Traces by @jared-outpost in [#1331](https://github.com/getsentry/spotlight/pull/1331)
+
+### Bug Fixes 🐛
+
+#### Deps
+
+- Resolve all open GitHub security alerts by @MathurAditya724 in [#1361](https://github.com/getsentry/spotlight/pull/1361)
+- Bump @microlink/react-json-view to fix invalid element type crash by @rvanvelzen in [#1355](https://github.com/getsentry/spotlight/pull/1355)
+
+#### Other
+
+- (build) Upgrade electron-builder keychain handling by @MathurAditya724 in [#1359](https://github.com/getsentry/spotlight/pull/1359)
+- (stream) Support text/plain envelope ingestion for all sentry.javascript SDKs by @Tyagiquamar in [#1354](https://github.com/getsentry/spotlight/pull/1354)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump hono from 4.13.5 to 4.13.7 by @dependabot in [#1360](https://github.com/getsentry/spotlight/pull/1360)
+- Bump vitest from 4.1.8 to 4.1.11 by @dependabot in [#1353](https://github.com/getsentry/spotlight/pull/1353)
+- Bump sharp from 0.35.0 to 0.35.4 by @dependabot in [#1352](https://github.com/getsentry/spotlight/pull/1352)
+- Bump astro from 7.1.4 to 7.2.8 by @dependabot in [#1351](https://github.com/getsentry/spotlight/pull/1351)
+- Bump hono from 4.12.34 to 4.13.5 by @dependabot in [#1350](https://github.com/getsentry/spotlight/pull/1350)
+- Bump hono from 4.12.27 to 4.12.34 by @dependabot in [#1344](https://github.com/getsentry/spotlight/pull/1344)
+- Migrate Astro 6 -> 7 + Vite 8 (closes #301 #302) by @BYK in [#1342](https://github.com/getsentry/spotlight/pull/1342)
+- Bump sharp from 0.33.5 to 0.35.0 by @dependabot in [#1340](https://github.com/getsentry/spotlight/pull/1340)
+- Bump @hono/node-server from 1.19.14 to 2.0.10 by @dependabot in [#1338](https://github.com/getsentry/spotlight/pull/1338)
+- Bump hono from 4.12.25 to 4.12.27 by @dependabot in [#1339](https://github.com/getsentry/spotlight/pull/1339)
+
+#### Other
+
+- (deps-dev) Bump electron from 39.8.5 to 39.8.10 by @dependabot in [#1347](https://github.com/getsentry/spotlight/pull/1347)
+- Reference renamed coverage action by @MathurAditya724 in [#1348](https://github.com/getsentry/spotlight/pull/1348)
+- Remove disabled changelog-preview workflow by @oioki in [#1345](https://github.com/getsentry/spotlight/pull/1345)
+
 ## 4.11.8
 
 ### New Features ✨
