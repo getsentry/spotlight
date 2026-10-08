@@ -42,7 +42,9 @@ export default defineConfig(({ mode }) => {
               // runtime. Without this, vite 6's default browser target makes
               // esbuild 0.27+ error on async destructuring it can't down-transpile.
               target: "node20",
-              rollupOptions: {
+              rolldownOptions: {
+                // Bundled CommonJS dependencies need createRequire in the ESM main process.
+                platform: "node",
                 plugins: [sourcemaps()],
               },
             },
