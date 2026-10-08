@@ -405,6 +405,9 @@ importers:
       astro:
         specifier: ^7.2.8
         version: 7.2.8(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.5.0)(@vercel/functions@3.5.1)(jiti@2.7.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.9.0)
+      cookie:
+        specifier: ^2.0.1
+        version: 2.0.1
       react:
         specifier: 'catalog:'
         version: 18.3.1
