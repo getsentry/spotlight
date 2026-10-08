@@ -24,6 +24,7 @@
     "@types/react-dom": "catalog:",
     "@vercel/analytics": "^1.6.1",
     "astro": "^7.2.8",
+    "cookie": "^2.0.1",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sharp": "^0.35.4",
