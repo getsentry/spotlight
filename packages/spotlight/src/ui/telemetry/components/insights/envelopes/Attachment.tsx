@@ -119,28 +119,17 @@ export default function Attachment({
           <Download className="inline h-4 w-4 opacity-60 transition-opacity group-hover:opacity-100" />
         </a>
       </h3>
-      {isExpanded ? (
-        <div className="flex flex-col gap-1">
-          <button
-            type="button"
-            onClick={() => setIsExpanded(false)}
-            aria-expanded={true}
-            className="text-primary-400 hover:text-primary-200 cursor-pointer text-left text-xs italic"
-          >
-            Collapse attachment.
-          </button>
-          {content}
-        </div>
-      ) : (
+      <div className="flex flex-col gap-1">
         <button
           type="button"
-          onClick={() => setIsExpanded(true)}
-          aria-expanded={false}
+          onClick={() => setIsExpanded(value => !value)}
+          aria-expanded={isExpanded}
           className="text-primary-400 hover:text-primary-200 cursor-pointer text-left text-xs italic"
         >
-          Expand to preview attachment.
+          {isExpanded ? "Collapse attachment." : "Expand to preview attachment."}
         </button>
-      )}
+        {isExpanded ? content : null}
+      </div>
     </>
   );
 }
