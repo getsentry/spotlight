@@ -123,10 +123,10 @@ importers:
     dependencies:
       '@hono/mcp':
         specifier: ^0.2.2
-        version: 0.2.2(@modelcontextprotocol/sdk@1.31.0(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.13.7))(hono@4.13.7)(zod@4.1.13)
+        version: 0.2.2(@modelcontextprotocol/sdk@1.31.0(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.13.11))(hono@4.13.11)(zod@4.1.13)
       '@hono/node-server':
         specifier: '>=2.0.5 <3'
-        version: 2.0.10(hono@4.13.7)
+        version: 2.0.10(hono@4.13.11)
       '@jridgewell/trace-mapping':
         specifier: ^0.3.25
         version: 0.3.31
@@ -152,8 +152,8 @@ importers:
         specifier: ^1.12.0
         version: 1.12.0
       hono:
-        specifier: ^4.13.7
-        version: 4.13.7
+        specifier: ^4.13.11
+        version: 4.13.11
       launch-editor:
         specifier: ^2.14.1
         version: 2.14.1
@@ -4815,8 +4815,8 @@ packages:
     peerDependencies:
       hono: ^4.1.1
 
-  hono@4.13.7:
-    resolution: {integrity: sha512-c8/gF9ac8Y78/agExVocyLevgR+JlpNB444Py0FSX8pJoPdYUfUzRcXtYEYGwt6l19qIlVZPN5Mfsw9jFShmQQ==}
+  hono@4.13.11:
+    resolution: {integrity: sha512-/SMX/RQNJn7oNmFwH6DtwDqcrzZU2otm1FD6OJe2cWF6cfy/F8hq0XVBv7xW3FTJshRQwuBnXHDq2kNsdZnshg==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@4.1.0:
@@ -6045,8 +6045,8 @@ packages:
     resolution: {integrity: sha512-Oo/NZcSWccq8KyoG7gLE9fnltgHns+pNCjCAp/WmjsUySi+sX7y4z4Xqu4fVb42CDHzRPl33fjzT15V1wvcyhA==}
     engines: {node: '>=16.0.0'}
 
-  pkijs@3.4.2:
-    resolution: {integrity: sha512-LIy5RqLEzlliax2ANQNWvDLvhJ2CtlpJahiSvKtXnpMdKHhXXoLdpdnWqae/uaTyF3U5l5ARweW0kZp9B0s2VA==}
+  pkijs@3.4.3:
+    resolution: {integrity: sha512-V9kOzaItwDgqlryhXysQsAXUEKi5O7kqWUaP3dXI7MLvkPqWWMb4wVb1QAtmEDCKI+XIAINsZoNKMFF7sZb1eg==}
     engines: {node: '>=16.0.0'}
 
   platformicons@7.0.5:
@@ -8480,17 +8480,17 @@ snapshots:
 
   '@fontsource/raleway@5.2.5': {}
 
-  '@hono/mcp@0.2.2(@modelcontextprotocol/sdk@1.31.0(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.13.7))(hono@4.13.7)(zod@4.1.13)':
+  '@hono/mcp@0.2.2(@modelcontextprotocol/sdk@1.31.0(zod@4.1.13))(hono-rate-limiter@0.4.2(hono@4.13.11))(hono@4.13.11)(zod@4.1.13)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.31.0(zod@4.1.13)
-      hono: 4.13.7
-      hono-rate-limiter: 0.4.2(hono@4.13.7)
+      hono: 4.13.11
+      hono-rate-limiter: 0.4.2(hono@4.13.11)
       pkce-challenge: 5.0.0
       zod: 4.1.13
 
-  '@hono/node-server@2.0.10(hono@4.13.7)':
+  '@hono/node-server@2.0.10(hono@4.13.11)':
     dependencies:
-      hono: 4.13.7
+      hono: 4.13.11
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -8753,7 +8753,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.31.0(zod@4.1.13)':
     dependencies:
-      '@hono/node-server': 2.0.10(hono@4.13.7)
+      '@hono/node-server': 2.0.10(hono@4.13.11)
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       content-type: 1.0.5
@@ -8763,7 +8763,7 @@ snapshots:
       eventsource-parser: 3.1.1
       express: 5.2.1
       express-rate-limit: 8.7.1(express@5.2.1)
-      hono: 4.13.7
+      hono: 4.13.11
       jose: 6.2.12
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -10824,7 +10824,7 @@ snapshots:
       json5: 2.2.3
       lazy-val: 1.0.5
       minimatch: 10.2.6
-      pkijs: 3.4.2
+      pkijs: 3.4.3
       plist: 3.1.0
       proper-lockfile: 4.1.2
       resedit: 1.7.2
@@ -12633,11 +12633,11 @@ snapshots:
     dependencies:
       react-is: 16.13.1
 
-  hono-rate-limiter@0.4.2(hono@4.13.7):
+  hono-rate-limiter@0.4.2(hono@4.13.11):
     dependencies:
-      hono: 4.13.7
+      hono: 4.13.11
 
-  hono@4.13.7: {}
+  hono@4.13.11: {}
 
   hosted-git-info@4.1.0:
     dependencies:
@@ -13754,7 +13754,7 @@ snapshots:
 
   node-abi@4.38.0:
     dependencies:
-      semver: 7.7.4
+      semver: 7.8.5
 
   node-api-version@0.2.1:
     dependencies:
@@ -14030,7 +14030,7 @@ snapshots:
       pvutils: 1.2.0
       tslib: 2.8.1
 
-  pkijs@3.4.2:
+  pkijs@3.4.3:
     dependencies:
       '@noble/hashes': 1.8.0
       asn1js: 3.1.0
