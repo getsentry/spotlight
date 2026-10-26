@@ -9,6 +9,7 @@ import { toTimestamp } from "../utils";
 import { processLogItems } from "../utils/logProcessor";
 import { mergeChunksToProfile, processProfileChunkEvent } from "../utils/profileChunkProcessor";
 import { processProfileEvent } from "../utils/profileProcessor";
+import { processSpanEvent } from "../utils/spanProcessor";
 import { initializeTrace } from "../utils/traceInitializer";
 import { processTransactionEvent, updateTraceMetadata } from "../utils/traceProcessor";
 
@@ -93,6 +94,14 @@ export const createEventsSlice: StateCreator<SentryStore, [], [], EventsSliceSta
       if (isTraceEvent(event)) {
         // Process transaction event and update trace
         const result = processTransactionEvent(event, {
+          existingTrace: trace,
+          profilesByTraceId,
+          profileChunksByProfilerId,
+        });
+        trace = result.trace;
+        mergedV2Profile = result.mergedProfile;
+      } else if (event.type === "span") {
+        const result = processSpanEvent(event, {
           existingTrace: trace,
           profilesByTraceId,
           profileChunksByProfilerId,

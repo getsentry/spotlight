@@ -5,6 +5,7 @@ import { ATTACHMENT_EVENT_TYPES, SUPPORTED_EVENT_TYPES } from "../../constants/s
 import type { EventAttachment, Sdk, SentryEvent } from "../../types";
 import { sdkToPlatform } from "../../utils/sdkToPlatform";
 import type { EnvelopesSliceActions, EnvelopesSliceState, SentryStore } from "../types";
+import { normalizeSpanItem } from "../utils/spanProcessor";
 
 const initialEnvelopesState: EnvelopesSliceState = {
   envelopes: new Map(),
@@ -78,6 +79,14 @@ export const createEnvelopesSlice: StateCreator<SentryStore, [], [], EnvelopesSl
     }
 
     for (const [itemHeader, itemData] of items) {
+      if (itemHeader.type === "span") {
+        for (const event of normalizeSpanItem(itemData, sdk)) {
+          event.platform = sdkToPlatform(sdk.name);
+          if (sourceType) event.__sourceType = sourceType;
+          get().pushEvent(event);
+        }
+        continue;
+      }
       if (SUPPORTED_EVENT_TYPES.has(itemHeader.type)) {
         const item = itemData as SentryEvent;
         if (!RAW_TYPES.has(itemHeader.type)) {

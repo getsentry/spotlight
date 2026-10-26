@@ -59,8 +59,8 @@ export function processTransactionEvent(
   trace.transactions.push(event);
   trace.transactions.sort(compareSpans);
 
-  // Recompute span map from all transactions
-  const spanMap: Map<string, Span> = new Map();
+  // Keep standalone spans received before this transaction/segment finished.
+  const spanMap: Map<string, Span> = new Map(trace.spans);
   for (const txn of trace.transactions) {
     const txnTrace = txn.contexts.trace;
     if (!txnTrace || !txnTrace.span_id || !txnTrace.trace_id) {
@@ -91,7 +91,7 @@ export function processTransactionEvent(
   }
 
   trace.spans = spanMap;
-  trace.spanTree = groupSpans(trace.spans);
+  rebuildSpanTree(trace);
 
   // Graft profile data if available (V1 profiles keyed by trace_id)
   const profileForTrace = profilesByTraceId.get(trace.trace_id);
@@ -124,6 +124,16 @@ export function processTransactionEvent(
     shouldUpdateTrace: true,
     mergedProfile,
   };
+}
+
+/** Rebuild from real spans so late parents replace placeholders and children are not appended twice. */
+export function rebuildSpanTree(trace: Trace): void {
+  trace.spans = new Map(
+    Array.from(trace.spans)
+      .filter(([, span]) => span.op !== "orphan")
+      .map(([id, span]) => [id, { ...span, children: undefined }]),
+  );
+  trace.spanTree = groupSpans(trace.spans);
 }
 
 /**
