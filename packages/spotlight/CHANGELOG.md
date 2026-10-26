@@ -1,5 +1,27 @@
 # @spotlightjs/spotlight
 
+## 4.12.1
+
+### Bug Fixes 🐛
+
+- (deps) Bump electron from 41.10.7 to 44.9.2 by @sentry-junior in [#1366](https://github.com/getsentry/spotlight/pull/1366)
+- (dev) Run the sidecar with --experimental-strip-types for Node 26 by @cristianchiriac in [#1364](https://github.com/getsentry/spotlight/pull/1364)
+- (tracing) Support streamed spans in Queries and traces by @MathurAditya724 in [#1372](https://github.com/getsentry/spotlight/pull/1372)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump launch-editor from 2.14.1 to 2.14.2 by @dependabot in [#1370](https://github.com/getsentry/spotlight/pull/1370)
+- Bump @modelcontextprotocol/sdk from 1.31.0 to 1.32.0 by @dependabot in [#1369](https://github.com/getsentry/spotlight/pull/1369)
+- Bump hono from 4.13.7 to 4.13.11 by @dependabot in [#1368](https://github.com/getsentry/spotlight/pull/1368)
+- Bump vite from 8.1.5 to 8.3.4 by @dependabot in [#1367](https://github.com/getsentry/spotlight/pull/1367)
+- Bump @modelcontextprotocol/sdk from 1.27.1 to 1.31.0 by @dependabot in [#1363](https://github.com/getsentry/spotlight/pull/1363)
+
+#### Other
+
+- (node) Bump Node to 24.22.1 by @sentry-junior in [#1371](https://github.com/getsentry/spotlight/pull/1371)
+
 ## 4.12.0
 
 ### New Features ✨
