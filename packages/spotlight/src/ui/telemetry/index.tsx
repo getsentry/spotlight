@@ -18,7 +18,7 @@ export function Telemetry({ sidecarUrl }: TelemetryRouteProps) {
   const listener = useCallback((event: string): void => {
     log(`Received new ${SENTRY_CONTENT_TYPE} event`);
     const envelope = typeof event === "string" ? JSON.parse(event) : event;
-    useSentryStore.getState().pushEnvelope(envelope);
+    void useSentryStore.getState().ingestEnvelope(envelope);
   }, []);
 
   const contentTypeListeners = useMemo(() => {

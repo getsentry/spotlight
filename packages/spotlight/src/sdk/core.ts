@@ -1,0 +1,22 @@
+export { createTelemetry } from "../telemetry/index.ts";
+export type {
+  Telemetry,
+  TelemetryOptions,
+  TelemetrySnapshot,
+  RawEnvelope,
+  ProcessedEvent,
+  ProcessedSpan,
+  ProcessedTrace,
+  ProcessedLog,
+  ProcessedProfile,
+  AITrace,
+  QuerySummary,
+  DatabaseQueryFilter,
+  ResourceSummary,
+  ProfileFunctionSummary,
+  EventFilter,
+  TraceFilter,
+  RetentionOptions,
+  Diagnostic,
+  IngestResult,
+} from "../telemetry/public.ts";

@@ -1,5 +1,6 @@
 import type { Envelope, EnvelopeItem } from "@sentry/core";
 import { type UUID, uuidv7obj } from "uuidv7";
+import { SUPPORTED_EVENT_TYPES } from "../../telemetry/constants/sentry.ts";
 import { RAW_TYPES } from "../constants.ts";
 import { type SourceType, inferEnvelopeSource } from "../formatters/human/utils.ts";
 import { logger } from "../logger.ts";
@@ -37,9 +38,16 @@ const TEXT_CONTENT_TYPES = new Set([
  * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
  * @param rawEvent Envelope data
  * @param senderUserAgent Optional User-Agent header from the HTTP request sending the envelope
+ * @param reportError Optional error observer; defaults to the legacy sidecar logger
+ * @param strict Reject truncated payloads and invalid explicit lengths
  * @returns parsed envelope
  */
-export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: string): ParsedEnvelope | null {
+export function processEnvelope(
+  rawEvent: RawEventContext,
+  senderUserAgent?: string,
+  reportError: (error: unknown) => void = error => logger.error(error),
+  strict = false,
+): ParsedEnvelope | null {
   let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
 
   function readLine(length?: number) {
@@ -49,9 +57,9 @@ export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: str
     return line;
   }
 
-  const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
-  if (!envelopeHeader) {
-    logger.error("Malformed envelope header, skipping...");
+  const envelopeHeader = parseJSONFromBuffer(readLine(), reportError) as Envelope[0];
+  if (!envelopeHeader || typeof envelopeHeader !== "object" || Array.isArray(envelopeHeader)) {
+    reportError("Malformed envelope header, skipping...");
     return null;
   }
 
@@ -64,17 +72,35 @@ export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: str
 
   const items: EnvelopeItem[] = [];
   while (buffer.length) {
-    const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
-    if (!itemHeader) {
-      logger.error("Malformed envelope item header, skipping envelope...");
+    if (strict && buffer.indexOf(0xa) === -1) {
+      reportError("Truncated envelope item header, skipping envelope...");
+      return null;
+    }
+    const itemHeader = parseJSONFromBuffer(readLine(), reportError) as EnvelopeItem[0];
+    if (!itemHeader || typeof itemHeader !== "object" || Array.isArray(itemHeader)) {
+      reportError("Malformed envelope item header, skipping envelope...");
       return null;
     }
     const payloadLength = itemHeader.length;
+    if (
+      strict &&
+      payloadLength !== undefined &&
+      (!Number.isInteger(payloadLength) ||
+        payloadLength < 0 ||
+        payloadLength > buffer.length ||
+        (payloadLength < buffer.length && buffer[payloadLength] !== 0xa))
+    ) {
+      reportError("Malformed envelope item length, skipping envelope...");
+      return null;
+    }
     const itemPayloadRaw = readLine(payloadLength);
 
     let itemPayload: EnvelopeItem[1];
     try {
-      if (RAW_TYPES.has(itemHeader.type)) {
+      if (
+        RAW_TYPES.has(itemHeader.type) ||
+        (strict && !SUPPORTED_EVENT_TYPES.has(itemHeader.type) && itemHeader.type !== "span")
+      ) {
         const rawPayload = itemPayloadRaw as Buffer;
         if (
           !itemHeader.content_type &&
@@ -88,9 +114,9 @@ export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: str
           data: rawPayload.toString(TEXT_CONTENT_TYPES.has(itemHeader.content_type as string) ? "utf-8" : "base64"),
         } as EnvelopeItem[1];
       } else {
-        itemPayload = parseJSONFromBuffer(itemPayloadRaw);
+        itemPayload = parseJSONFromBuffer(itemPayloadRaw, reportError);
         if (!itemPayload) {
-          logger.error(itemHeader);
+          reportError(itemHeader);
         } else if (itemHeader.type) {
           // data sanitization
           // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
@@ -99,7 +125,7 @@ export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: str
       }
     } catch (err) {
       itemPayload = itemPayloadRaw;
-      logger.error(err);
+      reportError(err);
     }
 
     items.push([itemHeader, itemPayload] as EnvelopeItem);
@@ -125,11 +151,11 @@ function getLineEnd(data: Uint8Array): number {
   return end;
 }
 
-function parseJSONFromBuffer<T = unknown>(data: Uint8Array): T {
+function parseJSONFromBuffer<T = unknown>(data: Uint8Array, reportError: (error: unknown) => void): T {
   try {
     return JSON.parse(new TextDecoder().decode(data)) as T;
   } catch (err) {
-    logger.error(err);
+    reportError(err);
     return null as T;
   }
 }

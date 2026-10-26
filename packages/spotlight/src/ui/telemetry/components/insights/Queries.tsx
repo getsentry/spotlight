@@ -2,21 +2,17 @@ import { ReactComponent as Sort } from "@spotlight/ui/assets/sort.svg";
 import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
 import { cn } from "@spotlight/ui/lib/cn";
 import { TimeBar } from "@spotlight/ui/telemetry/components/shared/TimeBar";
-import { DB_SPAN_REGEX, QUERIES_HEADERS, QUERIES_SORT_KEYS } from "@spotlight/ui/telemetry/constants";
+import { QUERIES_HEADERS, QUERIES_SORT_KEYS } from "@spotlight/ui/telemetry/constants";
 import { useSentrySpans } from "@spotlight/ui/telemetry/data/useSentrySpans";
 import useSort from "@spotlight/ui/telemetry/hooks/useSort";
-import type { Span } from "@spotlight/ui/telemetry/types";
 import { getFormattedDuration, getSpanDurationClassName } from "@spotlight/ui/telemetry/utils/duration";
 import Table from "@spotlight/ui/ui/table";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { type QuerySummary, getQuerySummaries } from "../../../../telemetry/selectors/database.ts";
 import EmptyState from "../shared/EmptyState";
 
-type QueryInfo = {
-  avgDuration: number;
-  totalTime: number;
-  description: string;
-};
+type QueryInfo = QuerySummary;
 type QueryInfoComparator = (a: QueryInfo, b: QueryInfo) => number;
 type QuerySortTypes = (typeof QUERIES_SORT_KEYS)[keyof typeof QUERIES_SORT_KEYS];
 
@@ -26,21 +22,8 @@ const COMPARATORS: Record<QuerySortTypes, QueryInfoComparator> = {
     if (a.description > b.description) return 1;
     return 0;
   },
-  [QUERIES_SORT_KEYS.avgDuration]: (a, b) => a.avgDuration - b.avgDuration,
-  [QUERIES_SORT_KEYS.totalTime]: (a, b) => a.totalTime - b.totalTime,
-};
-
-const calculateQueryInfo = ({ query, spanData }: { query: string; spanData: Span[] }): QueryInfo => {
-  const queryTypeData = spanData.filter((span: Span) => span.description === query);
-  const times = queryTypeData.map((span: Span) => span.timestamp - span.start_timestamp);
-  const totalTimeInMs = times.reduce((acc: number, time: number) => acc + time, 0);
-  const avgDuration = totalTimeInMs / times.length;
-
-  return {
-    avgDuration,
-    totalTime: totalTimeInMs,
-    description: query,
-  };
+  [QUERIES_SORT_KEYS.avgDuration]: (a, b) => a.averageDurationMs - b.averageDurationMs,
+  [QUERIES_SORT_KEYS.totalTime]: (a, b) => a.totalDurationMs - b.totalDurationMs,
 };
 
 const Queries = () => {
@@ -50,17 +33,10 @@ const Queries = () => {
 
   const queriesData: QueryInfo[] = useMemo(() => {
     const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.totalTime];
-    const spans = allSpans;
-    const onlyDBSpans = spans.filter((span: Span) => DB_SPAN_REGEX.test(span.op || ""));
-    const uniqueSpansSet = new Set(onlyDBSpans.map(span => (span.description ?? "").trim()));
-    // Clear out empty ones (they collapse as a single empty string since this is a set)
-    uniqueSpansSet.delete("");
-    return [...uniqueSpansSet]
-      .map(query => calculateQueryInfo({ query, spanData: onlyDBSpans }))
-      .sort((a, b) => (sort.asc ? compareQueryInfo(a, b) : compareQueryInfo(b, a)));
+    return getQuerySummaries(allSpans).sort((a, b) => (sort.asc ? compareQueryInfo(a, b) : compareQueryInfo(b, a)));
   }, [allSpans, sort]);
 
-  const maxTime = Math.max(...queriesData.map(query => query.totalTime));
+  const maxTime = Math.max(...queriesData.map(query => query.totalDurationMs));
 
   const handleRowClick = (query: QueryInfo) => {
     navigate(`/telemetry/insights/queries/${btoa(query.description)}`);
@@ -128,16 +104,23 @@ const Queries = () => {
             className="hover:bg-primary-900 cursor-pointer"
           >
             <td className="text-primary-200 w-2/5 truncate whitespace-nowrap px-6 py-4 text-left text-sm font-medium">
-              <TimeBar value={query.totalTime} maxValue={maxTime} title={query.description} className="text-lime-500">
+              <TimeBar
+                value={query.totalDurationMs}
+                maxValue={maxTime}
+                title={query.description}
+                className="text-lime-500"
+              >
                 {query.description}
               </TimeBar>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              <span className={getSpanDurationClassName(query.totalTime)}>{getFormattedDuration(query.totalTime)}</span>
+              <span className={getSpanDurationClassName(query.totalDurationMs)}>
+                {getFormattedDuration(query.totalDurationMs)}
+              </span>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              <span className={getSpanDurationClassName(query.avgDuration)}>
-                {getFormattedDuration(query.avgDuration)}
+              <span className={getSpanDurationClassName(query.averageDurationMs)}>
+                {getFormattedDuration(query.averageDurationMs)}
               </span>
             </td>
           </tr>

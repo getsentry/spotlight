@@ -1,4 +1,4 @@
-import type { SentryEvent } from "../../types";
+import type { ProcessedEvent } from "../../../../sdk/core.ts";
 import Attachment from "../insights/envelopes/Attachment";
 import { CodeViewer } from "../insights/envelopes/CodeViewer";
 import { ContextView } from "../shared/ContextView";
@@ -18,12 +18,12 @@ const exampleContext = (
   </div>
 );
 
-export default function EventContexts({ event }: { event: SentryEvent }) {
+export default function EventContexts({ event }: { event: ProcessedEvent }) {
   if (!event) {
     return exampleContext;
   }
 
-  const contexts: Record<string, Record<string, unknown> | null> = {
+  const contexts: Record<string, Record<string, unknown> | null | undefined> = {
     request: event.request,
     ...event.contexts,
   };
@@ -33,7 +33,7 @@ export default function EventContexts({ event }: { event: SentryEvent }) {
   }
 
   if (event.modules) {
-    contexts.extra = Object.assign(contexts.extra || {}, { modules: event.modules });
+    contexts.extra = { ...contexts.extra, modules: event.modules };
   }
 
   const contextEntries = Object.entries(contexts).filter(entry => entry[1]) as [string, Record<string, unknown>][];
