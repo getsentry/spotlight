@@ -90,7 +90,7 @@ export type TraceContext = EventEnvelopeHeaders["trace"] & {
   status?: "ok" | string;
   description?: string;
   parent_span_id?: string;
-  data?: Record<string, string>;
+  data?: Record<string, unknown>;
   op?: string;
 };
 
@@ -150,6 +150,14 @@ export type SentryTransactionEvent = CommonEventAttrs & {
   contexts: Contexts & {
     trace: TraceContext;
   };
+};
+
+// Standalone spans are normalized at the envelope boundary. Only segment spans
+// are represented as transactions; child spans remain individual spans.
+export type SentrySpanEvent = CommonEventAttrs & {
+  type: "span";
+  span: Span;
+  is_segment: boolean;
 };
 
 export type ProfileSample = {
@@ -298,6 +306,7 @@ export type SentryFeedbackEvent = CommonEventAttrs & {
 export type SentryEvent =
   | SentryErrorEvent
   | SentryTransactionEvent
+  | SentrySpanEvent
   | SentryProfileV1Event
   | SentryProfileV2ChunkEvent
   | SentryLogEvent
