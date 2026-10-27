@@ -64,13 +64,15 @@ export function decodeEnvelope(
       return null;
     }
     const payloadLength = itemHeader.length;
+    // Permissive mode allows truncated payloads, never invalid buffer indices.
+    if (payloadLength !== undefined && (!Number.isSafeInteger(payloadLength) || payloadLength < 0)) {
+      reportError("Malformed envelope item length, skipping envelope...");
+      return null;
+    }
     if (
       strict &&
       payloadLength !== undefined &&
-      (!Number.isInteger(payloadLength) ||
-        payloadLength < 0 ||
-        payloadLength > buffer.length ||
-        (payloadLength < buffer.length && buffer[payloadLength] !== 0xa))
+      (payloadLength > buffer.length || (payloadLength < buffer.length && buffer[payloadLength] !== 0xa))
     ) {
       reportError("Malformed envelope item length, skipping envelope...");
       return null;

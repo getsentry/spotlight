@@ -50,6 +50,15 @@ describe("portable byte envelope codec", () => {
     expect(errors).toHaveBeenCalledOnce();
   });
 
+  test.each([-1, -100, 1.5, "1", null, false])("rejects invalid item length %j in both decoder modes", length => {
+    const bytes = encode(`{}\n${JSON.stringify({ type: "attachment", length })}\n`);
+    for (const strict of [false, true]) {
+      const errors = vi.fn();
+      expect(decodeEnvelope(bytes, undefined, errors, strict)).toBeNull();
+      expect(errors).toHaveBeenCalledOnce();
+    }
+  });
+
   test.each([
     ["sentry.javascript.nextjs", "Mozilla/5.0 Chrome/131.0.0.0 Safari/537.36", "browser"],
     ["sentry.cocoa", "Mozilla/5.0 Safari/605", "mobile"],
