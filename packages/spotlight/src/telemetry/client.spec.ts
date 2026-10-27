@@ -185,7 +185,7 @@ test("retention preserves identities of profile spans derived from retained enve
   await client.ingestEnvelope(spans("evict-me"));
   for (const file of ["transaction.txt", "profile_chunk_1.txt"]) {
     const body = readFileSync(new URL(`../../_fixtures/continuous_profiling/${file}`, import.meta.url));
-    const result = await client.ingest({ body });
+    const result = await client.ingestPayload({ body });
     expect(result.status).toBe("processed");
   }
   const traceId = "f1e2d3c4b5a6978012345678901234ab";

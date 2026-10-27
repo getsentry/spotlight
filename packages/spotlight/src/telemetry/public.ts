@@ -1,4 +1,13 @@
-import type { Envelope } from "@sentry/core";
+import type { Envelope, EnvelopeItem } from "@sentry/core";
+import type {
+  BatchOptions,
+  ChangeMetadata,
+  Diagnostic,
+  IngestOptions,
+  IngestResult,
+  IngestStats,
+} from "./contracts.ts";
+import type { TelemetryReader } from "./reader.ts";
 import type {
   ProfileFunctionSummary as InternalProfileFunctionSummary,
   QuerySummary as InternalQuerySummary,
@@ -10,7 +19,6 @@ import type {
   Sdk,
   SentryErrorEvent,
   SentryEvent,
-  SentryEventWithPerformanceData,
   SentryLogEventItem,
   SentryProfileWithTraceMeta,
   Span,
@@ -30,7 +38,9 @@ export type DeepReadonly<T> = T extends (...args: never[]) => unknown
           : T;
 
 /** A parsed Sentry wire envelope; input timestamps retain their wire units. */
-export type RawEnvelope = Envelope;
+// Item payloads remain unknown: forward-compatible wire records include span-v2
+// containers that older @sentry/core payload unions cannot represent.
+export type RawEnvelope = [Envelope[0], [EnvelopeItem[0], unknown][]];
 export type ProcessedEvent = DeepReadonly<SentryEvent>;
 export type ProcessedSpan = DeepReadonly<Span>;
 export type ProcessedTrace = DeepReadonly<Trace>;
@@ -40,28 +50,29 @@ export type AITrace = DeepReadonly<InternalAITrace>;
 export type QuerySummary = DeepReadonly<InternalQuerySummary>;
 export type ResourceSummary = DeepReadonly<InternalResourceSummary>;
 export type ProfileFunctionSummary = DeepReadonly<InternalProfileFunctionSummary>;
-export type Diagnostic = { readonly code: string; readonly message: string };
-export type IngestResult =
-  | { readonly status: "processed"; readonly envelopeId: string; readonly diagnostics: readonly Diagnostic[] }
-  | {
-      readonly status: "ignored";
-      readonly reason: string;
-      readonly envelopeId?: string;
-      readonly diagnostics: readonly Diagnostic[];
-    }
-  | { readonly status: "invalid"; readonly diagnostics: readonly Diagnostic[] };
-export type TraceFilter = { traceId?: string };
-export type EventFilter = TraceFilter & { spanId?: string };
-export type DatabaseQueryFilter = TraceFilter & { description?: string };
+export type * from "./contracts.ts";
+export type {
+  TraceReadFilter as TraceFilter,
+  EventReadFilter as EventFilter,
+  DatabaseReadFilter as DatabaseQueryFilter,
+} from "./reader.ts";
 export type RetentionOptions = {
   /** Maximum retained envelopes, including all telemetry derived from them. Default: 500. */
   maxEnvelopes?: number;
   /** Optional maximum age since receipt. Expiration runs automatically; dispose releases the timer. */
   maxAgeMs?: number;
+  /** Serialized retained-envelope budget. Default: 64 MiB. */
+  maxBytes?: number;
 };
 export type IngesterOptions = {
   retention?: RetentionOptions;
-  enrichStacktrace?: (event: SentryErrorEvent) => Promise<void>;
+  enrichStacktrace?: (event: SentryErrorEvent, context: { signal: AbortSignal }) => Promise<void>;
+  /** Maximum ingestion operations, including active work. Default: 64. Overflow returns ignored/queue_full. */
+  maxPending?: number;
+  /** Maximum serialized parsed envelope size. Default: 32 MiB. */
+  maxEnvelopeBytes?: number;
+  /** Optional enrichment deadline. Default: 5000 ms. */
+  enrichmentTimeoutMs?: number;
   onDiagnostic?: (diagnostic: Diagnostic) => void;
 };
 export type IngesterSnapshot = {
@@ -73,27 +84,13 @@ export type IngesterSnapshot = {
   readonly sdks: readonly DeepReadonly<Sdk>[];
   readonly profiles: ReadonlyMap<string, ProcessedProfile>;
 };
-export type Ingester = {
-  ingestEnvelope: (input: unknown) => Promise<IngestResult>;
-  getSnapshot: () => IngesterSnapshot;
-  getEnvelope: (id: string) => DeepReadonly<RawEnvelope> | undefined;
-  getEnvelopes: () => readonly DeepReadonly<RawEnvelope>[];
-  getEvent: (id: string) => ProcessedEvent | undefined;
-  getEvents: (filter?: EventFilter) => readonly ProcessedEvent[];
-  getErrors: (filter?: EventFilter) => readonly DeepReadonly<SentryErrorEvent>[];
-  getTrace: (id: string) => ProcessedTrace | undefined;
-  getTraces: (filter?: TraceFilter) => readonly ProcessedTrace[];
-  getSpans: (filter?: TraceFilter) => readonly ProcessedSpan[];
-  getLog: (id: string) => ProcessedLog | undefined;
-  getLogs: (filter?: TraceFilter) => readonly ProcessedLog[];
-  getProfile: (traceId: string) => ProcessedProfile | undefined;
-  getProfileFunctionSummaries: (filter?: TraceFilter) => readonly ProfileFunctionSummary[];
-  getQuerySummaries: (filter?: DatabaseQueryFilter) => readonly QuerySummary[];
-  getResourceSummaries: (filter?: TraceFilter) => readonly ResourceSummary[];
-  getAITraces: (filter?: TraceFilter) => readonly AITrace[];
-  getWebVitals: () => readonly DeepReadonly<SentryEventWithPerformanceData>[];
-  getSdks: () => readonly DeepReadonly<Sdk>[];
-  subscribe: (listener: (snapshot: IngesterSnapshot) => void) => () => void;
+export type Ingester = TelemetryReader & {
+  ingestEnvelope: (input: unknown, options?: IngestOptions) => Promise<IngestResult>;
+  ingestBatch: (inputs: Iterable<unknown>, options?: BatchOptions) => Promise<readonly IngestResult[]>;
+  /** Wait for operations submitted before this call; future operations are excluded. */
+  drain: () => Promise<void>;
+  getStats: () => IngestStats;
+  subscribe: (listener: (snapshot: IngesterSnapshot, change: ChangeMetadata) => void) => () => void;
   reset: () => void;
   prune: () => Promise<void>;
   dispose: () => void;

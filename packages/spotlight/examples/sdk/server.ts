@@ -1,9 +1,12 @@
 import { createServer } from "node:http";
 import { createPipeline } from "@spotlightjs/spotlight/sdk/node";
 
+const maxPayloadBytes = 8 * 1024 * 1024;
+
 /** Embed the SDK in an HTTP server; the SDK itself does not open a port. */
 export function createTelemetryServer() {
   const pipeline = createPipeline({
+    maxPayloadBytes,
     rawBufferSize: 100,
     retention: { maxEnvelopes: 1000, maxAgeMs: 10 * 60 * 1000 },
   });
@@ -13,13 +16,30 @@ export function createTelemetryServer() {
       response.setHeader("content-type", "application/json");
       if (request.method === "POST" && url.pathname === "/envelope") {
         const chunks: Buffer[] = [];
-        for await (const chunk of request) chunks.push(Buffer.from(chunk));
-        const result = await pipeline.ingest({
+        let bytes = 0;
+        for await (const chunk of request) {
+          const buffer = Buffer.from(chunk);
+          bytes += buffer.length;
+          // Bound HTTP collection too: SDK limits only apply once the body is passed in.
+          if (bytes > maxPayloadBytes) {
+            response.writeHead(413).end(JSON.stringify({ error: "Payload too large" }));
+            return;
+          }
+          chunks.push(buffer);
+        }
+        const controller = new AbortController();
+        const abort = () => controller.abort();
+        response.once("close", abort);
+        const deliveryId = request.headers["idempotency-key"];
+        const result = await pipeline.ingestPayload({
           body: Buffer.concat(chunks),
           contentType: request.headers["content-type"],
           encoding: request.headers["content-encoding"],
           userAgent: request.headers["user-agent"],
+          deliveryId: typeof deliveryId === "string" ? deliveryId : undefined,
+          signal: controller.signal,
         });
+        response.off("close", abort);
         response.statusCode = result.status === "invalid" ? 400 : 202;
         response.end(JSON.stringify(result));
         return;

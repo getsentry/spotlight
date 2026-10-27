@@ -1,4 +1,4 @@
-import { createIngester } from "@spotlightjs/spotlight/sdk/core";
+import { type IngestOptions, createIngester } from "@spotlightjs/spotlight/sdk/core";
 
 /** Keep one instance for the lifetime of the telemetry view. */
 export function createFrontendTelemetry() {
@@ -6,7 +6,7 @@ export function createFrontendTelemetry() {
   return {
     ingester,
     // Pass the parsed envelopes received over SSE, WebSocket, or your own transport.
-    receiveEnvelope: (envelope: unknown) => ingester.ingestEnvelope(envelope),
+    receiveEnvelope: (envelope: unknown, options?: IngestOptions) => ingester.ingestEnvelope(envelope, options),
     disconnect: ingester.dispose,
   };
 }

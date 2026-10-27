@@ -1,9 +1,16 @@
-import type { Ingester } from "@spotlightjs/spotlight/sdk/core";
+import type { Ingester, TelemetryReader } from "@spotlightjs/spotlight/sdk/core";
 import { useSyncExternalStore } from "react";
 
-export function QueryList({ ingester, traceId }: { ingester: Ingester; traceId?: string }) {
-  useSyncExternalStore(ingester.subscribe, ingester.getSnapshot, ingester.getSnapshot);
-  const queries = ingester.getQuerySummaries({ traceId });
+type Props = {
+  reader: TelemetryReader;
+  subscribe: Ingester["subscribe"];
+  traceId?: string;
+};
+
+/** Pass reader={ingester} subscribe={ingester.subscribe}; the view cannot ingest or reset. */
+export function QueryList({ reader, subscribe, traceId }: Props) {
+  useSyncExternalStore(subscribe, reader.getSnapshot, reader.getSnapshot);
+  const queries = reader.getQuerySummaries({ traceId });
   return (
     <ul>
       {queries.map(query => (

@@ -13,24 +13,20 @@ export function setTelemetrySidecarUrl(url: string) {
 }
 
 const spotlight = createIngester({
-  enrichStacktrace: async event => {
+  enrichStacktrace: async (event, { signal }) => {
     await Promise.all(
       (event.exception?.values ?? []).map(async exception => {
         const frames = exception.stacktrace?.frames;
         if (!frames || frames.every(frame => frame.post_context && frame.pre_context && frame.context_line)) return;
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000);
         try {
           const response = await getNativeFetchImplementation()(contextLinesProvider, {
             method: "PUT",
             body: JSON.stringify(exception.stacktrace),
-            signal: controller.signal,
+            signal,
           });
           if (response.status === 200) exception.stacktrace = await response.json();
         } catch {
           // Optional context must not prevent sibling exceptions from finishing enrichment.
-        } finally {
-          clearTimeout(timeout);
         }
       }),
     );

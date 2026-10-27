@@ -35,7 +35,7 @@ function span(overrides: Record<string, unknown> = {}) {
 describe("shared Telemetry SDK", () => {
   test("ingests compressed v2 spans into traces and query summaries without a browser", async () => {
     const spotlight = createPipeline();
-    const result = await spotlight.ingest({ body: gzipSync(fixture), encoding: "gzip", contentType });
+    const result = await spotlight.ingestPayload({ body: gzipSync(fixture), encoding: "gzip", contentType });
     if (result.status !== "processed") throw new Error("Expected processed envelope");
     expect(spotlight.getQuerySummaries()).toMatchObject([
       {
@@ -49,7 +49,7 @@ describe("shared Telemetry SDK", () => {
     expect(spotlight.getTrace(traceId)?.spanTree[0].children?.[0].span_id).toBe(queryId);
     expect(spotlight.getSpans({ traceId })).toHaveLength(2);
     expect(spotlight.getEnvelope(result.envelopeId)?.[1][0][1]).toMatchObject({ version: 2, items: [{}, {}] });
-    expect(spotlight.getRawPayload(result.envelopeId)?.body).toEqual(fixture);
+    expect(spotlight.getDecodedPayload(result.envelopeId)?.body).toEqual(fixture);
     expect(spotlight.getEvents()[0]).toMatchObject({
       timestamp: 1793000000250,
       span: { timestamp: 1793000000250, start_timestamp: 1793000000125 },
@@ -178,14 +178,14 @@ describe("shared Telemetry SDK", () => {
   test("isolates instance state and resets buffer and processed data together", async () => {
     const first = createPipeline();
     const second = createPipeline();
-    const ingested = await first.ingest({ body: fixture, contentType });
+    const ingested = await first.ingestPayload({ body: fixture, contentType });
     expect(second.getTraces()).toEqual([]);
     expect(second.getSdks()).toEqual([]);
     first.reset();
     expect(first.getTraces()).toEqual([]);
     expect(first.getQuerySummaries()).toEqual([]);
     expect(first.getEnvelopes()).toEqual([]);
-    if (ingested.status === "processed") expect(first.getRawPayload(ingested.envelopeId)).toBeUndefined();
+    if (ingested.status === "processed") expect(first.getDecodedPayload(ingested.envelopeId)).toBeUndefined();
   });
 
   test("awaits optional stacktrace enrichment before exposing errors and trace correlation", async () => {
@@ -295,7 +295,7 @@ describe("shared Telemetry SDK", () => {
     const spotlight = createPipeline();
     const observed: number[] = [];
     const unsubscribe = spotlight.subscribe(() => observed.push(spotlight.getQuerySummaries().length));
-    await spotlight.ingest({ body: fixture, contentType });
+    await spotlight.ingestPayload({ body: fixture, contentType });
     expect(observed.at(-1)).toBe(1);
     unsubscribe();
     const count = observed.length;
@@ -403,7 +403,7 @@ describe("shared Telemetry SDK", () => {
         new URL("../../_fixtures/continuous_profiling/profile_chunk_1.txt", import.meta.url),
       );
       for (const body of profileFirst ? [profile, transaction] : [transaction, profile]) {
-        await spotlight.ingest({ body, contentType });
+        await spotlight.ingestPayload({ body, contentType });
       }
       const profileTraceId = "f1e2d3c4b5a6978012345678901234ab";
       expect(spotlight.getProfile(profileTraceId)?.samples.length).toBeGreaterThan(0);

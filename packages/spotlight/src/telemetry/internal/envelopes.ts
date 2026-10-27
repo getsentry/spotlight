@@ -1,5 +1,6 @@
 import type { Envelope } from "@sentry/core";
 import { SUPPORTED_EVENT_TYPES } from "../constants/sentry.ts";
+import { opaquePayload } from "../envelope/payload.ts";
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -19,36 +20,14 @@ export function validateEnvelope(input: unknown): input is Envelope {
   );
 }
 
-const TEXT_CONTENT_TYPES = new Set([
-  "text/plain",
-  "text/css",
-  "text/csv",
-  "text/html",
-  "text/javascript",
-  "text/json",
-  "text/x-json",
-  "application/json",
-  "application/ld+json",
-]);
-
-/** Match the wire decoder's attachment representation without requiring Node's Buffer. */
+/** Match serialized opaque items with the shared portable byte policy. */
 export function normalizeEnvelope(input: Envelope): Envelope {
   const envelope = structuredClone(input);
   for (const item of envelope[1]) {
     const [header, payload] = item;
     if (typeof payload !== "string" && !(payload instanceof Uint8Array)) continue;
-    const bytes = typeof payload === "string" ? new TextEncoder().encode(payload) : payload;
-    let data: string;
-    if (TEXT_CONTENT_TYPES.has(header.content_type as string)) {
-      data = new TextDecoder("utf-8", { ignoreBOM: true }).decode(bytes);
-    } else {
-      let binary = "";
-      for (let offset = 0; offset < bytes.length; offset += 0x8000) {
-        binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
-      }
-      data = btoa(binary);
-    }
-    item[1] = { data } as (typeof item)[1];
+    if (!header.content_type && (header.type as string) === "statsd") header.content_type = "text/plain";
+    item[1] = opaquePayload(payload, header.content_type as string) as (typeof item)[1];
   }
   return envelope;
 }

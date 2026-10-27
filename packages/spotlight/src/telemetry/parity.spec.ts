@@ -10,7 +10,7 @@ import { getAITraces, getQuerySummaries, getSpans } from "./selectors/index.ts";
 test("the UI store, browser processor, and Node SDK derive identical traces and queries", async () => {
   const spotlight = createPipeline();
   const browser = createIngester();
-  const result = await spotlight.ingest({
+  const result = await spotlight.ingestPayload({
     body: readFileSync(new URL("../../_fixtures/envelope_span_v2.txt", import.meta.url)),
     contentType: "application/x-sentry-envelope",
   });
@@ -23,7 +23,7 @@ test("the UI store, browser processor, and Node SDK derive identical traces and 
   const uiTraces = useSentryStore.getState().getTraces();
   expect(uiTraces).toEqual(spotlight.getTraces());
   expect(browser.getTraces()).toEqual(spotlight.getTraces());
-  expect(getQuerySummaries(getSpans(uiTraces))).toEqual(spotlight.getQuerySummaries());
+  expect(getQuerySummaries(getSpans(uiTraces))).toEqual(spotlight.getQuerySummaries({ includeSpans: true }));
   expect(browser.getQuerySummaries()).toEqual(spotlight.getQuerySummaries());
   expect(JSON.stringify(envelope)).toBe(original);
   useSentryStore.getState().resetData();
@@ -34,7 +34,7 @@ test("the UI, browser processor, and Node SDK share log, profile, and AI process
   const browser = createIngester();
   useSentryStore.getState().resetData();
   for (const file of ["continuous_profiling/transaction.txt", "continuous_profiling/profile_chunk_1.txt"]) {
-    const result = await spotlight.ingest({
+    const result = await spotlight.ingestPayload({
       body: readFileSync(new URL(`../../_fixtures/${file}`, import.meta.url)),
       contentType: "application/x-sentry-envelope",
     });
