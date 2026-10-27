@@ -38,11 +38,7 @@ export type Pipeline = Ingester & {
 };
 
 const envelopeContentType = "application/x-sentry-envelope";
-const decompressors = new Map([
-  ["gzip", gunzip],
-  ["deflate", inflate],
-  ["br", brotliDecompress],
-]);
+const compressedEncodings = new Set(["gzip", "deflate", "br"]);
 
 function limit(name: string, value: number, allowZero = false): number {
   if (!Number.isSafeInteger(value) || value < (allowZero ? 0 : 1)) {
@@ -121,8 +117,7 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
     }
     const initialCancellation = cancelled();
     if (initialCancellation) return initialCancellation;
-    const decompress = encoding ? decompressors.get(encoding) : undefined;
-    if (decompress) {
+    if (encoding && encoding !== "identity") {
       const controller = new AbortController();
       const abort = () => controller.abort();
       decodeControllers.add(controller);
@@ -131,10 +126,23 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
         // zlib applies this bound while producing output, before a compressed bomb can expand in memory.
         const decodeOptions = { maxOutputLength: maxDecodedBytes, signal: controller.signal };
         body = await new Promise<Buffer>((resolve, reject) => {
-          decompress(body, decodeOptions, (error, output) => {
+          const completed = (error: Error | null, output: Buffer) => {
             if (error) reject(error);
             else resolve(output);
-          });
+          };
+          switch (encoding) {
+            case "gzip":
+              gunzip(body, decodeOptions, completed);
+              break;
+            case "deflate":
+              inflate(body, decodeOptions, completed);
+              break;
+            case "br":
+              brotliDecompress(body, decodeOptions, completed);
+              break;
+            default:
+              reject(new Error("Unsupported content encoding"));
+          }
         });
       } catch (error) {
         const cancellation = cancelled();
@@ -262,7 +270,7 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
       return invalid("unsupported_encoding", "Content encoding must be a string");
     }
     const encoding = input.encoding?.trim().toLowerCase();
-    if (encoding && encoding !== "identity" && !decompressors.has(encoding)) {
+    if (encoding && encoding !== "identity" && !compressedEncodings.has(encoding)) {
       return invalid("unsupported_encoding", `Unsupported content encoding: ${encoding}`);
     }
     const size = typeof input.body === "string" ? Buffer.byteLength(input.body, "utf8") : input.body.byteLength;
