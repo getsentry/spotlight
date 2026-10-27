@@ -26,7 +26,7 @@ function spans(id: string, traceId = "trace", count = 1) {
 afterEach(() => vi.useRealTimers());
 
 test("canonical reads have consistent filters and explicit summary units", async () => {
-  const client = core.createTelemetry();
+  const client = core.createIngester();
   const result = await client.ingestEnvelope(spans("one"));
   expect(result).toMatchObject({ status: "processed", envelopeId: "one", diagnostics: [] });
   expect(client.getQuerySummaries({ traceId: "trace" })).toMatchObject([
@@ -40,7 +40,7 @@ test("canonical reads have consistent filters and explicit summary units", async
 });
 
 test("subscribers see exactly one coherent update per ingestion", async () => {
-  const client = core.createTelemetry();
+  const client = core.createIngester();
   const seen: number[] = [];
   client.subscribe(snapshot => {
     expect(snapshot.events).toHaveLength(3);
@@ -57,7 +57,7 @@ test("subscribers see exactly one coherent update per ingestion", async () => {
 });
 
 test("returned events, nested maps and earlier snapshots cannot mutate engine state", async () => {
-  const client = core.createTelemetry();
+  const client = core.createIngester();
   await client.ingestEnvelope(spans("one"));
   const snapshot = client.getSnapshot();
   const trace = client.getTrace("trace")!;
@@ -75,7 +75,7 @@ test("returned events, nested maps and earlier snapshots cannot mutate engine st
 });
 
 test("snapshots preserve own prototype-named JSON fields without inheriting their values", async () => {
-  const client = core.createTelemetry();
+  const client = core.createIngester();
   const input = JSON.parse(
     '[{"__spotlight_envelope_id":"proto"},[[{"type":"event"},{"event_id":"proto","timestamp":1,"extra":{"__proto__":{"unexpected":true},"kept":1}}]]]',
   );
@@ -91,7 +91,7 @@ test("snapshots preserve own prototype-named JSON fields without inheriting thei
 });
 
 test("invalid and unsupported envelopes return diagnostics without changing the snapshot", async () => {
-  const client = core.createTelemetry();
+  const client = core.createIngester();
   const initial = client.getSnapshot();
   expect(await client.ingestEnvelope(null)).toMatchObject({
     status: "invalid",
@@ -111,7 +111,7 @@ test("invalid and unsupported envelopes return diagnostics without changing the 
 
 test("invalid parsed input reports the same diagnostic to the observer and caller", async () => {
   const diagnostics: string[] = [];
-  const client = core.createTelemetry({ onDiagnostic: diagnostic => diagnostics.push(diagnostic.code) });
+  const client = core.createIngester({ onDiagnostic: diagnostic => diagnostics.push(diagnostic.code) });
   const result = await client.ingestEnvelope(null);
   expect(diagnostics).toEqual(["invalid_envelope"]);
   expect(result.diagnostics.map(diagnostic => diagnostic.code)).toEqual(diagnostics);
@@ -128,7 +128,7 @@ test("a rejected envelope waits for sibling enrichment and cannot poison later e
     entered = resolve;
   });
   let enrichments = 0;
-  const client = core.createTelemetry({
+  const client = core.createIngester({
     enrichStacktrace: async event => {
       enrichments++;
       if (enrichments === 1) {
@@ -163,7 +163,7 @@ test("a rejected envelope waits for sibling enrichment and cannot poison later e
 });
 
 test("malformed spans have diagnostics while mixed valid spans still process", async () => {
-  const client = core.createTelemetry();
+  const client = core.createIngester();
   expect(await client.ingestEnvelope([{}, [[{ type: "span" }, { version: 2, items: [{}] }]]])).toMatchObject({
     status: "invalid",
     diagnostics: [{ code: "invalid_span" }],
@@ -180,8 +180,8 @@ test("malformed spans have diagnostics while mixed valid spans still process", a
 
 test("retention preserves identities of profile spans derived from retained envelopes", async () => {
   const { readFileSync } = await import("node:fs");
-  const { createNodeTelemetry } = await import("../sdk/node.ts");
-  const client = createNodeTelemetry({ retention: { maxEnvelopes: 3 } });
+  const { createPipeline } = await import("../sdk/node.ts");
+  const client = createPipeline({ retention: { maxEnvelopes: 3 } });
   await client.ingestEnvelope(spans("evict-me"));
   for (const file of ["transaction.txt", "profile_chunk_1.txt"]) {
     const body = readFileSync(new URL(`../../_fixtures/continuous_profiling/${file}`, import.meta.url));
@@ -197,7 +197,7 @@ test("retention preserves identities of profile spans derived from retained enve
 });
 
 test("count retention evicts related events, traces, logs and profiles coherently", async () => {
-  const client = core.createTelemetry({ retention: { maxEnvelopes: 1 } });
+  const client = core.createIngester({ retention: { maxEnvelopes: 1 } });
   await client.ingestEnvelope([
     { __spotlight_envelope_id: "old" },
     [
@@ -231,7 +231,7 @@ test("count retention evicts related events, traces, logs and profiles coherentl
 
 test("retention replay preserves generated log IDs and does not repeat enrichment", async () => {
   let enrichments = 0;
-  const client = core.createTelemetry({
+  const client = core.createIngester({
     retention: { maxEnvelopes: 2 },
     enrichStacktrace: async () => {
       enrichments++;
@@ -266,7 +266,7 @@ test("duplicate error IDs have one deterministic enrichment owner across replay"
     entered = resolve;
   });
   let calls = 0;
-  const client = core.createTelemetry({
+  const client = core.createIngester({
     retention: { maxEnvelopes: 2 },
     enrichStacktrace: async () => {
       calls++;
@@ -297,7 +297,7 @@ test("duplicate error IDs have one deterministic enrichment owner across replay"
 
 test("evicting an error owner enriches the retained duplicate from its own exception", async () => {
   const seen: string[] = [];
-  const client = core.createTelemetry({
+  const client = core.createIngester({
     retention: { maxEnvelopes: 3 },
     enrichStacktrace: async event => {
       const exception = event.exception.values![0];
@@ -323,7 +323,7 @@ test("evicting an error owner enriches the retained duplicate from its own excep
 
 test("SDK last-seen times do not advance when retained envelopes replay", async () => {
   vi.useFakeTimers();
-  const client = core.createTelemetry({ retention: { maxEnvelopes: 2 } });
+  const client = core.createIngester({ retention: { maxEnvelopes: 2 } });
   for (const [index, name] of ["old", "keep", "new"].entries()) {
     vi.setSystemTime(1000 * (index + 1));
     await client.ingestEnvelope([
@@ -337,7 +337,7 @@ test("SDK last-seen times do not advance when retained envelopes replay", async 
 
 test("age retention expires while idle and disposes its timer", async () => {
   vi.useFakeTimers();
-  const client = core.createTelemetry({ retention: { maxAgeMs: 1000 } });
+  const client = core.createIngester({ retention: { maxAgeMs: 1000 } });
   await client.ingestEnvelope(spans("old"));
   await vi.advanceTimersByTimeAsync(1000);
   expect(client.getTraces()).toEqual([]);
@@ -358,7 +358,7 @@ test("reset invalidates active and queued work while allowing immediate new inge
   const ready = new Promise<void>(resolve => {
     entered = resolve;
   });
-  const client = core.createTelemetry({
+  const client = core.createIngester({
     enrichStacktrace: () => {
       entered();
       return gate;
@@ -382,7 +382,7 @@ test("reset invalidates active and queued work while allowing immediate new inge
 });
 
 test("subscribers can reset without a later notification restoring stale state", async () => {
-  const client = core.createTelemetry();
+  const client = core.createIngester();
   let reset = false;
   const observed: number[] = [];
   client.subscribe(snapshot => {

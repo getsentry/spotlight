@@ -2,8 +2,8 @@ import type { Envelope } from "@sentry/core";
 import { CONTEXT_LINES_ENDPOINT } from "@spotlight/shared/constants.ts";
 import { DEFAULT_SIDECAR_URL } from "@spotlight/ui/constants";
 import { useStore } from "zustand";
-import { createTelemetry } from "../../../sdk/core.ts";
-import type { IngestResult, TelemetrySnapshot } from "../../../sdk/core.ts";
+import { createIngester } from "../../../sdk/core.ts";
+import type { IngestResult, IngesterSnapshot } from "../../../sdk/core.ts";
 import type { SentryStore, SentryStoreState, Subscription } from "../../../telemetry/store/types.ts";
 import { getNativeFetchImplementation } from "../utils/fetch";
 
@@ -12,7 +12,7 @@ export function setTelemetrySidecarUrl(url: string) {
   contextLinesProvider = new URL(CONTEXT_LINES_ENDPOINT, url).href;
 }
 
-const spotlight = createTelemetry({
+const spotlight = createIngester({
   enrichStacktrace: async event => {
     await Promise.all(
       (event.exception?.values ?? []).map(async exception => {
@@ -95,8 +95,8 @@ const actions = {
     };
   },
 };
-function view(snapshot: TelemetrySnapshot): UiState {
-  const logsByTraceId = new Map<string, Set<TelemetrySnapshot["logs"][number]>>();
+function view(snapshot: IngesterSnapshot): UiState {
+  const logsByTraceId = new Map<string, Set<IngesterSnapshot["logs"][number]>>();
   for (const log of snapshot.logs) {
     if (!log.trace_id) continue;
     const group = logsByTraceId.get(log.trace_id) ?? new Set();

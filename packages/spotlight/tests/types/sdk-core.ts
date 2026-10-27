@@ -1,6 +1,6 @@
-import { type ProcessedEvent, type QuerySummary, createTelemetry } from "@spotlightjs/spotlight/sdk/core";
+import { type ProcessedEvent, type QuerySummary, createIngester } from "@spotlightjs/spotlight/sdk/core";
 
-const telemetry = createTelemetry();
+const telemetry = createIngester();
 const queries: readonly QuerySummary[] = telemetry.getQuerySummaries({ traceId: "trace" });
 const events: readonly ProcessedEvent[] = telemetry.getEvents({ traceId: "trace", spanId: "span" });
 const envelope = telemetry.getEnvelope("envelope");

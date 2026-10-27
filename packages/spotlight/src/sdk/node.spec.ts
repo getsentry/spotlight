@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { brotliCompressSync, deflateSync, gzipSync } from "node:zlib";
 import { describe, expect, test, vi } from "vitest";
-import { createNodeTelemetry } from "./node.ts";
+import { createPipeline } from "./node.ts";
 
 const fixture = readFileSync(new URL("../../_fixtures/envelope_span_v2.txt", import.meta.url));
 
@@ -16,7 +16,7 @@ describe("Node Telemetry adapter", () => {
         Buffer.from(`${JSON.stringify({ type, length: binary.length })}\n`),
         binary,
       ]);
-      const telemetry = createNodeTelemetry();
+      const telemetry = createPipeline();
       const result = await telemetry.ingest({ body });
       expect(result.status).toBe("processed");
       expect(telemetry.getEvent("with-opaque-item")).toBeDefined();
@@ -30,7 +30,7 @@ describe("Node Telemetry adapter", () => {
   test.each(['{}\n{"type":"attachment","length":0}', '{}\n{"type":"attachment"}'])(
     "rejects a truncated item header without its terminating newline: %s",
     async body => {
-      const telemetry = createNodeTelemetry();
+      const telemetry = createPipeline();
       expect((await telemetry.ingest({ body })).status).toBe("invalid");
       expect(telemetry.getEnvelopes()).toEqual([]);
       telemetry.dispose();
@@ -38,7 +38,7 @@ describe("Node Telemetry adapter", () => {
   );
 
   test("accepts an empty attachment payload after a complete item header", async () => {
-    const telemetry = createNodeTelemetry();
+    const telemetry = createPipeline();
     expect((await telemetry.ingest({ body: '{}\n{"type":"attachment","length":0}\n' })).status).toBe("ignored");
     expect(telemetry.getEnvelopes()).toHaveLength(1);
     telemetry.dispose();
@@ -48,7 +48,7 @@ describe("Node Telemetry adapter", () => {
     ["processed", fixture],
     ["unsupported", Buffer.from('{}\n{"type":"attachment","length":5}\nhello')],
   ] as const)("subscribers observe %s raw bytes together with the envelope in one notification", async (_, body) => {
-    const spotlight = createNodeTelemetry();
+    const spotlight = createPipeline();
     const observations: (Buffer | undefined)[] = [];
     spotlight.subscribe(snapshot => {
       const id = String(snapshot.envelopes[0][0].__spotlight_envelope_id);
@@ -59,7 +59,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("raw history bounds already apply when subscribers observe the next envelope", async () => {
-    const spotlight = createNodeTelemetry({ rawBufferSize: 1 });
+    const spotlight = createPipeline({ rawBufferSize: 1 });
     const first = await spotlight.ingest({ body: fixture });
     if (first.status !== "processed") throw new Error("Expected processed envelope");
     const observations: { old: Buffer | undefined; newest: Buffer | undefined }[] = [];
@@ -75,7 +75,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("defaults to Sentry envelopes and exposes processed raw payloads", async () => {
-    const spotlight = createNodeTelemetry();
+    const spotlight = createPipeline();
     const result = await spotlight.ingest({ body: fixture });
     expect(result.status).toBe("processed");
     if (result.status !== "processed") throw new Error("Expected processed envelope");
@@ -92,7 +92,7 @@ describe("Node Telemetry adapter", () => {
     ["deflate", deflateSync],
     ["br", brotliCompressSync],
   ] as const)("decodes %s payloads", async (encoding, compress) => {
-    const spotlight = createNodeTelemetry();
+    const spotlight = createPipeline();
     const result = await spotlight.ingest({
       body: new Uint8Array(compress(fixture)),
       contentType: " Application/X-Sentry-Envelope ; charset=utf-8 ",
@@ -105,12 +105,12 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("accepts serialized envelope strings", async () => {
-    const spotlight = createNodeTelemetry();
+    const spotlight = createPipeline();
     expect((await spotlight.ingest({ body: fixture.toString("utf8") })).status).toBe("processed");
   });
 
   test("returns an explicit ignored result for unsupported content types", async () => {
-    const spotlight = createNodeTelemetry();
+    const spotlight = createPipeline();
     expect(await spotlight.ingest({ body: fixture, contentType: "application/json" })).toMatchObject({
       status: "ignored",
       reason: expect.any(String),
@@ -119,7 +119,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("retains raw payloads for valid envelopes containing only unsupported items", async () => {
-    const spotlight = createNodeTelemetry();
+    const spotlight = createPipeline();
     const body = Buffer.from('{}\n{"type":"attachment","length":5}\nhello');
     const result = await spotlight.ingest({ body });
     expect(result).toMatchObject({ status: "ignored", reason: "unsupported_items", envelopeId: expect.any(String) });
@@ -150,7 +150,7 @@ describe("Node Telemetry adapter", () => {
     const warnings = vi.spyOn(console, "warn").mockImplementation(() => {});
     const logs = vi.spyOn(console, "log").mockImplementation(() => {});
     try {
-      const spotlight = createNodeTelemetry();
+      const spotlight = createPipeline();
       // Runtime validation is part of the public boundary.
       const result = await spotlight.ingest(input as Parameters<typeof spotlight.ingest>[0]);
       expect(result).toMatchObject({ status: "invalid", diagnostics: [{ code }] });
@@ -164,7 +164,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("copies incoming and returned raw payload bytes", async () => {
-    const spotlight = createNodeTelemetry();
+    const spotlight = createPipeline();
     const body = Buffer.from(fixture);
     const pending = spotlight.ingest({ body });
     body.fill(0);
@@ -178,7 +178,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("bounds raw payload history independently from processed retention", async () => {
-    const spotlight = createNodeTelemetry({ rawBufferSize: 1 });
+    const spotlight = createPipeline({ rawBufferSize: 1 });
     const first = await spotlight.ingest({ body: fixture });
     const second = await spotlight.ingest({ body: fixture });
     if (first.status !== "processed" || second.status !== "processed") throw new Error("Expected envelopes");
@@ -191,7 +191,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("invalid ingestion cannot evict a retained raw payload", async () => {
-    const spotlight = createNodeTelemetry({ rawBufferSize: 1 });
+    const spotlight = createPipeline({ rawBufferSize: 1 });
     const first = await spotlight.ingest({ body: fixture });
     if (first.status !== "processed") throw new Error("Expected processed envelope");
     expect((await spotlight.ingest({ body: "not an envelope" })).status).toBe("invalid");
@@ -202,7 +202,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("retains at most 500 raw payloads by default", async () => {
-    const spotlight = createNodeTelemetry({ retention: { maxEnvelopes: 1 } });
+    const spotlight = createPipeline({ retention: { maxEnvelopes: 1 } });
     const first = await spotlight.ingest({ body: fixture });
     let last = first;
     for (let i = 0; i < 500; i++) last = await spotlight.ingest({ body: fixture });
@@ -213,7 +213,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("zero raw buffer capacity still processes telemetry", async () => {
-    const spotlight = createNodeTelemetry({ rawBufferSize: 0 });
+    const spotlight = createPipeline({ rawBufferSize: 0 });
     const result = await spotlight.ingest({ body: fixture });
     if (result.status !== "processed") throw new Error("Expected processed envelope");
     expect(spotlight.getRawPayload(result.envelopeId)).toBeUndefined();
@@ -222,7 +222,7 @@ describe("Node Telemetry adapter", () => {
 
   test("processed age retention does not expire the separate raw history", async () => {
     vi.useFakeTimers();
-    const spotlight = createNodeTelemetry({ retention: { maxAgeMs: 100 } });
+    const spotlight = createPipeline({ retention: { maxAgeMs: 100 } });
     try {
       const result = await spotlight.ingest({ body: fixture });
       if (result.status !== "processed") throw new Error("Expected processed envelope");
@@ -244,7 +244,7 @@ describe("Node Telemetry adapter", () => {
     const gate = new Promise<void>(resolve => {
       release = resolve;
     });
-    const spotlight = createNodeTelemetry({
+    const spotlight = createPipeline({
       enrichStacktrace: async () => {
         start();
         await gate;
@@ -272,7 +272,7 @@ describe("Node Telemetry adapter", () => {
 
   test("delivers invalid-input diagnostics to the configured observer", async () => {
     const diagnostics: string[] = [];
-    const spotlight = createNodeTelemetry({
+    const spotlight = createPipeline({
       onDiagnostic: diagnostic => {
         diagnostics.push(diagnostic.code);
       },
@@ -283,7 +283,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("throwing diagnostic observers do not reject invalid input", async () => {
-    const spotlight = createNodeTelemetry({
+    const spotlight = createPipeline({
       onDiagnostic: () => {
         throw new Error("observer failed");
       },
@@ -292,7 +292,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("reset from a subscriber cannot repopulate raw payload history", async () => {
-    const spotlight = createNodeTelemetry();
+    const spotlight = createPipeline();
     let reset = false;
     spotlight.subscribe(() => {
       if (!reset && spotlight.getEnvelopes().length > 0) {
@@ -307,7 +307,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("dispose clears raw payloads and prevents subsequent ingestion", async () => {
-    const spotlight = createNodeTelemetry();
+    const spotlight = createPipeline();
     const result = await spotlight.ingest({ body: fixture });
     if (result.status !== "processed") throw new Error("Expected processed envelope");
     spotlight.dispose();

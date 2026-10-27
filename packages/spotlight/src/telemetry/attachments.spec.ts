@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { createTelemetry } from "../sdk/core.ts";
+import { createIngester } from "../sdk/core.ts";
 
 describe("parsed protocol attachments", () => {
   test.each([
@@ -11,7 +11,7 @@ describe("parsed protocol attachments", () => {
   ] as const)(
     "associates %s with its event and retains canonical immutable data",
     async (_, payload, contentType, data) => {
-      const telemetry = createTelemetry();
+      const telemetry = createIngester();
       const input = [
         {},
         [
@@ -31,7 +31,7 @@ describe("parsed protocol attachments", () => {
   );
 
   test("retains opaque unsupported items without discarding their accompanying event", async () => {
-    const telemetry = createTelemetry();
+    const telemetry = createIngester();
     const result = await telemetry.ingestEnvelope([
       {},
       [
@@ -52,7 +52,7 @@ describe("parsed protocol attachments", () => {
   });
 
   test("continues to reject primitive payloads for supported telemetry items", async () => {
-    const telemetry = createTelemetry();
+    const telemetry = createIngester();
     const result = await telemetry.ingestEnvelope([{}, [[{ type: "event" }, "not a parsed event"]]]);
     expect(result.status).toBe("invalid");
     expect(telemetry.getEnvelopes()).toEqual([]);

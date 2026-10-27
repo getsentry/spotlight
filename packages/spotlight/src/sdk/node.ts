@@ -1,9 +1,11 @@
 import { Buffer } from "node:buffer";
 import { brotliDecompressSync, gunzipSync, inflateSync } from "node:zlib";
 import { processEnvelope } from "../server/parser/processEnvelope.ts";
-import { type Diagnostic, type IngestResult, type Telemetry, type TelemetryOptions, createTelemetry } from "./core.ts";
+import { type Diagnostic, type IngestResult, type Ingester, type IngesterOptions, createIngester } from "./core.ts";
 
-export type NodeTelemetryOptions = TelemetryOptions & {
+export type { IngesterSnapshot as PipelineSnapshot } from "./core.ts";
+
+export type PipelineOptions = IngesterOptions & {
   /**
    * Maximum decoded raw payloads to retain (default 500); zero disables storage.
    * This history is independent of processed telemetry retention and prune().
@@ -11,7 +13,7 @@ export type NodeTelemetryOptions = TelemetryOptions & {
   rawBufferSize?: number;
 };
 
-export type NodeIngestInput = {
+export type PipelineInput = {
   body: Uint8Array | string;
   contentType?: string;
   encoding?: string;
@@ -19,8 +21,8 @@ export type NodeIngestInput = {
 };
 
 export type RawPayload = { body: Buffer; contentType: string };
-export type NodeTelemetry = Telemetry & {
-  ingest(input: NodeIngestInput): Promise<IngestResult>;
+export type Pipeline = Ingester & {
+  ingest(input: PipelineInput): Promise<IngestResult>;
   getRawPayload(envelopeId: string): RawPayload | undefined;
 };
 
@@ -31,13 +33,13 @@ const decompressors = new Map<string, (body: Buffer) => Buffer>([
   ["br", brotliDecompressSync],
 ]);
 
-/** Decode serialized Sentry envelopes into an independent Telemetry processing instance. */
-export function createNodeTelemetry(options: NodeTelemetryOptions = {}): NodeTelemetry {
+/** Decode serialized Sentry envelopes with Node APIs, then process them through the shared ingester. */
+export function createPipeline(options: PipelineOptions = {}): Pipeline {
   const rawBufferSize = options.rawBufferSize ?? 500;
   if (!Number.isSafeInteger(rawBufferSize) || rawBufferSize < 0) {
     throw new RangeError("rawBufferSize must be a non-negative safe integer");
   }
-  const telemetry = createTelemetry(options);
+  const telemetry = createIngester(options);
   const rawPayloads = new Map<string, RawPayload>();
   const stagedPayloads = new Map<string, RawPayload>();
   let generation = 0;

@@ -6,9 +6,9 @@ import type {
   Diagnostic,
   EventFilter,
   IngestResult,
-  Telemetry,
-  TelemetryOptions,
-  TelemetrySnapshot,
+  Ingester,
+  IngesterOptions,
+  IngesterSnapshot,
   TraceFilter,
 } from "./public.ts";
 import {
@@ -27,7 +27,7 @@ import { generateUuidv4 } from "./uuid.ts";
 type RetainedEnvelope = { id: string; envelope: Envelope; receivedAtMs: number };
 
 /** Portable, independently owned telemetry with immutable committed reads. */
-export function createTelemetry(options: TelemetryOptions = {}): Telemetry {
+export function createIngester(options: IngesterOptions = {}): Ingester {
   const maxEnvelopes = options.retention?.maxEnvelopes ?? 500;
   const maxAgeMs = options.retention?.maxAgeMs;
   if (!Number.isSafeInteger(maxEnvelopes) || maxEnvelopes < 1)
@@ -41,7 +41,7 @@ export function createTelemetry(options: TelemetryOptions = {}): Telemetry {
   let journal: RetainedEnvelope[] = [];
   let timer: ReturnType<typeof setTimeout> | undefined;
   const identities = new WeakMap<object, string>();
-  const listeners = new Set<(snapshot: TelemetrySnapshot) => void>();
+  const listeners = new Set<(snapshot: IngesterSnapshot) => void>();
   let enrichmentCache = new Map<string, { envelopeId: string; exception: SentryErrorEvent["exception"] }>();
   let currentDiagnostics: Diagnostic[] = [];
   function diagnostic(item: Diagnostic) {
@@ -96,7 +96,7 @@ export function createTelemetry(options: TelemetryOptions = {}): Telemetry {
     return readonlyCopy({ status: "invalid" as const, diagnostics: [item] });
   }
   let engine = makeEngine();
-  function stateSnapshot(): TelemetrySnapshot {
+  function stateSnapshot(): IngesterSnapshot {
     const state = engine.store.getState();
     return readonlyCopy({
       revision,
@@ -117,7 +117,7 @@ export function createTelemetry(options: TelemetryOptions = {}): Telemetry {
       try {
         listener(committed);
       } catch {
-        diagnostic({ code: "subscriber_failed", message: "A Telemetry subscription callback failed." });
+        diagnostic({ code: "subscriber_failed", message: "A telemetry subscription callback failed." });
       }
       if (snapshot !== committed) break;
     }
@@ -177,7 +177,7 @@ export function createTelemetry(options: TelemetryOptions = {}): Telemetry {
   function filteredTraces(filter?: TraceFilter) {
     return snapshot.traces.filter(trace => filter?.traceId === undefined || trace.trace_id === filter.traceId);
   }
-  const client: Telemetry = {
+  const client: Ingester = {
     ingestEnvelope: input => {
       if (disposed) return Promise.resolve(ignored("disposed"));
       if (!validateEnvelope(input))
@@ -267,11 +267,11 @@ export function createTelemetry(options: TelemetryOptions = {}): Telemetry {
     getEvents: filter => (filter ? Object.freeze(filterEvents(filter)) : snapshot.events),
     getErrors: filter =>
       Object.freeze(filterEvents(filter).filter(event => isErrorEvent(event as SentryEvent))) as ReturnType<
-        Telemetry["getErrors"]
+        Ingester["getErrors"]
       >,
     getTrace: id => snapshot.traces.find(trace => trace.trace_id === id),
     getTraces: filter => (filter ? Object.freeze(filteredTraces(filter)) : snapshot.traces),
-    getSpans: filter => Object.freeze(getSpans(filteredTraces(filter) as Trace[])) as ReturnType<Telemetry["getSpans"]>,
+    getSpans: filter => Object.freeze(getSpans(filteredTraces(filter) as Trace[])) as ReturnType<Ingester["getSpans"]>,
     getLog: id => snapshot.logs.find(log => log.id === id),
     getLogs: filter =>
       filter?.traceId === undefined
@@ -337,4 +337,4 @@ export function createTelemetry(options: TelemetryOptions = {}): Telemetry {
   return client;
 }
 
-export type { Telemetry, TelemetryOptions, TelemetrySnapshot, IngestResult, Diagnostic } from "./public.ts";
+export type { Ingester, IngesterOptions, IngesterSnapshot, IngestResult, Diagnostic } from "./public.ts";

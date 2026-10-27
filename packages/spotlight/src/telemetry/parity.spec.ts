@@ -2,14 +2,14 @@
 import { readFileSync } from "node:fs";
 import type { Envelope } from "@sentry/core";
 import { expect, test } from "vitest";
-import { createTelemetry } from "../sdk/core.ts";
-import { createNodeTelemetry } from "../sdk/node.ts";
+import { createIngester } from "../sdk/core.ts";
+import { createPipeline } from "../sdk/node.ts";
 import useSentryStore from "../ui/telemetry/store/store";
 import { getAITraces, getQuerySummaries, getSpans } from "./selectors/index.ts";
 
 test("the UI store, browser processor, and Node SDK derive identical traces and queries", async () => {
-  const spotlight = createNodeTelemetry();
-  const browser = createTelemetry();
+  const spotlight = createPipeline();
+  const browser = createIngester();
   const result = await spotlight.ingest({
     body: readFileSync(new URL("../../_fixtures/envelope_span_v2.txt", import.meta.url)),
     contentType: "application/x-sentry-envelope",
@@ -30,8 +30,8 @@ test("the UI store, browser processor, and Node SDK derive identical traces and 
 });
 
 test("the UI, browser processor, and Node SDK share log, profile, and AI processing", async () => {
-  const spotlight = createNodeTelemetry();
-  const browser = createTelemetry();
+  const spotlight = createPipeline();
+  const browser = createIngester();
   useSentryStore.getState().resetData();
   for (const file of ["continuous_profiling/transaction.txt", "continuous_profiling/profile_chunk_1.txt"]) {
     const result = await spotlight.ingest({

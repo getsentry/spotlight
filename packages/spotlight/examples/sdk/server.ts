@@ -1,9 +1,9 @@
 import { createServer } from "node:http";
-import { createNodeTelemetry } from "@spotlightjs/spotlight/sdk/node";
+import { createPipeline } from "@spotlightjs/spotlight/sdk/node";
 
 /** Embed the SDK in an HTTP server; the SDK itself does not open a port. */
 export function createTelemetryServer() {
-  const telemetry = createNodeTelemetry({
+  const pipeline = createPipeline({
     rawBufferSize: 100,
     retention: { maxEnvelopes: 1000, maxAgeMs: 10 * 60 * 1000 },
   });
@@ -14,7 +14,7 @@ export function createTelemetryServer() {
       if (request.method === "POST" && url.pathname === "/envelope") {
         const chunks: Buffer[] = [];
         for await (const chunk of request) chunks.push(Buffer.from(chunk));
-        const result = await telemetry.ingest({
+        const result = await pipeline.ingest({
           body: Buffer.concat(chunks),
           contentType: request.headers["content-type"],
           encoding: request.headers["content-encoding"],
@@ -26,7 +26,7 @@ export function createTelemetryServer() {
       }
       if (request.method === "GET" && url.pathname === "/queries") {
         const traceId = url.searchParams.get("traceId") ?? undefined;
-        response.end(JSON.stringify(telemetry.getQuerySummaries({ traceId })));
+        response.end(JSON.stringify(pipeline.getQuerySummaries({ traceId })));
         return;
       }
       response.statusCode = 404;
@@ -39,6 +39,6 @@ export function createTelemetryServer() {
       }
     }
   });
-  server.on("close", telemetry.dispose);
-  return { server, telemetry };
+  server.on("close", pipeline.dispose);
+  return { server, pipeline };
 }

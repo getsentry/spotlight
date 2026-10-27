@@ -8,26 +8,28 @@ across server and frontend consumers.
 
 | Entry | Factory | Input |
 | --- | --- | --- |
-| `@spotlightjs/spotlight/sdk/core` | `createTelemetry()` | Parsed Sentry envelopes; portable across server and frontend |
-| `@spotlightjs/spotlight/sdk/node` | `createNodeTelemetry()` | Adds serialized bodies, decompression, and raw payload history |
+| `@spotlightjs/spotlight/sdk/core` | `createIngester()` | Parsed Sentry envelopes; portable across server and frontend |
+| `@spotlightjs/spotlight/sdk/node` | `createPipeline()` | Adds serialized bodies, decompression, and raw payload history |
 | `@spotlightjs/spotlight/sdk` | Existing buffer helpers | Compatibility for existing transport consumers |
 
-The core requires no React, DOM, Node globals, or Zustand knowledge. Each instance
-owns its state. The SDK does not start a server or synchronize instances; feed
+`createIngester()` runs on the frontend or server with parsed envelopes.
+`createPipeline()` requires Node APIs for wire decoding and decompression.
+Both share all processing and query logic. The core requires no React, DOM,
+Node globals, or Zustand knowledge. Each instance owns its state. The SDK does not start a server or synchronize instances; feed
 server and frontend instances the same envelope stream when both need processing.
 Match retention settings when comparing their retained histories.
 
 ## Server: receive envelopes and read insights
 
 ```ts
-import { createNodeTelemetry } from "@spotlightjs/spotlight/sdk/node";
+import { createPipeline } from "@spotlightjs/spotlight/sdk/node";
 
-const telemetry = createNodeTelemetry({
+const pipeline = createPipeline({
   rawBufferSize: 100,
   retention: { maxEnvelopes: 1000, maxAgeMs: 10 * 60 * 1000 },
 });
 
-const result = await telemetry.ingest({
+const result = await pipeline.ingest({
   body: Buffer.from(envelopeBody),
   // Defaults to application/x-sentry-envelope.
   // contentType: request.headers["content-type"],
@@ -38,9 +40,9 @@ const result = await telemetry.ingest({
 if (result.status === "invalid") {
   console.error(result.diagnostics);
 } else if (result.status === "processed") {
-  const trace = telemetry.getTrace(traceId);
-  const queries = telemetry.getQuerySummaries({ traceId });
-  const raw = telemetry.getRawPayload(result.envelopeId); // defensive byte copy
+  const trace = pipeline.getTrace(traceId);
+  const queries = pipeline.getQuerySummaries({ traceId });
+  const raw = pipeline.getRawPayload(result.envelopeId); // defensive byte copy
 }
 ```
 
@@ -51,17 +53,17 @@ Call `server.listen(...)` to start that example; closing it disposes its SDK ins
 ## Frontend: process the same stream
 
 ```ts
-import { createTelemetry } from "@spotlightjs/spotlight/sdk/core";
+import { createIngester } from "@spotlightjs/spotlight/sdk/core";
 
-const telemetry = createTelemetry();
+const ingester = createIngester();
 
 // Your SSE/WebSocket handler supplies parsed envelopes.
-await telemetry.ingestEnvelope(parsedEnvelope);
+await ingester.ingestEnvelope(parsedEnvelope);
 
-const queries = telemetry.getQuerySummaries({ traceId });
+const queries = ingester.getQuerySummaries({ traceId });
 // [{ description, count, totalDurationMs, averageDurationMs, spans }]
-const logs = telemetry.getLogs({ traceId });
-const spans = telemetry.getSpans({ traceId });
+const logs = ingester.getLogs({ traceId });
+const spans = ingester.getSpans({ traceId });
 ```
 
 See [the frontend lifecycle example](examples/sdk/frontend.ts). Create an instance
@@ -71,13 +73,13 @@ once for the view or application, then call `dispose()` when it is no longer nee
 
 ```tsx
 import { useSyncExternalStore } from "react";
-import type { Telemetry } from "@spotlightjs/spotlight/sdk/core";
+import type { Ingester } from "@spotlightjs/spotlight/sdk/core";
 
-function TraceCount({ telemetry }: { telemetry: Telemetry }) {
+function TraceCount({ ingester }: { ingester: Ingester }) {
   const snapshot = useSyncExternalStore(
-    telemetry.subscribe,
-    telemetry.getSnapshot,
-    telemetry.getSnapshot,
+    ingester.subscribe,
+    ingester.getSnapshot,
+    ingester.getSnapshot,
   );
   return <span>{snapshot.traces.length} traces</span>;
 }
@@ -140,7 +142,7 @@ at that same update. A subscriber or diagnostic observer cannot break ingestion.
 - Processed retention defaults to **500 envelopes**, including telemetry derived
   from them. Set `retention.maxEnvelopes` to another positive integer.
 - Optional `retention.maxAgeMs` measures age since receipt. Expiration runs while
-  idle, and `await telemetry.prune()` can enforce limits explicitly.
+  idle, and `await ingester.prune()` can enforce limits explicitly.
 - Eviction rebuilds derived state from retained envelopes so traces, logs, profiles,
   and insights stay consistent. Enrichment is reused; generated IDs remain stable.
   Rebuilding costs CPU proportional to retained telemetry; use smaller limits for

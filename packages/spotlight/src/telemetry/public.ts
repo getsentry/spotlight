@@ -59,12 +59,12 @@ export type RetentionOptions = {
   /** Optional maximum age since receipt. Expiration runs automatically; dispose releases the timer. */
   maxAgeMs?: number;
 };
-export type TelemetryOptions = {
+export type IngesterOptions = {
   retention?: RetentionOptions;
   enrichStacktrace?: (event: SentryErrorEvent) => Promise<void>;
   onDiagnostic?: (diagnostic: Diagnostic) => void;
 };
-export type TelemetrySnapshot = {
+export type IngesterSnapshot = {
   readonly revision: number;
   readonly envelopes: readonly DeepReadonly<RawEnvelope>[];
   readonly events: readonly ProcessedEvent[];
@@ -73,9 +73,9 @@ export type TelemetrySnapshot = {
   readonly sdks: readonly DeepReadonly<Sdk>[];
   readonly profiles: ReadonlyMap<string, ProcessedProfile>;
 };
-export type Telemetry = {
+export type Ingester = {
   ingestEnvelope: (input: unknown) => Promise<IngestResult>;
-  getSnapshot: () => TelemetrySnapshot;
+  getSnapshot: () => IngesterSnapshot;
   getEnvelope: (id: string) => DeepReadonly<RawEnvelope> | undefined;
   getEnvelopes: () => readonly DeepReadonly<RawEnvelope>[];
   getEvent: (id: string) => ProcessedEvent | undefined;
@@ -93,7 +93,7 @@ export type Telemetry = {
   getAITraces: (filter?: TraceFilter) => readonly AITrace[];
   getWebVitals: () => readonly DeepReadonly<SentryEventWithPerformanceData>[];
   getSdks: () => readonly DeepReadonly<Sdk>[];
-  subscribe: (listener: (snapshot: TelemetrySnapshot) => void) => () => void;
+  subscribe: (listener: (snapshot: IngesterSnapshot) => void) => () => void;
   reset: () => void;
   prune: () => Promise<void>;
   dispose: () => void;

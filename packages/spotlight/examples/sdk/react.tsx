@@ -1,9 +1,9 @@
-import type { Telemetry } from "@spotlightjs/spotlight/sdk/core";
+import type { Ingester } from "@spotlightjs/spotlight/sdk/core";
 import { useSyncExternalStore } from "react";
 
-export function QueryList({ telemetry, traceId }: { telemetry: Telemetry; traceId?: string }) {
-  useSyncExternalStore(telemetry.subscribe, telemetry.getSnapshot, telemetry.getSnapshot);
-  const queries = telemetry.getQuerySummaries({ traceId });
+export function QueryList({ ingester, traceId }: { ingester: Ingester; traceId?: string }) {
+  useSyncExternalStore(ingester.subscribe, ingester.getSnapshot, ingester.getSnapshot);
+  const queries = ingester.getQuerySummaries({ traceId });
   return (
     <ul>
       {queries.map(query => (

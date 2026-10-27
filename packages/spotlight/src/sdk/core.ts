@@ -1,8 +1,8 @@
-export { createTelemetry } from "../telemetry/index.ts";
+export { createIngester } from "../telemetry/index.ts";
 export type {
-  Telemetry,
-  TelemetryOptions,
-  TelemetrySnapshot,
+  Ingester,
+  IngesterOptions,
+  IngesterSnapshot,
   RawEnvelope,
   ProcessedEvent,
   ProcessedSpan,
