@@ -40,7 +40,14 @@ export function createTelemetryServer() {
           signal: controller.signal,
         });
         response.off("close", abort);
-        response.statusCode = result.status === "invalid" ? 400 : 202;
+        response.statusCode =
+          result.status === "invalid"
+            ? 400
+            : result.status === "ignored" && result.reason === "unsupported_content_type"
+              ? 415
+              : result.status === "ignored" && ["queue_full", "reset", "disposed", "aborted"].includes(result.reason)
+                ? 503
+                : 202;
         response.end(JSON.stringify(result));
         return;
       }

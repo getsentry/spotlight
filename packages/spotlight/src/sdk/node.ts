@@ -1,4 +1,5 @@
 import { Buffer } from "node:buffer";
+import { types as nodeTypes } from "node:util";
 import { brotliDecompress, gunzip, inflate } from "node:zlib";
 import type { Envelope } from "@sentry/core";
 import type { BatchOptions, DiagnosticCode, IgnoreReason, IngestOptions } from "../telemetry/contracts.ts";
@@ -179,7 +180,7 @@ export function createTelemetryPipeline(options: TelemetryPipelineOptions = {}):
     }
     if (!envelope || parseFailed) return invalid("invalid_envelope", "Malformed serialized Sentry envelope");
     // Normalize the codec's legacy UUID object before staging; the core publishes this exact string ID.
-    const envelopeId = input.deliveryId ?? String(envelope[0].__spotlight_envelope_id);
+    const envelopeId = input.deliveryId ?? envelope[0].__spotlight_envelope_id.toString();
     const parsedEnvelope = envelope as Envelope;
     parsedEnvelope[0].__spotlight_envelope_id = envelopeId;
     const payload = { body, contentType };
@@ -261,7 +262,7 @@ export function createTelemetryPipeline(options: TelemetryPipelineOptions = {}):
 
   type PreparedPayload = { input: TelemetryPayload; body: Buffer; contentType: string; encoding?: string };
   function preparePayload(input: TelemetryPayload): PreparedPayload | IngestResult {
-    if (!input || (typeof input.body !== "string" && !(input.body instanceof Uint8Array))) {
+    if (!input || (typeof input.body !== "string" && !nodeTypes.isUint8Array(input.body))) {
       return invalid("invalid_body", "Envelope body must be a string or Uint8Array");
     }
     if (input.signal?.aborted) return ignored("aborted");

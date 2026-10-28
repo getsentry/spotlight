@@ -31,7 +31,7 @@ function check(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
-const { ingester, receiveEnvelope, disconnect } = createFrontendTelemetry();
+const { telemetry, receiveEnvelope, disconnect } = createFrontendTelemetry();
 const pipeline = createTelemetryPipeline();
 try {
   const input = envelope("one");
@@ -41,7 +41,7 @@ try {
   check(retry.status === "ignored" && retry.reason === "duplicate", "Retained delivery retry");
 
   // Each input gets a receipt. A malformed middle input does not roll back valid neighbors.
-  const batch = await ingester.ingestEnvelopes([envelope("two"), null, envelope("three")]);
+  const batch = await telemetry.ingestEnvelopes([envelope("two"), null, envelope("three")]);
   check(
     batch[0].status === "processed" && batch[1].status === "invalid" && batch[2].status === "processed",
     "Partial batch",
@@ -53,20 +53,20 @@ try {
   }
   const controller = new AbortController();
   controller.abort();
-  const cancelled = await ingester.ingestEnvelope(envelope("cancelled"), { signal: controller.signal });
+  const cancelled = await telemetry.ingestEnvelope(envelope("cancelled"), { signal: controller.signal });
   check(cancelled.status === "ignored" && cancelled.reason === "aborted", "Cancellation receipt");
-  await ingester.drain(); // A barrier for work already submitted, not future submissions.
-  check(ingester.getStats().pending === 0, "Drained work");
+  await telemetry.drain(); // A barrier for work already submitted, not future submissions.
+  check(telemetry.getStats().pending === 0, "Drained work");
 
-  const reader = inspectTrace(ingester, "example-trace");
+  const reader = inspectTrace(telemetry, "example-trace");
   check(JSON.parse(reader.snapshotJson).schemaVersion === 1, "JSON schema");
   check(JSON.parse(reader.profileJson).schemaVersion === 1, "Summary JSON schema");
-  const page = ingester.readPage("events", { limit: 1 });
+  const page = telemetry.readPage("events", { limit: 1 });
   check(page.status === "ok" && page.nextCursor, "Bounded page");
   await receiveEnvelope(envelope("four"));
-  const stale = ingester.readPage("events", { limit: 1, cursor: page.nextCursor });
+  const stale = telemetry.readPage("events", { limit: 1, cursor: page.nextCursor });
   check(stale.status === "invalid" && stale.code === "stale_cursor", "Revision-bound cursor");
-  check(readEventIds(ingester).status === "ok", "Reader-only pagination");
+  check(readEventIds(telemetry).status === "ok", "Reader-only pagination");
 
   const wire = (id: string) => `{}\n${JSON.stringify({ type: "span" })}\n${JSON.stringify(envelope(id)[1][0][1])}`;
   const payloads = await pipeline.ingestPayloads([{ body: wire("node-one") }, { body: "invalid" }]);
@@ -75,7 +75,7 @@ try {
     check(pipeline.getDecodedPayload(payloads[0].envelopeId)?.body.length, "Copied decoded payload");
   }
   await pipeline.drain();
-  console.log(SDK_CAPABILITIES.timestampUnit, first.counts, ingester.getStats());
+  console.log(SDK_CAPABILITIES.timestampUnit, first.counts, telemetry.getStats());
 } finally {
   pipeline.dispose();
   disconnect();

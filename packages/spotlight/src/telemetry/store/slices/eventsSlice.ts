@@ -62,7 +62,7 @@ export const createEventsSlice =
           }
 
           if (isLogEvent(event) && event.items?.length) {
-            const { logsById, logsByTraceId } = get();
+            const { logsById, logsByTraceId, tracesById } = get();
             const existingLogIds = new Set(logsById.keys());
             const { processedLogs } = processLogItems(event, existingLogIds);
 
@@ -70,19 +70,40 @@ export const createEventsSlice =
             // Build up the Maps incrementally to avoid stale state capture
             const newLogsById = new Map(logsById);
             const newLogsByTraceId = new Map(logsByTraceId);
+            const newTracesById = new Map(tracesById);
 
             for (const logItem of processedLogs) {
               newLogsById.set(logItem.id, logItem);
 
-              if (logItem.trace_id) {
+              if (typeof logItem.trace_id === "string" && logItem.trace_id.trim()) {
                 const logSet = newLogsByTraceId.get(logItem.trace_id) || new Set<SentryLogEventItem>();
                 logSet.add(logItem);
                 newLogsByTraceId.set(logItem.trace_id, logSet);
+                // A log batch carries trace IDs on its individual records, not
+                // necessarily on the containing event. Keep log-only traces
+                // discoverable until transactions or spans arrive later.
+                if (Number.isFinite(logItem.timestamp)) {
+                  const trace =
+                    newTracesById.get(logItem.trace_id) ??
+                    initializeTrace({
+                      ...event,
+                      timestamp: logItem.timestamp,
+                      start_timestamp: undefined,
+                      contexts: { trace: { trace_id: logItem.trace_id } },
+                    });
+                  trace.start_timestamp = Math.min(trace.start_timestamp, logItem.timestamp);
+                  trace.timestamp = Math.max(trace.timestamp, logItem.timestamp);
+                  newTracesById.set(logItem.trace_id, trace);
+                }
               }
             }
 
             // Set state once with all accumulated changes
-            set({ logsById: newLogsById, logsByTraceId: newLogsByTraceId });
+            set({
+              logsById: newLogsById,
+              logsByTraceId: newLogsByTraceId,
+              tracesById: newTracesById,
+            });
             if (runtime.generation !== generation) return;
           }
 
@@ -151,7 +172,10 @@ export const createEventsSlice =
             if (mergedV2Profile) {
               const newProfilesByTraceId = new Map(profilesByTraceId);
               newProfilesByTraceId.set(trace.trace_id, mergedV2Profile);
-              set({ tracesById: newTracesById, profilesByTraceId: newProfilesByTraceId });
+              set({
+                tracesById: newTracesById,
+                profilesByTraceId: newProfilesByTraceId,
+              });
             } else {
               set({ tracesById: newTracesById });
             }

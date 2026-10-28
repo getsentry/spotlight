@@ -18,7 +18,7 @@ export function groupSpans(spans: Map<string, Span>): Span[] {
     if (parent) {
       parent.children ??= [];
       parent.children.push(span);
-    } else if (span.parent_span_id) {
+    } else if (span.parent_span_id && span.parent_span_id !== span.span_id) {
       const parentParent = sortedSpans.find(s => !s.parent_span_id);
       if (!parentParent) {
         log(`Root span (${span.parent_span_id}) for span (${span.span_id}). Creating orphan.`);
@@ -54,7 +54,7 @@ export function groupSpans(spans: Map<string, Span>): Span[] {
 }
 
 function getParentOfSpan(span: Span, idLookup: Map<string, Span>, allSpans: Span[]): Span | undefined {
-  if (!span.parent_span_id) {
+  if (!span.parent_span_id || span.parent_span_id === span.span_id) {
     return undefined;
   }
 

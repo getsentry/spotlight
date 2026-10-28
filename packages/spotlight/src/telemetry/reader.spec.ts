@@ -5,8 +5,20 @@ import { createTelemetryReader } from "./reader.ts";
 import type { Span, Trace } from "./types.ts";
 function fixture() {
   const spans: Span[] = [
-    { span_id: "b", start_timestamp: 10, timestamp: 20, op: "db.query", description: "SELECT 1" },
-    { span_id: "a", start_timestamp: 5, timestamp: 20, op: "db.query", description: "SELECT 1" },
+    {
+      span_id: "b",
+      start_timestamp: 10,
+      timestamp: 20,
+      op: "db.query",
+      description: "SELECT 1",
+    },
+    {
+      span_id: "a",
+      start_timestamp: 5,
+      timestamp: 20,
+      op: "db.query",
+      description: "SELECT 1",
+    },
     {
       span_id: "c",
       start_timestamp: 25,
@@ -32,9 +44,21 @@ function fixture() {
     revision: 1,
     envelopes: [],
     events: [
-      { event_id: "b", timestamp: 20, exception: { value: undefined, values: [] } },
-      { event_id: "a", timestamp: 20, exception: { value: undefined, values: [] } },
-      { event_id: "c", timestamp: 30, exception: { value: undefined, values: [] } },
+      {
+        event_id: "b",
+        timestamp: 20,
+        exception: { value: undefined, values: [] },
+      },
+      {
+        event_id: "a",
+        timestamp: 20,
+        exception: { value: undefined, values: [] },
+      },
+      {
+        event_id: "c",
+        timestamp: 30,
+        exception: { value: undefined, values: [] },
+      },
     ],
     traces: [trace],
     logs: [],
@@ -76,18 +100,33 @@ test("summaries default to compact and preserve trace-less legacy spans", () => 
   const { snapshot } = fixture();
   const reader = createTelemetryReader(() => snapshot);
   expect(reader.getDatabaseQuerySummaries({ traceId: "trace", toMs: 20 })).toEqual([
-    { description: "SELECT 1", count: 2, totalDurationMs: 25, averageDurationMs: 12.5 },
+    {
+      description: "SELECT 1",
+      count: 2,
+      totalDurationMs: 25,
+      averageDurationMs: 12.5,
+    },
   ]);
   expect(reader.getDatabaseQuerySummaries({ includeSpans: true })[0].spans).toHaveLength(2);
   expect(reader.getResourceSummaries()).toEqual([
-    { description: "script.js", count: 1, totalDurationMs: 5, averageDurationMs: 5, averageEncodedSizeBytes: 40 },
+    {
+      description: "script.js",
+      count: 1,
+      totalDurationMs: 5,
+      averageDurationMs: 5,
+      averageEncodedSizeBytes: 40,
+      averageSizeBytes: 40,
+    },
   ]);
   expect(reader.getResourceSummaries({ includeSpans: true })[0].spans).toHaveLength(1);
 });
 test("canonical filters share cached identity until revision changes", () => {
   let { snapshot } = fixture();
   const reader = createTelemetryReader(() => snapshot);
-  const first = reader.getDatabaseQuerySummaries({ traceId: "trace", fromMs: 10 });
+  const first = reader.getDatabaseQuerySummaries({
+    traceId: "trace",
+    fromMs: 10,
+  });
   expect(reader.getDatabaseQuerySummaries({ fromMs: 10, traceId: "trace" })).toBe(first);
   expect(reader.getEvents()).toBe(reader.getEvents({}));
   snapshot = { ...snapshot, revision: 2 };
@@ -97,9 +136,20 @@ test("page cursors bind collection, canonical query and revision", () => {
   let { snapshot } = fixture();
   const reader = createTelemetryReader(() => snapshot);
   const first = reader.readPage("events", { limit: 1, fromMs: 20 });
-  expect(first).toMatchObject({ status: "ok", revision: 1, total: 3, items: [{ event_id: "a" }] });
+  expect(first).toMatchObject({
+    status: "ok",
+    revision: 1,
+    total: 3,
+    items: [{ event_id: "a" }],
+  });
   if (first.status !== "ok") throw new Error("expected page");
-  expect(reader.readPage("events", { fromMs: 20, limit: 1, cursor: first.nextCursor })).toMatchObject({
+  expect(
+    reader.readPage("events", {
+      fromMs: 20,
+      limit: 1,
+      cursor: first.nextCursor,
+    }),
+  ).toMatchObject({
     status: "ok",
     items: [{ event_id: "b" }],
   });
@@ -107,17 +157,35 @@ test("page cursors bind collection, canonical query and revision", () => {
     status: "invalid",
     code: "invalid_cursor",
   });
-  expect(reader.readPage("events", { fromMs: 21, limit: 1, cursor: first.nextCursor })).toMatchObject({
+  expect(
+    reader.readPage("events", {
+      fromMs: 21,
+      limit: 1,
+      cursor: first.nextCursor,
+    }),
+  ).toMatchObject({
     status: "invalid",
     code: "invalid_cursor",
   });
   snapshot = { ...snapshot, revision: 2 };
-  expect(reader.readPage("events", { fromMs: 20, limit: 1, cursor: first.nextCursor })).toMatchObject({
+  expect(
+    reader.readPage("events", {
+      fromMs: 20,
+      limit: 1,
+      cursor: first.nextCursor,
+    }),
+  ).toMatchObject({
     status: "invalid",
     code: "stale_cursor",
   });
-  expect(reader.readPage("events", { cursor: "bad" })).toMatchObject({ status: "invalid", code: "invalid_cursor" });
-  expect(reader.readPage("events", { limit: 1001 })).toMatchObject({ status: "invalid", code: "invalid_query" });
+  expect(reader.readPage("events", { cursor: "bad" })).toMatchObject({
+    status: "invalid",
+    code: "invalid_cursor",
+  });
+  expect(reader.readPage("events", { limit: 1001 })).toMatchObject({
+    status: "invalid",
+    code: "invalid_query",
+  });
   expect(reader.readPage("events", { fromMs: 30, toMs: 20 })).toMatchObject({
     status: "invalid",
     code: "invalid_query",
@@ -162,7 +230,10 @@ test("web vitals apply limit after selecting measurements", () => {
       fid: { value: 10, unit: "millisecond" },
     },
   };
-  const reader = createTelemetryReader(() => ({ ...snapshot, events: [...snapshot.events, measured] }));
+  const reader = createTelemetryReader(() => ({
+    ...snapshot,
+    events: [...snapshot.events, measured],
+  }));
   expect(reader.getWebVitals({ limit: 1 }).map(event => event.event_id)).toEqual(["vital"]);
 });
 
@@ -176,5 +247,7 @@ test("reader bounds cached queries while retaining recent identities", () => {
     expect(reader.getEvents({ fromMs: 0 })).toBe(recent);
   }
   expect(reader.getEvents({ fromMs: -1 })).not.toBe(oldest);
-  expect(reader.readPage("events", { limit: 0 })).toMatchObject({ revision: 1 });
+  expect(reader.readPage("events", { limit: 0 })).toMatchObject({
+    revision: 1,
+  });
 });

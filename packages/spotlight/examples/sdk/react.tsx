@@ -7,7 +7,7 @@ type Props = {
   traceId?: string;
 };
 
-/** Pass reader={ingester} subscribe={ingester.subscribe}; the view cannot ingest or reset. */
+/** Pass reader={telemetry} subscribe={telemetry.subscribe}; the view cannot ingest or reset. */
 export function QueryList({ reader, subscribe, traceId }: Props) {
   useSyncExternalStore(subscribe, reader.getSnapshot, reader.getSnapshot);
   const queries = reader.getDatabaseQuerySummaries({ traceId });

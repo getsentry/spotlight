@@ -35,7 +35,11 @@ function profile(): SentryProcessedProfile {
 describe("domain summaries", () => {
   it("groups database spans using normalized millisecond fields and excludes invalid inputs", () => {
     const first = span();
-    const second = span({ span_id: "second", description: "SELECT 1", timestamp: 1030 });
+    const second = span({
+      span_id: "second",
+      description: "SELECT 1",
+      timestamp: 1030,
+    });
     const result = getDatabaseQuerySummaries([
       first,
       span({ op: "http.client" }),
@@ -61,9 +65,15 @@ describe("domain summaries", () => {
   });
 
   it("reports resource size in bytes and retains member spans once", () => {
-    const first = span({ op: "resource.script", data: { "http.response_content_length": 400 } });
+    const first = span({
+      op: "resource.script",
+      data: { "http.response_content_length": 400 },
+    });
     const second = span({ op: "resource.script", timestamp: 1030 });
-    const third = span({ op: "resource.script", data: { "http.response_content_length": "unknown" } });
+    const third = span({
+      op: "resource.script",
+      data: { "http.response_content_length": "unknown" },
+    });
     expect(getResourceSummaries([first, second, third, span()])).toEqual([
       {
         description: "SELECT 1",
@@ -71,6 +81,7 @@ describe("domain summaries", () => {
         totalDurationMs: 50,
         averageDurationMs: 50 / 3,
         averageEncodedSizeBytes: 400 / 3,
+        averageSizeBytes: 400,
         spans: [first, second, third],
       },
     ]);
@@ -82,15 +93,60 @@ describe("domain summaries", () => {
       ["trace-b", profile()],
     ]);
     expect(getProfileFunctionSummaries(profiles)).toEqual([
-      { name: "app@main", totalDurationMs: 80, sampleCount: 4, traceIds: new Set(["trace-a", "trace-b"]) },
-      { name: "app@query", totalDurationMs: 20, sampleCount: 2, traceIds: new Set(["trace-a", "trace-b"]) },
+      {
+        name: "app@main",
+        totalDurationMs: 80,
+        sampleCount: 4,
+        traceIds: new Set(["trace-a", "trace-b"]),
+      },
+      {
+        name: "app@query",
+        totalDurationMs: 20,
+        sampleCount: 2,
+        traceIds: new Set(["trace-a", "trace-b"]),
+      },
     ]);
     expect(getProfileFunctionSummaries(profiles, { traceId: "trace-a" })).toEqual([
-      { name: "app@main", totalDurationMs: 40, sampleCount: 2, traceIds: new Set(["trace-a"]) },
-      { name: "app@query", totalDurationMs: 10, sampleCount: 1, traceIds: new Set(["trace-a"]) },
+      {
+        name: "app@main",
+        totalDurationMs: 40,
+        sampleCount: 2,
+        traceIds: new Set(["trace-a"]),
+      },
+      {
+        name: "app@query",
+        totalDurationMs: 10,
+        sampleCount: 1,
+        traceIds: new Set(["trace-a"]),
+      },
     ]);
     expect(getProfileFunctionSummaries(profiles, { traceId: "missing" })).toEqual([]);
     expect(getProfileFunctionSummaries(new Map([["empty", { ...profile(), samples: [] }]]))).toEqual([]);
     expect(profiles.get("trace-a")?.samples).toHaveLength(3);
   });
+});
+
+it("averages known resource sizes across captured aliases without treating absent or invalid sizes as zero", () => {
+  const sizes = [
+    { "http.response_content_length": 400 },
+    { "http.response.body.size": 200 },
+    { "http.decoded_response_content_length": 300 },
+    {
+      "http.response_content_length": "invalid",
+      "http.response.body.size": 100,
+    },
+    {},
+    { "http.response.body.size": -1 },
+    { "http.response.body.size": Number.NaN },
+    { "http.response.body.size": 0 },
+  ];
+  const result = getResourceSummaries(
+    sizes.map((data, index) => span({ span_id: String(index), op: "resource.script", data })),
+  );
+  expect(result[0]).toMatchObject({
+    count: 8,
+    averageEncodedSizeBytes: 50,
+    averageSizeBytes: 200,
+  });
+  expect(getResourceSummaries([span({ op: "resource.script" })])[0]).not.toHaveProperty("averageSizeBytes");
 });

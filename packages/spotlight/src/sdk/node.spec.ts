@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { readFileSync } from "node:fs";
+import { runInNewContext } from "node:vm";
 import { brotliCompressSync, deflateSync, gzipSync } from "node:zlib";
 import { describe, expect, test, vi } from "vitest";
 import { createTelemetryPipeline } from "./node.ts";
@@ -762,4 +763,28 @@ test("diagnostic callbacks cannot bypass shared admission during core validation
   expect(observed).toEqual([1]);
   expect(await Promise.all(later)).toMatchObject([{ status: "ignored", reason: "queue_full" }]);
   pipeline.dispose();
+});
+
+test("accepts Uint8Array bodies created in another realm", async () => {
+  const body: Uint8Array = runInNewContext("Uint8Array.from(bytes)", { bytes: [...fixture] });
+  expect(body instanceof Uint8Array).toBe(false);
+  const telemetry = createTelemetryPipeline();
+  try {
+    expect((await telemetry.ingestPayload({ body })).status).toBe("processed");
+    expect(telemetry.getTraces().length).toBeGreaterThan(0);
+  } finally {
+    telemetry.dispose();
+  }
+});
+
+test("generated payload identities are canonical UUID strings", async () => {
+  const telemetry = createTelemetryPipeline();
+  try {
+    const result = await telemetry.ingestPayload({ body: fixture });
+    expect(result.status).toBe("processed");
+    if (result.status !== "processed") throw new Error("Expected processed envelope");
+    expect(result.envelopeId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+  } finally {
+    telemetry.dispose();
+  }
 });

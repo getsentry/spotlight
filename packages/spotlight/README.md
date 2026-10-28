@@ -140,7 +140,9 @@ Event reads accept `traceId` and `spanId`; trace/log/span/profile/summary reads
 accept `traceId`; query summaries also accept `description`. The time/order/limit
 filters apply to filtered collection reads, not `getEnvelopes()` or `getSdks()`.
 Summary fields name units explicitly, including `totalDurationMs`,
-`averageDurationMs`, and `averageEncodedSizeBytes`. Stored envelopes retain wire
+`averageDurationMs`, and `averageEncodedSizeBytes`. Resource summaries also expose optional `averageSizeBytes`, averaging known finite, nonnegative response sizes using encoded length, body size, and decoded length fallbacks. Unknown sizes are excluded; `averageEncodedSizeBytes` remains the encoded-specific field.
+
+Stored envelopes retain wire
 timestamp units. Caller input is copied; read results are readonly.
 
 `reset()` clears captured data and decoded history, keeps subscriptions, and
