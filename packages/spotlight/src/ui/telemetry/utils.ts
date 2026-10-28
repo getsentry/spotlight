@@ -1,10 +1,9 @@
 import { removeURLSuffix } from "@spotlight/ui/lib/removeURLSuffix";
 import { log } from "../lib/logger";
-import useSentryStore from "./store";
+import { setTelemetrySidecarUrl } from "./store/store";
 
 export function setSidecarUrlInStore(url: string) {
-  const store = useSentryStore.getState();
   const baseSidecarUrl = removeURLSuffix(url, "/stream");
-  store.setSidecarUrl(baseSidecarUrl);
+  setTelemetrySidecarUrl(baseSidecarUrl);
   log("Set sidecar URL for telemetry:", baseSidecarUrl);
 }

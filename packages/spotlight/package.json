@@ -26,15 +26,14 @@
     "lint:react-refresh": "eslint 'src/ui/**/*.{ts,tsx}'",
     "test": "vitest run",
     "test:dev": "vitest",
+    "test:sdk-types": "node ../../scripts/check-sdk-types.mjs",
     "test:e2e": "pnpm run test:e2e:cli && pnpm run test:e2e:ui && pnpm run test:e2e:electron",
     "test:e2e:cli": "vitest run --config vitest.cli.config.ts",
     "test:e2e:ui": "playwright test tests/e2e/ui",
     "test:e2e:electron": "playwright test tests/electron.test.ts",
     "sample": "node ./_fixtures/send_to_sidecar.cjs"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "bin": {
     "spotlight": "./dist/run.js"
   },
@@ -49,6 +48,14 @@
     "./sdk": {
       "import": "./dist/server/sdk.js",
       "types": "./dist/server/sdk.d.ts"
+    },
+    "./sdk/core": {
+      "types": "./dist/sdk/core.d.ts",
+      "import": "./dist/sdk/core.js"
+    },
+    "./sdk/node": {
+      "types": "./dist/sdk/node.d.ts",
+      "import": "./dist/sdk/node.js"
     }
   },
   "dependencies": {
@@ -69,7 +76,8 @@
     "semver": "^7.7.3",
     "uuidv7": "^1.0.2",
     "yaml": "^2.8.3",
-    "zod": "^4"
+    "zod": "^4",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@fontsource/raleway": "catalog:",
@@ -133,8 +141,7 @@
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-electron": "^0.29.0",
     "vite-plugin-svgr": "^5.2.0",
-    "vitest": "catalog:",
-    "zustand": "^5.0.3"
+    "vitest": "catalog:"
   },
   "volta": {
     "extends": "../../package.json"

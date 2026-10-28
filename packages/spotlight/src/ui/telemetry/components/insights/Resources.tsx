@@ -3,57 +3,15 @@ import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
 import { cn } from "@spotlight/ui/lib/cn";
 import Table from "@spotlight/ui/ui/table";
 import { useMemo } from "react";
+import { type ResourceSummary, getResourceSummaries } from "../../../../telemetry/selectors/resources.ts";
 import { RESOURCES_SORT_KEYS, RESOURCE_HEADERS } from "../../constants";
 import { useSentrySpans } from "../../data/useSentrySpans";
 import useSort from "../../hooks/useSort";
-import type { Span } from "../../types";
 import { formatBytes } from "../../utils/bytes";
 import { getFormattedDuration, getSpanDurationClassName } from "../../utils/duration";
 import EmptyState from "../shared/EmptyState";
 
-type ResourceInfo = {
-  avgDuration: number;
-  totalTime: number;
-  description: string;
-  avgEncodedSize: number;
-  similarResources: Span[];
-};
-
-const calculateResourceInfo = ({ resource, spanData }: { resource: string; spanData: Span[] }): ResourceInfo => {
-  const specificResources = spanData.filter((span: Span) => span.description === resource);
-  const totalTimeInMs = specificResources.reduce(
-    (acc: number, span: Span) => acc + (span.timestamp - span.start_timestamp),
-    0,
-  );
-  const avgDuration = totalTimeInMs / specificResources.length;
-  const avgEncodedSize =
-    specificResources.reduce((acc: number, span: Span) => {
-      const contentLength = span.data?.["http.response_content_length"];
-      if (typeof contentLength === "number") {
-        return acc + contentLength;
-      }
-      return acc;
-    }, 0) / specificResources.length;
-
-  return {
-    avgDuration,
-    totalTime: totalTimeInMs,
-    description: resource,
-    avgEncodedSize,
-    similarResources: specificResources,
-  };
-};
-
-const getResourceSpans = (spans: Span[], options: { type?: string; regex?: RegExp }) => {
-  if (options.type) {
-    return spans.filter((span: Span) => span.description === options.type);
-  }
-  if (options.regex) {
-    const regex = new RegExp(options.regex);
-    return spans.filter((span: Span) => regex.test(span.op || ""));
-  }
-  return [];
-};
+type ResourceInfo = ResourceSummary;
 
 type ResourceInfoComparator = (a: ResourceInfo, b: ResourceInfo) => number;
 type ResourceSortTypes = (typeof RESOURCES_SORT_KEYS)[keyof typeof RESOURCES_SORT_KEYS];
@@ -63,9 +21,9 @@ const COMPARATORS: Record<ResourceSortTypes, ResourceInfoComparator> = {
     if (a.description > b.description) return 1;
     return 0;
   },
-  [RESOURCES_SORT_KEYS.avgEncodedSize]: (a, b) => a.avgEncodedSize - b.avgEncodedSize,
-  [RESOURCES_SORT_KEYS.avgDuration]: (a, b) => a.avgDuration - b.avgDuration,
-  [RESOURCES_SORT_KEYS.totalTime]: (a, b) => a.totalTime - b.totalTime,
+  [RESOURCES_SORT_KEYS.avgEncodedSize]: (a, b) => a.averageEncodedSizeBytes - b.averageEncodedSizeBytes,
+  [RESOURCES_SORT_KEYS.avgDuration]: (a, b) => a.averageDurationMs - b.averageDurationMs,
+  [RESOURCES_SORT_KEYS.totalTime]: (a, b) => a.totalDurationMs - b.totalDurationMs,
 };
 
 const Resources = () => {
@@ -73,18 +31,10 @@ const Resources = () => {
   const { sort, toggleSortOrder } = useSort({ defaultSortType: RESOURCES_SORT_KEYS.totalTime });
 
   const resources = useMemo(() => {
-    const filteredResourceSpans = getResourceSpans(allSpans, { regex: /resource\.[A-Za-z]+/ });
-    const uniqueResourceDescriptionsSet = new Set(filteredResourceSpans.map(span => (span.description ?? "").trim()));
-    // Clear out empty ones (they collapse as a single empty string since this is a set)
-    uniqueResourceDescriptionsSet.delete("");
-    const uniqueResourceDescriptions: string[] = [...uniqueResourceDescriptionsSet];
     const compareResourceInfo = COMPARATORS[sort.active] || COMPARATORS[RESOURCES_SORT_KEYS.totalTime];
-
-    return uniqueResourceDescriptions
-      .map(resource => calculateResourceInfo({ resource, spanData: filteredResourceSpans }))
-      .sort((a, b) => {
-        return sort.asc ? compareResourceInfo(a, b) : compareResourceInfo(b, a);
-      });
+    return getResourceSummaries(allSpans).sort((a, b) =>
+      sort.asc ? compareResourceInfo(a, b) : compareResourceInfo(b, a),
+    );
   }, [sort, allSpans]);
 
   if (!resources?.length) {
@@ -143,17 +93,17 @@ const Resources = () => {
               <span className="cursor-default truncate block">{resource.description}</span>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              <span className={getSpanDurationClassName(resource.avgDuration)}>
-                {getFormattedDuration(resource.avgDuration)}
+              <span className={getSpanDurationClassName(resource.averageDurationMs)}>
+                {getFormattedDuration(resource.averageDurationMs)}
               </span>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              <span className={getSpanDurationClassName(resource.totalTime)}>
-                {getFormattedDuration(resource.totalTime)}
+              <span className={getSpanDurationClassName(resource.totalDurationMs)}>
+                {getFormattedDuration(resource.totalDurationMs)}
               </span>
             </td>
             <td className="text-primary-200 w-[15%] whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              {formatBytes(resource.avgEncodedSize)}
+              {formatBytes(resource.averageEncodedSizeBytes)}
             </td>
           </tr>
         ))}
