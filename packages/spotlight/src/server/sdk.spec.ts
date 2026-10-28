@@ -3,7 +3,7 @@ import { gzipSync } from "node:zlib";
 // @vitest-environment node
 import type { Envelope } from "@sentry/core";
 import { describe, expect, test } from "vitest";
-import { createPipeline } from "../sdk/node.ts";
+import { createTelemetryPipeline } from "../sdk/node.ts";
 import * as sdk from "./sdk.ts";
 
 const traceId = "a9eab6940aba4ae7bf2f8ac5a54c6a2f";
@@ -34,10 +34,10 @@ function span(overrides: Record<string, unknown> = {}) {
 
 describe("shared Telemetry SDK", () => {
   test("ingests compressed v2 spans into traces and query summaries without a browser", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     const result = await spotlight.ingestPayload({ body: gzipSync(fixture), encoding: "gzip", contentType });
     if (result.status !== "processed") throw new Error("Expected processed envelope");
-    expect(spotlight.getQuerySummaries()).toMatchObject([
+    expect(spotlight.getDatabaseQuerySummaries()).toMatchObject([
       {
         count: 1,
         totalDurationMs: 125,
@@ -77,18 +77,18 @@ describe("shared Telemetry SDK", () => {
       ],
     });
     const before = JSON.stringify(input);
-    const first = createPipeline();
-    const second = createPipeline();
+    const first = createTelemetryPipeline();
+    const second = createTelemetryPipeline();
     await first.ingestEnvelope(input);
     await second.ingestEnvelope(input);
     await first.ingestEnvelope(input);
     expect(JSON.stringify(input)).toBe(before);
-    expect(first.getQuerySummaries()).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
-    expect(second.getQuerySummaries()).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
+    expect(first.getDatabaseQuerySummaries()).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
+    expect(second.getDatabaseQuerySummaries()).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
   });
 
   test("keeps child spans when parents arrive later and deduplicates repeated delivery", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     await spotlight.ingestEnvelope(envelope("span", { version: 2, items: [span()] }));
     await spotlight.ingestEnvelope(
       envelope(
@@ -103,7 +103,7 @@ describe("shared Telemetry SDK", () => {
       ),
     );
     await spotlight.ingestEnvelope(envelope("span", { version: 2, items: [span()] }, "redelivery"));
-    expect(spotlight.getQuerySummaries()).toMatchObject([
+    expect(spotlight.getDatabaseQuerySummaries()).toMatchObject([
       { count: 1, description: "SELECT 1", averageDurationMs: 125 },
     ]);
     expect(spotlight.getTrace(traceId)?.spanTree[0].children?.map(s => s.span_id)).toEqual([queryId]);
@@ -111,19 +111,19 @@ describe("shared Telemetry SDK", () => {
   });
 
   test("can scope queries to a trace without merging spans that share an ID", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     await spotlight.ingestEnvelope(
       envelope("span", { version: 2, items: [span(), span({ trace_id: "other-trace" })] }),
     );
-    expect(spotlight.getQuerySummaries()).toMatchObject([{ count: 2, totalDurationMs: 250 }]);
-    expect(spotlight.getQuerySummaries({ traceId })).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
+    expect(spotlight.getDatabaseQuerySummaries()).toMatchObject([{ count: 2, totalDurationMs: 250 }]);
+    expect(spotlight.getDatabaseQuerySummaries({ traceId })).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
     expect(spotlight.getSpans({ traceId: "absent" })).toEqual([]);
   });
 
   test.each([true, false])(
     "merges a legacy transaction and streamed segment for the same span (legacy first: %s)",
     async legacyFirst => {
-      const spotlight = createPipeline();
+      const spotlight = createTelemetryPipeline();
       const legacy = envelope(
         "transaction",
         {
@@ -171,25 +171,25 @@ describe("shared Telemetry SDK", () => {
       expect(trace.rootTransactionName).toBe("request");
       expect(trace.spans.get(rootId)?.op).toBe("http.server");
       expect(trace.spans.get(rootId)?.data).toMatchObject({ legacy: true, streamed: "yes" });
-      expect(spotlight.getQuerySummaries()).toMatchObject([{ count: 2, totalDurationMs: 150 }]);
+      expect(spotlight.getDatabaseQuerySummaries()).toMatchObject([{ count: 2, totalDurationMs: 150 }]);
     },
   );
 
   test("isolates instance state and resets buffer and processed data together", async () => {
-    const first = createPipeline();
-    const second = createPipeline();
+    const first = createTelemetryPipeline();
+    const second = createTelemetryPipeline();
     const ingested = await first.ingestPayload({ body: fixture, contentType });
     expect(second.getTraces()).toEqual([]);
     expect(second.getSdks()).toEqual([]);
     first.reset();
     expect(first.getTraces()).toEqual([]);
-    expect(first.getQuerySummaries()).toEqual([]);
+    expect(first.getDatabaseQuerySummaries()).toEqual([]);
     expect(first.getEnvelopes()).toEqual([]);
     if (ingested.status === "processed") expect(first.getDecodedPayload(ingested.envelopeId)).toBeUndefined();
   });
 
   test("awaits optional stacktrace enrichment before exposing errors and trace correlation", async () => {
-    const spotlight = createPipeline({
+    const spotlight = createTelemetryPipeline({
       enrichStacktrace: async event => {
         await Promise.resolve();
         event.exception!.values![0].stacktrace!.frames[0].context_line = "throw new Error()";
@@ -216,7 +216,7 @@ describe("shared Telemetry SDK", () => {
     const gate = new Promise<void>(resolve => {
       release = resolve;
     });
-    const spotlight = createPipeline({ enrichStacktrace: () => gate });
+    const spotlight = createTelemetryPipeline({ enrichStacktrace: () => gate });
     const pending = spotlight.ingestEnvelope(
       envelope("event", {
         event_id: "error",
@@ -236,7 +236,7 @@ describe("shared Telemetry SDK", () => {
   test.each(["sdks", "logs", "events"] as const)(
     "reset from a %s subscriber cancels the current ingestion",
     async key => {
-      const spotlight = createPipeline();
+      const spotlight = createTelemetryPipeline();
       let reset = false;
       spotlight.subscribe(state => {
         if (!reset && state[key].length > 0) {
@@ -264,7 +264,7 @@ describe("shared Telemetry SDK", () => {
   );
 
   test("normalizes logs and correlates them to traces", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     await spotlight.ingestEnvelope(
       envelope("log", {
         type: "log",
@@ -275,7 +275,7 @@ describe("shared Telemetry SDK", () => {
   });
 
   test("redelivery of the same idless parsed envelope does not duplicate logs", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     const input = [
       {},
       [[{ type: "log" }, { items: [{ timestamp: 1, body: "hello", level: "info", attributes: {} }] }]],
@@ -292,9 +292,9 @@ describe("shared Telemetry SDK", () => {
   });
 
   test("notifies subscribers with completed state and supports unsubscribing", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     const observed: number[] = [];
-    const unsubscribe = spotlight.subscribe(() => observed.push(spotlight.getQuerySummaries().length));
+    const unsubscribe = spotlight.subscribe(() => observed.push(spotlight.getDatabaseQuerySummaries().length));
     await spotlight.ingestPayload({ body: fixture, contentType });
     expect(observed.at(-1)).toBe(1);
     unsubscribe();
@@ -314,7 +314,7 @@ describe("shared Telemetry SDK", () => {
     const gate = new Promise<void>(resolve => {
       release = resolve;
     });
-    const spotlight = createPipeline({ enrichStacktrace: () => gate });
+    const spotlight = createTelemetryPipeline({ enrichStacktrace: () => gate });
     const input = envelope("event", { event_id: "pending", type: "event", timestamp: 1, exception: { values: [] } });
     const first = spotlight.ingestEnvelope(input);
     let secondFinished = false;
@@ -329,7 +329,7 @@ describe("shared Telemetry SDK", () => {
   });
 
   test("an unavailable enrichment adapter does not discard a captured error", async () => {
-    const spotlight = createPipeline({
+    const spotlight = createTelemetryPipeline({
       enrichStacktrace: async () => {
         throw new Error("offline");
       },
@@ -341,7 +341,7 @@ describe("shared Telemetry SDK", () => {
   });
 
   test("shares resource summaries, AI extraction, and web-vitals scoring", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     await spotlight.ingestEnvelope(
       envelope("span", {
         version: 2,
@@ -395,7 +395,7 @@ describe("shared Telemetry SDK", () => {
   test.each([true, false])(
     "associates continuous profiles with their trace (profile first: %s)",
     async profileFirst => {
-      const spotlight = createPipeline();
+      const spotlight = createTelemetryPipeline();
       const transaction = readFileSync(
         new URL("../../_fixtures/continuous_profiling/transaction.txt", import.meta.url),
       );

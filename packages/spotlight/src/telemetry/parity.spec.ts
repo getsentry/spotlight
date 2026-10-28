@@ -2,14 +2,14 @@
 import { readFileSync } from "node:fs";
 import type { Envelope } from "@sentry/core";
 import { expect, test } from "vitest";
-import { createIngester } from "../sdk/core.ts";
-import { createPipeline } from "../sdk/node.ts";
+import { createTelemetryStore } from "../sdk/core.ts";
+import { createTelemetryPipeline } from "../sdk/node.ts";
 import useSentryStore from "../ui/telemetry/store/store";
-import { getAITraces, getQuerySummaries, getSpans } from "./selectors/index.ts";
+import { getAITraces, getDatabaseQuerySummaries, getSpans } from "./selectors/index.ts";
 
 test("the UI store, browser processor, and Node SDK derive identical traces and queries", async () => {
-  const spotlight = createPipeline();
-  const browser = createIngester();
+  const spotlight = createTelemetryPipeline();
+  const browser = createTelemetryStore();
   const result = await spotlight.ingestPayload({
     body: readFileSync(new URL("../../_fixtures/envelope_span_v2.txt", import.meta.url)),
     contentType: "application/x-sentry-envelope",
@@ -23,15 +23,17 @@ test("the UI store, browser processor, and Node SDK derive identical traces and 
   const uiTraces = useSentryStore.getState().getTraces();
   expect(uiTraces).toEqual(spotlight.getTraces());
   expect(browser.getTraces()).toEqual(spotlight.getTraces());
-  expect(getQuerySummaries(getSpans(uiTraces))).toEqual(spotlight.getQuerySummaries({ includeSpans: true }));
-  expect(browser.getQuerySummaries()).toEqual(spotlight.getQuerySummaries());
+  expect(getDatabaseQuerySummaries(getSpans(uiTraces))).toEqual(
+    spotlight.getDatabaseQuerySummaries({ includeSpans: true }),
+  );
+  expect(browser.getDatabaseQuerySummaries()).toEqual(spotlight.getDatabaseQuerySummaries());
   expect(JSON.stringify(envelope)).toBe(original);
   useSentryStore.getState().resetData();
 });
 
 test("the UI, browser processor, and Node SDK share log, profile, and AI processing", async () => {
-  const spotlight = createPipeline();
-  const browser = createIngester();
+  const spotlight = createTelemetryPipeline();
+  const browser = createTelemetryStore();
   useSentryStore.getState().resetData();
   for (const file of ["continuous_profiling/transaction.txt", "continuous_profiling/profile_chunk_1.txt"]) {
     const result = await spotlight.ingestPayload({

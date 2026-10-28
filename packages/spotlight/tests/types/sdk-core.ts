@@ -4,15 +4,15 @@ import {
   type QuerySummary,
   SDK_CAPABILITIES,
   type TelemetryReader,
-  createIngester,
   createTelemetryReader,
+  createTelemetryStore,
   serializeSnapshot,
   serializeSummaries,
   serializeTrace,
 } from "@spotlightjs/spotlight/sdk/core";
 
-const telemetry = createIngester();
-const queries: readonly QuerySummary[] = telemetry.getQuerySummaries({ traceId: "trace", includeSpans: true });
+const telemetry = createTelemetryStore();
+const queries: readonly QuerySummary[] = telemetry.getDatabaseQuerySummaries({ traceId: "trace", includeSpans: true });
 const events: readonly ProcessedEvent[] = telemetry.getEvents({ traceId: "trace", spanId: "span" });
 const envelope = telemetry.getEnvelope("envelope");
 if (envelope) {
@@ -41,7 +41,7 @@ void queries[0].averageDurationMs;
 const reader: TelemetryReader = createTelemetryReader(telemetry.getSnapshot);
 // @ts-expect-error Read-only consumers cannot ingest.
 reader.ingestEnvelope;
-const compact = reader.getQuerySummaries();
+const compact = reader.getDatabaseQuerySummaries();
 // @ts-expect-error Full spans require includeSpans: true.
 const full: readonly QuerySummary[] = compact;
 void full;
@@ -68,7 +68,7 @@ serializeSummaries(queries);
 void version;
 void unit;
 async function receipts() {
-  const results: readonly IngestResult[] = await telemetry.ingestBatch([null], {
+  const results: readonly IngestResult[] = await telemetry.ingestEnvelopes([null], {
     signal: new AbortController().signal,
   });
   const receipt = await telemetry.ingestEnvelope(null, { deliveryId: "retry" });
@@ -88,6 +88,8 @@ async function receipts() {
     void severity;
     void index;
   }
+  const resized: Promise<void> = telemetry.setRetention({ maxEnvelopes: 10 });
+  await resized;
   await telemetry.drain();
   void results;
   void retained;

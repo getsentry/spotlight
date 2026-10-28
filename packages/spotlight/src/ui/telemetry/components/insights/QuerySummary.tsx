@@ -6,7 +6,7 @@ import Breadcrumbs from "@spotlight/ui/ui/breadcrumbs";
 import Table from "@spotlight/ui/ui/table";
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getQuerySummaries } from "../../../../telemetry/selectors/database.ts";
+import { getDatabaseQuerySummaries } from "../../../../telemetry/selectors/database.ts";
 import { QUERY_SUMMARY_HEADERS, QUERY_SUMMARY_SORT_KEYS } from "../../constants";
 import { useSentrySpans } from "../../data/useSentrySpans";
 import useSort from "../../hooks/useSort";
@@ -49,7 +49,7 @@ const QuerySummary = () => {
     const spans = allSpans;
     const compareSpanInfo = COMPARATORS[sort.active] || COMPARATORS[QUERY_SUMMARY_SORT_KEYS.totalTime];
 
-    return (getQuerySummaries(spans, { description: decodedType })[0]?.spans ?? []).sort((a, b) =>
+    return (getDatabaseQuerySummaries(spans, { description: decodedType })[0]?.spans ?? []).sort((a, b) =>
       sort.asc ? compareSpanInfo(a, b) : compareSpanInfo(b, a),
     );
   }, [allSpans, sort, decodedType]);

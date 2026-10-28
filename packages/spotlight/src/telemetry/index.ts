@@ -13,7 +13,8 @@ import { createEngine } from "./internal/engine.ts";
 import { normalizeEnvelope, supportsEnvelope, validateEnvelope } from "./internal/envelopes.ts";
 import { readonlyCopy } from "./internal/readonly.ts";
 import { diagnostic as makeDiagnostic, receipt, reportDiagnostic } from "./internal/results.ts";
-import type { Ingester, IngesterOptions, IngesterSnapshot } from "./public.ts";
+import { validateRetention } from "./internal/retention.ts";
+import type { TelemetrySnapshot, TelemetryStore, TelemetryStoreOptions } from "./public.ts";
 import { createTelemetryReader } from "./reader.ts";
 import { normalizeSpanItem } from "./store/utils/spanProcessor.ts";
 import type { SentryErrorEvent } from "./types.ts";
@@ -27,15 +28,14 @@ function positive(value: number, name: string) {
 }
 
 /** Portable processing with bounded work, immutable committed reads and explicit receipts. */
-export function createIngester(options: IngesterOptions = {}): Ingester {
-  const maxEnvelopes = positive(options.retention?.maxEnvelopes ?? 500, "retention.maxEnvelopes");
-  const maxBytes = positive(options.retention?.maxBytes ?? 64 * MiB, "retention.maxBytes");
+export function createTelemetryStore(options: TelemetryStoreOptions = {}): TelemetryStore {
+  const retention = validateRetention(options.retention ?? {});
+  let maxEnvelopes = retention.maxEnvelopes ?? 500;
+  let maxBytes = retention.maxBytes ?? 64 * MiB;
   const maxPending = positive(options.maxPending ?? 64, "maxPending");
   const maxEnvelopeBytes = positive(options.maxEnvelopeBytes ?? 32 * MiB, "maxEnvelopeBytes");
   const enrichmentTimeoutMs = positive(options.enrichmentTimeoutMs ?? 5000, "enrichmentTimeoutMs");
-  const maxAgeMs = options.retention?.maxAgeMs;
-  if (maxAgeMs !== undefined && (!Number.isFinite(maxAgeMs) || maxAgeMs <= 0))
-    throw new RangeError("retention.maxAgeMs must be a positive finite number");
+  let maxAgeMs = retention.maxAgeMs;
   let generation = 0;
   let disposed = false;
   let revision = 0;
@@ -46,7 +46,7 @@ export function createIngester(options: IngesterOptions = {}): Ingester {
   let timer: ReturnType<typeof setTimeout> | undefined;
   let lifetime = new AbortController();
   const identities = new WeakMap<object, string>();
-  const listeners = new Set<(snapshot: IngesterSnapshot, change: ChangeMetadata) => void>();
+  const listeners = new Set<(snapshot: TelemetrySnapshot, change: ChangeMetadata) => void>();
   let enrichmentCache = new Map<string, { envelopeId: string; exception: SentryErrorEvent["exception"] }>();
   let currentDiagnostics: Diagnostic[] = [];
   const stableCopies = new WeakMap<object, unknown>();
@@ -176,7 +176,7 @@ export function createIngester(options: IngesterOptions = {}): Ingester {
     if (!stableCopies.has(value)) stableCopies.set(value, readonlyCopy(value));
     return stableCopies.get(value) as T;
   }
-  function stateSnapshot(): IngesterSnapshot {
+  function stateSnapshot(): TelemetrySnapshot {
     const state = engine.store.getState();
     return Object.freeze({
       revision,
@@ -425,10 +425,22 @@ export function createIngester(options: IngesterOptions = {}): Ingester {
     };
     return withinEpoch === undefined ? enqueue(process) : process(withinEpoch);
   }
-  const client: Ingester = {
+  function queueRetentionPrune(): Promise<void> {
+    const epoch = generation;
+    const operation = queue.then(async () => {
+      if (!active(epoch)) return;
+      currentDiagnostics = [];
+      const evicted = await enforceRetention(epoch);
+      if (active(epoch) && evicted.length) publish("evict", evicted);
+      if (active(epoch)) scheduleExpiry();
+    });
+    queue = operation.catch(() => {});
+    return operation;
+  }
+  const client: TelemetryStore = {
     ...reader,
     ingestEnvelope: (input, inputOptions) => ingestOne(input, inputOptions),
-    ingestBatch(inputs, batchOptions = {}) {
+    ingestEnvelopes(inputs, batchOptions = {}) {
       const signal = batchOptions.signal;
       if (disposed || pending >= maxPending) {
         return Promise.resolve(Object.freeze(Array.from(inputs, () => ignored(disposed ? "disposed" : "queue_full"))));
@@ -474,20 +486,21 @@ export function createIngester(options: IngesterOptions = {}): Ingester {
       pending = 0;
       publish("reset");
     },
+    setRetention(update) {
+      if (disposed) return Promise.resolve();
+      const next = validateRetention(update);
+      if (next.maxEnvelopes !== undefined) maxEnvelopes = next.maxEnvelopes;
+      if (next.maxBytes !== undefined) maxBytes = next.maxBytes;
+      if (next.maxAgeMs !== undefined) maxAgeMs = next.maxAgeMs;
+      // A distinct barrier must cover work submitted after an earlier coalesced prune.
+      return queueRetentionPrune();
+    },
     prune() {
       if (disposed) return Promise.resolve();
       if (pruning) return pruning;
       // Control work has one coalesced continuation outside ingestion admission.
       // Link it into the same barrier so even invalid/empty work cannot skip expiry.
-      const epoch = generation;
-      const operation = queue.then(async () => {
-        if (!active(epoch)) return;
-        currentDiagnostics = [];
-        const evicted = await enforceRetention(epoch);
-        if (active(epoch) && evicted.length) publish("evict", evicted);
-        if (active(epoch)) scheduleExpiry();
-      });
-      queue = operation.catch(() => {});
+      const operation = queueRetentionPrune();
       pruning = operation;
       void operation.then(
         () => {
@@ -518,5 +531,5 @@ export function createIngester(options: IngesterOptions = {}): Ingester {
   };
   return client;
 }
-export type { Ingester, IngesterOptions, IngesterSnapshot } from "./public.ts";
+export type { TelemetryStore, TelemetryStoreOptions, TelemetrySnapshot } from "./public.ts";
 export type { IngestResult, Diagnostic } from "./contracts.ts";

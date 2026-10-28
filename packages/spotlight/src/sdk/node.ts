@@ -5,23 +5,26 @@ import type { BatchOptions, DiagnosticCode, IgnoreReason, IngestOptions } from "
 import { decodeEnvelope } from "../telemetry/envelope/codec.ts";
 import { normalizeEnvelope, validateEnvelope } from "../telemetry/internal/envelopes.ts";
 import { diagnostic, receipt, reportDiagnostic } from "../telemetry/internal/results.ts";
+import { validateRetention } from "../telemetry/internal/retention.ts";
 import { generateUuidv4 } from "../telemetry/uuid.ts";
-import { type IngestResult, type Ingester, type IngesterOptions, createIngester } from "./core.ts";
+import { type IngestResult, type TelemetryStore, type TelemetryStoreOptions, createTelemetryStore } from "./core.ts";
 
-export type { IngesterSnapshot as PipelineSnapshot } from "./core.ts";
+export type { TelemetrySnapshot } from "./core.ts";
 
-export type PipelineOptions = IngesterOptions & {
-  /** Maximum retained decoded payloads (default 500); zero disables storage. */
-  rawBufferSize?: number;
+export type TelemetryPipelineOptions = TelemetryStoreOptions & {
+  decodedHistory?: {
+    /** Maximum retained decoded payloads (default 500); zero disables storage. */
+    maxEntries?: number;
+    /** Total decoded payload history budget (default 32 MiB); zero disables storage. */
+    maxBytes?: number;
+  };
   /** Maximum input body size before decompression. Default: 8 MiB. */
   maxPayloadBytes?: number;
   /** Maximum body size after decompression. Default: 32 MiB. */
   maxDecodedBytes?: number;
-  /** Total decoded payload history budget (default 32 MiB); zero disables storage. */
-  maxRawBytes?: number;
 };
 
-export type PipelineInput = {
+export type TelemetryPayload = {
   body: Uint8Array | string;
   contentType?: string;
   encoding?: string;
@@ -30,11 +33,11 @@ export type PipelineInput = {
   signal?: AbortSignal;
 };
 
-export type RawPayload = { body: Buffer; contentType: string };
-export type Pipeline = Ingester & {
-  ingestPayload(input: PipelineInput): Promise<IngestResult>;
-  ingestPayloadBatch(inputs: readonly PipelineInput[]): Promise<readonly IngestResult[]>;
-  getDecodedPayload(envelopeId: string): RawPayload | undefined;
+export type DecodedPayload = { body: Buffer; contentType: string };
+export type TelemetryPipeline = TelemetryStore & {
+  ingestPayload(input: TelemetryPayload): Promise<IngestResult>;
+  ingestPayloads(inputs: readonly TelemetryPayload[]): Promise<readonly IngestResult[]>;
+  getDecodedPayload(envelopeId: string): DecodedPayload | undefined;
 };
 
 const envelopeContentType = "application/x-sentry-envelope";
@@ -47,49 +50,49 @@ function limit(name: string, value: number, allowZero = false): number {
   return value;
 }
 
-/** Decode bounded serialized Sentry envelopes, then process them through the shared ingester. */
-export function createPipeline(options: PipelineOptions = {}): Pipeline {
-  const rawBufferSize = limit("rawBufferSize", options.rawBufferSize ?? 500, true);
-  const maxRawBytes = limit("maxRawBytes", options.maxRawBytes ?? 32 * 1024 * 1024, true);
+/** Decode bounded serialized Sentry envelopes, then process them through the shared telemetry store. */
+export function createTelemetryPipeline(options: TelemetryPipelineOptions = {}): TelemetryPipeline {
+  const maxHistoryEntries = limit("decodedHistory.maxEntries", options.decodedHistory?.maxEntries ?? 500, true);
+  const maxHistoryBytes = limit("decodedHistory.maxBytes", options.decodedHistory?.maxBytes ?? 32 * 1024 * 1024, true);
   const maxPayloadBytes = limit("maxPayloadBytes", options.maxPayloadBytes ?? 8 * 1024 * 1024);
   const maxDecodedBytes = limit("maxDecodedBytes", options.maxDecodedBytes ?? 32 * 1024 * 1024);
   const maxPending = limit("maxPending", options.maxPending ?? 64);
   const maxEnvelopeBytes = options.maxEnvelopeBytes ?? 32 * 1024 * 1024;
-  const telemetry = createIngester(options);
-  const rawPayloads = new Map<string, RawPayload>();
-  const stagedPayloads = new Map<string, RawPayload>();
+  const telemetry = createTelemetryStore(options);
+  const decodedPayloads = new Map<string, DecodedPayload>();
+  const stagedPayloads = new Map<string, DecodedPayload>();
   const pending = new Set<Promise<unknown>>();
   const decodeControllers = new Set<AbortController>();
   const coreAdmissions = new Set<symbol>();
   const identities = new WeakMap<object, string>();
-  let rawBytes = 0;
+  let decodedBytes = 0;
   let generation = 0;
   let disposed = false;
   let queue = Promise.resolve();
   let pruning: Promise<void> | undefined;
 
-  function retainRawPayload(envelopeId: string, payload: RawPayload) {
-    // Oversized individual payloads are processed but cannot enter the raw history.
-    if (rawBufferSize === 0 || payload.body.length > maxRawBytes || maxRawBytes === 0) return;
-    const previous = rawPayloads.get(envelopeId);
-    if (previous) rawBytes -= previous.body.length;
-    rawPayloads.set(envelopeId, payload);
-    rawBytes += payload.body.length;
-    while (rawPayloads.size > rawBufferSize || rawBytes > maxRawBytes) {
-      const oldest = rawPayloads.keys().next().value!;
-      rawBytes -= rawPayloads.get(oldest)!.body.length;
-      rawPayloads.delete(oldest);
+  function retainDecodedPayload(envelopeId: string, payload: DecodedPayload) {
+    // Oversized individual payloads are processed but cannot enter the decoded history.
+    if (maxHistoryEntries === 0 || payload.body.length > maxHistoryBytes || maxHistoryBytes === 0) return;
+    const previous = decodedPayloads.get(envelopeId);
+    if (previous) decodedBytes -= previous.body.length;
+    decodedPayloads.set(envelopeId, payload);
+    decodedBytes += payload.body.length;
+    while (decodedPayloads.size > maxHistoryEntries || decodedBytes > maxHistoryBytes) {
+      const oldest = decodedPayloads.keys().next().value!;
+      decodedBytes -= decodedPayloads.get(oldest)!.body.length;
+      decodedPayloads.delete(oldest);
     }
   }
 
-  // Register before public listeners so raw history commits with the core snapshot.
+  // Register before public listeners so decoded history commits with the core snapshot.
   telemetry.subscribe(snapshot => {
     for (const envelope of snapshot.envelopes) {
       const envelopeId = String(envelope[0].__spotlight_envelope_id);
       const payload = stagedPayloads.get(envelopeId);
       if (!payload) continue;
       stagedPayloads.delete(envelopeId);
-      retainRawPayload(envelopeId, payload);
+      retainDecodedPayload(envelopeId, payload);
     }
   });
 
@@ -103,7 +106,7 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
   }
 
   async function processPayload(
-    input: PipelineInput,
+    input: TelemetryPayload,
     body: Buffer,
     contentType: string,
     encoding: string | undefined,
@@ -180,7 +183,8 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
     const parsedEnvelope = envelope as Envelope;
     parsedEnvelope[0].__spotlight_envelope_id = envelopeId;
     const payload = { body, contentType };
-    if (rawBufferSize > 0 && maxRawBytes > 0 && body.length <= maxRawBytes) stagedPayloads.set(envelopeId, payload);
+    if (maxHistoryEntries > 0 && maxHistoryBytes > 0 && body.length <= maxHistoryBytes)
+      stagedPayloads.set(envelopeId, payload);
     try {
       const result = await withCoreAdmission(() =>
         telemetry.ingestEnvelope(parsedEnvelope, {
@@ -198,7 +202,7 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
         stagedPayloads.get(envelopeId) === payload
       ) {
         // Raw history is independent of processed retention, including immediate age/byte eviction.
-        retainRawPayload(result.envelopeId, payload);
+        retainDecodedPayload(result.envelopeId, payload);
       }
       return result;
     } finally {
@@ -255,8 +259,8 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
     return Math.max(pending.size, telemetry.getStats().pending + pending.size - coreAdmissions.size);
   }
 
-  type PreparedPayload = { input: PipelineInput; body: Buffer; contentType: string; encoding?: string };
-  function preparePayload(input: PipelineInput): PreparedPayload | IngestResult {
+  type PreparedPayload = { input: TelemetryPayload; body: Buffer; contentType: string; encoding?: string };
+  function preparePayload(input: TelemetryPayload): PreparedPayload | IngestResult {
     if (!input || (typeof input.body !== "string" && !(input.body instanceof Uint8Array))) {
       return invalid("invalid_body", "Envelope body must be a string or Uint8Array");
     }
@@ -297,7 +301,7 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
     return operation;
   }
 
-  function ingestPayload(input: PipelineInput): Promise<IngestResult> {
+  function ingestPayload(input: TelemetryPayload): Promise<IngestResult> {
     if (disposed) return Promise.resolve(ignored("disposed"));
     if (input?.signal?.aborted) return Promise.resolve(ignored("aborted"));
     if (pendingCount() >= maxPending) return Promise.resolve(ignored("queue_full"));
@@ -319,7 +323,10 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
     return enqueue(epoch => processEnvelope(prepared, epoch));
   }
 
-  function ingestBatch(inputs: Iterable<unknown>, batchOptions: BatchOptions = {}): Promise<readonly IngestResult[]> {
+  function ingestEnvelopes(
+    inputs: Iterable<unknown>,
+    batchOptions: BatchOptions = {},
+  ): Promise<readonly IngestResult[]> {
     const signal = batchOptions.signal;
     const rejected = disposed ? "disposed" : pendingCount() >= maxPending ? "queue_full" : undefined;
     if (rejected) return Promise.resolve(Object.freeze(Array.from(inputs, () => ignored(rejected))));
@@ -340,9 +347,9 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
   return {
     ...telemetry,
     ingestEnvelope,
-    ingestBatch,
+    ingestEnvelopes,
     ingestPayload,
-    ingestPayloadBatch(inputs) {
+    ingestPayloads(inputs) {
       const rejected = disposed ? "disposed" : pendingCount() >= maxPending ? "queue_full" : undefined;
       const entries = Array.from(inputs);
       if (rejected) return Promise.resolve(Object.freeze(entries.map(() => ignored(rejected))));
@@ -366,7 +373,7 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
       });
     },
     getDecodedPayload(envelopeId) {
-      const payload = rawPayloads.get(envelopeId);
+      const payload = decodedPayloads.get(envelopeId);
       return payload && { body: Buffer.from(payload.body), contentType: payload.contentType };
     },
     getStats() {
@@ -378,6 +385,17 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
       const wireBarrier = queue;
       const coreBarrier = telemetry.drain();
       await Promise.all([wireBarrier, coreBarrier]);
+    },
+    setRetention(update) {
+      if (disposed) return Promise.resolve();
+      const next = validateRetention(update);
+      const epoch = generation;
+      // Retention changes share payload ordering without consuming an admission slot.
+      const operation = queue.then(async () => {
+        if (!disposed && epoch === generation) await telemetry.setRetention(next);
+      });
+      queue = operation.catch(() => {});
+      return operation;
     },
     prune() {
       if (disposed) return Promise.resolve();
@@ -402,9 +420,9 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
       pending.clear();
       coreAdmissions.clear();
       for (const controller of decodeControllers) controller.abort();
-      rawPayloads.clear();
+      decodedPayloads.clear();
       stagedPayloads.clear();
-      rawBytes = 0;
+      decodedBytes = 0;
       telemetry.reset();
     },
     dispose() {
@@ -415,9 +433,9 @@ export function createPipeline(options: PipelineOptions = {}): Pipeline {
       pending.clear();
       coreAdmissions.clear();
       for (const controller of decodeControllers) controller.abort();
-      rawPayloads.clear();
+      decodedPayloads.clear();
       stagedPayloads.clear();
-      rawBytes = 0;
+      decodedBytes = 0;
       telemetry.dispose();
     },
   };

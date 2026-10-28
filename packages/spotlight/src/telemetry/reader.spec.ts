@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { expect, test } from "vitest";
-import type { IngesterSnapshot } from "./public.ts";
+import type { TelemetrySnapshot } from "./public.ts";
 import { createTelemetryReader } from "./reader.ts";
 import type { Span, Trace } from "./types.ts";
 function fixture() {
@@ -28,7 +28,7 @@ function fixture() {
     spanTree: spans,
     profileGrafted: false,
   };
-  const snapshot: IngesterSnapshot = {
+  const snapshot: TelemetrySnapshot = {
     revision: 1,
     envelopes: [],
     events: [
@@ -75,10 +75,10 @@ test("invalid getter filters throw", () => {
 test("summaries default to compact and preserve trace-less legacy spans", () => {
   const { snapshot } = fixture();
   const reader = createTelemetryReader(() => snapshot);
-  expect(reader.getQuerySummaries({ traceId: "trace", toMs: 20 })).toEqual([
+  expect(reader.getDatabaseQuerySummaries({ traceId: "trace", toMs: 20 })).toEqual([
     { description: "SELECT 1", count: 2, totalDurationMs: 25, averageDurationMs: 12.5 },
   ]);
-  expect(reader.getQuerySummaries({ includeSpans: true })[0].spans).toHaveLength(2);
+  expect(reader.getDatabaseQuerySummaries({ includeSpans: true })[0].spans).toHaveLength(2);
   expect(reader.getResourceSummaries()).toEqual([
     { description: "script.js", count: 1, totalDurationMs: 5, averageDurationMs: 5, averageEncodedSizeBytes: 40 },
   ]);
@@ -87,11 +87,11 @@ test("summaries default to compact and preserve trace-less legacy spans", () => 
 test("canonical filters share cached identity until revision changes", () => {
   let { snapshot } = fixture();
   const reader = createTelemetryReader(() => snapshot);
-  const first = reader.getQuerySummaries({ traceId: "trace", fromMs: 10 });
-  expect(reader.getQuerySummaries({ fromMs: 10, traceId: "trace" })).toBe(first);
+  const first = reader.getDatabaseQuerySummaries({ traceId: "trace", fromMs: 10 });
+  expect(reader.getDatabaseQuerySummaries({ fromMs: 10, traceId: "trace" })).toBe(first);
   expect(reader.getEvents()).toBe(reader.getEvents({}));
   snapshot = { ...snapshot, revision: 2 };
-  expect(reader.getQuerySummaries({ fromMs: 10, traceId: "trace" })).not.toBe(first);
+  expect(reader.getDatabaseQuerySummaries({ fromMs: 10, traceId: "trace" })).not.toBe(first);
 });
 test("page cursors bind collection, canonical query and revision", () => {
   let { snapshot } = fixture();
@@ -143,7 +143,7 @@ test("explicit default filter values share cached results", () => {
   const { snapshot } = fixture();
   const reader = createTelemetryReader(() => snapshot);
   expect(reader.getEvents({ order: "asc" })).toBe(reader.getEvents());
-  expect(reader.getQuerySummaries({ includeSpans: false })).toBe(reader.getQuerySummaries());
+  expect(reader.getDatabaseQuerySummaries({ includeSpans: false })).toBe(reader.getDatabaseQuerySummaries());
 });
 
 test("web vitals apply limit after selecting measurements", () => {

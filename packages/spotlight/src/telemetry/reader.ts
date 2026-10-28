@@ -2,7 +2,6 @@ import { readonlyCopy } from "./internal/readonly.ts";
 import type {
   AITrace,
   DeepReadonly,
-  IngesterSnapshot,
   ProcessedEvent,
   ProcessedLog,
   ProcessedProfile,
@@ -11,11 +10,12 @@ import type {
   ProfileFunctionSummary,
   QuerySummary,
   ResourceSummary,
+  TelemetrySnapshot,
 } from "./public.ts";
 import {
   getAITraces,
+  getDatabaseQuerySummaries,
   getProfileFunctionSummaries,
-  getQuerySummaries,
   getResourceSummaries,
   getWebVitals,
 } from "./selectors/index.ts";
@@ -58,9 +58,9 @@ export type ReadPageResult<T> =
       readonly message: string;
     };
 export type TelemetryReader = {
-  getSnapshot(): IngesterSnapshot;
-  getEnvelope(id: string): IngesterSnapshot["envelopes"][number] | undefined;
-  getEnvelopes(): IngesterSnapshot["envelopes"];
+  getSnapshot(): TelemetrySnapshot;
+  getEnvelope(id: string): TelemetrySnapshot["envelopes"][number] | undefined;
+  getEnvelopes(): TelemetrySnapshot["envelopes"];
   getEvent(id: string): ProcessedEvent | undefined;
   getEvents(filter?: EventReadFilter): readonly ProcessedEvent[];
   getErrors(filter?: EventReadFilter): readonly DeepReadonly<SentryErrorEvent>[];
@@ -71,9 +71,9 @@ export type TelemetryReader = {
   getLogs(filter?: TraceReadFilter): readonly ProcessedLog[];
   getProfile(traceId: string): ProcessedProfile | undefined;
   getProfileFunctionSummaries(filter?: TraceReadFilter): readonly ProfileFunctionSummary[];
-  getQuerySummaries(filter: DatabaseReadFilter & { includeSpans: true }): readonly QuerySummary[];
-  getQuerySummaries(filter?: DatabaseReadFilter & { includeSpans?: false }): readonly CompactQuerySummary[];
-  getQuerySummaries(
+  getDatabaseQuerySummaries(filter: DatabaseReadFilter & { includeSpans: true }): readonly QuerySummary[];
+  getDatabaseQuerySummaries(filter?: DatabaseReadFilter & { includeSpans?: false }): readonly CompactQuerySummary[];
+  getDatabaseQuerySummaries(
     filter?: DatabaseReadFilter,
   ): readonly (CompactQuerySummary & { readonly spans?: QuerySummary["spans"] })[];
   getResourceSummaries(filter: SummaryReadFilter & { includeSpans: true }): readonly ResourceSummary[];
@@ -140,10 +140,10 @@ function named<T>(items: readonly T[], filter: TelemetryReadFilter, name: (item:
 }
 
 /** A portable read-only dependency. The current revision retains at most 256 recently used reads. */
-export function createTelemetryReader(getSnapshot: () => IngesterSnapshot): TelemetryReader {
+export function createTelemetryReader(getSnapshot: () => TelemetrySnapshot): TelemetryReader {
   let revision = -1;
   const cache = new Map<string, unknown>();
-  function read<T>(name: string, filter: object, derive: (snapshot: IngesterSnapshot) => T): T {
+  function read<T>(name: string, filter: object, derive: (snapshot: TelemetrySnapshot) => T): T {
     const snapshot = getSnapshot();
     if (revision !== snapshot.revision) {
       cache.clear();
@@ -161,12 +161,12 @@ export function createTelemetryReader(getSnapshot: () => IngesterSnapshot): Tele
     if (cache.size > 256) cache.delete(cache.keys().next().value!);
     return value;
   }
-  const traces = (snapshot: IngesterSnapshot, filter: TraceReadFilter) =>
+  const traces = (snapshot: TelemetrySnapshot, filter: TraceReadFilter) =>
     snapshot.traces.filter(trace => filter.traceId === undefined || trace.trace_id === filter.traceId);
   // Legacy transaction child spans need not carry trace_id. Scope their owning trace first.
-  const spans = (snapshot: IngesterSnapshot, filter: TraceReadFilter) =>
+  const spans = (snapshot: TelemetrySnapshot, filter: TraceReadFilter) =>
     traces(snapshot, filter).flatMap(trace => Array.from(trace.spans.values()));
-  function events(snapshot: IngesterSnapshot, filter: EventReadFilter) {
+  function events(snapshot: TelemetrySnapshot, filter: EventReadFilter) {
     return snapshot.events.filter(
       event =>
         (filter.traceId === undefined ||
@@ -261,7 +261,7 @@ export function createTelemetryReader(getSnapshot: () => IngesterSnapshot): Tele
         ),
       );
     },
-    getQuerySummaries: ((filter: DatabaseReadFilter = {}) => {
+    getDatabaseQuerySummaries: ((filter: DatabaseReadFilter = {}) => {
       validate(filter);
       if (filter.description !== undefined && typeof filter.description !== "string")
         throw new RangeError("description must be a string");
@@ -270,7 +270,7 @@ export function createTelemetryReader(getSnapshot: () => IngesterSnapshot): Tele
       return read("queries", filter, snapshot =>
         readonlyCopy(
           named(
-            getQuerySummaries(
+            getDatabaseQuerySummaries(
               ordered(
                 spans(snapshot, filter),
                 { fromMs: filter.fromMs, toMs: filter.toMs, order: filter.order },
@@ -287,7 +287,7 @@ export function createTelemetryReader(getSnapshot: () => IngesterSnapshot): Tele
           ),
         ),
       );
-    }) as TelemetryReader["getQuerySummaries"],
+    }) as TelemetryReader["getDatabaseQuerySummaries"],
     getResourceSummaries: ((filter: SummaryReadFilter = {}) => {
       validate(filter);
       if (filter.includeSpans !== undefined && typeof filter.includeSpans !== "boolean")

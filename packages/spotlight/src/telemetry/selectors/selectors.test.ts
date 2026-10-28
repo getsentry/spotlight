@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { SentryProcessedProfile, Span } from "../types.ts";
-import { getQuerySummaries } from "./database.ts";
+import { getDatabaseQuerySummaries } from "./database.ts";
 import { getProfileFunctionSummaries } from "./profiles.ts";
 import { getResourceSummaries } from "./resources.ts";
 
@@ -36,7 +36,7 @@ describe("domain summaries", () => {
   it("groups database spans using normalized millisecond fields and excludes invalid inputs", () => {
     const first = span();
     const second = span({ span_id: "second", description: "SELECT 1", timestamp: 1030 });
-    const result = getQuerySummaries([
+    const result = getDatabaseQuerySummaries([
       first,
       span({ op: "http.client" }),
       second,
@@ -55,9 +55,9 @@ describe("domain summaries", () => {
       },
     ]);
     expect(first.description).toBe(" SELECT 1 ");
-    expect(getQuerySummaries([first], { description: " SELECT 1 " })).toHaveLength(1);
-    expect(getQuerySummaries([first], { description: "SELECT 2" })).toEqual([]);
-    expect(getQuerySummaries([first], { traceId: "trace-b" })).toEqual([]);
+    expect(getDatabaseQuerySummaries([first], { description: " SELECT 1 " })).toHaveLength(1);
+    expect(getDatabaseQuerySummaries([first], { description: "SELECT 2" })).toEqual([]);
+    expect(getDatabaseQuerySummaries([first], { traceId: "trace-b" })).toEqual([]);
   });
 
   it("reports resource size in bytes and retains member spans once", () => {

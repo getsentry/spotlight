@@ -10,8 +10,8 @@ comparing their retained histories.
 
 | Entry | Factory | Input |
 | --- | --- | --- |
-| `@spotlightjs/spotlight/sdk/core` | `createIngester()` | Parsed Sentry envelopes in portable runtimes |
-| `@spotlightjs/spotlight/sdk/node` | `createPipeline()` | Adds serialized bodies, decompression, and decoded payload history |
+| `@spotlightjs/spotlight/sdk/core` | `createTelemetryStore()` | Parsed Sentry envelopes in portable runtimes |
+| `@spotlightjs/spotlight/sdk/node` | `createTelemetryPipeline()` | Adds serialized bodies, decompression, and decoded payload history |
 | `@spotlightjs/spotlight/sdk` | Existing buffer helpers | Compatibility for existing transport consumers |
 
 ## Ingest and read telemetry
@@ -19,9 +19,9 @@ comparing their retained histories.
 Use `@spotlightjs/spotlight/sdk/core` for parsed Sentry envelopes in a browser, worker, or Node application. Use `@spotlightjs/spotlight/sdk/node` for serialized or compressed payloads on Node 20+. Both expose the same processing and read APIs; creating an instance does not start a server. The portable entry has no Node or React dependency. The existing raw-buffer helpers at `/sdk` remain available.
 
 ```ts
-import { createIngester, serializeSnapshot } from "@spotlightjs/spotlight/sdk/core";
+import { createTelemetryStore, serializeSnapshot } from "@spotlightjs/spotlight/sdk/core";
 
-const telemetry = createIngester();
+const telemetry = createTelemetryStore();
 const receipt = await telemetry.ingestEnvelope(parsedEnvelope, {
   deliveryId: "transport-request-123", // Reuse for retries of this delivery.
   signal: abortController.signal,
@@ -38,16 +38,16 @@ const json = JSON.stringify(serializeSnapshot(telemetry.getSnapshot()));
 telemetry.dispose();
 ```
 
-The Node adapter accepts `string`, `Uint8Array`, and `Buffer` bodies. `ingestPayload({ body, contentType?, encoding?, userAgent?, deliveryId?, signal? })` decodes `application/x-sentry-envelope` (the default content type) and supports identity, gzip, deflate, and Brotli encoding. Use `getDecodedPayload(envelopeId)` for a copied decompressed payload when it remains in the independently bounded history. Parsed envelopes still use `ingestEnvelope`; the payload methods are `ingestPayload` and `ingestPayloadBatch`.
+The Node adapter accepts `string`, `Uint8Array`, and `Buffer` bodies. `ingestPayload({ body, contentType?, encoding?, userAgent?, deliveryId?, signal? })` decodes `application/x-sentry-envelope` (the default content type) and supports identity, gzip, deflate, and Brotli encoding. Use `getDecodedPayload(envelopeId)` for a copied decompressed payload when it remains in the independently bounded history. Parsed envelopes still use `ingestEnvelope`; the payload methods are `ingestPayload` and `ingestPayloads`.
 
 ```ts
-import { createPipeline } from "@spotlightjs/spotlight/sdk/node";
+import { createTelemetryPipeline } from "@spotlightjs/spotlight/sdk/node";
 
-const pipeline = createPipeline({ rawBufferSize: 100 });
+const pipeline = createTelemetryPipeline({ decodedHistory: { maxEntries: 100 } });
 const receipt = await pipeline.ingestPayload({ body: envelopeBody, deliveryId: "request-1" });
 if (receipt.status === "processed") {
   const payload = pipeline.getDecodedPayload(receipt.envelopeId); // Defensive decoded-byte copy.
-  const queries = pipeline.getQuerySummaries({ traceId }); // Compact by default.
+  const queries = pipeline.getDatabaseQuerySummaries({ traceId }); // Compact by default.
 }
 await pipeline.drain();
 pipeline.dispose();
@@ -72,7 +72,7 @@ Branch on diagnostic `code` and `severity`, or ignored `reason`, rather than mes
 
 Delivery IDs deduplicate only while the corresponding envelope is retained. Eviction and `reset()` permit that delivery again. There is no content hashing: separately allocated envelopes without IDs are separate observations. Reusing the same parsed object or its explicit Spotlight envelope ID preserves its delivery identity within the retained window. Event-ID deduplication is separate from delivery deduplication.
 
-`ingestBatch(iterable, { signal? })` returns receipts in input order and preserves valid neighbors of invalid inputs. It is not a transaction. `ingestPayloadBatch(inputs)` does the same for Node inputs; each input carries its own signal and delivery ID. A batch occupies one queued operation, including while active. Items are copied as they are reached rather than copying the entire batch up front: keep queued batch items unchanged until their receipts resolve. Individual `ingestEnvelope` and `ingestPayload` calls copy their input before the first await. Cancellation returns `ignored/aborted`. `drain()` waits for operations already submitted at the call, excluding future work. `getStats()` reports pending operations, retained envelope count/bytes, revision, and disposal. `subscribe((snapshot, change) => ...)` returns an unsubscribe function; `change` identifies ingest, eviction, reset, or disposal and affected envelope IDs. Release timers and listeners with `dispose()`.
+`ingestEnvelopes(iterable, { signal? })` returns receipts in input order and preserves valid neighbors of invalid inputs. It is not a transaction. `ingestPayloads(inputs)` does the same for Node inputs; each input carries its own signal and delivery ID. A batch occupies one queued operation, including while active. Items are copied as they are reached rather than copying the entire batch up front: keep queued batch items unchanged until their receipts resolve. Individual `ingestEnvelope` and `ingestPayload` calls copy their input before the first await. Cancellation returns `ignored/aborted`. `drain()` waits for operations already submitted at the call, excluding future work. `getStats()` reports pending operations, retained envelope count/bytes, revision, and disposal. `subscribe((snapshot, change) => ...)` returns an unsubscribe function; `change` identifies ingest, eviction, reset, or disposal and affected envelope IDs. Release timers and listeners with `dispose()`.
 
 An optional `enrichStacktrace(event, { signal })` hook receives a copied event. Observe its signal to cancel external work. A timeout reports a warning and keeps telemetry; abort, reset, disposal, or timeout prevent late hook writes from entering published state.
 
@@ -81,8 +81,8 @@ An optional `enrichStacktrace(event, { signal })` hook receives a copied event. 
 Accept a `TelemetryReader` from `/sdk/core` in consumers that only query telemetry. Both factories implement it. `createTelemetryReader(getSnapshot)` also constructs a reader over an existing snapshot source. Singular getters such as `getTrace(id)` and `getEvent(id)` return `undefined` when absent; collection getters return readonly arrays. All processed timestamps and durations use milliseconds; time bounds are inclusive Unix milliseconds.
 
 ```ts
-const queries = reader.getQuerySummaries({ traceId, fromMs, toMs, limit: 10 });
-const detailed = reader.getQuerySummaries({ traceId, includeSpans: true });
+const queries = reader.getDatabaseQuerySummaries({ traceId, fromMs, toMs, limit: 10 });
+const detailed = reader.getDatabaseQuerySummaries({ traceId, includeSpans: true });
 const first = reader.readPage("events", { traceId, limit: 100, order: "desc" });
 if (first.status === "ok" && first.nextCursor) {
   const next = reader.readPage("events", {
@@ -110,9 +110,11 @@ Use `serializeSummaries(reader.getProfileFunctionSummaries())` or pass compact q
 | `retention.maxEnvelopes` / `retention.maxBytes` | 500 / 64 MiB |
 | `retention.maxAgeMs` | No age limit; when configured, expires automatically since receipt |
 | Node `maxPayloadBytes` / `maxDecodedBytes` | 8 MiB / 32 MiB |
-| Node `rawBufferSize` / `maxRawBytes` | 500 / 32 MiB |
+| Node `decodedHistory.maxEntries` / `decodedHistory.maxBytes` | 500 / 32 MiB |
 
-Limits must be positive safe integers; Node `rawBufferSize` and `maxRawBytes` also allow zero to disable decoded history. Byte limits use bytes, with 1 MiB = 1024 × 1024 bytes. The Node decoder bounds decompression output. Bound transport collection separately before passing a complete body to the SDK, as shown in the HTTP example. Retention evicts whole envelopes and the telemetry derived from them; the byte budget measures the serialized retained envelopes, not total JavaScript heap size.
+`setRetention({ maxEnvelopes?, maxBytes?, maxAgeMs? })` updates only supplied retention limits and resolves after queued eviction. Existing subscriptions and Node decoded history remain available. Age limits cannot be cleared; disposed instances ignore updates. Node updates follow earlier payload/parsed work, and `drain()` includes retention updates submitted before the drain.
+
+Limits must be positive safe integers; Node `decodedHistory.maxEntries` and `decodedHistory.maxBytes` also allow zero to disable decoded history. Byte limits use bytes, with 1 MiB = 1024 × 1024 bytes. The Node decoder bounds decompression output. Bound transport collection separately before passing a complete body to the SDK, as shown in the HTTP example. Retention evicts whole envelopes and the telemetry derived from them; the byte budget measures the serialized retained envelopes, not total JavaScript heap size.
 
 `SDK_CAPABILITIES` exposes readonly machine-readable metadata for legacy and v2 spans, profile v1/v2, supported item types, and timestamp units. Supported item types include event/error, transaction, span, log, profile/profile_chunk, feedback, and attachment; individual wire versions can still be unsupported. Portable runtimes need standard JavaScript APIs including `AbortController`, `TextEncoder`, timers, maps, and sets. React is required only by your React consumer; compressed payload decoding is provided by the Node entry.
 
@@ -126,7 +128,7 @@ The [SDK examples](examples/sdk) cover a bounded HTTP server, a frontend transpo
 | `getEvent(eventId)`, `getEvents(filter?)`, `getErrors(filter?)` | Normalized events and captured exceptions |
 | `getSpans(filter?)` | Normalized spans |
 | `getLog(logId)`, `getLogs(filter?)` | Logs and trace correlation |
-| `getQuerySummaries(filter?)` | Database spans grouped by trimmed description |
+| `getDatabaseQuerySummaries(filter?)` | Database spans grouped by trimmed description |
 | `getResourceSummaries(filter?)` | Resource timings and encoded sizes |
 | `getProfile(traceId)`, `getProfileFunctionSummaries(filter?)` | Associated profiles and inclusive frame durations/sample counts |
 | `getAITraces(filter?)` | AI interactions, tokens, prompts, responses, and tools |

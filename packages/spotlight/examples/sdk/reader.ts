@@ -9,8 +9,8 @@ import {
 export function inspectTrace(reader: TelemetryReader, traceId: string) {
   const trace = reader.getTrace(traceId);
   return {
-    queries: reader.getQuerySummaries({ traceId, order: "desc", limit: 10 }),
-    detailedQueries: reader.getQuerySummaries({ traceId, includeSpans: true }),
+    queries: reader.getDatabaseQuerySummaries({ traceId, order: "desc", limit: 10 }),
+    detailedQueries: reader.getDatabaseQuerySummaries({ traceId, includeSpans: true }),
     traceJson: trace ? JSON.stringify(serializeTrace(trace)) : undefined,
     snapshotJson: JSON.stringify(serializeSnapshot(reader.getSnapshot())),
     profileJson: JSON.stringify(serializeSummaries(reader.getProfileFunctionSummaries({ traceId }))),

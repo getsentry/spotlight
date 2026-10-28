@@ -1,10 +1,10 @@
-import { type RawEnvelope, SDK_CAPABILITIES } from "@spotlightjs/spotlight/sdk/core";
-import { createPipeline } from "@spotlightjs/spotlight/sdk/node";
+import { SDK_CAPABILITIES, type SentryEnvelope } from "@spotlightjs/spotlight/sdk/core";
+import { createTelemetryPipeline } from "@spotlightjs/spotlight/sdk/node";
 import { createFrontendTelemetry } from "./frontend.js";
 import { inspectTrace, readEventIds } from "./reader.js";
 
 // Parsed wire timestamps are seconds; normalized reader timestamps are Unix milliseconds.
-function envelope(id: string): RawEnvelope {
+function envelope(id: string): SentryEnvelope {
   return [
     {},
     [
@@ -32,7 +32,7 @@ function check(condition: unknown, message: string): asserts condition {
 }
 
 const { ingester, receiveEnvelope, disconnect } = createFrontendTelemetry();
-const pipeline = createPipeline();
+const pipeline = createTelemetryPipeline();
 try {
   const input = envelope("one");
   const first = await receiveEnvelope(input, { deliveryId: "request-1" });
@@ -41,7 +41,7 @@ try {
   check(retry.status === "ignored" && retry.reason === "duplicate", "Retained delivery retry");
 
   // Each input gets a receipt. A malformed middle input does not roll back valid neighbors.
-  const batch = await ingester.ingestBatch([envelope("two"), null, envelope("three")]);
+  const batch = await ingester.ingestEnvelopes([envelope("two"), null, envelope("three")]);
   check(
     batch[0].status === "processed" && batch[1].status === "invalid" && batch[2].status === "processed",
     "Partial batch",
@@ -69,7 +69,7 @@ try {
   check(readEventIds(ingester).status === "ok", "Reader-only pagination");
 
   const wire = (id: string) => `{}\n${JSON.stringify({ type: "span" })}\n${JSON.stringify(envelope(id)[1][0][1])}`;
-  const payloads = await pipeline.ingestPayloadBatch([{ body: wire("node-one") }, { body: "invalid" }]);
+  const payloads = await pipeline.ingestPayloads([{ body: wire("node-one") }, { body: "invalid" }]);
   check(payloads[0].status === "processed" && payloads[1].status === "invalid", "Payload batch");
   if (payloads[0].status === "processed") {
     check(pipeline.getDecodedPayload(payloads[0].envelopeId)?.body.length, "Copied decoded payload");

@@ -38,7 +38,7 @@ Spotlight uses Sentry SDKs to capture telemetry data and sends it to the Sidecar
 
 ## Embed the telemetry SDK
 
-Use `createIngester()` from `@spotlightjs/spotlight/sdk/core` to process parsed Sentry envelopes in portable runtimes, or `createPipeline()` from `@spotlightjs/spotlight/sdk/node` for serialized and compressed Node payloads. Both share the same processing, receipts, readers, and retention controls.
+Use `createTelemetryStore()` from `@spotlightjs/spotlight/sdk/core` to process parsed Sentry envelopes in portable runtimes, or `createTelemetryPipeline()` from `@spotlightjs/spotlight/sdk/node` for serialized and compressed Node payloads. Both share the same processing, receipts, readers, and retention controls.
 
 See the [SDK reference](packages/spotlight/README.md) and [executable examples](packages/spotlight/examples/sdk) for integration, retries, cancellation, paging, JSON exports, and React subscriptions.
 

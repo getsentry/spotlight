@@ -1,12 +1,12 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, expect, test } from "vitest";
-import { createIngester } from "../../../../telemetry/index.ts";
+import { createTelemetryStore } from "../../../../telemetry/index.ts";
 import EventContexts from "./EventContexts";
 
 afterEach(cleanup);
 
 test("renders modules alongside extra data without mutating the SDK event", async () => {
-  const telemetry = createIngester();
+  const telemetry = createTelemetryStore();
   await telemetry.ingestEnvelope([
     {},
     [

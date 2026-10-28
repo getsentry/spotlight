@@ -82,8 +82,8 @@ test("span tree and transaction copies merge their child references without drop
 
 test("valid continuous profiles and streamed plus legacy traces serialize", async () => {
   const { readFileSync } = await import("node:fs");
-  const { createPipeline } = await import("../sdk/node.ts");
-  const pipeline = createPipeline();
+  const { createTelemetryPipeline } = await import("../sdk/node.ts");
+  const pipeline = createTelemetryPipeline();
   try {
     for (const file of [
       "continuous_profiling/transaction.txt",
@@ -119,8 +119,8 @@ test("a wide span graph does not use call-argument expansion", () => {
 });
 
 test("canonical spans serialize after streamed updates supersede transaction span copies", async () => {
-  const { createIngester } = await import("./index.ts");
-  const client = createIngester();
+  const { createTelemetryStore } = await import("./index.ts");
+  const client = createTelemetryStore();
   try {
     expect(
       (

@@ -1,9 +1,9 @@
 import type {
   DeepReadonly,
-  IngesterSnapshot,
   ProcessedSpan,
   ProcessedTrace,
   ProfileFunctionSummary,
+  TelemetrySnapshot,
 } from "./public.ts";
 import type { CompactQuerySummary, CompactResourceSummary } from "./reader.ts";
 
@@ -125,7 +125,7 @@ export function serializeTrace(trace: ProcessedTrace): SerializedTrace {
 }
 
 /** A JSON-ready DTO: Map entries and Set values become arrays; no custom JSON replacer is needed. */
-export function serializeSnapshot(snapshot: IngesterSnapshot): SerializedSnapshot {
+export function serializeSnapshot(snapshot: TelemetrySnapshot): SerializedSnapshot {
   return {
     schemaVersion: 1,
     revision: snapshot.revision,

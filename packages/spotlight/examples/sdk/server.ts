@@ -1,13 +1,13 @@
 import { createServer } from "node:http";
-import { createPipeline } from "@spotlightjs/spotlight/sdk/node";
+import { createTelemetryPipeline } from "@spotlightjs/spotlight/sdk/node";
 
 const maxPayloadBytes = 8 * 1024 * 1024;
 
 /** Embed the SDK in an HTTP server; the SDK itself does not open a port. */
 export function createTelemetryServer() {
-  const pipeline = createPipeline({
+  const pipeline = createTelemetryPipeline({
     maxPayloadBytes,
-    rawBufferSize: 100,
+    decodedHistory: { maxEntries: 100 },
     retention: { maxEnvelopes: 1000, maxAgeMs: 10 * 60 * 1000 },
   });
   const server = createServer(async (request, response) => {
@@ -46,7 +46,7 @@ export function createTelemetryServer() {
       }
       if (request.method === "GET" && url.pathname === "/queries") {
         const traceId = url.searchParams.get("traceId") ?? undefined;
-        response.end(JSON.stringify(pipeline.getQuerySummaries({ traceId })));
+        response.end(JSON.stringify(pipeline.getDatabaseQuerySummaries({ traceId })));
         return;
       }
       response.statusCode = 404;

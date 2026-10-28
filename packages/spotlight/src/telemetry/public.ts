@@ -40,7 +40,7 @@ export type DeepReadonly<T> = T extends (...args: never[]) => unknown
 /** A parsed Sentry wire envelope; input timestamps retain their wire units. */
 // Item payloads remain unknown: forward-compatible wire records include span-v2
 // containers that older @sentry/core payload unions cannot represent.
-export type RawEnvelope = [Envelope[0], [EnvelopeItem[0], unknown][]];
+export type SentryEnvelope = [Envelope[0], [EnvelopeItem[0], unknown][]];
 export type ProcessedEvent = DeepReadonly<SentryEvent>;
 export type ProcessedSpan = DeepReadonly<Span>;
 export type ProcessedTrace = DeepReadonly<Trace>;
@@ -64,7 +64,7 @@ export type RetentionOptions = {
   /** Serialized retained-envelope budget. Default: 64 MiB. */
   maxBytes?: number;
 };
-export type IngesterOptions = {
+export type TelemetryStoreOptions = {
   retention?: RetentionOptions;
   enrichStacktrace?: (event: SentryErrorEvent, context: { signal: AbortSignal }) => Promise<void>;
   /** Maximum ingestion operations, including active work. Default: 64. Overflow returns ignored/queue_full. */
@@ -75,23 +75,25 @@ export type IngesterOptions = {
   enrichmentTimeoutMs?: number;
   onDiagnostic?: (diagnostic: Diagnostic) => void;
 };
-export type IngesterSnapshot = {
+export type TelemetrySnapshot = {
   readonly revision: number;
-  readonly envelopes: readonly DeepReadonly<RawEnvelope>[];
+  readonly envelopes: readonly DeepReadonly<SentryEnvelope>[];
   readonly events: readonly ProcessedEvent[];
   readonly traces: readonly ProcessedTrace[];
   readonly logs: readonly ProcessedLog[];
   readonly sdks: readonly DeepReadonly<Sdk>[];
   readonly profiles: ReadonlyMap<string, ProcessedProfile>;
 };
-export type Ingester = TelemetryReader & {
+export type TelemetryStore = TelemetryReader & {
   ingestEnvelope: (input: unknown, options?: IngestOptions) => Promise<IngestResult>;
-  ingestBatch: (inputs: Iterable<unknown>, options?: BatchOptions) => Promise<readonly IngestResult[]>;
+  ingestEnvelopes: (inputs: Iterable<unknown>, options?: BatchOptions) => Promise<readonly IngestResult[]>;
   /** Wait for operations submitted before this call; future operations are excluded. */
   drain: () => Promise<void>;
   getStats: () => IngestStats;
-  subscribe: (listener: (snapshot: IngesterSnapshot, change: ChangeMetadata) => void) => () => void;
+  subscribe: (listener: (snapshot: TelemetrySnapshot, change: ChangeMetadata) => void) => () => void;
   reset: () => void;
+  /** Update supplied limits, preserving omitted fields, then wait for retention eviction. */
+  setRetention: (options: RetentionOptions) => Promise<void>;
   prune: () => Promise<void>;
   dispose: () => void;
 };

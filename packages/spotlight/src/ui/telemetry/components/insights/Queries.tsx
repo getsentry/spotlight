@@ -9,7 +9,7 @@ import { getFormattedDuration, getSpanDurationClassName } from "@spotlight/ui/te
 import Table from "@spotlight/ui/ui/table";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { type QuerySummary, getQuerySummaries } from "../../../../telemetry/selectors/database.ts";
+import { type QuerySummary, getDatabaseQuerySummaries } from "../../../../telemetry/selectors/database.ts";
 import EmptyState from "../shared/EmptyState";
 
 type QueryInfo = QuerySummary;
@@ -33,7 +33,9 @@ const Queries = () => {
 
   const queriesData: QueryInfo[] = useMemo(() => {
     const compareQueryInfo = COMPARATORS[sort.active] || COMPARATORS[QUERIES_SORT_KEYS.totalTime];
-    return getQuerySummaries(allSpans).sort((a, b) => (sort.asc ? compareQueryInfo(a, b) : compareQueryInfo(b, a)));
+    return getDatabaseQuerySummaries(allSpans).sort((a, b) =>
+      sort.asc ? compareQueryInfo(a, b) : compareQueryInfo(b, a),
+    );
   }, [allSpans, sort]);
 
   const maxTime = Math.max(...queriesData.map(query => query.totalDurationMs));

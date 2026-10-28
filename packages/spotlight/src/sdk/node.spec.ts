@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { brotliCompressSync, deflateSync, gzipSync } from "node:zlib";
 import { describe, expect, test, vi } from "vitest";
-import { createPipeline } from "./node.ts";
+import { createTelemetryPipeline } from "./node.ts";
 
 const fixture = readFileSync(new URL("../../_fixtures/envelope_span_v2.txt", import.meta.url));
 
@@ -16,7 +16,7 @@ describe("Node Telemetry adapter", () => {
         Buffer.from(`${JSON.stringify({ type, length: binary.length })}\n`),
         binary,
       ]);
-      const telemetry = createPipeline();
+      const telemetry = createTelemetryPipeline();
       const result = await telemetry.ingestPayload({ body });
       expect(result.status).toBe("processed");
       expect(telemetry.getEvent("with-opaque-item")).toBeDefined();
@@ -30,7 +30,7 @@ describe("Node Telemetry adapter", () => {
   test.each(['{}\n{"type":"attachment","length":0}', '{}\n{"type":"attachment"}'])(
     "rejects a truncated item header without its terminating newline: %s",
     async body => {
-      const telemetry = createPipeline();
+      const telemetry = createTelemetryPipeline();
       expect((await telemetry.ingestPayload({ body })).status).toBe("invalid");
       expect(telemetry.getEnvelopes()).toEqual([]);
       telemetry.dispose();
@@ -38,7 +38,7 @@ describe("Node Telemetry adapter", () => {
   );
 
   test("accepts an empty attachment payload after a complete item header", async () => {
-    const telemetry = createPipeline();
+    const telemetry = createTelemetryPipeline();
     expect((await telemetry.ingestPayload({ body: '{}\n{"type":"attachment","length":0}\n' })).status).toBe("ignored");
     expect(telemetry.getEnvelopes()).toHaveLength(1);
     telemetry.dispose();
@@ -48,7 +48,7 @@ describe("Node Telemetry adapter", () => {
     ["processed", fixture],
     ["unsupported", Buffer.from('{}\n{"type":"attachment","length":5}\nhello')],
   ] as const)("subscribers observe %s raw bytes together with the envelope in one notification", async (_, body) => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     const observations: (Buffer | undefined)[] = [];
     spotlight.subscribe(snapshot => {
       const id = String(snapshot.envelopes[0][0].__spotlight_envelope_id);
@@ -59,7 +59,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("raw history bounds already apply when subscribers observe the next envelope", async () => {
-    const spotlight = createPipeline({ rawBufferSize: 1 });
+    const spotlight = createTelemetryPipeline({ decodedHistory: { maxEntries: 1 } });
     const first = await spotlight.ingestPayload({ body: fixture });
     if (first.status !== "processed") throw new Error("Expected processed envelope");
     const observations: { old: Buffer | undefined; newest: Buffer | undefined }[] = [];
@@ -75,11 +75,11 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("defaults to Sentry envelopes and exposes processed raw payloads", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     const result = await spotlight.ingestPayload({ body: fixture });
     expect(result.status).toBe("processed");
     if (result.status !== "processed") throw new Error("Expected processed envelope");
-    expect(spotlight.getQuerySummaries()).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
+    expect(spotlight.getDatabaseQuerySummaries()).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
     expect(spotlight.getDecodedPayload(result.envelopeId)).toEqual({
       body: fixture,
       contentType: "application/x-sentry-envelope",
@@ -92,25 +92,25 @@ describe("Node Telemetry adapter", () => {
     ["deflate", deflateSync],
     ["br", brotliCompressSync],
   ] as const)("decodes %s payloads", async (encoding, compress) => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     const result = await spotlight.ingestPayload({
       body: new Uint8Array(compress(fixture)),
       contentType: " Application/X-Sentry-Envelope ; charset=utf-8 ",
       encoding,
     });
     expect(result.status).toBe("processed");
-    expect(spotlight.getQuerySummaries()).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
+    expect(spotlight.getDatabaseQuerySummaries()).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
     if (result.status !== "processed") throw new Error("Expected processed envelope");
     expect(spotlight.getDecodedPayload(result.envelopeId)?.body).toEqual(fixture);
   });
 
   test("accepts serialized envelope strings", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     expect((await spotlight.ingestPayload({ body: fixture.toString("utf8") })).status).toBe("processed");
   });
 
   test("returns an explicit ignored result for unsupported content types", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     expect(await spotlight.ingestPayload({ body: fixture, contentType: "application/json" })).toMatchObject({
       status: "ignored",
       reason: expect.any(String),
@@ -119,7 +119,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("retains raw payloads for valid envelopes containing only unsupported items", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     const body = Buffer.from('{}\n{"type":"attachment","length":5}\nhello');
     const result = await spotlight.ingestPayload({ body });
     expect(result).toMatchObject({ status: "ignored", reason: "unsupported_items", envelopeId: expect.any(String) });
@@ -150,7 +150,7 @@ describe("Node Telemetry adapter", () => {
     const warnings = vi.spyOn(console, "warn").mockImplementation(() => {});
     const logs = vi.spyOn(console, "log").mockImplementation(() => {});
     try {
-      const spotlight = createPipeline();
+      const spotlight = createTelemetryPipeline();
       // Runtime validation is part of the public boundary.
       const result = await spotlight.ingestPayload(input as Parameters<typeof spotlight.ingestPayload>[0]);
       expect(result).toMatchObject({ status: "invalid", diagnostics: [{ code }] });
@@ -164,7 +164,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("copies incoming and returned raw payload bytes", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     const body = Buffer.from(fixture);
     const pending = spotlight.ingestPayload({ body });
     body.fill(0);
@@ -178,7 +178,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("bounds raw payload history independently from processed retention", async () => {
-    const spotlight = createPipeline({ rawBufferSize: 1 });
+    const spotlight = createTelemetryPipeline({ decodedHistory: { maxEntries: 1 } });
     const first = await spotlight.ingestPayload({ body: fixture });
     const second = await spotlight.ingestPayload({ body: fixture });
     if (first.status !== "processed" || second.status !== "processed") throw new Error("Expected envelopes");
@@ -191,7 +191,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("invalid ingestion cannot evict a retained raw payload", async () => {
-    const spotlight = createPipeline({ rawBufferSize: 1 });
+    const spotlight = createTelemetryPipeline({ decodedHistory: { maxEntries: 1 } });
     const first = await spotlight.ingestPayload({ body: fixture });
     if (first.status !== "processed") throw new Error("Expected processed envelope");
     expect((await spotlight.ingestPayload({ body: "not an envelope" })).status).toBe("invalid");
@@ -202,7 +202,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("retains at most 500 raw payloads by default", async () => {
-    const spotlight = createPipeline({ retention: { maxEnvelopes: 1 } });
+    const spotlight = createTelemetryPipeline({ retention: { maxEnvelopes: 1 } });
     const first = await spotlight.ingestPayload({ body: fixture });
     let last = first;
     for (let i = 0; i < 500; i++) last = await spotlight.ingestPayload({ body: fixture });
@@ -213,16 +213,16 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("zero raw buffer capacity still processes telemetry", async () => {
-    const spotlight = createPipeline({ rawBufferSize: 0 });
+    const spotlight = createTelemetryPipeline({ decodedHistory: { maxEntries: 0 } });
     const result = await spotlight.ingestPayload({ body: fixture });
     if (result.status !== "processed") throw new Error("Expected processed envelope");
     expect(spotlight.getDecodedPayload(result.envelopeId)).toBeUndefined();
-    expect(spotlight.getQuerySummaries()).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
+    expect(spotlight.getDatabaseQuerySummaries()).toMatchObject([{ count: 1, totalDurationMs: 125 }]);
   });
 
   test("processed age retention does not expire the separate raw history", async () => {
     vi.useFakeTimers();
-    const spotlight = createPipeline({ retention: { maxAgeMs: 100 } });
+    const spotlight = createTelemetryPipeline({ retention: { maxAgeMs: 100 } });
     try {
       const result = await spotlight.ingestPayload({ body: fixture });
       if (result.status !== "processed") throw new Error("Expected processed envelope");
@@ -244,7 +244,7 @@ describe("Node Telemetry adapter", () => {
     const gate = new Promise<void>(resolve => {
       release = resolve;
     });
-    const spotlight = createPipeline({
+    const spotlight = createTelemetryPipeline({
       enrichStacktrace: async () => {
         start();
         await gate;
@@ -273,7 +273,7 @@ describe("Node Telemetry adapter", () => {
 
   test("delivers invalid-input diagnostics to the configured observer", async () => {
     const diagnostics: string[] = [];
-    const spotlight = createPipeline({
+    const spotlight = createTelemetryPipeline({
       onDiagnostic: diagnostic => {
         diagnostics.push(diagnostic.code);
       },
@@ -284,7 +284,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("throwing diagnostic observers do not reject invalid input", async () => {
-    const spotlight = createPipeline({
+    const spotlight = createTelemetryPipeline({
       onDiagnostic: () => {
         throw new Error("observer failed");
       },
@@ -293,7 +293,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("reset from a subscriber cannot repopulate raw payload history", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     let reset = false;
     spotlight.subscribe(() => {
       if (!reset && spotlight.getEnvelopes().length > 0) {
@@ -309,7 +309,7 @@ describe("Node Telemetry adapter", () => {
   });
 
   test("dispose clears raw payloads and prevents subsequent ingestion", async () => {
-    const spotlight = createPipeline();
+    const spotlight = createTelemetryPipeline();
     const result = await spotlight.ingestPayload({ body: fixture });
     if (result.status !== "processed") throw new Error("Expected processed envelope");
     spotlight.dispose();
@@ -325,7 +325,7 @@ describe("bounded payload ingestion", () => {
     ["deflate", deflateSync],
     ["br", brotliCompressSync],
   ] as const)("rejects %s expansion at the decompressor output limit", async (encoding, compress) => {
-    const pipeline = createPipeline({ maxDecodedBytes: 128 });
+    const pipeline = createTelemetryPipeline({ maxDecodedBytes: 128 });
     const result = await pipeline.ingestPayload({ body: compress(Buffer.alloc(4096, 65)), encoding });
     expect(result).toMatchObject({
       status: "invalid",
@@ -337,13 +337,13 @@ describe("bounded payload ingestion", () => {
   });
 
   test("enforces input and uncompressed decoded byte limits", async () => {
-    const inputLimited = createPipeline({ maxPayloadBytes: 10 });
+    const inputLimited = createTelemetryPipeline({ maxPayloadBytes: 10 });
     expect(await inputLimited.ingestPayload({ body: fixture })).toMatchObject({
       status: "invalid",
       diagnostics: [{ code: "payload_too_large" }],
     });
     inputLimited.dispose();
-    const decodedLimited = createPipeline({ maxDecodedBytes: 10 });
+    const decodedLimited = createTelemetryPipeline({ maxDecodedBytes: 10 });
     expect(await decodedLimited.ingestPayload({ body: fixture })).toMatchObject({
       status: "invalid",
       diagnostics: [{ code: "decoded_payload_too_large" }],
@@ -352,7 +352,7 @@ describe("bounded payload ingestion", () => {
   });
 
   test("evicts raw bytes by total decoded size before notifying subscribers", async () => {
-    const pipeline = createPipeline({ maxRawBytes: fixture.length });
+    const pipeline = createTelemetryPipeline({ decodedHistory: { maxBytes: fixture.length } });
     const first = await pipeline.ingestPayload({ body: fixture });
     if (first.status !== "processed") throw new Error("Expected processed envelope");
     const observations: unknown[] = [];
@@ -367,7 +367,7 @@ describe("bounded payload ingestion", () => {
   });
 
   test("zero raw byte budget disables decoded history", async () => {
-    const pipeline = createPipeline({ maxRawBytes: 0 });
+    const pipeline = createTelemetryPipeline({ decodedHistory: { maxBytes: 0 } });
     const result = await pipeline.ingestPayload({ body: fixture });
     if (result.status !== "processed") throw new Error("Expected processed envelope");
     expect(pipeline.getDecodedPayload(result.envelopeId)).toBeUndefined();
@@ -375,7 +375,7 @@ describe("bounded payload ingestion", () => {
   });
 
   test("forwards delivery identity and abort signals to processing", async () => {
-    const pipeline = createPipeline();
+    const pipeline = createTelemetryPipeline();
     const first = await pipeline.ingestPayload({ body: fixture, deliveryId: "wire-delivery" });
     const duplicate = await pipeline.ingestPayload({ body: fixture, deliveryId: "wire-delivery" });
     expect(first.status).toBe("processed");
@@ -391,7 +391,7 @@ describe("bounded payload ingestion", () => {
   });
 
   test.each(["reset", "dispose"] as const)("%s cancels asynchronous decompression", async action => {
-    const pipeline = createPipeline();
+    const pipeline = createTelemetryPipeline();
     const pending = pipeline.ingestPayload({ body: gzipSync(fixture), encoding: "gzip" });
     await Promise.resolve();
     pipeline[action]();
@@ -401,7 +401,7 @@ describe("bounded payload ingestion", () => {
   });
 
   test("bounds concurrently admitted payloads and drain includes decoding", async () => {
-    const pipeline = createPipeline({ maxPending: 1 });
+    const pipeline = createTelemetryPipeline({ maxPending: 1 });
     const first = pipeline.ingestPayload({ body: gzipSync(fixture), encoding: "gzip" });
     expect(await pipeline.ingestPayload({ body: fixture })).toMatchObject({ status: "ignored", reason: "queue_full" });
     await pipeline.drain();
@@ -411,8 +411,8 @@ describe("bounded payload ingestion", () => {
   });
 
   test("payload batches retain order and isolate invalid entries", async () => {
-    const pipeline = createPipeline();
-    const results = await pipeline.ingestPayloadBatch([
+    const pipeline = createTelemetryPipeline();
+    const results = await pipeline.ingestPayloads([
       { body: fixture, deliveryId: "first" },
       { body: "invalid" },
       { body: fixture, deliveryId: "first" },
@@ -425,7 +425,7 @@ describe("bounded payload ingestion", () => {
 
 describe("payload lifecycle boundaries", () => {
   test("delivery IDs key decoded history before public subscriptions", async () => {
-    const pipeline = createPipeline();
+    const pipeline = createTelemetryPipeline();
     const observed: unknown[] = [];
     pipeline.subscribe(snapshot => {
       const id = String(snapshot.envelopes[0][0].__spotlight_envelope_id);
@@ -447,7 +447,7 @@ describe("payload lifecycle boundaries", () => {
       release = resolve;
     });
     const controller = new AbortController();
-    const pipeline = createPipeline({
+    const pipeline = createTelemetryPipeline({
       enrichStacktrace: async () => {
         start();
         await gate;
@@ -470,7 +470,7 @@ describe("payload lifecycle boundaries", () => {
   });
 
   test("aborting decompression does not retain or process the decoded output", async () => {
-    const pipeline = createPipeline();
+    const pipeline = createTelemetryPipeline();
     const controller = new AbortController();
     const pending = pipeline.ingestPayload({ body: gzipSync(fixture), encoding: "gzip", signal: controller.signal });
     await Promise.resolve();
@@ -480,21 +480,23 @@ describe("payload lifecycle boundaries", () => {
     pipeline.dispose();
   });
 
-  test.each(["maxPayloadBytes", "maxDecodedBytes", "maxRawBytes", "rawBufferSize"] as const)(
+  test.each(["maxPayloadBytes", "maxDecodedBytes", "maxBytes", "maxEntries"] as const)(
     "validates %s configuration",
     name => {
       for (const invalid of [-1, 0.1, Number.NaN, Number.POSITIVE_INFINITY, Number.MAX_SAFE_INTEGER + 1]) {
-        expect(() => createPipeline({ [name]: invalid })).toThrow(RangeError);
+        const options =
+          name === "maxBytes" || name === "maxEntries" ? { decodedHistory: { [name]: invalid } } : { [name]: invalid };
+        expect(() => createTelemetryPipeline(options)).toThrow(RangeError);
       }
       if (name === "maxPayloadBytes" || name === "maxDecodedBytes") {
-        expect(() => createPipeline({ [name]: 0 })).toThrow(RangeError);
+        expect(() => createTelemetryPipeline({ [name]: 0 })).toThrow(RangeError);
       }
     },
   );
 });
 
 test("Node pending stats include queued decode work and reset releases admission capacity", async () => {
-  const pipeline = createPipeline({ maxPending: 1 });
+  const pipeline = createTelemetryPipeline({ maxPending: 1 });
   const old = pipeline.ingestPayload({ body: gzipSync(fixture), encoding: "gzip" });
   expect(pipeline.getStats().pending).toBe(1);
   await Promise.resolve();
@@ -517,7 +519,7 @@ test("Node drain excludes payloads admitted after its barrier", async () => {
   const gate = new Promise<void>(resolve => {
     release = resolve;
   });
-  const pipeline = createPipeline({
+  const pipeline = createTelemetryPipeline({
     enrichStacktrace: async () => {
       start();
       await gate;
@@ -538,8 +540,8 @@ test("Node drain excludes payloads admitted after its barrier", async () => {
 });
 
 test("drain includes every entry of an already-submitted payload batch", async () => {
-  const pipeline = createPipeline({ maxPending: 1 });
-  const batch = pipeline.ingestPayloadBatch([
+  const pipeline = createTelemetryPipeline({ maxPending: 1 });
+  const batch = pipeline.ingestPayloads([
     { body: gzipSync(fixture), encoding: "gzip", deliveryId: "batch-first" },
     { body: gzipSync(fixture), encoding: "gzip", deliveryId: "batch-second" },
   ]);
@@ -550,8 +552,8 @@ test("drain includes every entry of an already-submitted payload batch", async (
 });
 
 test("reset cancels the remaining entries of a submitted payload batch", async () => {
-  const pipeline = createPipeline();
-  const batch = pipeline.ingestPayloadBatch([
+  const pipeline = createTelemetryPipeline();
+  const batch = pipeline.ingestPayloads([
     { body: gzipSync(fixture), encoding: "gzip", deliveryId: "batch-first" },
     { body: fixture, deliveryId: "batch-second" },
   ]);
@@ -576,13 +578,13 @@ test("a queued payload batch stays ahead of later payload work", async () => {
   const gate = new Promise<void>(resolve => {
     release = resolve;
   });
-  const pipeline = createPipeline({
+  const pipeline = createTelemetryPipeline({
     enrichStacktrace: async () => {
       start();
       await gate;
     },
   });
-  const batch = pipeline.ingestPayloadBatch([
+  const batch = pipeline.ingestPayloads([
     { body: gzipSync(fixture), encoding: "gzip", deliveryId: "batch-first" },
     { body: fixture, deliveryId: "batch-second" },
   ]);
@@ -605,12 +607,12 @@ describe("one Node admission queue for every input method", () => {
     [[{ type: "event" }, { event_id: id, timestamp: 1, ...(error ? { exception: { values: [] } } : {}) }]],
   ];
 
-  test.each(["ingestEnvelope", "ingestBatch"] as const)("wire admission bounds later %s calls", async method => {
-    const pipeline = createPipeline({ maxPending: 1 });
+  test.each(["ingestEnvelope", "ingestEnvelopes"] as const)("wire admission bounds later %s calls", async method => {
+    const pipeline = createTelemetryPipeline({ maxPending: 1 });
     const wire = pipeline.ingestPayload({ body: gzipSync(fixture), encoding: "gzip" });
     const input = parsedEvent("later-parsed");
     const later =
-      method === "ingestEnvelope" ? await pipeline.ingestEnvelope(input) : (await pipeline.ingestBatch([input]))[0];
+      method === "ingestEnvelope" ? await pipeline.ingestEnvelope(input) : (await pipeline.ingestEnvelopes([input]))[0];
     expect(later).toMatchObject({ status: "ignored", reason: "queue_full" });
     expect(pipeline.getStats().pending).toBe(1);
     expect((await wire).status).toBe("processed");
@@ -618,24 +620,19 @@ describe("one Node admission queue for every input method", () => {
     pipeline.dispose();
   });
 
-  test.each(["ingestPayload", "ingestPayloadBatch"] as const)(
-    "parsed admission bounds later %s calls",
-    async method => {
-      const pipeline = createPipeline({ maxPending: 1 });
-      const parsed = pipeline.ingestEnvelope(parsedEvent("first-parsed"));
-      const input = { body: fixture };
-      const later =
-        method === "ingestPayload"
-          ? await pipeline.ingestPayload(input)
-          : (await pipeline.ingestPayloadBatch([input]))[0];
-      expect(later).toMatchObject({ status: "ignored", reason: "queue_full" });
-      expect(pipeline.getStats().pending).toBe(1);
-      expect((await parsed).status).toBe("processed");
-      pipeline.dispose();
-    },
-  );
+  test.each(["ingestPayload", "ingestPayloads"] as const)("parsed admission bounds later %s calls", async method => {
+    const pipeline = createTelemetryPipeline({ maxPending: 1 });
+    const parsed = pipeline.ingestEnvelope(parsedEvent("first-parsed"));
+    const input = { body: fixture };
+    const later =
+      method === "ingestPayload" ? await pipeline.ingestPayload(input) : (await pipeline.ingestPayloads([input]))[0];
+    expect(later).toMatchObject({ status: "ignored", reason: "queue_full" });
+    expect(pipeline.getStats().pending).toBe(1);
+    expect((await parsed).status).toBe("processed");
+    pipeline.dispose();
+  });
 
-  test.each(["ingestEnvelope", "ingestBatch"] as const)("wire drain excludes a later gated %s", async method => {
+  test.each(["ingestEnvelope", "ingestEnvelopes"] as const)("wire drain excludes a later gated %s", async method => {
     let start!: () => void;
     let release!: () => void;
     const started = new Promise<void>(resolve => {
@@ -644,7 +641,7 @@ describe("one Node admission queue for every input method", () => {
     const gate = new Promise<void>(resolve => {
       release = resolve;
     });
-    const pipeline = createPipeline({
+    const pipeline = createTelemetryPipeline({
       enrichStacktrace: async () => {
         start();
         await gate;
@@ -653,10 +650,10 @@ describe("one Node admission queue for every input method", () => {
     const wire = pipeline.ingestPayload({ body: gzipSync(fixture), encoding: "gzip" });
     const drained = pipeline.drain();
     const input = parsedEvent("later-gated-parsed", true);
-    const later = method === "ingestEnvelope" ? pipeline.ingestEnvelope(input) : pipeline.ingestBatch([input]);
+    const later = method === "ingestEnvelope" ? pipeline.ingestEnvelope(input) : pipeline.ingestEnvelopes([input]);
     await started;
     // The wire job must commit first; its already-captured barrier must settle while later work is gated.
-    expect(pipeline.getQuerySummaries()).toHaveLength(1);
+    expect(pipeline.getDatabaseQuerySummaries()).toHaveLength(1);
     await drained;
     expect((await wire).status).toBe("processed");
     release();
@@ -665,12 +662,12 @@ describe("one Node admission queue for every input method", () => {
   });
 
   test("parsed batches retain order ahead of later wire jobs", async () => {
-    const pipeline = createPipeline();
+    const pipeline = createTelemetryPipeline();
     const seen: string[] = [];
     pipeline.subscribe((_snapshot, change) => {
       if (change.type === "ingest") seen.push(...change.envelopeIds);
     });
-    const batch = pipeline.ingestBatch([
+    const batch = pipeline.ingestEnvelopes([
       [{ __spotlight_envelope_id: "parsed-first" }, []],
       [{ __spotlight_envelope_id: "parsed-second" }, []],
     ]);
@@ -683,7 +680,7 @@ describe("one Node admission queue for every input method", () => {
   });
 
   test("copied standalone parsed inputs retain weak object identity across calls and batches", async () => {
-    const pipeline = createPipeline();
+    const pipeline = createTelemetryPipeline();
     const input = parsedEvent("copied-input");
     const pending = pipeline.ingestEnvelope(input);
     input[1] = [];
@@ -696,14 +693,14 @@ describe("one Node admission queue for every input method", () => {
       reason: "duplicate",
       envelopeId: "envelopeId" in first ? first.envelopeId : "missing",
     });
-    expect((await pipeline.ingestBatch([input, input])).map(item => item.status)).toEqual(["ignored", "ignored"]);
+    expect((await pipeline.ingestEnvelopes([input, input])).map(item => item.status)).toEqual(["ignored", "ignored"]);
     expect(pipeline.getEnvelopes()).toHaveLength(1);
     expect(input[0]).not.toHaveProperty("__spotlight_envelope_id");
     pipeline.dispose();
   });
 
   test("prune calls coalesce without exceeding a full shared queue", async () => {
-    const pipeline = createPipeline({ maxPending: 1 });
+    const pipeline = createTelemetryPipeline({ maxPending: 1 });
     const wire = pipeline.ingestPayload({ body: gzipSync(fixture), encoding: "gzip" });
     const first = pipeline.prune();
     const second = pipeline.prune();
@@ -716,10 +713,10 @@ describe("one Node admission queue for every input method", () => {
 });
 
 test("parsed batch clone failures produce per-item receipts and preserve later inputs", async () => {
-  const pipeline = createPipeline();
+  const pipeline = createTelemetryPipeline();
   const uncloneable = [{ bad: () => {} }, []];
   const good = [{}, [[{ type: "event" }, { event_id: "after-clone-failure", timestamp: 1 }]]];
-  const results = await pipeline.ingestBatch([uncloneable, good, good]);
+  const results = await pipeline.ingestEnvelopes([uncloneable, good, good]);
   expect(results).toMatchObject([
     { status: "invalid", diagnostics: [{ code: "invalid_envelope" }] },
     { status: "processed" },
@@ -731,10 +728,10 @@ test("parsed batch clone failures produce per-item receipts and preserve later i
 });
 
 test("reset invalidates queued parsed jobs and the remaining parsed batch entries", async () => {
-  const pipeline = createPipeline();
+  const pipeline = createTelemetryPipeline();
   const wire = pipeline.ingestPayload({ body: gzipSync(fixture), encoding: "gzip" });
   const parsed = pipeline.ingestEnvelope([{}, []]);
-  const batch = pipeline.ingestBatch([
+  const batch = pipeline.ingestEnvelopes([
     [{}, []],
     [{}, []],
   ]);
@@ -753,7 +750,7 @@ test("reset invalidates queued parsed jobs and the remaining parsed batch entrie
 test("diagnostic callbacks cannot bypass shared admission during core validation", async () => {
   const later: Promise<import("./core.ts").IngestResult>[] = [];
   const observed: number[] = [];
-  const pipeline = createPipeline({
+  const pipeline = createTelemetryPipeline({
     maxPending: 1,
     onDiagnostic() {
       observed.push(pipeline.getStats().pending);
