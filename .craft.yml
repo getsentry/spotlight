@@ -1,7 +1,7 @@
 # Craft Release Configuration
 # https://getsentry.github.io/craft/configuration/
 
-minVersion: "2.21.1"
+minVersion: "3.9.0"
 
 versioning:
   policy: auto
