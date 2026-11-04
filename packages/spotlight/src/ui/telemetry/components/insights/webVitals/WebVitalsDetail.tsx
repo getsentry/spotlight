@@ -1,14 +1,9 @@
-import { PERFORMANCE_SCORE_PROFILES } from "@spotlight/ui/telemetry/constants";
 import { useSentryEvents } from "@spotlight/ui/telemetry/data/useSentryEvents";
-import type {
-  MetricScoreProps,
-  MetricWeightsProps,
-  SentryEventWithPerformanceData,
-} from "@spotlight/ui/telemetry/types";
+import type { MetricScoreProps, MetricWeightsProps } from "@spotlight/ui/telemetry/types";
 import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
 import Breadcrumbs from "@spotlight/ui/ui/breadcrumbs";
 import { useParams } from "react-router-dom";
-import { normalizePerformanceScore } from "../../../utils/webVitals";
+import { getWebVitals } from "../../../../../telemetry/selectors/webVitals.ts";
 import EmptyState from "../../shared/EmptyState";
 import PerformanceChart from "./PerformanceChart";
 
@@ -16,17 +11,7 @@ const WebVitalsDetail = () => {
   const events = useSentryEvents();
   const { page } = useParams();
 
-  let measurementEvent: SentryEventWithPerformanceData | undefined;
-  for (const event of events) {
-    if (event.event_id === page && event.measurements && event?.contexts?.trace?.op === "pageload") {
-      const updatedEvent = { ...event };
-      normalizePerformanceScore(updatedEvent, PERFORMANCE_SCORE_PROFILES);
-      if (updatedEvent.measurements["score.total"] != null) {
-        measurementEvent = updatedEvent as unknown as SentryEventWithPerformanceData;
-        break;
-      }
-    }
-  }
+  const measurementEvent = getWebVitals(events).find(event => event.event_id === page);
 
   if (page && measurementEvent) {
     const metricScore: MetricScoreProps = {

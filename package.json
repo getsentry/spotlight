@@ -6,6 +6,7 @@
     "dev:website": "turbo dev --filter=@spotlightjs/website",
     "dev:electron": "pnpm run --filter=@spotlightjs/spotlight dev:electron",
     "build": "turbo build",
+    "test:sdk-types": "pnpm --filter @spotlightjs/spotlight test:sdk-types",
     "preview": "turbo preview",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",

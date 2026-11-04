@@ -1,11 +1,7 @@
 import { ReactComponent as Sort } from "@spotlight/ui/assets/sort.svg";
 import { ReactComponent as SortDown } from "@spotlight/ui/assets/sortDown.svg";
 import { cn } from "@spotlight/ui/lib/cn";
-import {
-  PERFORMANCE_SCORE_PROFILES,
-  WEB_VITALS_HEADERS,
-  WEB_VITALS_SORT_KEYS,
-} from "@spotlight/ui/telemetry/constants";
+import { WEB_VITALS_HEADERS, WEB_VITALS_SORT_KEYS } from "@spotlight/ui/telemetry/constants";
 import { useSentryEvents } from "@spotlight/ui/telemetry/data/useSentryEvents";
 import useSort from "@spotlight/ui/telemetry/hooks/useSort";
 import type { SentryEventWithPerformanceData } from "@spotlight/ui/telemetry/types";
@@ -13,7 +9,7 @@ import { getFormattedDuration } from "@spotlight/ui/telemetry/utils/duration";
 import Table from "@spotlight/ui/ui/table";
 import { type KeyboardEvent, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { normalizePerformanceScore } from "../../../utils/webVitals";
+import { getWebVitals } from "../../../../../telemetry/selectors/webVitals.ts";
 import EmptyState from "../../shared/EmptyState";
 
 type SentryEventComparator = (a: SentryEventWithPerformanceData, b: SentryEventWithPerformanceData) => number;
@@ -40,25 +36,7 @@ const WebVitals = () => {
   const measurementEvents: SentryEventWithPerformanceData[] = useMemo(() => {
     const compareEvents = COMPARATORS[sort.active] || COMPARATORS[WEB_VITALS_SORT_KEYS.score];
 
-    return (
-      events
-        // TODO: Skipping this check because of not getting all required metrics
-        // && !PERFORMANCE_SCORE_PROFILES.profiles[0].scoreComponents.some(c => {
-        //   return (
-        //     !Object.prototype.hasOwnProperty.call(event.measurements, c.measurement) &&
-        //     Math.abs(c.weight) >= Number.EPSILON &&
-        //     !c.optional
-        //   );
-        // })
-        .filter(event => event.measurements && event?.contexts?.trace?.op === "pageload")
-        .map(event => {
-          const updatedEvent = { ...event };
-          normalizePerformanceScore(updatedEvent, PERFORMANCE_SCORE_PROFILES);
-          return updatedEvent as unknown as SentryEventWithPerformanceData;
-        })
-        .filter(event => event.measurements["score.total"] != null)
-        .sort((a, b) => (sort.asc ? compareEvents(a, b) : compareEvents(b, a)))
-    );
+    return getWebVitals(events).sort((a, b) => (sort.asc ? compareEvents(a, b) : compareEvents(b, a)));
   }, [events, sort]);
 
   const handleRowClick = (measurementEvent: SentryEventWithPerformanceData) => {

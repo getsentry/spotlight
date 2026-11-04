@@ -44,7 +44,7 @@ function segment(overrides: Record<string, unknown> = {}) {
   });
 }
 
-function ingest(type: string, payload: unknown, contentType?: string): Envelope {
+async function ingest(type: string, payload: unknown, contentType?: string): Promise<Envelope> {
   const parsed = processEnvelope({
     contentType: "application/x-sentry-envelope",
     data: [
@@ -54,11 +54,11 @@ function ingest(type: string, payload: unknown, contentType?: string): Envelope 
     ].join("\n"),
   });
   expect(parsed).not.toBeNull();
-  useSentryStore.getState().pushEnvelope(parsed!.envelope);
+  await useSentryStore.getState().pushEnvelope(parsed!.envelope);
   return parsed!.envelope;
 }
 
-function ingestSpans(items: unknown[]) {
+async function ingestSpans(items: unknown[]) {
   return ingest("span", { version: 2, items }, "application/vnd.sentry.items.span.v2+json");
 }
 
@@ -99,8 +99,8 @@ function legacyTransaction() {
 describe("standalone span envelope ingestion", () => {
   beforeEach(() => useSentryStore.getState().resetData());
 
-  test("v2 database spans populate Queries with names, typed attributes and millisecond timing", () => {
-    const envelope = ingestSpans([streamedSpan(), segment()]);
+  test("v2 database spans populate Queries with names, typed attributes and millisecond timing", async () => {
+    const envelope = await ingestSpans([streamedSpan(), segment()]);
 
     expect(useSentryStore.getState().getTraces()).toHaveLength(1);
     expect(getQueries()).toHaveLength(1);
@@ -120,14 +120,14 @@ describe("standalone span envelope ingestion", () => {
     expect(envelope[1][0][1]).toMatchObject({ version: 2, items: [{ name: query }, {}] });
   });
 
-  test("queries are visible before their segment ends and late parents replace orphan placeholders", () => {
+  test("queries are visible before their segment ends and late parents replace orphan placeholders", async () => {
     const parentId = "83aed660f800afd4";
-    ingestSpans([streamedSpan({ parent_span_id: parentId })]);
+    await ingestSpans([streamedSpan({ parent_span_id: parentId })]);
     expect(getQueries()).toHaveLength(1);
 
-    ingestSpans([segment()]);
-    ingestSpans([streamedSpan({ span_id: parentId, name: "prisma query", attributes: {} })]);
-    ingestSpans([streamedSpan({ span_id: "bbbbbbbbbbbbbbbb", parent_span_id: parentId })]);
+    await ingestSpans([segment()]);
+    await ingestSpans([streamedSpan({ span_id: parentId, name: "prisma query", attributes: {} })]);
+    await ingestSpans([streamedSpan({ span_id: "bbbbbbbbbbbbbbbb", parent_span_id: parentId })]);
 
     expect(getQueries()).toHaveLength(2);
     expect(getTrace().transactions).toHaveLength(1);
@@ -137,18 +137,18 @@ describe("standalone span envelope ingestion", () => {
     expect(getTrace().timestamp - getTrace().start_timestamp).toBe(1000);
   });
 
-  test("repeated delivery does not duplicate query counts or span tree children", () => {
-    ingestSpans([segment(), streamedSpan()]);
-    ingestSpans([streamedSpan(), segment()]);
+  test("repeated delivery does not duplicate query counts or span tree children", async () => {
+    await ingestSpans([segment(), streamedSpan()]);
+    await ingestSpans([streamedSpan(), segment()]);
     expect(getQueries()).toHaveLength(1);
     expect(treeIds(getTrace().spanTree)).toEqual([rootId, queryId]);
     expect(getTrace().transactions).toHaveLength(1);
   });
 
-  test.each([true, false])("legacy transactions and streamed queries coexist (transaction first: %s)", first => {
-    if (first) ingest("transaction", legacyTransaction());
-    ingestSpans([streamedSpan()]);
-    if (!first) ingest("transaction", legacyTransaction());
+  test.each([true, false])("legacy transactions and streamed queries coexist (transaction first: %s)", async first => {
+    if (first) await ingest("transaction", legacyTransaction());
+    await ingestSpans([streamedSpan()]);
+    if (!first) await ingest("transaction", legacyTransaction());
 
     expect(
       getQueries()
@@ -158,8 +158,8 @@ describe("standalone span envelope ingestion", () => {
     expect(treeIds(getTrace().spanTree).sort()).toEqual([rootId, queryId, "aaaaaaaaaaaaaaaa"].sort());
   });
 
-  test("legacy standalone span items are accepted alongside v2 containers", () => {
-    ingest("span", {
+  test("legacy standalone span items are accepted alongside v2 containers", async () => {
+    await ingest("span", {
       trace_id: traceId,
       span_id: queryId,
       parent_span_id: rootId,
@@ -169,34 +169,40 @@ describe("standalone span envelope ingestion", () => {
       timestamp: 1793000000.25,
       data: { "db.system": "postgresql" },
     });
-    ingestSpans([segment()]);
+    await ingestSpans([segment()]);
     expect(getQueries()[0]).toMatchObject({ description: query, data: { "db.system": "postgresql" } });
     expect(treeIds(getTrace().spanTree)).toEqual([rootId, queryId]);
   });
 
-  test("segment spans with remote parents still supply the local trace name", () => {
-    ingestSpans([streamedSpan(), segment({ parent_span_id: "cccccccccccccccc" })]);
+  test("segment spans with remote parents still supply the local trace name", async () => {
+    await ingestSpans([streamedSpan(), segment({ parent_span_id: "cccccccccccccccc" })]);
     expect(getTrace().rootTransactionName).toBe("GET /applications/[applicationId]/subscriptions");
     expect(getTrace().rootTransaction?.contexts.trace.span_id).toBe(rootId);
     expect(getQueries()).toHaveLength(1);
   });
 
-  test("unsupported containers and invalid spans do not prevent valid spans from being ingested", () => {
-    ingest("span", { version: 99, items: [streamedSpan()] });
+  test("unsupported containers and invalid spans do not prevent valid spans from being ingested", async () => {
+    await ingest("span", { version: 99, items: [streamedSpan()] });
     expect(useSentryStore.getState().getTraces()).toHaveLength(0);
-    ingestSpans([null, {}, streamedSpan({ end_timestamp: undefined }), streamedSpan({ trace_id: "" }), streamedSpan()]);
+    await ingestSpans([
+      null,
+      {},
+      streamedSpan({ end_timestamp: undefined }),
+      streamedSpan({ trace_id: "" }),
+      streamedSpan(),
+    ]);
     expect(getQueries()).toHaveLength(1);
     expect(Number.isFinite(getTrace().timestamp)).toBe(true);
   });
 
-  test("span IDs are scoped to their trace", () => {
-    ingestSpans([streamedSpan(), streamedSpan({ trace_id: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" })]);
+  test("span IDs are scoped to their trace", async () => {
+    await ingestSpans([streamedSpan(), streamedSpan({ trace_id: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" })]);
     expect(useSentryStore.getState().getTraces()).toHaveLength(2);
     expect(getQueries()).toHaveLength(1);
   });
 
-  test("segment attributes survive subsequent segments in the same distributed trace", () => {
-    ingestSpans([
+  test("segment attributes survive subsequent segments in the same distributed trace", async () => {
+    await ingestSpans([
       segment({
         attributes: {
           "sentry.op": { type: "string", value: "http.server" },
@@ -205,7 +211,7 @@ describe("standalone span envelope ingestion", () => {
         },
       }),
     ]);
-    ingestSpans([segment({ span_id: "dddddddddddddddd", parent_span_id: rootId })]);
+    await ingestSpans([segment({ span_id: "dddddddddddddddd", parent_span_id: rootId })]);
     expect(getTrace().spans.get(rootId)?.data).toMatchObject({
       "http.request.method": "GET",
       "http.response.status_code": 200,

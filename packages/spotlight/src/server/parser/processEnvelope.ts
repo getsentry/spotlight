@@ -1,135 +1,19 @@
-import type { Envelope, EnvelopeItem } from "@sentry/core";
-import { type UUID, uuidv7obj } from "uuidv7";
-import { RAW_TYPES } from "../constants.ts";
-import { type SourceType, inferEnvelopeSource } from "../formatters/human/utils.ts";
+import { type DecodedEnvelope, decodeEnvelope } from "../../telemetry/envelope/codec.ts";
 import { logger } from "../logger.ts";
 import type { RawEventContext } from "./types.ts";
 
-/**
- * Spotlight-specific extensions added to envelope headers for internal tracking
- */
-export type SpotlightEnvelopeExtensions = {
-  __spotlight_envelope_id: UUID;
-  __spotlight_sender_user_agent?: string;
-  __spotlight_inferred_source?: SourceType;
-};
+export type { SpotlightEnvelopeExtensions } from "../../telemetry/envelope/codec.ts";
+export type ParsedEnvelope = { envelope: DecodedEnvelope; rawEnvelope: RawEventContext };
 
-export type ParsedEnvelope = {
-  envelope: [Envelope[0] & SpotlightEnvelopeExtensions, Envelope[1]];
-  rawEnvelope: RawEventContext;
-};
-
-const TEXT_CONTENT_TYPES = new Set([
-  "text/plain",
-  "text/css",
-  "text/csv",
-  "text/html",
-  "text/javascript",
-  "text/json",
-  "text/x-json",
-  "application/json",
-  "application/ld+json",
-  "application/json",
-]);
-
-/**
- * Implements parser for
- * @see https://develop.sentry.dev/sdk/envelopes/#serialization-format
- * @param rawEvent Envelope data
- * @param senderUserAgent Optional User-Agent header from the HTTP request sending the envelope
- * @returns parsed envelope
- */
-export function processEnvelope(rawEvent: RawEventContext, senderUserAgent?: string): ParsedEnvelope | null {
-  let buffer = typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
-
-  function readLine(length?: number) {
-    const cursor = length ?? getLineEnd(buffer);
-    const line = buffer.subarray(0, cursor);
-    buffer = buffer.subarray(cursor + 1);
-    return line;
-  }
-
-  const envelopeHeader = parseJSONFromBuffer(readLine()) as Envelope[0];
-  if (!envelopeHeader) {
-    logger.error("Malformed envelope header, skipping...");
-    return null;
-  }
-
-  envelopeHeader.__spotlight_envelope_id = uuidv7obj();
-
-  // Store sender User-Agent for improved SDK categorization
-  if (senderUserAgent) {
-    envelopeHeader.__spotlight_sender_user_agent = senderUserAgent;
-  }
-
-  const items: EnvelopeItem[] = [];
-  while (buffer.length) {
-    const itemHeader = parseJSONFromBuffer(readLine()) as EnvelopeItem[0];
-    if (!itemHeader) {
-      logger.error("Malformed envelope item header, skipping envelope...");
-      return null;
-    }
-    const payloadLength = itemHeader.length;
-    const itemPayloadRaw = readLine(payloadLength);
-
-    let itemPayload: EnvelopeItem[1];
-    try {
-      if (RAW_TYPES.has(itemHeader.type)) {
-        const rawPayload = itemPayloadRaw as Buffer;
-        if (
-          !itemHeader.content_type &&
-          // @ts-expect-error -- statsd is an old and deprecated event type but have envelopes for that
-          itemHeader.type === "statsd"
-        ) {
-          // @ts-expect-error -- same as above
-          itemHeader.content_type = "text/plain";
-        }
-        itemPayload = {
-          data: rawPayload.toString(TEXT_CONTENT_TYPES.has(itemHeader.content_type as string) ? "utf-8" : "base64"),
-        } as EnvelopeItem[1];
-      } else {
-        itemPayload = parseJSONFromBuffer(itemPayloadRaw);
-        if (!itemPayload) {
-          logger.error(itemHeader);
-        } else if (itemHeader.type) {
-          // data sanitization
-          // @ts-expect-error ts(2339) -- We should really stop adding type to payloads
-          itemPayload.type = itemHeader.type;
-        }
-      }
-    } catch (err) {
-      itemPayload = itemPayloadRaw;
-      logger.error(err);
-    }
-
-    items.push([itemHeader, itemPayload] as EnvelopeItem);
-  }
-
-  // Infer the envelope source (browser, server, or mobile) for UI display
-  // Scan all events to find a deterministic match
-  const eventPayloads = items.map(([, payload]) => payload);
-  envelopeHeader.__spotlight_inferred_source = inferEnvelopeSource(envelopeHeader, eventPayloads);
-
-  return {
-    envelope: [envelopeHeader, items] as ParsedEnvelope["envelope"],
-    rawEnvelope: rawEvent,
-  };
-}
-
-function getLineEnd(data: Uint8Array): number {
-  let end = data.indexOf(0xa);
-  if (end === -1) {
-    end = data.length;
-  }
-
-  return end;
-}
-
-function parseJSONFromBuffer<T = unknown>(data: Uint8Array): T {
-  try {
-    return JSON.parse(new TextDecoder().decode(data)) as T;
-  } catch (err) {
-    logger.error(err);
-    return null as T;
-  }
+/** Legacy sidecar wrapper: preserve permissive parsing and default logger reporting. */
+export function processEnvelope(
+  rawEvent: RawEventContext,
+  senderUserAgent?: string,
+  reportError: (error: unknown) => void = error => logger.error(error),
+  strict = false,
+): ParsedEnvelope | null {
+  const bytes =
+    typeof rawEvent.data === "string" ? Uint8Array.from(rawEvent.data, c => c.charCodeAt(0)) : rawEvent.data;
+  const envelope = decodeEnvelope(bytes, senderUserAgent, reportError, strict);
+  return envelope ? { envelope, rawEnvelope: rawEvent } : null;
 }

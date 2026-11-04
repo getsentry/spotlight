@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import type { SentryErrorEvent } from "../types";
 import useErrorFiltering from "./useErrorFiltering";
 
-function makeError(overrides: Partial<SentryErrorEvent> & { type: string; value: string }): SentryErrorEvent {
+function makeError(
+  overrides: Partial<Omit<SentryErrorEvent, "type">> & { type: string; value: string },
+): SentryErrorEvent {
   const { type, value, ...rest } = overrides;
   return {
     event_id: `${type}-${value}`,

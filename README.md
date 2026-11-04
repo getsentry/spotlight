@@ -36,6 +36,12 @@ Spotlight offers two main ways to work with your development telemetry:
 
 Spotlight uses Sentry SDKs to capture telemetry data and sends it to the Sidecar, a local proxy server running on your machine. The Sidecar processes these events and forwards them to the UI, where you can view everything in real-time via the web interface or stream output to your terminal. Spotlight works standalone or alongside your existing Sentry setup without interference.
 
+## Embed the telemetry SDK
+
+Use `createTelemetryStore()` from `@spotlightjs/spotlight/sdk/core` to process parsed Sentry envelopes in portable runtimes, or `createTelemetryPipeline()` from `@spotlightjs/spotlight/sdk/node` for serialized and compressed Node payloads. Both share the same processing, receipts, readers, and retention controls.
+
+See the [SDK reference](packages/spotlight/README.md) and [executable examples](packages/spotlight/examples/sdk) for integration, retries, cancellation, paging, JSON exports, and React subscriptions.
+
 ## Links
 
 - [![Documentation](https://img.shields.io/badge/documentation-spotlight-indigo.svg)](https://spotlightjs.com/about/)

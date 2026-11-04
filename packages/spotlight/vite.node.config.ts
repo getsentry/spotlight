@@ -43,6 +43,8 @@ export default defineConfig({
         run: resolve(__dirname, "src/run.ts"),
         "server/main": resolve(__dirname, "src/server/main.ts"),
         "server/sdk": resolve(__dirname, "src/server/sdk.ts"),
+        "sdk/core": resolve(__dirname, "src/sdk/core.ts"),
+        "sdk/node": resolve(__dirname, "src/sdk/node.ts"),
       },
       formats: ["es"],
     },
@@ -71,6 +73,7 @@ export default defineConfig({
         "uuidv7",
         "yaml",
         "zod",
+        "zustand/vanilla",
       ],
       output: {
         entryFileNames: "[name].js",

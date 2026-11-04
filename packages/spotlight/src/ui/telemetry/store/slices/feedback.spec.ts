@@ -8,7 +8,7 @@ describe("feedback envelope ingestion", () => {
     useSentryStore.getState().resetData();
   });
 
-  test("pushEnvelope stores a feedback item as a retrievable event", () => {
+  test("pushEnvelope stores a feedback item as a retrievable event", async () => {
     const envelope = [
       {
         event_id: "feedback-event-id",
@@ -35,7 +35,7 @@ describe("feedback envelope ingestion", () => {
       ],
     ] as unknown as Envelope;
 
-    useSentryStore.getState().pushEnvelope(envelope);
+    await useSentryStore.getState().pushEnvelope(envelope);
 
     const events = useSentryStore.getState().getEvents();
     const feedbackEvents = events.filter(isFeedbackEvent);

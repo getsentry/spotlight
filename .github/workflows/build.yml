@@ -113,6 +113,9 @@ jobs:
           FOSSILIZE_PLATFORMS: linux-x64,linux-arm64,win-x64,darwin-x64,darwin-arm64
           FOSSILIZE_SIGN: ${{ github.event_name == 'push' && (github.ref_name == 'main' || startsWith(github.ref_name, 'release/')) && 'y' || 'n' }}
         run: pnpm build
+
+      - name: Check built SDK types and run examples
+        run: pnpm test:sdk-types
       
       - name: Checking npx
         run: npx ./packages/spotlight --help
