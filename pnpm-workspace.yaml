@@ -7,12 +7,12 @@ catalog:
   "@types/node": ^22.15.21
   "@types/react": ^18.3.11
   "@types/react-dom": ^18.3.0
-  "@sentry/astro": ^10.31.0
-  "@sentry/core": ^10.31.0
-  "@sentry/node": ^10.31.0
+  "@sentry/astro": ^10.78.0
+  "@sentry/core": ^10.78.0
+  "@sentry/node": ^10.78.0
   react: ^18.3.1
   react-dom: ^18.3.1
   tailwindcss: ^4.1.10
   typescript: ^5.6.2
   vite: ^8.1.0
-  vitest: ^4.1.11
+  vitest: ^4.1.12
