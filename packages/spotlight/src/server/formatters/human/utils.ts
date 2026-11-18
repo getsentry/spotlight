@@ -79,8 +79,8 @@ function inferSourceFromEvent(event: any): SourceType | null {
     return "browser";
   }
 
-  // Runtime context indicates server
-  if (event.contexts?.runtime?.name) {
+  // Runtime context indicates server, except the browser runtime emitted by browser SDKs
+  if (event.contexts?.runtime?.name && event.contexts.runtime.name !== "browser") {
     return "server";
   }
 
